@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski", "Gablarski\Gablarski.csproj", "{7991BCA7-9FAF-435D-8ACE-B01CD5FD906B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GablarskiClient", "GablarskiClient\GablarskiClient.csproj", "{AC568A70-8BBF-4EEE-86E5-435EA8605E78}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GablarskiServer", "GablarskiServer\GablarskiServer.csproj", "{E75B29A9-DC0E-4BB1-9E54-B5AEB45BD15E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7991BCA7-9FAF-435D-8ACE-B01CD5FD906B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7991BCA7-9FAF-435D-8ACE-B01CD5FD906B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7991BCA7-9FAF-435D-8ACE-B01CD5FD906B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7991BCA7-9FAF-435D-8ACE-B01CD5FD906B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC568A70-8BBF-4EEE-86E5-435EA8605E78}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC568A70-8BBF-4EEE-86E5-435EA8605E78}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC568A70-8BBF-4EEE-86E5-435EA8605E78}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC568A70-8BBF-4EEE-86E5-435EA8605E78}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E75B29A9-DC0E-4BB1-9E54-B5AEB45BD15E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E75B29A9-DC0E-4BB1-9E54-B5AEB45BD15E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E75B29A9-DC0E-4BB1-9E54-B5AEB45BD15E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E75B29A9-DC0E-4BB1-9E54-B5AEB45BD15E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
