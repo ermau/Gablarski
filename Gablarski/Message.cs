@@ -27,12 +27,36 @@ namespace Gablarski
 			private set;
 		}
 
-		public abstract void Encode (NetBuffer buffer);
-
-		protected void EncodeHeader (NetBuffer buffer)
+		public NetBuffer GetBuffer ()
 		{
-			buffer.Write (FirstByte);
-			buffer.WriteVariableInt32 (this.Connection.AuthHash);
+			this.buffer = this.Connection.CreateBuffer ();
+			this.buffer.Write (FirstByte);
+			this.buffer.WriteVariableUInt32 (this.MessageTypeCode);
+			this.buffer.WriteVariableInt32 (this.Connection.AuthHash);
+
+			return this.buffer;
+		}
+
+		public void Send (NetClient client, NetChannel channel)
+		{
+			client.SendMessage (this.buffer, channel);
+		}
+
+		public void Send (NetServer server, NetConnection recipient, NetChannel channel)
+		{
+			server.SendMessage (this.buffer, recipient, channel);
+		}
+
+		public void Send (NetServer server, IList<NetConnection> recipients, NetChannel channel)
+		{
+			server.SendMessage (this.buffer, recipients, channel);
+		}
+
+		private NetBuffer buffer;
+
+		protected abstract uint MessageTypeCode
+		{
+			get;
 		}
 	}
 }

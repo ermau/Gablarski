@@ -45,8 +45,10 @@ namespace Gablarski.Server
 					{
 						case NetMessageType.StatusChanged:
 						{
-							if (sender.Status == NetConnectionStatus.Connecting)
-								sender.Tag = new UserConnection (GenerateHash ());
+							if (sender.Status == NetConnectionStatus.Connected)
+								sender.Tag = new UserConnection (GenerateHash (), Server);
+
+							ConnectionHandler (sender, buffer);
 
 							break;
 						}
@@ -74,7 +76,9 @@ namespace Gablarski.Server
 
 		static void ConnectionHandler (NetConnection connection, NetBuffer buffer)
 		{
-			
+			ServerMessage msg = new ServerMessage ((UserConnection)connection.Tag);
+			msg.MessageType = ServerMessages.Connected;
+			msg.Send (Server, connection, NetChannel.ReliableInOrder1);
 		}
 	}
 }

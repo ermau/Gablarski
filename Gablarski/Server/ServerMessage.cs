@@ -16,9 +16,9 @@ namespace Gablarski.Server
 		{
 		}
 
-		public override void Encode (NetBuffer buffer)
+		protected override uint MessageTypeCode
 		{
-			EncodeHeader (buffer);
+			get { return (uint)this.MessageType; }
 		}
 	}
 

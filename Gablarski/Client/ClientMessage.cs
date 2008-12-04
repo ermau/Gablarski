@@ -17,9 +17,9 @@ namespace Gablarski.Client
 		{
 		}
 
-		public override void Encode (NetBuffer buffer)
+		protected override uint MessageTypeCode
 		{
-			EncodeHeader (buffer);
+			get { return (uint)this.MessageType; }
 		}
 	}
 
@@ -27,7 +27,6 @@ namespace Gablarski.Client
 		: uint
 	{
 		Ping		= 1,
-		Connect		= 2,
-		Login		= 3
+		Login		= 2
 	}
 }
