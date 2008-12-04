@@ -11,7 +11,7 @@ namespace Gablarski.Server
 {
 	public class GablarskiServer
 	{
-		public event EventHandler ClientConnected;
+		public event EventHandler<ServerEventArgs> ClientConnected;
 
 		public bool IsRunning
 		{
@@ -76,6 +76,8 @@ namespace Gablarski.Server
 				NetMessageType type;
 				while (Server.ReadMessage (buffer, out type, out sender))
 				{
+					ServerEventArgs e = new ServerEventArgs (sender, buffer);
+
 					switch (type)
 					{
 						case NetMessageType.StatusChanged:
@@ -83,7 +85,7 @@ namespace Gablarski.Server
 								if (sender.Status == NetConnectionStatus.Connected)
 									sender.Tag = new UserConnection(GenerateHash(), Server);
 
-								ConnectionHandler (this, sender, buffer);
+								this.OnClientConnected (e);
 
 								break;
 							}
@@ -95,8 +97,12 @@ namespace Gablarski.Server
 
 							ClientMessages messageType = (ClientMessages)buffer.ReadVariableUInt32();
 
-							if (Handlers.ContainsKey (messageType))
-								Handlers[messageType](this, sender, buffer);
+							switch (messageType)
+							{
+								case ClientMessages.Login:
+									this.OnClientLogin (e);
+									break;
+							}
 
 							break;
 					}
@@ -104,38 +110,45 @@ namespace Gablarski.Server
 			}
 		}
 
-		protected virtual void OnClientConnected (EventArgs e)
+		protected virtual void OnClientConnected (ServerEventArgs e)
 		{
+			ServerMessage msg = new ServerMessage((UserConnection)e.Connection.Tag);
+			msg.MessageType = ServerMessages.Connected;
+			msg.Send(this.Server, e.Connection, NetChannel.ReliableInOrder1);
+
 			var connected = this.ClientConnected;
 			if (connected != null)
 				connected (this, e);
 		}
 
-		private static Dictionary<ClientMessages, Action<GablarskiServer, NetConnection, NetBuffer>> Handlers;
-		static GablarskiServer()
+		protected virtual void OnClientLogin (ServerEventArgs e)
 		{
-			Handlers = new Dictionary<ClientMessages, Action<GablarskiServer, NetConnection, NetBuffer>>
-			{
-				{ ClientMessages.Login, LoginHandler }
-			};
-
+			
 		}
 
 		static int GenerateHash()
 		{
 			return DateTime.Now.Millisecond + DateTime.Now.Second + 42;
 		}
+	}
 
-		static void ConnectionHandler (GablarskiServer server, NetConnection connection, NetBuffer buffer)
+	public class ServerEventArgs
+		: EventArgs
+	{
+		public ServerEventArgs (NetConnection connection, NetBuffer buffer)
 		{
-			ServerMessage msg = new ServerMessage((UserConnection)connection.Tag);
-			msg.MessageType = ServerMessages.Connected;
-			msg.Send (server.Server, connection, NetChannel.ReliableInOrder1);
+			this.Connection = connection;
+			this.Buffer = buffer;
 		}
 
-		static void LoginHandler (GablarskiServer server, NetConnection connection, NetBuffer buffer)
+		public NetConnection Connection
 		{
-			
+			get; private set;
+		}
+
+		public NetBuffer Buffer
+		{
+			get; private set;
 		}
 	}
 }
