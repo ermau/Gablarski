@@ -46,7 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ByteExtensions.cs" />
-    <Compile Include="Client\Connection.cs" />
+    <Compile Include="Client\ClientConnection.cs" />
     <Compile Include="Server\IAuthProvider.cs" />
     <Compile Include="Server\IChatServerProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -55,6 +55,12 @@
     <Compile Include="Server\ServerMessage.cs" />
     <Compile Include="User.cs" />
     <Compile Include="UserConnection.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Lidgren.Network\Lidgren.Network.csproj">
+      <Project>{BA202214-F6F8-4853-BCC9-CA4F13C5F479}</Project>
+      <Name>Lidgren.Network</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
