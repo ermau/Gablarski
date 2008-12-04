@@ -11,7 +11,7 @@ namespace Gablarski.Server
 {
 	public class GablarskiServer
 	{
-		public event EventHandler<ServerEventArgs> ClientConnected;
+		public event EventHandler<ConnectionEventArgs> ClientConnected;
 
 		public bool IsRunning
 		{
@@ -76,7 +76,7 @@ namespace Gablarski.Server
 				NetMessageType type;
 				while (Server.ReadMessage (buffer, out type, out sender))
 				{
-					ServerEventArgs e = new ServerEventArgs (sender, buffer);
+					ConnectionEventArgs e = new ConnectionEventArgs(sender, buffer);
 
 					switch (type)
 					{
@@ -110,7 +110,7 @@ namespace Gablarski.Server
 			}
 		}
 
-		protected virtual void OnClientConnected (ServerEventArgs e)
+		protected virtual void OnClientConnected(ConnectionEventArgs e)
 		{
 			ServerMessage msg = new ServerMessage((UserConnection)e.Connection.Tag);
 			msg.MessageType = ServerMessages.Connected;
@@ -121,7 +121,7 @@ namespace Gablarski.Server
 				connected (this, e);
 		}
 
-		protected virtual void OnClientLogin (ServerEventArgs e)
+		protected virtual void OnClientLogin(ConnectionEventArgs e)
 		{
 			
 		}
@@ -129,26 +129,6 @@ namespace Gablarski.Server
 		static int GenerateHash()
 		{
 			return DateTime.Now.Millisecond + DateTime.Now.Second + 42;
-		}
-	}
-
-	public class ServerEventArgs
-		: EventArgs
-	{
-		public ServerEventArgs (NetConnection connection, NetBuffer buffer)
-		{
-			this.Connection = connection;
-			this.Buffer = buffer;
-		}
-
-		public NetConnection Connection
-		{
-			get; private set;
-		}
-
-		public NetBuffer Buffer
-		{
-			get; private set;
 		}
 	}
 }

@@ -39,20 +39,25 @@ namespace Gablarski
 
 		public void Send (NetClient client, NetChannel channel)
 		{
-			client.SendMessage (this.buffer, channel);
+			client.SendMessage (this.Buffer, channel);
 		}
 
 		public void Send (NetServer server, NetConnection recipient, NetChannel channel)
 		{
-			server.SendMessage (this.buffer, recipient, channel);
+			server.SendMessage (this.Buffer, recipient, channel);
 		}
 
 		public void Send (NetServer server, IList<NetConnection> recipients, NetChannel channel)
 		{
-			server.SendMessage (this.buffer, recipients, channel);
+			server.SendMessage (this.Buffer, recipients, channel);
 		}
 
 		private NetBuffer buffer;
+
+		protected NetBuffer Buffer
+		{
+			get { return (this.buffer ?? this.GetBuffer()); }
+		}
 
 		protected abstract uint MessageTypeCode
 		{

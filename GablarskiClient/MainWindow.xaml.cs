@@ -23,5 +23,11 @@ namespace GablarskiClient
 		{
 			InitializeComponent ();
 		}
+
+		private void button1_Click(object sender, RoutedEventArgs e)
+		{
+			Gablarski.Client.GablarskiClient client = new Gablarski.Client.GablarskiClient();
+			client.Connect ("localhost", 6112);
+		}
 	}
 }

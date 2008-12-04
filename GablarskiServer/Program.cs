@@ -33,6 +33,7 @@ namespace Gablarski.Server
 			Console.WriteLine ("Gablarski Server v" + Assembly.GetExecutingAssembly ().GetName ().Version + " starting up...");
 			
 			GablarskiServer server = new GablarskiServer();
+			server.ClientConnected += (sender, e) => Trace.WriteLine ("Client connected.");
 			server.Start();
 		}
 	}

@@ -47,12 +47,16 @@
   <ItemGroup>
     <Compile Include="ByteExtensions.cs" />
     <Compile Include="Client\ClientConnection.cs" />
+    <Compile Include="Client\GablarskiClient.cs" />
+    <Compile Include="ConnectionEventArgs.cs" />
+    <Compile Include="IPlugin.cs" />
     <Compile Include="Server\IAuthProvider.cs" />
     <Compile Include="Server\IChatServerProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="Client\ClientMessage.cs" />
     <Compile Include="Server\GablarskiServer.cs" />
+    <Compile Include="Server\IServerPlugin.cs" />
     <Compile Include="Server\ServerMessage.cs" />
     <Compile Include="User.cs" />
     <Compile Include="UserConnection.cs" />
