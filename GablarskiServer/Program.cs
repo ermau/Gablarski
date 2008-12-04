@@ -18,7 +18,17 @@ namespace Gablarski.Server
 		static void Main (string[] args)
 		{
 			Trace.UseGlobalLock = true;
-			Trace.Listeners.Add (new ConsoleListener());
+			Trace.Listeners.Add(new ConsoleListener());
+
+			if (!Debugger.IsAttached)
+			{
+				AppDomain.CurrentDomain.UnhandledException += delegate (object sender, UnhandledExceptionEventArgs e)
+				{
+					var ex = (Exception)e.ExceptionObject;
+					Trace.WriteLine (ex.Message);
+					Trace.WriteLine (ex.StackTrace);
+				};
+			}
 			
 			Console.WriteLine ("Gablarski Server v" + Assembly.GetExecutingAssembly ().GetName ().Version + " starting up...");
 			
