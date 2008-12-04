@@ -25,21 +25,24 @@ namespace Gablarski.Server.Providers
 			return loggedIn;
 		}
 
-		public bool Login (string username, string password)
+		public User Login (string username, string password)
 		{
 			rwl.EnterUpgradeableReadLock ();
 			if (!users.ContainsKey (username))
 			{
+				NickAuthUser user = new NickAuthUser ((uint)users.Count, username);
+
 				rwl.EnterWriteLock ();
-				users.Add (username, new User (username));
+				users.Add (username, user);
 				rwl.ExitWriteLock ();
 				rwl.ExitUpgradeableReadLock ();
-				return true;
+				
+				return user;
 			}
 			else
 			{
 				rwl.ExitUpgradeableReadLock ();
-				return false;
+				return null;
 			}
 		}
 
@@ -47,5 +50,22 @@ namespace Gablarski.Server.Providers
 
 		private readonly static ReaderWriterLockSlim rwl = new ReaderWriterLockSlim ();
 		private readonly static Dictionary<string, User> users = new Dictionary<string, User> ();
+	}
+
+	public class NickAuthUser
+		: User
+	{
+		internal NickAuthUser (uint userID, string nickname)
+			: base (nickname)
+		{
+			this.id = userID;
+		}
+
+		public override uint ID
+		{
+			get { return this.id; }
+		}
+
+		private readonly uint id;
 	}
 }

@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Lidgren.Network;
 
 namespace Gablarski
 {
 	public abstract class Message<TMessage>
-		where TMessage : Enum
 	{
 		public const byte FirstByte = (byte)42;
 
@@ -27,6 +27,12 @@ namespace Gablarski
 			private set;
 		}
 
-		public abstract byte[] ToByteArray ();
+		public abstract void Encode (NetBuffer buffer);
+
+		protected void EncodeHeader (NetBuffer buffer)
+		{
+			buffer.Write (FirstByte);
+			buffer.WriteVariableInt32 (this.Connection.AuthHash);
+		}
 	}
 }

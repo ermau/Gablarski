@@ -7,15 +7,15 @@ namespace Gablarski
 {
 	public class UserConnection
 	{
-		public UserConnection (User user)
+		public UserConnection (int hash)
 		{
-			this.User = user;
+			this.AuthHash = hash;
 		}
 
 		public User User
 		{
 			get;
-			private set;
+			set;
 		}
 
 		public int AuthHash

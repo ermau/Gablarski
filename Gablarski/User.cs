@@ -5,11 +5,16 @@ using System.Text;
 
 namespace Gablarski
 {
-	public class User
+	public abstract class User
 	{
-		public User (string nickname)
+		protected User (string nickname)
 		{
 			this.Nickname = nickname;
+		}
+
+		public abstract uint ID
+		{
+			get;
 		}
 
 		public string Nickname
@@ -20,8 +25,9 @@ namespace Gablarski
 
 		public string Username
 		{
-			get;
-			private set;
+			get { return (this.username ?? this.Nickname); }
 		}
+
+		private string username;
 	}
 }

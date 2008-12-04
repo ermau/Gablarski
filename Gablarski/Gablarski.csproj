@@ -46,12 +46,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ByteExtensions.cs" />
-    <Compile Include="IAuthProvider.cs" />
-    <Compile Include="IChatServerProvider.cs" />
+    <Compile Include="Client\Connection.cs" />
+    <Compile Include="Server\IAuthProvider.cs" />
+    <Compile Include="Server\IChatServerProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Message.cs" />
-    <Compile Include="ClientMessage.cs" />
-    <Compile Include="ServerMessage.cs" />
+    <Compile Include="Client\ClientMessage.cs" />
+    <Compile Include="Server\ServerMessage.cs" />
     <Compile Include="User.cs" />
     <Compile Include="UserConnection.cs" />
   </ItemGroup>
