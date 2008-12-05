@@ -37,6 +37,18 @@ namespace Gablarski.Server
 			set { this.maxConnections = value; }
 		}
 
+		public IEnumerable<UserConnection> Users
+		{
+			get
+			{
+				userRWL.EnterReadLock ();
+				IEnumerable<UserConnection> users = this.users.Values.ToList ();
+				userRWL.ExitReadLock ();
+
+				return users;
+			}
+		}
+
 		public void Start ()
 		{
 			if (this.IsRunning)
@@ -52,7 +64,7 @@ namespace Gablarski.Server
 		public void Shutdown ()
 		{
 			this.IsRunning = false;
-			Server.Connections.ForEach (nc => nc.Disconnect ("Server shutting down.", 0.5f));
+			Server.Connections.ForEach (nc => nc.Disconnect ("Server shutting down.", 0.0f));
 			this.ServerThread.Join();
 
 			Server.Dispose();
@@ -88,15 +100,16 @@ namespace Gablarski.Server
 				NetMessageType type;
 				while (Server.ReadMessage (buffer, out type, out sender))
 				{
-					ConnectionEventArgs e = new ConnectionEventArgs(sender, buffer);
+					ConnectionEventArgs e = new ConnectionEventArgs (sender, buffer);
 
 					switch (type)
 					{
 						case NetMessageType.StatusChanged:
 							if (sender.Status == NetConnectionStatus.Connected)
-								sender.Tag = new UserConnection(GenerateHash(), Server);
-
-							this.OnClientConnected (e);
+							{
+								sender.Tag = new UserConnection (GenerateHash (), Server);
+								this.OnClientConnected (e);
+							}
 
 							break;
 
@@ -120,11 +133,19 @@ namespace Gablarski.Server
 			}
 		}
 
-		protected virtual void OnClientConnected(ConnectionEventArgs e)
+		protected virtual void OnClientConnected (ConnectionEventArgs e)
 		{
+			userRWL.EnterUpgradeableReadLock ();
+			if (this.pendingLogins.ContainsKey (e.UserConnection.AuthHash))
+			{
+				userRWL.ExitUpgradeableReadLock ();
+				return;
+			}
+
 			userRWL.EnterWriteLock();
 			this.pendingLogins.Add (e.UserConnection.AuthHash, DateTime.Now);
 			userRWL.ExitWriteLock();
+			userRWL.ExitUpgradeableReadLock ();
 
 			ServerMessage msg = new ServerMessage (ServerMessages.Connected, e.UserConnection);
 			msg.Send (this.Server, e.Connection, NetChannel.ReliableInOrder1);
@@ -136,16 +157,22 @@ namespace Gablarski.Server
 
 		protected virtual void OnClientLogin (ConnectionEventArgs e)
 		{
+			int hash = e.Buffer.ReadVariableInt32 ();
+
 			userRWL.EnterUpgradeableReadLock();
-			
-			if (!this.pendingLogins.ContainsKey (e.UserConnection.AuthHash))
+
+			if (!this.pendingLogins.ContainsKey (hash))
 				this.DisconnectUser (e.UserConnection, "Auth Hash Failure", e.Connection);
+			else
+				e.UserConnection.AuthHash = hash;
 
 			userRWL.ExitUpgradeableReadLock();
 
 			string nickname = e.Buffer.ReadString();
 			string username = e.Buffer.ReadString();
 			string password = e.Buffer.ReadString();
+
+			Trace.WriteLine ("Login attempt: " + nickname);
 
 			LoginResult result = null;
 
@@ -159,7 +186,7 @@ namespace Gablarski.Server
 
 				userRWL.EnterReadLock();
 
-				if (this.users.Values.Where(uc => uc.User.Nickname == nickname).Any())
+				if (this.users.Values.Where (uc => uc.User.Nickname == nickname).Any())
 				{
 					this.DisconnectUser(e.UserConnection, "User already logged in.", e.Connection);
 					return;
@@ -204,6 +231,7 @@ namespace Gablarski.Server
 			userRWL.ExitWriteLock();
 
 			ServerMessage msg = new ServerMessage (ServerMessages.LoggedIn, e.UserConnection);
+			msg.Send (this.Server, e.Connection, NetChannel.ReliableInOrder1);
 
 			var login = this.UserLogin;
 			if (login != null)
@@ -212,6 +240,8 @@ namespace Gablarski.Server
 
 		protected void DisconnectUser (UserConnection userc, string reason, NetConnection netc)
 		{
+			Trace.WriteLine ("Disconnecting user '" + ((userc.User != null) ? userc.User.Nickname ?? userc.User.Username : "Unknown") + "': " + reason);
+
 			netc.Disconnect (reason, 0);
 
 			userRWL.EnterWriteLock();

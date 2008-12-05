@@ -6,6 +6,9 @@ using System.Threading;
 
 namespace Gablarski.Server.Providers
 {
+	/// <summary>
+	/// An authentication provider for no-registration
+	/// </summary>
 	public class NicknameAuthenticationProvider
 		: IAuthProvider
 	{
@@ -13,7 +16,7 @@ namespace Gablarski.Server.Providers
 
 		public bool CheckUserExists (string username)
 		{
-			return true;
+			return false;
 		}
 
 		public LoginResult Login (string nickname)

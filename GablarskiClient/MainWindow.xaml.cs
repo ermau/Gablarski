@@ -34,19 +34,19 @@ namespace GablarskiClient
 			client.Login (this.nickname.Text);
 		}
 
-		void client_LoggedIn(object sender, Gablarski.ConnectionEventArgs e)
+		void client_LoggedIn (object sender, Gablarski.ConnectionEventArgs e)
 		{
 			this.SetStatusImage ("./Resources/key.png");
 		}
 
 		private void client_Disconnected (object sender, Gablarski.ReasonEventArgs e)
 		{
-			this.SetStatusImage("./Resources/disconnect.png");
+			this.SetStatusImage ("./Resources/disconnect.png");
 		}
 
 		private void client_Connected (object sender, Gablarski.ConnectionEventArgs e)
 		{
-			this.SetStatusImage("./Resources/connect.png");
+			this.SetStatusImage ("./Resources/connect.png");
 		}
 
 		private void SetStatusImage (string uri)

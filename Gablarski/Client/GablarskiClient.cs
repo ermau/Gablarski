@@ -29,6 +29,8 @@ namespace Gablarski.Client
 				throw new InvalidOperationException ("Client already running.");
 
 			this.IsRunning = true;
+			this.connecting = true;
+
 			this.client = new NetClient(new NetConfiguration("Gablarski"));
 
 			this.runnerThread = new Thread (this.ClientRunner)
@@ -48,8 +50,13 @@ namespace Gablarski.Client
 
 		public void Login (string nickname, string username, string password)
 		{
-			if (!this.IsRunning || this.connection == null)
+			if (!this.IsRunning || (this.connection == null && !this.connecting))
 				throw new InvalidOperationException("Must be connected before logging in.");
+			else if (this.connecting || this.connecting != null)
+			{
+				while (this.connecting)
+					Thread.Sleep (1);
+			}
 
 			ClientMessage msg = new ClientMessage (ClientMessages.Login, this.connection);
 			NetBuffer buffer = msg.GetBuffer ();
@@ -60,6 +67,7 @@ namespace Gablarski.Client
 			msg.Send (this.client, NetChannel.ReliableInOrder1);
 		}
 
+		private bool connecting;
 		private UserConnection connection;
 		private Thread runnerThread;
 		private NetClient client;
@@ -78,6 +86,8 @@ namespace Gablarski.Client
 
 		protected virtual void OnConnected (ConnectionEventArgs e)
 		{
+			this.connecting = false;
+
 			var connected = this.Connected;
 			if (connected != null)
 				connected (this, e);

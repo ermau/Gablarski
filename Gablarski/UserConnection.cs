@@ -23,7 +23,7 @@ namespace Gablarski
 		public int AuthHash
 		{
 			get;
-			private set;
+			internal set;
 		}
 
 		public NetBuffer CreateBuffer()
