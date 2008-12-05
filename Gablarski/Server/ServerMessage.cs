@@ -11,8 +11,8 @@ namespace Gablarski.Server
 	public class ServerMessage
 		: Message<ServerMessages>
 	{
-		public ServerMessage (UserConnection connection)
-			: base (connection)
+		public ServerMessage (ServerMessages messageType, UserConnection connection)
+			: base (messageType, connection)
 		{
 		}
 
@@ -20,18 +20,19 @@ namespace Gablarski.Server
 		{
 			get { return (uint)this.MessageType; }
 		}
+
+		protected override bool SendAuthHash
+		{
+			get { return (this.MessageType == ServerMessages.Connected); }
+		}
 	}
 
 	public enum ServerMessages
 		: uint
 	{
 		Pingback		= 1,
-		Acknowledge		= 2,
+		Acknowledge	= 2,
 		Connected		= 3,
-		Disconnected	= 4,
-		UserNotFound	= 5,
-		LoginRejected	= 6,
-		ChannelList		= 7,
-		PlayerList		= 8
+		LoggedIn		= 4
 	}
 }

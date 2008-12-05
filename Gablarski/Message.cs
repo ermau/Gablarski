@@ -10,15 +10,16 @@ namespace Gablarski
 	{
 		public const byte FirstByte = (byte)42;
 
-		protected Message (UserConnection connection)
+		protected Message (TMessage messageType, UserConnection connection)
 		{
+			this.MessageType = messageType;
 			this.Connection = connection;
 		}
 
 		public TMessage MessageType
 		{
 			get;
-			set;
+			private set;
 		}
 
 		public UserConnection Connection
@@ -32,7 +33,9 @@ namespace Gablarski
 			this.buffer = this.Connection.CreateBuffer ();
 			this.buffer.Write (FirstByte);
 			this.buffer.WriteVariableUInt32 (this.MessageTypeCode);
-			this.buffer.WriteVariableInt32 (this.Connection.AuthHash);
+
+			if (this.SendAuthHash)
+				this.buffer.WriteVariableInt32 (this.Connection.AuthHash);
 
 			return this.buffer;
 		}
@@ -56,10 +59,15 @@ namespace Gablarski
 
 		protected NetBuffer Buffer
 		{
-			get { return (this.buffer ?? this.GetBuffer()); }
+			get { return (this.buffer ?? this.GetBuffer ()); }
 		}
 
 		protected abstract uint MessageTypeCode
+		{
+			get;
+		}
+
+		protected abstract bool SendAuthHash
 		{
 			get;
 		}

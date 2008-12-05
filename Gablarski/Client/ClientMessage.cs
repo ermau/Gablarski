@@ -12,14 +12,19 @@ namespace Gablarski.Client
 	public class ClientMessage
 		: Message<ClientMessages>
 	{
-		public ClientMessage (UserConnection connection)
-			: base (connection)
+		public ClientMessage (ClientMessages messageType, UserConnection connection)
+			: base (messageType, connection)
 		{
 		}
 
 		protected override uint MessageTypeCode
 		{
 			get { return (uint)this.MessageType; }
+		}
+
+		protected override bool SendAuthHash
+		{
+			get { return true; }
 		}
 	}
 

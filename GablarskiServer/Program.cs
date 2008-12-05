@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Reflection;
+using Gablarski.Server.Providers;
 using Lidgren.Network;
 using Gablarski.Server;
 using Gablarski.Client;
@@ -29,10 +30,12 @@ namespace Gablarski.Server
 					Trace.WriteLine (ex.StackTrace);
 				};
 			}
+
+			Authentication = new NicknameAuthenticationProvider();
 			
 			Console.WriteLine ("Gablarski Server v" + Assembly.GetExecutingAssembly ().GetName ().Version + " starting up...");
 			
-			GablarskiServer server = new GablarskiServer();
+			GablarskiServer server = new GablarskiServer(Authentication);
 			server.ClientConnected += (sender, e) => Trace.WriteLine ("Client connected.");
 			server.Start();
 		}

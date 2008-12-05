@@ -16,40 +16,21 @@ namespace Gablarski.Server.Providers
 			return true;
 		}
 
-		public bool CheckUserLoggedIn (string username)
+		public LoginResult Login (string nickname)
 		{
-			rwl.EnterReadLock ();
-			bool loggedIn = users.ContainsKey (username);
-			rwl.ExitReadLock ();
-
-			return loggedIn;
+			return Login (nickname, null);
 		}
 
-		public User Login (string username, string password)
+		public LoginResult Login (string username, string password)
 		{
-			rwl.EnterUpgradeableReadLock ();
-			if (!users.ContainsKey (username))
-			{
-				NickAuthUser user = new NickAuthUser ((uint)users.Count, username);
+			Interlocked.Increment (ref this.lastID);
 
-				rwl.EnterWriteLock ();
-				users.Add (username, user);
-				rwl.ExitWriteLock ();
-				rwl.ExitUpgradeableReadLock ();
-				
-				return user;
-			}
-			else
-			{
-				rwl.ExitUpgradeableReadLock ();
-				return null;
-			}
+			return new LoginResult (true, new NickAuthUser ((uint)this.lastID, username));
 		}
 
 		#endregion
 
-		private readonly static ReaderWriterLockSlim rwl = new ReaderWriterLockSlim ();
-		private readonly static Dictionary<string, User> users = new Dictionary<string, User> ();
+		private int lastID;
 	}
 
 	public class NickAuthUser
