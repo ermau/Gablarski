@@ -18,7 +18,13 @@ namespace Gablarski
 		protected Message (TMessage messageType, UserConnection connection)
 			: this (messageType)
 		{
-			this.Connection = connection;
+			this.UserConnections = new List<UserConnection> { connection };
+		}
+
+		protected Message (TMessage messageType, IEnumerable<UserConnection> connections)
+			: this (messageType)
+		{
+			this.UserConnections = connections;
 		}
 
 		public TMessage MessageType
@@ -27,24 +33,28 @@ namespace Gablarski
 			private set;
 		}
 
-		public UserConnection Connection
+		public UserConnection UserConnection
 		{
-			get;
-			private set;
+			get { return (this.UserConnections != null) ? this.UserConnections.FirstOrDefault() : null; }
+		}
+
+		public IEnumerable<UserConnection> UserConnections
+		{
+			get; private set;
 		}
 
 		public NetBuffer GetBuffer ()
 		{
-			if (this.Connection != null)
-				this.buffer = this.Connection.CreateBuffer ();
+			if (this.UserConnection != null)
+				this.buffer = this.UserConnection.CreateBuffer ();
 			else
 				this.buffer = new NetBuffer (4);
 
 			this.buffer.Write (FirstByte);
 			this.buffer.WriteVariableUInt32 (this.MessageTypeCode);
 
-			if (this.SendAuthHash && this.Connection != null)
-				this.buffer.WriteVariableInt32 (this.Connection.AuthHash);
+			if (this.SendAuthHash && this.UserConnection != null)
+				this.buffer.WriteVariableInt32 (this.UserConnection.AuthHash);
 
 			return this.buffer;
 		}
@@ -54,14 +64,15 @@ namespace Gablarski
 			client.SendMessage (this.Buffer, channel);
 		}
 
-		public void Send (NetServer server, NetConnection recipient, NetChannel channel)
+		public void Send (NetServer server, NetChannel channel)
 		{
-			server.SendMessage (this.Buffer, recipient, channel);
-		}
+			if (this.UserConnection == null)
+				throw new InvalidOperationException ("No connection set");
 
-		public void Send (NetServer server, IList<NetConnection> recipients, NetChannel channel)
-		{
-			server.SendMessage (this.Buffer, recipients, channel);
+			if (this.UserConnections.Any())
+				server.SendMessage (this.Buffer, this.UserConnections.Select (uc => uc.Connection).ToList(), channel);
+			else
+				server.SendMessage (this.Buffer, this.UserConnection.Connection, channel);
 		}
 
 		private NetBuffer buffer;

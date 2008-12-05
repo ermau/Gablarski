@@ -149,6 +149,12 @@ namespace Gablarski.Server
 			userRWL.ExitUpgradeableReadLock ();
 
 			Trace.WriteLineIf (e.UserConnection.User != null, e.UserConnection.User.Username + " disconnected.");
+
+
+
+			var disconnected = this.ClientDisconnected;
+			if (disconnected != null)
+				disconnected (this, e);
 		}
 
 		protected virtual void OnClientConnected (ConnectionEventArgs e)
@@ -166,7 +172,7 @@ namespace Gablarski.Server
 			userRWL.ExitUpgradeableReadLock ();
 
 			ServerMessage msg = new ServerMessage (ServerMessages.Connected, e.UserConnection);
-			msg.Send (this.Server, e.Connection, NetChannel.ReliableInOrder1);
+			msg.Send (this.Server, NetChannel.ReliableInOrder1);
 
 			var connected = this.ClientConnected;
 			if (connected != null)
@@ -251,11 +257,11 @@ namespace Gablarski.Server
 			userRWL.ExitWriteLock();
 
 			ServerMessage msg = new ServerMessage (ServerMessages.LoggedIn, e.UserConnection);
-			msg.Send (this.Server, e.Connection, NetChannel.ReliableInOrder1);
+			msg.Send (this.Server, NetChannel.ReliableInOrder1);
 
-			msg = new ServerMessage (ServerMessages.UserConnected);
+			msg = new ServerMessage (ServerMessages.UserConnected, this.users.Values);
 			e.UserConnection.User.Encode (msg.GetBuffer ());
-			msg.Send (this.Server, this.users.Values.Select (uc => uc.Connection).ToList(), NetChannel.ReliableUnordered);
+			msg.Send (this.Server, NetChannel.ReliableUnordered);
 
 			var login = this.UserLogin;
 			if (login != null)

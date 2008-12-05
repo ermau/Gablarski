@@ -512,7 +512,7 @@ namespace Lidgren.Network
 		/// <summary>
 		/// Sends a message to the specified connections
 		/// </summary>
-		public void SendMessage(NetBuffer data, IList<NetConnection> recipients, NetChannel channel)
+		public void SendMessage(NetBuffer data, IEnumerable<NetConnection> recipients, NetChannel channel)
 		{
 			if (recipients == null)
 				throw new ArgumentNullException("recipients");

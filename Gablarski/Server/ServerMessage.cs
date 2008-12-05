@@ -21,6 +21,11 @@ namespace Gablarski.Server
 		{
 		}
 
+		public ServerMessage (ServerMessages messageType, IEnumerable<UserConnection> userConnections)
+			: base (messageType, userConnections)
+		{
+		}
+
 		protected override uint MessageTypeCode
 		{
 			get { return (uint)this.MessageType; }
