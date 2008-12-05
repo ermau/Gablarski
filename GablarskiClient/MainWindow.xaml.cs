@@ -29,17 +29,24 @@ namespace GablarskiClient
 			Gablarski.Client.GablarskiClient client = new Gablarski.Client.GablarskiClient();
 			client.Connected += client_Connected;
 			client.Disconnected += client_Disconnected;
-			client.Connect ("localhost", 6112);
+			client.Connect (this.host.Text, 6112);
 		}
 
 		private void client_Disconnected (object sender, Gablarski.ReasonEventArgs e)
 		{
-			this.statusImage.Source = new BitmapImage (new Uri("./Resources/disconnect.png"));
+			this.Dispatcher.BeginInvoke ((Action)delegate
+			{
+				this.statusImage.Source = new BitmapImage (new Uri ("./Resources/disconnect.png", UriKind.Relative));
+			});
 		}
 
 		private void client_Connected (object sender, Gablarski.ConnectionEventArgs e)
 		{
-			this.statusImage.Source = new BitmapImage (new Uri ("./Resources/connect.png"));
+			this.Dispatcher.BeginInvoke ((Action)delegate
+			{
+				this.statusImage.Source =
+					new BitmapImage (new Uri ("./Resources/connect.png", UriKind.Relative));
+			});
 		}
 	}
 }
