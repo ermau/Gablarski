@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ByteExtensions.cs" />
+    <Compile Include="ChannelInfo.cs" />
     <Compile Include="Client\GablarskiClient.cs" />
     <Compile Include="ConnectionEventArgs.cs" />
     <Compile Include="IPlugin.cs" />

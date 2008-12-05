@@ -32,6 +32,7 @@ namespace Gablarski.Client
 		: uint
 	{
 		Ping		= 1,
-		Login		= 2
+		Login		= 2,
+		Disconnect	= 3
 	}
 }

@@ -11,6 +11,11 @@ namespace Gablarski.Server
 	public class ServerMessage
 		: Message<ServerMessages>
 	{
+		public ServerMessage (ServerMessages messageType)
+			: base (messageType)
+		{
+		}
+
 		public ServerMessage (ServerMessages messageType, UserConnection connection)
 			: base (messageType, connection)
 		{
@@ -30,9 +35,11 @@ namespace Gablarski.Server
 	public enum ServerMessages
 		: uint
 	{
-		Pingback		= 1,
-		Acknowledge	= 2,
-		Connected		= 3,
-		LoggedIn		= 4
+		Pingback			= 1,
+		Acknowledge			= 2,
+		Connected			= 3,
+		LoggedIn			= 4,
+		UserConnected		= 5,
+		UserDisconnected	= 6
 	}
 }

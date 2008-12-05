@@ -9,21 +9,21 @@ namespace Gablarski
 	public class ConnectionEventArgs
 		: EventArgs
 	{
-		public ConnectionEventArgs(NetConnection connection, NetBuffer buffer)
+		public ConnectionEventArgs (UserConnection connection, NetBuffer buffer)
 		{
-			this.Connection = connection;
+			this.UserConnection = connection;
 			this.Buffer = buffer;
 		}
 
 		public UserConnection UserConnection
 		{
-			get { return (this.Connection.Tag as UserConnection); }
+			get;
+			private set;
 		}
 
 		public NetConnection Connection
 		{
-			get;
-			private set;
+			get { return this.UserConnection.Connection; }
 		}
 
 		public NetBuffer Buffer
@@ -36,7 +36,7 @@ namespace Gablarski
 	public class ReasonEventArgs
 		: ConnectionEventArgs
 	{
-		public ReasonEventArgs (NetConnection connection, NetBuffer buffer, string reason)
+		public ReasonEventArgs (UserConnection connection, NetBuffer buffer, string reason)
 			: base (connection, buffer)
 		{
 			this.Reason = reason;

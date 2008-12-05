@@ -24,9 +24,11 @@ namespace GablarskiClient
 			InitializeComponent ();
 		}
 
+		private Gablarski.Client.GablarskiClient client;
+
 		private void connectButton_Click(object sender, RoutedEventArgs e)
 		{
-			Gablarski.Client.GablarskiClient client = new Gablarski.Client.GablarskiClient();
+			client = new Gablarski.Client.GablarskiClient();
 			client.Connected += client_Connected;
 			client.Disconnected += client_Disconnected;
 			client.LoggedIn += client_LoggedIn;
@@ -56,6 +58,11 @@ namespace GablarskiClient
 				this.statusImage.Source =
 					new BitmapImage(new Uri(uri, UriKind.Relative));
 			});
+		}
+
+		private void Window_Closed (object sender, EventArgs e)
+		{
+			this.client.Disconnect ();
 		}
 	}
 }

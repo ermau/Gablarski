@@ -13,7 +13,7 @@ namespace Gablarski.Server
 {
 	class Program
 	{
-		public static NetServer Server;
+		public static GablarskiServer Server;
 		public static IAuthProvider Authentication;
 
 		static void Main (string[] args)
@@ -35,9 +35,9 @@ namespace Gablarski.Server
 			
 			Console.WriteLine ("Gablarski Server v" + Assembly.GetExecutingAssembly ().GetName ().Version + " starting up...");
 			
-			GablarskiServer server = new GablarskiServer(Authentication);
-			server.ClientConnected += (sender, e) => Trace.WriteLine ("Client connected.");
-			server.Start();
+			Server = new GablarskiServer (Authentication);
+			Server.ClientConnected += (sender, e) => Trace.WriteLine ("Client connected.");
+			Server.Start();
 		}
 	}
 

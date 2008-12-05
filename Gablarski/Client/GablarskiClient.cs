@@ -43,6 +43,17 @@ namespace Gablarski.Client
 			this.client.Connect (host, port);
 		}
 
+		public void Disconnect ()
+		{
+			if (!this.IsRunning)
+				return;
+
+			ClientMessage msg = new ClientMessage (ClientMessages.Disconnect, this.connection);
+			msg.Send (this.client, NetChannel.ReliableInOrder1);
+
+			this.client.Disconnect (String.Empty);
+		}
+
 		public void Login (string nickname)
 		{
 			Login (nickname, String.Empty, String.Empty);
@@ -52,7 +63,7 @@ namespace Gablarski.Client
 		{
 			if (!this.IsRunning || (this.connection == null && !this.connecting))
 				throw new InvalidOperationException("Must be connected before logging in.");
-			else if (this.connecting || this.connecting != null)
+			else if (this.connecting || this.connection != null)
 			{
 				while (this.connecting)
 					Thread.Sleep (1);
@@ -115,7 +126,7 @@ namespace Gablarski.Client
 						case NetMessageType.StatusChanged:
 						{
 							if (this.client.Status == NetConnectionStatus.Disconnected)
-								this.OnDisconnected (new ReasonEventArgs (client.ServerConnection, buffer, buffer.ReadString()));
+								this.OnDisconnected (new ReasonEventArgs (this.connection, buffer, buffer.ReadString()));
 
 							break;
 						}
@@ -130,13 +141,14 @@ namespace Gablarski.Client
 							switch (message)
 							{
 								case ServerMessages.Connected:
-									this.connection = new UserConnection (buffer.ReadVariableInt32(), client);
-									this.OnConnected (new ConnectionEventArgs (this.client.ServerConnection, buffer));
+									this.connection = new UserConnection (client, client.ServerConnection);
+									this.connection.AuthHash = buffer.ReadVariableInt32();
+									this.OnConnected (new ConnectionEventArgs (this.connection, buffer));
 									
 									break;
 
 								case ServerMessages.LoggedIn:
-									this.OnLoggedIn (new ConnectionEventArgs (this.client.ServerConnection, buffer));
+									this.OnLoggedIn (new ConnectionEventArgs (this.connection, buffer));
 									break;
 							}
 
@@ -144,6 +156,8 @@ namespace Gablarski.Client
 						}
 					}
 				}
+
+				Thread.Sleep (1);
 			}
 		}
 	}

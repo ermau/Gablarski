@@ -42,14 +42,7 @@ namespace Gablarski.Server.Providers
 		internal NickAuthUser (uint userID, string nickname)
 			: base (nickname)
 		{
-			this.id = userID;
+			this.ID = userID;
 		}
-
-		public override uint ID
-		{
-			get { return this.id; }
-		}
-
-		private readonly uint id;
 	}
 }

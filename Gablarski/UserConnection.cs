@@ -8,10 +8,10 @@ namespace Gablarski
 {
 	public class UserConnection
 	{
-		public UserConnection (int hash, NetBase net)
+		public UserConnection (NetBase net, NetConnection connection)
 		{
-			this.AuthHash = hash;
 			this.net = net;
+			this.Connection = connection;
 		}
 
 		public User User
@@ -24,6 +24,12 @@ namespace Gablarski
 		{
 			get;
 			internal set;
+		}
+
+		public NetConnection Connection
+		{
+			get;
+			private set;
 		}
 
 		public NetBuffer CreateBuffer()
