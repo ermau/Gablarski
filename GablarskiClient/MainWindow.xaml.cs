@@ -27,7 +27,19 @@ namespace GablarskiClient
 		private void connectButton_Click(object sender, RoutedEventArgs e)
 		{
 			Gablarski.Client.GablarskiClient client = new Gablarski.Client.GablarskiClient();
+			client.Connected += client_Connected;
+			client.Disconnected += client_Disconnected;
 			client.Connect ("localhost", 6112);
+		}
+
+		private void client_Disconnected (object sender, Gablarski.ReasonEventArgs e)
+		{
+			this.statusImage.Source = new BitmapImage (new Uri("./Resources/disconnect.png"));
+		}
+
+		private void client_Connected (object sender, Gablarski.ConnectionEventArgs e)
+		{
+			this.statusImage.Source = new BitmapImage (new Uri ("./Resources/connect.png"));
 		}
 	}
 }
