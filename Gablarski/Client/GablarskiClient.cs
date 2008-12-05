@@ -48,7 +48,7 @@ namespace Gablarski.Client
 
 		public void Login (string nickname, string username, string password)
 		{
-			if (!this.IsRunning)
+			if (!this.IsRunning || this.connection == null)
 				throw new InvalidOperationException("Must be connected before logging in.");
 
 			ClientMessage msg = new ClientMessage (ClientMessages.Login, this.connection);

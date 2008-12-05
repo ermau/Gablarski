@@ -29,23 +29,32 @@ namespace GablarskiClient
 			Gablarski.Client.GablarskiClient client = new Gablarski.Client.GablarskiClient();
 			client.Connected += client_Connected;
 			client.Disconnected += client_Disconnected;
+			client.LoggedIn += client_LoggedIn;
 			client.Connect (this.host.Text, 6112);
+			client.Login (this.nickname.Text);
+		}
+
+		void client_LoggedIn(object sender, Gablarski.ConnectionEventArgs e)
+		{
+			this.SetStatusImage ("./Resources/key.png");
 		}
 
 		private void client_Disconnected (object sender, Gablarski.ReasonEventArgs e)
 		{
-			this.Dispatcher.BeginInvoke ((Action)delegate
-			{
-				this.statusImage.Source = new BitmapImage (new Uri ("./Resources/disconnect.png", UriKind.Relative));
-			});
+			this.SetStatusImage("./Resources/disconnect.png");
 		}
 
 		private void client_Connected (object sender, Gablarski.ConnectionEventArgs e)
 		{
-			this.Dispatcher.BeginInvoke ((Action)delegate
+			this.SetStatusImage("./Resources/connect.png");
+		}
+
+		private void SetStatusImage (string uri)
+		{
+			this.Dispatcher.BeginInvoke((Action)delegate
 			{
 				this.statusImage.Source =
-					new BitmapImage (new Uri ("./Resources/connect.png", UriKind.Relative));
+					new BitmapImage(new Uri(uri, UriKind.Relative));
 			});
 		}
 	}
