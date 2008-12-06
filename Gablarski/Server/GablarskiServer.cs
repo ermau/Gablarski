@@ -232,6 +232,7 @@ namespace Gablarski.Server
 				if (this.users.Values.Where (uc => uc.User.Nickname == nickname).Any())
 				{
 					this.DisconnectUser (e.UserConnection, "User already logged in.", e.Connection);
+					userRWL.ExitUpgradeableReadLock ();
 					return;
 				}
 
