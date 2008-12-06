@@ -7,11 +7,15 @@ using Gablarski.Server;
 
 namespace Gablarski
 {
-	public abstract class User
+	public class User
 	{
-		protected User (string nickname)
+		protected internal User (string nickname)
 		{
 			this.Nickname = nickname;
+		}
+
+		internal User ()
+		{
 		}
 
 		public uint ID
@@ -48,21 +52,21 @@ namespace Gablarski
 		internal void Encode (NetBuffer buffer)
 		{
 			buffer.WriteVariableUInt32 (this.ID);
-			//buffer.WriteVariableUInt32 ((this.Channel != null) ? this.Channel.ID : 0);
 			buffer.WriteVariableUInt32 ((uint)this.State);
 			buffer.Write (this.Username);
 		}
 
-		internal void Decode (NetBuffer buffer, GablarskiServer server)
+		internal User Decode (NetBuffer buffer)
 		{
 			this.ID = buffer.ReadVariableUInt32 ();
-			//this.Channel = server.Channels[buffer.ReadVariableUInt32 ()];
 			this.State = (UserState)buffer.ReadVariableUInt32 ();
 
 			if ((this.State & UserState.Registered) == UserState.Registered)
 				this.username = buffer.ReadString ();
 			else
 				this.Nickname = buffer.ReadString ();
+
+			return this;
 		}
 	}
 

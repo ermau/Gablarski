@@ -7,9 +7,9 @@
 		<Label HorizontalAlignment="Left" Margin="12,44,0,42" Width="65.5">Nickname:</Label>
 
 		<TextBox Name="host" Margin="84,14,12,0" Height="22" VerticalAlignment="Top">localhost</TextBox>
-		<TextBox Name="nickname" Margin="83,48,13,42">Rogue Jedi</TextBox>
-		<Button Name="connectButton" Height="23" Margin="84,0,84,5" VerticalAlignment="Bottom" Click="connectButton_Click">Connect</Button>
+		<TextBox Name="nickname" Margin="83,48,13,0" Height="22" VerticalAlignment="Top">Rogue Jedi</TextBox>
+		<Button Name="connectButton" Margin="84,84,84,0" Click="connectButton_Click" Height="23" VerticalAlignment="Top">Connect</Button>
 
-		<Image Width="16" Margin="12,0,0,12" Name="statusImage" Source="./Resources/disconnect.png" HorizontalAlignment="Left" Height="16" VerticalAlignment="Bottom" />
+		<Image Width="16" Margin="12,84,0,0" Name="statusImage" Source="./Resources/disconnect.png" HorizontalAlignment="Left" Height="16" VerticalAlignment="Top" />
 	</Grid>
 </Window>

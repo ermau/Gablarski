@@ -257,6 +257,7 @@ namespace Gablarski.Server
 			userRWL.ExitWriteLock();
 
 			ServerMessage msg = new ServerMessage (ServerMessages.LoggedIn, e.UserConnection);
+			e.UserConnection.User.Encode (msg.GetBuffer ());
 			msg.Send (this.Server, NetChannel.ReliableInOrder1);
 
 			msg = new ServerMessage (ServerMessages.UserConnected, this.users.Values);

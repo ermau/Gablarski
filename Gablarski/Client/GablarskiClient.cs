@@ -18,6 +18,9 @@ namespace Gablarski.Client
 		public event EventHandler<ReasonEventArgs> Disconnected;
 		public event EventHandler<ConnectionEventArgs> LoggedIn;
 
+		public event EventHandler<UserEventArgs> UserLogin;
+		public event EventHandler<UserEventArgs> UserLogout;
+
 		public bool IsRunning
 		{
 			get; private set;
@@ -111,6 +114,20 @@ namespace Gablarski.Client
 				loggedin (this, e);
 		}
 
+		protected virtual void OnUserLogin (UserEventArgs e)
+		{
+			var ulogin = this.UserLogin;
+			if (ulogin != null)
+				ulogin (this, e);
+		}
+
+		protected virtual void OnUserLogout (UserEventArgs e)
+		{
+			var ulogout = this.UserLogout;
+			if (ulogout != null)
+				ulogout (this, e);
+		}
+
 		private void ClientRunner ()
 		{
 			NetBuffer buffer = this.client.CreateBuffer();
@@ -149,6 +166,14 @@ namespace Gablarski.Client
 
 								case ServerMessages.LoggedIn:
 									this.OnLoggedIn (new ConnectionEventArgs (this.connection, buffer));
+									break;
+
+								case ServerMessages.UserConnected:
+									this.OnUserLogin (new UserEventArgs (new User ().Decode (buffer)));
+									break;
+
+								case ServerMessages.UserDisconnected:
+									this.OnUserLogout (new UserEventArgs (new User ().Decode (buffer)));
 									break;
 							}
 

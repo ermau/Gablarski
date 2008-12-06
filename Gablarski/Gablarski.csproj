@@ -64,6 +64,7 @@
     <Compile Include="Server\LoginResult.cs" />
     <Compile Include="Server\Providers\NicknameAuthenticationProvider.cs" />
     <Compile Include="Server\ServerMessage.cs" />
+    <Compile Include="Server\UserEventArgs.cs" />
     <Compile Include="User.cs" />
     <Compile Include="UserConnection.cs" />
   </ItemGroup>
