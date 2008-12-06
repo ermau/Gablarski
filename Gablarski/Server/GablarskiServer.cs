@@ -17,7 +17,7 @@ namespace Gablarski.Server
 		}
 
 		public event EventHandler<ConnectionEventArgs> ClientConnected;
-		public event EventHandler<ConnectionEventArgs> ClientDisconnected;
+		public event EventHandler<ReasonEventArgs> ClientDisconnected;
 		public event EventHandler<ConnectionEventArgs> UserLogin;
 
 		public bool IsRunning
@@ -112,7 +112,7 @@ namespace Gablarski.Server
 								this.OnClientConnected (e);
 							}
 							else if (sender.Status == NetConnectionStatus.Disconnected)
-								this.OnClientDisconnected (e);
+								this.OnClientDisconnected (new ReasonEventArgs(e, buffer.ReadString()));
 
 							break;
 
@@ -137,7 +137,7 @@ namespace Gablarski.Server
 									e.UserConnection.User = this.users[hash].User;
 									userRWL.ExitReadLock ();
 
-									this.OnClientDisconnected (e);
+									this.ClientDisconnect (new ReasonEventArgs (e, "Client requested"), true);
 									break;
 							}
 
@@ -149,7 +149,7 @@ namespace Gablarski.Server
 			}
 		}
 
-		protected virtual void OnClientDisconnected (ConnectionEventArgs e)
+		private void ClientDisconnect (ReasonEventArgs e, bool commanded)
 		{
 			userRWL.EnterUpgradeableReadLock ();
 			if (this.pendingLogins.ContainsKey (e.UserConnection.AuthHash) || this.users.ContainsKey (e.UserConnection.AuthHash))
@@ -161,8 +161,13 @@ namespace Gablarski.Server
 			}
 			userRWL.ExitUpgradeableReadLock ();
 
+			//if (!commanded)
+				e.Connection.Disconnect (String.Empty, 0.0f);
+
 			if (e.UserConnection.User != null)
-				Trace.WriteLine(e.UserConnection.User.Username + " disconnected.");
+				Trace.WriteLine (e.UserConnection.User.Username + " disconnected: " + e.Reason);
+			else
+				Trace.WriteLine ("Unknown disconnected: " + e.Reason);
 
 			if (e.UserConnection.User != null)
 			{
@@ -174,6 +179,11 @@ namespace Gablarski.Server
 			var disconnected = this.ClientDisconnected;
 			if (disconnected != null)
 				disconnected (this, e);
+		}
+
+		protected virtual void OnClientDisconnected (ReasonEventArgs e)
+		{
+			this.ClientDisconnect (e, false);
 		}
 
 		protected virtual void OnClientConnected (ConnectionEventArgs e)

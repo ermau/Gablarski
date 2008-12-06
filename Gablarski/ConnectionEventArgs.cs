@@ -42,6 +42,11 @@ namespace Gablarski
 			this.Reason = reason;
 		}
 
+		public ReasonEventArgs (ConnectionEventArgs e, string reason)
+			: this (e.UserConnection, e.Buffer, reason)
+		{
+		}
+
 		public string Reason
 		{
 			get; private set;

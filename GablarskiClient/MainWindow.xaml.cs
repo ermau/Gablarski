@@ -87,5 +87,10 @@ namespace GablarskiClient
 		{
 			this.client.Disconnect ();
 		}
+
+		private void disconnectButton_Click (object sender, RoutedEventArgs e)
+		{
+			this.client.Disconnect ();
+		}
 	}
 }

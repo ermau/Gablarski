@@ -66,12 +66,9 @@ namespace Gablarski
 
 		public void Send (NetServer server, NetChannel channel)
 		{
-			if (this.UserConnection == null)
-				throw new InvalidOperationException ("No connection set");
-
 			if (this.UserConnections.Any())
 				server.SendMessage (this.Buffer, this.UserConnections.Select (uc => uc.Connection).ToList(), channel);
-			else
+			else if (this.UserConnection != null)
 				server.SendMessage (this.Buffer, this.UserConnection.Connection, channel);
 		}
 

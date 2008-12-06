@@ -8,9 +8,10 @@
 
 		<TextBox Name="host" Margin="84,14,12,0" Height="22" VerticalAlignment="Top">localhost</TextBox>
 		<TextBox Name="nickname" Margin="83,48,13,0" Height="22" VerticalAlignment="Top">Rogue Jedi</TextBox>
-		<Button Name="connectButton" Margin="84,84,84,0" Click="connectButton_Click" Height="23" VerticalAlignment="Top">Connect</Button>
+		<Button Name="connectButton" Margin="84,84,105,0" Click="connectButton_Click" Height="23" VerticalAlignment="Top">Connect</Button>
 
 		<Image Width="16" Margin="12,84,0,0" Name="statusImage" Source="./Resources/disconnect.png" HorizontalAlignment="Left" Height="16" VerticalAlignment="Top" />
         <TextBlock Name="log" Margin="12,113,13,12" />
+        <Button HorizontalAlignment="Right" Margin="0,83,13,0" Name="disconnectButton" Width="86" Height="24" VerticalAlignment="Top" Click="disconnectButton_Click">Disconnect</Button>
     </Grid>
 </Window>
