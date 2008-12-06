@@ -29,9 +29,9 @@ namespace GablarskiClient
 		private void connectButton_Click(object sender, RoutedEventArgs e)
 		{
 			client = new Gablarski.Client.GablarskiClient();
-			client.Connected += client_Connected;
+			client.Connected	+= client_Connected;
 			client.Disconnected += client_Disconnected;
-			client.LoggedIn += client_LoggedIn;
+			client.LoggedIn		+= client_LoggedIn;
 			client.Connect (this.host.Text, 6112);
 			client.Login (this.nickname.Text);
 		}

@@ -54,7 +54,7 @@ namespace Gablarski.Client
 			ClientMessage msg = new ClientMessage (ClientMessages.Disconnect, this.connection);
 			msg.Send (this.client, NetChannel.ReliableInOrder1);
 
-			this.client.Disconnect (String.Empty);
+			//this.client.Disconnect (String.Empty);
 		}
 
 		public void Login (string nickname)

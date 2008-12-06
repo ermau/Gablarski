@@ -111,6 +111,8 @@ namespace Gablarski.Server
 								e.UserConnection.AuthHash = GenerateHash ();
 								this.OnClientConnected (e);
 							}
+							else if (sender.Status == NetConnectionStatus.Disconnected)
+								this.OnClientDisconnected (e);
 
 							break;
 
@@ -125,6 +127,17 @@ namespace Gablarski.Server
 							{
 								case ClientMessages.Login:
 									this.OnClientLogin (e);
+									break;
+
+								case ClientMessages.Disconnect:
+									int hash = e.Buffer.ReadVariableInt32 ();
+									e.UserConnection.AuthHash = hash;
+
+									userRWL.EnterReadLock ();
+									e.UserConnection.User = this.users[hash].User;
+									userRWL.ExitReadLock ();
+
+									this.OnClientDisconnected (e);
 									break;
 							}
 
@@ -148,9 +161,15 @@ namespace Gablarski.Server
 			}
 			userRWL.ExitUpgradeableReadLock ();
 
-			Trace.WriteLineIf (e.UserConnection.User != null, e.UserConnection.User.Username + " disconnected.");
+			if (e.UserConnection.User != null)
+				Trace.WriteLine(e.UserConnection.User.Username + " disconnected.");
 
-
+			if (e.UserConnection.User != null)
+			{
+				ServerMessage msg = new ServerMessage (ServerMessages.UserDisconnected, this.users.Values.Where (uc => uc.Connection.Status == NetConnectionStatus.Connected));
+				e.UserConnection.User.Encode (msg.GetBuffer ());
+				msg.Send (this.Server, NetChannel.ReliableUnordered);
+			}
 
 			var disconnected = this.ClientDisconnected;
 			if (disconnected != null)
@@ -260,7 +279,7 @@ namespace Gablarski.Server
 			e.UserConnection.User.Encode (msg.GetBuffer ());
 			msg.Send (this.Server, NetChannel.ReliableInOrder1);
 
-			msg = new ServerMessage (ServerMessages.UserConnected, this.users.Values);
+			msg = new ServerMessage (ServerMessages.UserConnected, this.users.Values.Where (uc => uc.Connection.Status == NetConnectionStatus.Connected));
 			e.UserConnection.User.Encode (msg.GetBuffer ());
 			msg.Send (this.Server, NetChannel.ReliableUnordered);
 
