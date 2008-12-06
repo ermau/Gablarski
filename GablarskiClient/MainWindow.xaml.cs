@@ -32,23 +32,38 @@ namespace GablarskiClient
 			client.Connected	+= client_Connected;
 			client.Disconnected += client_Disconnected;
 			client.LoggedIn		+= client_LoggedIn;
+			client.UserLogin	+= client_UserLogin;
+			client.UserLogout	+= client_UserLogout;
 			client.Connect (this.host.Text, 6112);
 			client.Login (this.nickname.Text);
+		}
+
+		void client_UserLogout (object sender, Gablarski.Server.UserEventArgs e)
+		{
+			this.Log (e.User.Username + " has disconnected.");
+		}
+
+		void client_UserLogin (object sender, Gablarski.Server.UserEventArgs e)
+		{
+			this.Log (e.User.Username + " has connected.");
 		}
 
 		void client_LoggedIn (object sender, Gablarski.ConnectionEventArgs e)
 		{
 			this.SetStatusImage ("./Resources/key.png");
+			this.Log ("Logged in.");
 		}
 
 		private void client_Disconnected (object sender, Gablarski.ReasonEventArgs e)
 		{
 			this.SetStatusImage ("./Resources/disconnect.png");
+			this.Log ("Disconnected: " + e.Reason);
 		}
 
 		private void client_Connected (object sender, Gablarski.ConnectionEventArgs e)
 		{
 			this.SetStatusImage ("./Resources/connect.png");
+			this.Log ("Connected.");
 		}
 
 		private void SetStatusImage (string uri)
@@ -57,6 +72,14 @@ namespace GablarskiClient
 			{
 				this.statusImage.Source =
 					new BitmapImage(new Uri(uri, UriKind.Relative));
+			});
+		}
+
+		private void Log (string log)
+		{
+			this.Dispatcher.BeginInvoke ((Action)delegate
+			{
+				this.log.Text += log + Environment.NewLine;
 			});
 		}
 
