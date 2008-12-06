@@ -253,10 +253,11 @@ namespace Gablarski.Server
 				if (this.users.Values.Where (uc => uc.User.Username == username).Any())
 				{
 					this.DisconnectUser (e.UserConnection, "User already logged in.", e.Connection);
+					userRWL.ExitUpgradeableReadLock ();
 					return;
 				}
 
-				userRWL.EnterUpgradeableReadLock ();
+				userRWL.ExitUpgradeableReadLock ();
 
 				result = this.auth.Login (username, password);
 			}
