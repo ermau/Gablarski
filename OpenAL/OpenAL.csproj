@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{7991BCA7-9FAF-435D-8ACE-B01CD5FD906B}</ProjectGuid>
+    <ProjectGuid>{1EFCB570-3B06-47AF-9130-531C5625AE79}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Gablarski</RootNamespace>
-    <AssemblyName>Gablarski</AssemblyName>
+    <RootNamespace>Gablarski.Client.Providers.OpenAL</RootNamespace>
+    <AssemblyName>OpenAL</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -31,10 +32,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Speex.NET, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Speex.NET.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -47,33 +44,20 @@
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="Tao.OpenAl, Version=1.1.0.1, Culture=neutral, PublicKeyToken=a7579dda88828311, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Tao.OpenAl.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ByteExtensions.cs" />
-    <Compile Include="ChannelInfo.cs" />
-    <Compile Include="Client\GablarskiClient.cs" />
-    <Compile Include="Client\ICaptureDevice.cs" />
-    <Compile Include="Client\ICaptureProvider.cs" />
-    <Compile Include="ConnectionEventArgs.cs" />
-    <Compile Include="IPlugin.cs" />
-    <Compile Include="Server\IAuthProvider.cs" />
-    <Compile Include="Server\IChatServerProvider.cs" />
+    <Compile Include="OpenALCaptureDevice.cs" />
+    <Compile Include="OpenALCaptureProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Message.cs" />
-    <Compile Include="Client\ClientMessage.cs" />
-    <Compile Include="Server\GablarskiServer.cs" />
-    <Compile Include="Server\IServerPlugin.cs" />
-    <Compile Include="Server\LoginResult.cs" />
-    <Compile Include="Server\Providers\NicknameAuthenticationProvider.cs" />
-    <Compile Include="Server\ServerMessage.cs" />
-    <Compile Include="Server\UserEventArgs.cs" />
-    <Compile Include="User.cs" />
-    <Compile Include="UserConnection.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Lidgren.Network\Lidgren.Network.csproj">
-      <Project>{BA202214-F6F8-4853-BCC9-CA4F13C5F479}</Project>
-      <Name>Lidgren.Network</Name>
+    <ProjectReference Include="..\Gablarski\Gablarski.csproj">
+      <Project>{7991BCA7-9FAF-435D-8ACE-B01CD5FD906B}</Project>
+      <Name>Gablarski</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -10,10 +10,6 @@ namespace Gablarski.Client
 {
 	public class GablarskiClient
 	{
-		public GablarskiClient ()
-		{
-		}
-
 		public event EventHandler<ConnectionEventArgs> Connected;
 		public event EventHandler<ReasonEventArgs> Disconnected;
 		public event EventHandler<ConnectionEventArgs> LoggedIn;
