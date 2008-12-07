@@ -80,7 +80,7 @@ namespace Gablarski.Server
 
 		private readonly ReaderWriterLockSlim userRWL = new ReaderWriterLockSlim();
 		private readonly Dictionary<int, DateTime> pendingLogins = new Dictionary<int, DateTime>();
-		private readonly Dictionary<int, UserConnection> users = new Dictionary<int, UserConnection>();
+		private readonly Dictionary<int, UserConnection> users = new Dictionary<int, UserConnection> ();
 
 		private void ServerRunner ()
 		{
@@ -101,7 +101,8 @@ namespace Gablarski.Server
 				NetMessageType type;
 				while (Server.ReadMessage (buffer, out type, out sender))
 				{
-					ConnectionEventArgs e = new ConnectionEventArgs (new UserConnection (Server, sender), buffer);
+					UserConnection connection = users.Values.FirstOrDefault (uc => uc.Connection == sender) ?? new UserConnection (Server, sender);
+					ConnectionEventArgs e = new ConnectionEventArgs (connection, buffer);
 
 					switch (type)
 					{
@@ -302,8 +303,6 @@ namespace Gablarski.Server
 
 		protected void DisconnectUser (UserConnection userc, string reason, NetConnection netc)
 		{
-			Trace.WriteLine ("Disconnecting user '" + ((userc.User != null) ? userc.User.Nickname ?? userc.User.Username : "Unknown") + "': " + reason);
-
 			netc.Disconnect (reason, 0);
 
 			userRWL.EnterWriteLock();
