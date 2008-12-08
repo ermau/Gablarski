@@ -44,10 +44,10 @@ namespace Gablarski.Server
 			get
 			{
 				userRWL.EnterReadLock ();
-				IEnumerable<UserConnection> users = this.users.Values.ToList ();
+				IEnumerable<UserConnection> u = this.users.Values.ToList ();
 				userRWL.ExitReadLock ();
 
-				return users;
+				return u;
 			}
 		}
 
@@ -73,7 +73,7 @@ namespace Gablarski.Server
 			Server.Dispose();
 		}
 
-		private IAuthProvider auth;
+		private readonly IAuthProvider auth;
 
 		private int port = 6112;
 		private int maxConnections = 128;

@@ -8,7 +8,7 @@ namespace Gablarski
 {
 	public abstract class Message<TMessage>
 	{
-		public const byte FirstByte = (byte)42;
+		public const byte FirstByte = 42;
 
 		protected Message (TMessage messageType)
 		{
@@ -45,10 +45,7 @@ namespace Gablarski
 
 		public NetBuffer GetBuffer ()
 		{
-			if (this.UserConnection != null)
-				this.buffer = this.UserConnection.CreateBuffer ();
-			else
-				this.buffer = new NetBuffer (4);
+			this.buffer = (this.UserConnection != null) ? this.UserConnection.CreateBuffer() : new NetBuffer (4);
 
 			this.buffer.Write (FirstByte);
 			this.buffer.WriteVariableUInt32 (this.MessageTypeCode);

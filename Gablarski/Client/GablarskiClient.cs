@@ -89,8 +89,8 @@ namespace Gablarski.Client
 			msg.Send (this.client, NetChannel.ReliableInOrder1);
 		}
 
-		private ReaderWriterLockSlim userRWL = new ReaderWriterLockSlim ();
-		private Dictionary<uint, User> users = new Dictionary<uint, User> ();
+		private readonly ReaderWriterLockSlim userRWL = new ReaderWriterLockSlim ();
+		private readonly Dictionary<uint, User> users = new Dictionary<uint, User> ();
 
 		private bool connecting;
 		private UserConnection connection;
