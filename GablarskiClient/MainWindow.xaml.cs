@@ -117,24 +117,12 @@ namespace GablarskiClient
 		private void Window_Closed (object sender, EventArgs e)
 		{
 			this.client.Disconnect ();
+			this.Server.Shutdown();
 		}
 
 		private void disconnectButton_Click (object sender, RoutedEventArgs e)
 		{
 			this.client.Disconnect ();
-		}
-		
-
-		private void DoEvents ()
-		{
-			DispatcherFrame f = new DispatcherFrame ();
-			Dispatcher.CurrentDispatcher.BeginInvoke (DispatcherPriority.Background,
-			(SendOrPostCallback)delegate (object arg)
-			{
-				DispatcherFrame fr = arg as DispatcherFrame;
-				fr.Continue = true;
-			}, f);
-			Dispatcher.PushFrame (f);
 		}
 
 		private static IAuthProvider Authentication;

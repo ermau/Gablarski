@@ -66,9 +66,10 @@ namespace Gablarski.Server
 		public void Shutdown ()
 		{
 			this.IsRunning = false;
-			Server.Connections.ForEach (nc => nc.Disconnect ("Server shutting down.", 0.0f));
+			
+			Server.Shutdown("Server shutting down.");
 			this.ServerThread.Join();
-
+			
 			Server.Dispose();
 		}
 
@@ -238,7 +239,7 @@ namespace Gablarski.Server
 
 			Trace.WriteLine ("Login attempt: " + nickname);
 
-			LoginResult result = null;
+			LoginResult result;
 
 			if (String.IsNullOrEmpty (username))
 			{
@@ -250,7 +251,7 @@ namespace Gablarski.Server
 
 				userRWL.EnterUpgradeableReadLock();
 
-				if (this.users.Values.Where (uc => uc.User.Nickname == nickname).Any())
+				if (this.users.Values.Any (uc => uc.User.Nickname == nickname))
 				{
 					this.DisconnectUser (e.UserConnection, "User already logged in.", e.Connection);
 					userRWL.ExitUpgradeableReadLock ();
@@ -271,7 +272,7 @@ namespace Gablarski.Server
 
 				userRWL.EnterUpgradeableReadLock();
 
-				if (this.users.Values.Where (uc => uc.User.Username == username).Any())
+				if (this.users.Values.Any (uc => uc.User.Username == username))
 				{
 					this.DisconnectUser (e.UserConnection, "User already logged in.", e.Connection);
 					userRWL.ExitUpgradeableReadLock ();

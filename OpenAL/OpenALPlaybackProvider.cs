@@ -83,7 +83,7 @@ namespace Gablarski.Client.Providers.OpenAL
 
 				IntPtr data;
 				fixed (byte* pbuffer = samples)
-					data = new IntPtr ((void*)pbuffer);
+					data = new IntPtr (pbuffer);
 
 				Al.alBufferData (this.buffer, Al.AL_FORMAT_MONO16, data, samples.Length, 44100);
 				Al.alSourcei (this.source, Al.AL_BUFFER, this.buffer);
@@ -96,6 +96,9 @@ namespace Gablarski.Client.Providers.OpenAL
 					Thread.Sleep (1);
 					Al.alGetSourcei (this.source, Al.AL_SOURCE_STATE, out state);
 				}
+
+				Al.alDeleteBuffers (1, ref buffer);
+				Al.alGenBuffers (1, out buffer);
 			}
 		}
 	}
