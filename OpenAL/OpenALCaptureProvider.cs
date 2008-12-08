@@ -94,12 +94,12 @@ namespace Gablarski.Client.Providers.OpenAL
 				if (this.captureThread != null)
 					return;
 
-				(this.captureThread = new Thread (this.Capture)
-				{
-					Name = "OpenAL Capture",
-					Priority = this.Priority,
-					IsBackground = true
-				}).Start ();
+				//(this.captureThread = new Thread (this.Capture)
+				//{
+				//    Name = "OpenAL Capture",
+				//    Priority = this.Priority,
+				//    IsBackground = true
+				//}).Start ();
 
 				this.dbuffer = new byte[this.bufferSize];
 				fixed (byte* pbuffer = dbuffer)

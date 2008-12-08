@@ -45,6 +45,8 @@ namespace Gablarski.Client.Providers.OpenAL
 
 		public void Dispose ()
 		{
+			this.playing = false;
+
 			if (this.PlayerThread != null)
 				this.PlayerThread.Join ();
 		}
@@ -54,6 +56,8 @@ namespace Gablarski.Client.Providers.OpenAL
 		private object lck = new object ();
 		private Queue<byte[]> q = new Queue<byte[]> ();
 
+		private bool playing = true;
+
 		private readonly IntPtr device;
 		private readonly IntPtr context;
 		private int buffer;
@@ -62,14 +66,17 @@ namespace Gablarski.Client.Providers.OpenAL
 		private readonly Thread PlayerThread;
 		private void Player ()
 		{
-			while (true)
+			while (this.playing)
 			{
 				byte[] samples;
 
 				lock (lck)
 				{
 					if (q.Count == 0)
+					{
+						Thread.Sleep (1);
 						continue;
+					}
 
 					samples = q.Dequeue ();
 				}
