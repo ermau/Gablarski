@@ -138,7 +138,7 @@ namespace Gablarski.Client
 		protected virtual void OnUserLogout (UserEventArgs e)
 		{
 			userRWL.EnterUpgradeableReadLock ();
-			if (this.users.ContainsKey (e.User.ID))
+			if (!this.users.ContainsKey (e.User.ID))
 			{
 				userRWL.ExitUpgradeableReadLock ();
 				return;
