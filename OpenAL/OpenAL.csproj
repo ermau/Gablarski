@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="OpenALCaptureDevice.cs" />
     <Compile Include="OpenALCaptureProvider.cs" />
+    <Compile Include="OpenALPlaybackProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

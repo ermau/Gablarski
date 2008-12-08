@@ -19,6 +19,7 @@ namespace Gablarski.Server
 		public event EventHandler<ConnectionEventArgs> ClientConnected;
 		public event EventHandler<ReasonEventArgs> ClientDisconnected;
 		public event EventHandler<ConnectionEventArgs> UserLogin;
+		public event EventHandler<VoiceEventArgs> VoiceReceived;
 
 		public bool IsRunning
 		{
@@ -124,6 +125,17 @@ namespace Gablarski.Server
 
 							ClientMessages messageType = (ClientMessages)buffer.ReadVariableUInt32();
 
+							int hash = e.Buffer.ReadVariableInt32 ();
+							e.UserConnection.AuthHash = hash;
+
+							userRWL.EnterReadLock ();
+							if (!this.users.ContainsKey (hash) && !this.pendingLogins.ContainsKey (hash))
+							{
+								userRWL.ExitReadLock ();
+								this.ClientDisconnect (new ReasonEventArgs (e, "Auth failure"), false);
+							}
+							userRWL.ExitReadLock ();
+
 							switch (messageType)
 							{
 								case ClientMessages.Login:
@@ -131,14 +143,23 @@ namespace Gablarski.Server
 									break;
 
 								case ClientMessages.Disconnect:
-									int hash = e.Buffer.ReadVariableInt32 ();
-									e.UserConnection.AuthHash = hash;
-
-									userRWL.EnterReadLock ();
-									e.UserConnection.User = this.users[hash].User;
-									userRWL.ExitReadLock ();
-
 									this.ClientDisconnect (new ReasonEventArgs (e, "Client requested"), true);
+									break;
+
+								case ClientMessages.VoiceData:
+									Trace.WriteLine ("Received voice data from: " + e.UserConnection.User.Username);
+
+									int voiceLen = buffer.ReadVariableInt32();
+									if (voiceLen <= 0)
+										continue;
+
+									ServerMessage msg = new ServerMessage (ServerMessages.VoiceData, this.users.Values/*.Where (uc => uc != e.UserConnection)*/);
+									var msgbuffer = msg.GetBuffer ();
+									msgbuffer.WriteVariableUInt32 (e.UserConnection.User.ID);
+									msgbuffer.WriteVariableInt32 (voiceLen);
+									msgbuffer.Write (buffer.ReadBytes (voiceLen));
+									msg.Send (this.Server, NetChannel.Unreliable);
+
 									break;
 							}
 
@@ -211,17 +232,6 @@ namespace Gablarski.Server
 
 		protected virtual void OnClientLogin (ConnectionEventArgs e)
 		{
-			int hash = e.Buffer.ReadVariableInt32 ();
-
-			userRWL.EnterUpgradeableReadLock();
-
-			if (!this.pendingLogins.ContainsKey (hash))
-				this.DisconnectUser (e.UserConnection, "Auth Hash Failure", e.Connection);
-			else
-				e.UserConnection.AuthHash = hash;
-
-			userRWL.ExitUpgradeableReadLock();
-
 			string nickname = e.Buffer.ReadString();
 			string username = e.Buffer.ReadString();
 			string password = e.Buffer.ReadString();

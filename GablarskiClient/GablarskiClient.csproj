@@ -47,6 +47,10 @@
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="Tao.OpenAl, Version=1.1.0.1, Culture=neutral, PublicKeyToken=a7579dda88828311, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Tao.OpenAl.dll</HintPath>
+    </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -99,6 +103,10 @@
       <Project>{7991BCA7-9FAF-435D-8ACE-B01CD5FD906B}</Project>
       <Name>Gablarski</Name>
     </ProjectReference>
+    <ProjectReference Include="..\OpenAL\OpenAL.csproj">
+      <Project>{1EFCB570-3B06-47AF-9130-531C5625AE79}</Project>
+      <Name>OpenAL</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\disconnect.png" />
@@ -108,6 +116,10 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\key.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\sound.png" />
+    <Resource Include="Resources\sound_none.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

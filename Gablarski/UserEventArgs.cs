@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Gablarski.Server
+namespace Gablarski
 {
 	public class UserEventArgs
 		: EventArgs
@@ -14,6 +14,22 @@ namespace Gablarski.Server
 		}
 
 		public User User
+		{
+			get;
+			private set;
+		}
+	}
+
+	public class VoiceEventArgs
+		: UserEventArgs
+	{
+		public VoiceEventArgs (User user, byte[] voiceData)
+			: base (user)
+		{
+			this.VoiceData = voiceData;
+		}
+
+		public byte[] VoiceData
 		{
 			get;
 			private set;

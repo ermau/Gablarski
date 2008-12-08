@@ -33,6 +33,7 @@ namespace Gablarski.Client
 	{
 		Ping		= 1,
 		Login		= 2,
-		Disconnect	= 3
+		Disconnect	= 3,
+		VoiceData	= 4
 	}
 }

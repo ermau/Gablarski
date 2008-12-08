@@ -16,6 +16,7 @@ namespace Gablarski.Client
 
 		public event EventHandler<UserEventArgs> UserLogin;
 		public event EventHandler<UserEventArgs> UserLogout;
+		public event EventHandler<VoiceEventArgs> VoiceReceived;
 
 		public bool IsRunning
 		{
@@ -60,6 +61,15 @@ namespace Gablarski.Client
 			Login (nickname, String.Empty, String.Empty);
 		}
 
+		public void SendVoiceData (byte[] data)
+		{
+			ClientMessage msg = new ClientMessage (ClientMessages.VoiceData, this.connection);
+			var buffer = msg.GetBuffer ();
+			buffer.WriteVariableInt32 (data.Length);
+			buffer.Write (data);
+			msg.Send (this.client, NetChannel.Unreliable);
+		}
+
 		public void Login (string nickname, string username, string password)
 		{
 			if (!this.IsRunning || (this.connection == null && !this.connecting))
@@ -78,6 +88,9 @@ namespace Gablarski.Client
 
 			msg.Send (this.client, NetChannel.ReliableInOrder1);
 		}
+
+		private ReaderWriterLockSlim userRWL = new ReaderWriterLockSlim ();
+		private Dictionary<uint, User> users = new Dictionary<uint, User> ();
 
 		private bool connecting;
 		private UserConnection connection;
@@ -114,6 +127,9 @@ namespace Gablarski.Client
 
 		protected virtual void OnUserLogin (UserEventArgs e)
 		{
+			if (!ValidateAndAddUser (e.User))
+				return;
+
 			var ulogin = this.UserLogin;
 			if (ulogin != null)
 				ulogin (this, e);
@@ -121,9 +137,57 @@ namespace Gablarski.Client
 
 		protected virtual void OnUserLogout (UserEventArgs e)
 		{
+			userRWL.EnterUpgradeableReadLock ();
+			if (this.users.ContainsKey (e.User.ID))
+			{
+				userRWL.ExitUpgradeableReadLock ();
+				return;
+			}
+
+			userRWL.EnterWriteLock ();
+			this.users.Remove (e.User.ID);
+			userRWL.ExitWriteLock ();
+			userRWL.ExitUpgradeableReadLock ();
+
 			var ulogout = this.UserLogout;
 			if (ulogout != null)
 				ulogout (this, e);
+		}
+
+		protected virtual void OnVoiceReceived (VoiceEventArgs e)
+		{
+			var voice = this.VoiceReceived;
+			if (voice != null)
+				voice (this, e);
+		}
+
+		private bool ValidateAndAddUser (User user)
+		{
+			userRWL.EnterUpgradeableReadLock ();
+			if (this.users.ContainsKey (user.ID))
+			{
+				userRWL.ExitUpgradeableReadLock ();
+				return false;
+			}
+
+			userRWL.EnterWriteLock ();
+			this.users.Add (user.ID, user);
+			userRWL.ExitWriteLock ();
+			userRWL.ExitUpgradeableReadLock ();
+			
+			return true;
+		}
+
+		private User GetUser (uint id)
+		{
+			User user = null;
+
+			userRWL.EnterReadLock ();
+			if (this.users.ContainsKey (id))
+				user = this.users[id];
+
+			userRWL.ExitReadLock ();
+			return user;
 		}
 
 		private void ClientRunner ()
@@ -159,7 +223,6 @@ namespace Gablarski.Client
 									this.connection = new UserConnection (client, client.ServerConnection);
 									this.connection.AuthHash = buffer.ReadVariableInt32();
 									this.OnConnected (new ConnectionEventArgs (this.connection, buffer));
-									
 									break;
 
 								case ServerMessages.LoggedIn:
@@ -172,6 +235,18 @@ namespace Gablarski.Client
 
 								case ServerMessages.UserDisconnected:
 									this.OnUserLogout (new UserEventArgs (new User ().Decode (buffer)));
+									break;
+
+								case ServerMessages.VoiceData:
+									User user = this.GetUser (buffer.ReadVariableUInt32());
+									if (user == null)
+										continue;
+
+									int voiceLen = buffer.ReadVariableInt32();
+									if (voiceLen <= 0)
+										continue;
+
+									this.OnVoiceReceived (new VoiceEventArgs (user, buffer.ReadBytes (voiceLen)));
 									break;
 							}
 

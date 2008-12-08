@@ -1,17 +1,27 @@
 ﻿<Window x:Class="GablarskiClient.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Title="Gablarski" Height="286" Width="300" Closed="Window_Closed">
+    Title="Gablarski" Height="300" Width="600" Closed="Window_Closed">
     <Grid Margin="5">
-		<Label VerticalAlignment="Top" HorizontalAlignment="Left" Margin="12,12,0,0" Width="37.31" Height="25.96">Host:</Label>
-		<Label HorizontalAlignment="Left" Margin="12,44,0,42" Width="65.5">Nickname:</Label>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="259*" />
+            <ColumnDefinition Width="210*" />
+        </Grid.ColumnDefinitions>
+        <Label VerticalAlignment="Top" HorizontalAlignment="Left" Margin="12,12,0,0" Width="37.31" Height="25.96" Grid.Column="0">Host:</Label>
+		<Label HorizontalAlignment="Left" Margin="12,44,0,0" Width="65.5" Height="26" VerticalAlignment="Top">Nickname:</Label>
 
-		<TextBox Name="host" Margin="84,14,12,0" Height="22" VerticalAlignment="Top">localhost</TextBox>
-		<TextBox Name="nickname" Margin="83,48,13,0" Height="22" VerticalAlignment="Top">Rogue Jedi</TextBox>
-		<Button Name="connectButton" Margin="84,84,105,0" Click="connectButton_Click" Height="23" VerticalAlignment="Top">Connect</Button>
+		<TextBox Name="host" Margin="84,14,16.562,0" Height="22" VerticalAlignment="Top" Grid.Column="0">localhost</TextBox>
+		<TextBox Name="nickname" Margin="83,48,16.562,0" Height="22" VerticalAlignment="Top" Grid.Column="0">Rogue Jedi</TextBox>
+		<Button Name="connectButton" Margin="84,84,0,0" Click="connectButton_Click" Height="23" VerticalAlignment="Top" HorizontalAlignment="Left" Width="73" Grid.Column="0">Connect</Button>
 
-		<Image Width="16" Margin="12,84,0,0" Name="statusImage" Source="./Resources/disconnect.png" HorizontalAlignment="Left" Height="16" VerticalAlignment="Top" />
-        <TextBlock Name="log" Margin="12,113,13,12" />
-        <Button HorizontalAlignment="Right" Margin="0,83,13,0" Name="disconnectButton" Width="86" Height="24" VerticalAlignment="Top" Click="disconnectButton_Click">Disconnect</Button>
+		<Image Width="16" Margin="12,84,0,0" Name="statusImage" Source="./Resources/disconnect.png" HorizontalAlignment="Left" Height="16" VerticalAlignment="Top" Grid.Column="0" />
+        <TextBlock Grid.Column="0" Name="log" Margin="12,113,16.562,12" />
+        <Button IsEnabled="False" Margin="163,83,0,0" Name="disconnectButton" Height="24" VerticalAlignment="Top" Click="disconnectButton_Click" HorizontalAlignment="Left" Width="79.438" Grid.Column="0">Disconnect</Button>
+        <Button Height="23" Click="talk_Click" HorizontalAlignment="Left" Margin="52,84,0,0" Name="talk" VerticalAlignment="Top" Width="26" IsEnabled="False" ClickMode="Release">
+            <Image Name="talkStatus" Source="./Resources/sound_none.png" />
+        </Button>
+        <Button Grid.Column="1" Height="23" Margin="16,14.96,102,0" Name="startServer" IsEnabled="True" VerticalAlignment="Top" Click="startServer_Click">Start Server</Button>
+        <Button Grid.Column="1" Height="23" HorizontalAlignment="Right" Margin="0,14.96,12,0" IsEnabled="False" Name="stopServer" VerticalAlignment="Top" Width="84">Stop Server</Button>
+        <TextBlock x:FieldModifier="public" Grid.Column="1" Margin="16,44,12,12" Name="serverLog" />
     </Grid>
 </Window>

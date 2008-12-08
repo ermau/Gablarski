@@ -20,7 +20,7 @@ namespace Gablarski.Client.Providers.OpenAL
 
 		public void SetDevice (ICaptureDevice device)
 		{
-			captureDevice = Alc.alcCaptureOpenDevice ((string)device.Identifier, 44100, Al.AL_FORMAT_MONO16, 44100 * 2);
+			captureDevice = Alc.alcCaptureOpenDevice ((string)device.Identifier, 44100, Al.AL_FORMAT_MONO16, 10 * 44100 * 2);
 		}
 
 		public void StartCapture ()
@@ -45,7 +45,7 @@ namespace Gablarski.Client.Providers.OpenAL
 			}
 		}
 
-		public bool ReadSamples (out byte[] samples)
+		public unsafe bool ReadSamples (out byte[] samples)
 		{
 			lock (lck)
 			{
