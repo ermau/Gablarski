@@ -20,6 +20,9 @@ namespace Gablarski.Client.Providers.OpenAL
 			this.context = context;
 
 			Al.alGenSources (16, this.sources);
+
+			for (int i = 0; i < this.sources.Length; ++i)
+				owners[this.sources[i]] = 0;
 		}
 
 		private int[] sources = new int[16];
