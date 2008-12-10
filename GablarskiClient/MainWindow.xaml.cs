@@ -52,7 +52,13 @@ namespace GablarskiClient
 			this.talk.IsEnabled = true;
 
 			this.capture = new OpenALCaptureProvider ();
-			this.capture.SetDevice (this.capture.GetDevices ().First ());
+			this.capture.CaptureDevice = this.capture.GetDevices ().First ();
+			this.capture.SamplesAvailable += new EventHandler<SamplesEventArgs> (capture_SamplesAvailable);
+		}
+
+		void capture_SamplesAvailable (object sender, SamplesEventArgs e)
+		{
+			this.client.SendVoiceData (e.Samples);
 		}
 
 		private OpenALPlaybackProvider playback;
@@ -183,8 +189,6 @@ namespace GablarskiClient
 				byte[] samples;
 
 				this.capture.EndCapture ();
-				if (this.capture.ReadSamples (out samples))
-					this.client.SendVoiceData (samples);
 			}
 		}
 	}
