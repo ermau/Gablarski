@@ -11,23 +11,53 @@ namespace Gablarski.Client.Providers.OpenAL
 		: ICaptureProvider
 	{
 		#region ICaptureProvider Members
-
-		public ThreadPriority Priority
+		public ICaptureDevice CaptureDevice
 		{
-			get { return this.priority; }
-			set { this.priority = value; }
+			get;
+			set;
 		}
 
-		public void SetDevice (ICaptureDevice device)
+		public event EventHandler<SamplesEventArgs> SamplesAvailable
 		{
-			captureDevice = Alc.alcCaptureOpenDevice ((string)device.Identifier, 44100, Al.AL_FORMAT_MONO16, 10 * 44100 * 2);
-		}
+			add
+			{
+				lock (lck)
+				{
+					if (this.listenerThread == null)
+					{
+						this.sampleListening = true;
+						(this.listenerThread = new Thread (this.SampleListener)
+						{
+							Name = "Samples Listener",
+							IsBackground = true
+						}).Start ();
+					}
 
+					this.samples += value;
+				}
+			}
+
+			remove 
+			{
+				lock (lck)
+				{
+					this.samples -= value;
+
+					if (this.samples == null)
+					{
+						this.sampleListening = false;
+						this.listenerThread.Join ();
+						this.listenerThread = null;
+					}
+				}
+			}
+		}
+		
 		public void StartCapture ()
 		{
-			ThrowIfNoDevice ();
-
 			Init ();
+
+			ThrowIfNoDevice ();
 
 			lock (lck)
 			{
@@ -47,11 +77,20 @@ namespace Gablarski.Client.Providers.OpenAL
 
 		public unsafe bool ReadSamples (out byte[] samples)
 		{
+			ThrowIfNoDevice ();
+
+			Init ();
+
+			samples = null;
+
+			int numSamples;
+			Alc.alcGetIntegerv (this.captureDevice, Alc.ALC_CAPTURE_SAMPLES, IntPtr.Size, out numSamples);
+
+			if (numSamples <= 0)
+				return false;
+
 			lock (lck)
 			{
-				samples = null;
-
-				int numSamples;
 				Alc.alcGetIntegerv (this.captureDevice, Alc.ALC_CAPTURE_SAMPLES, IntPtr.Size, out numSamples);
 
 				if (numSamples <= 0)
@@ -72,46 +111,75 @@ namespace Gablarski.Client.Providers.OpenAL
 
 		public void Dispose ()
 		{
-			if (this.captureThread != null)
-				this.captureThread.Join ();
+			lock (lck)
+			{
+				this.sampleListening = false;
+				if (this.listenerThread != null)
+				{
+					this.listenerThread.Join ();
+					this.listenerThread = null;
+				}
+			}
 		}
 		#endregion
 
-		private bool capturing = false;
-		private ThreadPriority priority = ThreadPriority.Normal;
-		private Thread captureThread;
+		private EventHandler<SamplesEventArgs> samples;
+
+		private bool sampleListening = false;
+		private Thread listenerThread;
 		private IntPtr captureDevice = IntPtr.Zero;
 		private object lck = new object ();
-
-		private int bufferSize = (2 * 44100) * 2;
 		private byte[] dbuffer;
 		private IntPtr buffer;
+		private const int BufferSize = 2 * 44100 * 2;
+
+		protected virtual void OnSamplesAvailable (SamplesEventArgs e)
+		{
+			var se = this.samples;
+			if (se != null)
+				se (this, e);
+		}
 
 		private unsafe void Init ()
 		{
 			lock (lck)
 			{
-				if (this.captureThread != null)
+				if (captureDevice != IntPtr.Zero)
 					return;
 
-				//(this.captureThread = new Thread (this.Capture)
-				//{
-				//    Name = "OpenAL Capture",
-				//    Priority = this.Priority,
-				//    IsBackground = true
-				//}).Start ();
-
-				this.dbuffer = new byte[this.bufferSize];
+				this.dbuffer = new byte[BufferSize];
 				fixed (byte* pbuffer = dbuffer)
 					this.buffer = new IntPtr ((void*)pbuffer);
+
+				captureDevice = Alc.alcCaptureOpenDevice ((string)this.CaptureDevice.Identifier, 44100, Al.AL_FORMAT_MONO16, BufferSize);
 			}
 		}
 
-		private void Capture ()
+		private void SampleListener ()
 		{
-			while (true)
+			while (this.sampleListening)
 			{
+				lock (lck)
+				{
+					if (this.captureDevice == IntPtr.Zero)
+					{
+						Thread.Sleep (1);
+						continue;
+					}
 
+					int numSamples;
+					Alc.alcGetIntegerv (this.captureDevice, Alc.ALC_CAPTURE_SAMPLES, IntPtr.Size, out numSamples);
+
+					if (numSamples > 0)
+					{
+						byte[] samples;
+						this.ReadSamples (out samples);
+
+						this.OnSamplesAvailable (new SamplesEventArgs (samples));
+					}
+				}
+
+				Thread.Sleep (1);
 			}
 		}
 

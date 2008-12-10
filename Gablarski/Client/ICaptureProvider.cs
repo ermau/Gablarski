@@ -9,9 +9,14 @@ namespace Gablarski.Client
 	public interface ICaptureProvider
 		: IDisposable
 	{
-		ThreadPriority Priority { get; set; }
+		/// <remarks>
+		/// If you consume this event, you MUST handle the bytes. Any samples
+		/// provided through this event will be consumed and unavailable from
+		/// ReadSamples();
+		/// </remarks>
+		event EventHandler<SamplesEventArgs> SamplesAvailable;
 
-		void SetDevice (ICaptureDevice device);
+		ICaptureDevice CaptureDevice { set; }
 
 		void StartCapture ();
 		void EndCapture ();
@@ -19,5 +24,20 @@ namespace Gablarski.Client
 		bool ReadSamples (out byte[] samples);
 
 		IEnumerable<ICaptureDevice> GetDevices ();
+	}
+
+	public class SamplesEventArgs
+		: EventArgs
+	{
+		public SamplesEventArgs (byte[] samples)
+		{
+			this.Samples = samples;
+		}
+
+		public byte[] Samples
+		{
+			get;
+			private set;
+		}
 	}
 }
