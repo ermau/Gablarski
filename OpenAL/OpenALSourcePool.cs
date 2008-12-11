@@ -93,10 +93,10 @@ namespace Gablarski.Client.Providers.OpenAL
 				rwl.EnterReadLock();
 				foreach (int sourceID in owners.Keys)
 				{
-					int[] buffers = new int[0];
-					Al.alGetSourcei (sourceID, Al.AL_BUFFERS_PROCESSED, buffers);
-					if (buffers.Length > 0)
-						Al.alSourceUnqueueBuffers (sourceID, buffers.Length, buffers);
+					int buffers;
+					Al.alGetSourcei (sourceID, Al.AL_BUFFERS_PROCESSED, out buffers);
+					if (buffers > 0)
+					    Al.alSourceUnqueueBuffers (sourceID, buffers, ref buffers);
 
 					int state;
 					Al.alGetSourcei (sourceID, Al.AL_SOURCE_STATE, out state);
