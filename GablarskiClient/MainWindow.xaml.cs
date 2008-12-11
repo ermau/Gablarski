@@ -21,7 +21,7 @@ using Gablarski.Server;
 using Gablarski.Server.Providers;
 using Gablarski;
 
-namespace GablarskiClient
+namespace Gablarski.Client
 {
 	/// <summary>
 	/// Interaction logic for Window1.xaml
@@ -69,7 +69,7 @@ namespace GablarskiClient
 			if (this.playback == null)
 				this.playback = new OpenALPlaybackProvider ();
 
-			this.playback.QueuePlayback (e.VoiceData);
+			this.playback.QueuePlayback (e.VoiceData, e.User.ID);
 		}
 
 		void client_UserLogout (object sender, UserEventArgs e)
@@ -112,11 +112,11 @@ namespace GablarskiClient
 			});
 		}
 
-		private void Log (string log)
+		private void Log (string logentry)
 		{
 			this.Dispatcher.BeginInvoke ((Action)delegate
 			{
-				this.log.Text += log + Environment.NewLine;
+				this.log.Text += logentry + Environment.NewLine;
 			});
 		}
 

@@ -75,13 +75,13 @@ namespace Gablarski.Client.Providers.OpenAL
 			}
 		}
 
-		public unsafe bool ReadSamples (out byte[] samples)
+		public bool ReadSamples (out byte[] readSamples)
 		{
 			ThrowIfNoDevice ();
 
 			Init ();
 
-			samples = null;
+			readSamples = null;
 
 			int numSamples;
 			Alc.alcGetIntegerv (this.captureDevice, Alc.ALC_CAPTURE_SAMPLES, IntPtr.Size, out numSamples);
@@ -96,9 +96,9 @@ namespace Gablarski.Client.Providers.OpenAL
 				if (numSamples <= 0)
 					return false;
 
-				samples = new byte[numSamples * 2];
+				readSamples = new byte[numSamples * 2];
 				Alc.alcCaptureSamples (this.captureDevice, this.buffer, numSamples);
-				Array.Copy (this.dbuffer, samples, samples.Length);
+				Array.Copy (this.dbuffer, readSamples, readSamples.Length);
 
 				return true;
 			}

@@ -8,6 +8,6 @@ namespace Gablarski.Client
 	public interface IPlaybackProvider
 		: IDisposable
 	{
-		void QueuePlayback (byte[] data);
+		void QueuePlayback (byte[] data, uint playerID);
 	}
 }

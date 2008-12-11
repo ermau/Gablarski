@@ -14,29 +14,37 @@ namespace Gablarski.Client.Providers.OpenAL
 		{
 			this.device = Alc.alcOpenDevice (null);
 			this.context = Alc.alcCreateContext (this.device, IntPtr.Zero);
+			
+			Al.alDistanceModel (Al.AL_NONE);
 			Alc.alcMakeContextCurrent (this.context);
 
-			Al.alGenSources (1, out this.source);
-			Al.alGenBuffers (1, out this.buffer);
-
-			Al.alDistanceModel (Al.AL_NONE);
-
-			this.PlayerThread = new Thread (this.Player)
-			{
-				IsBackground = true,
-				Name = "OpenAL Player"
-			};
-			this.PlayerThread.Start ();
+			this.sourcePool = new OpenALSourcePool (this.device);
+			
+			//this.PlayerThread = new Thread (this.Player)
+			//{
+			//    IsBackground = true,
+			//    Name = "OpenAL Player"
+			//};
+			//this.PlayerThread.Start ();
 		}
 
 		#region IPlaybackProvider Members
 
-		public void QueuePlayback (byte[] data)
+		public void QueuePlayback (byte[] data, uint playerID)
 		{
-			lock (lck)
-			{
-				q.Enqueue (data);
-			}
+			int source = this.sourcePool.RequestSource (playerID);
+			if (source == -1)
+				return;
+			
+			int newBuffer;
+			Al.alGenBuffers (1, out newBuffer);
+			Al.alBufferData (newBuffer, Al.AL_FORMAT_MONO16, data, data.Length, 44100);
+			Al.alSourceQueueBuffers (source, 1, ref newBuffer);
+
+			int state;
+			Al.alGetSourcei (source, Al.AL_SOURCE_STATE, out state);
+			if (state != Al.AL_PLAYING)
+				Al.alSourcePlay (source);
 		}
 
 		#endregion
@@ -54,51 +62,50 @@ namespace Gablarski.Client.Providers.OpenAL
 		#endregion
 
 		private object lck = new object ();
-		private Queue<byte[]> q = new Queue<byte[]> ();
+
+		private readonly OpenALSourcePool sourcePool;
 
 		private bool playing = true;
 
 		private readonly IntPtr device;
 		private readonly IntPtr context;
-		private int buffer;
-		private readonly int source;
 
 		private readonly Thread PlayerThread;
 		private void Player ()
 		{
 			while (this.playing)
 			{
-				byte[] samples;
+				//byte[] samples;
 
-				lock (lck)
-				{
-					if (q.Count == 0)
-					{
-						Thread.Sleep (1);
-						continue;
-					}
+				//lock (lck)
+				//{
+				//    if (q.Count == 0)
+				//    {
+				//        Thread.Sleep (1);
+				//        continue;
+				//    }
 
-					samples = q.Dequeue ();
-				}
+				//    samples = q.Dequeue ();
+				//}
 
-				IntPtr data;
-				fixed (byte* pbuffer = samples)
-					data = new IntPtr (pbuffer);
+				//IntPtr data;
+				//fixed (byte* pbuffer = samples)
+				//    data = new IntPtr (pbuffer);
 
-				Al.alBufferData (this.buffer, Al.AL_FORMAT_MONO16, data, samples.Length, 44100);
-				Al.alSourcei (this.source, Al.AL_BUFFER, this.buffer);
+				//Al.alBufferData (this.buffer, Al.AL_FORMAT_MONO16, data, samples.Length, 44100);
+				//Al.alSourcei (this.source, Al.AL_BUFFER, this.buffer);
 
-				Al.alSourcePlay (this.source);
+				//Al.alSourcePlay (this.source);
 
-				int state = Al.AL_PLAYING;
-				while (state == Al.AL_PLAYING)
-				{
-					Thread.Sleep (1);
-					Al.alGetSourcei (this.source, Al.AL_SOURCE_STATE, out state);
-				}
+				//int state = Al.AL_PLAYING;
+				//while (state == Al.AL_PLAYING)
+				//{
+				//    Thread.Sleep (1);
+				//    Al.alGetSourcei (this.source, Al.AL_SOURCE_STATE, out state);
+				//}
 
-				Al.alDeleteBuffers (1, ref buffer);
-				Al.alGenBuffers (1, out buffer);
+				//Al.alDeleteBuffers (1, ref buffer);
+				//Al.alGenBuffers (1, out buffer);
 			}
 		}
 	}
