@@ -135,6 +135,9 @@ namespace Gablarski.Client
 		private GablarskiServer Server;
 		private void startServer_Click (object sender, RoutedEventArgs e)
 		{
+			this.startServer.IsEnabled = false;
+			this.stopServer.IsEnabled = true;
+
 			Trace.UseGlobalLock = true;
 			Trace.Listeners.Add (new ServerLogListener (this));
 

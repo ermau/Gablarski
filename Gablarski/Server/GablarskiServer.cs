@@ -154,7 +154,7 @@ namespace Gablarski.Server
 									if (voiceLen <= 0)
 										continue;
 
-									ServerMessage msg = new ServerMessage (ServerMessages.VoiceData, this.users.Values/*.Where (uc => uc != e.UserConnection)*/);
+									ServerMessage msg = new ServerMessage (ServerMessages.VoiceData, this.users.Values.Where (uc => uc != e.UserConnection));
 									var msgbuffer = msg.GetBuffer ();
 									msgbuffer.WriteVariableUInt32 (e.UserConnection.User.ID);
 									msgbuffer.WriteVariableInt32 (voiceLen);

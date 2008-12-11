@@ -96,7 +96,10 @@ namespace Gablarski.Client.Providers.OpenAL
 					int buffers;
 					Al.alGetSourcei (sourceID, Al.AL_BUFFERS_PROCESSED, out buffers);
 					if (buffers > 0)
-					    Al.alSourceUnqueueBuffers (sourceID, buffers, ref buffers);
+					{
+						Al.alSourceUnqueueBuffers (sourceID, buffers, ref buffers);
+						Al.alDeleteBuffers (buffers, ref buffers);
+					}
 
 					int state;
 					Al.alGetSourcei (sourceID, Al.AL_SOURCE_STATE, out state);
