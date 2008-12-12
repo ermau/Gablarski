@@ -14,7 +14,7 @@ namespace Gablarski
 			this.Connection = connection;
 		}
 
-		public User User
+		public IUser User
 		{
 			get;
 			set;

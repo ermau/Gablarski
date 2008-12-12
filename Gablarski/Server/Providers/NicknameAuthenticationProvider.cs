@@ -37,12 +37,43 @@ namespace Gablarski.Server.Providers
 	}
 
 	public class NickAuthUser
-		: User
+		: IUser
 	{
 		internal NickAuthUser (uint userID, string nickname)
-			: base (nickname)
 		{
 			this.ID = userID;
+			this.Nickname = nickname;
+
+			this.State = (userID == 1) ? UserState.Registered : UserState.Unregistered;
 		}
+
+		#region IUser Members
+
+		public uint ID
+		{
+			get; set;
+		}
+
+		public string Nickname
+		{
+			get; set;
+		}
+
+		public string Username
+		{
+			get; set;
+		}
+
+		public UserState State
+		{
+			get; set;
+		}
+
+		public ChannelInfo Channel
+		{
+			get; set;
+		}
+
+		#endregion
 	}
 }

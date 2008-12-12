@@ -7,13 +7,13 @@ namespace Gablarski.Server
 {
 	public class LoginResult
 	{
-		public LoginResult (bool success, User user)
+		public LoginResult (bool success, IUser user)
 		{
 			this.Succeeded = success;
 			this.User = user;
 		}
 
-		public LoginResult (bool success, User user, string failureReason)
+		public LoginResult (bool success, IUser user, string failureReason)
 		{
 			this.Succeeded = success;
 			this.User = user;
@@ -25,7 +25,7 @@ namespace Gablarski.Server
 			get; private set;
 		}
 
-		public User User
+		public IUser User
 		{
 			get; private set;
 		}

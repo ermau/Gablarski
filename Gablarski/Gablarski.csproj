@@ -51,12 +51,14 @@
   <ItemGroup>
     <Compile Include="ByteExtensions.cs" />
     <Compile Include="ChannelInfo.cs" />
+    <Compile Include="DecodedUser.cs" />
     <Compile Include="Client\GablarskiClient.cs" />
     <Compile Include="Client\ICaptureDevice.cs" />
     <Compile Include="Client\ICaptureProvider.cs" />
     <Compile Include="Client\IPlaybackProvider.cs" />
     <Compile Include="ConnectionEventArgs.cs" />
     <Compile Include="IPlugin.cs" />
+    <Compile Include="IUser.cs" />
     <Compile Include="Server\IAuthProvider.cs" />
     <Compile Include="Server\IChatServerProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -67,7 +69,6 @@
     <Compile Include="Server\LoginResult.cs" />
     <Compile Include="Server\Providers\NicknameAuthenticationProvider.cs" />
     <Compile Include="Server\ServerMessage.cs" />
-    <Compile Include="User.cs" />
     <Compile Include="UserConnection.cs" />
     <Compile Include="UserEventArgs.cs" />
   </ItemGroup>

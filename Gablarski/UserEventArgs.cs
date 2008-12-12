@@ -8,12 +8,12 @@ namespace Gablarski
 	public class UserEventArgs
 		: EventArgs
 	{
-		public UserEventArgs (User user)
+		public UserEventArgs (IUser user)
 		{
 			this.User = user;
 		}
 
-		public User User
+		public IUser User
 		{
 			get;
 			private set;
@@ -23,7 +23,7 @@ namespace Gablarski
 	public class VoiceEventArgs
 		: UserEventArgs
 	{
-		public VoiceEventArgs (User user, byte[] voiceData)
+		public VoiceEventArgs (IUser user, byte[] voiceData)
 			: base (user)
 		{
 			this.VoiceData = voiceData;

@@ -22,6 +22,6 @@ namespace Gablarski.Client.Providers.OpenAL
 
 		#endregion
 
-		private string deviceName;
+		private readonly string deviceName;
 	}
 }

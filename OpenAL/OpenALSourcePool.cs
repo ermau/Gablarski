@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace Gablarski.Client.Providers.OpenAL
 {
-	internal unsafe class OpenALSourcePool
+	internal class OpenALSourcePool
         : IDisposable
 	{
 		static public int SourcesAvailable

@@ -90,7 +90,7 @@ namespace Gablarski.Client
 		}
 
 		private readonly ReaderWriterLockSlim userRWL = new ReaderWriterLockSlim ();
-		private readonly Dictionary<uint, User> users = new Dictionary<uint, User> ();
+		private readonly Dictionary<uint, IUser> users = new Dictionary<uint, IUser> ();
 
 		private bool connecting;
 		private UserConnection connection;
@@ -161,7 +161,7 @@ namespace Gablarski.Client
 				voice (this, e);
 		}
 
-		private bool ValidateAndAddUser (User user)
+		private bool ValidateAndAddUser (IUser user)
 		{
 			userRWL.EnterUpgradeableReadLock ();
 			if (this.users.ContainsKey (user.ID))
@@ -178,9 +178,9 @@ namespace Gablarski.Client
 			return true;
 		}
 
-		private User GetUser (uint id)
+		private IUser GetUser (uint id)
 		{
-			User user = null;
+			IUser user = null;
 
 			userRWL.EnterReadLock ();
 			if (this.users.ContainsKey (id))
@@ -230,15 +230,15 @@ namespace Gablarski.Client
 									break;
 
 								case ServerMessages.UserConnected:
-									this.OnUserLogin (new UserEventArgs (new User ().Decode (buffer)));
+									this.OnUserLogin (new UserEventArgs (new DecodedUser ().Decode (buffer)));
 									break;
 
 								case ServerMessages.UserDisconnected:
-									this.OnUserLogout (new UserEventArgs (new User ().Decode (buffer)));
+									this.OnUserLogout(new UserEventArgs(new DecodedUser().Decode(buffer)));
 									break;
 
 								case ServerMessages.VoiceData:
-									User user = this.GetUser (buffer.ReadVariableUInt32());
+									IUser user = this.GetUser (buffer.ReadVariableUInt32());
 									if (user == null)
 										continue;
 
