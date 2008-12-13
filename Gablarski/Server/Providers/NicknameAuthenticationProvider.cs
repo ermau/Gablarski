@@ -45,6 +45,8 @@ namespace Gablarski.Server.Providers
 			this.Nickname = nickname;
 
 			this.State = (userID == 1) ? UserState.Registered : UserState.Unregistered;
+			if (this.State == UserState.Registered)
+				this.Username = this.Nickname;
 		}
 
 		#region IUser Members

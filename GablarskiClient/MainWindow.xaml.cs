@@ -53,7 +53,7 @@ namespace Gablarski.Client
 
 			this.capture = new OpenALCaptureProvider ();
 			this.capture.CaptureDevice = this.capture.GetDevices ().First ();
-			this.capture.SamplesAvailable += new EventHandler<SamplesEventArgs> (capture_SamplesAvailable);
+			this.capture.SamplesAvailable += capture_SamplesAvailable;
 		}
 
 		void capture_SamplesAvailable (object sender, SamplesEventArgs e)
@@ -64,7 +64,7 @@ namespace Gablarski.Client
 		private OpenALPlaybackProvider playback;
 		void client_VoiceReceived (object sender, Gablarski.VoiceEventArgs e)
 		{
-			this.Log ("Received voice data from: " + e.User.Username);
+			this.Log ("Received voice data from: " + e.User.Nickname);
 
 			if (this.playback == null)
 				this.playback = new OpenALPlaybackProvider ();
@@ -74,12 +74,12 @@ namespace Gablarski.Client
 
 		void client_UserLogout (object sender, UserEventArgs e)
 		{
-			this.Log (e.User.Username + " has disconnected.");
+			this.Log (e.User.Nickname + " has disconnected.");
 		}
 
 		void client_UserLogin (object sender, UserEventArgs e)
 		{
-			this.Log (e.User.Username + " has connected.");
+			this.Log (e.User.Nickname + " has connected.");
 		}
 
 		void client_LoggedIn (object sender, ConnectionEventArgs e)

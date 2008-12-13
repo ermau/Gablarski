@@ -148,7 +148,7 @@ namespace Gablarski.Server
 									break;
 
 								case ClientMessages.VoiceData:
-									Trace.WriteLine ("Received voice data from: " + e.UserConnection.User.Username);
+									Trace.WriteLine ("Received voice data from: " + e.UserConnection.User.Nickname);
 
 									int voiceLen = buffer.ReadVariableInt32();
 									if (voiceLen <= 0)
@@ -188,7 +188,7 @@ namespace Gablarski.Server
 				e.Connection.Disconnect (String.Empty, 0.0f);
 
 			if (e.UserConnection.User != null)
-				Trace.WriteLine (e.UserConnection.User.Username + " disconnected: " + e.Reason);
+				Trace.WriteLine (e.UserConnection.User.Nickname + " disconnected: " + e.Reason);
 			else
 				Trace.WriteLine ("Unknown disconnected: " + e.Reason);
 
@@ -290,7 +290,7 @@ namespace Gablarski.Server
 				return;
 			}
 
-			Trace.WriteLine (result.User.Username + " logged in.");
+			Trace.WriteLine (result.User.Nickname + " logged in.");
 
 			e.UserConnection.User = result.User;
 
@@ -303,9 +303,20 @@ namespace Gablarski.Server
 			e.UserConnection.User.Encode (msg.GetBuffer ());
 			msg.Send (this.Server, NetChannel.ReliableInOrder1);
 
+			userRWL.EnterReadLock();
 			msg = new ServerMessage (ServerMessages.UserConnected, this.users.Values.Where (uc => uc.Connection.Status == NetConnectionStatus.Connected));
 			e.UserConnection.User.Encode (msg.GetBuffer ());
-			msg.Send (this.Server, NetChannel.ReliableUnordered);
+			msg.Send (this.Server, NetChannel.ReliableInOrder1);
+
+			msg = new ServerMessage (ServerMessages.UserList, e.UserConnection);
+			var mbuffer = msg.GetBuffer();
+			mbuffer.WriteVariableInt32 (this.users.Count);
+			foreach (IUser u in this.users.Values.Select (uc => uc.User))
+				u.Encode (mbuffer);
+
+			msg.Send (this.Server, NetChannel.ReliableInOrder1);
+
+			userRWL.ExitReadLock();
 
 			var login = this.UserLogin;
 			if (login != null)

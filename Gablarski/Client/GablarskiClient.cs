@@ -14,6 +14,7 @@ namespace Gablarski.Client
 		public event EventHandler<ReasonEventArgs> Disconnected;
 		public event EventHandler<ConnectionEventArgs> LoggedIn;
 
+		public event EventHandler<UserListEventArgs> UserList;
 		public event EventHandler<UserEventArgs> UserLogin;
 		public event EventHandler<UserEventArgs> UserLogout;
 		public event EventHandler<VoiceEventArgs> VoiceReceived;
@@ -21,6 +22,21 @@ namespace Gablarski.Client
 		public bool IsRunning
 		{
 			get; private set;
+		}
+
+		public bool IsConnected
+		{
+			get; private set;
+		}
+
+		public bool IsLoggedin
+		{
+			get; private set;
+		}
+
+		public IEnumerable<IUser> Users
+		{
+			get { return this.users.Values; }
 		}
 
 		public void Connect (string host, int port)
@@ -99,6 +115,8 @@ namespace Gablarski.Client
 
 		protected virtual void OnDisconnected (ReasonEventArgs e)
 		{
+			this.IsLoggedin = false;
+			this.IsConnected = false;
 			this.IsRunning = false;
 			this.runnerThread.Join();
 
@@ -111,6 +129,7 @@ namespace Gablarski.Client
 
 		protected virtual void OnConnected (ConnectionEventArgs e)
 		{
+			this.IsConnected = true;
 			this.connecting = false;
 
 			var connected = this.Connected;
@@ -120,6 +139,8 @@ namespace Gablarski.Client
 
 		protected virtual void OnLoggedIn (ConnectionEventArgs e)
 		{
+			this.IsLoggedin = true;
+
 			var loggedin = this.LoggedIn;
 			if (loggedin != null)
 				loggedin (this, e);
@@ -133,6 +154,30 @@ namespace Gablarski.Client
 			var ulogin = this.UserLogin;
 			if (ulogin != null)
 				ulogin (this, e);
+		}
+
+		protected virtual void OnUserList (UserListEventArgs e)
+		{
+			userRWL.EnterUpgradeableReadLock();
+			foreach (IUser user in e.Users)
+			{
+				if (this.users.ContainsKey (user.ID))
+					continue;
+
+				if (!userRWL.IsWriteLockHeld)
+					userRWL.EnterWriteLock();
+
+				this.users.Add (user.ID, user);
+			}
+
+			if (userRWL.IsWriteLockHeld)
+				userRWL.ExitWriteLock();
+
+			userRWL.ExitUpgradeableReadLock();
+
+			var ulist = this.UserList;
+			if (ulist != null)
+				ulist (this, e);
 		}
 
 		protected virtual void OnUserLogout (UserEventArgs e)
@@ -223,6 +268,15 @@ namespace Gablarski.Client
 									this.connection = new UserConnection (client, client.ServerConnection);
 									this.connection.AuthHash = buffer.ReadVariableInt32();
 									this.OnConnected (new ConnectionEventArgs (this.connection, buffer));
+									break;
+
+								case ServerMessages.UserList:
+									IUser[] userList = new IUser[buffer.ReadVariableInt32()];
+									for (int i = 0; i < userList.Length; ++i)
+										userList[i] = (new DecodedUser().Decode (buffer));
+
+									this.OnUserList (new UserListEventArgs (userList));
+
 									break;
 
 								case ServerMessages.LoggedIn:

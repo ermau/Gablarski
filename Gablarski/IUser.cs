@@ -22,6 +22,7 @@ namespace Gablarski
 		{
 			buffer.WriteVariableUInt32 (self.ID);
 			buffer.WriteVariableUInt32 ((uint)self.State);
+			buffer.Write (self.Nickname);
 			buffer.Write (self.Username);
 		}
 
@@ -30,11 +31,8 @@ namespace Gablarski
 			var user = new DecodedUser();
 			user.ID = buffer.ReadVariableUInt32 ();
 			user.State = (UserState)buffer.ReadVariableUInt32 ();
-
-			if ((user.State & UserState.Registered) == UserState.Registered)
-				user.Username = buffer.ReadString ();
-			else
-				user.Nickname = buffer.ReadString ();
+			user.Nickname = buffer.ReadString ();
+			user.Username = buffer.ReadString ();
 
 			return user;
 		}

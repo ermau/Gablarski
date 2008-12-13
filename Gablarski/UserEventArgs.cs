@@ -20,6 +20,20 @@ namespace Gablarski
 		}
 	}
 
+	public class UserListEventArgs
+		: EventArgs
+	{
+		public UserListEventArgs (IEnumerable<IUser> users)
+		{
+			this.Users = users;
+		}
+
+		public IEnumerable<IUser> Users
+		{
+			get; private set;
+		}
+	}
+
 	public class VoiceEventArgs
 		: UserEventArgs
 	{
