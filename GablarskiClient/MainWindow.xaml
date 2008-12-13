@@ -23,5 +23,7 @@
         <Button Grid.Column="1" Height="23" HorizontalAlignment="Right" Margin="0,14.96,12,0" IsEnabled="False" Name="stopServer" VerticalAlignment="Top" Width="147">Stop Server</Button>
 		<TextBox Margin="12,113,16.562,12" Name="log" IsReadOnly="True" VerticalScrollBarVisibility="Auto" />
 		<TextBox Grid.Column="1" Margin="16,48,12,12" Name="serverLog" VerticalScrollBarVisibility="Auto" IsReadOnly="True" />
-	</Grid>
+        <TextBox Height="23" Margin="0,84,16.562,0" Name="pushtotalk" VerticalAlignment="Top" HorizontalAlignment="Right" Width="64" PreviewKeyUp="pushtotalk_PreviewKeyUp" />
+        <Label Height="23" HorizontalAlignment="Right" Margin="0,84,87,0" VerticalAlignment="Top" Width="77">Push-to-talk:</Label>
+    </Grid>
 </Window>

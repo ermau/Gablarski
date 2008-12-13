@@ -99,8 +99,8 @@ namespace Gablarski.Client
 			ClientMessage msg = new ClientMessage (ClientMessages.Login, this.connection);
 			NetBuffer buffer = msg.GetBuffer ();
 			buffer.Write (nickname);
-			buffer.Write (username ?? String.Empty);
-			buffer.Write (password ?? String.Empty);
+			buffer.Write (username);
+			buffer.Write (password);
 
 			msg.Send (this.client, NetChannel.ReliableInOrder1);
 		}
@@ -122,6 +122,7 @@ namespace Gablarski.Client
 
 			this.client.Dispose();
 
+
 			var dced = this.Disconnected;
 			if (dced != null)
 				dced (this, e);
@@ -132,6 +133,7 @@ namespace Gablarski.Client
 			this.IsConnected = true;
 			this.connecting = false;
 
+
 			var connected = this.Connected;
 			if (connected != null)
 				connected (this, e);
@@ -140,6 +142,7 @@ namespace Gablarski.Client
 		protected virtual void OnLoggedIn (ConnectionEventArgs e)
 		{
 			this.IsLoggedin = true;
+
 
 			var loggedin = this.LoggedIn;
 			if (loggedin != null)
@@ -150,6 +153,7 @@ namespace Gablarski.Client
 		{
 			if (!ValidateAndAddUser (e.User))
 				return;
+
 
 			var ulogin = this.UserLogin;
 			if (ulogin != null)
@@ -175,6 +179,7 @@ namespace Gablarski.Client
 
 			userRWL.ExitUpgradeableReadLock();
 
+
 			var ulist = this.UserList;
 			if (ulist != null)
 				ulist (this, e);
@@ -193,6 +198,7 @@ namespace Gablarski.Client
 			this.users.Remove (e.User.ID);
 			userRWL.ExitWriteLock ();
 			userRWL.ExitUpgradeableReadLock ();
+
 
 			var ulogout = this.UserLogout;
 			if (ulogout != null)

@@ -5,6 +5,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
+using Gablarski.Client;
 
 namespace GablarskiClient
 {
@@ -25,6 +26,15 @@ namespace GablarskiClient
 		{
 			var ex = (Exception) e.ExceptionObject;
 			MessageBox.Show (ex.Message + Environment.NewLine + Environment.NewLine + ex.StackTrace);
+
+			PushToTalk.Uninstall();
+		}
+
+		protected override void OnExit (ExitEventArgs e)
+		{
+			PushToTalk.Uninstall();
+
+			base.OnExit (e);
 		}
 	}
 }

@@ -31,6 +31,26 @@ namespace Gablarski.Client
 		public MainWindow ()
 		{
 			InitializeComponent ();
+			PushToTalk.Talking += PushToTalk_Talking;
+			PushToTalk.StoppedTalking += PushToTalk_StoppedTalking;
+		}
+
+		void PushToTalk_StoppedTalking (object sender, EventArgs e)
+		{
+			if (!client.IsLoggedin)
+				return;
+
+			this.talkStatus.Source = new BitmapImage (new Uri ("./resources/sound_none.png", UriKind.Relative));
+			capture.EndCapture();
+		}
+
+		void PushToTalk_Talking (object sender, EventArgs e)
+		{
+			if (!client.IsLoggedin)
+				return;
+
+			this.talkStatus.Source = new BitmapImage (new Uri ("./resources/sound.png", UriKind.Relative));
+			capture.StartCapture();
 		}
 
 		private Gablarski.Client.GablarskiClient client;
@@ -193,6 +213,18 @@ namespace Gablarski.Client
 
 				this.capture.EndCapture ();
 			}
+		}
+
+		private void pushtotalk_PreviewKeyUp (object sender, KeyEventArgs e)
+		{
+			try
+			{
+				PushToTalk.Keys = (System.Windows.Forms.Keys)Enum.Parse (typeof (System.Windows.Forms.Keys), e.Key.ToString (), true);
+				this.pushtotalk.Text = PushToTalk.Keys.ToString();
+				e.Handled = true;
+			}
+			catch
+			{}
 		}
 	}
 }
