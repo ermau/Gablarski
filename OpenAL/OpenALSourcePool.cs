@@ -42,8 +42,11 @@ namespace Gablarski.Client.Providers.OpenAL
 			int free = -1;
 			foreach (var kvp in owners)
 			{
-				if (free == -1 && kvp.Value == 0)
+				if (kvp.Value == 0)
+				{
 					free = kvp.Key;
+					break;
+				}
 				else if (kvp.Value == playerID)
 				{
 					rwl.ExitUpgradeableReadLock ();
