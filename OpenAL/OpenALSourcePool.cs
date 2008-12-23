@@ -7,10 +7,10 @@ using System.Threading;
 
 namespace Gablarski.Client.Providers.OpenAL
 {
-	internal class OpenALSourcePool
+	internal unsafe class OpenALSourcePool
         : IDisposable
 	{
-		static public int SourcesAvailable
+		static public int TotalSourcesAvailable
 		{
 			get { return 16; }
 		}
@@ -22,12 +22,6 @@ namespace Gablarski.Client.Providers.OpenAL
 
 			this.device = device;
 
-			// This assumes MONO.
-			Al.alGenSources (SourcesAvailable, this.sources);
-
-			for (int i = 0; i < this.sources.Length; ++i)
-				owners[this.sources[i]] = 0;
-
 			this.collecting = true;
 			(this.collectorThread = new Thread (this.Collector)
 			                        {
@@ -36,9 +30,10 @@ namespace Gablarski.Client.Providers.OpenAL
 			                        }).Start();
 		}
 
-		public int RequestSource (uint playerID)
+		public int RequestSource (uint ownerID, bool stereo)
 		{
 			rwl.EnterUpgradeableReadLock ();
+
 			int free = -1;
 			foreach (var kvp in owners)
 			{
@@ -47,7 +42,7 @@ namespace Gablarski.Client.Providers.OpenAL
 					free = kvp.Key;
 					break;
 				}
-				else if (kvp.Value == playerID)
+				else if (kvp.Value == ownerID)
 				{
 					rwl.ExitUpgradeableReadLock ();
 					return kvp.Key;
@@ -56,12 +51,18 @@ namespace Gablarski.Client.Providers.OpenAL
 
 			if (free == -1)
 			{
-				rwl.EnterUpgradeableReadLock();
-				return -1;
+				if (this.sourcesAvailable > 0)
+					Al.alGenSources (1, out free);
+				else
+				{
+					rwl.ExitUpgradeableReadLock();
+					return -1;
+				}
 			}
 
 			rwl.EnterWriteLock ();
-			owners[free] = playerID;
+			sourcesAvailable -= (stereo) ? 2 : 1;
+			owners[free] = ownerID;
 			rwl.ExitWriteLock ();
 			rwl.ExitUpgradeableReadLock ();
 
@@ -75,15 +76,12 @@ namespace Gablarski.Client.Providers.OpenAL
 			rwl.ExitWriteLock ();
 		}
 
+		private int sourcesAvailable = 16;
 		private readonly Thread collectorThread;
 		private bool collecting;
 		private readonly ReaderWriterLockSlim rwl = new ReaderWriterLockSlim ();
 
-		// ReSharper disable FieldCanBeMadeReadOnly
-		private int[] sources = new int[SourcesAvailable];
-		// ReSharper restore FieldCanBeMadeReadOnly
-
-		private readonly Dictionary<int, uint> owners = new Dictionary<int, uint> (SourcesAvailable);
+		private readonly Dictionary<int, uint> owners = new Dictionary<int, uint> (TotalSourcesAvailable);
 
 		private readonly IntPtr device;
 
@@ -91,7 +89,7 @@ namespace Gablarski.Client.Providers.OpenAL
 		{
 			while (this.collecting)
 			{
-				List<int> toFree = new List<int>(this.sources.Length);
+				List<int> toFree = new List<int> (TotalSourcesAvailable);
 
 				rwl.EnterReadLock();
 				foreach (int sourceID in owners.Keys)
@@ -107,11 +105,9 @@ namespace Gablarski.Client.Providers.OpenAL
 					int state;
 					Al.alGetSourcei (sourceID, Al.AL_SOURCE_STATE, out state);
 					if (state != Al.AL_PLAYING)
-						toFree.Add (sourceID);
+						FreeSource (sourceID);
 				}
 				rwl.ExitReadLock();
-
-				toFree.ForEach (this.FreeSource);
 
 				Thread.Sleep (100);
 			}
@@ -126,7 +122,9 @@ namespace Gablarski.Client.Providers.OpenAL
 			rwl.EnterWriteLock();
 			owners.Clear ();
 
-			Al.alDeleteSources (this.sources.Length, this.sources);
+			//Al.alDeleteSources (this.sources.Length, this.sources);
+			foreach (int source in owners.Keys)
+				Al.alDeleteSources (1, (int*)source);
 
 			rwl.ExitWriteLock();
 

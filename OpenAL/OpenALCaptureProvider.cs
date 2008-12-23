@@ -179,7 +179,7 @@ namespace Gablarski.Client.Providers.OpenAL
 					}
 				}
 
-				Thread.Sleep (10);
+				Thread.Sleep (30);
 			}
 		}
 

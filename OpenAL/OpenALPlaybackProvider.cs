@@ -32,7 +32,7 @@ namespace Gablarski.Client.Providers.OpenAL
 
 		public void QueuePlayback (byte[] data, uint playerID)
 		{
-			int source = this.sourcePool.RequestSource (playerID);
+			int source = this.sourcePool.RequestSource (playerID, false);
 			if (source == -1)
 				return;
 			
