@@ -32,10 +32,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Speex.NET, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Speex.NET.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -48,10 +44,15 @@
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="Tao.FFmpeg, Version=0.4.9.0, Culture=neutral, PublicKeyToken=9c7a200e36c0094e, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ByteExtensions.cs" />
     <Compile Include="ChannelInfo.cs" />
+    <Compile Include="IAudioDecoder.cs" />
+    <Compile Include="IAudioEncoder.cs" />
+    <Compile Include="AudioSource.cs" />
+    <Compile Include="Client\VoiceSource.cs" />
     <Compile Include="DecodedUser.cs" />
     <Compile Include="Client\GablarskiClient.cs" />
     <Compile Include="Client\ICaptureDevice.cs" />

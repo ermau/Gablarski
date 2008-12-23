@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace Gablarski.Client.Providers.OpenAL
 {
-	internal unsafe class OpenALSourcePool
+	internal class OpenALSourcePool
         : IDisposable
 	{
 		static public int TotalSourcesAvailable
@@ -30,7 +30,7 @@ namespace Gablarski.Client.Providers.OpenAL
 			                        }).Start();
 		}
 
-		public int RequestSource (uint ownerID, bool stereo)
+		public int RequestSource (uint sourceID, bool stereo)
 		{
 			rwl.EnterUpgradeableReadLock ();
 
@@ -42,7 +42,7 @@ namespace Gablarski.Client.Providers.OpenAL
 					free = kvp.Key;
 					break;
 				}
-				else if (kvp.Value == ownerID)
+				else if (kvp.Value == sourceID)
 				{
 					rwl.ExitUpgradeableReadLock ();
 					return kvp.Key;
@@ -62,7 +62,7 @@ namespace Gablarski.Client.Providers.OpenAL
 
 			rwl.EnterWriteLock ();
 			sourcesAvailable -= (stereo) ? 2 : 1;
-			owners[free] = ownerID;
+			owners[free] = sourceID;
 			rwl.ExitWriteLock ();
 			rwl.ExitUpgradeableReadLock ();
 
@@ -89,8 +89,6 @@ namespace Gablarski.Client.Providers.OpenAL
 		{
 			while (this.collecting)
 			{
-				List<int> toFree = new List<int> (TotalSourcesAvailable);
-
 				rwl.EnterReadLock();
 				foreach (int sourceID in owners.Keys)
 				{
@@ -115,14 +113,13 @@ namespace Gablarski.Client.Providers.OpenAL
 
 		#region IDisposable Members
 
-		public void Dispose ()
+		public unsafe void Dispose ()
 		{
 			this.collecting = false;
 
 			rwl.EnterWriteLock();
 			owners.Clear ();
 
-			//Al.alDeleteSources (this.sources.Length, this.sources);
 			foreach (int source in owners.Keys)
 				Al.alDeleteSources (1, (int*)source);
 

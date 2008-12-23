@@ -30,21 +30,22 @@ namespace Gablarski.Client.Providers.OpenAL
 
 		#region IPlaybackProvider Members
 
-		public void QueuePlayback (byte[] data, uint playerID)
+		public void QueuePlayback (byte[] data, AudioSource source)
 		{
-			int source = this.sourcePool.RequestSource (playerID, false);
-			if (source == -1)
+			bool stereo = (source.Channels == AudioSourceChannels.Stereo);
+			int alSource = this.sourcePool.RequestSource (source.ID, stereo);
+			if (alSource == -1)
 				return;
 			
 			int newBuffer;
 			Al.alGenBuffers (1, out newBuffer);
-			Al.alBufferData (newBuffer, Al.AL_FORMAT_MONO16, data, data.Length, 44100);
-			Al.alSourceQueueBuffers (source, 1, ref newBuffer);
+			Al.alBufferData (newBuffer, ((stereo) ? Al.AL_FORMAT_STEREO16 : Al.AL_FORMAT_MONO16), data, data.Length, 44100);
+			Al.alSourceQueueBuffers (alSource, 1, ref newBuffer);
 
 			int state;
-			Al.alGetSourcei (source, Al.AL_SOURCE_STATE, out state);
+			Al.alGetSourcei (alSource, Al.AL_SOURCE_STATE, out state);
 			if (state != Al.AL_PLAYING)
-				Al.alSourcePlay (source);
+				Al.alSourcePlay (alSource);
 		}
 
 		#endregion

@@ -28,11 +28,13 @@ namespace Gablarski
 
 		internal static DecodedUser Decode (this IUser self, NetBuffer buffer)
 		{
-			var user = new DecodedUser();
-			user.ID = buffer.ReadVariableUInt32 ();
-			user.State = (UserState)buffer.ReadVariableUInt32 ();
-			user.Nickname = buffer.ReadString ();
-			user.Username = buffer.ReadString ();
+			var user = new DecodedUser
+			{
+				ID = buffer.ReadVariableUInt32(),
+				State = ((UserState) buffer.ReadVariableUInt32()),
+				Nickname = buffer.ReadString(),
+				Username = buffer.ReadString()
+			};
 
 			return user;
 		}

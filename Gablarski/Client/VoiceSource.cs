@@ -5,9 +5,8 @@ using System.Text;
 
 namespace Gablarski.Client
 {
-	public interface IPlaybackProvider
-		: IDisposable
+	public class VoiceSource
+		: AudioSource
 	{
-		void QueuePlayback (byte[] data, AudioSource source);
 	}
 }
