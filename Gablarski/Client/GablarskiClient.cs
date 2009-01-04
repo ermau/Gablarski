@@ -17,7 +17,7 @@ namespace Gablarski.Client
 		public event EventHandler<UserListEventArgs> UserList;
 		public event EventHandler<UserEventArgs> UserLogin;
 		public event EventHandler<UserEventArgs> UserLogout;
-		public event EventHandler<VoiceEventArgs> VoiceReceived;
+		public event EventHandler<AudioEventArgs> VoiceReceived;
 
 		public bool IsRunning
 		{
@@ -79,8 +79,9 @@ namespace Gablarski.Client
 
 		public void SendVoiceData (byte[] data)
 		{
-			ClientMessage msg = new ClientMessage (ClientMessages.VoiceData, this.connection);
+			ClientMessage msg = new ClientMessage (ClientMessages.AudioData, this.connection);
 			var buffer = msg.GetBuffer ();
+
 			buffer.WriteVariableInt32 (data.Length);
 			buffer.Write (data);
 			msg.Send (this.client, NetChannel.Unreliable);
@@ -205,7 +206,7 @@ namespace Gablarski.Client
 				ulogout (this, e);
 		}
 
-		protected virtual void OnVoiceReceived (VoiceEventArgs e)
+		protected virtual void OnVoiceReceived (AudioEventArgs e)
 		{
 			var voice = this.VoiceReceived;
 			if (voice != null)
@@ -297,7 +298,7 @@ namespace Gablarski.Client
 									this.OnUserLogout(new UserEventArgs(new DecodedUser().Decode(buffer)));
 									break;
 
-								case ServerMessages.VoiceData:
+								case ServerMessages.AudioData:
 									IUser user = this.GetUser (buffer.ReadVariableUInt32());
 									if (user == null)
 										continue;
@@ -306,7 +307,7 @@ namespace Gablarski.Client
 									if (voiceLen <= 0)
 										continue;
 
-									this.OnVoiceReceived (new VoiceEventArgs (user, buffer.ReadBytes (voiceLen)));
+									this.OnVoiceReceived (new AudioEventArgs (user, buffer.ReadBytes (voiceLen)));
 									break;
 							}
 

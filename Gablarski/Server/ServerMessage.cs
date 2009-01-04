@@ -46,7 +46,7 @@ namespace Gablarski.Server
 		LoggedIn			= 4,
 		UserConnected		= 5,
 		UserDisconnected	= 6,
-		VoiceData			= 7,
+		AudioData			= 7,
 		UserList			= 8,
 		ChannelList			= 9
 	}

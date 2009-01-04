@@ -31,9 +31,9 @@ namespace Gablarski.Client
 	public enum ClientMessages
 		: uint
 	{
-		Ping		= 1,
-		Login		= 2,
-		Disconnect	= 3,
-		VoiceData	= 4
+		Ping			= 1,
+		Login			= 2,
+		Disconnect		= 3,
+		AudioData		= 4
 	}
 }

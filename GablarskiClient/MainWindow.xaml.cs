@@ -53,7 +53,7 @@ namespace Gablarski.Client
 			capture.StartCapture();
 		}
 
-		private Gablarski.Client.GablarskiClient client;
+		private GablarskiClient client;
 		private ICaptureProvider capture;
 
 		private void connectButton_Click(object sender, RoutedEventArgs e)
@@ -64,7 +64,7 @@ namespace Gablarski.Client
 			client.LoggedIn		+= client_LoggedIn;
 			client.UserLogin	+= client_UserLogin;
 			client.UserLogout	+= client_UserLogout;
-			client.VoiceReceived += client_VoiceReceived;
+			client.VoiceReceived += this.client_AudioReceived;
 			client.Connect (this.host.Text, 6112);
 			client.Login (this.nickname.Text);
 
@@ -82,9 +82,9 @@ namespace Gablarski.Client
 		}
 
 		private OpenALPlaybackProvider playback;
-		void client_VoiceReceived (object sender, Gablarski.VoiceEventArgs e)
+		void client_AudioReceived (object sender, Gablarski.AudioEventArgs e)
 		{
-			this.Log ("Received voice data from: " + e.User.Nickname);
+			this.Log ("Received audio data from: " + e.Source.Owner.Nickname);
 
 			if (this.playback == null)
 				this.playback = new OpenALPlaybackProvider ();

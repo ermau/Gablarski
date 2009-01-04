@@ -34,13 +34,18 @@ namespace Gablarski
 		}
 	}
 
-	public class VoiceEventArgs
-		: UserEventArgs
+	public class AudioEventArgs
+		: EventArgs
 	{
-		public VoiceEventArgs (IUser user, byte[] voiceData)
-			: base (user)
+		public AudioEventArgs (AudioSource source, byte[] voiceData)
 		{
+			this.Source = source;
 			this.VoiceData = voiceData;
+		}
+
+		public AudioSource Source
+		{
+			get; private set;
 		}
 
 		public byte[] VoiceData

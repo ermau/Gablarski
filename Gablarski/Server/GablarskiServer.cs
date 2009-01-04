@@ -19,7 +19,7 @@ namespace Gablarski.Server
 		public event EventHandler<ConnectionEventArgs> ClientConnected;
 		public event EventHandler<ReasonEventArgs> ClientDisconnected;
 		public event EventHandler<ConnectionEventArgs> UserLogin;
-		public event EventHandler<VoiceEventArgs> VoiceReceived;
+		public event EventHandler<AudioEventArgs> VoiceReceived;
 
 		public bool IsRunning
 		{
@@ -109,15 +109,21 @@ namespace Gablarski.Server
 					switch (type)
 					{
 						case NetMessageType.StatusChanged:
-							if (sender.Status == NetConnectionStatus.Connected)
+						{
+							switch (sender.Status)
 							{
-								e.UserConnection.AuthHash = GenerateHash ();
-								this.OnClientConnected (e);
+								case NetConnectionStatus.Connected:
+									e.UserConnection.AuthHash = GenerateHash();
+									this.OnClientConnected (e);
+									break;
+
+								case NetConnectionStatus.Disconnected:
+									this.OnClientDisconnected (new ReasonEventArgs (e, buffer.ReadString()));
+									break;
 							}
-							else if (sender.Status == NetConnectionStatus.Disconnected)
-								this.OnClientDisconnected (new ReasonEventArgs(e, buffer.ReadString()));
 
 							break;
+						}
 
 						case NetMessageType.Data:
 							byte sanity = buffer.ReadByte();
@@ -147,14 +153,14 @@ namespace Gablarski.Server
 									this.ClientDisconnect (new ReasonEventArgs (e, "Client requested"), true);
 									break;
 
-								case ClientMessages.VoiceData:
+								case ClientMessages.AudioData:
 									Trace.WriteLine ("Received voice data from: " + e.UserConnection.User.Nickname);
 
 									int voiceLen = buffer.ReadVariableInt32();
 									if (voiceLen <= 0)
 										continue;
 
-									ServerMessage msg = new ServerMessage (ServerMessages.VoiceData, this.users.Values.Where (uc => uc != e.UserConnection));
+									ServerMessage msg = new ServerMessage (ServerMessages.AudioData, this.users.Values.Where (uc => uc != e.UserConnection));
 									var msgbuffer = msg.GetBuffer ();
 									msgbuffer.WriteVariableUInt32 (e.UserConnection.User.ID);
 									msgbuffer.WriteVariableInt32 (voiceLen);
