@@ -7,6 +7,16 @@ namespace Gablarski.Server
 {
 	public interface IAuthProvider
 	{
+		/// <summary>
+		/// Gets whether or not unregistered users are supported
+		/// </summary>
+		bool GuestsAllowed { get; }
+
+		/// <summary>
+		/// Checks to see if the user exists.
+		/// </summary>
+		/// <param name="username">The username to check</param>
+		/// <returns><c>true</c> if the user exists, <c>false</c> if not</returns>
 		bool CheckUserExists (string username);
 
 		/// <summary>

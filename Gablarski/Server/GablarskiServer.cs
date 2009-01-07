@@ -19,7 +19,7 @@ namespace Gablarski.Server
 		public event EventHandler<ConnectionEventArgs> ClientConnected;
 		public event EventHandler<ReasonEventArgs> ClientDisconnected;
 		public event EventHandler<ConnectionEventArgs> UserLogin;
-		public event EventHandler<AudioEventArgs> VoiceReceived;
+		public event EventHandler<MediaEventArgs> VoiceReceived;
 
 		public bool IsRunning
 		{
@@ -83,6 +83,55 @@ namespace Gablarski.Server
 		private readonly ReaderWriterLockSlim userRWL = new ReaderWriterLockSlim();
 		private readonly Dictionary<int, DateTime> pendingLogins = new Dictionary<int, DateTime>();
 		private readonly Dictionary<int, UserConnection> users = new Dictionary<int, UserConnection> ();
+		private readonly Dictionary<IUser, List<IMediaSource>> sources = new Dictionary<IUser, List<IMediaSource>>();
+
+		private bool RequestSource (MediaSourceType type, IUser requester, out IMediaSource source)
+		{
+			source = null;
+
+			userRWL.EnterUpgradeableReadLock();
+			
+			if (!sources.ContainsKey (requester))
+			{
+				userRWL.EnterWriteLock();
+				sources.Add (requester, new List<IMediaSource>());
+				userRWL.ExitWriteLock();
+			}
+
+			if (!sources[requester].Any (s => s.Type == type))
+			{
+				userRWL.EnterWriteLock();
+				source = CreateSource (sources.Values.Max (m => m.Max (s => s.ID)) + 1, type, requester);
+
+				if (source != null)
+				{
+					sources[requester].Add (source);
+					userRWL.ExitWriteLock ();
+					return true;
+				}
+				else
+					userRWL.ExitWriteLock();
+			}
+			
+			userRWL.ExitUpgradeableReadLock();
+
+			return false;
+		}
+
+		private IMediaSource CreateSource (int sourceID, MediaSourceType type, IUser owner)
+		{
+			IMediaSource source;
+
+			switch (type)
+			{
+				case MediaSourceType.Voice:
+				default:
+					source = new VoiceSource (sourceID, owner);
+					break;
+			}
+
+			return source;
+		}
 
 		private void ServerRunner ()
 		{

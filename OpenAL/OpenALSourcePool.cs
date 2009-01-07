@@ -30,7 +30,7 @@ namespace Gablarski.Client.Providers.OpenAL
 			                        }).Start();
 		}
 
-		public int RequestSource (uint sourceID, bool stereo)
+		public int RequestSource (int sourceID, bool stereo)
 		{
 			rwl.EnterUpgradeableReadLock ();
 
@@ -81,7 +81,7 @@ namespace Gablarski.Client.Providers.OpenAL
 		private bool collecting;
 		private readonly ReaderWriterLockSlim rwl = new ReaderWriterLockSlim ();
 
-		private readonly Dictionary<int, uint> owners = new Dictionary<int, uint> (TotalSourcesAvailable);
+		private readonly Dictionary<int, int> owners = new Dictionary<int, int> (TotalSourcesAvailable);
 
 		private readonly IntPtr device;
 

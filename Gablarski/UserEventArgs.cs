@@ -34,24 +34,17 @@ namespace Gablarski
 		}
 	}
 
-	public class AudioEventArgs
+	public class MediaEventArgs
 		: EventArgs
 	{
-		public AudioEventArgs (AudioSource source, byte[] voiceData)
+		public MediaEventArgs (IMediaSource source)
 		{
 			this.Source = source;
-			this.VoiceData = voiceData;
 		}
 
-		public AudioSource Source
+		public IMediaSource Source
 		{
 			get; private set;
-		}
-
-		public byte[] VoiceData
-		{
-			get;
-			private set;
 		}
 	}
 }

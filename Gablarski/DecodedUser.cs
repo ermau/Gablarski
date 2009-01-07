@@ -25,12 +25,12 @@ namespace Gablarski
 			get; set;
 		}
 
-		public UserState State
-		{
-			get; set;
-		}
+		//public UserState State
+		//{
+		//    get; set;
+		//}
 
-		public ChannelInfo Channel
+		public Channel Channel
 		{
 			get; set;
 		}

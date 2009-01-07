@@ -30,9 +30,9 @@ namespace Gablarski.Client.Providers.OpenAL
 
 		#region IPlaybackProvider Members
 
-		public void QueuePlayback (byte[] data, AudioSource source)
+		public void QueuePlayback (byte[] data, IMediaSource source)
 		{
-			bool stereo = (source.Channels == AudioSourceChannels.Stereo);
+			bool stereo = false;// (source.Channels == AudioSourceChannels.Stereo);
 			int alSource = this.sourcePool.RequestSource (source.ID, stereo);
 			if (alSource == -1)
 				return;

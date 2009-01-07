@@ -13,6 +13,10 @@ namespace Gablarski.Server.Providers
 		: IAuthProvider
 	{
 		#region IAuthProvider Members
+		public bool GuestsAllowed
+		{
+			get { return true; }
+		}
 
 		public bool CheckUserExists (string username)
 		{
@@ -44,8 +48,8 @@ namespace Gablarski.Server.Providers
 			this.ID = userID;
 			this.Nickname = nickname;
 
-			this.State = (userID == 1) ? UserState.Registered : UserState.Unregistered;
-			if (this.State == UserState.Registered)
+			//this.State = (userID == 1) ? UserState.Registered : UserState.Unregistered;
+			//if (this.State == UserState.Registered)
 				this.Username = this.Nickname;
 		}
 
@@ -66,12 +70,12 @@ namespace Gablarski.Server.Providers
 			get; set;
 		}
 
-		public UserState State
-		{
-			get; set;
-		}
+		//public UserState State
+		//{
+		//    get; set;
+		//}
 
-		public ChannelInfo Channel
+		public Channel Channel
 		{
 			get; set;
 		}

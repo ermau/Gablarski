@@ -17,7 +17,7 @@ namespace Gablarski.Client
 		public event EventHandler<UserListEventArgs> UserList;
 		public event EventHandler<UserEventArgs> UserLogin;
 		public event EventHandler<UserEventArgs> UserLogout;
-		public event EventHandler<AudioEventArgs> VoiceReceived;
+		public event EventHandler<MediaEventArgs> VoiceReceived;
 
 		public bool IsRunning
 		{
@@ -206,7 +206,7 @@ namespace Gablarski.Client
 				ulogout (this, e);
 		}
 
-		protected virtual void OnVoiceReceived (AudioEventArgs e)
+		protected virtual void OnVoiceReceived (MediaEventArgs e)
 		{
 			var voice = this.VoiceReceived;
 			if (voice != null)
@@ -298,17 +298,17 @@ namespace Gablarski.Client
 									this.OnUserLogout(new UserEventArgs(new DecodedUser().Decode(buffer)));
 									break;
 
-								case ServerMessages.AudioData:
-									IUser user = this.GetUser (buffer.ReadVariableUInt32());
-									if (user == null)
-										continue;
+								//case ServerMessages.AudioData:
+								//    IUser user = this.GetUser (buffer.ReadVariableUInt32());
+								//    if (user == null)
+								//        continue;
 
-									int voiceLen = buffer.ReadVariableInt32();
-									if (voiceLen <= 0)
-										continue;
+								//    int voiceLen = buffer.ReadVariableInt32();
+								//    if (voiceLen <= 0)
+								//        continue;
 
-									this.OnVoiceReceived (new AudioEventArgs (user, buffer.ReadBytes (voiceLen)));
-									break;
+								//    this.OnVoiceReceived (new MediaEventArgs (user, buffer.ReadBytes (voiceLen)));
+								//    break;
 							}
 
 							break;

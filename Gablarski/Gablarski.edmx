@@ -1,0 +1,209 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="1.0" xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="Gablarski.Server.Store" Alias="Self" Provider="System.Data.SQLite" ProviderManifestToken="ISO8601" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2006/04/edm/ssdl">
+        <EntityContainer Name="GablarskiServerStoreContainer">
+          <EntitySet Name="Channels" EntityType="Gablarski.Server.Store.Channels" store:Type="Tables" />
+          <EntitySet Name="Permissions" EntityType="Gablarski.Server.Store.Permissions" store:Type="Tables" />
+          <EntitySet Name="Users" EntityType="Gablarski.Server.Store.Users" store:Type="Tables" />
+          <AssociationSet Name="FK_Permissions_0" Association="Gablarski.Server.Store.FK_Permissions_0">
+            <End Role="Channels" EntitySet="Channels" />
+            <End Role="Permissions" EntitySet="Permissions" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Permissions_1" Association="Gablarski.Server.Store.FK_Permissions_1">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Permissions" EntitySet="Permissions" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="Channels">
+          <Key>
+            <PropertyRef Name="channelID" />
+          </Key>
+          <Property Name="channelID" Type="int" Nullable="false" />
+          <Property Name="channelParent" Type="int" Nullable="false" />
+          <Property Name="channelName" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="channelDesc" Type="nvarchar" Nullable="false" MaxLength="255" />
+        </EntityType>
+        <EntityType Name="Permissions">
+          <Key>
+            <PropertyRef Name="permissionID" />
+          </Key>
+          <Property Name="permissionID" Type="int" Nullable="false" />
+          <Property Name="permissionUserID" Type="int" Nullable="false" />
+          <Property Name="permissionChannelID" Type="int" Nullable="false" />
+          <Property Name="permissionKey" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="permissionValue" Type="nvarchar" Nullable="false" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="Users">
+          <Key>
+            <PropertyRef Name="userID" />
+          </Key>
+          <Property Name="userID" Type="int" Nullable="false" />
+          <Property Name="userName" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="userPassword" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="userAdmin" Type="bit" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_Permissions_0">
+          <End Role="Channels" Type="Gablarski.Server.Store.Channels" Multiplicity="1" />
+          <End Role="Permissions" Type="Gablarski.Server.Store.Permissions" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Channels">
+              <PropertyRef Name="channelID" />
+            </Principal>
+            <Dependent Role="Permissions">
+              <PropertyRef Name="permissionChannelID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Permissions_1">
+          <End Role="Users" Type="Gablarski.Server.Store.Users" Multiplicity="1" />
+          <End Role="Permissions" Type="Gablarski.Server.Store.Permissions" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="userID" />
+            </Principal>
+            <Dependent Role="Permissions">
+              <PropertyRef Name="permissionUserID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="Gablarski.Server" Alias="Self" xmlns="http://schemas.microsoft.com/ado/2006/04/edm">
+        <EntityContainer Name="GablarskiDB">
+          <EntitySet Name="ChannelSet" EntityType="Gablarski.Server.Channel" />
+          <EntitySet Name="PermissionSet" EntityType="Gablarski.Server.Permission" />
+          <EntitySet Name="UserSet" EntityType="Gablarski.Server.User" />
+          <AssociationSet Name="FK_Permissions_Channels" Association="Gablarski.Server.FK_Permissions_Channels">
+            <End Role="Channels" EntitySet="ChannelSet" />
+            <End Role="Permissions" EntitySet="PermissionSet" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Permissions_Users" Association="Gablarski.Server.FK_Permissions_Users">
+            <End Role="Users" EntitySet="UserSet" />
+            <End Role="Permissions" EntitySet="PermissionSet" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="Channel">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="ParentID" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="Description" Type="String" Nullable="false" MaxLength="255" Unicode="true" FixedLength="false" />
+          <NavigationProperty Name="Permissions" Relationship="Gablarski.Server.FK_Permissions_Channels" FromRole="Channels" ToRole="Permissions" />
+        </EntityType>
+        <EntityType Name="Permission">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="Key" Type="String" Nullable="false" MaxLength="50" Unicode="true" FixedLength="false" />
+          <NavigationProperty Name="Channel" Relationship="Gablarski.Server.FK_Permissions_Channels" FromRole="Permissions" ToRole="Channels" />
+          <NavigationProperty Name="User" Relationship="Gablarski.Server.FK_Permissions_Users" FromRole="Permissions" ToRole="Users" />
+          <Property Name="Value" Type="String" Nullable="false" /></EntityType>
+        <EntityType Name="User">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="Password" Type="String" Nullable="false" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="Admin" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="Permissions" Relationship="Gablarski.Server.FK_Permissions_Users" FromRole="Users" ToRole="Permissions" />
+        </EntityType>
+        <Association Name="FK_Permissions_Channels">
+          <End Role="Channels" Type="Gablarski.Server.Channel" Multiplicity="1" />
+          <End Role="Permissions" Type="Gablarski.Server.Permission" Multiplicity="*" />
+        </Association>
+        <Association Name="FK_Permissions_Users">
+          <End Role="Users" Type="Gablarski.Server.User" Multiplicity="1" />
+          <End Role="Permissions" Type="Gablarski.Server.Permission" Multiplicity="*" />
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="urn:schemas-microsoft-com:windows:storage:mapping:CS">
+        <EntityContainerMapping StorageEntityContainer="GablarskiServerStoreContainer" CdmEntityContainer="GablarskiDB">
+          <EntitySetMapping Name="ChannelSet">
+            <EntityTypeMapping TypeName="IsTypeOf(Gablarski.Server.Channel)">
+              <MappingFragment StoreEntitySet="Channels">
+                <ScalarProperty Name="ID" ColumnName="channelID" />
+                <ScalarProperty Name="ParentID" ColumnName="channelParent" />
+                <ScalarProperty Name="Name" ColumnName="channelName" />
+                <ScalarProperty Name="Description" ColumnName="channelDesc" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PermissionSet">
+            <EntityTypeMapping TypeName="IsTypeOf(Gablarski.Server.Permission)">
+              <MappingFragment StoreEntitySet="Permissions">
+                <ScalarProperty Name="Value" ColumnName="permissionValue" />
+                <ScalarProperty Name="ID" ColumnName="permissionID" />
+                <ScalarProperty Name="Key" ColumnName="permissionKey" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="UserSet">
+            <EntityTypeMapping TypeName="IsTypeOf(Gablarski.Server.User)">
+              <MappingFragment StoreEntitySet="Users">
+                <ScalarProperty Name="ID" ColumnName="userID" />
+                <ScalarProperty Name="Name" ColumnName="userName" />
+                <ScalarProperty Name="Password" ColumnName="userPassword" />
+                <ScalarProperty Name="Admin" ColumnName="userAdmin" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <AssociationSetMapping Name="FK_Permissions_Channels" TypeName="Gablarski.Server.FK_Permissions_Channels" StoreEntitySet="Permissions">
+            <EndProperty Name="Channels">
+              <ScalarProperty Name="ID" ColumnName="permissionChannelID" />
+            </EndProperty>
+            <EndProperty Name="Permissions">
+              <ScalarProperty Name="ID" ColumnName="permissionID" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="FK_Permissions_Users" TypeName="Gablarski.Server.FK_Permissions_Users" StoreEntitySet="Permissions">
+            <EndProperty Name="Users">
+              <ScalarProperty Name="ID" ColumnName="permissionUserID" />
+            </EndProperty>
+            <EndProperty Name="Permissions">
+              <ScalarProperty Name="ID" ColumnName="permissionID" />
+            </EndProperty>
+          </AssociationSetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2007/06/edmx">
+    <edmx:Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </edmx:Connection>
+    <edmx:Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+      </DesignerInfoPropertySet>
+    </edmx:Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram Name="Gablarski">
+        <EntityTypeShape EntityType="Gablarski.Server.Channel" Width="1.5" PointX="0.5" PointY="3.5" Height="1.9802864583333335" IsExpanded="true" />
+        <EntityTypeShape EntityType="Gablarski.Server.Permission" Width="1.5" PointX="3.5" PointY="0.5" Height="1.7879850260416665" IsExpanded="true" />
+        <EntityTypeShape EntityType="Gablarski.Server.User" Width="1.5" PointX="0.5" PointY="0.5" Height="1.9802864583333335" IsExpanded="true" />
+        <AssociationConnector Association="Gablarski.Server.FK_Permissions_Channels" ManuallyRouted="false">
+          <ConnectorPoint PointX="2" PointY="4.4901432291666667" />
+          <ConnectorPoint PointX="4.25" PointY="4.4901432291666667" />
+          <ConnectorPoint PointX="4.25" PointY="2.2879850260416665" /></AssociationConnector>
+        <AssociationConnector Association="Gablarski.Server.FK_Permissions_Users" ManuallyRouted="false">
+          <ConnectorPoint PointX="2" PointY="1.3939925130208333" />
+          <ConnectorPoint PointX="3.5" PointY="1.3939925130208333" />
+          </AssociationConnector></Diagram></edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

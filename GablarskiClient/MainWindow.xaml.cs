@@ -82,7 +82,7 @@ namespace Gablarski.Client
 		}
 
 		private OpenALPlaybackProvider playback;
-		void client_AudioReceived (object sender, Gablarski.AudioEventArgs e)
+		void client_AudioReceived (object sender, Gablarski.MediaEventArgs e)
 		{
 			this.Log ("Received audio data from: " + e.Source.Owner.Nickname);
 

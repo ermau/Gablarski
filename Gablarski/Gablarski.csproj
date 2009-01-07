@@ -22,6 +22,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -36,6 +38,13 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Data.Entity">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Security" />
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -48,17 +57,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ByteExtensions.cs" />
-    <Compile Include="ChannelInfo.cs" />
-    <Compile Include="IAudioDecoder.cs" />
-    <Compile Include="IAudioEncoder.cs" />
-    <Compile Include="AudioSource.cs" />
-    <Compile Include="Client\VoiceSource.cs" />
+    <Compile Include="Codecs\PassthruCodec.cs" />
     <Compile Include="DecodedUser.cs" />
     <Compile Include="Client\GablarskiClient.cs" />
     <Compile Include="Client\ICaptureDevice.cs" />
     <Compile Include="Client\ICaptureProvider.cs" />
     <Compile Include="Client\IPlaybackProvider.cs" />
     <Compile Include="ConnectionEventArgs.cs" />
+    <Compile Include="Gablarski1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Gablarski.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="IMediaCodec.cs" />
+    <Compile Include="IMediaSource.cs" />
     <Compile Include="IPlugin.cs" />
     <Compile Include="IUser.cs" />
     <Compile Include="Server\IAuthProvider.cs" />
@@ -73,12 +85,22 @@
     <Compile Include="Server\ServerMessage.cs" />
     <Compile Include="UserConnection.cs" />
     <Compile Include="UserEventArgs.cs" />
+    <Compile Include="VoiceSource.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lidgren.Network\Lidgren.Network.csproj">
       <Project>{BA202214-F6F8-4853-BCC9-CA4F13C5F479}</Project>
       <Name>Lidgren.Network</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.Config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EntityDeploy Include="Gablarski.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>Gablarski1.Designer.cs</LastGenOutput>
+    </EntityDeploy>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
