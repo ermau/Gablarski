@@ -1,29 +1,8 @@
 ﻿<Window x:Class="Gablarski.Client.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Title="Gablarski" Height="300" Width="800" Closed="Window_Closed">
-    <Grid Margin="5">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="259*" />
-            <ColumnDefinition Width="210*" />
-        </Grid.ColumnDefinitions>
-        <Label VerticalAlignment="Top" HorizontalAlignment="Left" Margin="12,12,0,0" Width="37.31" Height="25.96" Grid.Column="0">Host:</Label>
-		<Label HorizontalAlignment="Left" Margin="12,44,0,0" Width="65.5" Height="26" VerticalAlignment="Top">Nickname:</Label>
-
-		<TextBox Name="host" Margin="84,14,16.562,0" Height="22" VerticalAlignment="Top" Grid.Column="0">localhost</TextBox>
-		<TextBox Name="nickname" Margin="83,48,16.562,0" Height="22" VerticalAlignment="Top" Grid.Column="0">Rogue Jedi</TextBox>
-		<Button Name="connectButton" Margin="84,84,0,0" Click="connectButton_Click" Height="23" VerticalAlignment="Top" HorizontalAlignment="Left" Width="73" Grid.Column="0">Connect</Button>
-
-		<Image Width="16" Margin="12,84,0,0" Name="statusImage" Source="./Resources/disconnect.png" HorizontalAlignment="Left" Height="16" VerticalAlignment="Top" Grid.Column="0" />
-		<Button IsEnabled="False" Margin="163,83,0,0" Name="disconnectButton" Height="24" VerticalAlignment="Top" Click="disconnectButton_Click" HorizontalAlignment="Left" Width="79.438" Grid.Column="0">Disconnect</Button>
-        <Button Height="23" Click="talk_Click" HorizontalAlignment="Left" Margin="52,84,0,0" Name="talk" VerticalAlignment="Top" Width="26" IsEnabled="False" ClickMode="Release">
-            <Image Name="talkStatus" Source="./Resources/sound_none.png" />
-        </Button>
-        <Button Grid.Column="1" Height="23" Margin="16,14.96,165,0" Name="startServer" IsEnabled="True" VerticalAlignment="Top" Click="startServer_Click">Start Server</Button>
-        <Button Grid.Column="1" Height="23" HorizontalAlignment="Right" Margin="0,14.96,12,0" IsEnabled="False" Name="stopServer" VerticalAlignment="Top" Width="147">Stop Server</Button>
-		<TextBox Margin="12,113,16.562,12" Name="log" IsReadOnly="True" VerticalScrollBarVisibility="Auto" />
-		<TextBox Grid.Column="1" Margin="16,48,12,12" Name="serverLog" VerticalScrollBarVisibility="Auto" IsReadOnly="True" />
-        <TextBox Height="23" Margin="0,84,16.562,0" Name="pushtotalk" VerticalAlignment="Top" HorizontalAlignment="Right" Width="64" PreviewKeyUp="pushtotalk_PreviewKeyUp" />
-        <Label Height="23" HorizontalAlignment="Right" Margin="0,84,87,0" VerticalAlignment="Top" Width="77">Push-to-talk:</Label>
-    </Grid>
+    Title="Gablarski" Height="300" Width="300">
+    <Grid>
+		<Button Height="54" Margin="65,37,65,0" Name="joinServer" VerticalAlignment="Top" FontSize="24">Join Server</Button>
+	</Grid>
 </Window>
