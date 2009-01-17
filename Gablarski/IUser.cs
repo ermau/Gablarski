@@ -35,30 +35,6 @@ namespace Gablarski
 		Channel Channel { get; }
 	}
 
-	internal static class UserExtensions
-	{
-		internal static void Encode (this IUser self, NetBuffer buffer)
-		{
-			buffer.WriteVariableUInt32 (self.ID);
-			//buffer.WriteVariableUInt32 ((uint)self.State);
-			buffer.Write (self.Nickname);
-			buffer.Write (self.Username);
-		}
-
-		internal static DecodedUser Decode (this IUser self, NetBuffer buffer)
-		{
-			var user = new DecodedUser
-			{
-				ID = buffer.ReadVariableUInt32(),
-				//State = ((UserState) buffer.ReadVariableUInt32()),
-				Nickname = buffer.ReadString(),
-				Username = buffer.ReadString()
-			};
-
-			return user;
-		}
-	}
-
 	//[Flags]
 	//public enum UserState
 	//    : uint

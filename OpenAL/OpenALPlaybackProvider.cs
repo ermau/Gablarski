@@ -32,7 +32,7 @@ namespace Gablarski.Client.Providers.OpenAL
 
 		public void QueuePlayback (byte[] data, IMediaSource source)
 		{
-			bool stereo = false;// (source.Channels == AudioSourceChannels.Stereo);
+			bool stereo = true;// (source.Channels == AudioSourceChannels.Stereo);
 			int alSource = this.sourcePool.RequestSource (source.ID, stereo);
 			if (alSource == -1)
 				return;

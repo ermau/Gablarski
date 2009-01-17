@@ -19,7 +19,6 @@ namespace Gablarski.Server
 		public event EventHandler<ConnectionEventArgs> ClientConnected;
 		public event EventHandler<ReasonEventArgs> ClientDisconnected;
 		public event EventHandler<ConnectionEventArgs> UserLogin;
-		public event EventHandler<MediaEventArgs> VoiceReceived;
 
 		public bool IsRunning
 		{
@@ -101,7 +100,7 @@ namespace Gablarski.Server
 			if (!sources[requester].Any (s => s.Type == type))
 			{
 				userRWL.EnterWriteLock();
-				source = CreateSource (sources.Values.Max (m => m.Max (s => s.ID)) + 1, type, requester);
+				source = CreateSource (sources.Values.MaxOrDefault (m => m.MaxOrDefault (s => s.ID, 0), 0) + 1, type, requester);
 
 				if (source != null)
 				{
@@ -209,7 +208,7 @@ namespace Gablarski.Server
 									if (voiceLen <= 0)
 										continue;
 
-									ServerMessage msg = new ServerMessage (ServerMessages.AudioData, this.users.Values.Where (uc => uc != e.UserConnection));
+									ServerMessage msg = new ServerMessage(ServerMessages.AudioData, this.users.Values);//.Where (uc => uc != e.UserConnection));
 									var msgbuffer = msg.GetBuffer ();
 									msgbuffer.WriteVariableUInt32 (e.UserConnection.User.ID);
 									msgbuffer.WriteVariableInt32 (voiceLen);
@@ -250,7 +249,7 @@ namespace Gablarski.Server
 			if (e.UserConnection.User != null)
 			{
 				ServerMessage msg = new ServerMessage (ServerMessages.UserDisconnected, this.users.Values.Where (uc => uc.Connection.Status == NetConnectionStatus.Connected));
-				e.UserConnection.User.Encode (msg.GetBuffer ());
+				msg.GetBuffer ().Write (e.UserConnection.User);
 				msg.Send (this.Server, NetChannel.ReliableUnordered);
 			}
 
@@ -349,25 +348,34 @@ namespace Gablarski.Server
 
 			e.UserConnection.User = result.User;
 
+			IMediaSource source;
+			if (!this.RequestSource (MediaSourceType.Voice, result.User, out source))
+			{
+				this.DisconnectUser (e.UserConnection, "Voice source request failed.", e.Connection);
+				return;
+			}
+
 			userRWL.EnterWriteLock();
 			this.pendingLogins.Remove (e.UserConnection.AuthHash);
 			this.users.Add (e.UserConnection.AuthHash, e.UserConnection);
 			userRWL.ExitWriteLock();
 
 			ServerMessage msg = new ServerMessage (ServerMessages.LoggedIn, e.UserConnection);
-			e.UserConnection.User.Encode (msg.GetBuffer ());
+			var mbuffer = msg.GetBuffer();
+			mbuffer.Write(e.UserConnection.User);
+			mbuffer.Write(source);
 			msg.Send (this.Server, NetChannel.ReliableInOrder1);
 
 			userRWL.EnterReadLock();
 			msg = new ServerMessage (ServerMessages.UserConnected, this.users.Values.Where (uc => uc.Connection.Status == NetConnectionStatus.Connected));
-			e.UserConnection.User.Encode (msg.GetBuffer ());
+			msg.GetBuffer ().Write (e.UserConnection.User);
 			msg.Send (this.Server, NetChannel.ReliableInOrder1);
 
 			msg = new ServerMessage (ServerMessages.UserList, e.UserConnection);
-			var mbuffer = msg.GetBuffer();
+			mbuffer = msg.GetBuffer();
 			mbuffer.WriteVariableInt32 (this.users.Count);
 			foreach (IUser u in this.users.Values.Select (uc => uc.User))
-				u.Encode (mbuffer);
+				mbuffer.Write (u);
 
 			msg.Send (this.Server, NetChannel.ReliableInOrder1);
 

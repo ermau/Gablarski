@@ -17,7 +17,7 @@ namespace Gablarski.Client
 		public event EventHandler<UserListEventArgs> UserList;
 		public event EventHandler<UserEventArgs> UserLogin;
 		public event EventHandler<UserEventArgs> UserLogout;
-		public event EventHandler<MediaEventArgs> VoiceReceived;
+		//public event EventHandler<MediaEventArgs> VoiceReceived;
 
 		public bool IsRunning
 		{
@@ -110,7 +110,11 @@ namespace Gablarski.Client
 		private readonly Dictionary<uint, IUser> users = new Dictionary<uint, IUser> ();
 
 		private bool connecting;
+
+		private IUser user;
+		private List<IMediaSource> sources = new List<IMediaSource>();
 		private UserConnection connection;
+
 		private Thread runnerThread;
 		private NetClient client;
 
@@ -134,7 +138,6 @@ namespace Gablarski.Client
 			this.IsConnected = true;
 			this.connecting = false;
 
-
 			var connected = this.Connected;
 			if (connected != null)
 				connected (this, e);
@@ -144,6 +147,11 @@ namespace Gablarski.Client
 		{
 			this.IsLoggedin = true;
 
+			this.user = e.Buffer.ReadUser();
+
+			userRWL.EnterWriteLock();
+			this.sources.Add (e.Buffer.ReadSource (this.user));
+			userRWL.ExitWriteLock();
 
 			var loggedin = this.LoggedIn;
 			if (loggedin != null)
@@ -155,7 +163,6 @@ namespace Gablarski.Client
 			if (!ValidateAndAddUser (e.User))
 				return;
 
-
 			var ulogin = this.UserLogin;
 			if (ulogin != null)
 				ulogin (this, e);
@@ -163,23 +170,27 @@ namespace Gablarski.Client
 
 		protected virtual void OnUserList (UserListEventArgs e)
 		{
+			bool write = false;
+
 			userRWL.EnterUpgradeableReadLock();
 			foreach (IUser user in e.Users)
 			{
 				if (this.users.ContainsKey (user.ID))
 					continue;
 
-				if (!userRWL.IsWriteLockHeld)
+				if (!write)
+				{
+					write = true;
 					userRWL.EnterWriteLock();
+				}
 
 				this.users.Add (user.ID, user);
 			}
 
-			if (userRWL.IsWriteLockHeld)
+			if (write)
 				userRWL.ExitWriteLock();
 
 			userRWL.ExitUpgradeableReadLock();
-
 
 			var ulist = this.UserList;
 			if (ulist != null)
@@ -206,12 +217,12 @@ namespace Gablarski.Client
 				ulogout (this, e);
 		}
 
-		protected virtual void OnVoiceReceived (MediaEventArgs e)
-		{
-			var voice = this.VoiceReceived;
-			if (voice != null)
-				voice (this, e);
-		}
+		//protected virtual void OnVoiceReceived (MediaEventArgs e)
+		//{
+		//    var voice = this.VoiceReceived;
+		//    if (voice != null)
+		//        voice (this, e);
+		//}
 
 		private bool ValidateAndAddUser (IUser user)
 		{
@@ -280,7 +291,7 @@ namespace Gablarski.Client
 								case ServerMessages.UserList:
 									IUser[] userList = new IUser[buffer.ReadVariableInt32()];
 									for (int i = 0; i < userList.Length; ++i)
-										userList[i] = (new DecodedUser().Decode (buffer));
+										userList[i] = buffer.ReadUser();
 
 									this.OnUserList (new UserListEventArgs (userList));
 
@@ -291,11 +302,11 @@ namespace Gablarski.Client
 									break;
 
 								case ServerMessages.UserConnected:
-									this.OnUserLogin (new UserEventArgs (new DecodedUser ().Decode (buffer)));
+									this.OnUserLogin (new UserEventArgs (buffer.ReadUser()));
 									break;
 
 								case ServerMessages.UserDisconnected:
-									this.OnUserLogout(new UserEventArgs(new DecodedUser().Decode(buffer)));
+									this.OnUserLogout(new UserEventArgs(buffer.ReadUser()));
 									break;
 
 								//case ServerMessages.AudioData:

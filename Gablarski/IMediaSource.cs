@@ -23,12 +23,7 @@ namespace Gablarski
 		/// <summary>
 		/// Gets an implementation of the audio codec used for the source
 		/// </summary>
-		IMediaCodec AudioCodec { get; }
-
-		/// <summary>
-		/// /// Gets an implementation of the video codec used for the source
-		/// </summary>
-		IMediaCodec VideoCodec { get; }
+		IMediaCodec Codec { get; }
 
 		/// <summary>
 		/// Gets the owner of the source

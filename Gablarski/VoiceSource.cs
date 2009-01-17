@@ -30,14 +30,9 @@ namespace Gablarski
 			get { return MediaSourceType.Voice; }
 		}
 
-		public IMediaCodec AudioCodec
+		public IMediaCodec Codec
 		{
 			get { return this.codec; }
-		}
-
-		public IMediaCodec VideoCodec
-		{
-			get { return null; }
 		}
 
 		public IUser Owner

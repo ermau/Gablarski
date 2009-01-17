@@ -33,7 +33,28 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Speex.NET, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Speex.NET.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -53,22 +74,20 @@
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Tao.FFmpeg, Version=0.4.9.0, Culture=neutral, PublicKeyToken=9c7a200e36c0094e, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BufferExtensions.cs" />
     <Compile Include="ByteExtensions.cs" />
     <Compile Include="Codecs\PassthruCodec.cs" />
+    <Compile Include="Codecs\Speex.cs" />
     <Compile Include="DecodedUser.cs" />
     <Compile Include="Client\GablarskiClient.cs" />
     <Compile Include="Client\ICaptureDevice.cs" />
     <Compile Include="Client\ICaptureProvider.cs" />
     <Compile Include="Client\IPlaybackProvider.cs" />
     <Compile Include="ConnectionEventArgs.cs" />
-    <Compile Include="Gablarski1.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Gablarski.edmx</DependentUpon>
-    </Compile>
+    <Compile Include="Gablarski.Designer.cs" />
+    <Compile Include="IEnumerableExtensions.cs" />
     <Compile Include="IMediaCodec.cs" />
     <Compile Include="IMediaSource.cs" />
     <Compile Include="IPlugin.cs" />
@@ -83,6 +102,7 @@
     <Compile Include="Server\LoginResult.cs" />
     <Compile Include="Server\Providers\NicknameAuthenticationProvider.cs" />
     <Compile Include="Server\ServerMessage.cs" />
+    <Compile Include="Sources.cs" />
     <Compile Include="UserConnection.cs" />
     <Compile Include="UserEventArgs.cs" />
     <Compile Include="VoiceSource.cs" />
