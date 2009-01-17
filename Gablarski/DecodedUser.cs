@@ -11,7 +11,7 @@ namespace Gablarski
 	{
 		#region IUser Members
 
-		public uint ID
+		public int ID
 		{
 			get; set;
 		}

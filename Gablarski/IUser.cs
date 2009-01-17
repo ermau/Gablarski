@@ -15,7 +15,7 @@ namespace Gablarski
 		/// <summary>
 		/// Gets the ID of the user
 		/// </summary>
-		uint ID { get; }
+		int ID { get; }
 
 		/// <summary>
 		/// Gets the nickname (display name) of the user

@@ -15,16 +15,16 @@ namespace Gablarski
 			this.MessageType = messageType;
 		}
 
-		protected Message (TMessage messageType, UserConnection connection)
+		protected Message (TMessage messageType, NetConnection connection)
 			: this (messageType)
 		{
-			this.UserConnections = new List<UserConnection> { connection };
+			this.Connections = new List<NetConnection> { connection };
 		}
 
-		protected Message (TMessage messageType, IEnumerable<UserConnection> connections)
+		protected Message (TMessage messageType, IEnumerable<NetConnection> connections)
 			: this (messageType)
 		{
-			this.UserConnections = connections;
+			this.Connections = connections;
 		}
 
 		public TMessage MessageType
@@ -33,25 +33,25 @@ namespace Gablarski
 			private set;
 		}
 
-		public UserConnection UserConnection
+		public NetConnection Connection
 		{
-			get { return (this.UserConnections != null) ? this.UserConnections.FirstOrDefault() : null; }
+			get { return (this.Connections != null) ? this.Connections.FirstOrDefault() : null; }
 		}
 
-		public IEnumerable<UserConnection> UserConnections
+		public IEnumerable<NetConnection> Connections
 		{
 			get; private set;
 		}
 
 		public NetBuffer GetBuffer ()
 		{
-			this.buffer = (this.UserConnection != null) ? this.UserConnection.CreateBuffer() : new NetBuffer (4);
+			this.buffer = new NetBuffer (8);
 
 			this.buffer.Write (FirstByte);
 			this.buffer.WriteVariableUInt32 (this.MessageTypeCode);
 
-			if (this.SendAuthHash && this.UserConnection != null)
-				this.buffer.WriteVariableInt32 (this.UserConnection.AuthHash);
+			if (this.SendAuthHash && this.Connection != null)
+				this.buffer.WriteVariableInt32 ((int)this.Connection.Tag);
 
 			return this.buffer;
 		}
@@ -63,10 +63,10 @@ namespace Gablarski
 
 		public void Send (NetServer server, NetChannel channel)
 		{
-			if (this.UserConnections.Any())
-				server.SendMessage (this.Buffer, this.UserConnections.Select (uc => uc.Connection).ToList(), channel);
-			else if (this.UserConnection != null)
-				server.SendMessage (this.Buffer, this.UserConnection.Connection, channel);
+			if (this.Connections.Any())
+				server.SendMessage (this.Buffer, this.Connections, channel);
+			else if (this.Connection != null)
+				server.SendMessage (this.Buffer, this.Connection, channel);
 		}
 
 		private NetBuffer buffer;

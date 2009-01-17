@@ -80,6 +80,7 @@
     <Compile Include="ByteExtensions.cs" />
     <Compile Include="Codecs\PassthruCodec.cs" />
     <Compile Include="Codecs\Speex.cs" />
+    <Compile Include="Server\ServerState.cs" />
     <Compile Include="DecodedUser.cs" />
     <Compile Include="Client\GablarskiClient.cs" />
     <Compile Include="Client\ICaptureDevice.cs" />
@@ -87,11 +88,13 @@
     <Compile Include="Client\IPlaybackProvider.cs" />
     <Compile Include="ConnectionEventArgs.cs" />
     <Compile Include="Gablarski.Designer.cs" />
+    <Compile Include="GablarskiBase.cs" />
     <Compile Include="IEnumerableExtensions.cs" />
     <Compile Include="IMediaCodec.cs" />
     <Compile Include="IMediaSource.cs" />
     <Compile Include="IPlugin.cs" />
     <Compile Include="IUser.cs" />
+    <Compile Include="PairCollection.cs" />
     <Compile Include="Server\IAuthProvider.cs" />
     <Compile Include="Server\IChatServerProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -103,7 +106,6 @@
     <Compile Include="Server\Providers\NicknameAuthenticationProvider.cs" />
     <Compile Include="Server\ServerMessage.cs" />
     <Compile Include="Sources.cs" />
-    <Compile Include="UserConnection.cs" />
     <Compile Include="UserEventArgs.cs" />
     <Compile Include="VoiceSource.cs" />
   </ItemGroup>

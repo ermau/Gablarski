@@ -24,11 +24,6 @@ namespace Gablarski
 		/// Gets an implementation of the audio codec used for the source
 		/// </summary>
 		IMediaCodec Codec { get; }
-
-		/// <summary>
-		/// Gets the owner of the source
-		/// </summary>
-		IUser Owner { get; }
 	}
 
 	/// <summary>

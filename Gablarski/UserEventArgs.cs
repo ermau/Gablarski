@@ -5,6 +5,22 @@ using System.Text;
 
 namespace Gablarski
 {
+	public class SourceEventArgs
+		: UserEventArgs
+	{
+		public SourceEventArgs (IUser user, IMediaSource source)
+			: base (user)
+		{
+			this.Source = source;
+		}
+
+		public IMediaSource Source
+		{
+			get;
+			private set;
+		}
+	}
+
 	public class UserEventArgs
 		: EventArgs
 	{
@@ -31,6 +47,22 @@ namespace Gablarski
 		public IEnumerable<IUser> Users
 		{
 			get; private set;
+		}
+	}
+
+	public class AudioEventArgs
+		: MediaEventArgs
+	{
+		public AudioEventArgs (IMediaSource source, byte[] data)
+			: base(source)
+		{
+			this.Data = data;
+		}
+
+		public byte[] Data
+		{
+			get;
+			private set;
 		}
 	}
 

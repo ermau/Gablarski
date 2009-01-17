@@ -10,6 +10,7 @@ using Lidgren.Network;
 namespace Gablarski.Server
 {
 	public class GablarskiServer
+		: GablarskiBase
 	{
 		public GablarskiServer (IAuthProvider authProvider)
 		{
@@ -18,7 +19,6 @@ namespace Gablarski.Server
 
 		public event EventHandler<ConnectionEventArgs> ClientConnected;
 		public event EventHandler<ReasonEventArgs> ClientDisconnected;
-		public event EventHandler<ConnectionEventArgs> UserLogin;
 
 		public bool IsRunning
 		{
@@ -38,16 +38,9 @@ namespace Gablarski.Server
 			set { this.maxConnections = value; }
 		}
 				
-		public IEnumerable<UserConnection> Users
+		public IEnumerable<IUser> Users
 		{
-			get
-			{
-				userRWL.EnterReadLock ();
-				IEnumerable<UserConnection> u = this.users.Values.ToList ();
-				userRWL.ExitReadLock ();
-
-				return u;
-			}
+			get { return this.state.Users; }
 		}
 
 		public void Start ()
@@ -79,45 +72,34 @@ namespace Gablarski.Server
 		private NetServer Server;
 		private Thread ServerThread;
 
-		private readonly ReaderWriterLockSlim userRWL = new ReaderWriterLockSlim();
-		private readonly Dictionary<int, DateTime> pendingLogins = new Dictionary<int, DateTime>();
-		private readonly Dictionary<int, UserConnection> users = new Dictionary<int, UserConnection> ();
-		private readonly Dictionary<IUser, List<IMediaSource>> sources = new Dictionary<IUser, List<IMediaSource>>();
+		private ServerState state = new ServerState ();
+
+		private Dictionary<IUser, List<IMediaSource>> sources = new Dictionary<IUser, List<IMediaSource>> ();
 
 		private bool RequestSource (MediaSourceType type, IUser requester, out IMediaSource source)
 		{
 			source = null;
 
-			userRWL.EnterUpgradeableReadLock();
-			
 			if (!sources.ContainsKey (requester))
-			{
-				userRWL.EnterWriteLock();
 				sources.Add (requester, new List<IMediaSource>());
-				userRWL.ExitWriteLock();
-			}
 
 			if (!sources[requester].Any (s => s.Type == type))
 			{
-				userRWL.EnterWriteLock();
-				source = CreateSource (sources.Values.MaxOrDefault (m => m.MaxOrDefault (s => s.ID, 0), 0) + 1, type, requester);
+				source = CreateSource (sources.Values.MaxOrDefault (m => m.MaxOrDefault (s => s.ID, 0), 0) + 1, type);
 
 				if (source != null)
 				{
 					sources[requester].Add (source);
-					userRWL.ExitWriteLock ();
 					return true;
 				}
-				else
-					userRWL.ExitWriteLock();
 			}
-			
-			userRWL.ExitUpgradeableReadLock();
+
+			this.OnSourceCreated (new SourceEventArgs (requester, source));
 
 			return false;
 		}
 
-		private IMediaSource CreateSource (int sourceID, MediaSourceType type, IUser owner)
+		private IMediaSource CreateSource (int sourceID, MediaSourceType type)
 		{
 			IMediaSource source;
 
@@ -125,7 +107,7 @@ namespace Gablarski.Server
 			{
 				case MediaSourceType.Voice:
 				default:
-					source = new VoiceSource (sourceID, owner);
+					source = new VoiceSource (sourceID);
 					break;
 			}
 
@@ -151,8 +133,13 @@ namespace Gablarski.Server
 				NetMessageType type;
 				while (Server.ReadMessage (buffer, out type, out sender))
 				{
-					UserConnection connection = users.Values.FirstOrDefault (uc => uc.Connection == sender) ?? new UserConnection (Server, sender);
-					ConnectionEventArgs e = new ConnectionEventArgs (connection, buffer);
+					if (sender == null)
+						continue;
+
+					if (!this.state.Contains (sender))
+						this.state.AddConnection (sender, GenerateHash ());
+
+					ConnectionEventArgs e = new ConnectionEventArgs (sender, buffer);
 
 					switch (type)
 					{
@@ -161,7 +148,6 @@ namespace Gablarski.Server
 							switch (sender.Status)
 							{
 								case NetConnectionStatus.Connected:
-									e.UserConnection.AuthHash = GenerateHash();
 									this.OnClientConnected (e);
 									break;
 
@@ -181,36 +167,36 @@ namespace Gablarski.Server
 							ClientMessages messageType = (ClientMessages)buffer.ReadVariableUInt32();
 
 							int hash = e.Buffer.ReadVariableInt32 ();
-							e.UserConnection.AuthHash = hash;
 
-							userRWL.EnterReadLock ();
-							if (!this.users.ContainsKey (hash) && !this.pendingLogins.ContainsKey (hash))
-							{
-								userRWL.ExitReadLock ();
-								this.ClientDisconnect (new ReasonEventArgs (e, "Auth failure"), false);
-							}
-							userRWL.ExitReadLock ();
+							if (!this.state.Contains (hash))
+								this.ClientDisconnect (new ReasonEventArgs (e, "Auth failure"));
 
 							switch (messageType)
 							{
 								case ClientMessages.Login:
-									this.OnClientLogin (e);
+									LoginResult result = this.UserLogin (e);
+									if (result.Succeeded)
+									{
+										this.state.AddUser (sender, result.User);
+										this.OnUserLogin (new UserEventArgs (result.User));
+									}
+
 									break;
 
 								case ClientMessages.Disconnect:
-									this.ClientDisconnect (new ReasonEventArgs (e, "Client requested"), true);
+									this.ClientDisconnect (new ReasonEventArgs (e, "Client requested"));
 									break;
 
 								case ClientMessages.AudioData:
-									Trace.WriteLine ("Received voice data from: " + e.UserConnection.User.Nickname);
+									//Trace.WriteLine ("Received voice data from: " + e.UserConnection.User.Nickname);
 
 									int voiceLen = buffer.ReadVariableInt32();
 									if (voiceLen <= 0)
 										continue;
 
-									ServerMessage msg = new ServerMessage(ServerMessages.AudioData, this.users.Values);//.Where (uc => uc != e.UserConnection));
+									ServerMessage msg = new ServerMessage (ServerMessages.AudioData, this.state.Connections);//.Where (uc => uc != e.UserConnection));
 									var msgbuffer = msg.GetBuffer ();
-									msgbuffer.WriteVariableUInt32 (e.UserConnection.User.ID);
+									msgbuffer.WriteVariableInt32 (this.state[sender].ID);
 									msgbuffer.WriteVariableInt32 (voiceLen);
 									msgbuffer.Write (buffer.ReadBytes (voiceLen));
 									msg.Send (this.Server, NetChannel.Unreliable);
@@ -226,58 +212,104 @@ namespace Gablarski.Server
 			}
 		}
 
-		private void ClientDisconnect (ReasonEventArgs e, bool commanded)
+		private LoginResult UserLogin (ConnectionEventArgs e)
 		{
-			userRWL.EnterUpgradeableReadLock ();
-			if (this.pendingLogins.ContainsKey (e.UserConnection.AuthHash) || this.users.ContainsKey (e.UserConnection.AuthHash))
+			string nickname = e.Buffer.ReadString();
+			string username = e.Buffer.ReadString();
+			string password = e.Buffer.ReadString();
+
+			Trace.WriteLine("Login attempt: " + nickname);
+
+			LoginResult result = null;
+
+			if (String.IsNullOrEmpty(username))
 			{
-				userRWL.EnterWriteLock ();
-				this.pendingLogins.Remove (e.UserConnection.AuthHash);
-				this.users.Remove (e.UserConnection.AuthHash);
-				userRWL.ExitWriteLock ();
+				if (this.auth.CheckUserExists(nickname))
+				{
+					this.DisconnectUser (e.Connection, "Registered user owns this login already.", e.Connection);
+					return null;
+				}
+
+				if (this.state.Users.Any (u => u.Nickname == nickname))
+				{
+					this.DisconnectUser (e.Connection, "User already logged in.", e.Connection);
+					return null;
+				}
+
+				result = this.auth.Login(nickname);
 			}
-			userRWL.ExitUpgradeableReadLock ();
+			else
+			{
+				if (!this.auth.CheckUserExists(nickname))
+				{
+					this.DisconnectUser (e.Connection, "User does not exist.", e.Connection);
+					return null;
+				}
 
-			//if (!commanded)
-				e.Connection.Disconnect (String.Empty, 0.0f);
+				if (this.state.Users.Any (u => u.Username == username))
+				{
+					this.DisconnectUser (e.Connection, "User already logged in.", e.Connection);
+					return null;
+				}
+				result = this.auth.Login (username, password);
+			}
 
-			if (e.UserConnection.User != null)
-				Trace.WriteLine (e.UserConnection.User.Nickname + " disconnected: " + e.Reason);
+			if (!result.Succeeded)
+			{
+				this.DisconnectUser (e.Connection, result.FailureReason, e.Connection);
+				return null;
+			}
+
+			Trace.WriteLine(result.User.Nickname + " logged in.");
+			return result;
+		}
+
+		private void ClientDisconnect (ReasonEventArgs e)
+		{
+			this.state.Remove (e.Connection);
+
+			e.Connection.Disconnect (String.Empty, 0.0f);
+
+			var user = this.state[e.Connection];
+
+			if (user != null)
+				Trace.WriteLine (user.Nickname + " disconnected: " + e.Reason);
 			else
 				Trace.WriteLine ("Unknown disconnected: " + e.Reason);
 
-			if (e.UserConnection.User != null)
+			if (user != null)
 			{
-				ServerMessage msg = new ServerMessage (ServerMessages.UserDisconnected, this.users.Values.Where (uc => uc.Connection.Status == NetConnectionStatus.Connected));
-				msg.GetBuffer ().Write (e.UserConnection.User);
+				ServerMessage msg = new ServerMessage (ServerMessages.UserDisconnected, this.state.Connections.Where (c => c.Status == NetConnectionStatus.Connected));
+				msg.GetBuffer ().Write (user);
 				msg.Send (this.Server, NetChannel.ReliableUnordered);
 			}
+		}
 
-			var disconnected = this.ClientDisconnected;
-			if (disconnected != null)
-				disconnected (this, e);
+		protected override void OnSourceCreated (SourceEventArgs e)
+		{
+			var msg = new ServerMessage (ServerMessages.SourceCreated, this.state.Connections);
+
+			var buffer = msg.GetBuffer();
+			buffer.Write(e.User);
+			buffer.Write(e.Source);
+
+			msg.Send (this.Server, NetChannel.ReliableInOrder1);
+
+			base.OnSourceCreated(e);
 		}
 
 		protected virtual void OnClientDisconnected (ReasonEventArgs e)
 		{
-			this.ClientDisconnect (e, false);
+			this.ClientDisconnect (e);
+
+			var disconnected = this.ClientDisconnected;
+			if (disconnected != null)
+				disconnected(this, e);
 		}
 
 		protected virtual void OnClientConnected (ConnectionEventArgs e)
 		{
-			userRWL.EnterUpgradeableReadLock ();
-			if (this.pendingLogins.ContainsKey (e.UserConnection.AuthHash))
-			{
-				userRWL.ExitUpgradeableReadLock ();
-				return;
-			}
-
-			userRWL.EnterWriteLock();
-			this.pendingLogins.Add (e.UserConnection.AuthHash, DateTime.Now);
-			userRWL.ExitWriteLock();
-			userRWL.ExitUpgradeableReadLock ();
-
-			ServerMessage msg = new ServerMessage (ServerMessages.Connected, e.UserConnection);
+			ServerMessage msg = new ServerMessage (ServerMessages.Connected, e.Connection);
 			msg.Send (this.Server, NetChannel.ReliableInOrder1);
 
 			var connected = this.ClientConnected;
@@ -285,115 +317,43 @@ namespace Gablarski.Server
 				connected (this, e);
 		}
 
-		protected virtual void OnClientLogin (ConnectionEventArgs e)
+		protected override void OnUserLogin (UserEventArgs e)
 		{
-			string nickname = e.Buffer.ReadString();
-			string username = e.Buffer.ReadString();
-			string password = e.Buffer.ReadString();
-
-			Trace.WriteLine ("Login attempt: " + nickname);
-
-			LoginResult result;
-
-			if (String.IsNullOrEmpty (username))
-			{
-				if (this.auth.CheckUserExists (nickname))
-				{
-					this.DisconnectUser (e.UserConnection, "Registered user owns this login already.", e.Connection);
-					return;
-				}
-
-				userRWL.EnterUpgradeableReadLock();
-
-				if (this.users.Values.Any (uc => uc.User.Nickname == nickname))
-				{
-					this.DisconnectUser (e.UserConnection, "User already logged in.", e.Connection);
-					userRWL.ExitUpgradeableReadLock ();
-					return;
-				}
-
-				userRWL.ExitUpgradeableReadLock();
-
-				result = this.auth.Login (nickname);
-			}
-			else
-			{
-				if (!this.auth.CheckUserExists(nickname))
-				{
-					this.DisconnectUser (e.UserConnection, "User does not exist.", e.Connection);
-					return;
-				}
-
-				userRWL.EnterUpgradeableReadLock();
-
-				if (this.users.Values.Any (uc => uc.User.Username == username))
-				{
-					this.DisconnectUser (e.UserConnection, "User already logged in.", e.Connection);
-					userRWL.ExitUpgradeableReadLock ();
-					return;
-				}
-
-				userRWL.ExitUpgradeableReadLock ();
-
-				result = this.auth.Login (username, password);
-			}
-			
-			if (!result.Succeeded)
-			{
-				this.DisconnectUser (e.UserConnection, result.FailureReason, e.Connection);
-				return;
-			}
-
-			Trace.WriteLine (result.User.Nickname + " logged in.");
-
-			e.UserConnection.User = result.User;
+			var connection = this.state[e.User];
 
 			IMediaSource source;
-			if (!this.RequestSource (MediaSourceType.Voice, result.User, out source))
+			if (!this.RequestSource (MediaSourceType.Voice, e.User, out source))
 			{
-				this.DisconnectUser (e.UserConnection, "Voice source request failed.", e.Connection);
+				this.DisconnectUser (connection, "Voice source request failed.", connection);
 				return;
 			}
 
-			userRWL.EnterWriteLock();
-			this.pendingLogins.Remove (e.UserConnection.AuthHash);
-			this.users.Add (e.UserConnection.AuthHash, e.UserConnection);
-			userRWL.ExitWriteLock();
-
-			ServerMessage msg = new ServerMessage (ServerMessages.LoggedIn, e.UserConnection);
+			ServerMessage msg = new ServerMessage (ServerMessages.LoggedIn, connection);
 			var mbuffer = msg.GetBuffer();
-			mbuffer.Write(e.UserConnection.User);
+			mbuffer.Write(e.User);
 			mbuffer.Write(source);
 			msg.Send (this.Server, NetChannel.ReliableInOrder1);
 
-			userRWL.EnterReadLock();
-			msg = new ServerMessage (ServerMessages.UserConnected, this.users.Values.Where (uc => uc.Connection.Status == NetConnectionStatus.Connected));
-			msg.GetBuffer ().Write (e.UserConnection.User);
+			msg = new ServerMessage (ServerMessages.UserConnected, this.state.Connections.Where (c => c.Status == NetConnectionStatus.Connected));
+			msg.GetBuffer ().Write (e.User);
 			msg.Send (this.Server, NetChannel.ReliableInOrder1);
 
-			msg = new ServerMessage (ServerMessages.UserList, e.UserConnection);
+			msg = new ServerMessage (ServerMessages.UserList, connection);
 			mbuffer = msg.GetBuffer();
-			mbuffer.WriteVariableInt32 (this.users.Count);
-			foreach (IUser u in this.users.Values.Select (uc => uc.User))
+			mbuffer.WriteVariableInt32 (this.state.Users.Count());
+			foreach (IUser u in this.state.Users)
 				mbuffer.Write (u);
 
 			msg.Send (this.Server, NetChannel.ReliableInOrder1);
 
-			userRWL.ExitReadLock();
-
-			var login = this.UserLogin;
-			if (login != null)
-				login (this, e);
+			base.OnUserLogin (e);
 		}
 
-		protected void DisconnectUser (UserConnection userc, string reason, NetConnection netc)
+		protected void DisconnectUser (NetConnection userc, string reason, NetConnection netc)
 		{
 			netc.Disconnect (reason, 0);
 
-			userRWL.EnterWriteLock();
-			this.pendingLogins.Remove (userc.AuthHash);
-			this.users.Remove (userc.AuthHash);
-			userRWL.ExitWriteLock();
+			this.state.Remove (userc);
 		}
 
 		static int GenerateHash()

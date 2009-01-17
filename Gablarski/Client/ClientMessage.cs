@@ -12,7 +12,7 @@ namespace Gablarski.Client
 	public class ClientMessage
 		: Message<ClientMessages>
 	{
-		public ClientMessage (ClientMessages messageType, UserConnection connection)
+		public ClientMessage (ClientMessages messageType, NetConnection connection)
 			: base (messageType, connection)
 		{
 		}

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Lidgren.Network;
 
 namespace Gablarski.Server
 {
@@ -16,12 +17,12 @@ namespace Gablarski.Server
 		{
 		}
 
-		public ServerMessage (ServerMessages messageType, UserConnection connection)
+		public ServerMessage (ServerMessages messageType, NetConnection connection)
 			: base (messageType, connection)
 		{
 		}
 
-		public ServerMessage (ServerMessages messageType, IEnumerable<UserConnection> userConnections)
+		public ServerMessage (ServerMessages messageType, IEnumerable<NetConnection> userConnections)
 			: base (messageType, userConnections)
 		{
 		}
@@ -48,6 +49,7 @@ namespace Gablarski.Server
 		UserDisconnected	= 6,
 		AudioData			= 7,
 		UserList			= 8,
-		ChannelList			= 9
+		ChannelList			= 9,
+		SourceCreated		= 10,
 	}
 }

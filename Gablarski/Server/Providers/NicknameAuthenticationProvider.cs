@@ -32,7 +32,7 @@ namespace Gablarski.Server.Providers
 		{
 			Interlocked.Increment (ref this.lastID);
 
-			return new LoginResult (true, new NickAuthUser ((uint)this.lastID, username));
+			return new LoginResult (true, new NickAuthUser (this.lastID, username));
 		}
 
 		#endregion
@@ -43,7 +43,7 @@ namespace Gablarski.Server.Providers
 	public class NickAuthUser
 		: IUser
 	{
-		internal NickAuthUser (uint userID, string nickname)
+		internal NickAuthUser (int userID, string nickname)
 		{
 			this.ID = userID;
 			this.Nickname = nickname;
@@ -55,7 +55,7 @@ namespace Gablarski.Server.Providers
 
 		#region IUser Members
 
-		public uint ID
+		public int ID
 		{
 			get; set;
 		}

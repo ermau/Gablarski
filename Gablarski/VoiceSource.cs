@@ -12,10 +12,9 @@ namespace Gablarski
 	public class VoiceSource
 		: IMediaSource
 	{
-		public VoiceSource (int sourceID, IUser owner)
+		public VoiceSource (int sourceID)
 		{
 			this.ID = sourceID;
-			this.Owner = owner;
 		}
 
 		#region IMediaSource Members
@@ -34,12 +33,6 @@ namespace Gablarski
 		{
 			get { return this.codec; }
 		}
-
-		public IUser Owner
-		{
-			get; private set;
-		}
-
 		#endregion
 
 		private readonly IMediaCodec codec = new PassthruCodec();

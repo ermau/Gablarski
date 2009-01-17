@@ -9,15 +9,13 @@ using Lidgren.Network;
 namespace Gablarski.Client
 {
 	public class GablarskiClient
+		: GablarskiBase
 	{
 		public event EventHandler<ConnectionEventArgs> Connected;
 		public event EventHandler<ReasonEventArgs> Disconnected;
 		public event EventHandler<ConnectionEventArgs> LoggedIn;
 
 		public event EventHandler<UserListEventArgs> UserList;
-		public event EventHandler<UserEventArgs> UserLogin;
-		public event EventHandler<UserEventArgs> UserLogout;
-		//public event EventHandler<MediaEventArgs> VoiceReceived;
 
 		public bool IsRunning
 		{
@@ -82,8 +80,10 @@ namespace Gablarski.Client
 			ClientMessage msg = new ClientMessage (ClientMessages.AudioData, this.connection);
 			var buffer = msg.GetBuffer ();
 
-			buffer.WriteVariableInt32 (data.Length);
-			buffer.Write (data);
+			byte[] encoded = this.voiceSource.Codec.Encode (data);
+
+			buffer.WriteVariableInt32(encoded.Length);
+			buffer.Write(encoded);
 			msg.Send (this.client, NetChannel.Unreliable);
 		}
 
@@ -106,17 +106,18 @@ namespace Gablarski.Client
 			msg.Send (this.client, NetChannel.ReliableInOrder1);
 		}
 
-		private readonly ReaderWriterLockSlim userRWL = new ReaderWriterLockSlim ();
-		private readonly Dictionary<uint, IUser> users = new Dictionary<uint, IUser> ();
-
 		private bool connecting;
 
 		private IUser user;
 		private List<IMediaSource> sources = new List<IMediaSource>();
-		private UserConnection connection;
+		private IMediaSource voiceSource;
 
 		private Thread runnerThread;
 		private NetClient client;
+
+		private NetConnection connection;
+
+		private Dictionary<int, IUser> users = new Dictionary<int, IUser> ();
 
 		protected virtual void OnDisconnected (ReasonEventArgs e)
 		{
@@ -149,108 +150,51 @@ namespace Gablarski.Client
 
 			this.user = e.Buffer.ReadUser();
 
-			userRWL.EnterWriteLock();
-			this.sources.Add (e.Buffer.ReadSource (this.user));
-			userRWL.ExitWriteLock();
+			this.sources.Add (e.Buffer.ReadSource ());
 
 			var loggedin = this.LoggedIn;
 			if (loggedin != null)
 				loggedin (this, e);
 		}
 
-		protected virtual void OnUserLogin (UserEventArgs e)
+		protected override void OnUserLogin (UserEventArgs e)
 		{
 			if (!ValidateAndAddUser (e.User))
 				return;
 
-			var ulogin = this.UserLogin;
-			if (ulogin != null)
-				ulogin (this, e);
+			base.OnUserLogin (e);
 		}
 
 		protected virtual void OnUserList (UserListEventArgs e)
 		{
-			bool write = false;
-
-			userRWL.EnterUpgradeableReadLock();
 			foreach (IUser user in e.Users)
 			{
 				if (this.users.ContainsKey (user.ID))
 					continue;
 
-				if (!write)
-				{
-					write = true;
-					userRWL.EnterWriteLock();
-				}
-
 				this.users.Add (user.ID, user);
 			}
-
-			if (write)
-				userRWL.ExitWriteLock();
-
-			userRWL.ExitUpgradeableReadLock();
 
 			var ulist = this.UserList;
 			if (ulist != null)
 				ulist (this, e);
 		}
 
-		protected virtual void OnUserLogout (UserEventArgs e)
+		protected override void OnUserLogout (UserEventArgs e)
 		{
-			userRWL.EnterUpgradeableReadLock ();
-			if (!this.users.ContainsKey (e.User.ID))
-			{
-				userRWL.ExitUpgradeableReadLock ();
+			if (!this.users.ContainsKey(e.User.ID))
 				return;
-			}
 
-			userRWL.EnterWriteLock ();
 			this.users.Remove (e.User.ID);
-			userRWL.ExitWriteLock ();
-			userRWL.ExitUpgradeableReadLock ();
-
-
-			var ulogout = this.UserLogout;
-			if (ulogout != null)
-				ulogout (this, e);
 		}
-
-		//protected virtual void OnVoiceReceived (MediaEventArgs e)
-		//{
-		//    var voice = this.VoiceReceived;
-		//    if (voice != null)
-		//        voice (this, e);
-		//}
-
+		
 		private bool ValidateAndAddUser (IUser user)
 		{
-			userRWL.EnterUpgradeableReadLock ();
 			if (this.users.ContainsKey (user.ID))
-			{
-				userRWL.ExitUpgradeableReadLock ();
 				return false;
-			}
 
-			userRWL.EnterWriteLock ();
 			this.users.Add (user.ID, user);
-			userRWL.ExitWriteLock ();
-			userRWL.ExitUpgradeableReadLock ();
-			
 			return true;
-		}
-
-		private IUser GetUser (uint id)
-		{
-			IUser user = null;
-
-			userRWL.EnterReadLock ();
-			if (this.users.ContainsKey (id))
-				user = this.users[id];
-
-			userRWL.ExitReadLock ();
-			return user;
 		}
 
 		private void ClientRunner ()
@@ -283,8 +227,8 @@ namespace Gablarski.Client
 							switch (message)
 							{
 								case ServerMessages.Connected:
-									this.connection = new UserConnection (client, client.ServerConnection);
-									this.connection.AuthHash = buffer.ReadVariableInt32();
+									this.connection = client.ServerConnection;
+									this.connection.Tag = buffer.ReadVariableInt32();
 									this.OnConnected (new ConnectionEventArgs (this.connection, buffer));
 									break;
 
@@ -309,17 +253,19 @@ namespace Gablarski.Client
 									this.OnUserLogout(new UserEventArgs(buffer.ReadUser()));
 									break;
 
-								//case ServerMessages.AudioData:
-								//    IUser user = this.GetUser (buffer.ReadVariableUInt32());
-								//    if (user == null)
-								//        continue;
+								case ServerMessages.SourceCreated:
+									this.OnSourceCreated (new SourceEventArgs(buffer.ReadUser(), buffer.ReadSource()));
+									break;
 
-								//    int voiceLen = buffer.ReadVariableInt32();
-								//    if (voiceLen <= 0)
-								//        continue;
+								case ServerMessages.AudioData:
+									IMediaSource source = buffer.ReadSource();
 
-								//    this.OnVoiceReceived (new MediaEventArgs (user, buffer.ReadBytes (voiceLen)));
-								//    break;
+									int audioLen = buffer.ReadVariableInt32();
+									if (audioLen <= 0)
+										continue;
+
+									this.OnAudioReceived(new AudioEventArgs (source, buffer.ReadBytes (audioLen)));
+									break;
 							}
 
 							break;
