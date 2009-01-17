@@ -37,6 +37,17 @@ namespace Gablarski.Client
 			get { return this.users.Values; }
 		}
 
+		public IMediaSource VoiceSource
+		{
+			get;
+			private set;
+		}
+
+		public IEnumerable<IMediaSource> Sources
+		{
+			get { return this.sources; }
+		}
+
 		public void Connect (string host, int port)
 		{
 			if (this.IsRunning)
@@ -75,12 +86,13 @@ namespace Gablarski.Client
 			Login (nickname, String.Empty, String.Empty);
 		}
 
-		public void SendVoiceData (byte[] data)
+		public void SendMedia (IMediaSource source, byte[] data)
 		{
 			ClientMessage msg = new ClientMessage (ClientMessages.AudioData, this.connection);
 			var buffer = msg.GetBuffer ();
+			buffer.Write (source);
 
-			byte[] encoded = this.voiceSource.Codec.Encode (data);
+			byte[] encoded = source.Codec.Encode (data);
 
 			buffer.WriteVariableInt32(encoded.Length);
 			buffer.Write(encoded);
@@ -110,8 +122,7 @@ namespace Gablarski.Client
 
 		private IUser user;
 		private List<IMediaSource> sources = new List<IMediaSource>();
-		private IMediaSource voiceSource;
-
+		
 		private Thread runnerThread;
 		private NetClient client;
 
@@ -149,8 +160,8 @@ namespace Gablarski.Client
 			this.IsLoggedin = true;
 
 			this.user = e.Buffer.ReadUser();
-
-			this.sources.Add (e.Buffer.ReadSource ());
+			this.VoiceSource = e.Buffer.ReadSource ();
+			this.sources.Add (VoiceSource);
 
 			var loggedin = this.LoggedIn;
 			if (loggedin != null)
@@ -264,7 +275,7 @@ namespace Gablarski.Client
 									if (audioLen <= 0)
 										continue;
 
-									this.OnAudioReceived(new AudioEventArgs (source, buffer.ReadBytes (audioLen)));
+									this.OnAudioReceived (new AudioEventArgs (source, buffer.ReadBytes (audioLen)));
 									break;
 							}
 

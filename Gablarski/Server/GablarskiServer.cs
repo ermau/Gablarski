@@ -174,12 +174,14 @@ namespace Gablarski.Server
 							switch (messageType)
 							{
 								case ClientMessages.Login:
-									LoginResult result = this.UserLogin (e);
+									LoginResult result = this.AttemptUserLogin (e);
 									if (result.Succeeded)
 									{
 										this.state.AddUser (sender, result.User);
 										this.OnUserLogin (new UserEventArgs (result.User));
 									}
+									else
+										this.DisconnectUser (sender, result.FailureReason.ToString ());
 
 									break;
 
@@ -189,6 +191,7 @@ namespace Gablarski.Server
 
 								case ClientMessages.AudioData:
 									//Trace.WriteLine ("Received voice data from: " + e.UserConnection.User.Nickname);
+									IMediaSource source = buffer.ReadSource ();
 
 									int voiceLen = buffer.ReadVariableInt32();
 									if (voiceLen <= 0)
@@ -196,7 +199,7 @@ namespace Gablarski.Server
 
 									ServerMessage msg = new ServerMessage (ServerMessages.AudioData, this.state.Connections);//.Where (uc => uc != e.UserConnection));
 									var msgbuffer = msg.GetBuffer ();
-									msgbuffer.WriteVariableInt32 (this.state[sender].ID);
+									msgbuffer.Write (source);
 									msgbuffer.WriteVariableInt32 (voiceLen);
 									msgbuffer.Write (buffer.ReadBytes (voiceLen));
 									msg.Send (this.Server, NetChannel.Unreliable);
@@ -212,7 +215,7 @@ namespace Gablarski.Server
 			}
 		}
 
-		private LoginResult UserLogin (ConnectionEventArgs e)
+		private LoginResult AttemptUserLogin (ConnectionEventArgs e)
 		{
 			string nickname = e.Buffer.ReadString();
 			string username = e.Buffer.ReadString();
@@ -220,48 +223,28 @@ namespace Gablarski.Server
 
 			Trace.WriteLine("Login attempt: " + nickname);
 
-			LoginResult result = null;
-
-			if (String.IsNullOrEmpty(username))
+			if (String.IsNullOrEmpty (username))
 			{
-				if (this.auth.CheckUserExists(nickname))
-				{
-					this.DisconnectUser (e.Connection, "Registered user owns this login already.", e.Connection);
-					return null;
-				}
+				if (this.auth.CheckUserExists (nickname))
+					return new LoginResult (LoginFailureReason.NicknameOwned);
 
 				if (this.state.Users.Any (u => u.Nickname == nickname))
-				{
-					this.DisconnectUser (e.Connection, "User already logged in.", e.Connection);
-					return null;
-				}
+					return new LoginResult (LoginFailureReason.NicknameUsed);
 
-				result = this.auth.Login(nickname);
+				Trace.WriteLine (nickname + " logged in.");
+				return this.auth.Login (nickname);
 			}
 			else
 			{
-				if (!this.auth.CheckUserExists(nickname))
-				{
-					this.DisconnectUser (e.Connection, "User does not exist.", e.Connection);
-					return null;
-				}
+				if (!this.auth.CheckUserExists (username))
+					return new LoginResult (LoginFailureReason.UserDoesntExist);
 
 				if (this.state.Users.Any (u => u.Username == username))
-				{
-					this.DisconnectUser (e.Connection, "User already logged in.", e.Connection);
-					return null;
-				}
-				result = this.auth.Login (username, password);
-			}
+					return new LoginResult (LoginFailureReason.UserLoggedIn);
 
-			if (!result.Succeeded)
-			{
-				this.DisconnectUser (e.Connection, result.FailureReason, e.Connection);
-				return null;
+				Trace.WriteLine (username + " logged in.");
+				return this.auth.Login (username, password);
 			}
-
-			Trace.WriteLine(result.User.Nickname + " logged in.");
-			return result;
 		}
 
 		private void ClientDisconnect (ReasonEventArgs e)
@@ -324,7 +307,7 @@ namespace Gablarski.Server
 			IMediaSource source;
 			if (!this.RequestSource (MediaSourceType.Voice, e.User, out source))
 			{
-				this.DisconnectUser (connection, "Voice source request failed.", connection);
+				this.DisconnectUser (connection, "Voice source request failed.");
 				return;
 			}
 
@@ -349,11 +332,10 @@ namespace Gablarski.Server
 			base.OnUserLogin (e);
 		}
 
-		protected void DisconnectUser (NetConnection userc, string reason, NetConnection netc)
+		protected void DisconnectUser (NetConnection netc, string reason)
 		{
 			netc.Disconnect (reason, 0);
-
-			this.state.Remove (userc);
+			this.state.Remove (netc);
 		}
 
 		static int GenerateHash()

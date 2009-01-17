@@ -10,7 +10,8 @@ namespace Gablarski
 	{
 		public event EventHandler<UserEventArgs> UserLogin;
 		public event EventHandler<UserEventArgs> UserLogout;
-		public event EventHandler<MediaEventArgs> AudioReceived;
+
+		public event EventHandler<AudioEventArgs> AudioReceived;
 
 		public event EventHandler<SourceEventArgs> SourceCreated;
 		public event EventHandler<SourceEventArgs> SourceDestroyed;
@@ -36,11 +37,11 @@ namespace Gablarski
 				ulogout(this, e);
 		}
 
-		protected virtual void OnAudioReceived (MediaEventArgs e)
+		protected virtual void OnAudioReceived (AudioEventArgs e)
 		{
 			var audio = this.AudioReceived;
 			if (audio != null)
-				audio(this, e);
+				audio (this, e);
 		}
 	}
 }

@@ -13,11 +13,10 @@ namespace Gablarski.Server
 			this.User = user;
 		}
 
-		public LoginResult (bool success, IUser user, string failureReason)
+		public LoginResult (LoginFailureReason reason)
 		{
-			this.Succeeded = success;
-			this.User = user;
-			this.FailureReason = failureReason;
+			this.Succeeded = false;
+			this.FailureReason = reason;
 		}
 
 		public bool Succeeded
@@ -30,9 +29,17 @@ namespace Gablarski.Server
 			get; private set;
 		}
 
-		public string FailureReason
+		public LoginFailureReason FailureReason
 		{
 			get; private set;
 		}
+	}
+
+	public enum LoginFailureReason
+	{
+		NicknameOwned,
+		NicknameUsed,
+		UserDoesntExist,
+		UserLoggedIn
 	}
 }

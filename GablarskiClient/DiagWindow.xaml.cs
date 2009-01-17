@@ -55,6 +55,7 @@ namespace Gablarski.Client
 			client.LoggedIn		+= client_LoggedIn;
 			client.UserLogin	+= client_UserLogin;
 			client.UserLogout	+= client_UserLogout;
+			client.AudioReceived+= client_AudioReceived;
 			client.Connect (this.host.Text, 6112);
 			client.Login (this.nickname.Text);
 
@@ -68,18 +69,18 @@ namespace Gablarski.Client
 
 		void capture_SamplesAvailable (object sender, SamplesEventArgs e)
 		{
-			this.client.SendVoiceData (e.Samples);
+			this.client.SendMedia (this.client.VoiceSource, e.Samples);
 		}
 
 		private OpenALPlaybackProvider playback;
-		void client_AudioReceived (object sender, Gablarski.MediaEventArgs e)
+		void client_AudioReceived (object sender, AudioEventArgs e)
 		{
 			this.Log ("Received audio data from source: " + e.Source.ID);
 
 			if (this.playback == null)
 				this.playback = new OpenALPlaybackProvider ();
 
-			//this.playback.QueuePlayback (e.VoiceData, e.User.ID);
+			this.playback.QueuePlayback (e.Data, e.Source);
 		}
 
 		void client_UserLogout (object sender, UserEventArgs e)
@@ -250,8 +251,8 @@ namespace Gablarski.Client
 		//    #endregion
 		//}
 		
-		private unsafe void button1_Click (object sender, RoutedEventArgs e)
-		{
+		//private void button1_Click (object sender, RoutedEventArgs e)
+		//{
 			//OpenALPlaybackProvider provider = new OpenALPlaybackProvider();
 
 			//FFmpeg.av_register_all();
@@ -311,6 +312,6 @@ namespace Gablarski.Client
 
 			//    provider.QueuePlayback(buffer, t);
 			//}
-		}
+		//}
 	}
 }

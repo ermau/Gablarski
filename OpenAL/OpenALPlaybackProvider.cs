@@ -12,7 +12,10 @@ namespace Gablarski.Client.Providers.OpenAL
 	{
 		public OpenALPlaybackProvider ()
 		{
-			this.device = Alc.alcOpenDevice (null);
+			//int e = Alc.alcIsExtensionPresent (IntPtr.Zero, "ALC_ENUMERATION_EXT");
+			//string f = Alc.alcGetString (IntPtr.Zero, Alc.ALC_ALL_DEVICES_SPECIFIER);
+
+			this.device = Alc.alcOpenDevice (null);//Alc.alcGetString (IntPtr.Zero, Alc.ALC_DEVICE_SPECIFIER));
 			this.context = Alc.alcCreateContext (this.device, IntPtr.Zero);
 			
 			Al.alDistanceModel (Al.AL_NONE);
@@ -54,6 +57,14 @@ namespace Gablarski.Client.Providers.OpenAL
 
 		public void Dispose ()
 		{
+			this.Dispose (true);
+		}
+
+		protected void Dispose (bool disposing)
+		{
+			if (this.device != IntPtr.Zero)
+				Alc.alcCloseDevice (this.device);
+
 			this.playing = false;
 
 			if (this.PlayerThread != null)
