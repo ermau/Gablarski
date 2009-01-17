@@ -75,6 +75,8 @@ namespace Lidgren.Network
 
 		Ping = 100,
 		Pong = 101,
+
+		StringTableAck = 200,
 	}
 
 	/// <summary>

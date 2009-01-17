@@ -27,6 +27,10 @@ namespace Lidgren.Network
 	public sealed partial class NetConnection
 	{
 		internal NetConnectionStatistics m_statistics;
+
+		/// <summary>
+		/// Gets the statistics object for this connection
+		/// </summary>
 		public NetConnectionStatistics Statistics { get { return m_statistics; } }
 	}
 
@@ -321,7 +325,7 @@ namespace Lidgren.Network
 				int retval = 0;
 				for (int i = 0; i < m_connection.m_withheldMessages.Length; i++)
 				{
-					List<NetMessage> list = m_connection.m_withheldMessages[i];
+					List<IncomingNetMessage> list = m_connection.m_withheldMessages[i];
 					if (list != null)
 						retval += list.Count;
 				}

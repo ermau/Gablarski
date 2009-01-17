@@ -71,6 +71,14 @@ namespace Lidgren.Network
 			}
 		}
 
+		public NetBuffer CreateBuffer(string str)
+		{
+			// TODO: optimize
+			NetBuffer retval = CreateBuffer(Encoding.UTF8.GetByteCount(str) + 1);
+			retval.Write(str);
+			return retval;
+		}
+
 		public NetBuffer CreateBuffer()
 		{
 			return CreateBuffer(4);

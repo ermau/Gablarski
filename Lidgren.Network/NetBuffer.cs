@@ -19,6 +19,7 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 
 namespace Lidgren.Network
 {
@@ -59,8 +60,31 @@ namespace Lidgren.Network
 		/// </summary>
 		public NetBuffer(byte[] copyData)
 		{
-			InternalEnsureBufferSize(m_bitLength + copyData.Length);
-			Buffer.BlockCopy(copyData, copyData.Length, Data, 0, copyData.Length);
+			if (copyData != null)
+			{
+				Data = new byte[copyData.Length];
+				Buffer.BlockCopy(copyData, 0, Data, 0, copyData.Length);
+				m_bitLength = copyData.Length * 8;
+			}
+			else
+			{
+				Data = new byte[4];
+			}
+		}
+
+		public NetBuffer(string str)
+		{
+			if (string.IsNullOrEmpty(str))
+			{
+				Data = new byte[1];
+				WriteVariableUInt32(0);
+				return;
+			}
+
+			byte[] strData = Encoding.UTF8.GetBytes(str);
+			Data = new byte[1 + strData.Length];
+			WriteVariableUInt32((uint)strData.Length);
+			Write(strData);
 		}
 
 		/// <summary>
@@ -119,8 +143,18 @@ namespace Lidgren.Network
 		/// </summary>
 		public void Reset()
 		{
-			m_bitLength = 0;
 			m_readPosition = 0;
+			m_bitLength = 0;
+			m_refCount = 0;
+		}
+
+		/// <summary>
+		/// Resets read and write pointers
+		/// </summary>
+		internal void Reset(int readPos, int writePos)
+		{
+			m_readPosition = readPos;
+			m_bitLength = writePos;
 			m_refCount = 0;
 		}
 		

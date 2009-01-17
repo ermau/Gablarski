@@ -145,7 +145,7 @@ namespace Lidgren.Network
 		/// <summary>
 		/// Handle a discovery request
 		/// </summary>
-		internal void HandleRequest(NetMessage message, IPEndPoint senderEndpoint)
+		internal void HandleRequest(IncomingNetMessage message, IPEndPoint senderEndpoint)
 		{
 			ushort number;
 
@@ -169,7 +169,7 @@ namespace Lidgren.Network
 		}
 
 		internal bool VerifyIdentifiers(
-			NetMessage message,
+			IncomingNetMessage message,
 			IPEndPoint endPoint,
 			out ushort number
 		)
@@ -207,8 +207,8 @@ namespace Lidgren.Network
 		/// <summary>
 		/// Returns a NetMessage to return to application; or null if nothing
 		/// </summary>
-		internal NetMessage HandleResponse(
-			NetMessage message,
+		internal IncomingNetMessage HandleResponse(
+			IncomingNetMessage message,
 			IPEndPoint endPoint
 		)
 		{
@@ -245,15 +245,11 @@ namespace Lidgren.Network
 
 			m_netBase.LogVerbose("Received discovery response to request " + number + " - passing on to app...");
 
-			NetMessage resMsg = m_netBase.CreateMessage();
+			IncomingNetMessage resMsg = m_netBase.CreateIncomingMessage();
 			resMsg.m_msgType = NetMessageType.ServerDiscovered;
 
-			NetBuffer resBuf = m_netBase.CreateBuffer();
-			resMsg.m_data = resBuf;
-
 			// write sender, assume ipv4
-			resBuf.Write(endPoint);
-			//resBuf.Write(discoverData);
+			resMsg.m_data.Write(endPoint);
 
 			return resMsg;
 		}

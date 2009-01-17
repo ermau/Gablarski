@@ -14,10 +14,11 @@ namespace Lidgren.Network
 	{
 		private NetBase m_owner;
 		internal IPEndPoint m_remoteEndPoint;
-		internal NetQueue<NetMessage> m_unsentMessages;
-		internal NetQueue<NetMessage> m_lockedUnsentMessages;
+		internal NetQueue<OutgoingNetMessage> m_unsentMessages;
+		internal NetQueue<OutgoingNetMessage> m_lockedUnsentMessages;
 		internal NetConnectionStatus m_status;
-		private byte[] m_hailData;
+		private byte[] m_localHailData; // outgoing hail data
+		private byte[] m_remoteHailData; // incoming hail data (with connect or response)
 		private double m_ackWithholdingStarted;
 		private float m_throttleDebt;
 		private double m_lastSentUnsentMessages;
@@ -32,6 +33,16 @@ namespace Lidgren.Network
 		private bool m_isInitiator; // if true: we sent Connect; if false: we received Connect
 		internal double m_handshakeInitiated;
 		private int m_handshakeAttempts;
+
+		/// <summary>
+		/// Gets or sets local (outgoing) hail data
+		/// </summary>
+		public byte[] LocalHailData { get { return m_localHailData; } set { m_localHailData = value; } }
+
+		/// <summary>
+		/// Gets remote (incoming) hail data, if available
+		/// </summary>
+		public byte[] RemoteHailData { get { return m_remoteHailData; } }
 
 		/// <summary>
 		/// Remote endpoint for this connection
@@ -55,32 +66,41 @@ namespace Lidgren.Network
 
 		internal void SetStatus(NetConnectionStatus status, string reason)
 		{
-			if (m_status == status)
+			// Connecting status is given to NetConnection at startup, so we must treat it differently
+			if (m_status == status && status != NetConnectionStatus.Connecting)
 				return;
 
 			//m_owner.LogWrite("New connection status: " + status + " (" + reason + ")");
 			NetConnectionStatus oldStatus = m_status;
 			m_status = status;
 
+			if (m_status == NetConnectionStatus.Connected)
+			{
+				// no need for further hole punching
+				m_owner.CeaseHolePunching(m_remoteEndPoint);
+			}
+
 			m_owner.NotifyStatusChange(this, reason);
 		}
 
-		internal NetConnection(NetBase owner, IPEndPoint remoteEndPoint, byte[] hailData)
+		internal NetConnection(NetBase owner, IPEndPoint remoteEndPoint, byte[] localHailData, byte[] remoteHailData)
 		{
 			m_owner = owner;
 			m_remoteEndPoint = remoteEndPoint;
-			m_hailData = hailData;
+			m_localHailData = localHailData;
+			m_remoteHailData = remoteHailData;
 			m_futureClose = double.MaxValue;
 
 			m_throttleDebt = owner.m_config.m_throttleBytesPerSecond; // slower start
 
 			m_statistics = new NetConnectionStatistics(this, 1.0f);
-			m_unsentMessages = new NetQueue<NetMessage>(6);
-			m_lockedUnsentMessages = new NetQueue<NetMessage>(3);
+			m_unsentMessages = new NetQueue<OutgoingNetMessage>(6);
+			m_lockedUnsentMessages = new NetQueue<OutgoingNetMessage>(3);
 			m_status = NetConnectionStatus.Connecting; // to prevent immediate removal on heartbeat thread
 
 			InitializeReliability();
 			InitializeFragmentation();
+			InitializeStringTable();
 			//InitializeCongestionControl(32);
 		}
 
@@ -123,7 +143,7 @@ namespace Lidgren.Network
 
 				for (int i = 0; i < numFragments; i++)
 				{
-					NetMessage fmsg = m_owner.CreateMessage();
+					OutgoingNetMessage fmsg = m_owner.CreateOutgoingMessage();
 					fmsg.m_type = NetMessageLibraryType.UserFragmented;
 					fmsg.m_msgType = NetMessageType.Data;
 
@@ -175,7 +195,7 @@ namespace Lidgren.Network
 			// Normal, unfragmented, message
 			//
 
-			NetMessage msg = m_owner.CreateMessage();
+			OutgoingNetMessage msg = m_owner.CreateOutgoingMessage();
 			msg.m_msgType = NetMessageType.Data;
 			msg.m_type = NetMessageLibraryType.User;
 			msg.m_data = data;
@@ -204,12 +224,12 @@ namespace Lidgren.Network
 			m_futureClose = double.MaxValue;
 			m_futureDisconnectReason = null;
 
-			m_owner.LogVerbose("Sending Connect request", this);
-			NetMessage msg = m_owner.CreateSystemMessage(NetSystemType.Connect);
+			m_owner.LogVerbose("Sending Connect request to " + m_remoteEndPoint, this);
+			OutgoingNetMessage msg = m_owner.CreateSystemMessage(NetSystemType.Connect);
 			msg.m_data.Write(m_owner.Configuration.ApplicationIdentifier);
 			msg.m_data.Write(m_owner.m_randomIdentifier);
-			if (m_hailData != null && m_hailData.Length > 0)
-				msg.m_data.Write(m_hailData);
+			if (m_localHailData != null && m_localHailData.Length > 0)
+				msg.m_data.Write(m_localHailData);
 			m_unsentMessages.Enqueue(msg);
 			SetStatus(NetConnectionStatus.Connecting, "Connecting");
 		}
@@ -224,7 +244,7 @@ namespace Lidgren.Network
 			// drain messages from application into main unsent list
 			lock (m_lockedUnsentMessages)
 			{
-				NetMessage lm;
+				OutgoingNetMessage lm;
 				while ((lm = m_lockedUnsentMessages.Dequeue()) != null)
 					m_unsentMessages.Enqueue(lm);
 			}
@@ -249,7 +269,10 @@ namespace Lidgren.Network
 						m_owner.LogWrite("Re-sending ConnectResponse", this);
 						m_handshakeInitiated = now;
 
-						m_unsentMessages.Enqueue(m_owner.CreateSystemMessage(NetSystemType.ConnectResponse));
+						OutgoingNetMessage response = m_owner.CreateSystemMessage(NetSystemType.ConnectResponse);
+						if (m_localHailData != null)
+							response.m_data.Write(m_localHailData);
+						m_unsentMessages.Enqueue(response);
 					}
 				}
 			}
@@ -330,7 +353,7 @@ namespace Lidgren.Network
 			sendBuffer.Reset();
 			while (m_unsentMessages.Count > 0)
 			{
-				NetMessage msg = m_unsentMessages.Peek();
+				OutgoingNetMessage msg = m_unsentMessages.Peek();
 				int estimatedMessageSize = msg.m_data.LengthBytes + 5;
 
 				// check if this message fits the throttle window
@@ -530,11 +553,11 @@ namespace Lidgren.Network
 		}
 		*/
 
-		internal void HandleSystemMessage(NetMessage msg, double now)
+		internal void HandleSystemMessage(IncomingNetMessage msg, double now)
 		{
 			msg.m_data.Position = 0;
 			NetSystemType sysType = (NetSystemType)msg.m_data.ReadByte();
-			NetMessage response = null;
+			OutgoingNetMessage response = null;
 			switch (sysType)
 			{
 				case NetSystemType.Disconnect:
@@ -567,12 +590,20 @@ namespace Lidgren.Network
 						return;
 					}
 
+					// read hail data
+					m_remoteHailData = null;
+					int hailBytesCount = (msg.m_data.LengthBits - msg.m_data.Position) / 8;
+					if (hailBytesCount > 0)
+						m_remoteHailData = msg.m_data.ReadBytes(hailBytesCount);
+
 					// finalize disconnect if it's in process
 					if (m_status == NetConnectionStatus.Disconnecting)
 						FinalizeDisconnect();
 
 					// send response; even if connected
 					response = m_owner.CreateSystemMessage(NetSystemType.ConnectResponse);
+					if (m_localHailData != null)
+						response.m_data.Write(m_localHailData);
 					m_unsentMessages.Enqueue(response);
 
 					break;
@@ -582,9 +613,17 @@ namespace Lidgren.Network
 						m_owner.LogWrite("Received connection response but we're not connecting...", this);
 						return;
 					}
+					
+					// read hail data
+					m_remoteHailData = null;
+					int numHailBytes = (msg.m_data.LengthBits - msg.m_data.Position) / 8;
+					if (numHailBytes > 0)
+						m_remoteHailData = msg.m_data.ReadBytes(numHailBytes);
 
 					// Send connectionestablished
 					response = m_owner.CreateSystemMessage(NetSystemType.ConnectionEstablished);
+					if (m_localHailData != null)
+						response.m_data.Write(m_localHailData);
 					m_unsentMessages.Enqueue(response);
 
 					// send first ping 250ms after connected
@@ -600,6 +639,15 @@ namespace Lidgren.Network
 							m_owner.NotifyApplication(NetMessageType.BadMessageReceived, "Received connection response but we're not connecting...", this, msg.m_senderEndPoint);
 						return;
 					}
+
+					// read hail data
+					if (m_remoteHailData == null)
+					{
+						int hbc = (msg.m_data.LengthBits - msg.m_data.Position) / 8;
+						if (hbc > 0)
+							m_remoteHailData = msg.m_data.ReadBytes(hbc);
+					}
+
 					// send first ping 100-350ms after connected
 					m_lastSentPing = now - m_owner.Configuration.PingFrequency + 0.1 + (NetRandom.Instance.NextFloat() * 0.25f);
 					m_statistics.Reset();
@@ -624,6 +672,10 @@ namespace Lidgren.Network
 					if (twoWayLatency < 0)
 						break;
 					ReceivedPong(twoWayLatency, msg);
+					break;
+				case NetSystemType.StringTableAck:
+					ushort val = msg.m_data.ReadUInt16();
+					StringTableAcknowledgeReceived(val);
 					break;
 				default:
 					m_owner.LogWrite("Undefined behaviour in NetConnection for system message " + sysType, this);
@@ -689,6 +741,9 @@ namespace Lidgren.Network
 			ResetReliability();
 		}
 
-
+		public override string ToString()
+		{
+			return "[NetConnection " + m_remoteEndPoint.ToString() + " / " + m_status + "]";
+		}
 	}
 }

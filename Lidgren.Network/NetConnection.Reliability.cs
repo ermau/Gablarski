@@ -9,7 +9,7 @@ namespace Lidgren.Network
 		internal double[] m_earliestResend;
 		internal Queue<int> m_acknowledgesToSend;
 		//internal ushort[] m_nextExpectedSequence;
-		internal List<NetMessage>[] m_storedMessages;
+		internal List<OutgoingNetMessage>[] m_storedMessages;
 		//internal List<NetMessage> m_withheldMessages;
 		internal List<NetMessage> m_removeList;
 		//internal uint[][] m_receivedSequences;
@@ -20,12 +20,12 @@ namespace Lidgren.Network
 		// next expected UnreliableOrdered
 		private int[] m_nextExpectedSequenced = new int[16];
 		private bool[][] m_reliableReceived = new bool[NetConstants.NumSequenceChannels][];
-		internal List<NetMessage>[] m_withheldMessages = new List<NetMessage>[16]; // number of reliable channels
+		internal List<IncomingNetMessage>[] m_withheldMessages = new List<IncomingNetMessage>[16]; // number of reliable channels
 		private int[] m_allReliableReceivedUpTo = new int[16];
 
 		internal void InitializeReliability()
 		{
-			m_storedMessages = new List<NetMessage>[NetConstants.NumReliableChannels];
+			m_storedMessages = new List<OutgoingNetMessage>[NetConstants.NumReliableChannels];
 			//m_withheldMessages = new List<NetMessage>(2);
 			//m_nextExpectedSequence = new ushort[NetConstants.NumSequenceChannels];
 			m_nextSequenceToSend = new int[NetConstants.NumSequenceChannels];
@@ -92,7 +92,7 @@ namespace Lidgren.Network
 		/// <summary>
 		/// Process a user message
 		/// </summary>
-		internal void HandleUserMessage(NetMessage msg)
+		internal void HandleUserMessage(IncomingNetMessage msg)
 		{
 #if DEBUG
 			if (System.Threading.Thread.CurrentThread != m_owner.m_heartbeatThread)
@@ -190,10 +190,10 @@ namespace Lidgren.Network
 			}
 
 			// Early ordered message; withhold
-			List<NetMessage> wmlist = m_withheldMessages[relChanNr];
+			List<IncomingNetMessage> wmlist = m_withheldMessages[relChanNr];
 			if (wmlist == null)
 			{
-				wmlist = new List<NetMessage>();
+				wmlist = new List<IncomingNetMessage>();
 				m_withheldMessages[relChanNr] = wmlist;
 			}
 
@@ -229,7 +229,7 @@ namespace Lidgren.Network
 						// this should be a withheld message
 						int wmlidx = (int)seqChan - (int)NetChannel.ReliableUnordered;
 						bool foundWithheld = false;
-						foreach (NetMessage wm in m_withheldMessages[wmlidx])
+						foreach (IncomingNetMessage wm in m_withheldMessages[wmlidx])
 						{
 							if ((int)wm.m_sequenceChannel == seqChan && wm.m_sequenceNumber == arut)
 							{
@@ -250,7 +250,7 @@ namespace Lidgren.Network
 			m_allReliableReceivedUpTo[relChanNr] = arut;
 		}
 
-		private void AssignSequenceNumber(NetMessage msg)
+		private void AssignSequenceNumber(OutgoingNetMessage msg)
 		{
 			int idx = (int)msg.m_sequenceChannel;
 			int nr = m_nextSequenceToSend[idx];
@@ -261,14 +261,14 @@ namespace Lidgren.Network
 			m_nextSequenceToSend[idx] = nr;
 		}
 
-		internal void StoreMessage(double now, NetMessage msg)
+		internal void StoreMessage(double now, OutgoingNetMessage msg)
 		{
 			int chanBufIdx = (int)msg.m_sequenceChannel - (int)NetChannel.ReliableUnordered;
 
-			List<NetMessage> list = m_storedMessages[chanBufIdx];
+			List<OutgoingNetMessage> list = m_storedMessages[chanBufIdx];
 			if (list == null)
 			{
-				list = new List<NetMessage>();
+				list = new List<OutgoingNetMessage>();
 				m_storedMessages[chanBufIdx] = list;
 			}
 			list.Add(msg);
@@ -289,14 +289,14 @@ namespace Lidgren.Network
 		{
 			for (int i = 0; i < m_storedMessages.Length; i++)
 			{
-				List<NetMessage> list = m_storedMessages[i];
+				List<OutgoingNetMessage> list = m_storedMessages[i];
 				if (list == null || list.Count < 1)
 					continue;
 
 				if (now > m_earliestResend[i])
 				{
 					double newEarliest = double.MaxValue;
-					foreach (NetMessage msg in list)
+					foreach (OutgoingNetMessage msg in list)
 					{
 						double resend = msg.m_nextResend;
 						if (now > resend)
@@ -314,7 +314,7 @@ namespace Lidgren.Network
 					}
 
 					m_earliestResend[i] = newEarliest;
-					foreach (NetMessage msg in m_removeList)
+					foreach (OutgoingNetMessage msg in m_removeList)
 						list.Remove(msg);
 					m_removeList.Clear();
 				}
@@ -328,13 +328,13 @@ namespace Lidgren.Network
 		{
 			int mtuBits = ((m_owner.m_config.m_maximumTransmissionUnit - 10) / 3) * 8;
 
-			NetMessage ackMsg = null;
+			OutgoingNetMessage ackMsg = null;
 			int numAcks = m_acknowledgesToSend.Count;
 			for (int i = 0; i < numAcks; i++)
 			{
 				if (ackMsg == null)
 				{
-					ackMsg = m_owner.CreateMessage();
+					ackMsg = m_owner.CreateOutgoingMessage();
 					ackMsg.m_sequenceChannel = NetChannel.Unreliable;
 					ackMsg.m_type = NetMessageLibraryType.Acknowledge;
 				}
@@ -363,7 +363,7 @@ namespace Lidgren.Network
 			m_statistics.CountAcknowledgesSent(numAcks);
 		}
 
-		internal void HandleAckMessage(NetMessage ackMessage)
+		internal void HandleAckMessage(IncomingNetMessage ackMessage)
 		{
 			int len = ackMessage.m_data.LengthBytes;
 			if ((len % 3) != 0)
@@ -391,7 +391,7 @@ namespace Lidgren.Network
 					continue;
 				}
 
-				List<NetMessage> list = m_storedMessages[chanIdx];
+				List<OutgoingNetMessage> list = m_storedMessages[chanIdx];
 				if (list != null)
 				{
 					int cnt = list.Count;
@@ -399,7 +399,7 @@ namespace Lidgren.Network
 					{
 						for (int o = 0; o < cnt; o++)
 						{
-							NetMessage msg = list[o];
+							OutgoingNetMessage msg = list[o];
 							if (msg.m_sequenceNumber == seqNr)
 							{
 

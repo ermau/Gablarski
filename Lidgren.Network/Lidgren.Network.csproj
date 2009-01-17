@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.50727</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{BA202214-F6F8-4853-BCC9-CA4F13C5F479}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -11,9 +11,9 @@
     <AssemblyName>Lidgren.Network</AssemblyName>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
-    <OldToolsVersion>2.0</OldToolsVersion>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -33,6 +33,13 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>bin\Release\Lidgren.Network.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'ReleaseWithStatistics|AnyCPU' ">
+    <OutputPath>bin\ReleaseWithStatistics\</OutputPath>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Optimize>true</Optimize>
+    <DefineConstants>TRACE;USE_RELEASE_STATISTICS</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -58,6 +65,7 @@
     <Compile Include="NetConnection.Latency.cs" />
     <Compile Include="NetConnection.Reliability.cs" />
     <Compile Include="NetConnection.Statistics.cs" />
+    <Compile Include="NetConnection.StringTable.cs" />
     <Compile Include="NetConstants.cs" />
     <Compile Include="NetDiscovery.cs" />
     <Compile Include="NetEnums.cs" />

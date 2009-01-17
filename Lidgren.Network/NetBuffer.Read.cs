@@ -79,6 +79,16 @@ namespace Lidgren.Network
 			return retval;
 		}
 
+		public void ReadBytes(byte[] into, int offset, int numberOfBytes)
+		{
+			Debug.Assert(m_bitLength - m_readPosition >= (numberOfBytes * 8), c_readOverflowError);
+			Debug.Assert(offset + numberOfBytes <= into.Length);
+
+			NetBitWriter.ReadBytes(Data, numberOfBytes, m_readPosition, into, offset);
+			m_readPosition += (8 * numberOfBytes);
+			return;
+		}
+
 		//
 		// 16 bit
 		//
@@ -298,6 +308,27 @@ namespace Lidgren.Network
 		}
 
 		/// <summary>
+		/// Reads a UInt32 written using WriteUnsignedVarInt()
+		/// </summary>
+		[CLSCompliant(false)]
+		public UInt64 ReadVariableUInt64()
+		{
+			UInt64 num1 = 0;
+			int num2 = 0;
+			while (true)
+			{
+				if (num2 == 0x23)
+					throw new FormatException("Bad 7-bit encoded integer");
+
+				byte num3 = this.ReadByte();
+				num1 |= ((UInt64)num3 & 0x7f) << (num2 & 0x1f);
+				num2 += 7;
+				if ((num3 & 0x80) == 0)
+					return num1;
+			}
+		}
+
+		/// <summary>
 		/// Reads a float written using WriteSignedSingle()
 		/// </summary>
 		public float ReadSignedSingle(int numberOfBits)
@@ -363,6 +394,14 @@ namespace Lidgren.Network
 			
 			byte[] bytes = ReadBytes(byteLen);
 			return System.Text.Encoding.UTF8.GetString(bytes, 0, bytes.Length);
+		}
+
+		/// <summary>
+		/// Reads a string using the string table
+		/// </summary>
+		public string ReadString(NetConnection sender)
+		{
+			return sender.ReadStringTable(this);
 		}
 
 		/// <summary>

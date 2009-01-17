@@ -31,6 +31,10 @@ namespace Lidgren.Network
 	public partial class NetBase
 	{
 		internal NetBaseStatistics m_statistics;
+
+		/// <summary>
+		/// Statistics for this NetBase instance
+		/// </summary>
 		public NetBaseStatistics Statistics { get { return m_statistics; } }
 
 #if DEBUG || USE_RELEASE_STATISTICS
@@ -103,6 +107,9 @@ namespace Lidgren.Network
 #endif
 	}
 
+	/// <summary>
+	/// Statistics for a NetBase derived class
+	/// </summary>
 	public sealed class NetBaseStatistics
 	{
 		private double m_startTimestamp;
@@ -139,21 +146,33 @@ namespace Lidgren.Network
 		/// </summary>
 		public long BytesSent { get { return m_bytesSent; } }
 
+		/// <summary>
+		/// Gets the number of packets sent per second
+		/// </summary>
 		public float GetPacketsSentPerSecond(double now)
 		{
 			return (float)((double)m_packetsSent / (now - m_startTimestamp));
 		}
 
+		/// <summary>
+		/// Gets the number of bytes sent per second
+		/// </summary>
 		public float GetBytesSentPerSecond(double now)
 		{
 			return (float)((double)m_bytesSent / (now - m_startTimestamp));
 		}
 
+		/// <summary>
+		/// Gets the number of packets received per second
+		/// </summary>
 		public float GetPacketsReceivedPerSecond(double now)
 		{
 			return (float)((double)m_packetsReceived / (now - m_startTimestamp));
 		}
 
+		/// <summary>
+		/// Gets the number of bytes received per second
+		/// </summary>
 		public float GetBytesReceivedPerSecond(double now)
 		{
 			return (float)((double)m_bytesReceived / (now - m_startTimestamp));
@@ -164,6 +183,9 @@ namespace Lidgren.Network
 			Reset();
 		}
 
+		/// <summary>
+		/// Resets all statistics, including starting timestamp
+		/// </summary>
 #if !USE_RELEASE_STATISTICS
 		[Conditional("DEBUG")]
 #endif

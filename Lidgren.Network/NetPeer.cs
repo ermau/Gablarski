@@ -36,9 +36,9 @@ namespace Lidgren.Network
 		}
 
 		/// <summary>
-		/// Connects to the specified endpoint; passing hailData to the server
+		/// Connects to the specified endpoint; passing (outgoing) hailData to the server
 		/// </summary>
-		public void Connect(IPEndPoint remoteEndpoint, byte[] hailData)
+		public void Connect(IPEndPoint remoteEndpoint, byte[] localHailData)
 		{
 			// ensure we're bound to socket
 			if (!m_isBound)
@@ -56,7 +56,7 @@ namespace Lidgren.Network
 			else
 			{
 				// create new connection
-				connection = new NetConnection(this, remoteEndpoint, hailData);
+				connection = new NetConnection(this, remoteEndpoint, localHailData, null);
 				lock (m_connections)
 					m_connections.Add(connection);
 				m_connectionLookup.Add(remoteEndpoint, connection);

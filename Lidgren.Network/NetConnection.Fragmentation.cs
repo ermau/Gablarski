@@ -32,7 +32,7 @@ namespace Lidgren.Network
 		/// <summary>
 		/// Called when a message should be released to the application
 		/// </summary>
-		private void AcceptMessage(NetMessage msg)
+		private void AcceptMessage(IncomingNetMessage msg)
 		{
 			if (msg.m_type == NetMessageLibraryType.UserFragmented)
 			{

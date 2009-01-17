@@ -43,10 +43,12 @@ namespace Lidgren.Network
 		protected bool m_shutdownComplete;
 
 		// ready for reading by the application
-		internal NetQueue<NetMessage> m_receivedMessages;
+		internal NetQueue<IncomingNetMessage> m_receivedMessages;
 		private NetQueue<NetBuffer> m_unsentOutOfBandMessages;
 		private NetQueue<IPEndPoint> m_unsentOutOfBandRecipients;
 		private Queue<SUSystemMessage> m_susmQueue;
+		internal List<IPEndPoint> m_holePunches;
+		private double m_lastHolePunch;
 
 		internal NetConfiguration m_config;
 		internal NetBuffer m_receiveBuffer;
@@ -123,7 +125,7 @@ namespace Lidgren.Network
 			m_sendBuffer = new NetBuffer(config.SendBufferSize);
 			m_senderRemote = (EndPoint)new IPEndPoint(IPAddress.Any, 0);
 			m_statistics = new NetBaseStatistics();
-			m_receivedMessages = new NetQueue<NetMessage>(4);
+			m_receivedMessages = new NetQueue<IncomingNetMessage>(4);
 			m_scratchBuffer = new NetBuffer(32);
 			m_bindLock = new object();
 			m_discovery = new NetDiscovery(this);
@@ -143,15 +145,27 @@ namespace Lidgren.Network
 
 
 		/// <summary>
-		/// Creates a new NetMessage with a resetted NetBuffer, increasing refCount
+		/// Creates an outgoing net message
 		/// </summary>
-		internal NetMessage CreateMessage()
+		internal OutgoingNetMessage CreateOutgoingMessage()
 		{
 			// no recycling for messages
-			NetMessage msg = new NetMessage();
+			OutgoingNetMessage msg = new OutgoingNetMessage();
 			msg.m_sequenceNumber = -1;
 			msg.m_numSent = 0;
 			msg.m_nextResend = double.MaxValue;
+			msg.m_msgType = NetMessageType.Data;
+			msg.m_data = CreateBuffer();
+			return msg;
+		}
+
+		/// <summary>
+		/// Creates an incoming net message
+		/// </summary>
+		internal IncomingNetMessage CreateIncomingMessage()
+		{
+			// no recycling for messages
+			IncomingNetMessage msg = new IncomingNetMessage();
 			msg.m_msgType = NetMessageType.Data;
 			msg.m_data = CreateBuffer();
 			return msg;
@@ -234,10 +248,44 @@ namespace Lidgren.Network
 		{
 			while (!m_shutdownComplete)
 			{
-				Heartbeat();
+				try
+				{
+					Heartbeat();
+				}
+				catch (Exception ex)
+				{
+					LogWrite("Heartbeat() failed on network thread: " + ex.Message);
+				}
 
 				// wait here to give cpu to other threads/processes
 				Thread.Sleep(m_runSleep);
+			}
+		}
+
+		/// <summary>
+		/// Stop any udp hole punching in progress towards ep
+		/// </summary>
+		public void CeaseHolePunching(IPEndPoint ep)
+		{
+			int hc = ep.GetHashCode();
+			if (m_holePunches != null)
+			{
+				bool wasRemoved = false;
+				do
+				{
+					for (int i = 0; i < m_holePunches.Count; i++)
+					{
+						if (m_holePunches[i].GetHashCode() == hc)
+						{
+							m_holePunches.RemoveAt(i);
+							wasRemoved = true;
+							break;
+						}
+					}
+				} while (m_holePunches.Count > 0 && wasRemoved);
+
+				if (m_holePunches.Count == 0)
+					m_holePunches = null;
 			}
 		}
 
@@ -251,6 +299,28 @@ namespace Lidgren.Network
 
 			// discovery
 			m_discovery.Heartbeat(now);
+
+			// hole punching
+			if (m_holePunches != null)
+			{
+				if (now > m_lastHolePunch + NetConstants.HolePunchingFrequency)
+				{
+					if (m_holePunches.Count < 0)
+					{
+						m_holePunches = null;
+					}
+					else
+					{
+						IPEndPoint dest = m_holePunches[0];
+						m_holePunches.RemoveAt(0);
+						NotifyApplication(NetMessageType.DebugMessage, "Sending hole punch to " + dest, null);
+						NetConnection.SendPing(this, dest, now);
+						if (m_holePunches.Count < 1)
+							m_holePunches = null;
+						m_lastHolePunch = now;
+					}
+				}
+			}
 
 			// Send queued system messages
 			if (m_susmQueue.Count > 0)
@@ -290,7 +360,17 @@ namespace Lidgren.Network
 					if (m_socket == null || m_socket.Available < 1)
 						return;
 					m_receiveBuffer.Reset();
-					int bytesReceived = m_socket.ReceiveFrom(m_receiveBuffer.Data, 0, m_receiveBuffer.Data.Length, SocketFlags.None, ref m_senderRemote);
+
+					int bytesReceived = 0;
+					try
+					{
+						bytesReceived = m_socket.ReceiveFrom(m_receiveBuffer.Data, 0, m_receiveBuffer.Data.Length, SocketFlags.None, ref m_senderRemote);
+					}
+					catch (SocketException)
+					{
+						// no good response to this yet
+						return;
+					}
 					if (bytesReceived < 1)
 						return;
 					if (bytesReceived > 0)
@@ -311,7 +391,7 @@ namespace Lidgren.Network
 						int beginPosition = m_receiveBuffer.Position;
 
 						// read message header
-						NetMessage msg = CreateMessage();
+						IncomingNetMessage msg = CreateIncomingMessage();
 						msg.m_sender = sender;
 						msg.ReadFrom(m_receiveBuffer, ipsender);
 
@@ -342,11 +422,53 @@ namespace Lidgren.Network
 
 		protected abstract void Heartbeat();
 
-		internal abstract NetConnection GetConnection(IPEndPoint remoteEndpoint);
+		public abstract NetConnection GetConnection(IPEndPoint remoteEndpoint);
 
-		internal abstract void HandleReceivedMessage(NetMessage message, IPEndPoint senderEndpoint);
+		internal abstract void HandleReceivedMessage(IncomingNetMessage message, IPEndPoint senderEndpoint);
 
 		internal abstract void HandleConnectionForciblyClosed(NetConnection connection, SocketException sex);
+
+		/// <summary>
+		/// Returns true if message should be dropped
+		/// </summary>
+		internal bool HandleNATIntroduction(IncomingNetMessage message)
+		{
+			if (message.m_type == NetMessageLibraryType.System)
+			{
+				if (message.m_data.LengthBytes > 4 && message.m_data.PeekByte() == (byte)NetSystemType.NatIntroduction)
+				{
+					if ((m_enabledMessageTypes & NetMessageType.NATIntroduction) != NetMessageType.NATIntroduction)
+						return true; // drop
+					try
+					{
+						message.m_data.ReadByte(); // step past system type byte
+						IPEndPoint presented = message.m_data.ReadIPEndPoint();
+
+						LogVerbose("Received NATIntroduction to " + presented + "; sending punching ping...");
+
+						double now = NetTime.Now;
+						NetConnection.SendPing(this, presented, now);
+
+						if (m_holePunches == null)
+							m_holePunches = new List<IPEndPoint>();
+
+						for (int i = 0; i < 5; i++)
+							m_holePunches.Add(new IPEndPoint(presented.Address, presented.Port));
+
+						NetBuffer info = CreateBuffer();
+						info.Write(presented);
+						NotifyApplication(NetMessageType.NATIntroduction, info, message.m_sender, message.m_senderEndPoint);
+						return true;
+					}
+					catch (Exception ex)
+					{
+						NotifyApplication(NetMessageType.BadMessageReceived, "Bad NAT introduction message received: " + ex.Message, message.m_sender, message.m_senderEndPoint);
+						return true;
+					}
+				}
+			}
+			return false;
+		}
 
 		/// <summary>
 		/// Notify application that a connection changed status
@@ -357,10 +479,10 @@ namespace Lidgren.Network
 				return; // disabled
 			NotifyApplication(NetMessageType.StatusChanged, reason, connection);
 		}
-
-		internal NetMessage CreateSystemMessage(NetSystemType systemType)
+		
+		internal OutgoingNetMessage CreateSystemMessage(NetSystemType systemType)
 		{
-			NetMessage msg = CreateMessage();
+			OutgoingNetMessage msg = CreateOutgoingMessage();
 			msg.m_type = NetMessageLibraryType.System;
 			msg.m_sequenceChannel = NetChannel.Unreliable;
 			msg.m_sequenceNumber = 0;
@@ -573,8 +695,12 @@ namespace Lidgren.Network
 		/// </summary>
 		internal void SendPacket(byte[] data, int length, IPEndPoint remoteEP)
 		{
-			if (length <= 0)
-				return;
+			if (length <= 0 || length > m_config.SendBufferSize)
+			{
+				string str = "Invalid packet size; Must be between 1 and NetConfiguration.SendBufferSize - Invalid value: " + length;
+				LogWrite(str);
+				throw new NetException(str);
+			}
 
 			if (!m_isBound)
 				Start();
@@ -582,12 +708,12 @@ namespace Lidgren.Network
 #if DEBUG
 			if (!m_suppressSimulatedLag)
 			{
-				// only count if we're not suppressing simulated lag (or it'll be counted twice)
-				m_statistics.CountPacketSent(length);
-
 				bool send = SimulatedSendPacket(data, length, remoteEP);
 				if (!send)
+				{
+					m_statistics.CountPacketSent(length);
 					return;
+				}
 			}
 #endif
 
@@ -596,6 +722,10 @@ namespace Lidgren.Network
 				//m_socket.SendTo(data, 0, length, SocketFlags.None, remoteEP);
 				int bytesSent = m_socket.SendTo(data, 0, length, SocketFlags.None, remoteEP);
 				//LogVerbose("Sent " + bytesSent + " bytes");
+#if DEBUG || USE_RELEASE_STATISTICS
+				if (!m_suppressSimulatedLag)
+					m_statistics.CountPacketSent(bytesSent);
+#endif
 				return;
 			}
 			catch (SocketException sex)
@@ -617,7 +747,7 @@ namespace Lidgren.Network
 					sex.SocketErrorCode == SocketError.ConnectionAborted)
 				{
 					LogWrite("Remote socket forcefully closed: " + sex.SocketErrorCode);
-					// TODO: notify connection somehow
+					// TODO: notify connection somehow?
 					return;
 				}
 
@@ -633,7 +763,7 @@ namespace Lidgren.Network
 			if ((m_enabledMessageTypes & NetMessageType.Receipt) != NetMessageType.Receipt)
 				return; // disabled
 
-			NetMessage msg = CreateMessage();
+			IncomingNetMessage msg = CreateIncomingMessage();
 			msg.m_sender = connection;
 			msg.m_msgType = NetMessageType.Receipt;
 			msg.m_data = receiptData;
@@ -680,15 +810,13 @@ namespace Lidgren.Network
 
 		internal void NotifyApplication(NetMessageType tp, string message, NetConnection conn)
 		{
-			NetBuffer buf = CreateBuffer();
-			buf.Write(message);
+			NetBuffer buf = CreateBuffer(message);
 			NotifyApplication(tp, buf, conn);
 		}
-
+		
 		internal void NotifyApplication(NetMessageType tp, string message, NetConnection conn, IPEndPoint ep)
 		{
-			NetBuffer buf = CreateBuffer();
-			buf.Write(message);
+			NetBuffer buf = CreateBuffer(message);
 			NotifyApplication(tp, buf, conn, ep);
 		}
 
@@ -699,7 +827,7 @@ namespace Lidgren.Network
 
 		internal void NotifyApplication(NetMessageType tp, NetBuffer buffer, NetConnection conn, IPEndPoint ep)
 		{
-			NetMessage msg = new NetMessage();
+			IncomingNetMessage msg = new IncomingNetMessage();
 			msg.m_data = buffer;
 			msg.m_msgType = tp;
 			msg.m_sender = conn;
@@ -753,6 +881,9 @@ namespace Lidgren.Network
 			GC.SuppressFinalize(this);
 		}
 
+		/// <summary>
+		/// Destructor
+		/// </summary>
 		~NetBase()
 		{
 			// Finalizer calls Dispose(false)
@@ -761,6 +892,9 @@ namespace Lidgren.Network
 
 		protected virtual void Dispose(bool disposing)
 		{
+			// Unless we're already shut down, this is the equivalent of killing the process
+			m_shutdownComplete = true;
+			m_isBound = false;
 			if (disposing)
 			{
 				if (m_socket != null)

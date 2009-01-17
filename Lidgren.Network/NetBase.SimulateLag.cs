@@ -31,7 +31,7 @@ namespace Lidgren.Network
 	}
 
 	/// <summary>
-	/// Methods for simulating latency and loss
+	/// Methods for simulating outgoing latency and loss
 	/// </summary>
 	public abstract partial class NetBase
 	{
@@ -51,7 +51,7 @@ namespace Lidgren.Network
 		public float SimulatedDuplicates { get { return m_simulatedDuplicateChance; } set { m_simulatedDuplicateChance = value; } }
 
 		/// <summary>
-		/// Simulates minimum two-way latency, ie. roundtrip (in seconds)
+		/// Simulates minimum two-way latency, ie. roundtrip (in seconds) of outgoing packets
 		/// </summary>
 		public float SimulatedMinimumLatency { get { return m_simulatedMinimumLatency; } set { m_simulatedMinimumLatency = value; } }
 
@@ -65,7 +65,7 @@ namespace Lidgren.Network
 		private List<DelayedPacket> m_removeDelayedPackets = new List<DelayedPacket>();
 
 		/// <summary>
-		/// Simulates bad networking conditions
+		/// Simulates bad outgoing networking conditions - similar settings should be used on both server and client
 		/// </summary>
 		/// <param name="lossChance">0.0 means no packets dropped; 1.0 means all packets dropped</param>
 		/// <param name="duplicateChance">0.0 means no packets duplicated; 1.0f means all packets duplicated</param>

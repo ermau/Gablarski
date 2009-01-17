@@ -23,6 +23,9 @@ using System.Diagnostics;
 
 namespace Lidgren.Network
 {
+	/// <summary>
+	/// Helper class for NetBuffer to write/read bits
+	/// </summary>
 	public static class NetBitWriter
 	{
 		/// <summary>

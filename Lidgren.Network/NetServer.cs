@@ -102,7 +102,7 @@ namespace Lidgren.Network
 			}
 		}
 
-		internal override NetConnection GetConnection(IPEndPoint remoteEndpoint)
+		public override NetConnection GetConnection(IPEndPoint remoteEndpoint)
 		{
 			NetConnection retval;
 			if (m_connectionLookup.TryGetValue(remoteEndpoint, out retval))
@@ -110,41 +110,15 @@ namespace Lidgren.Network
 			return null;
 		}
 
-		internal override void HandleReceivedMessage(NetMessage message, IPEndPoint senderEndpoint)
+		internal override void HandleReceivedMessage(IncomingNetMessage message, IPEndPoint senderEndpoint)
 		{
 			double now = NetTime.Now;
 
 			int payLen = message.m_data.LengthBytes;
 
 			// NAT introduction?
-			if (message.m_type == NetMessageLibraryType.System)
-			{
-				if (message.m_data.LengthBytes > 4 && message.m_data.PeekByte() == (byte)NetSystemType.NatIntroduction)
-				{
-					if ((m_enabledMessageTypes & NetMessageType.NATIntroduction) != NetMessageType.NATIntroduction)
-						return; // drop
-					try
-					{
-						message.m_data.ReadByte(); // step past system type byte
-						IPEndPoint presented = message.m_data.ReadIPEndPoint();
-
-						//
-						// TODO: Send repeated packets when a delay between
-						//
-						NetConnection.SendPing(this, presented, now);
-
-						NetBuffer info = CreateBuffer();
-						info.Write(presented);
-						NotifyApplication(NetMessageType.NATIntroduction, info, message.m_sender, message.m_senderEndPoint);
-						return;
-					}
-					catch (Exception ex)
-					{
-						NotifyApplication(NetMessageType.BadMessageReceived, "Bad NAT introduction message received", message.m_sender, message.m_senderEndPoint);
-						return;
-					}
-				}
-			}
+			if (HandleNATIntroduction(message))
+				return;
 
 			// Out of band?
 			if (message.m_type == NetMessageLibraryType.OutOfBand)
@@ -225,13 +199,13 @@ namespace Lidgren.Network
 
 						// Create connection
 						LogWrite("New connection: " + senderEndpoint);
-						NetConnection conn = new NetConnection(this, senderEndpoint, hailData);
+						NetConnection conn = new NetConnection(this, senderEndpoint, null, hailData);
 
 						// Connection approval?
 						if ((m_enabledMessageTypes & NetMessageType.ConnectionApproval) == NetMessageType.ConnectionApproval)
 						{
 							// Ask application if this connection is allowed to proceed
-							NetMessage app = CreateMessage();
+							IncomingNetMessage app = CreateIncomingMessage();
 							app.m_msgType = NetMessageType.ConnectionApproval;
 							if (hailData != null)
 								app.m_data.Write(hailData);
@@ -251,13 +225,14 @@ namespace Lidgren.Network
 							NotifyApplication(NetMessageType.BadMessageReceived, "Connection established received from non-connection! " + senderEndpoint, null, senderEndpoint);
 						return;
 					case NetSystemType.Discovery:
-						m_discovery.HandleRequest(message, senderEndpoint);
+						if (m_config.AnswerDiscoveryRequests)
+							m_discovery.HandleRequest(message, senderEndpoint);
 						break;
 					case NetSystemType.DiscoveryResponse:
 						if (m_allowOutgoingConnections)
 						{
 							// NetPeer
-							NetMessage resMsg = m_discovery.HandleResponse(message, senderEndpoint);
+							IncomingNetMessage resMsg = m_discovery.HandleResponse(message, senderEndpoint);
 							resMsg.m_senderEndPoint = senderEndpoint;
 							if (resMsg != null)
 							{
@@ -303,6 +278,7 @@ namespace Lidgren.Network
 					case NetSystemType.Pong:
 					case NetSystemType.Disconnect:
 					case NetSystemType.ConnectionRejected:
+					case NetSystemType.StringTableAck:
 						message.m_sender.HandleSystemMessage(message, now);
 						break;
 					case NetSystemType.ConnectResponse:
@@ -318,7 +294,8 @@ namespace Lidgren.Network
 						break;
 					case NetSystemType.Discovery:
 						// Allow discovery even if connected
-						m_discovery.HandleRequest(message, senderEndpoint);
+						if (m_config.AnswerDiscoveryRequests)
+							m_discovery.HandleRequest(message, senderEndpoint);
 						break;
 					default:
 						if ((m_enabledMessageTypes & NetMessageType.BadMessageReceived) == NetMessageType.BadMessageReceived)
@@ -333,12 +310,13 @@ namespace Lidgren.Network
 
 		internal void AddConnection(double now, NetConnection conn)
 		{
-			// send response; even if connected
-			NetMessage response = CreateSystemMessage(NetSystemType.ConnectResponse);
-			conn.m_unsentMessages.Enqueue(response);
+			conn.SetStatus(NetConnectionStatus.Connecting, "Connecting");
 
-			if (conn.m_status != NetConnectionStatus.Connecting)
-				conn.SetStatus(NetConnectionStatus.Connecting, "Connecting...");
+			// send response; even if connected
+			OutgoingNetMessage response = CreateSystemMessage(NetSystemType.ConnectResponse);
+			if (conn.LocalHailData != null)
+				response.m_data.Write(conn.LocalHailData);
+			conn.m_unsentMessages.Enqueue(response);
 
 			conn.m_handshakeInitiated = now;
 			
@@ -376,9 +354,14 @@ namespace Lidgren.Network
 		/// <summary>
 		/// Read any received message in any connection queue
 		/// </summary>
-		public bool ReadMessage(NetBuffer intoBuffer, List<NetConnection> onlyFor, bool includeNullConnectionMessages, out NetMessageType type, out NetConnection sender)
+		public bool ReadMessage(
+			NetBuffer intoBuffer,
+			List<NetConnection> onlyFor,
+			bool includeNullConnectionMessages,
+			out NetMessageType type,
+			out NetConnection sender)
 		{
-			NetMessage msg = null;
+			IncomingNetMessage msg = null;
 			lock (m_receivedMessages)
 			{
 				int sz = m_receivedMessages.Count;
@@ -443,12 +426,16 @@ namespace Lidgren.Network
 		/// <summary>
 		/// Read any received message in any connection queue
 		/// </summary>
-		public bool ReadMessage(NetBuffer intoBuffer, out NetMessageType type, out NetConnection sender, out IPEndPoint senderEndPoint)
+		public bool ReadMessage(
+			NetBuffer intoBuffer,
+			out NetMessageType type,
+			out NetConnection sender,
+			out IPEndPoint senderEndPoint)
 		{
 			if (intoBuffer == null)
 				throw new ArgumentNullException("intoBuffer");
 
-			NetMessage msg;
+			IncomingNetMessage msg;
 			lock(m_receivedMessages)
 				msg = m_receivedMessages.Dequeue();
 

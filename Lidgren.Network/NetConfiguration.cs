@@ -40,6 +40,7 @@ namespace Lidgren.Network
 		internal float m_disconnectLingerMaxDelay;
 		internal float m_throttleBytesPerSecond;
 		internal bool m_useBufferRecycling;
+		internal bool m_answerDiscoveryRequests;
 
 		/// <summary>
 		/// Gets or sets the string identifying this particular application; distinquishing it from other Lidgren based applications. Ie. this needs to be the same on client and server.
@@ -119,6 +120,11 @@ namespace Lidgren.Network
 		public float DisconnectLingerMaxDelay { get { return m_disconnectLingerMaxDelay; } set { m_disconnectLingerMaxDelay = value; } }
 
 		/// <summary>
+		/// Gets or sets if a NetServer/NetPeer should answer discovery requests
+		/// </summary>
+		public bool AnswerDiscoveryRequests { get { return m_answerDiscoveryRequests; } set { m_answerDiscoveryRequests = value; } }
+
+		/// <summary>
 		/// Gets or sets the amount of bytes allowed to be sent per second; set to 0 for no throttling
 		/// </summary>
 		public float ThrottleBytesPerSecond
@@ -147,6 +153,7 @@ namespace Lidgren.Network
 			m_maxAckWithholdTime = 0.5f; // one half RT wait before sending explicit ack
 			m_disconnectLingerMaxDelay = 3.0f;
 			m_resendTimeMultiplier = 1.1f;
+			m_answerDiscoveryRequests = true;
 			m_useBufferRecycling = false; // TODO: enable this when sure there's no threading issues
 		}
 	}

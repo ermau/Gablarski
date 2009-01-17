@@ -88,6 +88,20 @@ namespace Lidgren.Network
 			);
 		}
 
+		internal static void QueuePing(NetBase netBase, IPEndPoint toEndPoint, double now)
+		{
+			ushort nowEnc = NetTime.Encoded(now);
+			NetBuffer buffer = netBase.m_scratchBuffer;
+			buffer.Reset();
+			buffer.Write(nowEnc);
+			netBase.QueueSingleUnreliableSystemMessage(
+				NetSystemType.Ping,
+				buffer,
+				toEndPoint,
+				false
+			);
+		}
+
 		internal static void SendPong(NetBase netBase, IPEndPoint toEndPoint, double now)
 		{
 			ushort nowEnc = NetTime.Encoded(now);

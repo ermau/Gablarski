@@ -4,10 +4,10 @@ using System.Text;
 
 namespace Lidgren.Network
 {
+
 	/// <summary>
-	/// A fast random number generator for .NET
-	/// Colin Green, January 2005
-	/// 
+	/// A fast random number generator for .NET by Colin Green, January 2005
+	/// </summary>
 	/// September 4th 2005
 	///	 Added NextBytesUnsafe() - commented out by default.
 	///	 Fixed bug in ReInitialize() - y,z and w variables were not being reset.
@@ -38,7 +38,6 @@ namespace Lidgren.Network
 	///  re-allocation of variables on each call. However care should be taken if multiple instances of
 	///  FastRandom are in use or if being used in a multi-threaded environment.
 	/// 
-	/// </summary>
 	public sealed class NetRandom
 	{
 		public static NetRandom Instance = new NetRandom();

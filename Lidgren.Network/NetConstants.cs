@@ -28,6 +28,8 @@ namespace Lidgren.Network
 		internal const int NumKeptSequenceNumbers = 2048;
 		internal const int NumReliableChannels = 16;
 
+		internal const double HolePunchingFrequency = 2.0f;
+
 		/// <summary>
 		/// Maximum sequence difference for messages to be classified as Early
 		/// </summary>

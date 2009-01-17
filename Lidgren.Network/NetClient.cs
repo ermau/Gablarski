@@ -32,7 +32,7 @@ namespace Lidgren.Network
 		private NetConnection m_serverConnection;
 
 		private bool m_connectRequested;
-		private byte[] m_hailData;
+		private byte[] m_localHailData; // temporary container until NetConnection has been created
 		private IPEndPoint m_connectEndpoint;
 		private object m_startLock;
 
@@ -63,9 +63,12 @@ namespace Lidgren.Network
 			m_startLock = new object();
 		}
 
-		public void Connect (string host, int port)
+		/// <summary>
+		/// Connects to the specified host on the specified port; passing no hail data
+		/// </summary>
+		public void Connect(string host, int port)
 		{
-			Connect (host, port, null);
+			Connect(host, port, null);
 		}
 
 		/// <summary>
@@ -94,7 +97,7 @@ namespace Lidgren.Network
 		{
 			m_connectRequested = true;
 			m_connectEndpoint = remoteEndpoint;
-			m_hailData = hailData;
+			m_localHailData = hailData;
 
 			Start(); // start heartbeat thread etc
 		}
@@ -110,18 +113,18 @@ namespace Lidgren.Network
 			{
 				m_serverConnection.Disconnect("New connect", 0, m_serverConnection.Status == NetConnectionStatus.Connected, true);
 				if (m_serverConnection.RemoteEndpoint.Equals(m_connectEndpoint))
-					m_serverConnection = new NetConnection(this, m_connectEndpoint, m_hailData);
+					m_serverConnection = new NetConnection(this, m_connectEndpoint, m_localHailData, null);
 			}
 			else
 			{
-				m_serverConnection = new NetConnection(this, m_connectEndpoint, m_hailData);
+				m_serverConnection = new NetConnection(this, m_connectEndpoint, m_localHailData, null);
 			}
 
 			// connect
 			m_serverConnection.Connect();
 
 			m_connectEndpoint = null;
-			m_hailData = null;
+			m_localHailData = null;
 		}
 
 		/// <summary>
@@ -162,14 +165,17 @@ namespace Lidgren.Network
 				m_serverConnection.Heartbeat(now); // will send unsend messages etc.
 		}
 
-		internal override NetConnection GetConnection(IPEndPoint remoteEndpoint)
+		/// <summary>
+		/// Returns ServerConnection if passed the correct endpoint
+		/// </summary>
+		public override NetConnection GetConnection(IPEndPoint remoteEndpoint)
 		{
 			if (m_serverConnection != null && m_serverConnection.RemoteEndpoint.Equals(remoteEndpoint))
 				return m_serverConnection;
 			return null;
 		}
 
-		internal override void HandleReceivedMessage(NetMessage message, IPEndPoint senderEndpoint)
+		internal override void HandleReceivedMessage(IncomingNetMessage message, IPEndPoint senderEndpoint)
 		{
 			//LogWrite("NetClient received message " + message);
 			double now = NetTime.Now;
@@ -182,36 +188,15 @@ namespace Lidgren.Network
 				NetSystemType sysType = (NetSystemType)message.m_data.PeekByte();
 
 				// NAT introduction?
-				if (sysType == NetSystemType.NatIntroduction)
-				{
-					if ((m_enabledMessageTypes & NetMessageType.NATIntroduction) != NetMessageType.NATIntroduction)
-						return; // drop
-					try
-					{
-						message.m_data.ReadByte(); // step past system type byte
-						IPEndPoint presented = message.m_data.ReadIPEndPoint();
+				if (HandleNATIntroduction(message))
+					return;
 
-						//
-						// TODO: send repeated ping packets with delay
-						//
-						NetConnection.SendPing(this, presented, now);
-
-						NetBuffer info = CreateBuffer();
-						info.Write(presented);
-						NotifyApplication(NetMessageType.NATIntroduction, info, message.m_sender, senderEndpoint);
-						return;
-					}
-					catch (Exception ex)
-					{
-						NotifyApplication(NetMessageType.BadMessageReceived, "Bad NAT introduction message received", message.m_sender, senderEndpoint);
-						return;
-					}
-				}
+				
 
 				if (sysType == NetSystemType.DiscoveryResponse)
 				{
 					message.m_data.ReadByte(); // step past system type byte
-					NetMessage resMsg = m_discovery.HandleResponse(message, senderEndpoint);
+					IncomingNetMessage resMsg = m_discovery.HandleResponse(message, senderEndpoint);
 					if (resMsg != null)
 					{
 						resMsg.m_senderEndPoint = senderEndpoint;
@@ -262,6 +247,7 @@ namespace Lidgren.Network
 					case NetSystemType.Pong:
 					case NetSystemType.Disconnect:
 					case NetSystemType.ConnectionRejected:
+					case NetSystemType.StringTableAck:
 						if (m_serverConnection != null)
 							m_serverConnection.HandleSystemMessage(message, now);
 						return;
@@ -286,7 +272,7 @@ namespace Lidgren.Network
 				// lost connectresponse packet?
 				// Emulate it; 
 				LogVerbose("Received user message before ConnectResponse; emulating ConnectResponse...", m_serverConnection);
-				NetMessage emuMsg = CreateMessage();
+				IncomingNetMessage emuMsg = CreateIncomingMessage();
 				emuMsg.m_type = NetMessageLibraryType.System;
 				emuMsg.m_data.Reset();
 				emuMsg.m_data.Write((byte)NetSystemType.ConnectResponse);
@@ -334,7 +320,7 @@ namespace Lidgren.Network
 		/// <returns>true if a message was read</returns>
 		public bool ReadMessage(NetBuffer intoBuffer, out NetMessageType type, out IPEndPoint senderEndpoint)
 		{
-			NetMessage msg;
+			IncomingNetMessage msg;
 			lock (m_receivedMessages)
 				msg = m_receivedMessages.Dequeue();
 
