@@ -89,23 +89,28 @@ namespace Gablarski.Client.Providers.OpenAL
 		{
 			while (this.collecting)
 			{
+				List<int> toFree = new List<int> (this.owners.Count);
+
 				rwl.EnterReadLock();
 				foreach (int sourceID in owners.Keys)
 				{
-					int buffers;
-					Al.alGetSourcei (sourceID, Al.AL_BUFFERS_PROCESSED, out buffers);
-					if (buffers > 0)
+					int numBuffers;
+					Al.alGetSourcei (sourceID, Al.AL_BUFFERS_PROCESSED, out numBuffers);
+					if (numBuffers > 0)
 					{
-						Al.alSourceUnqueueBuffers (sourceID, buffers, ref buffers);
-						Al.alDeleteBuffers (buffers, ref buffers);
+						int[] buffers = new int[numBuffers];
+						Al.alSourceUnqueueBuffers (sourceID, numBuffers, buffers);
+						Al.alDeleteBuffers (numBuffers, buffers);
 					}
 
 					int state;
 					Al.alGetSourcei (sourceID, Al.AL_SOURCE_STATE, out state);
 					if (state != Al.AL_PLAYING)
-						FreeSource (sourceID);
+						toFree.Add (sourceID);
 				}
 				rwl.ExitReadLock();
+
+				toFree.ForEach (this.FreeSource);
 
 				Thread.Sleep (100);
 			}
