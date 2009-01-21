@@ -24,10 +24,10 @@ namespace Gablarski.Client.Providers.OpenAL
 
 			this.collecting = true;
 			(this.collectorThread = new Thread (this.Collector)
-			                        {
-			                        	IsBackground = true,
-			                        	Name = "OpenAL Source Pool Collector"
-			                        }).Start();
+									{
+										IsBackground = true,
+										Name = "OpenAL Source Pool Collector"
+									}).Start ();
 		}
 
 		public int RequestSource (int sourceID, bool stereo)
@@ -78,7 +78,7 @@ namespace Gablarski.Client.Providers.OpenAL
 
 		private int sourcesAvailable = 16;
 		private readonly Thread collectorThread;
-		private bool collecting;
+		private volatile bool collecting;
 		private readonly ReaderWriterLockSlim rwl = new ReaderWriterLockSlim ();
 
 		private readonly Dictionary<int, int> owners = new Dictionary<int, int> (TotalSourcesAvailable);

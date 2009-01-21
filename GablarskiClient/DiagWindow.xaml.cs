@@ -72,7 +72,7 @@ namespace Gablarski.Client
 			this.client.SendMedia (this.client.VoiceSource, e.Samples);
 		}
 
-		private OpenALPlaybackProvider playback;
+		private OpenALPlaybackProvider playback = new OpenALPlaybackProvider ();
 		void client_AudioReceived (object sender, AudioEventArgs e)
 		{
 			this.Log ("Received audio data from source: " + e.Source.ID);
