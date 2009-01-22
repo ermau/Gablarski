@@ -45,7 +45,7 @@ namespace Gablarski.Client
 
 		public IEnumerable<IMediaSource> Sources
 		{
-			get { return this.sources; }
+			get { return this.sources.Values; }
 		}
 
 		public void Connect (string host, int port)
@@ -90,7 +90,7 @@ namespace Gablarski.Client
 		{
 			ClientMessage msg = new ClientMessage (ClientMessages.AudioData, this.connection);
 			var buffer = msg.GetBuffer ();
-			buffer.Write (source);
+			buffer.WriteVariableInt32 (source.ID);
 
 			byte[] encoded = source.Codec.Encode (data);
 
@@ -121,7 +121,7 @@ namespace Gablarski.Client
 		private bool connecting;
 
 		private IUser user;
-		private List<IMediaSource> sources = new List<IMediaSource>();
+		private Dictionary<int, IMediaSource> sources = new Dictionary<int, IMediaSource> ();
 		
 		private Thread runnerThread;
 		private NetClient client;
@@ -161,7 +161,7 @@ namespace Gablarski.Client
 
 			this.user = e.Buffer.ReadUser();
 			this.VoiceSource = e.Buffer.ReadSource ();
-			this.sources.Add (VoiceSource);
+			this.sources.Add (VoiceSource.ID, VoiceSource);
 
 			var loggedin = this.LoggedIn;
 			if (loggedin != null)
@@ -269,7 +269,8 @@ namespace Gablarski.Client
 									break;
 
 								case ServerMessages.AudioData:
-									IMediaSource source = buffer.ReadSource();
+									//IMediaSource source = buffer.ReadSource();
+									IMediaSource source = this.sources[buffer.ReadVariableInt32 ()];
 
 									int audioLen = buffer.ReadVariableInt32();
 									if (audioLen <= 0)

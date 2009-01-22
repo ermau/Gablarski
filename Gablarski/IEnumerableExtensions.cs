@@ -7,7 +7,7 @@ namespace Gablarski
 {
 	public static class IEnumerableExtensions
 	{
-		public static V MaxOrDefault<T, V> (this IEnumerable<T> self, Func<T, V> selector, V def)
+		public static TValue MaxOrDefault<TElement, TValue> (this IEnumerable<TElement> self, Func<TElement, TValue> selector, TValue def)
 		{
 			return (self.Any()) ? self.Max (selector) : def;
 		}

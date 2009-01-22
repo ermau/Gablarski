@@ -191,7 +191,8 @@ namespace Gablarski.Server
 
 								case ClientMessages.AudioData:
 									//Trace.WriteLine ("Received voice data from: " + e.UserConnection.User.Nickname);
-									IMediaSource source = buffer.ReadSource ();
+									//IMediaSource source = buffer.ReadSource ();
+									int sourceID = buffer.ReadVariableInt32 ();
 
 									int voiceLen = buffer.ReadVariableInt32();
 									if (voiceLen <= 0)
@@ -199,7 +200,7 @@ namespace Gablarski.Server
 
 									ServerMessage msg = new ServerMessage (ServerMessages.AudioData, this.state.Connections);//.Where (uc => uc != e.UserConnection));
 									var msgbuffer = msg.GetBuffer ();
-									msgbuffer.Write (source);
+									msgbuffer.WriteVariableInt32 (sourceID);
 									msgbuffer.WriteVariableInt32 (voiceLen);
 									msgbuffer.Write (buffer.ReadBytes (voiceLen));
 									msg.Send (this.Server, NetChannel.Unreliable);
