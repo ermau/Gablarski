@@ -12,10 +12,7 @@ namespace Gablarski.Client.Providers.OpenAL
 	{
 		public OpenALPlaybackProvider ()
 		{
-			//int e = Alc.alcIsExtensionPresent (IntPtr.Zero, "ALC_ENUMERATION_EXT");
-			//string f = Alc.alcGetString (IntPtr.Zero, Alc.ALC_ALL_DEVICES_SPECIFIER);
-
-			this.device = Alc.alcOpenDevice (null);//Alc.alcGetString (IntPtr.Zero, Alc.ALC_DEVICE_SPECIFIER));
+			this.device = Alc.alcOpenDevice (null);
 			this.context = Alc.alcCreateContext (this.device, IntPtr.Zero);
 			
 			Al.alDistanceModel (Al.AL_NONE);
@@ -35,7 +32,7 @@ namespace Gablarski.Client.Providers.OpenAL
 
 		public void QueuePlayback (byte[] data, IMediaSource source)
 		{
-			bool stereo = true;// (source.Channels == AudioSourceChannels.Stereo);
+			bool stereo = false;// (source.Channels == AudioSourceChannels.Stereo);
 			int alSource = this.sourcePool.RequestSource (source.ID, stereo);
 			if (alSource == -1)
 				return;
