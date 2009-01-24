@@ -8,8 +8,8 @@
     <ProjectGuid>{1EFCB570-3B06-47AF-9130-531C5625AE79}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Gablarski.Client.Providers.OpenAL</RootNamespace>
-    <AssemblyName>OpenAL</AssemblyName>
+    <RootNamespace>Gablarski.OpenAL</RootNamespace>
+    <AssemblyName>Gablarski.OpenAL</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -61,16 +61,11 @@
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Tao.OpenAl, Version=1.1.0.1, Culture=neutral, PublicKeyToken=a7579dda88828311, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>.\Tao.OpenAl.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="OpenALCaptureDevice.cs" />
-    <Compile Include="OpenALCaptureProvider.cs" />
-    <Compile Include="OpenALPlaybackProvider.cs" />
-    <Compile Include="OpenALSourcePool.cs" />
+    <Compile Include="Source.cs" />
+    <Compile Include="SourceBuffer.cs" />
+    <Compile Include="OpenAL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -78,11 +73,6 @@
       <Project>{7991BCA7-9FAF-435D-8ACE-B01CD5FD906B}</Project>
       <Name>Gablarski</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="OpenAL32.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
