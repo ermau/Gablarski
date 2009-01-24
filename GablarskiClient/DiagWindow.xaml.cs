@@ -80,7 +80,7 @@ namespace Gablarski.Client
 			if (this.playback == null)
 				this.playback = new OpenALPlaybackProvider ();
 
-			this.playback.QueuePlayback (e.Data, e.Source);
+			this.playback.QueuePlayback (e.Source.Codec.Decode (e.Data), e.Source);
 		}
 
 		void client_UserLogout (object sender, UserEventArgs e)

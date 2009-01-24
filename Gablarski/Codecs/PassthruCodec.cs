@@ -13,6 +13,11 @@ namespace Gablarski.Codecs
 	{
 		#region IMediaCodec Members
 
+		public int MinimumSamples
+		{
+			get { return 1300; }
+		}
+
 		public MediaSourceType SupportedTypes
 		{
 			get { return MediaSourceType.All; }

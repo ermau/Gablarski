@@ -35,6 +35,6 @@ namespace Gablarski
 		}
 		#endregion
 
-		private readonly IMediaCodec codec = new PassthruCodec();
+		private readonly IMediaCodec codec = new PassthruCodec(); //new Speex();
 	}
 }

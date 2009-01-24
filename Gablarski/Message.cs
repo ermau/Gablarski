@@ -45,7 +45,12 @@ namespace Gablarski
 
 		public NetBuffer GetBuffer ()
 		{
-			this.buffer = new NetBuffer (8);
+			return GetBuffer (0);
+		}
+
+		public NetBuffer GetBuffer (int capacity)
+		{
+			this.buffer = new NetBuffer (capacity + 8);
 
 			this.buffer.Write (FirstByte);
 			this.buffer.WriteVariableUInt32 (this.MessageTypeCode);

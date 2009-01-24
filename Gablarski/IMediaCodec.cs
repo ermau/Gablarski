@@ -10,6 +10,8 @@ namespace Gablarski
 	/// </summary>
 	public interface IMediaCodec
 	{
+		int MinimumSamples { get; }
+
 		/// <summary>
 		/// The supported media types of the codec
 		/// </summary>

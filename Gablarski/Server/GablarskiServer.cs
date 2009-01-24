@@ -190,16 +190,14 @@ namespace Gablarski.Server
 									break;
 
 								case ClientMessages.AudioData:
-									//Trace.WriteLine ("Received voice data from: " + e.UserConnection.User.Nickname);
-									//IMediaSource source = buffer.ReadSource ();
 									int sourceID = buffer.ReadVariableInt32 ();
 
 									int voiceLen = buffer.ReadVariableInt32();
 									if (voiceLen <= 0)
 										continue;
 
-									ServerMessage msg = new ServerMessage (ServerMessages.AudioData, this.state.Connections);//.Where (uc => uc != e.UserConnection));
-									var msgbuffer = msg.GetBuffer ();
+									ServerMessage msg = new ServerMessage (ServerMessages.AudioData, this.state.Connections);//.Where (nc => nc != e.Connection));
+									var msgbuffer = msg.GetBuffer (voiceLen + 8);
 									msgbuffer.WriteVariableInt32 (sourceID);
 									msgbuffer.WriteVariableInt32 (voiceLen);
 									msgbuffer.Write (buffer.ReadBytes (voiceLen));

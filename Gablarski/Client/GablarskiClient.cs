@@ -90,12 +90,13 @@ namespace Gablarski.Client
 		{
 			ClientMessage msg = new ClientMessage (ClientMessages.AudioData, this.connection);
 			var buffer = msg.GetBuffer ();
+			
 			buffer.WriteVariableInt32 (source.ID);
 
 			byte[] encoded = source.Codec.Encode (data);
-
 			buffer.WriteVariableInt32(encoded.Length);
 			buffer.Write(encoded);
+
 			msg.Send (this.client, NetChannel.Unreliable);
 		}
 

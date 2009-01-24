@@ -13,6 +13,11 @@ namespace Gablarski.Codecs
 	{
 		#region IMediaCodec Members
 
+		public int MinimumSamples
+		{
+			get { return 1300; }
+		}
+
 		public MediaSourceType SupportedTypes
 		{
 			get { throw new NotImplementedException(); }
@@ -26,12 +31,23 @@ namespace Gablarski.Codecs
 				this.encoder.init (2, 10, 44100, 2);
 			}
 
-			this.encoder.processData (buffer.Cast<sbyte>().ToArray(), 0, buffer.Length);
+			float[] fbuffer = new float[buffer.Length / 4];
+			for (int i = 0; i < fbuffer.Length; ++i)
+			{
+				fbuffer[i] = BitConverter.ToSingle (buffer, i);
+				i += 3;
+			}
 
-			sbyte[] encoded = new sbyte[buffer.Length];
-			this.encoder.getProcessedData (encoded, 0);
+			this.encoder.processData (fbuffer, fbuffer.Length);
 
-			return encoded.Cast<byte>().ToArray();
+			sbyte[] sencoded = new sbyte[this.encoder.getProcessedDataByteSize ()];
+			this.encoder.getProcessedData (sencoded, 0);
+
+			byte[] encoded = new byte[sencoded.Length];
+			for (int i = 0; i < sencoded.Length; ++i)
+				encoded[i] = (byte)sencoded[i];
+
+			return encoded;
 		}
 
 		public byte[] Decode (byte[] encoded)
