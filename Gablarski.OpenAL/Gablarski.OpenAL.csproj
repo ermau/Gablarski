@@ -63,6 +63,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Device.cs" />
+    <Compile Include="Extension.cs" />
     <Compile Include="Source.cs" />
     <Compile Include="SourceBuffer.cs" />
     <Compile Include="OpenAL.cs" />
