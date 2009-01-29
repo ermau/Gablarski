@@ -15,11 +15,13 @@ namespace Gablarski.OpenAL
 			if (GetIsExtensionPresent (null, "ALC_EXT_CAPTURE"))
 			{
 				OpenAL.IsCaptureSupported = true;
-				OpenAL.CaptureDevices = ReadStringsFromMemory (alcGetString (IntPtr.Zero, ALC_CAPTURE_DEVICE_SPECIFIER));
+				OpenAL.CaptureDevices = ReadStringsFromMemory (alcGetString (IntPtr.Zero, ALC_CAPTURE_DEVICE_SPECIFIER))
+											.Select (n => new Device (n));
 			}
 			
 			if (GetIsExtensionPresent (null, "ALC_ENUMERATION_EXT"))
-				OpenAL.PlaybackDevices = ReadStringsFromMemory (alcGetString (IntPtr.Zero, ALC_DEVICE_SPECIFIER));
+				OpenAL.PlaybackDevices = ReadStringsFromMemory (alcGetString (IntPtr.Zero, ALC_DEVICE_SPECIFIER))
+											.Select (n => new Device (n));
 		}
 
 		public static bool IsCaptureSupported
@@ -28,13 +30,13 @@ namespace Gablarski.OpenAL
 			private set;
 		}
 
-		public static IEnumerable<string> PlaybackDevices
+		public static IEnumerable<Device> PlaybackDevices
 		{
 			get;
 			private set;
 		}
 
-		public static IEnumerable<string> CaptureDevices
+		public static IEnumerable<Device> CaptureDevices
 		{
 			get;
 			private set;
