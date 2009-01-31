@@ -17,11 +17,18 @@ namespace Gablarski.OpenAL
 				OpenAL.IsCaptureSupported = true;
 				OpenAL.CaptureDevices = ReadStringsFromMemory (alcGetString (IntPtr.Zero, ALC_CAPTURE_DEVICE_SPECIFIER))
 											.Select (n => new Device (n));
+
+				OpenAL.DefaultCaptureDevice = new Device (Marshal.PtrToStringAnsi (alcGetString (IntPtr.Zero, ALC_CAPTURE_DEFAULT_DEVICE_SPECIFIER)));
+
 			}
-			
+
 			if (GetIsExtensionPresent (null, "ALC_ENUMERATION_EXT"))
+			{
 				OpenAL.PlaybackDevices = ReadStringsFromMemory (alcGetString (IntPtr.Zero, ALC_DEVICE_SPECIFIER))
 											.Select (n => new Device (n));
+			}
+
+			OpenAL.DefaultPlaybackDevice = new Device (Marshal.PtrToStringAnsi (alcGetString (IntPtr.Zero, ALC_DEFAULT_DEVICE_SPECIFIER)));
 		}
 
 		public static bool IsCaptureSupported
@@ -30,7 +37,19 @@ namespace Gablarski.OpenAL
 			private set;
 		}
 
+		public static Device DefaultPlaybackDevice
+		{
+			get;
+			private set;
+		}
+
 		public static IEnumerable<Device> PlaybackDevices
+		{
+			get;
+			private set;
+		}
+
+		public static Device DefaultCaptureDevice
 		{
 			get;
 			private set;
@@ -124,8 +143,10 @@ namespace Gablarski.OpenAL
 			}
 		}
 
+		internal const int ALC_DEFAULT_DEVICE_SPECIFIER = 0x1004;
 		internal const int ALC_DEVICE_SPECIFIER = 0x1005;
 		internal const int ALC_CAPTURE_DEVICE_SPECIFIER = 0x310;
+		internal const int ALC_CAPTURE_DEFAULT_DEVICE_SPECIFIER = 0x311;
 	}
 
 	internal enum OpenALError
