@@ -62,17 +62,17 @@ namespace Gablarski.OpenAL
 		}
 
 		#endregion
-		
-		[DllImport ("OpenAL32.dll")]
+
+		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
 		private static extern void alGenSources (int count, ref uint[] sources);
 
-		[DllImport ("OpenAL32.dll")]
+		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
 		private static extern void alDeleteSources (int count, ref uint[] sources);
 
-		[DllImport ("OpenAL32.dll")]
+		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
 		private static extern void alGetSourcef (uint sourceID, SourceProperty property, out float value);
 
-		[DllImport ("OpenAL32.dll")]
+		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
 		private static extern void alSourcef (uint sourceID, SourceProperty property, float value);
 
 		internal static float GetPropertyF (uint sourceID, SourceProperty property)

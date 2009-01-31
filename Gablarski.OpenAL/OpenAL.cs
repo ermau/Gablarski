@@ -16,9 +16,9 @@ namespace Gablarski.OpenAL
 			{
 				OpenAL.IsCaptureSupported = true;
 				OpenAL.CaptureDevices = ReadStringsFromMemory (alcGetString (IntPtr.Zero, ALC_CAPTURE_DEVICE_SPECIFIER))
-											.Select (n => new Device (n));
+											.Select (n => new CaptureDevice (n));
 
-				OpenAL.DefaultCaptureDevice = new Device (Marshal.PtrToStringAnsi (alcGetString (IntPtr.Zero, ALC_CAPTURE_DEFAULT_DEVICE_SPECIFIER)));
+				OpenAL.DefaultCaptureDevice = new CaptureDevice (Marshal.PtrToStringAnsi (alcGetString (IntPtr.Zero, ALC_CAPTURE_DEFAULT_DEVICE_SPECIFIER)));
 
 			}
 
@@ -55,7 +55,7 @@ namespace Gablarski.OpenAL
 			private set;
 		}
 
-		public static IEnumerable<Device> CaptureDevices
+		public static IEnumerable<CaptureDevice> CaptureDevices
 		{
 			get;
 			private set;
@@ -65,17 +65,22 @@ namespace Gablarski.OpenAL
 
 		internal static IntPtr NullDevice = IntPtr.Zero;
 
+		#region Imports
+		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void alcGetIntegerv (IntPtr device, ALCEnum param, int size, out int data);
+
 		[DllImport ("OpenAL32.dll", CallingConvention=CallingConvention.Cdecl)]
 		internal static extern IntPtr alcGetString ([In] IntPtr device, int name);
 
-		[DllImport ("OpenAL32.dll")]
+		[DllImport ("OpenAL32.dll", CallingConvention=CallingConvention.Cdecl)]
 		internal static extern int alGetError ();
 
-		[DllImport ("OpenAL32.dll")]
+		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
 		internal static extern sbyte alcIsExtensionPresent ([In] IntPtr device, string extensionName);
 
-		[DllImport ("OpenAL32.dll")]
+		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
 		internal static extern sbyte alIsExtensionPresent (IntPtr device, string extensionName);
+		#endregion
 
 		internal static bool GetIsExtensionPresent (Device device, string extension)
 		{
@@ -157,5 +162,14 @@ namespace Gablarski.OpenAL
 		AL_INVALID_VALUE = 0xA003,
 		AL_INVALID_OPERATION = 0xA004,
 		AL_OUT_OF_MEMORY = 0xA005,
+	}
+
+	internal enum ALCEnum
+	{
+		ALC_MAJOR_VERSION	= 0x1000,
+		ALC_MINOR_VERSION	= 0x1001,
+		ALC_ATTRIBUTES_SIZE	= 0x1002,
+		ALC_ALL_ATTRIBUTES	= 0x1003,
+		ALC_CAPTURE_SAMPLES	= 0x312
 	}
 }

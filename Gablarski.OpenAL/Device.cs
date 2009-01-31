@@ -46,11 +46,13 @@ namespace Gablarski.OpenAL
 		internal IntPtr Handle;
 		private bool disposed;
 
-		[DllImport ("OpenAL32.dll")]
+		#region Imports
+		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
 		private static extern IntPtr alcOpenDevice (string deviceName);
 
-		[DllImport ("OpenAL32.dll")]
+		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
 		private static extern IntPtr alcCloseDevice (IntPtr handle);
+		#endregion
 
 		#region IDisposable Members
 
