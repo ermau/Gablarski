@@ -68,6 +68,8 @@
     <Compile Include="Device.cs" />
     <Compile Include="Extension.cs" />
     <Compile Include="PlaybackDevice.cs" />
+    <Compile Include="Providers\OpenALCaptureProvider.cs" />
+    <Compile Include="Providers\OpenALPlaybackProvider.cs" />
     <Compile Include="Source.cs" />
     <Compile Include="SourceBuffer.cs" />
     <Compile Include="OpenAL.cs" />

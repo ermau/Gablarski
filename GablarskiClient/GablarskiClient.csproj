@@ -69,10 +69,6 @@
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Tao.OpenAl, Version=1.1.0.1, Culture=neutral, PublicKeyToken=a7579dda88828311, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Tao.OpenAl.dll</HintPath>
-    </Reference>
     <Reference Include="UIAutomationProvider">
       <RequiredTargetFramework>3.0</RequiredTargetFramework>
     </Reference>
@@ -138,13 +134,13 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Gablarski.OpenAL\Gablarski.OpenAL.csproj">
+      <Project>{1EFCB570-3B06-47AF-9130-531C5625AE79}</Project>
+      <Name>Gablarski.OpenAL</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Gablarski\Gablarski.csproj">
       <Project>{7991BCA7-9FAF-435D-8ACE-B01CD5FD906B}</Project>
       <Name>Gablarski</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\LidgrenNetwork\Lidgren.Network.csproj">
-      <Project>{BA202214-F6F8-4853-BCC9-CA4F13C5F479}</Project>
-      <Name>Lidgren.Network</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
