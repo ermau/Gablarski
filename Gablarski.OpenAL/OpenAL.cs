@@ -31,6 +31,15 @@ namespace Gablarski.OpenAL
 			OpenAL.DefaultPlaybackDevice = new PlaybackDevice (Marshal.PtrToStringAnsi (alcGetString (IntPtr.Zero, ALC_DEFAULT_DEVICE_SPECIFIER)));
 		}
 
+		public static DistanceModel DistanceModel
+		{
+			set
+			{
+				alDistanceModel (value);
+				OpenAL.ErrorCheck ();
+			}
+		}
+
 		public static bool IsCaptureSupported
 		{
 			get;
@@ -61,7 +70,11 @@ namespace Gablarski.OpenAL
 			private set;
 		}
 
+#if DEBUG
 		public static bool ErrorChecking = true;
+#else
+		public static bool ErrorChecking = false;
+#endif
 
 		#region AudioFormat Extensions
 		public static uint GetBytesPerSample (this AudioFormat self, uint frequency)
@@ -114,6 +127,9 @@ namespace Gablarski.OpenAL
 
 		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
 		internal static extern sbyte alIsExtensionPresent (IntPtr device, string extensionName);
+
+		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void alDistanceModel (DistanceModel model);
 		#endregion
 
 		internal static bool GetIsExtensionPresent (Device device, string extension)
@@ -126,6 +142,8 @@ namespace Gablarski.OpenAL
 				result = alcIsExtensionPresent (handle, extension);
 			else
 				result = alIsExtensionPresent (handle, extension);
+
+			OpenAL.ErrorCheck ();
 
 			return (result == 1);
 		}
@@ -205,6 +223,11 @@ namespace Gablarski.OpenAL
 		ALC_ATTRIBUTES_SIZE	= 0x1002,
 		ALC_ALL_ATTRIBUTES	= 0x1003,
 		ALC_CAPTURE_SAMPLES	= 0x312
+	}
+
+	public enum DistanceModel
+	{
+		None = 0
 	}
 
 	public enum AudioFormat

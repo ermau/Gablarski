@@ -22,14 +22,11 @@ namespace Gablarski.OpenAL
 
 		public bool IsOpen
 		{
-			get;
-			protected set;
+			get { return (this.Handle == IntPtr.Zero); }
 		}
 
-		public abstract void Close ();
-
 		internal IntPtr Handle;
-		private bool disposed;
+		protected bool disposed;
 
 		#region Imports
 		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
@@ -47,14 +44,7 @@ namespace Gablarski.OpenAL
 			GC.SuppressFinalize (this);
 		}
 
-		protected virtual void Dispose (bool disposing)
-		{
-			if (this.disposed)
-				return;
-
-			this.Close ();
-			this.disposed = true;
-		}
+		protected abstract void Dispose (bool disposing);
 
 		~Device ()
 		{

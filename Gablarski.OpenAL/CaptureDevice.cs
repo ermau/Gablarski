@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Security;
 
 namespace Gablarski.OpenAL
 {
+	[SuppressUnmanagedCodeSecurity]
 	public class CaptureDevice
 		: Device
 	{
@@ -27,24 +29,24 @@ namespace Gablarski.OpenAL
 			get { return this.frequency; }
 		}
 
-		public unsafe void Open (uint frequency, AudioFormat format)
+		public int AvailableSamples
+		{
+			get { return GetSamplesAvailable (); }
+		}
+
+		public unsafe CaptureDevice Open (uint frequency, AudioFormat format)
 		{
 			this.format = format;
 			this.frequency = frequency;
 
-			this.IsOpen = true;
-			alcCaptureOpenDevice (this.DeviceName, frequency, format, (int)format.GetBytesPerSample (frequency) * 2);
+			this.Handle = alcCaptureOpenDevice (this.DeviceName, frequency, format, (int)format.GetBytesPerSample (frequency) * 2);
 			OpenAL.ErrorCheck ();
 
 			pcm = new byte[format.GetBytesPerSample (frequency) * 2];
 			fixed (byte* bppcm = pcm)
 				pcmPtr = new IntPtr ((void*)bppcm);
-		}
 
-		public override void Close ()
-		{
-			alcCaptureCloseDevice (this.Handle);
-			OpenAL.ErrorCheck ();
+			return this;
 		}
 
 		public void StartCapture ()
@@ -75,12 +77,41 @@ namespace Gablarski.OpenAL
 				this.listenerThread.Join ();
 		}
 
-		public int GetSamplesAvailable ()
+		public byte[] GetSamples ()
 		{
-			int samples;
-			OpenAL.alcGetIntegerv (this.Handle, ALCEnum.ALC_CAPTURE_SAMPLES, 4, out samples);
+			return GetSamples (AvailableSamples);
+		}
+
+		public byte[] GetSamples (out int numSamples)
+		{
+			numSamples = GetSamplesAvailable ();
+			return GetSamples (numSamples);
+		}
+
+		public byte[] GetSamples (int numSamples)
+		{
+			byte[] samples = new byte[numSamples * 2];
+
+			alcCaptureSamples (this.Handle, pcmPtr, numSamples);
 			OpenAL.ErrorCheck ();
+			Array.Copy (pcm, samples, samples.Length);
+
 			return samples;
+		}
+
+		protected override void Dispose (bool disposing)
+		{
+			if (this.Handle == IntPtr.Zero)
+				return;
+
+			if (this.IsOpen)
+			{
+				alcCaptureCloseDevice (this.Handle);
+				OpenAL.ErrorCheck ();
+				this.Handle = IntPtr.Zero;
+			}
+
+			this.disposed = true;
 		}
 
 		#region Imports
@@ -94,7 +125,7 @@ namespace Gablarski.OpenAL
 		private static extern void alcCaptureSamples (IntPtr device, IntPtr buffer, int numSamples);
 
 		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
-		private static extern void alcCaptureOpenDevice (string deviceName, uint frequency, AudioFormat format, int bufferSize);
+		private static extern IntPtr alcCaptureOpenDevice (string deviceName, uint frequency, AudioFormat format, int bufferSize);
 
 		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
 		private static extern void alcCaptureCloseDevice (IntPtr device);
@@ -108,9 +139,17 @@ namespace Gablarski.OpenAL
 		private byte[] pcm;
 		private IntPtr pcmPtr;
 
-		protected virtual void OnSamplesAvailable (SamplesAvailableEventArgs e)
+		protected virtual void OnCaptureSamplesAvailable (SamplesAvailableEventArgs e)
 		{
 			this.SamplesAvailable (this, e);
+		}
+
+		private int GetSamplesAvailable ()
+		{
+			int samples;
+			OpenAL.alcGetIntegerv (this.Handle, ALCEnum.ALC_CAPTURE_SAMPLES, 4, out samples);
+			OpenAL.ErrorCheck ();
+			return samples;
 		}
 
 		private void SampleListener (object state)
@@ -121,18 +160,19 @@ namespace Gablarski.OpenAL
 
 			while (this.listening)
 			{
-				int samples = GetSamplesAvailable ();
-				if (samples > minimumSamples)
+				int numSamples = AvailableSamples;
+				if (numSamples > minimumSamples)
 				{
-					alcCaptureSamples (this.Handle, this.pcmPtr, GetSamplesAvailable ());
+					alcCaptureSamples (this.Handle, this.pcmPtr, numSamples);
+					OpenAL.ErrorCheck ();
 
-					OnSamplesAvailable (new SamplesAvailableEventArgs (this.pcm));
+					OnCaptureSamplesAvailable (new SamplesAvailableEventArgs ((byte[])this.pcm.Clone(), numSamples));
 				}
 
-				if (samples == minimumSamples)
-					samples = 0;
+				if (numSamples == minimumSamples)
+					numSamples = 0;
 
-				Thread.Sleep ((int)(((minimumSamples - samples) / sps) * 1000));
+				Thread.Sleep ((int)(((minimumSamples - numSamples) / sps) * 1000));
 			}
 		}
 	}
@@ -140,11 +180,18 @@ namespace Gablarski.OpenAL
 	public class SamplesAvailableEventArgs
 		: EventArgs
 	{
-		public SamplesAvailableEventArgs (byte[] Data)
+		public SamplesAvailableEventArgs (byte[] Data, int samples)
 		{
 			this.Data = Data;
+			this.Samples = samples;
 		}
 
 		public readonly byte[] Data;
+		
+		public int Samples
+		{
+			get;
+			private set;
+		}
 	}
 }

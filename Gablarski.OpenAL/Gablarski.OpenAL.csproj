@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CaptureDevice.cs" />
+    <Compile Include="Context.cs" />
     <Compile Include="Device.cs" />
     <Compile Include="Extension.cs" />
     <Compile Include="PlaybackDevice.cs" />

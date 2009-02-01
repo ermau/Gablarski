@@ -14,21 +14,37 @@ namespace Gablarski.OpenAL
 		{
 		}
 
-		public void Open ()
+		public PlaybackDevice Open ()
 		{
 			this.Handle = alcOpenDevice (this.DeviceName);
 			OpenAL.ErrorCheck ();
-			this.IsOpen = true;
+
+			return this;
 		}
 
-		public override void Close ()
+		public Context CreateContext ()
 		{
-			if (this.Handle == IntPtr.Zero)
+			return Context.Create (this);
+		}
+
+		public Context CreateAndActivateContext ()
+		{
+			return Context.CreateAndActivate (this);
+		}
+
+		protected override void Dispose (bool disposing)
+		{
+			if (this.disposed)
 				return;
 
-			alcCloseDevice (this.Handle);
-			OpenAL.ErrorCheck ();
-			this.Handle = IntPtr.Zero;
+			if (this.IsOpen)
+			{
+				alcCloseDevice (this.Handle);
+				OpenAL.ErrorCheck ();
+				this.Handle = IntPtr.Zero;
+			}
+
+			this.disposed = true;
 		}
 
 		#region Imports
