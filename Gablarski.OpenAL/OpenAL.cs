@@ -25,10 +25,10 @@ namespace Gablarski.OpenAL
 			if (GetIsExtensionPresent (null, "ALC_ENUMERATION_EXT"))
 			{
 				OpenAL.PlaybackDevices = ReadStringsFromMemory (alcGetString (IntPtr.Zero, ALC_DEVICE_SPECIFIER))
-											.Select (n => new Device (n));
+											.Select (n => new PlaybackDevice (n));
 			}
 
-			OpenAL.DefaultPlaybackDevice = new Device (Marshal.PtrToStringAnsi (alcGetString (IntPtr.Zero, ALC_DEFAULT_DEVICE_SPECIFIER)));
+			OpenAL.DefaultPlaybackDevice = new PlaybackDevice (Marshal.PtrToStringAnsi (alcGetString (IntPtr.Zero, ALC_DEFAULT_DEVICE_SPECIFIER)));
 		}
 
 		public static bool IsCaptureSupported
@@ -37,19 +37,19 @@ namespace Gablarski.OpenAL
 			private set;
 		}
 
-		public static Device DefaultPlaybackDevice
+		public static PlaybackDevice DefaultPlaybackDevice
 		{
 			get;
 			private set;
 		}
 
-		public static IEnumerable<Device> PlaybackDevices
+		public static IEnumerable<PlaybackDevice> PlaybackDevices
 		{
 			get;
 			private set;
 		}
 
-		public static Device DefaultCaptureDevice
+		public static CaptureDevice DefaultCaptureDevice
 		{
 			get;
 			private set;
@@ -62,6 +62,40 @@ namespace Gablarski.OpenAL
 		}
 
 		public static bool ErrorChecking = true;
+
+		#region AudioFormat Extensions
+		public static uint GetBytesPerSample (this AudioFormat self, uint frequency)
+		{
+			uint samples = self.GetSamplesPerSecond (frequency);
+
+			switch (self)
+			{
+				case AudioFormat.Mono8Bit:
+				case AudioFormat.Stereo8Bit:
+					return samples;
+
+				default:
+				case AudioFormat.Mono16Bit:
+				case AudioFormat.Stereo16Bit:
+					return samples * 2;
+			}
+		}
+
+		public static uint GetSamplesPerSecond (this AudioFormat self, uint frequency)
+		{
+			switch (self)
+			{
+				default:
+				case AudioFormat.Mono8Bit:
+				case AudioFormat.Mono16Bit:
+					return frequency;
+
+				case AudioFormat.Stereo8Bit:
+				case AudioFormat.Stereo16Bit:
+					return (frequency * 2);
+			}
+		}
+		#endregion
 
 		internal static IntPtr NullDevice = IntPtr.Zero;
 
@@ -171,5 +205,13 @@ namespace Gablarski.OpenAL
 		ALC_ATTRIBUTES_SIZE	= 0x1002,
 		ALC_ALL_ATTRIBUTES	= 0x1003,
 		ALC_CAPTURE_SAMPLES	= 0x312
+	}
+
+	public enum AudioFormat
+	{
+		Mono8Bit = 0x1100,
+		Mono16Bit = 0x1101,
+		Stereo8Bit = 0x1102,
+		Stereo16Bit = 0x1103
 	}
 }

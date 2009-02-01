@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 
 namespace Gablarski.OpenAL
 {
-	public class Device
+	public abstract class Device
 		: IDisposable
 	{
 		public Device (string deviceName)
@@ -23,25 +23,10 @@ namespace Gablarski.OpenAL
 		public bool IsOpen
 		{
 			get;
-			private set;
+			protected set;
 		}
 
-		public void Open ()
-		{
-			this.Handle = alcOpenDevice (this.DeviceName);
-			OpenAL.ErrorCheck ();
-			this.IsOpen = true;
-		}
-
-		public void Close ()
-		{
-			if (this.Handle == IntPtr.Zero)
-				return;
-			
-			alcCloseDevice (this.Handle);
-			OpenAL.ErrorCheck ();
-			this.Handle = IntPtr.Zero;
-		}
+		public abstract void Close ();
 
 		internal IntPtr Handle;
 		private bool disposed;
@@ -62,8 +47,11 @@ namespace Gablarski.OpenAL
 			GC.SuppressFinalize (this);
 		}
 
-		protected void Dispose (bool disposing)
+		protected virtual void Dispose (bool disposing)
 		{
+			if (this.disposed)
+				return;
+
 			this.Close ();
 			this.disposed = true;
 		}
