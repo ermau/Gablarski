@@ -165,6 +165,11 @@ namespace Gablarski.OpenAL
 
 		#endregion
 
+		public static Source Generate ()
+		{
+			return Generate (1)[0];
+		}
+
 		public static Source[] Generate (int count)
 		{
 			if (count > AvailableSources)

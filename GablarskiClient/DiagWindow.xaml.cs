@@ -8,7 +8,7 @@ using System.Windows.Media.Imaging;
 //using FFmpegSharp.Interop;
 //using FFmpegSharp.Interop.Codec;
 //using FFmpegSharp.Interop.Format;
-using Gablarski.Client.Providers.OpenAL;
+using Gablarski.Client.Providers;
 using Gablarski.Server;
 using Gablarski.Server.Providers;
 

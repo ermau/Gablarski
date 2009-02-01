@@ -51,6 +51,11 @@ namespace Gablarski.OpenAL
 
 		internal readonly uint bufferID;
 
+		public static SourceBuffer Generate ()
+		{
+			return Generate (1)[0];
+		}
+
 		public static SourceBuffer[] Generate (int count)
 		{
 			lock (lck)

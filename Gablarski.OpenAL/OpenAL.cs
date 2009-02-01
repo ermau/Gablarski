@@ -77,21 +77,26 @@ namespace Gablarski.OpenAL
 #endif
 
 		#region AudioFormat Extensions
-		public static uint GetBytesPerSample (this AudioFormat self, uint frequency)
+		public static uint GetBytesPerSample (this AudioFormat self)
 		{
-			uint samples = self.GetSamplesPerSecond (frequency);
-
 			switch (self)
 			{
-				case AudioFormat.Mono8Bit:
-				case AudioFormat.Stereo8Bit:
-					return samples;
-
 				default:
+				case AudioFormat.Mono8Bit:
+					return 1;
+
 				case AudioFormat.Mono16Bit:
+				case AudioFormat.Stereo8Bit:
+					return 2;
+
 				case AudioFormat.Stereo16Bit:
-					return samples * 2;
+					return 4;
 			}
+		}
+
+		public static uint GetBytes (this AudioFormat self, uint samples)
+		{
+			return self.GetBytesPerSample () * samples;
 		}
 
 		public static uint GetSamplesPerSecond (this AudioFormat self, uint frequency)

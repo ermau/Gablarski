@@ -2,39 +2,70 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Gablarski.OpenAL;
 
-namespace Gablarski.Client.Providers.OpenAL
+namespace Gablarski.Client.Providers
 {
 	public class OpenALCaptureProvider
 		: ICaptureProvider
 	{
+		public OpenALCaptureProvider ()
+		{
+			this.capture = OpenAL.OpenAL.DefaultCaptureDevice.Open (44100, AudioFormat.Mono16Bit);
+		}
+
 		#region ICaptureProvider Members
 
-		public event EventHandler<SamplesEventArgs> SamplesAvailable;
+		public event EventHandler<SamplesEventArgs> SamplesAvailable
+		{
+			add
+			{
+				this.capture.SamplesAvailable += capture_SamplesAvailable;
+				samples += value;
+			}
+
+			remove
+			{
+				this.capture.SamplesAvailable -= capture_SamplesAvailable;
+				samples -= value;
+			}
+		}
+
+		void capture_SamplesAvailable (object sender, SamplesAvailableEventArgs e)
+		{
+			samples (sender, new SamplesEventArgs (e.Data));
+		}
 
 		public ICaptureDevice CaptureDevice
 		{
-			set { throw new NotImplementedException (); }
+			set {  }
 		}
 
 		public void StartCapture ()
 		{
-			throw new NotImplementedException ();
+			this.capture.StartCapture ();
 		}
 
 		public void EndCapture ()
 		{
-			throw new NotImplementedException ();
+			this.capture.StopCapture ();
 		}
 
 		public bool ReadSamples (out byte[] samples)
 		{
-			throw new NotImplementedException ();
+			if (this.capture.AvailableSamples <= 0)
+			{
+				samples = null;
+				return false;
+			}
+
+			samples = this.capture.GetSamples ();
+			return true;
 		}
 
 		public IEnumerable<ICaptureDevice> GetDevices ()
 		{
-			throw new NotImplementedException ();
+			return new ICaptureDevice[] { null };
 		}
 
 		#endregion
@@ -47,5 +78,8 @@ namespace Gablarski.Client.Providers.OpenAL
 		}
 
 		#endregion
+
+		private readonly CaptureDevice capture;
+		private EventHandler<SamplesEventArgs> samples;
 	}
 }

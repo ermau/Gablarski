@@ -68,10 +68,12 @@ namespace Gablarski.OpenAL
 			this.format = format;
 			this.frequency = frequency;
 
-			this.Handle = alcCaptureOpenDevice (this.DeviceName, frequency, format, (int)format.GetBytesPerSample (frequency) * 2);
+			uint bufferSize = format.GetBytes (format.GetSamplesPerSecond(44100)) * 2;
+
+			this.Handle = alcCaptureOpenDevice (this.DeviceName, frequency, format, (int)bufferSize);
 			OpenAL.ErrorCheck ();
 
-			pcm = new byte[format.GetBytesPerSample (frequency) * 2];
+			pcm = new byte[bufferSize];
 			fixed (byte* bppcm = pcm)
 				pcmPtr = new IntPtr ((void*)bppcm);
 
@@ -194,7 +196,8 @@ namespace Gablarski.OpenAL
 				if (numSamples == this.minimumSamples)
 					numSamples = 0;
 
-				Thread.Sleep ((int)(((this.minimumSamples - numSamples) / sps) * 1000));
+				Thread.Sleep (20);
+				//Thread.Sleep ((int)(((this.minimumSamples - numSamples) / sps) * 1000));
 			}
 		}
 	}

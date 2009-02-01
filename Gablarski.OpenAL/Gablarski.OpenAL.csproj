@@ -74,6 +74,7 @@
     <Compile Include="SourceBuffer.cs" />
     <Compile Include="OpenAL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SourcePool.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Gablarski\Gablarski.csproj">
