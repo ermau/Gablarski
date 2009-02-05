@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>849fbea6-4d9e-4043-aca9-53db61e70d2e</ProjectGuid>
+    <ProjectGuid>{7347052B-DA5B-4CCA-AB28-3963766E3CDB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Gablarski</RootNamespace>
@@ -45,8 +45,51 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="AuthedClient.cs" />
+    <Compile Include="Client\GablarskiClient.cs" />
+    <Compile Include="HybridConnection.cs" />
+    <Compile Include="IChannel.cs" />
+    <Compile Include="IChannelProvider.cs" />
+    <Compile Include="IUserProvider.cs" />
+    <Compile Include="Message.cs" />
+    <Compile Include="Mono.Rocks\Check.cs" />
+    <Compile Include="Mono.Rocks\Delegates.cs" />
+    <Compile Include="Mono.Rocks\Either.cs" />
+    <Compile Include="Mono.Rocks\Eithers.cs" />
+    <Compile Include="Mono.Rocks\EnumerableValueReader.cs" />
+    <Compile Include="Mono.Rocks\ICustomAttributeProvider.cs" />
+    <Compile Include="Mono.Rocks\IEnumerable.cs" />
+    <Compile Include="Mono.Rocks\Int16.cs" />
+    <Compile Include="Mono.Rocks\Int32.cs" />
+    <Compile Include="Mono.Rocks\Int64.cs" />
+    <Compile Include="Mono.Rocks\IValueReader.cs" />
+    <Compile Include="Mono.Rocks\IValueWriter.cs" />
+    <Compile Include="Mono.Rocks\JaggedArray.cs" />
+    <Compile Include="Mono.Rocks\KeyValuePair.cs" />
+    <Compile Include="Mono.Rocks\Lambda.cs" />
+    <Compile Include="Mono.Rocks\Lambdas.cs" />
+    <Compile Include="Mono.Rocks\Maybe.cs" />
+    <Compile Include="Mono.Rocks\NaturalStringComparer.cs" />
+    <Compile Include="Mono.Rocks\Nullable.cs" />
+    <Compile Include="Mono.Rocks\Object.cs" />
+    <Compile Include="Mono.Rocks\OrderedDictionary.cs" />
+    <Compile Include="Mono.Rocks\RectangularArray.cs" />
+    <Compile Include="Mono.Rocks\Sequence.cs" />
+    <Compile Include="Mono.Rocks\Stream.cs" />
+    <Compile Include="Mono.Rocks\StreamConverter.cs" />
+    <Compile Include="Mono.Rocks\String.cs" />
+    <Compile Include="Mono.Rocks\SystemStreamConverter.cs" />
+    <Compile Include="Mono.Rocks\TextReader.cs" />
+    <Compile Include="Mono.Rocks\TextValueReader.cs" />
+    <Compile Include="Mono.Rocks\Tuple.cs" />
+    <Compile Include="Mono.Rocks\Tuples.cs" />
+    <Compile Include="Mono.Rocks\Type.cs" />
+    <Compile Include="Mono.Rocks\UInt16.cs" />
+    <Compile Include="Mono.Rocks\UInt32.cs" />
+    <Compile Include="Mono.Rocks\UInt64.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Server\GablarskiServer.cs" />
+    <Compile Include="User.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
