@@ -15,6 +15,9 @@ namespace Gablarski.Server
 			this.tcp = new TcpListener (port);
 		}
 
+		/// <summary>
+		/// Starts the server.
+		/// </summary>
 		public void Start ()
 		{
 			this.listening = true;
@@ -27,6 +30,9 @@ namespace Gablarski.Server
 			}).Start ();
 		}
 
+		/// <summary>
+		/// Stops the server.
+		/// </summary>
 		public void Stop ()
 		{
 			this.listening = false;
@@ -95,8 +101,8 @@ namespace Gablarski.Server
 			int sanity = stream.ReadByte ();
 			if (sanity != 42 && sanity != 43)
 				return null;
-
-			return new AuthedClient (GenerateHash(), sanity == 43);
+			// 42 == Little Endian, 43 == Big Endian
+			return new AuthedClient (GenerateHash(), sanity == 42);
 		}
 
 		private int GenerateHash ()
