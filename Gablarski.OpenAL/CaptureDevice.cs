@@ -17,6 +17,9 @@ namespace Gablarski.OpenAL
 		{
 		}
 
+		/// <summary>
+		/// Gets or sets the minimum samples needed before the <c>SamplesAvailable</c> event is triggered.
+		/// </summary>
 		public int MinimumSamples
 		{
 			get { return this.minimumSamples; }
@@ -48,21 +51,37 @@ namespace Gablarski.OpenAL
 					this.StopSampleListener ();
 			}
 		}
+
+		/// <summary>
+		/// Gets the current format of the capture device.
+		/// </summary>
 		public AudioFormat Format
 		{
 			get { return this.format; }
 		}
 
+		/// <summary>
+		/// Gets the current frequency of the capture device.
+		/// </summary>
 		public uint Frequency
 		{
 			get { return this.frequency; }
 		}
 
+		/// <summary>
+		/// Gets the number of available samples.
+		/// </summary>
 		public int AvailableSamples
 		{
 			get { return GetSamplesAvailable (); }
 		}
 
+		/// <summary>
+		/// Opens the capture device with the specified <paramref name="frequency"/> and <paramref name="format"/>.
+		/// </summary>
+		/// <param name="frequency">The frequency to open the capture device with.</param>
+		/// <param name="format">The audio format to open the device with.</param>
+		/// <returns>Returns <c>this</c>.</returns>
 		public unsafe CaptureDevice Open (uint frequency, AudioFormat format)
 		{
 			this.format = format;
@@ -80,18 +99,27 @@ namespace Gablarski.OpenAL
 			return this;
 		}
 
+		/// <summary>
+		/// Starts capturing.
+		/// </summary>
 		public void StartCapture ()
 		{
 			alcCaptureStart (this.Handle);
 			OpenAL.ErrorCheck ();
 		}
 
+		/// <summary>
+		/// Stops capturing.
+		/// </summary>
 		public void StopCapture ()
 		{
 			alcCaptureStop (this.Handle);
 			OpenAL.ErrorCheck ();
 		}
 
+		/// <summary>
+		/// Forces the sample listener, if active, to stop.
+		/// </summary>
 		public void StopSampleListener ()
 		{
 			this.listening = false;
@@ -99,26 +127,34 @@ namespace Gablarski.OpenAL
 				this.listenerThread.Join ();
 		}
 
+		/// <summary>
+		/// Gets the available samples.
+		/// </summary>
+		/// <returns>The available PCM samples.</returns>
 		public byte[] GetSamples ()
 		{
-			return GetSamples (AvailableSamples);
+			return GetSamples (AvailableSamples, false);
 		}
 
+		/// <summary>
+		/// Gets the available samples and provides the number of samples.
+		/// </summary>
+		/// <param name="numSamples">The number of samples returned.</param>
+		/// <returns>The available PCM samples.</returns>
 		public byte[] GetSamples (out int numSamples)
 		{
 			numSamples = GetSamplesAvailable ();
-			return GetSamples (numSamples);
+			return GetSamples (numSamples, false);
 		}
 
+		/// <summary>
+		/// Gets the specified number of samples.
+		/// </summary>
+		/// <param name="numSamples">The number of samples to return.</param>
+		/// <returns></returns>
 		public byte[] GetSamples (int numSamples)
 		{
-			byte[] samples = new byte[numSamples * 2];
-
-			alcCaptureSamples (this.Handle, pcmPtr, numSamples);
-			OpenAL.ErrorCheck ();
-			Array.Copy (pcm, samples, samples.Length);
-
-			return samples;
+			return GetSamples (numSamples, true);
 		}
 
 		protected override void Dispose (bool disposing)
@@ -168,6 +204,19 @@ namespace Gablarski.OpenAL
 			var available = this.samplesAvailable;
 			if (available != null)
 				available (this, e);
+		}
+
+		private byte[] GetSamples (int numSamples, bool block)
+		{
+			byte[] samples = new byte[numSamples * 2];
+
+			while (block && this.AvailableSamples < numSamples) ;
+
+			alcCaptureSamples (this.Handle, pcmPtr, numSamples);
+			OpenAL.ErrorCheck ();
+			Array.Copy (pcm, samples, samples.Length);
+
+			return samples;
 		}
 
 		private int GetSamplesAvailable ()

@@ -60,10 +60,31 @@ namespace Gablarski.OpenAL
 			set { SetPropertyF (this.sourceID, FloatSourceProperty.AL_PITCH, value); }
 		}
 
+		/// <summary>
+		/// Gets or sets the minimum gain for this source.
+		/// </summary>
+		public float MinimumGain
+		{
+			get { return GetPropertyF (this.sourceID, FloatSourceProperty.AL_MIN_GAIN); }
+			set { SetPropertyF (this.sourceID, FloatSourceProperty.AL_MIN_GAIN, value); }
+		}
+
+		/// <summary>
+		/// Gets or sets the source's gain.
+		/// </summary>
 		public float Gain
 		{
 			get { return GetPropertyF (this.sourceID, FloatSourceProperty.AL_GAIN); }
 			set { SetPropertyF (this.sourceID, FloatSourceProperty.AL_GAIN, value); }
+		}
+
+		/// <summary>
+		/// Gets or sets the maximum gain for this source.
+		/// </summary>
+		public float MaximumGain
+		{
+			get { return GetPropertyF (this.sourceID, FloatSourceProperty.AL_MAX_GAIN); }
+			set { SetPropertyF (this.sourceID, FloatSourceProperty.AL_MAX_GAIN, value); }
 		}
 
 		public void Queue (SourceBuffer buffer)

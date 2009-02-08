@@ -14,6 +14,10 @@ namespace Gablarski.OpenAL
 		{
 		}
 
+		/// <summary>
+		/// Opens the device.
+		/// </summary>
+		/// <returns>Returns <c>this</c>.</returns>
 		public PlaybackDevice Open ()
 		{
 			this.Handle = alcOpenDevice (this.DeviceName);
@@ -22,11 +26,19 @@ namespace Gablarski.OpenAL
 			return this;
 		}
 
+		/// <summary>
+		/// Creates and returns a new device context.
+		/// </summary>
+		/// <returns>The created device context.</returns>
 		public Context CreateContext ()
 		{
 			return Context.Create (this);
 		}
 
+		/// <summary>
+		/// Creats, activates and returns a new device context.
+		/// </summary>
+		/// <returns></returns>
 		public Context CreateAndActivateContext ()
 		{
 			return Context.CreateAndActivate (this);

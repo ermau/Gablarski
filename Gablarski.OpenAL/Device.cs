@@ -14,12 +14,18 @@ namespace Gablarski.OpenAL
 			this.DeviceName = deviceName;
 		}
 
+		/// <summary>
+		/// Gets the name of the device
+		/// </summary>
 		public string DeviceName
 		{
 			get;
 			private set;
 		}
 
+		/// <summary>
+		/// Gets whether the device is open or not
+		/// </summary>
 		public bool IsOpen
 		{
 			get { return (this.Handle == IntPtr.Zero); }

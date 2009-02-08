@@ -12,6 +12,11 @@ namespace Gablarski.OpenAL
 	{
 		static OpenAL ()
 		{
+
+			#if DEBUG
+			OpenAL.ErrorChecking = true;
+			#endif
+
 			if (GetIsExtensionPresent (null, "ALC_EXT_CAPTURE"))
 			{
 				OpenAL.IsCaptureSupported = true;
@@ -31,6 +36,10 @@ namespace Gablarski.OpenAL
 			OpenAL.DefaultPlaybackDevice = new PlaybackDevice (Marshal.PtrToStringAnsi (alcGetString (IntPtr.Zero, ALC_DEFAULT_DEVICE_SPECIFIER)));
 		}
 
+
+		/// <summary>
+		/// Sets the distance model for OpenAL.
+		/// </summary>
 		public static DistanceModel DistanceModel
 		{
 			set
@@ -40,41 +49,83 @@ namespace Gablarski.OpenAL
 			}
 		}
 
+		/// <summary>
+		/// Sets the speed of sound for OpenAL.
+		/// </summary>
+		public static float SpeedOfSound
+		{
+			set
+			{
+				alSpeedOfSound (value);
+				OpenAL.ErrorCheck ();
+			}
+		}
+
+		/// <summary>
+		/// Sets the doppler factor for OpenAL.
+		/// </summary>
+		public static float DopplerFactor
+		{
+			set
+			{
+				alDopplerFactor (value);
+				OpenAL.ErrorCheck ();
+			}
+		}
+
+		/// <summary>
+		/// Gets whether capture support is available.
+		/// </summary>
 		public static bool IsCaptureSupported
 		{
 			get;
 			private set;
 		}
 
+		/// <summary>
+		/// Gets the default playback device.
+		/// </summary>
 		public static PlaybackDevice DefaultPlaybackDevice
 		{
 			get;
 			private set;
 		}
 
+		/// <summary>
+		/// Gets a listing of playback devices.
+		/// </summary>
 		public static IEnumerable<PlaybackDevice> PlaybackDevices
 		{
 			get;
 			private set;
 		}
 
+		/// <summary>
+		/// Gets the default capture device. <c>null</c> if unsupported.
+		/// </summary>
 		public static CaptureDevice DefaultCaptureDevice
 		{
 			get;
 			private set;
 		}
 
+		/// <summary>
+		/// Gets a listing of capture devices. <c>null</c> if unsupported.
+		/// </summary>
 		public static IEnumerable<CaptureDevice> CaptureDevices
 		{
 			get;
 			private set;
 		}
 
-#if DEBUG
-		public static bool ErrorChecking = true;
-#else
-		public static bool ErrorChecking = false;
-#endif
+		/// <summary>
+		/// Gets or sets whether error checking is enabled.
+		/// </summary>
+		public static bool ErrorChecking
+		{
+			get;
+			private set;
+		}
 
 		#region AudioFormat Extensions
 		public static uint GetBytesPerSample (this AudioFormat self)
@@ -118,6 +169,12 @@ namespace Gablarski.OpenAL
 		internal static IntPtr NullDevice = IntPtr.Zero;
 
 		#region Imports
+		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void alDopplerFactor (float value);
+
+		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void alSpeedOfSound (float value);
+
 		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
 		internal static extern void alcGetIntegerv (IntPtr device, ALCEnum param, int size, out int data);
 
