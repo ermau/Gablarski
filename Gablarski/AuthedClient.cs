@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Net.Sockets;
+using Mono.Rocks;
 
 namespace Gablarski
 {
@@ -25,7 +26,5 @@ namespace Gablarski
 			get;
 			internal set;
 		}
-
-		internal NetworkStream tcp;
 	}
 }

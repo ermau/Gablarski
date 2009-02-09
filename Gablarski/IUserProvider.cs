@@ -29,13 +29,13 @@ namespace Gablarski
 	public class LoginResult
 	{
 		public LoginResult (bool success)
-			: this (success, String.Empty)
 		{
+			this.Succeeded = success;
 		}
 
 		public LoginResult (bool success, string failureReason)
+			: this (success)
 		{
-			this.Succeeded = success;
 			this.FailureReason = failureReason;
 		}
 
@@ -49,7 +49,7 @@ namespace Gablarski
 		}
 
 		/// <summary>
-		/// Gets the reason for a login failure, empty otherwise.
+		/// Gets the reason for a login failure, <c>null</c> otherwise.
 		/// </summary>
 		public string FailureReason
 		{

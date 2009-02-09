@@ -6,44 +6,24 @@ using System.Text;
 namespace Gablarski
 {
 	public abstract class Message<TMessage>
+		: MessageBase
 	{
-		protected Message (TMessage messageType)
+		protected Message (TMessage messageType, AuthedClient client)
+			: base (client)
 		{
 			this.MessageType = messageType;
 		}
 
-		protected Message (TMessage messageType, AuthedClient client)
-			: this (messageType)
-		{
-			this.Connections = new[] { client };
-		}
-
 		protected Message (TMessage messageType, IEnumerable<AuthedClient> clients)
-			: this (messageType)
+			: base (clients)
 		{
-			this.Connections = clients;
+			this.MessageType = messageType;
 		}
 
 		public TMessage MessageType
 		{
 			get;
-			private set;
-		}
-
-		public IEnumerable<AuthedClient> Connections
-		{
-			get;
-			private set;
-		}
-
-		protected abstract uint MessageTypeCode
-		{
-			get;
-		}
-
-		protected abstract bool SendAuthHash
-		{
-			get;
+			protected set;
 		}
 	}
 }
