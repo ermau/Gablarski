@@ -8,10 +8,11 @@ namespace Gablarski.Client
 {
 	public class GablarskiClient
 	{
-		public IEnumerable<IConnection> Connections
+		public void Connect (string host, int port)
 		{
-			get;
-			private set;
+			
 		}
+
+		private IClientConnection connection;
 	}
 }

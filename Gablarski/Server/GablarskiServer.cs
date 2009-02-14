@@ -8,12 +8,7 @@ namespace Gablarski.Server
 {
 	public class GablarskiServer
 	{
-		public GablarskiServer (int port)
-		{
-			
-		}
-
-		public IEnumerable<IConnection> Connections
+		public IEnumerable<IAvailableConnection> Connections
 		{
 			get
 			{
@@ -29,7 +24,34 @@ namespace Gablarski.Server
 			}
 		}
 
+		public void AddConnection (IAvailableConnection connection)
+		{
+			connection.MessageReceived += this.OnMessageReceived;
+			connection.StartListening ();
+
+			lock (connectionLock)
+			{
+				this.connections.Add (connection);
+			}
+		}
+
+		public void RemoveConnection (IAvailableConnection connection)
+		{
+			connection.StopListening ();
+			connection.MessageReceived -= this.OnMessageReceived;
+
+			lock (connectionLock)
+			{
+				this.connections.Remove (connection);
+			}
+		}
+
 		private object connectionLock = new object();
-		private List<IConnection> connections;
+		private List<IAvailableConnection> connections = new List<IAvailableConnection> ();
+
+		private void OnMessageReceived (object sender, MessageReceivedEventArgs e)
+		{
+			throw new NotImplementedException ();
+		}
 	}
 }

@@ -5,14 +5,11 @@ using System.Text;
 
 namespace Gablarski
 {
-	public interface IConnection
+	public interface IAvailableConnection
+		: IConnection
 	{
-		event EventHandler<MessageReceivedEventArgs> MessageReceived;
-
 		void StartListening ();
 		void StopListening ();
-
-		void Send (MessageBase message);
 	}
 
 	public class MessageReceivedEventArgs

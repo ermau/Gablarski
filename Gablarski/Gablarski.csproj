@@ -48,9 +48,10 @@
     <Compile Include="AuthedClient.cs" />
     <Compile Include="Client\ClientMessage.cs" />
     <Compile Include="Client\GablarskiClient.cs" />
+    <Compile Include="IAvailableConnection.cs" />
+    <Compile Include="IClientConnection.cs" />
     <Compile Include="IConnection.cs" />
     <Compile Include="MessageBase.cs" />
-    <Compile Include="NetworkConnection.cs" />
     <Compile Include="Server\GablarskiServer.cs" />
     <Compile Include="Server\ServerMessage.cs" />
     <Compile Include="Sources.cs" />
