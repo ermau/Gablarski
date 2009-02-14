@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Gablarski.Client
+namespace Gablarski.Messages
 {
 	/// <summary>
 	/// Client -> Server message
@@ -11,7 +11,7 @@ namespace Gablarski.Client
 	public abstract class ClientMessage
 		: Message<ClientMessages>
 	{
-		public ClientMessage (ClientMessages messageType, AuthedClient client)
+		protected ClientMessage (ClientMessages messageType, AuthedClient client)
 			: base (messageType, client)
 		{
 		}

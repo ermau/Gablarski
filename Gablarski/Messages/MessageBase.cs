@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Mono.Rocks;
 
-namespace Gablarski
+namespace Gablarski.Messages
 {
 	public abstract class MessageBase
 	{
@@ -23,6 +24,12 @@ namespace Gablarski
 			private set;
 		}
 
+		public T GetMessage<T> ()
+			where T : MessageBase
+		{
+			return (T) this;
+		}
+
 		protected abstract ushort MessageTypeCode
 		{
 			get;
@@ -33,6 +40,6 @@ namespace Gablarski
 			get;
 		}
 
-		protected abstract byte[] GetPayload ();
+		protected abstract void WritePayload (IValueWriter writer);
 	}
 }

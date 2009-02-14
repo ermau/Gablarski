@@ -12,7 +12,6 @@ namespace Gablarski.OpenAL
 	{
 		static OpenAL ()
 		{
-
 			#if DEBUG
 			OpenAL.ErrorChecking = true;
 			#endif
@@ -196,14 +195,11 @@ namespace Gablarski.OpenAL
 
 		internal static bool GetIsExtensionPresent (Device device, string extension)
 		{
-			sbyte result = 0;
-
 			IntPtr handle = (device != null) ? device.Handle : IntPtr.Zero;
 
-			if (extension.StartsWith ("ALC"))
-				result = alcIsExtensionPresent (handle, extension);
-			else
-				result = alIsExtensionPresent (handle, extension);
+			sbyte result = extension.StartsWith("ALC")
+							? alcIsExtensionPresent(handle, extension)
+							: alIsExtensionPresent(handle, extension);
 
 			OpenAL.ErrorCheck ();
 

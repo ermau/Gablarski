@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Gablarski
+namespace Gablarski.Messages
 {
 	public abstract class Message<TMessage>
 		: MessageBase

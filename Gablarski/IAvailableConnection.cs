@@ -6,24 +6,22 @@ using System.Text;
 namespace Gablarski
 {
 	public interface IAvailableConnection
-		: IConnection
 	{
+		event EventHandler<ConnectionMadeEventArgs> ConnectionMade;
+
 		void StartListening ();
 		void StopListening ();
 	}
 
-	public class MessageReceivedEventArgs
+	public class ConnectionMadeEventArgs
 		: EventArgs
 	{
-		public MessageReceivedEventArgs (MessageBase message)
+		public ConnectionMadeEventArgs (IConnection connection)
 		{
-			this.Message = message;
+			this.Connection = connection;
 		}
 
-		/// <summary>
-		/// Gets the message that was received.
-		/// </summary>
-		public MessageBase Message
+		public IConnection Connection
 		{
 			get;
 			private set;
