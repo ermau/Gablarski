@@ -8,8 +8,8 @@ namespace Gablarski.Messages
 	public class LoginMessage
 		: ClientMessage
 	{
-		public LoginMessage (IEndPoint endpoint)
-			: base (ClientMessages.Login, endpoint)
+		public LoginMessage (IConnection server)
+			: base (ClientMessages.Login, server)
 		{
 		}
 

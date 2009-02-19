@@ -11,13 +11,13 @@ namespace Gablarski.Messages
 	public abstract class ClientMessage
 		: Message<ClientMessages>
 	{
-		protected ClientMessage (ClientMessages messageType, IEndPoint endpoint)
-			: base (messageType, endpoint)
+		protected ClientMessage (ClientMessages messageType, IConnection recipient)
+			: base (messageType, recipient)
 		{
 		}
 
-		protected ClientMessage (ClientMessages messageType, IEndPoint endpoint, IValueReader payload)
-			: base (messageType, endpoint, payload)
+		protected ClientMessage (ClientMessages messageType, IConnection recipient, IValueReader payload)
+			: base (messageType, recipient, payload)
 		{
 		}
 

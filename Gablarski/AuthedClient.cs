@@ -8,16 +8,16 @@ namespace Gablarski
 {
 	public class AuthedClient
 	{
-		internal AuthedClient (int authHash, IEndPoint endpoint)
+		internal AuthedClient (int authHash, IConnection connection)
 		{
 			this.AuthHash = authHash;
-			this.EndPoint = endpoint;
+			this.Connection = connection;
 		}
 
 		internal AuthedClient (AuthedClient client)
 		{
 			this.AuthHash = client.AuthHash;
-			this.EndPoint = client.EndPoint;
+			this.Connection = client.Connection;
 		}
 
 		public int AuthHash
@@ -26,7 +26,7 @@ namespace Gablarski
 			private set;
 		}
 
-		public IEndPoint EndPoint
+		public IConnection Connection
 		{
 			get;
 			private set;

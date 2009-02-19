@@ -7,34 +7,33 @@ namespace Gablarski.Messages
 {
 	public abstract class MessageBase
 	{
-		protected MessageBase (IEndPoint endpoint)
+		#region Constructors
+		protected MessageBase (IConnection recipient)
 		{
-			this.EndPoints = new[] { endpoint };
+			this.Recipients = new[] { recipient };
 		}
 
-		protected MessageBase (IEndPoint endpoint, IValueReader payload)
+		protected MessageBase (IConnection recipient, IValueReader payload)
 		{
-			this.EndPoints = new[] { endpoint };
+			this.Recipients = new[] { recipient };
 			this.ReadPayload (payload);
 		}
 
-		protected MessageBase (IEnumerable<IEndPoint> endpoints)
+		protected MessageBase (IEnumerable<IConnection> recipients)
 		{
-			this.EndPoints = endpoints;
+			this.Recipients = recipients;
 		}
+		#endregion
 
-		public IEnumerable<IEndPoint> EndPoints
+		#region Public Properties
+		public IEnumerable<IConnection> Recipients
 		{
 			get;
 			private set;
 		}
+		#endregion
 
-		public T GetMessage<T> ()
-			where T : MessageBase
-		{
-			return (T) this;
-		}
-
+		#region Internals
 		protected abstract ushort MessageTypeCode
 		{
 			get;
@@ -52,5 +51,6 @@ namespace Gablarski.Messages
 
 		protected abstract void WritePayload (IValueWriter writer);
 		protected abstract void ReadPayload (IValueReader reader);
+		#endregion
 	}
 }

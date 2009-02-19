@@ -8,8 +8,8 @@ namespace Gablarski
 	public class User
 		: AuthedClient
 	{
-		internal User (int authHash, IEndPoint endpoint)
-			: base (authHash, endpoint)
+		internal User (int authHash, IConnection recipient)
+			: base (authHash, recipient)
 		{
 		}
 

@@ -8,20 +8,20 @@ namespace Gablarski.Messages
 	public abstract class Message<TMessage>
 		: MessageBase
 	{
-		protected Message (TMessage messageType, IEndPoint endpoint)
-			: base (endpoint)
+		protected Message (TMessage messageType, IConnection recipient)
+			: base (recipient)
 		{
 			this.MessageType = messageType;
 		}
 
-		protected Message (TMessage messageType, IEndPoint endpoint, IValueReader payload)
-			: base (endpoint, payload)
+		protected Message (TMessage messageType, IConnection recipient, IValueReader payload)
+			: base (recipient, payload)
 		{
 			this.MessageType = messageType;
 		}
 
-		protected Message (TMessage messageType, IEnumerable<IEndPoint> endpoints)
-			: base (endpoints)
+		protected Message (TMessage messageType, IEnumerable<IConnection> recipients)
+			: base (recipients)
 		{
 			this.MessageType = messageType;
 		}
