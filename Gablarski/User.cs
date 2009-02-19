@@ -8,13 +8,13 @@ namespace Gablarski
 	public class User
 		: AuthedClient
 	{
-		internal User (int authHash, bool isLittleEndian)
-			: base (authHash, isLittleEndian)
+		internal User (int authHash, IEndPoint endpoint)
+			: base (authHash, endpoint)
 		{
 		}
 
 		internal User (AuthedClient client)
-			: base (client.AuthHash, client.IsLittleEndian)
+			: base (client)
 		{
 		}
 

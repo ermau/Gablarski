@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Gablarski
 {
-	public interface IAvailableConnection
+	public interface IConnectionProvider
 	{
 		event EventHandler<ConnectionMadeEventArgs> ConnectionMade;
 

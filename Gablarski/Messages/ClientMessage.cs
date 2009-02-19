@@ -11,8 +11,13 @@ namespace Gablarski.Messages
 	public abstract class ClientMessage
 		: Message<ClientMessages>
 	{
-		protected ClientMessage (ClientMessages messageType, AuthedClient client)
-			: base (messageType, client)
+		protected ClientMessage (ClientMessages messageType, IEndPoint endpoint)
+			: base (messageType, endpoint)
+		{
+		}
+
+		protected ClientMessage (ClientMessages messageType, IEndPoint endpoint, IValueReader payload)
+			: base (messageType, endpoint, payload)
 		{
 		}
 
@@ -30,9 +35,9 @@ namespace Gablarski.Messages
 	public enum ClientMessages
 		: ushort
 	{
-		Ping = 1,
-		Login = 2,
-		Disconnect = 3,
-		AudioData = 4
+		RequestToken	= 1,
+		Login			= 2,
+		Disconnect		= 3,
+		AudioData		= 4
 	}
 }

@@ -2,23 +2,28 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Mono.Rocks;
 
 namespace Gablarski.Messages
 {
 	public abstract class MessageBase
 	{
-		protected MessageBase (AuthedClient client)
+		protected MessageBase (IEndPoint endpoint)
 		{
-			this.Clients = new[] { client };
+			this.EndPoints = new[] { endpoint };
 		}
 
-		protected MessageBase (IEnumerable<AuthedClient> clients)
+		protected MessageBase (IEndPoint endpoint, IValueReader payload)
 		{
-			this.Clients = clients;
+			this.EndPoints = new[] { endpoint };
+			this.ReadPayload (payload);
 		}
 
-		public IEnumerable<AuthedClient> Clients
+		protected MessageBase (IEnumerable<IEndPoint> endpoints)
+		{
+			this.EndPoints = endpoints;
+		}
+
+		public IEnumerable<IEndPoint> EndPoints
 		{
 			get;
 			private set;
@@ -40,6 +45,12 @@ namespace Gablarski.Messages
 			get;
 		}
 
+		protected virtual bool Reliable
+		{
+			get { return true; }
+		}
+
 		protected abstract void WritePayload (IValueWriter writer);
+		protected abstract void ReadPayload (IValueReader reader);
 	}
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace Mono.Rocks
+namespace Gablarski
 {
 	public class OrderedDictionary<TKey, TValue>
 		: IDictionary<TKey, TValue>

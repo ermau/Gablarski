@@ -3,18 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Mono.Rocks
+namespace Gablarski
 {
 	public interface IValueReader
 	{
-		IValueReader Read (out sbyte value);
-		IValueReader Read (out short value);
-		IValueReader Read (out int value);
-		IValueReader Read (out long value);
+		SByte ReadSByte ();
+		Int16 ReadInt16 ();
+		Int32 ReadInt32 ();
+		Int64 ReadInt64 ();
 
-		IValueReader Read (out byte value);
-		IValueReader Read (out ushort value);
-		IValueReader Read (out uint value);
-		IValueReader Read (out ulong value);
+		Byte ReadByte ();
+		UInt16 ReadUInt16 ();
+		UInt32 ReadUInt32 ();
+		UInt64 ReadUInt64 ();
+
+		string ReadString ();
 	}
 }

@@ -3,28 +3,33 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Net.Sockets;
-using Mono.Rocks;
 
 namespace Gablarski
 {
 	public class AuthedClient
 	{
-		internal AuthedClient (int authHash, bool isLittleEndian)
+		internal AuthedClient (int authHash, IEndPoint endpoint)
 		{
 			this.AuthHash = authHash;
-			this.IsLittleEndian = isLittleEndian;
+			this.EndPoint = endpoint;
+		}
+
+		internal AuthedClient (AuthedClient client)
+		{
+			this.AuthHash = client.AuthHash;
+			this.EndPoint = client.EndPoint;
 		}
 
 		public int AuthHash
 		{
 			get;
-			internal set;
+			private set;
 		}
 
-		public bool IsLittleEndian
+		public IEndPoint EndPoint
 		{
 			get;
-			internal set;
+			private set;
 		}
 	}
 }

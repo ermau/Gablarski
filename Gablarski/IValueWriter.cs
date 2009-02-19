@@ -3,18 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Mono.Rocks
+namespace Gablarski
 {
 	public interface IValueWriter
 	{
-		IValueWriter Write (sbyte value);
-		IValueWriter Write (short value);
-		IValueWriter Write (int value);
-		IValueWriter Write (long value);
+		void WriteSByte (SByte value);
+		void WriteInt16 (Int16 value);
+		void WriteInt32 (Int32 value);
+		void WriteInt64 (Int64 value);
+		
+		void WriteByte (Byte value);
+		void WriteUInt16 (UInt16 value);
+		void WriteUInt32 (UInt32 value);
+		void WriteUInt64 (UInt64 value);
 
-		IValueWriter Write (byte value);
-		IValueWriter Write (ushort value);
-		IValueWriter Write (uint value);
-		IValueWriter Write (ulong value);
+		void WriteString (string value);
 	}
 }

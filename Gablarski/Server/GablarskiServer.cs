@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using Gablarski.Client;
 using Gablarski.Messages;
-using Mono.Rocks;
 
 namespace Gablarski.Server
 {
@@ -15,7 +14,7 @@ namespace Gablarski.Server
 			this.userProvider = userProvider;
 		}
 
-		public IEnumerable<IAvailableConnection> Connections
+		public IEnumerable<IConnectionProvider> ConnectionProviders
 		{
 			get
 			{
@@ -31,7 +30,7 @@ namespace Gablarski.Server
 			}
 		}
 
-		public void AddAvailableConnection (IAvailableConnection connection)
+		public void AddConnectionProvider (IConnectionProvider connection)
 		{
 			connection.ConnectionMade += OnConnectionMade;
 			connection.StartListening ();
@@ -42,7 +41,7 @@ namespace Gablarski.Server
 			}
 		}
 
-		public void RemoveAvailableConnection (IAvailableConnection connection)
+		public void RemoveConnectionProvider (IConnectionProvider connection)
 		{
 			connection.StopListening ();
 			connection.ConnectionMade -= this.OnConnectionMade;
@@ -53,10 +52,12 @@ namespace Gablarski.Server
 			}
 		}
 
-		public void Disconnect (IConnection connection)
+		public void Disconnect (IConnection connection, string reason)
 		{
 			if (connection == null)
 				throw new ArgumentNullException ("connection");
+
+			connection.Disconnect (reason);
 
 			lock (connectionLock)
 			{
@@ -66,7 +67,7 @@ namespace Gablarski.Server
 		}
 
 		private readonly object connectionLock = new object();
-		private List<IAvailableConnection> availableConnections = new List<IAvailableConnection> ();
+		private List<IConnectionProvider> availableConnections = new List<IConnectionProvider> ();
 		private readonly List<IConnection> connections = new List<IConnection>();
 		private readonly IUserProvider userProvider;
 
@@ -75,9 +76,9 @@ namespace Gablarski.Server
 			/* If a connection sends a garbage message or something invalid,
 			 * the provider should 'send' a disconnected message. */
 			var m = (e.Message as ClientMessage);
-			if (m == null || m.MessageType == ClientMessages.Disconnect)
+			if (m == null)
 			{
-				Disconnect (e.Connection);
+				Disconnect (e.Connection, "Invalid message.");
 				return;
 			}
 		}

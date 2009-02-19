@@ -11,6 +11,8 @@ namespace Gablarski
 		event EventHandler<MessageReceivedEventArgs> MessageReceived;
 
 		void Send (MessageBase message);
+
+		void Disconnect (string reason);
 	}
 
 	public class MessageReceivedEventArgs

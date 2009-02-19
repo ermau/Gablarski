@@ -8,13 +8,13 @@ namespace Gablarski.Messages
 	public abstract class ServerMessage
 		: Message<ServerMessageType>
 	{
-		protected ServerMessage (ServerMessageType messageType, AuthedClient client)
+		protected ServerMessage (ServerMessageType messageType, IEndPoint client)
 			: base (messageType, client)
 		{
 			this.MessageType = messageType;
 		}
 
-		protected ServerMessage (ServerMessageType messageType, IEnumerable<AuthedClient> clients)
+		protected ServerMessage (ServerMessageType messageType, IEnumerable<IEndPoint> clients)
 			: base (messageType, clients)
 		{
 			this.MessageType = messageType;

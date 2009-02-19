@@ -5,21 +5,33 @@ using System.Text;
 
 namespace Gablarski
 {
-	public interface IChannel
+	public class Channel
 	{
 		/// <summary>
 		/// Gets the name of the channel.
 		/// </summary>
-		string Name { get; }
+		public string Name
+		{
+			get;
+			set;
+		}
 
 		/// <summary>
 		/// Gets the description of the channel.
 		/// </summary>
-		string Description { get; }
+		public string Description
+		{
+			get;
+			set;
+		}
 		
 		/// <summary>
 		/// Gets the player limit. 0 for no limit.
 		/// </summary>
-		int PlayerLimit { get; }
+		public int PlayerLimit
+		{
+			get;
+			set;
+		}
 	}
 }

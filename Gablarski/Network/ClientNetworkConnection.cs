@@ -16,6 +16,11 @@ namespace Gablarski.Network
 			throw new NotImplementedException ();
 		}
 
+		public void Disconnect (string reason)
+		{
+			throw new NotImplementedException ();
+		}
+
 		#endregion
 
 		#region IConnection Members

@@ -46,22 +46,27 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AuthedClient.cs" />
+    <Compile Include="Channel.cs" />
     <Compile Include="Client\GablarskiClient.cs" />
-    <Compile Include="IAvailableConnection.cs" />
+    <Compile Include="Client\ICaptureProvider.cs" />
+    <Compile Include="Client\IPlaybackProvider.cs" />
     <Compile Include="IClientConnection.cs" />
     <Compile Include="IConnection.cs" />
+    <Compile Include="IConnectionProvider.cs" />
+    <Compile Include="IEndPoint.cs" />
     <Compile Include="IValueReader.cs" />
     <Compile Include="IValueWriter.cs" />
     <Compile Include="Messages\ClientMessage.cs" />
+    <Compile Include="Messages\DisconnectMessage.cs" />
     <Compile Include="Messages\LoginMessage.cs" />
     <Compile Include="Messages\Message.cs" />
     <Compile Include="Messages\MessageBase.cs" />
+    <Compile Include="Messages\RequestTokenMessage.cs" />
     <Compile Include="Messages\ServerMessage.cs" />
     <Compile Include="Network\ClientNetworkConnection.cs" />
     <Compile Include="Server\GablarskiServer.cs" />
     <Compile Include="Sources.cs" />
     <Compile Include="HybridConnection.cs" />
-    <Compile Include="IChannel.cs" />
     <Compile Include="IChannelProvider.cs" />
     <Compile Include="ICodec.cs" />
     <Compile Include="IMediaSource.cs" />
