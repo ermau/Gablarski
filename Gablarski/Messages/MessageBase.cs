@@ -8,28 +8,13 @@ namespace Gablarski.Messages
 	public abstract class MessageBase
 	{
 		#region Constructors
-		protected MessageBase (IConnection recipient)
+		protected MessageBase ()
 		{
-			this.Recipients = new[] { recipient };
 		}
 
-		protected MessageBase (IConnection recipient, IValueReader payload)
+		protected MessageBase (IValueReader payload)
 		{
-			this.Recipients = new[] { recipient };
 			this.ReadPayload (payload);
-		}
-
-		protected MessageBase (IEnumerable<IConnection> recipients)
-		{
-			this.Recipients = recipients;
-		}
-		#endregion
-
-		#region Public Properties
-		public IEnumerable<IConnection> Recipients
-		{
-			get;
-			private set;
 		}
 		#endregion
 

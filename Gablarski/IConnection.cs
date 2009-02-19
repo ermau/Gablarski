@@ -15,6 +15,24 @@ namespace Gablarski
 		void Disconnect (string reason);
 	}
 
+	public static class ConnectionExtensions
+	{
+		public static void Send (this IEnumerable<IConnection> connections, MessageBase message)
+		{
+			foreach (var connection in connections)
+				connection.Send (message);
+		}
+
+		public static void Send (this IEnumerable<IConnection> connections, MessageBase message, Func<IConnection, bool> predicate)
+		{
+			foreach (var connection in connections)
+			{
+				if (predicate (connection))
+					connection.Send (message);
+			}
+		}
+	}
+
 	public class MessageReceivedEventArgs
 		: EventArgs
 	{

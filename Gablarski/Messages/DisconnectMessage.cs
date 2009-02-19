@@ -8,8 +8,8 @@ namespace Gablarski.Messages
 	public class DisconnectMessage
 		: ClientMessage
 	{
-		public DisconnectMessage (IConnection recipient)
-			: base (ClientMessages.Disconnect, recipient)
+		public DisconnectMessage ()
+			: base (ClientMessages.Disconnect)
 		{
 		}
 

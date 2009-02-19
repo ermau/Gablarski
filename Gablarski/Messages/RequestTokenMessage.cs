@@ -8,8 +8,8 @@ namespace Gablarski.Messages
 	public class RequestTokenMessage
 		: ClientMessage
 	{
-		public RequestTokenMessage (IConnection server)
-			: base (ClientMessages.RequestToken, server)
+		public RequestTokenMessage ()
+			: base (ClientMessages.RequestToken)
 		{
 		}
 

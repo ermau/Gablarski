@@ -8,20 +8,13 @@ namespace Gablarski.Messages
 	public abstract class Message<TMessage>
 		: MessageBase
 	{
-		protected Message (TMessage messageType, IConnection recipient)
-			: base (recipient)
+		protected Message (TMessage messageType)
 		{
 			this.MessageType = messageType;
 		}
 
-		protected Message (TMessage messageType, IConnection recipient, IValueReader payload)
-			: base (recipient, payload)
-		{
-			this.MessageType = messageType;
-		}
-
-		protected Message (TMessage messageType, IEnumerable<IConnection> recipients)
-			: base (recipients)
+		protected Message (TMessage messageType, IValueReader payload)
+			: base (payload)
 		{
 			this.MessageType = messageType;
 		}
