@@ -25,11 +25,6 @@ namespace Gablarski.Messages
 		{
 			get { return (ushort)this.MessageType; }
 		}
-
-		protected override bool SendAuthHash
-		{
-			get { return true; }
-		}
 	}
 
 	public enum ClientMessages

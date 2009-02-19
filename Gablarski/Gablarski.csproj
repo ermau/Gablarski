@@ -53,6 +53,7 @@
     <Compile Include="IClientConnection.cs" />
     <Compile Include="IConnection.cs" />
     <Compile Include="IConnectionProvider.cs" />
+    <Compile Include="Server\IPermissionsProvider.cs" />
     <Compile Include="IValueReader.cs" />
     <Compile Include="IValueWriter.cs" />
     <Compile Include="Messages\ClientMessage.cs" />
@@ -62,14 +63,16 @@
     <Compile Include="Messages\MessageBase.cs" />
     <Compile Include="Messages\RequestTokenMessage.cs" />
     <Compile Include="Messages\ServerMessage.cs" />
+    <Compile Include="Messages\TokenMessage.cs" />
     <Compile Include="Network\ClientNetworkConnection.cs" />
     <Compile Include="Server\GablarskiServer.cs" />
+    <Compile Include="Server\IUserProvider.cs" />
+    <Compile Include="Server\Permission.cs" />
     <Compile Include="Sources.cs" />
     <Compile Include="HybridConnection.cs" />
     <Compile Include="IChannelProvider.cs" />
     <Compile Include="ICodec.cs" />
     <Compile Include="IMediaSource.cs" />
-    <Compile Include="IUserProvider.cs" />
     <Compile Include="OrderedDictionary.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="User.cs" />

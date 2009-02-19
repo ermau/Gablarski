@@ -32,6 +32,7 @@ namespace Gablarski.Server
 
 		public void AddConnectionProvider (IConnectionProvider connection)
 		{
+			// MUST provide a gaurantee of persona
 			connection.ConnectionMade += OnConnectionMade;
 			connection.StartListening ();
 
@@ -68,8 +69,13 @@ namespace Gablarski.Server
 
 		private readonly object connectionLock = new object();
 		private List<IConnectionProvider> availableConnections = new List<IConnectionProvider> ();
-		private readonly List<IConnection> connections = new List<IConnection>();
+		private readonly Dictionary<IConnection, AuthedClient> connections = new Dictionary<IConnection,AuthedClient>();
 		private readonly IUserProvider userProvider;
+
+		protected int GetToken ()
+		{
+			return DateTime.Now.Millisecond + 42;
+		}
 
 		protected virtual void OnMessageReceived (object sender, MessageReceivedEventArgs e)
 		{
@@ -81,6 +87,13 @@ namespace Gablarski.Server
 				Disconnect (e.Connection, "Invalid message.");
 				return;
 			}
+
+			switch (m.MessageType)
+			{
+				case ClientMessages.RequestToken:
+					e.Connection.Send (new TokenMessage (GetToken ()));
+					break;
+			}
 		}
 		
 		protected virtual void OnConnectionMade (object sender, ConnectionMadeEventArgs e)
@@ -89,7 +102,7 @@ namespace Gablarski.Server
 
 			lock (connectionLock)
 			{
-				this.connections.Add (e.Connection);
+				this.connections.Add (e.Connection, null);
 			}
 		}
 	}

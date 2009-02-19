@@ -24,11 +24,6 @@ namespace Gablarski.Messages
 			get;
 		}
 
-		protected abstract bool SendAuthHash
-		{
-			get;
-		}
-
 		protected virtual bool Reliable
 		{
 			get { return true; }
