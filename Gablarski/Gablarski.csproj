@@ -54,6 +54,7 @@
     <Compile Include="IClientConnection.cs" />
     <Compile Include="IConnection.cs" />
     <Compile Include="IConnectionProvider.cs" />
+    <Compile Include="ReadOnlyDictionary.cs" />
     <Compile Include="Server\IChannelProvider.cs" />
     <Compile Include="Server\IPermissionsProvider.cs" />
     <Compile Include="IValueReader.cs" />

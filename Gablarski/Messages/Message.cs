@@ -13,12 +13,6 @@ namespace Gablarski.Messages
 			this.MessageType = messageType;
 		}
 
-		protected Message (TMessage messageType, IValueReader payload)
-			: base (payload)
-		{
-			this.MessageType = messageType;
-		}
-
 		public TMessage MessageType
 		{
 			get;

@@ -58,7 +58,7 @@ namespace Gablarski.Server
 			if (connection == null)
 				throw new ArgumentNullException ("connection");
 
-			connection.Disconnect (reason);
+			connection.Disconnect ();
 
 			lock (connectionLock)
 			{

@@ -13,23 +13,18 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public TokenMessage (IValueReader reader)
-			: base (ServerMessageType.Token, reader)
-		{
-		}
-
 		public int Token
 		{
 			get;
 			set;
 		}
 
-		protected override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (IValueReader reader)
 		{
 			this.Token = reader.ReadInt32 ();
 		}
 
-		protected override void WritePayload (IValueWriter writer)
+		public override void WritePayload (IValueWriter writer)
 		{
 			writer.WriteInt32 (this.Token);
 		}

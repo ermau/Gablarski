@@ -12,7 +12,7 @@ namespace Gablarski
 
 		void Send (MessageBase message);
 
-		void Disconnect (string reason);
+		void Disconnect ();
 	}
 
 	public static class ConnectionExtensions

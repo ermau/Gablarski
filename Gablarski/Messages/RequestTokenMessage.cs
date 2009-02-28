@@ -19,12 +19,12 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		protected override void WritePayload (IValueWriter writer)
+		public override void WritePayload (IValueWriter writer)
 		{
 			writer.WriteInt32 (this.AuthHash);
 		}
 
-		protected override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (IValueReader reader)
 		{
 			this.AuthHash = reader.ReadInt32 ();
 		}

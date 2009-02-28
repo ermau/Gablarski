@@ -14,13 +14,7 @@ namespace Gablarski.Messages
 			this.MessageType = messageType;
 		}
 
-		protected ServerMessage (ServerMessageType messageType, IValueReader reader)
-			: base (messageType, reader)
-		{
-			this.MessageType = messageType;
-		}
-
-		protected override ushort MessageTypeCode
+		public override ushort MessageTypeCode
 		{
 			get { return (ushort)this.MessageType; }
 		}

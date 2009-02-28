@@ -31,14 +31,14 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		protected override void WritePayload (IValueWriter writer)
+		public override void WritePayload (IValueWriter writer)
 		{
 			writer.WriteString (Nickname);
 			writer.WriteString (Username);
 			writer.WriteString (Password);
 		}
 
-		protected override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (IValueReader reader)
 		{
 			this.Nickname = reader.ReadString ();
 			this.Username = reader.ReadString ();

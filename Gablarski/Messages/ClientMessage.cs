@@ -16,12 +16,7 @@ namespace Gablarski.Messages
 		{
 		}
 
-		protected ClientMessage (ClientMessages messageType, IValueReader payload)
-			: base (messageType, payload)
-		{
-		}
-
-		protected override ushort MessageTypeCode
+		public override ushort MessageTypeCode
 		{
 			get { return (ushort)this.MessageType; }
 		}

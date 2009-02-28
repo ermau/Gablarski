@@ -15,7 +15,6 @@ namespace Gablarski
 		}
 
 		#region IValueReader Members
-
 		public sbyte ReadSByte ()
 		{
 			return (sbyte)this.baseStream.ReadByte ();
