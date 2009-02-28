@@ -91,6 +91,8 @@ namespace Gablarski.Network
 			}
 
 			MessageBase msg = MessageBase.MessageTypes[this.rreader.ReadUInt16 ()] ();
+			msg.ReadPayload (this.rreader);
+
 			this.OnMessageReceived (new MessageReceivedEventArgs (this, msg));
 		}
 
@@ -100,6 +102,7 @@ namespace Gablarski.Network
 			{
 				if (!this.waiting)
 				{
+					this.waiting = true;
 					byte[] mbuffer = new byte[3];
 					this.rstream.BeginRead (mbuffer, 0, 3, this.Received, mbuffer);
 				}
