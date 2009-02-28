@@ -50,9 +50,11 @@
     <Compile Include="Client\GablarskiClient.cs" />
     <Compile Include="Client\ICaptureProvider.cs" />
     <Compile Include="Client\IPlaybackProvider.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="IClientConnection.cs" />
     <Compile Include="IConnection.cs" />
     <Compile Include="IConnectionProvider.cs" />
+    <Compile Include="Server\IChannelProvider.cs" />
     <Compile Include="Server\IPermissionsProvider.cs" />
     <Compile Include="IValueReader.cs" />
     <Compile Include="IValueWriter.cs" />
@@ -70,11 +72,12 @@
     <Compile Include="Server\Permission.cs" />
     <Compile Include="Sources.cs" />
     <Compile Include="HybridConnection.cs" />
-    <Compile Include="IChannelProvider.cs" />
     <Compile Include="ICodec.cs" />
     <Compile Include="IMediaSource.cs" />
     <Compile Include="OrderedDictionary.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StreamValueReader.cs" />
+    <Compile Include="StreamValueWriter.cs" />
     <Compile Include="User.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

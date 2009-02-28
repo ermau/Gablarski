@@ -18,16 +18,16 @@ namespace Gablarski
 		{
 		}
 
-		public string Nickname
+		public virtual string Nickname
 		{
 			get;
-			internal set;
+			set;
 		}
 
-		public string Username
+		public virtual string Username
 		{
 			get;
-			internal set;
+			set;
 		}
 	}
 }
