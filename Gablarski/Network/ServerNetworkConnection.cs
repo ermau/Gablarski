@@ -2,27 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Net.Sockets;
+using Gablarski.Messages;
+using System.Threading;
 
 namespace Gablarski.Network
 {
 	public class ServerNetworkConnection
-		: IConnection
+		: NetworkConnectionBase
 	{
-
-		#region IConnection Members
-
-		public event EventHandler<MessageReceivedEventArgs> MessageReceived;
-
-		public void Send (Gablarski.Messages.MessageBase message)
+		public ServerNetworkConnection (TcpClient client)
+			: base (client)
 		{
-			throw new NotImplementedException ();
+			this.StartListener ();
 		}
-
-		public void Disconnect ()
-		{
-			throw new NotImplementedException ();
-		}
-
-		#endregion
 	}
 }
