@@ -14,6 +14,10 @@ namespace Gablarski.Network
 		public ServerNetworkConnection (TcpClient client)
 			: base (client)
 		{
+			this.rstream = tcp.GetStream ();
+			this.rwriter = new StreamValueWriter (this.rstream);
+			this.rreader = new StreamValueReader (this.rstream);
+
 			this.StartListener ();
 		}
 	}

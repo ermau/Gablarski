@@ -42,7 +42,9 @@ namespace Gablarski.Messages
 		{
 			this.Nickname = reader.ReadString ();
 			this.Username = reader.ReadString ();
-			this.Password = reader.ReadString ();
+			
+			if (!String.IsNullOrEmpty (this.Username))
+				this.Password = reader.ReadString ();
 		}
 	}
 }

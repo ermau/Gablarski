@@ -21,13 +21,4 @@ namespace Gablarski.Messages
 			get { return (ushort)this.MessageType; }
 		}
 	}
-
-	public enum ClientMessages
-		: ushort
-	{
-		RequestToken	= 1,
-		Login			= 2,
-		Disconnect		= 3,
-		AudioData		= 4
-	}
 }

@@ -33,7 +33,7 @@ namespace Gablarski.Server
 
 		public void AddConnectionProvider (IConnectionProvider connection)
 		{
-			Trace.WriteLine (connection.GetType().Name + " added.");
+			Trace.WriteLine ("[Server] " + connection.GetType().Name + " added.");
 
 			// MUST provide a gaurantee of persona
 			connection.ConnectionMade += OnConnectionMade;
@@ -47,6 +47,8 @@ namespace Gablarski.Server
 
 		public void RemoveConnectionProvider (IConnectionProvider connection)
 		{
+			Trace.WriteLine ("[Server] " + connection.GetType ().Name + " removed.");
+
 			connection.StopListening ();
 			connection.ConnectionMade -= this.OnConnectionMade;
 
@@ -84,14 +86,16 @@ namespace Gablarski.Server
 		{
 			/* If a connection sends a garbage message or something invalid,
 			 * the provider should 'send' a disconnected message. */
-			var m = (e.Message as ClientMessage);
-			if (m == null)
+			var msg = (e.Message as ClientMessage);
+			if (msg == null)
 			{
 				Disconnect (e.Connection, "Invalid message.");
 				return;
 			}
 
-			switch (m.MessageType)
+			Trace.WriteLine ("[Server] Message Received: " + msg.MessageType.ToString ());
+
+			switch (msg.MessageType)
 			{
 				case ClientMessages.RequestToken:
 					e.Connection.Send (new TokenMessage (GetToken ()));
@@ -101,6 +105,8 @@ namespace Gablarski.Server
 		
 		protected virtual void OnConnectionMade (object sender, ConnectionMadeEventArgs e)
 		{
+			Trace.WriteLine ("[Server] Connection Made");
+
 			e.Connection.MessageReceived += this.OnMessageReceived;
 
 			lock (connectionLock)

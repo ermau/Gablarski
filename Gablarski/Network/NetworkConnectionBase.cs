@@ -109,8 +109,8 @@ namespace Gablarski.Network
 				if (!this.waiting)
 				{
 					this.waiting = true;
-					byte[] mbuffer = new byte[3];
-					this.rstream.BeginRead (mbuffer, 0, 3, this.Received, mbuffer);
+					byte[] mbuffer = new byte[1];
+					this.rstream.BeginRead (mbuffer, 0, 1, this.Received, mbuffer);
 				}
 
 				while (mqueue.Count > 0)
@@ -120,7 +120,13 @@ namespace Gablarski.Network
 					{
 						message = this.mqueue.Dequeue ();
 					}
-					message.WritePayload (GetWriter (message));
+
+					var writer = GetWriter (message);
+					
+					writer.WriteByte (0x2A);
+					writer.WriteUInt16 (message.MessageTypeCode);
+
+					message.WritePayload (writer);
 				}
 			}
 		}

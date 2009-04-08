@@ -5,6 +5,7 @@ using System.Text;
 using Gablarski.Server;
 using Gablarski.Network;
 using Gablarski.Messages;
+using System.Diagnostics;
 
 namespace Gablarski.Client
 {
@@ -47,7 +48,10 @@ namespace Gablarski.Client
 			var msg = (e.Message as ServerMessage);
 			if (msg == null)
 			{
+				// TODO: d/c
 			}
+
+			Trace.WriteLine ("[Client] Message Received: " + msg.MessageType.ToString ());
 
 			switch (msg.MessageType)
 			{

@@ -8,9 +8,15 @@ namespace Gablarski.Messages
 	public class TokenMessage
 		: ServerMessage
 	{
+		public TokenMessage ()
+			: base (ServerMessageType.Token)
+		{
+		}
+
 		public TokenMessage (int token)
 			: base (ServerMessageType.Token)
 		{
+			this.Token = token;
 		}
 
 		public int Token

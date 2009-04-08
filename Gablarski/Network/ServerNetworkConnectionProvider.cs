@@ -10,6 +10,17 @@ namespace Gablarski.Network
 	public class ServerNetworkConnectionProvider
 		: IConnectionProvider
 	{
+		public ServerNetworkConnectionProvider ()
+		{
+			this.Port = 6112;
+		}
+
+		public int Port
+		{
+			get;
+			set;
+		}
+
 		#region IConnectionProvider Members
 
 		public event EventHandler<ConnectionMadeEventArgs> ConnectionMade;
@@ -17,7 +28,9 @@ namespace Gablarski.Network
 		public void StartListening ()
 		{
 			this.listening = true;
+			this.listener = new TcpListener (this.Port);
 			listener.Start ();
+
 			(this.listenChecker = new Thread (this.ListenChecker)
 			{
 				IsBackground = true,
@@ -34,7 +47,7 @@ namespace Gablarski.Network
 
 		private volatile bool listening;
 		private Thread listenChecker;
-		private TcpListener listener = new TcpListener (6112);
+		private TcpListener listener;
 
 		private void ListenChecker ()
 		{

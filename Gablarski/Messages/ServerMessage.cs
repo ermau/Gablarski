@@ -19,10 +19,4 @@ namespace Gablarski.Messages
 			get { return (ushort)this.MessageType; }
 		}
 	}
-
-	public enum ServerMessageType
-		: ushort
-	{
-		Token = 1
-	}
 }

@@ -22,6 +22,8 @@ namespace Gablarski.Network
 			this.rreader = new StreamValueReader (this.rstream);
 
 			udp.Connect (host, port);
+
+			this.StartListener ();
 		}
 
 		#endregion

@@ -24,7 +24,7 @@ namespace Gablarski
 
 		public void WriteSByte (sbyte value)
 		{
-			Write (BitConverter.GetBytes (value));
+			Write (new byte[] { (byte)value });
 		}
 
 		public void WriteInt16 (short value)
@@ -44,7 +44,7 @@ namespace Gablarski
 
 		public void WriteByte (byte value)
 		{
-			Write (BitConverter.GetBytes (value));
+			Write (new byte[] { value });
 		}
 
 		public void WriteUInt16 (ushort value)
@@ -64,7 +64,7 @@ namespace Gablarski
 
 		public void WriteString (string value)
 		{
-			Write (Encoding.UTF8.GetBytes (value));
+			Write (Encoding.UTF8.GetBytes (value ?? "\0"));
 		}
 
 		#endregion
