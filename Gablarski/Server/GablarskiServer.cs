@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Gablarski.Client;
 using Gablarski.Messages;
+using System.Diagnostics;
 
 namespace Gablarski.Server
 {
@@ -32,6 +33,8 @@ namespace Gablarski.Server
 
 		public void AddConnectionProvider (IConnectionProvider connection)
 		{
+			Trace.WriteLine (connection.GetType().Name + " added.");
+
 			// MUST provide a gaurantee of persona
 			connection.ConnectionMade += OnConnectionMade;
 			connection.StartListening ();

@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{7347052B-DA5B-4CCA-AB28-3963766E3CDB}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{DABD979A-6930-4250-A770-E746736F4AAF}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Gablarski</RootNamespace>
-    <AssemblyName>Gablarski</AssemblyName>
+    <RootNamespace>GablarskiTester</RootNamespace>
+    <AssemblyName>GablarskiTester</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -45,45 +45,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AuthedClient.cs" />
-    <Compile Include="Channel.cs" />
-    <Compile Include="Client\GablarskiClient.cs" />
-    <Compile Include="Client\ICaptureProvider.cs" />
-    <Compile Include="Client\IPlaybackProvider.cs" />
-    <Compile Include="Extensions.cs" />
-    <Compile Include="IClientConnection.cs" />
-    <Compile Include="IConnection.cs" />
-    <Compile Include="IConnectionProvider.cs" />
-    <Compile Include="Network\NetworkConnectionBase.cs" />
-    <Compile Include="Network\ServerNetworkConnection.cs" />
-    <Compile Include="Network\ServerNetworkConnectionProvider.cs" />
-    <Compile Include="ReadOnlyDictionary.cs" />
-    <Compile Include="Server\GuestUserProvider.cs" />
-    <Compile Include="Server\IChannelProvider.cs" />
-    <Compile Include="Server\IPermissionsProvider.cs" />
-    <Compile Include="IValueReader.cs" />
-    <Compile Include="IValueWriter.cs" />
-    <Compile Include="Messages\ClientMessage.cs" />
-    <Compile Include="Messages\DisconnectMessage.cs" />
-    <Compile Include="Messages\LoginMessage.cs" />
-    <Compile Include="Messages\Message.cs" />
-    <Compile Include="Messages\MessageBase.cs" />
-    <Compile Include="Messages\RequestTokenMessage.cs" />
-    <Compile Include="Messages\ServerMessage.cs" />
-    <Compile Include="Messages\TokenMessage.cs" />
-    <Compile Include="Network\ClientNetworkConnection.cs" />
-    <Compile Include="Server\GablarskiServer.cs" />
-    <Compile Include="Server\IUserProvider.cs" />
-    <Compile Include="Server\Permission.cs" />
-    <Compile Include="Sources.cs" />
-    <Compile Include="HybridConnection.cs" />
-    <Compile Include="ICodec.cs" />
-    <Compile Include="IMediaSource.cs" />
-    <Compile Include="OrderedDictionary.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StreamValueReader.cs" />
-    <Compile Include="StreamValueWriter.cs" />
-    <Compile Include="User.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Gablarski\Gablarski.csproj">
+      <Project>{7347052B-DA5B-4CCA-AB28-3963766E3CDB}</Project>
+      <Name>Gablarski</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
