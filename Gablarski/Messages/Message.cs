@@ -10,14 +10,16 @@ namespace Gablarski.Messages
 	{
 		RequestToken = 1,
 		Login = 3,
-		Disconnect = 4,
-		AudioData = 5
+		Disconnect = 5,
+		AudioData = 7
 	}
 
 	public enum ServerMessageType
 		: ushort
 	{
-		Token = 2
+		Token = 2,
+		LoginResult = 4,
+		Disconnect = 6
 	}
 
 	public abstract class Message<TMessage>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Net.Sockets;
+using Gablarski.Messages;
 
 namespace Gablarski
 {
@@ -30,6 +31,11 @@ namespace Gablarski
 		{
 			get;
 			private set;
+		}
+
+		public void Send (MessageBase message)
+		{
+			this.Connection.Send (message);
 		}
 	}
 }

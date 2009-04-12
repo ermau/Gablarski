@@ -19,4 +19,12 @@ namespace Gablarski
 
 		string ReadString ();
 	}
+
+	public static class ValueReaderExtensions
+	{
+		public static bool ReadBool (this IValueReader reader)
+		{
+			return (reader.ReadByte () == 1);
+		}
+	}
 }

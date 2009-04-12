@@ -96,8 +96,22 @@ namespace Gablarski.Network
 				return;
 			}
 
-			MessageBase msg = MessageBase.MessageTypes[this.rreader.ReadUInt16 ()] ();
-			msg.ReadPayload (this.rreader);
+			MessageBase msg = null;
+			try
+			{
+				msg = MessageBase.MessageTypes[this.rreader.ReadUInt16 ()] ();
+				msg.ReadPayload (this.rreader);
+			}
+			catch (Exception e)
+			{
+				#if DEBUG
+				throw e;
+				#else
+				Trace.WriteLine ("Error reading payload, disconnecting.");
+				this.Disconnect ();
+				return;
+				#endif
+			}
 
 			this.OnMessageReceived (new MessageReceivedEventArgs (this, msg));
 		}

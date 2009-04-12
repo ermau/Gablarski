@@ -7,16 +7,16 @@ namespace Gablarski
 {
 	public interface IConnectionProvider
 	{
-		event EventHandler<ConnectionMadeEventArgs> ConnectionMade;
+		event EventHandler<ConnectionEventArgs> ConnectionMade;
 
 		void StartListening ();
 		void StopListening ();
 	}
 
-	public class ConnectionMadeEventArgs
+	public class ConnectionEventArgs
 		: EventArgs
 	{
-		public ConnectionMadeEventArgs (IConnection connection)
+		public ConnectionEventArgs (IConnection connection)
 		{
 			this.Connection = connection;
 		}

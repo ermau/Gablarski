@@ -13,6 +13,12 @@ namespace Gablarski.Server
 		public GablarskiServer (IUserProvider userProvider)
 		{
 			this.userProvider = userProvider;
+
+			this.Handlers = new Dictionary<ClientMessages, Action<MessageReceivedEventArgs>>
+			{
+				{ ClientMessages.RequestToken, UserRequestsToken },
+				{ ClientMessages.Login, UserLoginAttempt }
+			};
 		}
 
 		public IEnumerable<IConnectionProvider> ConnectionProviders
@@ -77,6 +83,8 @@ namespace Gablarski.Server
 		private readonly Dictionary<IConnection, AuthedClient> connections = new Dictionary<IConnection,AuthedClient>();
 		private readonly IUserProvider userProvider;
 
+		private readonly Dictionary<ClientMessages, Action<MessageReceivedEventArgs>> Handlers;
+
 		protected int GetToken ()
 		{
 			return DateTime.Now.Millisecond + 42;
@@ -95,15 +103,34 @@ namespace Gablarski.Server
 
 			Trace.WriteLine ("[Server] Message Received: " + msg.MessageType.ToString ());
 
-			switch (msg.MessageType)
+			this.Handlers[msg.MessageType] (e);
+		}
+
+		protected void UserRequestsToken (MessageReceivedEventArgs e)
+		{
+			int token = GetToken ();
+			lock (this.connectionLock)
 			{
-				case ClientMessages.RequestToken:
-					e.Connection.Send (new TokenMessage (GetToken ()));
-					break;
+				connections.Add (e.Connection, new AuthedClient (token, e.Connection));
 			}
+
+			e.Connection.Send (new TokenMessage (token));
+		}
+
+		protected void UserLoginAttempt (MessageReceivedEventArgs e)
+		{
+			var login = (LoginMessage)e.Message;
+			var result = this.userProvider.Login (login.Username, login.Password);
+
+			e.Connection.Send (new LoginResultMessage (result));
+
+			Trace.WriteLine ("[Server]" + login.Username + " Login: " + result.Succeeded + ". " + (result.FailureReason ?? String.Empty));
+
+			if (!result.Succeeded)
+				e.Connection.Disconnect ();
 		}
 		
-		protected virtual void OnConnectionMade (object sender, ConnectionMadeEventArgs e)
+		protected virtual void OnConnectionMade (object sender, ConnectionEventArgs e)
 		{
 			Trace.WriteLine ("[Server] Connection Made");
 

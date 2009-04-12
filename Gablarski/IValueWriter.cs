@@ -21,4 +21,12 @@ namespace Gablarski
 
 		void WriteString (string value);
 	}
+
+	public static class ValueWriterExtensions
+	{
+		public static void WriteBool (this IValueWriter writer, bool value)
+		{
+			writer.WriteByte ((byte)((value) ? 1 : 0));
+		}
+	}
 }

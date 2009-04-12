@@ -48,7 +48,8 @@ namespace Gablarski.Client
 			var msg = (e.Message as ServerMessage);
 			if (msg == null)
 			{
-				// TODO: d/c
+				connection.Disconnect ();
+				return;
 			}
 
 			Trace.WriteLine ("[Client] Message Received: " + msg.MessageType.ToString ());

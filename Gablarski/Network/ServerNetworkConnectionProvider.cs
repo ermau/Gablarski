@@ -23,7 +23,7 @@ namespace Gablarski.Network
 
 		#region IConnectionProvider Members
 
-		public event EventHandler<ConnectionMadeEventArgs> ConnectionMade;
+		public event EventHandler<ConnectionEventArgs> ConnectionMade;
 
 		public void StartListening ()
 		{
@@ -54,11 +54,11 @@ namespace Gablarski.Network
 			while (this.listening)
 			{
 				TcpClient client = listener.AcceptTcpClient ();
-				this.OnConnectionMade (new ConnectionMadeEventArgs (new ServerNetworkConnection (client)));
+				this.OnConnectionMade (new ConnectionEventArgs (new ServerNetworkConnection (client)));
 			}
 		}
 
-		protected virtual void OnConnectionMade (ConnectionMadeEventArgs e)
+		protected virtual void OnConnectionMade (ConnectionEventArgs e)
 		{
 			var connection = this.ConnectionMade;
 			if (connection != null)
