@@ -6,14 +6,14 @@ using System.Text;
 namespace Gablarski
 {
 	public class User
-		: AuthedClient
+		: TokenedClient
 	{
 		internal User (int authHash, IConnection recipient)
 			: base (authHash, recipient)
 		{
 		}
 
-		internal User (AuthedClient client)
+		internal User (TokenedClient client)
 			: base (client)
 		{
 		}

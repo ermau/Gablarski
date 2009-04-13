@@ -11,7 +11,7 @@ namespace Gablarski.Messages
 		RequestToken = 1,
 		Login = 3,
 		Disconnect = 5,
-		AudioData = 7
+		RequestSource = 7,
 	}
 
 	public enum ServerMessageType
@@ -19,7 +19,8 @@ namespace Gablarski.Messages
 	{
 		Token = 2,
 		LoginResult = 4,
-		Disconnect = 6
+		Disconnect = 6,
+		Source = 8
 	}
 
 	public abstract class Message<TMessage>

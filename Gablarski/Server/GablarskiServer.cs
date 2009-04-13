@@ -70,25 +70,15 @@ namespace Gablarski.Server
 				throw new ArgumentNullException ("connection");
 
 			connection.Disconnect ();
-
-			lock (connectionLock)
-			{
-				if (this.connections.Remove (connection))
-					connection.MessageReceived -= this.OnMessageReceived;
-			}
+			connection.MessageReceived -= this.OnMessageReceived;
 		}
 
 		private readonly object connectionLock = new object();
 		private List<IConnectionProvider> availableConnections = new List<IConnectionProvider> ();
-		private readonly Dictionary<IConnection, AuthedClient> connections = new Dictionary<IConnection,AuthedClient>();
+		
 		private readonly IUserProvider userProvider;
 
 		private readonly Dictionary<ClientMessages, Action<MessageReceivedEventArgs>> Handlers;
-
-		protected int GetToken ()
-		{
-			return DateTime.Now.Millisecond + 42;
-		}
 
 		protected virtual void OnMessageReceived (object sender, MessageReceivedEventArgs e)
 		{
@@ -108,13 +98,7 @@ namespace Gablarski.Server
 
 		protected void UserRequestsToken (MessageReceivedEventArgs e)
 		{
-			int token = GetToken ();
-			lock (this.connectionLock)
-			{
-				connections.Add (e.Connection, new AuthedClient (token, e.Connection));
-			}
-
-			e.Connection.Send (new TokenMessage (token));
+			e.Connection.Send (new TokenMessage (TokenedClient.GetTokenedClient (e.Connection).Token));
 		}
 
 		protected void UserLoginAttempt (MessageReceivedEventArgs e)
@@ -135,11 +119,6 @@ namespace Gablarski.Server
 			Trace.WriteLine ("[Server] Connection Made");
 
 			e.Connection.MessageReceived += this.OnMessageReceived;
-
-			lock (connectionLock)
-			{
-				this.connections.Add (e.Connection, null);
-			}
 		}
 	}
 }

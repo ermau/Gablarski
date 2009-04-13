@@ -55,6 +55,7 @@ namespace Gablarski
 	/// </summary>
 	[Flags]
 	public enum MediaTypes
+		: byte
 	{
 		/// <summary>
 		/// Voice (Players talking)
@@ -73,6 +74,7 @@ namespace Gablarski
 	}
 
 	public enum MediaType
+		: byte
 	{
 		Voice,
 		Music
