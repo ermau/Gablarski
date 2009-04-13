@@ -26,5 +26,10 @@ namespace Gablarski
 		{
 			return (reader.ReadByte () == 1);
 		}
+
+		public static Version ReadVersion (this IValueReader reader)
+		{
+			return new Version (reader.ReadInt32 (), reader.ReadInt32 (), reader.ReadInt32 (), reader.ReadInt32 ());
+		}
 	}
 }

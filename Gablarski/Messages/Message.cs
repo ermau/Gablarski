@@ -17,7 +17,7 @@ namespace Gablarski.Messages
 	public enum ServerMessageType
 		: ushort
 	{
-		Token = 2,
+		TokenResult = 2,
 		LoginResult = 4,
 		Disconnect = 6,
 		SourceResult = 8

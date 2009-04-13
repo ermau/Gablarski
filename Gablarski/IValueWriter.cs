@@ -28,5 +28,13 @@ namespace Gablarski
 		{
 			writer.WriteByte ((byte)((value) ? 1 : 0));
 		}
+
+		public static void WriteVersion (this IValueWriter writer, Version version)
+		{
+			writer.WriteInt32 (version.Major);
+			writer.WriteInt32 (version.Minor);
+			writer.WriteInt32 (version.Build);
+			writer.WriteInt32 (version.Revision);
+		}
 	}
 }

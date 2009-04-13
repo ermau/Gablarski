@@ -19,10 +19,12 @@ namespace Gablarski.Server
 			this.Handlers = new Dictionary<ClientMessageType, Action<MessageReceivedEventArgs>>
 			{
 				{ ClientMessageType.RequestToken, UserRequestsToken },
-				{ ClientMessageType.Login, UserLoginAttempt }
+				{ ClientMessageType.Login, UserLoginAttempt },
+				{ ClientMessageType.RequestSource, UserRequestsSource }
 			};
 		}
 
+		#region Public Methods
 		public IEnumerable<IConnectionProvider> ConnectionProviders
 		{
 			get
@@ -74,6 +76,7 @@ namespace Gablarski.Server
 			connection.Disconnect ();
 			connection.MessageReceived -= this.OnMessageReceived;
 		}
+		#endregion
 
 		private readonly object connectionLock = new object();
 		private List<IConnectionProvider> availableConnections = new List<IConnectionProvider> ();
@@ -98,9 +101,33 @@ namespace Gablarski.Server
 			this.Handlers[msg.MessageType] (e);
 		}
 
+		protected void UserRequestsSource (MessageReceivedEventArgs e)
+		{
+		}
+
 		protected void UserRequestsToken (MessageReceivedEventArgs e)
 		{
-			e.Connection.Send (new TokenMessage (TokenedClient.GetTokenedClient (e.Connection).Token));
+			TokenedClient client = null;
+			TokenResult result = TokenResult.FailedUnknown;
+
+			var request = (RequestTokenMessage)e.Message;
+			if (request.ClientVersion < MinimumClientVersion)
+				result = TokenResult.FailedClientVersion;
+
+			try
+			{
+				client = TokenedClient.GetTokenedClient (e.Connection);
+				if (client != null)
+					result = TokenResult.Succeeded;
+			}
+			catch (OverflowException)
+			{
+				result = TokenResult.FailedTokenOverflow;
+			}
+			finally
+			{
+				e.Connection.Send (new TokenResultMessage (result, (client != null) ? client.Token : 0));
+			}
 		}
 
 		protected void UserLoginAttempt (MessageReceivedEventArgs e)

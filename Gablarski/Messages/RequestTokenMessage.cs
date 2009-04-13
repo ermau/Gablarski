@@ -13,7 +13,13 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public int AuthHash
+		public RequestTokenMessage (Version clientVersion)
+			: base (ClientMessageType.RequestToken)
+		{
+			this.ClientVersion = clientVersion;
+		}
+
+		public Version ClientVersion
 		{
 			get;
 			set;
@@ -21,12 +27,12 @@ namespace Gablarski.Messages
 
 		public override void WritePayload (IValueWriter writer)
 		{
-			writer.WriteInt32 (this.AuthHash);
+			writer.WriteVersion (this.ClientVersion);
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
-			this.AuthHash = reader.ReadInt32 ();
+			this.ClientVersion = reader.ReadVersion ();
 		}
 	}
 }
