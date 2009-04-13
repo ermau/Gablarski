@@ -13,6 +13,18 @@ namespace Gablarski.Messages
 		{
 		}
 
+		public SourceMessage (SourceResult SourceResult)
+			: this (ServerMessageType.Source)
+		{
+
+		}
+
+		public SourceResult SourceResult
+		{
+			get;
+			set;
+		}
+
 		public override void WritePayload (IValueWriter writer)
 		{
 			throw new NotImplementedException ();
@@ -22,5 +34,10 @@ namespace Gablarski.Messages
 		{
 			throw new NotImplementedException ();
 		}
+	}
+
+	public enum SourceResult
+		: byte
+	{
 	}
 }

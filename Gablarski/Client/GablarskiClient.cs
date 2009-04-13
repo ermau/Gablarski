@@ -14,6 +14,13 @@ namespace Gablarski.Client
 		public GablarskiClient (IClientConnection connection)
 		{
 			this.connection = connection;
+
+			this.Handlers = new Dictionary<ServerMessageType, Action<MessageReceivedEventArgs>>
+			{
+				{ ServerMessageType.Token, OnTokenReceived },
+				{ ServerMessageType.LoginResult, OnLoginResult },
+				{ ServerMessageType.SourceResult, OnSourceReceived }
+			};
 		}
 
 		public void Connect (string host, int port)
@@ -40,6 +47,13 @@ namespace Gablarski.Client
 			});
 		}
 
+		public void RequestSource (MediaType type, byte channels)
+		{
+			this.connection.Send (new RequestSourceMessage (this.token, type, channels));
+		}
+
+		private readonly Dictionary<ServerMessageType, Action<MessageReceivedEventArgs>> Handlers;
+
 		private readonly IClientConnection connection;
 		private int token;
 
@@ -54,12 +68,22 @@ namespace Gablarski.Client
 
 			Trace.WriteLine ("[Client] Message Received: " + msg.MessageType.ToString ());
 
-			switch (msg.MessageType)
-			{
-				case ServerMessageType.Token:
-					this.token = ((TokenMessage)msg).Token;
-					break;
-			}
+			this.Handlers[msg.MessageType] (e);
+		}
+
+		protected virtual void OnTokenReceived (MessageReceivedEventArgs e)
+		{
+			this.token = ((TokenMessage)e.Message).Token;
+		}
+
+		protected virtual void OnLoginResult (MessageReceivedEventArgs e)
+		{
+
+		}
+
+		protected virtual void OnSourceReceived (MessageReceivedEventArgs e)
+		{
+
 		}
 	}
 }

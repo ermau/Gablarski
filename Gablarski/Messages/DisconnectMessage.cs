@@ -9,7 +9,7 @@ namespace Gablarski.Messages
 		: ClientMessage
 	{
 		public DisconnectMessage ()
-			: base (ClientMessages.Disconnect)
+			: base (ClientMessageType.Disconnect)
 		{
 		}
 

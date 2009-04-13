@@ -10,14 +10,16 @@ namespace Gablarski.Server
 {
 	public class GablarskiServer
 	{
+		public static readonly Version MinimumClientVersion = new Version (0,0,1,0);
+
 		public GablarskiServer (IUserProvider userProvider)
 		{
 			this.userProvider = userProvider;
 
-			this.Handlers = new Dictionary<ClientMessages, Action<MessageReceivedEventArgs>>
+			this.Handlers = new Dictionary<ClientMessageType, Action<MessageReceivedEventArgs>>
 			{
-				{ ClientMessages.RequestToken, UserRequestsToken },
-				{ ClientMessages.Login, UserLoginAttempt }
+				{ ClientMessageType.RequestToken, UserRequestsToken },
+				{ ClientMessageType.Login, UserLoginAttempt }
 			};
 		}
 
@@ -78,7 +80,7 @@ namespace Gablarski.Server
 		
 		private readonly IUserProvider userProvider;
 
-		private readonly Dictionary<ClientMessages, Action<MessageReceivedEventArgs>> Handlers;
+		private readonly Dictionary<ClientMessageType, Action<MessageReceivedEventArgs>> Handlers;
 
 		protected virtual void OnMessageReceived (object sender, MessageReceivedEventArgs e)
 		{

@@ -9,7 +9,7 @@ namespace Gablarski.Messages
 		: ClientMessage
 	{
 		public LoginMessage ()
-			: base (ClientMessages.Login)
+			: base (ClientMessageType.Login)
 		{
 		}
 

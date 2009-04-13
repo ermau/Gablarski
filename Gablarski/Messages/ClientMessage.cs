@@ -9,9 +9,9 @@ namespace Gablarski.Messages
 	/// Client -> Server message
 	/// </summary>
 	public abstract class ClientMessage
-		: Message<ClientMessages>
+		: Message<ClientMessageType>
 	{
-		protected ClientMessage (ClientMessages messageType)
+		protected ClientMessage (ClientMessageType messageType)
 			: base (messageType)
 		{
 		}

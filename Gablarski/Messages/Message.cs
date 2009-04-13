@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Gablarski.Messages
 {
-	public enum ClientMessages
+	public enum ClientMessageType
 		: ushort
 	{
 		RequestToken = 1,
@@ -20,7 +20,7 @@ namespace Gablarski.Messages
 		Token = 2,
 		LoginResult = 4,
 		Disconnect = 6,
-		Source = 8
+		SourceResult = 8
 	}
 
 	public abstract class Message<TMessage>

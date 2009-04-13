@@ -9,7 +9,7 @@ namespace Gablarski.Messages
 		: ClientMessage
 	{
 		public RequestSourceMessage ()
-			: base (ClientMessages.RequestSource)
+			: base (ClientMessageType.RequestSource)
 		{
 		}
 
