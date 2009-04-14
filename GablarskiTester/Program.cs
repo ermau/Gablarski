@@ -35,7 +35,9 @@ namespace GablarskiTester
 
 		static void client_ReceivedLogin (object sender, ReceivedLoginEventArgs e)
 		{
-			Trace.WriteLine ("Login result: " + e.Result);
+			Trace.WriteLine ("Login result: " + e.Result.Succeeded + " " + e.Result.FailureReason);
+
+			client.RequestSource (Gablarski.MediaType.Voice, 1);
 		}
 
 		static void client_ReceivedTokenResult (object sender, ReceivedTokenEventArgs e)

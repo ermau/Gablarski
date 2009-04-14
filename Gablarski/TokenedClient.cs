@@ -21,6 +21,11 @@ namespace Gablarski
 		{
 		}
 
+		public bool Expired
+		{
+			get { return DateTime.Now.Subtract (this.Authenticated).TotalSeconds > TokenLifetime; }
+		}
+
 		public DateTime Authenticated
 		{
 			get;
@@ -42,6 +47,14 @@ namespace Gablarski
 		public void Send (MessageBase message)
 		{
 			this.Connection.Send (message);
+		}
+
+		public bool GetExpiredOrRefresh ()
+		{
+			if (!this.Expired)
+				this.Authenticated = DateTime.Now;
+
+			return this.Expired;
 		}
 
 		private static object connectionLock = new object ();
@@ -69,7 +82,19 @@ namespace Gablarski
 
 		public static TokenedClient GetTokenedClient (IConnection connection)
 		{
-			var authed = new TokenedClient (GetToken(), connection);
+			int token = 0;
+
+			while (true)
+			{
+				token = GetToken ();
+				lock (connectionLock)
+				{
+					if (!tokenedClients.ContainsKey (token))
+						break;
+				}
+			}
+
+			var authed = new TokenedClient (token, connection);
 			lock (connectionLock)
 			{
 				connections.Add (connection, authed);
@@ -87,11 +112,8 @@ namespace Gablarski
 				tokenedClients.TryGetValue (token, out client);
 			}
 
-			if (DateTime.Now.Subtract (client.Authenticated).TotalSeconds < TokenLifetime)
-			{
-				client.Authenticated = DateTime.Now;
+			if (!client.GetExpiredOrRefresh())
 				return client;
-			}
 			else
 			{
 				lock (connectionLock)

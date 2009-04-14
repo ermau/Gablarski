@@ -54,6 +54,7 @@ namespace Gablarski.Client
 
 			this.connection.Send (new LoginMessage
 			{
+				Token = token,
 				Nickname = nickname,
 				Username = username,
 				Password = password

@@ -83,6 +83,9 @@ namespace Gablarski.Server
 		
 		private readonly IUserProvider userProvider;
 
+		private object sourceLock = new object ();
+		private readonly Dictionary<TokenedClient, List<IMediaSource>> Sources = new Dictionary<TokenedClient, List<IMediaSource>> ();
+
 		private readonly Dictionary<ClientMessageType, Action<MessageReceivedEventArgs>> Handlers;
 
 		protected virtual void OnMessageReceived (object sender, MessageReceivedEventArgs e)
@@ -103,6 +106,7 @@ namespace Gablarski.Server
 
 		protected void UserRequestsSource (MessageReceivedEventArgs e)
 		{
+			
 		}
 
 		protected void UserRequestsToken (MessageReceivedEventArgs e)
@@ -133,7 +137,13 @@ namespace Gablarski.Server
 		protected void UserLoginAttempt (MessageReceivedEventArgs e)
 		{
 			var login = (LoginMessage)e.Message;
-			var result = this.userProvider.Login (login.Username, login.Password);
+			var client = TokenedClient.GetTokenedClient (login.Token);
+
+			LoginResult result = null;
+			if (client == null)
+				result = new LoginResult (false, "Invalid token.");
+			else
+				result = this.userProvider.Login (login.Username, login.Password);
 
 			e.Connection.Send (new LoginResultMessage (result));
 
