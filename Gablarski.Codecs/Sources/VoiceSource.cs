@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Gablarski.Media.Codecs;
 
-namespace Gablarski.MediaSources
+namespace Gablarski.Media.Sources
 {
 	public class VoiceSource
 		: IMediaSource

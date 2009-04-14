@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Threading;
 
-namespace Gablarski
+namespace Gablarski.Media.Sources
 {
 	/// <summary>
 	/// Media Sources
@@ -14,7 +14,7 @@ namespace Gablarski
 	/// <remarks>
 	/// All static members of this class are gauranteed to be thread-safe.
 	/// </remarks>
-	public static class Sources
+	public static class MediaSources
 	{
 		public static IMediaSource Create (Type sourceType, int sourceID)
 		{

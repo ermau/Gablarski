@@ -8,6 +8,7 @@ using System.Diagnostics;
 using Gablarski.Client;
 using System.Threading;
 using Gablarski.Messages;
+using Gablarski;
 
 namespace GablarskiTester
 {
@@ -37,7 +38,7 @@ namespace GablarskiTester
 		{
 			Trace.WriteLine ("Login result: " + e.Result.Succeeded + " " + e.Result.FailureReason);
 
-			client.RequestSource (Gablarski.MediaType.Voice, 1);
+			client.RequestSource (MediaType.Voice, 1);
 		}
 
 		static void client_ReceivedTokenResult (object sender, ReceivedTokenEventArgs e)

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Gablarski
+namespace Gablarski.Media.Codecs
 {
 	public interface IMediaCodec
 	{
@@ -50,33 +50,5 @@ namespace Gablarski
 		byte[] Decode (byte[] encoded, uint bitrate, uint quality);
 	}
 
-	/// <summary>
-	/// Media types
-	/// </summary>
-	[Flags]
-	public enum MediaTypes
-		: byte
-	{
-		/// <summary>
-		/// Voice (Players talking)
-		/// </summary>
-		Voice = 1,
-
-		/// <summary>
-		/// Music
-		/// </summary>
-		Music = 2,
-
-		/// <summary>
-		/// All types
-		/// </summary>
-		All = Voice | Music
-	}
-
-	public enum MediaType
-		: byte
-	{
-		Voice,
-		Music
-	}
+	
 }

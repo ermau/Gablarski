@@ -58,7 +58,6 @@
     <Compile Include="IClientConnection.cs" />
     <Compile Include="IConnection.cs" />
     <Compile Include="IConnectionProvider.cs" />
-    <Compile Include="IMediaCodec.cs" />
     <Compile Include="Messages\LoginResultMessage.cs" />
     <Compile Include="Messages\RequestSourceMessage.cs" />
     <Compile Include="Messages\SourceResultMessage.cs" />
@@ -83,11 +82,8 @@
     <Compile Include="Server\GablarskiServer.cs" />
     <Compile Include="Server\IUserProvider.cs" />
     <Compile Include="Server\Permission.cs" />
-    <Compile Include="Sources.cs" />
-    <Compile Include="IMediaSource.cs" />
     <Compile Include="OrderedDictionary.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="MediaSources\VoiceSource.cs" />
     <Compile Include="StreamValueReader.cs" />
     <Compile Include="StreamValueWriter.cs" />
     <Compile Include="TokenedClient.cs" />
@@ -98,6 +94,12 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>en-US.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Gablarski.Codecs\Gablarski.Codecs.csproj">
+      <Project>{3FA0CF5E-444C-49E0-BEAC-22D34F56140A}</Project>
+      <Name>Gablarski.Codecs</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

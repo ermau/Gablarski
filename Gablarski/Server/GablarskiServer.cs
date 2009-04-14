@@ -5,7 +5,7 @@ using System.Text;
 using Gablarski.Client;
 using Gablarski.Messages;
 using System.Diagnostics;
-using Gablarski.MediaSources;
+using Gablarski.Media.Sources;
 
 namespace Gablarski.Server
 {
@@ -125,7 +125,7 @@ namespace Gablarski.Server
 					sources[client].Add (null);
 				}
 
-				var source = Sources.Create (typeof (VoiceSource), sourceID);
+				var source = MediaSources.Create (typeof (VoiceSource), sourceID);
 				if (source != null)
 				{
 					lock (sourceLock)
