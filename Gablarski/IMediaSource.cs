@@ -10,11 +10,14 @@ namespace Gablarski
 		/// <summary>
 		/// Gets the ID of the source.
 		/// </summary>
-		uint ID { get; }
+		int ID { get; }
 
 		/// <summary>
 		/// Gets the type of the source.
 		/// </summary>
 		MediaType Type { get; }
+
+		IMediaCodec AudioCodec { get; }
+		IMediaCodec VideoCodec { get; }
 	}
 }

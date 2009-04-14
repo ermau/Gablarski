@@ -44,7 +44,10 @@ namespace Gablarski
 				rwl.ExitWriteLock ();
 			}
 
-			IMediaSource source = types[sourceType] (sourceID);
+			IMediaSource source = null;
+			if (types.ContainsKey (sourceType))
+				types[sourceType] (sourceID);
+
 			rwl.ExitUpgradeableReadLock ();
 
 			return source;

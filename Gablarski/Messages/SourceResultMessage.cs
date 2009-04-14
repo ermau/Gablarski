@@ -25,7 +25,7 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public uint SourceID
+		public int SourceID
 		{
 			get;
 			set;
@@ -33,12 +33,14 @@ namespace Gablarski.Messages
 
 		public override void WritePayload (IValueWriter writer)
 		{
-			throw new NotImplementedException ();
+			writer.WriteByte ((byte)this.SourceResult);
+			writer.WriteInt32 (this.SourceID);
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
-			throw new NotImplementedException ();
+			this.SourceResult = (SourceResult)reader.ReadByte ();
+			this.SourceID = reader.ReadInt32 ();
 		}
 	}
 
@@ -51,23 +53,28 @@ namespace Gablarski.Messages
 		Succeeded = 1,
 
 		/// <summary>
+		/// Failed for an unknown reason.
+		/// </summary>
+		FailedUnknown = 2,
+
+		/// <summary>
 		/// Failed because you or the server is at it's source limit.
 		/// </summary>
-		FailedLimit = 2,
+		FailedLimit = 3,
 
 		/// <summary>
 		/// Failed because you do not have sufficent permissions.
 		/// </summary>
-		FailedPermissions = 3,
+		FailedPermissions = 4,
 
 		/// <summary>
 		/// Failed because the MediaType requested is not allowed.
 		/// </summary>
-		FailedDisallowedType = 4,
+		FailedDisallowedType = 5,
 
 		/// <summary>
 		/// Failed because the server does not support the requested type.
 		/// </summary>
-		FailedNotSupportedType = 5,
+		FailedNotSupportedType = 6,
 	}
 }

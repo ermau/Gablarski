@@ -82,6 +82,12 @@ namespace Gablarski
 
 		public static TokenedClient GetTokenedClient (IConnection connection)
 		{
+			lock (connectionLock)
+			{
+				if (connections.ContainsKey (connection))
+					return connections[connection];
+			}
+
 			int token = 0;
 
 			while (true)

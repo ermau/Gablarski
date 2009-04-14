@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Gablarski
 {
-	public interface ICodec
+	public interface IMediaCodec
 	{
 		/// <summary>
 		/// Gets the name of the codec.

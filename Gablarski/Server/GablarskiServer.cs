@@ -5,6 +5,7 @@ using System.Text;
 using Gablarski.Client;
 using Gablarski.Messages;
 using System.Diagnostics;
+using Gablarski.MediaSources;
 
 namespace Gablarski.Server
 {
@@ -84,7 +85,7 @@ namespace Gablarski.Server
 		private readonly IUserProvider userProvider;
 
 		private object sourceLock = new object ();
-		private readonly Dictionary<TokenedClient, List<IMediaSource>> Sources = new Dictionary<TokenedClient, List<IMediaSource>> ();
+		private readonly Dictionary<TokenedClient, List<IMediaSource>> sources = new Dictionary<TokenedClient, List<IMediaSource>> ();
 
 		private readonly Dictionary<ClientMessageType, Action<MessageReceivedEventArgs>> Handlers;
 
@@ -106,7 +107,47 @@ namespace Gablarski.Server
 
 		protected void UserRequestsSource (MessageReceivedEventArgs e)
 		{
-			
+			var request = (RequestSourceMessage)e.Message;
+
+			SourceResult result = SourceResult.FailedUnknown;
+			int sourceID = 0;
+
+			var client = TokenedClient.GetTokenedClient (e.Connection);
+
+			try
+			{
+				lock (sourceLock)
+				{
+					if (!sources.ContainsKey (client))
+						sources.Add (client, new List<IMediaSource> ());
+
+					sourceID = sources.Sum (kvp => kvp.Value.Count);
+					sources[client].Add (null);
+				}
+
+				var source = Sources.Create (typeof (VoiceSource), sourceID);
+				if (source != null)
+				{
+					lock (sourceLock)
+					{
+						sources[client][sourceID] = source;
+					}
+
+					result = SourceResult.Succeeded;
+				}
+				else
+				{
+					result = SourceResult.FailedNotSupportedType;
+				}
+			}
+			catch (OverflowException)
+			{
+				result = SourceResult.FailedLimit;
+			}
+			finally
+			{
+				e.Connection.Send (new SourceResultMessage (result) { SourceID = sourceID });
+			}
 		}
 
 		protected void UserRequestsToken (MessageReceivedEventArgs e)
