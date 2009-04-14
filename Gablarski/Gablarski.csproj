@@ -60,7 +60,8 @@
     <Compile Include="IConnectionProvider.cs" />
     <Compile Include="Messages\LoginResultMessage.cs" />
     <Compile Include="Messages\RequestSourceMessage.cs" />
-    <Compile Include="Messages\SourceMessage.cs" />
+    <Compile Include="Messages\SourceResultMessage.cs" />
+    <Compile Include="Messages\TokenResultMessage.cs" />
     <Compile Include="Network\NetworkConnectionBase.cs" />
     <Compile Include="Network\ServerNetworkConnection.cs" />
     <Compile Include="Network\ServerNetworkConnectionProvider.cs" />
@@ -77,7 +78,6 @@
     <Compile Include="Messages\MessageBase.cs" />
     <Compile Include="Messages\RequestTokenMessage.cs" />
     <Compile Include="Messages\ServerMessage.cs" />
-    <Compile Include="Messages\TokenMessage.cs" />
     <Compile Include="Network\ClientNetworkConnection.cs" />
     <Compile Include="Server\GablarskiServer.cs" />
     <Compile Include="Server\IUserProvider.cs" />

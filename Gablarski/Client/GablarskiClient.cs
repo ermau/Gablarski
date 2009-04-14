@@ -45,14 +45,13 @@ namespace Gablarski.Client
 
 		public void Login (string nickname)
 		{
-			this.connection.Send (new LoginMessage
-			{
-				Nickname = nickname
-			});
+			Login (nickname, null, null);
 		}
 
 		public void Login (string nickname, string username, string password)
 		{
+			CheckToken ();
+
 			this.connection.Send (new LoginMessage
 			{
 				Nickname = nickname,
@@ -72,6 +71,12 @@ namespace Gablarski.Client
 		protected readonly IClientConnection connection;
 		protected int token;
 
+		protected void CheckToken ()
+		{
+			if (this.token == 0)
+				throw new InvalidOperationException ("Must receive token before attempting any action.");
+		}
+
 		protected virtual void OnMessageReceived (object sender, MessageReceivedEventArgs e)
 		{
 			var msg = (e.Message as ServerMessage);
@@ -80,6 +85,8 @@ namespace Gablarski.Client
 				connection.Disconnect ();
 				return;
 			}
+
+			Trace.WriteLine ("[Client] Message Received: " + msg.MessageType.ToString ());
 
 			this.Handlers[msg.MessageType] (e);
 		}

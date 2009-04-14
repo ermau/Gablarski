@@ -64,7 +64,8 @@ namespace Gablarski
 
 		public void WriteString (string value)
 		{
-			Write (Encoding.UTF8.GetBytes (value ?? "\0"));
+			value = (value ?? String.Empty) + '\0';
+			Write (Encoding.UTF8.GetBytes (value));
 		}
 
 		#endregion

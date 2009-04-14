@@ -87,30 +87,35 @@ namespace Gablarski.Network
 
 		private void Received (IAsyncResult read)
 		{
+			MessageBase msg = null;
+
 			this.rstream.EndRead (read);
 			byte[] mbuffer = (byte[])read.AsyncState;
 
-			if (mbuffer[0] != 0x2A)
-			{
-				this.Disconnect ();
-				return;
-			}
-
-			MessageBase msg = null;
 			try
 			{
+				if (mbuffer[0] != 0x2A)
+				{
+					this.Disconnect ();
+					return;
+				}
+
 				msg = MessageBase.MessageTypes[this.rreader.ReadUInt16 ()] ();
 				msg.ReadPayload (this.rreader);
 			}
 			catch (Exception e)
 			{
-				#if DEBUG
+#if DEBUG
 				throw e;
-				#else
+#else
 				Trace.WriteLine ("Error reading payload, disconnecting.");
 				this.Disconnect ();
 				return;
-				#endif
+#endif
+			}
+			finally
+			{
+				this.waiting = false;
 			}
 
 			this.OnMessageReceived (new MessageReceivedEventArgs (this, msg));
@@ -142,6 +147,8 @@ namespace Gablarski.Network
 
 					message.WritePayload (writer);
 				}
+
+				Thread.Sleep (1);
 			}
 		}
 	}

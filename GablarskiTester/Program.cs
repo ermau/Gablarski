@@ -13,21 +13,19 @@ namespace GablarskiTester
 {
 	class Program
 	{
+		static GablarskiServer server;
+		static GablarskiClient client;
+		static string username = "Rogue Jedi";
+
 		static void Main (string[] args)
 		{
-			Trace.Listeners.Add (new ConsoleTraceListener ());
-
-			Console.Write ("Username: ");
-			string username = Console.ReadLine ();
-
-			GablarskiServer server = new GablarskiServer (new GuestUserProvider ());
+			server = new GablarskiServer (new GuestUserProvider ());
 			server.AddConnectionProvider (new ServerNetworkConnectionProvider { Port = 6112 });
 
-			GablarskiClient client = new GablarskiClient (new ClientNetworkConnection ());
+			client = new GablarskiClient (new ClientNetworkConnection ());
 			client.ReceivedToken += client_ReceivedTokenResult;
 			client.ReceivedLogin += client_ReceivedLogin;
 			client.Connect ("localhost", 6112);
-			client.Login (username);
 
 			while (true)
 			{
@@ -37,12 +35,14 @@ namespace GablarskiTester
 
 		static void client_ReceivedLogin (object sender, ReceivedLoginEventArgs e)
 		{
-			Console.WriteLine ("Login result: " + e.Result);
+			Trace.WriteLine ("Login result: " + e.Result);
 		}
 
 		static void client_ReceivedTokenResult (object sender, ReceivedTokenEventArgs e)
 		{
-			Console.WriteLine ("Token result: " + e.Result);
+			Trace.WriteLine ("Token result: " + e.Result);
+
+			client.Login (username);
 		}
 	}
 }
