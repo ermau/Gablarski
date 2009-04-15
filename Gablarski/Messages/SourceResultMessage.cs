@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Gablarski.Media.Sources;
 
 namespace Gablarski.Messages
 {
@@ -13,10 +14,11 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public SourceResultMessage (SourceResult result)
+		public SourceResultMessage (SourceResult result, Type mediaSourceType)
 			: this ()
 		{
 			this.SourceResult = result;
+			this.MediaSourceType = mediaSourceType;
 		}
 
 		public SourceResult SourceResult
@@ -31,16 +33,29 @@ namespace Gablarski.Messages
 			set;
 		}
 
+		public Type MediaSourceType
+		{
+			get;
+			set;
+		}
+
+		public IMediaSource GetSource ()
+		{
+			return MediaSources.Create (this.MediaSourceType, this.SourceID);
+		}
+
 		public override void WritePayload (IValueWriter writer)
 		{
 			writer.WriteByte ((byte)this.SourceResult);
 			writer.WriteInt32 (this.SourceID);
+			writer.WriteString (this.MediaSourceType.AssemblyQualifiedName);
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
 			this.SourceResult = (SourceResult)reader.ReadByte ();
 			this.SourceID = reader.ReadInt32 ();
+			this.MediaSourceType = Type.GetType (reader.ReadString ());
 		}
 	}
 

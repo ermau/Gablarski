@@ -110,7 +110,7 @@ namespace Gablarski.Server
 			var request = (RequestSourceMessage)e.Message;
 
 			SourceResult result = SourceResult.FailedUnknown;
-			int sourceID = 0;
+			int sourceID = -1;
 
 			var client = TokenedClient.GetTokenedClient (e.Connection);
 
@@ -125,7 +125,7 @@ namespace Gablarski.Server
 					sources[client].Add (null);
 				}
 
-				var source = MediaSources.Create (typeof (VoiceSource), sourceID);
+				var source = MediaSources.Create (request.MediaSourceType, sourceID);
 				if (source != null)
 				{
 					lock (sourceLock)
@@ -136,9 +136,7 @@ namespace Gablarski.Server
 					result = SourceResult.Succeeded;
 				}
 				else
-				{
 					result = SourceResult.FailedNotSupportedType;
-				}
 			}
 			catch (OverflowException)
 			{
@@ -146,7 +144,7 @@ namespace Gablarski.Server
 			}
 			finally
 			{
-				e.Connection.Send (new SourceResultMessage (result) { SourceID = sourceID });
+				e.Connection.Send (new SourceResultMessage (result, request.MediaSourceType) { SourceID = sourceID });
 			}
 		}
 

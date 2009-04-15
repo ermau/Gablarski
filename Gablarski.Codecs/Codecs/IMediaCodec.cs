@@ -38,7 +38,7 @@ namespace Gablarski.Media.Codecs
 		/// <param name="data">The data to be encoded.</param>
 		/// <param name="bitrate">The bitrate to encode with.</param>
 		/// <param name="quality">The quality setting to encode with.</param>
-		void Encode (byte[] data, uint bitrate, uint quality);
+		byte[] Encode (byte[] data, uint bitrate, uint quality);
 
 		/// <summary>
 		/// Decodes the supplied <paramref name="encoded"/> data with the known <paramref name="bitrate"/> and <paramref name="quality"/>.

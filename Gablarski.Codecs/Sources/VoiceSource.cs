@@ -39,6 +39,6 @@ namespace Gablarski.Media.Sources
 
 		#endregion
 
-		private IMediaCodec codec;
+		private RawCodec codec = new RawCodec();
 	}
 }

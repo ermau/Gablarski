@@ -46,7 +46,7 @@ namespace Gablarski.Media.Sources
 
 			IMediaSource source = null;
 			if (types.ContainsKey (sourceType))
-				types[sourceType] (sourceID);
+				source = types[sourceType] (sourceID);
 
 			rwl.ExitUpgradeableReadLock ();
 

@@ -7,6 +7,7 @@ using Gablarski.Network;
 using Gablarski.Messages;
 using System.Diagnostics;
 using System.Reflection;
+using Gablarski.Media.Sources;
 
 namespace Gablarski.Client
 {
@@ -33,6 +34,7 @@ namespace Gablarski.Client
 		#region Events
 		public event EventHandler<ReceivedTokenEventArgs> ReceivedToken;
 		public event EventHandler<ReceivedLoginEventArgs> ReceivedLogin;
+		public event EventHandler<ReceivedSourceEventArgs> ReceivedSource;
 		#endregion
 
 		#region Public Methods
@@ -61,9 +63,9 @@ namespace Gablarski.Client
 			});
 		}
 
-		public void RequestSource (MediaType type, byte channels)
+		public void RequestSource (Type mediaSourceType, byte channels)
 		{
-			this.connection.Send (new RequestSourceMessage (this.token, type, channels));
+			this.connection.Send (new RequestSourceMessage (this.token, mediaSourceType, channels));
 		}
 		#endregion
 
@@ -71,6 +73,9 @@ namespace Gablarski.Client
 		protected readonly Dictionary<ServerMessageType, Action<MessageReceivedEventArgs>> Handlers;
 		protected readonly IClientConnection connection;
 		protected int token;
+
+		private object sourceLock = new object ();
+		private List<IMediaSource> sources = new List<IMediaSource> ();
 
 		protected void CheckToken ()
 		{
@@ -121,7 +126,16 @@ namespace Gablarski.Client
 
 		protected void OnSourceReceived (MessageReceivedEventArgs e)
 		{
+			var sourceMessage = (SourceResultMessage)e.Message;
 
+			OnReceivedSourceResult (new ReceivedSourceEventArgs (sourceMessage.GetSource (), sourceMessage.SourceResult));
+		}
+
+		protected virtual void OnReceivedSourceResult (ReceivedSourceEventArgs e)
+		{
+			var received = this.ReceivedSource;
+			if (received != null)
+				received (this, e);
 		}
 		#endregion
 	}
@@ -153,6 +167,28 @@ namespace Gablarski.Client
 		{
 			get;
 			private set;
+		}
+	}
+
+	public class ReceivedSourceEventArgs
+		: EventArgs
+	{
+		public ReceivedSourceEventArgs (IMediaSource source, SourceResult result)
+		{
+			this.Result = result;
+			this.Source = source;
+		}
+
+		public SourceResult Result
+		{
+			get;
+			set;
+		}
+
+		public IMediaSource Source
+		{
+			get;
+			set;
 		}
 	}
 }

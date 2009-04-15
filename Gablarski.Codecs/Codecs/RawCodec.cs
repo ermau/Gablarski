@@ -12,37 +12,37 @@ namespace Gablarski.Media.Codecs
 
 		public string Name
 		{
-			get { throw new NotImplementedException (); }
+			get { return "Raw"; }
 		}
 
 		public MediaTypes SupportedTypes
 		{
-			get { throw new NotImplementedException (); }
+			get { return MediaTypes.All; }
 		}
 
 		public IEnumerable<uint> Bitrates
 		{
-			get { throw new NotImplementedException (); }
+			get { return new uint[] { 705600 }; }
 		}
 
 		public uint MaxQuality
 		{
-			get { throw new NotImplementedException (); }
+			get { return 1; }
 		}
 
 		public uint MinQuality
 		{
-			get { throw new NotImplementedException (); }
+			get { return 1; }
 		}
 
-		public void Encode (byte[] data, uint bitrate, uint quality)
+		public byte[] Encode (byte[] data, uint bitrate, uint quality)
 		{
-			throw new NotImplementedException ();
+			return data;
 		}
 
 		public byte[] Decode (byte[] encoded, uint bitrate, uint quality)
 		{
-			throw new NotImplementedException ();
+			return encoded;
 		}
 
 		#endregion
