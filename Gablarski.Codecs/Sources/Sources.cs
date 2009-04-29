@@ -18,6 +18,9 @@ namespace Gablarski.Media.Sources
 	{
 		public static IMediaSource Create (Type sourceType, int sourceID)
 		{
+			if (sourceType == null)
+				throw new ArgumentNullException("sourceType");
+
 			if (sourceType.GetInterface ("IMediaSource") == null)
 				throw new InvalidOperationException ("Not media source type.");
 

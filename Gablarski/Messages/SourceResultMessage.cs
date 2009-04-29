@@ -21,6 +21,12 @@ namespace Gablarski.Messages
 			this.MediaSourceType = mediaSourceType;
 		}
 
+		public SourceResultMessage (SourceResult result, Type mediaSourceType, int ownerID)
+			: this (result, mediaSourceType)
+		{
+			this.OwnerID = ownerID;
+		}
+
 		public SourceResult SourceResult
 		{
 			get;
@@ -33,7 +39,18 @@ namespace Gablarski.Messages
 			set;
 		}
 
+		public string MediaSourceTypeName
+		{
+			get; set;
+		}
+
 		public Type MediaSourceType
+		{
+			get { return Type.GetType (this.MediaSourceTypeName); }
+			set { this.MediaSourceTypeName = value.AssemblyQualifiedName; }
+		}
+
+		public int OwnerID
 		{
 			get;
 			set;
@@ -48,20 +65,31 @@ namespace Gablarski.Messages
 		{
 			writer.WriteByte ((byte)this.SourceResult);
 			writer.WriteInt32 (this.SourceID);
-			writer.WriteString (this.MediaSourceType.AssemblyQualifiedName);
+			writer.WriteString (this.MediaSourceTypeName);
+
+			if (this.SourceResult == SourceResult.NewSource)
+				writer.WriteInt32 (this.OwnerID);
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
 			this.SourceResult = (SourceResult)reader.ReadByte ();
 			this.SourceID = reader.ReadInt32 ();
-			this.MediaSourceType = Type.GetType (reader.ReadString ());
+			this.MediaSourceTypeName = reader.ReadString();
+
+			if (this.SourceResult == SourceResult.NewSource)
+				this.OwnerID = reader.ReadInt32 ();
 		}
 	}
 
 	public enum SourceResult
 		: byte
 	{
+		/// <summary>
+		/// Another users new source.
+		/// </summary>
+		NewSource = 0,
+
 		/// <summary>
 		/// The source was successfully requested.
 		/// </summary>

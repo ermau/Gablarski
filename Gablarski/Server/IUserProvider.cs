@@ -28,15 +28,27 @@ namespace Gablarski
 	/// </summary>
 	public class LoginResult
 	{
-		public LoginResult (bool success)
+		internal LoginResult (IValueReader reader)
 		{
+			this.Deserialize (reader);
+		}
+
+		public LoginResult (long userId, bool success)
+		{
+			this.PlayerId = userId;
 			this.Succeeded = success;
 		}
 
 		public LoginResult (bool success, string failureReason)
-			: this (success)
+			: this (0, success)
 		{
 			this.FailureReason = failureReason;
+		}
+
+		public long PlayerId
+		{
+			get;
+			private set;
 		}
 
 		/// <summary>
@@ -55,6 +67,20 @@ namespace Gablarski
 		{
 			get;
 			private set;
+		}
+
+		internal void Serialize (IValueWriter writer)
+		{
+			writer.WriteBool (this.Succeeded);
+			writer.WriteInt64 (this.PlayerId);
+			writer.WriteString (this.FailureReason);
+		}
+
+		internal void Deserialize (IValueReader reader)
+		{
+			this.Succeeded = reader.ReadBool();
+			this.PlayerId = reader.ReadInt64();
+			this.FailureReason = reader.ReadString ();
 		}
 	}
 }

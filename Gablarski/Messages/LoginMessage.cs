@@ -13,12 +13,6 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public int Token
-		{
-			get;
-			set;
-		}
-
 		public string Nickname
 		{
 			get;
@@ -44,7 +38,6 @@ namespace Gablarski.Messages
 			if (String.IsNullOrEmpty (this.Password) && !guest)
 				throw new InvalidOperationException ("Can not login without a password.");
 
-			writer.WriteInt32 (this.Token);
 			writer.WriteBool (guest);
 			writer.WriteString (Nickname);
 
@@ -57,7 +50,6 @@ namespace Gablarski.Messages
 
 		public override void ReadPayload (IValueReader reader)
 		{
-			this.Token = reader.ReadInt32 ();
 			bool guest = reader.ReadBool ();
 
 			this.Nickname = reader.ReadString ();

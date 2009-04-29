@@ -13,18 +13,11 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public RequestSourceMessage (int token, Type mediaSourceType, byte channels)
+		public RequestSourceMessage (Type mediaSourceType, byte channels)
 			: this ()
 		{
-			this.Token = token;
 			this.MediaSourceType = mediaSourceType;
 			this.Channels = channels;
-		}
-
-		public int Token
-		{
-			get;
-			set;
 		}
 
 		public Type MediaSourceType
@@ -41,14 +34,12 @@ namespace Gablarski.Messages
 
 		public override void WritePayload (IValueWriter writer)
 		{
-			writer.WriteInt32 (this.Token);
 			writer.WriteString (this.MediaSourceType.AssemblyQualifiedName);
 			writer.WriteByte ((byte)this.Channels);
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
-			this.Token = reader.ReadInt32 ();
 			this.MediaSourceType = Type.GetType (reader.ReadString ());
 			this.Channels = reader.ReadByte ();
 		}

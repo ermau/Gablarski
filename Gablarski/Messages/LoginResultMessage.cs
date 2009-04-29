@@ -27,13 +27,12 @@ namespace Gablarski.Messages
 
 		public override void ReadPayload (IValueReader reader)
 		{
-			this.Result = new LoginResult (reader.ReadByte () == 1, reader.ReadString ());
+			this.Result = new LoginResult(reader);
 		}
 
 		public override void WritePayload (IValueWriter writer)
 		{
-			writer.WriteBool (this.Result.Succeeded);
-			writer.WriteString (this.Result.FailureReason);
+			this.Result.Serialize (writer);
 		}
 	}
 }

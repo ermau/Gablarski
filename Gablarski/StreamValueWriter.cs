@@ -22,6 +22,12 @@ namespace Gablarski
 			set;
 		}
 
+		public void WriteBytes (byte[] value)
+		{
+			WriteInt32 (value.Length);
+			Write (value);
+		}
+
 		public void WriteSByte (sbyte value)
 		{
 			Write (new byte[] { (byte)value });
@@ -67,7 +73,6 @@ namespace Gablarski
 			value = (value ?? String.Empty) + '\0';
 			Write (Encoding.UTF8.GetBytes (value));
 		}
-
 		#endregion
 
 		private readonly Stream baseStream;
@@ -75,7 +80,7 @@ namespace Gablarski
 		private void Write (byte[] buffer)
 		{
 			baseStream.Write (buffer, 0, buffer.Length);
-			
+
 			if (this.AutoFlush)
 				baseStream.Flush ();
 		}

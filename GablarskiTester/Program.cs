@@ -21,11 +21,16 @@ namespace GablarskiTester
 
 		static void Main (string[] args)
 		{
-			server = new GablarskiServer (new GuestUserProvider ());
+			server = new GablarskiServer (new ServerInfo
+			{
+				ServerName = "Rogue Jedi's Server",
+				ServerDescription = "Development Server",
+			}, new GuestUserProvider ());
+
 			server.AddConnectionProvider (new ServerNetworkConnectionProvider { Port = 6112 });
 
 			client = new GablarskiClient (new ClientNetworkConnection ());
-			client.ReceivedToken += client_ReceivedTokenResult;
+			client.Login (username);
 			client.ReceivedLogin += client_ReceivedLogin;
 			client.ReceivedSource += client_ReceivedSource;
 			client.Connect ("localhost", 6112);
@@ -46,13 +51,6 @@ namespace GablarskiTester
 			Trace.WriteLine ("Login result: " + e.Result.Succeeded + " " + e.Result.FailureReason);
 
 			client.RequestSource (typeof(VoiceSource), 1);
-		}
-
-		static void client_ReceivedTokenResult (object sender, ReceivedTokenEventArgs e)
-		{
-			Trace.WriteLine ("Token result: " + e.Result);
-
-			client.Login (username);
 		}
 	}
 }

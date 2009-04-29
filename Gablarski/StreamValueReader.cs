@@ -15,6 +15,12 @@ namespace Gablarski
 		}
 
 		#region IValueReader Members
+		public byte[] ReadBytes ()
+		{
+			int length = ReadInt32 ();
+			return baseStream.ReadBytes (length);
+		}
+
 		public sbyte ReadSByte ()
 		{
 			return (sbyte)this.baseStream.ReadByte ();

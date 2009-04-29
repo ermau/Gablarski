@@ -7,6 +7,8 @@ namespace Gablarski
 {
 	public interface IValueReader
 	{
+		byte[] ReadBytes ();
+
 		SByte ReadSByte ();
 		Int16 ReadInt16 ();
 		Int32 ReadInt32 ();
@@ -30,6 +32,11 @@ namespace Gablarski
 		public static Version ReadVersion (this IValueReader reader)
 		{
 			return new Version (reader.ReadInt32 (), reader.ReadInt32 (), reader.ReadInt32 (), reader.ReadInt32 ());
+		}
+
+		public static Type ReadType (this IValueReader reader)
+		{
+			return Type.GetType (reader.ReadString ());
 		}
 	}
 }

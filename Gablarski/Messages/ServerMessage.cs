@@ -5,6 +5,9 @@ using System.Text;
 
 namespace Gablarski.Messages
 {
+	/// <summary>
+	/// Server -> Client message
+	/// </summary>
 	public abstract class ServerMessage
 		: Message<ServerMessageType>
 	{

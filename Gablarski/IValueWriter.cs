@@ -8,6 +8,8 @@ namespace Gablarski
 	public interface IValueWriter
 	{
 		bool AutoFlush { get; set; }
+		
+		void WriteBytes (byte[] value);
 
 		void WriteSByte (SByte value);
 		void WriteInt16 (Int16 value);
@@ -35,6 +37,11 @@ namespace Gablarski
 			writer.WriteInt32 (version.Minor);
 			writer.WriteInt32 (version.Build);
 			writer.WriteInt32 (version.Revision);
+		}
+
+		public static void WriteType (this IValueWriter writer, Type value)
+		{
+			writer.WriteString (value.AssemblyQualifiedName);
 		}
 	}
 }

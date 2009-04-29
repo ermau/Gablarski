@@ -13,13 +13,13 @@ namespace Gablarski.Server
 	{
 		public static readonly Version MinimumClientVersion = new Version (0,0,1,0);
 
-		public GablarskiServer (IUserProvider userProvider)
+		public GablarskiServer (ServerInfo serverInfo, IUserProvider userProvider)
 		{
+			this.serverInfo = serverInfo;
 			this.userProvider = userProvider;
 
 			this.Handlers = new Dictionary<ClientMessageType, Action<MessageReceivedEventArgs>>
 			{
-				{ ClientMessageType.RequestToken, UserRequestsToken },
 				{ ClientMessageType.Login, UserLoginAttempt },
 				{ ClientMessageType.RequestSource, UserRequestsSource }
 			};
@@ -30,7 +30,7 @@ namespace Gablarski.Server
 		{
 			get
 			{
-				lock (connectionLock)
+				lock (availableConnectionLock)
 				{
 					return this.availableConnections.ToArray ();
 				}
@@ -50,7 +50,7 @@ namespace Gablarski.Server
 			connection.ConnectionMade += OnConnectionMade;
 			connection.StartListening ();
 
-			lock (connectionLock)
+			lock (availableConnectionLock)
 			{
 				this.availableConnections.Add (connection);
 			}
@@ -63,7 +63,7 @@ namespace Gablarski.Server
 			connection.StopListening ();
 			connection.ConnectionMade -= this.OnConnectionMade;
 
-			lock (connectionLock)
+			lock (availableConnectionLock)
 			{
 				this.availableConnections.Remove (connection);
 			}
@@ -79,20 +79,22 @@ namespace Gablarski.Server
 		}
 		#endregion
 
-		private readonly object connectionLock = new object();
+		private readonly ServerInfo serverInfo = new ServerInfo();
+
+		private readonly object availableConnectionLock = new object();
 		private List<IConnectionProvider> availableConnections = new List<IConnectionProvider> ();
 		
 		private readonly IUserProvider userProvider;
 
 		private object sourceLock = new object ();
-		private readonly Dictionary<TokenedClient, List<IMediaSource>> sources = new Dictionary<TokenedClient, List<IMediaSource>> ();
+		private readonly Dictionary<IConnection, List<IMediaSource>> sources = new Dictionary<IConnection, List<IMediaSource>> ();
+
+		private readonly ConnectionCollection connections = new ConnectionCollection();
 
 		private readonly Dictionary<ClientMessageType, Action<MessageReceivedEventArgs>> Handlers;
 
 		protected virtual void OnMessageReceived (object sender, MessageReceivedEventArgs e)
 		{
-			/* If a connection sends a garbage message or something invalid,
-			 * the provider should 'send' a disconnected message. */
 			var msg = (e.Message as ClientMessage);
 			if (msg == null)
 			{
@@ -100,7 +102,7 @@ namespace Gablarski.Server
 				return;
 			}
 
-			Trace.WriteLine ("[Server] Message Received: " + msg.MessageType.ToString ());
+			Trace.WriteLine ("[Server] Message Received: " + msg.MessageType);
 
 			this.Handlers[msg.MessageType] (e);
 		}
@@ -112,17 +114,15 @@ namespace Gablarski.Server
 			SourceResult result = SourceResult.FailedUnknown;
 			int sourceID = -1;
 
-			var client = TokenedClient.GetTokenedClient (e.Connection);
-
 			try
 			{
 				lock (sourceLock)
 				{
-					if (!sources.ContainsKey (client))
-						sources.Add (client, new List<IMediaSource> ());
+					if (!sources.ContainsKey (e.Connection))
+						sources.Add (e.Connection, new List<IMediaSource> ());
 
 					sourceID = sources.Sum (kvp => kvp.Value.Count);
-					sources[client].Add (null);
+					sources[e.Connection].Add (null);
 				}
 
 				var source = MediaSources.Create (request.MediaSourceType, sourceID);
@@ -130,7 +130,7 @@ namespace Gablarski.Server
 				{
 					lock (sourceLock)
 					{
-						sources[client][sourceID] = source;
+						sources[e.Connection][sourceID] = source;
 					}
 
 					result = SourceResult.Succeeded;
@@ -145,51 +145,31 @@ namespace Gablarski.Server
 			finally
 			{
 				e.Connection.Send (new SourceResultMessage (result, request.MediaSourceType) { SourceID = sourceID });
-			}
-		}
-
-		protected void UserRequestsToken (MessageReceivedEventArgs e)
-		{
-			TokenedClient client = null;
-			TokenResult result = TokenResult.FailedUnknown;
-
-			var request = (RequestTokenMessage)e.Message;
-			if (request.ClientVersion < MinimumClientVersion)
-				result = TokenResult.FailedClientVersion;
-
-			try
-			{
-				client = TokenedClient.GetTokenedClient (e.Connection);
-				if (client != null)
-					result = TokenResult.Succeeded;
-			}
-			catch (OverflowException)
-			{
-				result = TokenResult.FailedTokenOverflow;
-			}
-			finally
-			{
-				e.Connection.Send (new TokenResultMessage (result, (client != null) ? client.Token : 0));
+				if (result == SourceResult.Succeeded)
+				{
+					connections.Send (new SourceResultMessage (SourceResult.NewSource, request.MediaSourceType) {SourceID = sourceID},
+					                  c => c != e.Connection);
+				}
 			}
 		}
 
 		protected void UserLoginAttempt (MessageReceivedEventArgs e)
 		{
 			var login = (LoginMessage)e.Message;
-			var client = TokenedClient.GetTokenedClient (login.Token);
 
-			LoginResult result = null;
-			if (client == null)
-				result = new LoginResult (false, "Invalid token.");
-			else
-				result = this.userProvider.Login (login.Username, login.Password);
+			LoginResult result = this.userProvider.Login (login.Username, login.Password);
 
 			e.Connection.Send (new LoginResultMessage (result));
 
-			Trace.WriteLine ("[Server]" + login.Username + " Login: " + result.Succeeded + ". " + (result.FailureReason ?? String.Empty));
-
-			if (!result.Succeeded)
+			if (result.Succeeded)
+			{
+				this.connections.Add (e.Connection, new PlayerInfo (login.Nickname, result.PlayerId));
+				// TODO: broadcast
+			}
+			else
 				e.Connection.Disconnect ();
+
+			Trace.WriteLine ("[Server]" + login.Username + " Login: " + result.Succeeded + ". " + (result.FailureReason ?? String.Empty));
 		}
 		
 		protected virtual void OnConnectionMade (object sender, ConnectionEventArgs e)
@@ -197,6 +177,7 @@ namespace Gablarski.Server
 			Trace.WriteLine ("[Server] Connection Made");
 
 			e.Connection.MessageReceived += this.OnMessageReceived;
+			e.Connection.Send (new ServerInfoMessage (this.serverInfo));
 		}
 	}
 }

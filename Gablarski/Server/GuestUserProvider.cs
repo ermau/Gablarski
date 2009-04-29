@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Threading;
 
 namespace Gablarski.Server
 {
@@ -9,7 +7,6 @@ namespace Gablarski.Server
 		: IUserProvider
 	{
 		#region IUserProvider Members
-
 		public bool UserExists (string username)
 		{
 			return false;
@@ -17,11 +14,11 @@ namespace Gablarski.Server
 
 		public LoginResult Login (string username, string password)
 		{
-			return new LoginResult (true);
+			return new LoginResult (Interlocked.Increment (ref this.nextUserId), true);
 		}
 
 		#endregion
 
-		private object userLock = new object ();
+		private int nextUserId = 0;
 	}
 }
