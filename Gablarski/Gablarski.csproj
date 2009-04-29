@@ -59,8 +59,9 @@
     <Compile Include="IConnection.cs" />
     <Compile Include="IConnectionProvider.cs" />
     <Compile Include="MediaSourceInfo.cs" />
+    <Compile Include="Messages\AudioDataReceivedMessage.cs" />
     <Compile Include="Messages\LoginResultMessage.cs" />
-    <Compile Include="Messages\MediaDataMessage.cs" />
+    <Compile Include="Messages\SendAudioDataMessage.cs" />
     <Compile Include="Messages\PlayerListMessage.cs" />
     <Compile Include="Messages\RequestSourceMessage.cs" />
     <Compile Include="Messages\ServerInfoMessage.cs" />

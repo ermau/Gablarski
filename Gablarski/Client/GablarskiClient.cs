@@ -29,14 +29,30 @@ namespace Gablarski.Client
 				{ ServerMessageType.PlayerListReceived, OnPlayerListReceived },
 				{ ServerMessageType.SourceListReceived, OnSourceListReceived },
 				{ ServerMessageType.LoginResult, OnLoginResult },
-				{ ServerMessageType.SourceResult, OnSourceReceived }
+				{ ServerMessageType.SourceResult, OnSourceReceived },
+				{ ServerMessageType.AudioDataReceived, OnReceivedAudio }
 			};
 		}
 
 		#region Events
 		public event EventHandler<ReceivedLoginEventArgs> ReceivedLogin;
 		public event EventHandler<ReceivedSourceEventArgs> ReceivedSource;
+		public event EventHandler<ReceivedAudioEventArgs> ReceivedAudioData;
 		#endregion
+
+		public IMediaSource VoiceSource
+		{
+			get
+			{
+				IMediaSource source = null;
+				lock (sourceLock)
+				{
+					this.clientSources.TryGetValue (MediaType.Voice, out source);
+				}
+
+				return source;
+			}
+		}
 
 		#region Public Methods
 		public void Connect (string host, int port)
@@ -64,6 +80,13 @@ namespace Gablarski.Client
 		{
 			this.connection.Send (new RequestSourceMessage (mediaSourceType, channels));
 		}
+
+		public void SendAudioData (IMediaSource source, byte[] data)
+		{
+			// TODO: Add bitrate transmision etc
+			byte[] encoded = source.AudioCodec.Encode (data, source.AudioCodec.Bitrates.First(), source.AudioCodec.MaxQuality);
+			this.connection.Send (new SendAudioDataMessage (source.ID, encoded));
+		}
 		#endregion
 
 		#region Internals
@@ -75,7 +98,19 @@ namespace Gablarski.Client
 		protected readonly IClientConnection connection;
 
 		private object sourceLock = new object ();
-		private List<IMediaSource> sources = new List<IMediaSource> ();
+		private Dictionary<MediaType, IMediaSource> clientSources = new Dictionary<MediaType, IMediaSource> ();
+		private Dictionary<int, IMediaSource> allSources = new Dictionary<int, IMediaSource>();
+
+		protected void AddSource (IMediaSource source, bool mine)
+		{
+			lock (sourceLock)
+			{
+				this.allSources.Add (source.ID, source);
+
+				if (mine)
+					this.clientSources.Add (source.Type, source);
+			}
+		}
 
 		protected virtual void OnMessageReceived (object sender, MessageReceivedEventArgs e)
 		{
@@ -86,7 +121,7 @@ namespace Gablarski.Client
 				return;
 			}
 
-			Trace.WriteLine ("[Client] Message Received: " + msg.MessageType.ToString ());
+			Trace.WriteLine ("[Client] Message Received: " + msg.MessageType);
 
 			this.Handlers[msg.MessageType] (e);
 		}
@@ -136,10 +171,7 @@ namespace Gablarski.Client
 			else if (sourceMessage.SourceResult == SourceResult.Succeeded || sourceMessage.SourceResult == SourceResult.NewSource)
 			{
 				source = sourceMessage.GetSource();
-				lock (sourceLock)
-				{
-					this.sources.Add (source);
-				}
+				this.AddSource (source, (sourceMessage.SourceResult == SourceResult.Succeeded));
 			}
 
 			OnReceivedSourceResult (new ReceivedSourceEventArgs (source, sourceMessage.SourceResult));
@@ -151,7 +183,42 @@ namespace Gablarski.Client
 			if (received != null)
 				received (this, e);
 		}
+
+		protected void OnReceivedAudio (MessageReceivedEventArgs e)
+		{
+			var msg = (AudioDataReceivedMessage) e.Message;
+			OnReceivedAudioData (new ReceivedAudioEventArgs (this.allSources[msg.SourceId], msg.Data));
+		}
+
+		protected virtual void OnReceivedAudioData (ReceivedAudioEventArgs e)
+		{
+			var received = this.ReceivedAudioData;
+			if (received != null)
+				received (this, e);
+		}
 		#endregion
+	}
+
+	public class ReceivedAudioEventArgs
+		: EventArgs
+	{
+		public ReceivedAudioEventArgs (IMediaSource source, byte[] data)
+		{
+			this.Source = source;
+			this.AudioData = data;
+		}
+
+		public IMediaSource Source
+		{
+			get;
+			set;
+		}
+
+		public byte[] AudioData
+		{
+			get;
+			set;
+		}
 	}
 
 	public class ReceivedLoginEventArgs

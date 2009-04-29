@@ -21,7 +21,8 @@ namespace Gablarski.Server
 			this.Handlers = new Dictionary<ClientMessageType, Action<MessageReceivedEventArgs>>
 			{
 				{ ClientMessageType.Login, UserLoginAttempt },
-				{ ClientMessageType.RequestSource, UserRequestsSource }
+				{ ClientMessageType.RequestSource, ClientRequestsSource },
+				{ ClientMessageType.AudioData, AudioDataReceived }
 			};
 		}
 
@@ -107,7 +108,14 @@ namespace Gablarski.Server
 			this.Handlers[msg.MessageType] (e);
 		}
 
-		protected void UserRequestsSource (MessageReceivedEventArgs e)
+		protected void AudioDataReceived (MessageReceivedEventArgs e)
+		{
+			var msg = (SendAudioDataMessage) e.Message;
+
+			this.connections.Send (new AudioDataReceivedMessage (msg.SourceId, msg.Data), c => true);
+		}
+
+		protected void ClientRequestsSource (MessageReceivedEventArgs e)
 		{
 			var request = (RequestSourceMessage)e.Message;
 			
