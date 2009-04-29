@@ -15,6 +15,7 @@ namespace Gablarski.Messages
 		MediaData = 9,
 		RequestServerInfo = 11,
 		RequestPlayerList = 13,
+		RequestSourceList = 15,
 	}
 
 	public enum ServerMessageType
@@ -26,7 +27,8 @@ namespace Gablarski.Messages
 		SourceResult = 8,
 		MediaDataReceived = 10,
 		ServerInfoReceived = 12,
-		PlayerListReceived = 14
+		PlayerListReceived = 14,
+		SourceListReceived = 16,
 	}
 
 	public abstract class Message<TMessage>

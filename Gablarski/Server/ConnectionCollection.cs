@@ -19,6 +19,36 @@ namespace Gablarski.Server
 			}
 		}
 
+		public IEnumerable<PlayerInfo> Players
+		{
+			get
+			{
+				lock (lck)
+				{
+					PlayerInfo[] copiedPlayers = new PlayerInfo[this.players.Count];
+					this.players.Values.CopyTo (copiedPlayers, 0);
+
+					return copiedPlayers;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Gets the player Id for the connection, 0 if the connection wasn't found.
+		/// </summary>
+		public long GetPlayerId (IConnection connection)
+		{
+			long id = 0;
+			
+			lock (lck)
+			{
+				if (this.players.ContainsKey (connection))
+					id = this.players[connection].PlayerId;
+			}
+
+			return id;
+		}
+
 		public void Add (IConnection connection)
 		{
 			lock (lck)

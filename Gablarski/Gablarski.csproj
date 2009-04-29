@@ -58,11 +58,13 @@
     <Compile Include="IClientConnection.cs" />
     <Compile Include="IConnection.cs" />
     <Compile Include="IConnectionProvider.cs" />
+    <Compile Include="MediaSourceInfo.cs" />
     <Compile Include="Messages\LoginResultMessage.cs" />
     <Compile Include="Messages\MediaDataMessage.cs" />
     <Compile Include="Messages\PlayerListMessage.cs" />
     <Compile Include="Messages\RequestSourceMessage.cs" />
     <Compile Include="Messages\ServerInfoMessage.cs" />
+    <Compile Include="Messages\SourceListMessage.cs" />
     <Compile Include="Messages\SourceResultMessage.cs" />
     <Compile Include="Network\NetworkConnectionBase.cs" />
     <Compile Include="Network\ServerNetworkConnection.cs" />

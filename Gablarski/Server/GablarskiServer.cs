@@ -110,10 +110,11 @@ namespace Gablarski.Server
 		protected void UserRequestsSource (MessageReceivedEventArgs e)
 		{
 			var request = (RequestSourceMessage)e.Message;
-
+			
 			SourceResult result = SourceResult.FailedUnknown;
-			int sourceID = -1;
+			int sourceId = -1;
 
+			IMediaSource source = null;
 			try
 			{
 				lock (sourceLock)
@@ -121,16 +122,16 @@ namespace Gablarski.Server
 					if (!sources.ContainsKey (e.Connection))
 						sources.Add (e.Connection, new List<IMediaSource> ());
 
-					sourceID = sources.Sum (kvp => kvp.Value.Count);
+					sourceId = sources.Sum (kvp => kvp.Value.Count);
 					sources[e.Connection].Add (null);
 				}
 
-				var source = MediaSources.Create (request.MediaSourceType, sourceID);
+				source = MediaSources.Create (request.MediaSourceType, sourceId);
 				if (source != null)
 				{
 					lock (sourceLock)
 					{
-						sources[e.Connection][sourceID] = source;
+						sources[e.Connection][sourceId] = source;
 					}
 
 					result = SourceResult.Succeeded;
@@ -144,10 +145,18 @@ namespace Gablarski.Server
 			}
 			finally
 			{
-				e.Connection.Send (new SourceResultMessage (result, request.MediaSourceType) { SourceID = sourceID });
+				MediaSourceInfo sourceInfo = new MediaSourceInfo
+				                             	{
+				                             		SourceId = sourceId,
+													PlayerId = this.connections.GetPlayerId (e.Connection),
+													MediaType = (source != null) ? source.Type : MediaType.None,
+													SourceTypeName = request.MediaSourceType.AssemblyQualifiedName
+				                             	};
+
+				e.Connection.Send (new SourceResultMessage (result, sourceInfo));
 				if (result == SourceResult.Succeeded)
 				{
-					connections.Send (new SourceResultMessage (SourceResult.NewSource, request.MediaSourceType) {SourceID = sourceID},
+					connections.Send (new SourceResultMessage (SourceResult.NewSource, sourceInfo),
 					                  c => c != e.Connection);
 				}
 			}
@@ -178,6 +187,22 @@ namespace Gablarski.Server
 
 			e.Connection.MessageReceived += this.OnMessageReceived;
 			e.Connection.Send (new ServerInfoMessage (this.serverInfo));
+			e.Connection.Send (new PlayerListMessage (this.connections.Players));
+
+			IEnumerable<MediaSourceInfo> agrSources = Enumerable.Empty<MediaSourceInfo> ();
+			lock (this.sourceLock)
+			{
+				foreach (var kvp in this.sources)
+				{
+					IConnection connection = kvp.Key;
+					agrSources = agrSources.Concat (
+							kvp.Value.Select (s => new MediaSourceInfo (s) { PlayerId = this.connections.GetPlayerId (connection) }));
+				}
+
+				agrSources = agrSources.ToList();
+			}
+
+			e.Connection.Send (new SourceListMessage (agrSources));
 		}
 	}
 }

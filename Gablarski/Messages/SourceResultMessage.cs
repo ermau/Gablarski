@@ -14,17 +14,11 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public SourceResultMessage (SourceResult result, Type mediaSourceType)
+		public SourceResultMessage (SourceResult result, MediaSourceInfo sourceInfo)
 			: this ()
 		{
 			this.SourceResult = result;
-			this.MediaSourceType = mediaSourceType;
-		}
-
-		public SourceResultMessage (SourceResult result, Type mediaSourceType, int ownerID)
-			: this (result, mediaSourceType)
-		{
-			this.OwnerID = ownerID;
+			this.SourceInfo = sourceInfo;
 		}
 
 		public SourceResult SourceResult
@@ -33,52 +27,33 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public int SourceID
+		public MediaSourceInfo SourceInfo
 		{
 			get;
 			set;
-		}
-
-		public string MediaSourceTypeName
-		{
-			get; set;
 		}
 
 		public Type MediaSourceType
 		{
-			get { return Type.GetType (this.MediaSourceTypeName); }
-			set { this.MediaSourceTypeName = value.AssemblyQualifiedName; }
-		}
-
-		public int OwnerID
-		{
-			get;
-			set;
+			get { return Type.GetType (this.SourceInfo.SourceTypeName); }
+			set { this.SourceInfo.SourceTypeName = value.AssemblyQualifiedName; }
 		}
 
 		public IMediaSource GetSource ()
 		{
-			return MediaSources.Create (this.MediaSourceType, this.SourceID);
+			return MediaSources.Create (this.MediaSourceType, this.SourceInfo.SourceId);
 		}
 
 		public override void WritePayload (IValueWriter writer)
 		{
 			writer.WriteByte ((byte)this.SourceResult);
-			writer.WriteInt32 (this.SourceID);
-			writer.WriteString (this.MediaSourceTypeName);
-
-			if (this.SourceResult == SourceResult.NewSource)
-				writer.WriteInt32 (this.OwnerID);
+			this.SourceInfo.Serialize (writer);
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
 			this.SourceResult = (SourceResult)reader.ReadByte ();
-			this.SourceID = reader.ReadInt32 ();
-			this.MediaSourceTypeName = reader.ReadString();
-
-			if (this.SourceResult == SourceResult.NewSource)
-				this.OwnerID = reader.ReadInt32 ();
+			this.SourceInfo = new MediaSourceInfo (reader);
 		}
 	}
 

@@ -26,6 +26,8 @@ namespace Gablarski.Client
 			this.Handlers = new Dictionary<ServerMessageType, Action<MessageReceivedEventArgs>>
 			{
 				{ ServerMessageType.ServerInfoReceived, OnServerInfoReceived },
+				{ ServerMessageType.PlayerListReceived, OnPlayerListReceived },
+				{ ServerMessageType.SourceListReceived, OnSourceListReceived },
 				{ ServerMessageType.LoginResult, OnLoginResult },
 				{ ServerMessageType.SourceResult, OnSourceReceived }
 			};
@@ -97,6 +99,16 @@ namespace Gablarski.Client
 			Trace.WriteLine ("Server description: " + this.serverInfo.ServerDescription);
 		}
 
+		protected void OnPlayerListReceived (MessageReceivedEventArgs e)
+		{
+			var msg = (PlayerListMessage) e.Message;
+		}
+
+		protected void OnSourceListReceived (MessageReceivedEventArgs e)
+		{
+			var msg = (SourceListMessage) e.Message;
+		}
+
 		protected void OnLoginResult (MessageReceivedEventArgs e)
 		{
 			var msg = (LoginResultMessage) e.Message;
@@ -119,7 +131,7 @@ namespace Gablarski.Client
 			var sourceMessage = (SourceResultMessage)e.Message;
 			if (sourceMessage.MediaSourceType == null)
 			{
-				Trace.WriteLine("[Client] Source type " + sourceMessage.MediaSourceTypeName + " not found.");
+				Trace.WriteLine("[Client] Source type " + sourceMessage.SourceInfo.SourceTypeName + " not found.");
 			}
 			else if (sourceMessage.SourceResult == SourceResult.Succeeded || sourceMessage.SourceResult == SourceResult.NewSource)
 			{

@@ -37,6 +37,8 @@ namespace Gablarski.Messages
 			PlayerInfo[] players = new PlayerInfo[reader.ReadInt32()];
 			for (int i = 0; i < players.Length; ++i)
 				players[i] = new PlayerInfo (reader);
+
+			this.Players = players;
 		}
 	}
 }

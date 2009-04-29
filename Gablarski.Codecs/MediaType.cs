@@ -9,6 +9,8 @@ namespace Gablarski
 	public enum MediaTypes
 		: byte
 	{
+		None = 0,
+
 		/// <summary>
 		/// Voice (Players talking)
 		/// </summary>
@@ -28,6 +30,7 @@ namespace Gablarski
 	public enum MediaType
 		: byte
 	{
+		None = 0,
 		Voice,
 		Music
 	}
