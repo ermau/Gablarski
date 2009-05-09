@@ -68,9 +68,6 @@
     <Compile Include="Messages\ServerInfoMessage.cs" />
     <Compile Include="Messages\SourceListMessage.cs" />
     <Compile Include="Messages\SourceResultMessage.cs" />
-    <Compile Include="Network\NetworkConnectionBase.cs" />
-    <Compile Include="Network\ServerNetworkConnection.cs" />
-    <Compile Include="Network\ServerNetworkConnectionProvider.cs" />
     <Compile Include="PlayerInfo.cs" />
     <Compile Include="ReadOnlyDictionary.cs" />
     <Compile Include="ServerInfo.cs" />
@@ -86,7 +83,6 @@
     <Compile Include="Messages\Message.cs" />
     <Compile Include="Messages\MessageBase.cs" />
     <Compile Include="Messages\ServerMessage.cs" />
-    <Compile Include="Network\ClientNetworkConnection.cs" />
     <Compile Include="Server\GablarskiServer.cs" />
     <Compile Include="Server\IUserProvider.cs" />
     <Compile Include="Server\Permission.cs" />
@@ -106,6 +102,13 @@
       <Project>{3FA0CF5E-444C-49E0-BEAC-22D34F56140A}</Project>
       <Name>Gablarski.Codecs</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Lidgren.Network\Lidgren.Network.csproj">
+      <Project>{BA202214-F6F8-4853-BCC9-CA4F13C5F479}</Project>
+      <Name>Lidgren.Network</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Network\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
