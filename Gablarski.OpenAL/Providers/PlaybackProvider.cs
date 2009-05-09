@@ -32,10 +32,37 @@ namespace Gablarski.OpenAL.Providers
 			}
 
 			Source source = this.pool.RequestSource (mediaSource);
+			//if (source.ProcessedBuffers > 0)
+			//{
+			//    SourceBuffer[] freeBuffers = source.Dequeue ();
+			//    for (int i = 0; i < freeBuffers.Length; ++i)
+			//    {
+			//        lock (bufferLock)
+			//        {
+			//            if (!this.buffers.ContainsKey (mediaSource))
+			//                this.buffers[mediaSource] = new Stack<SourceBuffer> ();
 
-			SourceBuffer buffer = SourceBuffer.Generate();
+			//            this.buffers[mediaSource].Push (freeBuffers[i]);
+			//        }
+			//    }
+			//}
+
+			//SourceBuffer buffer = null;
+			//lock (bufferLock)
+			//{
+			//    if (!this.buffers.ContainsKey (mediaSource))
+			//    {
+			//        this.buffers[mediaSource] = new Stack<SourceBuffer> ();
+			//        SourceBuffer[] sbuffers = SourceBuffer.Generate (5);
+			//        for (int i = 0; i < sbuffers.Length; ++i)
+			//            this.buffers[mediaSource].Push (sbuffers[i]);
+			//    }
+
+			//    buffer = this.buffers[mediaSource].Pop();
+			//}
+
+			var buffer = SourceBuffer.Generate ();
 			buffer.Buffer (data, AudioFormat.Mono16Bit, 44100);
-
 			source.QueueAndPlay (buffer);
 		}
 
@@ -58,5 +85,7 @@ namespace Gablarski.OpenAL.Providers
 		private Context context;
 		private PlaybackDevice device;
 		private readonly SourcePool<IMediaSource> pool = new SourcePool<IMediaSource>();
+		private object bufferLock = new object ();
+		private readonly Dictionary<IMediaSource, Stack<SourceBuffer>> buffers = new Dictionary<IMediaSource, Stack<SourceBuffer>> ();
 	}
 }

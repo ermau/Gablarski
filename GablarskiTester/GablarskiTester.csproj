@@ -50,10 +50,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Gablarski.Codecs\Gablarski.Codecs.csproj">
-      <Project>{3FA0CF5E-444C-49E0-BEAC-22D34F56140A}</Project>
-      <Name>Gablarski.Codecs</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Gablarski.OpenAL\Gablarski.OpenAL.csproj">
       <Project>{1EFCB570-3B06-47AF-9130-531C5625AE79}</Project>
       <Name>Gablarski.OpenAL</Name>

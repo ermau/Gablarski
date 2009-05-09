@@ -5,9 +5,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.OpenAL", "Gablars
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski", "Gablarski\Gablarski.csproj", "{7347052B-DA5B-4CCA-AB28-3963766E3CDB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.Codecs", "Gablarski.Codecs\Gablarski.Codecs.csproj", "{3FA0CF5E-444C-49E0-BEAC-22D34F56140A}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GablarskiTester", "GablarskiTester\GablarskiTester.csproj", "{DABD979A-6930-4250-A770-E746736F4AAF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lidgren.Network", "Lidgren.Network\Lidgren.Network.csproj", "{BA202214-F6F8-4853-BCC9-CA4F13C5F479}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,15 +39,6 @@ Global
 		{7347052B-DA5B-4CCA-AB28-3963766E3CDB}.ReleaseWithStatistics|Any CPU.ActiveCfg = Release|Any CPU
 		{7347052B-DA5B-4CCA-AB28-3963766E3CDB}.ReleaseWithStatistics|Any CPU.Build.0 = Release|Any CPU
 		{7347052B-DA5B-4CCA-AB28-3963766E3CDB}.ReleaseWithStatistics|x86.ActiveCfg = Release|Any CPU
-		{3FA0CF5E-444C-49E0-BEAC-22D34F56140A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3FA0CF5E-444C-49E0-BEAC-22D34F56140A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3FA0CF5E-444C-49E0-BEAC-22D34F56140A}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{3FA0CF5E-444C-49E0-BEAC-22D34F56140A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3FA0CF5E-444C-49E0-BEAC-22D34F56140A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3FA0CF5E-444C-49E0-BEAC-22D34F56140A}.Release|x86.ActiveCfg = Release|Any CPU
-		{3FA0CF5E-444C-49E0-BEAC-22D34F56140A}.ReleaseWithStatistics|Any CPU.ActiveCfg = Release|Any CPU
-		{3FA0CF5E-444C-49E0-BEAC-22D34F56140A}.ReleaseWithStatistics|Any CPU.Build.0 = Release|Any CPU
-		{3FA0CF5E-444C-49E0-BEAC-22D34F56140A}.ReleaseWithStatistics|x86.ActiveCfg = Release|Any CPU
 		{DABD979A-6930-4250-A770-E746736F4AAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DABD979A-6930-4250-A770-E746736F4AAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DABD979A-6930-4250-A770-E746736F4AAF}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -57,6 +48,15 @@ Global
 		{DABD979A-6930-4250-A770-E746736F4AAF}.ReleaseWithStatistics|Any CPU.ActiveCfg = Release|Any CPU
 		{DABD979A-6930-4250-A770-E746736F4AAF}.ReleaseWithStatistics|Any CPU.Build.0 = Release|Any CPU
 		{DABD979A-6930-4250-A770-E746736F4AAF}.ReleaseWithStatistics|x86.ActiveCfg = Release|Any CPU
+		{BA202214-F6F8-4853-BCC9-CA4F13C5F479}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA202214-F6F8-4853-BCC9-CA4F13C5F479}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA202214-F6F8-4853-BCC9-CA4F13C5F479}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BA202214-F6F8-4853-BCC9-CA4F13C5F479}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA202214-F6F8-4853-BCC9-CA4F13C5F479}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA202214-F6F8-4853-BCC9-CA4F13C5F479}.Release|x86.ActiveCfg = Release|Any CPU
+		{BA202214-F6F8-4853-BCC9-CA4F13C5F479}.ReleaseWithStatistics|Any CPU.ActiveCfg = ReleaseWithStatistics|Any CPU
+		{BA202214-F6F8-4853-BCC9-CA4F13C5F479}.ReleaseWithStatistics|Any CPU.Build.0 = ReleaseWithStatistics|Any CPU
+		{BA202214-F6F8-4853-BCC9-CA4F13C5F479}.ReleaseWithStatistics|x86.ActiveCfg = ReleaseWithStatistics|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -77,10 +77,6 @@
     <Compile Include="SourcePool.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Gablarski.Codecs\Gablarski.Codecs.csproj">
-      <Project>{3FA0CF5E-444C-49E0-BEAC-22D34F56140A}</Project>
-      <Name>Gablarski.Codecs</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Gablarski\Gablarski.csproj">
       <Project>{7347052B-DA5B-4CCA-AB28-3963766E3CDB}</Project>
       <Name>Gablarski</Name>
