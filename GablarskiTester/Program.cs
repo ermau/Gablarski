@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Gablarski.OpenAL;
+using Gablarski.OpenAL.Providers;
 using Gablarski.Server;
 using Gablarski.Network;
 using System.Diagnostics;
@@ -20,7 +21,7 @@ namespace GablarskiTester
 		static GablarskiClient client;
 		static string username = "Rogue Jedi";
 		static CaptureDevice microphone;
-		static PlaybackDevice speakers;
+		static PlaybackProvider speakers;
 		static SourcePool<IMediaSource> sources;
 		static Context c;
 
@@ -28,19 +29,18 @@ namespace GablarskiTester
 		{
 			Console.WriteLine ("Playback devices:");
 			foreach (var device in OpenAL.PlaybackDevices)
-				Console.WriteLine (device.DeviceName);
+				Console.WriteLine (device.Name);
 
 			Console.WriteLine ("Capture devices:");
 			foreach (var device in OpenAL.CaptureDevices)
-				Console.WriteLine (device.DeviceName);
+				Console.WriteLine (device.Name);
 
-			microphone = OpenAL.CaptureDevices.Where (d => d.DeviceName.StartsWith ("Microphone")).FirstOrDefault();
+			microphone = OpenAL.CaptureDevices.Where (d => d.Name.StartsWith ("Microphone")).FirstOrDefault();
 			microphone.Open (44100, AudioFormat.Mono16Bit);
 			microphone.SamplesAvailable += microphone_SamplesAvailable;
 
-			speakers = OpenAL.PlaybackDevices.First().Open();
-			c = speakers.CreateAndActivateContext();
-			sources = new SourcePool<IMediaSource>();
+			speakers = new PlaybackProvider();
+			speakers.Device = speakers.GetDevices().First();
 
 			server = new GablarskiServer (new ServerInfo
 			{
@@ -85,7 +85,7 @@ namespace GablarskiTester
 
 		static void client_ReceivedAudioData (object sender, ReceivedAudioEventArgs e)
 		{
-			
+			speakers.QueuePlayback (e.Source, e.AudioData);
 		}
 
 		static void microphone_SamplesAvailable (object sender, SamplesAvailableEventArgs e)

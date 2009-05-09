@@ -37,9 +37,7 @@ namespace Gablarski.OpenAL
 			}
 
 			if (free == null)
-			{
 				free = Source.Generate ();
-			}
 
 			rwl.EnterWriteLock ();
 			owners[free] = owner;
@@ -92,7 +90,9 @@ namespace Gablarski.OpenAL
 				}
 				rwl.ExitReadLock ();
 
-				this.FreeSources (toFree);
+				if (toFree.Count > 0)
+					this.FreeSources (toFree);
+
 				Thread.Sleep (1);
 			}
 		}

@@ -48,6 +48,7 @@
     <Compile Include="Channel.cs" />
     <Compile Include="Client\GablarskiClient.cs" />
     <Compile Include="Client\ICaptureProvider.cs" />
+    <Compile Include="Client\IDevice.cs" />
     <Compile Include="Client\IPlaybackProvider.cs" />
     <Compile Include="en-US.Designer.cs">
       <AutoGen>True</AutoGen>

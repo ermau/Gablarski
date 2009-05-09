@@ -68,11 +68,23 @@
     <Compile Include="Device.cs" />
     <Compile Include="Extension.cs" />
     <Compile Include="PlaybackDevice.cs" />
+    <Compile Include="Providers\CaptureProvider.cs" />
+    <Compile Include="Providers\PlaybackProvider.cs" />
     <Compile Include="Source.cs" />
     <Compile Include="SourceBuffer.cs" />
     <Compile Include="OpenAL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SourcePool.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Gablarski.Codecs\Gablarski.Codecs.csproj">
+      <Project>{3FA0CF5E-444C-49E0-BEAC-22D34F56140A}</Project>
+      <Name>Gablarski.Codecs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Gablarski\Gablarski.csproj">
+      <Project>{7347052B-DA5B-4CCA-AB28-3963766E3CDB}</Project>
+      <Name>Gablarski</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

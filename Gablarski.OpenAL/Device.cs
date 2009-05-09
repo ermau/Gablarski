@@ -3,21 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
+using Gablarski.Client;
 
 namespace Gablarski.OpenAL
 {
 	public abstract class Device
-		: IDisposable
+		: IDevice, IDisposable
 	{
-		public Device (string deviceName)
+		protected Device (string deviceName)
 		{
-			this.DeviceName = deviceName;
+			this.Name = deviceName;
 		}
 
 		/// <summary>
 		/// Gets the name of the device
 		/// </summary>
-		public string DeviceName
+		public string Name
 		{
 			get;
 			private set;

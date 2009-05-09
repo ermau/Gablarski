@@ -20,7 +20,7 @@ namespace Gablarski.OpenAL
 		/// <returns>Returns <c>this</c>.</returns>
 		public PlaybackDevice Open ()
 		{
-			this.Handle = alcOpenDevice (this.DeviceName);
+			this.Handle = alcOpenDevice (this.Name);
 			OpenAL.ErrorCheck ();
 
 			return this;

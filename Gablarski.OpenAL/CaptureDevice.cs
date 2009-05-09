@@ -89,7 +89,7 @@ namespace Gablarski.OpenAL
 
 			uint bufferSize = format.GetBytes (format.GetSamplesPerSecond(44100)) * 2;
 
-			this.Handle = alcCaptureOpenDevice (this.DeviceName, frequency, format, (int)bufferSize);
+			this.Handle = alcCaptureOpenDevice (this.Name, frequency, format, (int)bufferSize);
 			OpenAL.ErrorCheck ();
 
 			pcm = new byte[bufferSize];
