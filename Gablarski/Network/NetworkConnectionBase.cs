@@ -50,7 +50,7 @@ namespace Gablarski.Network
 		protected volatile bool running = true;
 
 		protected object queuel = new object ();
-		protected Queue<MessageBase> mqueue = new Queue<MessageBase> ();
+		protected readonly Queue<MessageBase> mqueue = new Queue<MessageBase> ();
 
 		protected readonly TcpClient tcp;
 		protected readonly UdpClient udp;
@@ -62,7 +62,8 @@ namespace Gablarski.Network
 		protected IValueWriter uwriter;
 		protected IValueReader ureader;
 
-		protected bool waiting;
+		protected volatile bool rwaiting;
+		protected volatile bool uwaiting;
 
 		protected void StartListener ()
 		{
@@ -115,7 +116,7 @@ namespace Gablarski.Network
 			}
 			finally
 			{
-				this.waiting = false;
+				this.rwaiting = false;
 			}
 
 			this.OnMessageReceived (new MessageReceivedEventArgs (this, msg));
@@ -125,12 +126,18 @@ namespace Gablarski.Network
 		{
 			while (this.running)
 			{
-				if (!this.waiting)
+				if (!this.rwaiting)
 				{
-					this.waiting = true;
+					this.rwaiting = true;
 					byte[] mbuffer = new byte[1];
 					this.rstream.BeginRead (mbuffer, 0, 1, this.Received, mbuffer);
 				}
+
+				//if (!this.uwaiting)
+				//{
+				//    this.uwaiting = true;
+				//    byte[] mbuffer = new byte[1];
+				//}
 
 				while (mqueue.Count > 0)
 				{

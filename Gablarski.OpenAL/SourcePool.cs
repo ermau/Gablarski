@@ -93,6 +93,7 @@ namespace Gablarski.OpenAL
 				rwl.ExitReadLock ();
 
 				this.FreeSources (toFree);
+				Thread.Sleep (1);
 			}
 		}
 	}

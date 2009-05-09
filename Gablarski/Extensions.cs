@@ -14,7 +14,7 @@ namespace Gablarski
 
 			int i = 0;
 			int bytes = 0;
-			while (i < size && (bytes = stream.Read (buffer, i, size)) > 0)
+			while (i < buffer.Length && (bytes = stream.Read (buffer, i, size)) > 0)
 			{
 				i += bytes;
 				size -= bytes;
