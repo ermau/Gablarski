@@ -32,36 +32,40 @@ namespace Gablarski.OpenAL.Providers
 			}
 
 			Source source = this.pool.RequestSource (mediaSource);
-			//if (source.ProcessedBuffers > 0)
-			//{
-			//    SourceBuffer[] freeBuffers = source.Dequeue ();
-			//    for (int i = 0; i < freeBuffers.Length; ++i)
-			//    {
-			//        lock (bufferLock)
-			//        {
-			//            if (!this.buffers.ContainsKey (mediaSource))
-			//                this.buffers[mediaSource] = new Stack<SourceBuffer> ();
+			if (source.ProcessedBuffers > 0)
+			{
+				SourceBuffer[] freeBuffers = source.Dequeue ();
+				for (int i = 0; i < freeBuffers.Length; ++i)
+				{
+					lock (bufferLock)
+					{
+						if (!this.buffers.ContainsKey (mediaSource))
+							this.buffers[mediaSource] = new Stack<SourceBuffer> ();
 
-			//            this.buffers[mediaSource].Push (freeBuffers[i]);
-			//        }
-			//    }
-			//}
+						this.buffers[mediaSource].Push (freeBuffers[i]);
+					}
+				}
+			}
 
-			//SourceBuffer buffer = null;
-			//lock (bufferLock)
-			//{
-			//    if (!this.buffers.ContainsKey (mediaSource))
-			//    {
-			//        this.buffers[mediaSource] = new Stack<SourceBuffer> ();
-			//        SourceBuffer[] sbuffers = SourceBuffer.Generate (5);
-			//        for (int i = 0; i < sbuffers.Length; ++i)
-			//            this.buffers[mediaSource].Push (sbuffers[i]);
-			//    }
+			if (data.Length == 0)
+				return;
 
-			//    buffer = this.buffers[mediaSource].Pop();
-			//}
+			SourceBuffer buffer = null;
+			lock (bufferLock)
+			{
+				if (!this.buffers.ContainsKey (mediaSource))
+				{
+					this.buffers[mediaSource] = new Stack<SourceBuffer> ();
+					this.PushBuffers (mediaSource, 10);
+				}
 
-			var buffer = SourceBuffer.Generate ();
+				if (this.buffers[mediaSource].Count == 0)
+					this.PushBuffers (mediaSource, 10);
+
+				buffer = this.buffers[mediaSource].Pop ();
+			}
+
+			//var buffer = SourceBuffer.Generate ();
 			buffer.Buffer (data, AudioFormat.Mono16Bit, 44100);
 			source.QueueAndPlay (buffer);
 		}
@@ -87,5 +91,12 @@ namespace Gablarski.OpenAL.Providers
 		private readonly SourcePool<IMediaSource> pool = new SourcePool<IMediaSource>();
 		private object bufferLock = new object ();
 		private readonly Dictionary<IMediaSource, Stack<SourceBuffer>> buffers = new Dictionary<IMediaSource, Stack<SourceBuffer>> ();
+
+		private void PushBuffers (IMediaSource mediaSource, int number)
+		{
+			SourceBuffer[] sbuffers = SourceBuffer.Generate (number);
+			for (int i = 0; i < sbuffers.Length; ++i)
+				this.buffers[mediaSource].Push (sbuffers[i]);
+		}
 	}
 }

@@ -12,9 +12,9 @@ namespace Gablarski.OpenAL
 		public SourcePool ()
 		{
 			this.collecting = true;
-			Thread collector = new Thread (this.Collector);
-			collector.IsBackground = true;
-			collector.Start ();
+			//Thread collector = new Thread (this.Collector);
+			//collector.IsBackground = true;
+			//collector.Start ();
 		}
 
 		public Source RequestSource (T owner)

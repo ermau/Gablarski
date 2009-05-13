@@ -30,7 +30,7 @@ namespace Gablarski.OpenAL
 		{
 			add
 			{
-				if (this.listenerThread == null)
+				if (this.listenerThread == null || !this.listening)
 				{
 					this.listening = true;
 					(this.listenerThread = new Thread (this.SampleListener)
@@ -229,21 +229,21 @@ namespace Gablarski.OpenAL
 
 		private void SampleListener (object state)
 		{
-			uint sps = this.format.GetSamplesPerSecond (this.frequency);
+			//uint sps = this.format.GetSamplesPerSecond (this.frequency);
 
 			while (this.listening)
 			{
 				int numSamples = AvailableSamples;
 				if (numSamples > this.minimumSamples)
 				{
-					alcCaptureSamples (this.Handle, this.pcmPtr, numSamples);
-					OpenAL.ErrorCheck ();
+					//alcCaptureSamples (this.Handle, this.pcmPtr, numSamples);
+					//OpenAL.ErrorCheck ();
 
-					OnCaptureSamplesAvailable (new SamplesAvailableEventArgs ((byte[])this.pcm.Clone(), numSamples));
+					OnCaptureSamplesAvailable (new SamplesAvailableEventArgs (numSamples));
 				}
 
-				if (numSamples == this.minimumSamples)
-					numSamples = 0;
+				//if (numSamples == this.minimumSamples)
+				//	numSamples = 0;
 
 				Thread.Sleep (20);
 				//Thread.Sleep ((int)(((this.minimumSamples - numSamples) / sps) * 1000));
@@ -254,13 +254,10 @@ namespace Gablarski.OpenAL
 	public class SamplesAvailableEventArgs
 		: EventArgs
 	{
-		public SamplesAvailableEventArgs (byte[] Data, int samples)
+		public SamplesAvailableEventArgs (int samples)
 		{
-			this.Data = Data;
 			this.Samples = samples;
 		}
-
-		public readonly byte[] Data;
 		
 		public int Samples
 		{

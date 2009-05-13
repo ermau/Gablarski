@@ -78,6 +78,9 @@ namespace Gablarski.Client
 
 		public void RequestSource (Type mediaSourceType, byte channels)
 		{
+			if (mediaSourceType.GetInterface ("IMediaSource") == null)
+				throw new InvalidOperationException ("Can not request a source that is not a media source.");
+
 			this.connection.Send (new RequestSourceMessage (mediaSourceType, channels));
 		}
 
@@ -123,7 +126,15 @@ namespace Gablarski.Client
 
 			Trace.WriteLine ("[Client] Message Received: " + msg.MessageType);
 
-			this.Handlers[msg.MessageType] (e);
+			if (msg.MessageType == ServerMessageType.AudioDataReceived)
+			{
+				var amsg = (AudioDataReceivedMessage)msg;
+				var received = this.ReceivedAudioData;
+				if (received != null)
+					received (this, new ReceivedAudioEventArgs (this.allSources[amsg.SourceId], amsg.Data));
+			}
+			else
+				this.Handlers[msg.MessageType] (e);
 		}
 
 		protected void OnServerInfoReceived (MessageReceivedEventArgs e)

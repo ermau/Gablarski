@@ -35,12 +35,11 @@ namespace GablarskiTester
 			foreach (var device in OpenAL.CaptureDevices)
 				Console.WriteLine (device.Name);
 
-			microphone = OpenAL.CaptureDevices.Where (d => d.Name.StartsWith ("Microphone")).FirstOrDefault();
-			microphone.Open (44100, AudioFormat.Mono16Bit);
+			microphone = OpenAL.DefaultCaptureDevice.Open (44100, AudioFormat.Mono16Bit);
 			microphone.SamplesAvailable += microphone_SamplesAvailable;
 
 			speakers = new PlaybackProvider();
-			speakers.Device = speakers.GetDevices().First();
+			speakers.Device = OpenAL.DefaultPlaybackDevice.Open();
 
 			server = new GablarskiServer (new ServerInfo
 			{
@@ -90,7 +89,7 @@ namespace GablarskiTester
 
 		static void microphone_SamplesAvailable (object sender, SamplesAvailableEventArgs e)
 		{
-			client.SendAudioData (client.VoiceSource, microphone.GetSamples (e.Samples));
+			client.SendAudioData (client.VoiceSource, microphone.GetSamples());
 		}
 
 		static void client_ReceivedSource (object sender, ReceivedSourceEventArgs e)
