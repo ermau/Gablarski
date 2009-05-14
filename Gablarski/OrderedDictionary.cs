@@ -123,7 +123,13 @@ namespace Gablarski
 		public TValue this [TKey key]
 		{
 			get { return this.dict [key]; }
-			set { this.dict [key] = value; }
+			set
+			{
+				if (!this.ContainsKey (key))
+					this.orderedKeys.Add (key);
+
+				this.dict [key] = value;
+			}
 		}
 
 		#endregion
