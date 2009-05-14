@@ -94,5 +94,10 @@ namespace Gablarski.Messages
 		/// Failed because the server does not support the requested type.
 		/// </summary>
 		FailedNotSupportedType = 6,
+
+		/// <summary>
+		/// Failed because you're only permitted a single source of this type.
+		/// </summary>
+		FailedPermittedSingleSourceOfType = 7,
 	}
 }

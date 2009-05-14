@@ -19,20 +19,68 @@ namespace Gablarski.OpenAL
 			if (GetIsExtensionPresent (null, "ALC_EXT_CAPTURE"))
 			{
 				OpenAL.IsCaptureSupported = true;
-				OpenAL.CaptureDevices = ReadStringsFromMemory (alcGetString (IntPtr.Zero, ALC_CAPTURE_DEVICE_SPECIFIER))
-											.Select (n => new CaptureDevice (n));
+				
+				string defaultName = Marshal.PtrToStringAnsi (alcGetString (IntPtr.Zero, ALC_CAPTURE_DEFAULT_DEVICE_SPECIFIER));
 
-				OpenAL.DefaultCaptureDevice = new CaptureDevice (Marshal.PtrToStringAnsi (alcGetString (IntPtr.Zero, ALC_CAPTURE_DEFAULT_DEVICE_SPECIFIER)));
+				var strings = ReadStringsFromMemory (alcGetString (IntPtr.Zero, ALC_CAPTURE_DEVICE_SPECIFIER));
+				CaptureDevice[] devices = new CaptureDevice[strings.Length];
+				for (int i = 0; i < strings.Length; ++i)
+				{
+					string s = strings[i];
+					devices[i] = new CaptureDevice (s);
 
-			}
+					if (s == defaultName)
+						OpenAL.DefaultCaptureDevice = devices[i];
+				}
+				
+				OpenAL.CaptureDevices = devices;
 
-			if (GetIsExtensionPresent (null, "ALC_ENUMERATION_EXT"))
-			{
-				OpenAL.PlaybackDevices = ReadStringsFromMemory (alcGetString (IntPtr.Zero, ALC_DEVICE_SPECIFIER))
-											.Select (n => new PlaybackDevice (n));
+				if (OpenAL.DefaultCaptureDevice == null)
+					OpenAL.DefaultCaptureDevice = new CaptureDevice (defaultName);
 			}
 
 			OpenAL.DefaultPlaybackDevice = new PlaybackDevice (Marshal.PtrToStringAnsi (alcGetString (IntPtr.Zero, ALC_DEFAULT_DEVICE_SPECIFIER)));
+
+			if (GetIsExtensionPresent (null, "ALC_ENUMERATE_ALL_EXT"))
+			{
+				string defaultName = Marshal.PtrToStringAnsi (alcGetString (IntPtr.Zero, ALC_DEFAULT_ALL_DEVICES_SPECIFIER));
+
+				var strings = ReadStringsFromMemory (alcGetString (IntPtr.Zero, ALC_ALL_DEVICES_SPECIFIER));
+				PlaybackDevice[] devices = new PlaybackDevice[strings.Length];
+				for (int i = 0; i < strings.Length; ++i)
+				{
+					string s = strings[i];
+					devices[i] = new PlaybackDevice (s);
+
+					if (s == defaultName)
+						OpenAL.DefaultPlaybackDevice = devices[i];
+				}
+
+				OpenAL.PlaybackDevices = devices;
+
+				if (OpenAL.DefaultPlaybackDevice == null)
+					OpenAL.DefaultPlaybackDevice = new PlaybackDevice (defaultName);
+			}
+			else if (GetIsExtensionPresent (null, "ALC_ENUMERATION_EXT"))
+			{
+				string defaultName = Marshal.PtrToStringAnsi (alcGetString (IntPtr.Zero, ALC_DEFAULT_DEVICE_SPECIFIER));
+
+				var strings = ReadStringsFromMemory (alcGetString (IntPtr.Zero, ALC_DEVICE_SPECIFIER));
+				PlaybackDevice[] devices = new PlaybackDevice[strings.Length];
+				for (int i = 0; i < strings.Length; ++i)
+				{
+					string s = strings[i];
+					devices[i] = new PlaybackDevice (s);
+
+					if (s == defaultName)
+						OpenAL.DefaultPlaybackDevice = devices[i];
+				}
+
+				OpenAL.PlaybackDevices = devices;
+
+				if (OpenAL.DefaultPlaybackDevice == null)
+					OpenAL.DefaultPlaybackDevice = new PlaybackDevice (defaultName);
+			}
 		}
 
 
@@ -206,7 +254,7 @@ namespace Gablarski.OpenAL
 			return (result == 1);
 		}
 
-		internal static IEnumerable<string> ReadStringsFromMemory (IntPtr location)
+		internal static string[] ReadStringsFromMemory (IntPtr location)
 		{
 			List<string> strings = new List<string> ();
 
@@ -227,7 +275,7 @@ namespace Gablarski.OpenAL
 					lastNull = false;
 			}
 
-			return strings;
+			return strings.ToArray();
 		}
 
 		internal static void ErrorCheck ()
@@ -262,6 +310,8 @@ namespace Gablarski.OpenAL
 		internal const int ALC_DEVICE_SPECIFIER = 0x1005;
 		internal const int ALC_CAPTURE_DEVICE_SPECIFIER = 0x310;
 		internal const int ALC_CAPTURE_DEFAULT_DEVICE_SPECIFIER = 0x311;
+		internal const int ALC_ALL_DEVICES_SPECIFIER = 0x1013;
+		internal const int ALC_DEFAULT_ALL_DEVICES_SPECIFIER = 0x1012;
 	}
 
 	internal enum OpenALError

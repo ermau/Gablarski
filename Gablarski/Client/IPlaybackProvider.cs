@@ -7,12 +7,12 @@ using Gablarski.Media.Sources;
 namespace Gablarski.Client
 {
 	public interface IPlaybackProvider
-		: IDisposable
+		: IDeviceProvider, IDisposable
 	{
 		IDevice Device { get; set; }
 
 		void QueuePlayback (IMediaSource source, byte[] data);
 
-		IEnumerable<IDevice> GetDevices ();
+		
 	}
 }

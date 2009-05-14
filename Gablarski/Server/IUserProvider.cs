@@ -45,6 +45,9 @@ namespace Gablarski
 			this.FailureReason = failureReason;
 		}
 
+		/// <summary>
+		/// Gets the logged-in players ID.
+		/// </summary>
 		public long PlayerId
 		{
 			get;

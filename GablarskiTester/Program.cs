@@ -51,7 +51,7 @@ namespace GablarskiTester
 
 			client = new GablarskiClient (new ClientNetworkConnection ());
 			client.Login (username);
-			client.ReceivedLogin += client_ReceivedLogin;
+			client.ReceivedLoginResult += client_ReceivedLogin;
 			client.ReceivedSource += client_ReceivedSource;
 			client.ReceivedAudioData += client_ReceivedAudioData;
 			client.Connect ("localhost", 6112);

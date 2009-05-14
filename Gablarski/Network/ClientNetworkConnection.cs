@@ -14,6 +14,8 @@ namespace Gablarski.Network
 	{
 		#region IClientConnection Members
 
+		public event EventHandler Connected;
+
 		public void Connect (string host, int port)
 		{
 			tcp.Connect (host, port);
@@ -23,9 +25,17 @@ namespace Gablarski.Network
 
 			udp.Connect (host, port);
 
+			this.OnConnected (EventArgs.Empty);
 			this.StartListener ();
 		}
 
 		#endregion
+
+		private void OnConnected (EventArgs e)
+		{
+			EventHandler connected = this.Connected;
+			if (connected != null)
+				connected (this, e);
+		}
 	}
 }

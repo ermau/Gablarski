@@ -6,15 +6,30 @@ using System.Text;
 namespace Gablarski.Client
 {
 	public interface ICaptureProvider
-		: IDisposable
+		: IDeviceProvider, IDisposable
 	{
 		IDevice Device { get; set; }
+
+		event EventHandler<SamplesAvailableEventArgs> SamplesAvailable;
 
 		void StartCapture ();
 		void EndCapture ();
 
 		byte[] ReadSamples ();
+	}
 
-		IEnumerable<IDevice> GetDevices ();
+	public class SamplesAvailableEventArgs
+		: EventArgs
+	{
+		public SamplesAvailableEventArgs (int samples)
+		{
+			this.Samples = samples;
+		}
+
+		public int Samples
+		{
+			get;
+			private set;
+		}
 	}
 }

@@ -10,41 +10,58 @@ namespace Gablarski.OpenAL.Providers
 		: ICaptureProvider
 	{
 		#region ICaptureProvider Members
+		public event EventHandler<SamplesAvailableEventArgs> SamplesAvailable
+		{
+			add { this.device.SamplesAvailable += value; }
+			remove { this.device.SamplesAvailable -= value; }
+		}
 
 		public IDevice Device
 		{
-			get
-			{
-				throw new NotImplementedException ();
-			}
+			get { return this.device; }
 			set
 			{
-				throw new NotImplementedException ();
+				var cdevice = (value as CaptureDevice);
+
+				if (cdevice == null)
+					throw new ArgumentException ("Device must be a OpenAL.CaptureDevice", "value");
+
+				this.device = cdevice;
+				this.device.Open (44100, AudioFormat.Mono16Bit);
 			}
 		}
 
 		public void StartCapture ()
 		{
-			throw new NotImplementedException ();
+			this.device.StartCapture();
 		}
 
 		public void EndCapture ()
 		{
-			throw new NotImplementedException ();
+			this.device.StopCapture();
 		}
 
 		public byte[] ReadSamples ()
 		{
-			throw new NotImplementedException ();
-		}
-
-		public IEnumerable<IDevice> GetDevices ()
-		{
-			throw new NotImplementedException ();
+			return this.device.GetSamples();
 		}
 
 		#endregion
 
+		#region IDeviceProvider Members
+		
+		public IEnumerable<IDevice> GetDevices ()
+		{
+			return OpenAL.CaptureDevices.Cast<IDevice>();
+		}
+
+		public IDevice DefaultDevice
+		{
+			get { return OpenAL.DefaultCaptureDevice; }
+		}
+		
+		#endregion
+		
 		#region IDisposable Members
 
 		public void Dispose ()
@@ -53,5 +70,7 @@ namespace Gablarski.OpenAL.Providers
 		}
 
 		#endregion
+
+		private CaptureDevice device;
 	}
 }

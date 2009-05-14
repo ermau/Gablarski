@@ -8,6 +8,8 @@ namespace Gablarski
 	public interface IClientConnection
 		: IConnection
 	{
+		event EventHandler Connected;
+
 		void Connect (string host, int port);
 	}
 }

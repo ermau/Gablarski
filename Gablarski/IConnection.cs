@@ -9,6 +9,7 @@ namespace Gablarski
 	public interface IConnection
 	{
 		event EventHandler<MessageReceivedEventArgs> MessageReceived;
+		event EventHandler Disconnected;
 
 		void Send (MessageBase message);
 

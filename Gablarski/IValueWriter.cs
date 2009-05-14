@@ -7,8 +7,6 @@ namespace Gablarski
 {
 	public interface IValueWriter
 	{
-		bool AutoFlush { get; set; }
-		
 		void WriteBytes (byte[] value);
 
 		void WriteSByte (SByte value);

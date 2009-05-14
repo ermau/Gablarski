@@ -68,12 +68,35 @@ namespace Gablarski.Server
 			}
 		}
 
+		public void Send (MessageBase message)
+		{
+			lock (lck)
+			{
+				foreach (IConnection c in this.connections)
+					c.Send (message);
+			}
+		}
+
 		public void Send (MessageBase message, Func<IConnection, bool> selector)
 		{
 			lock (lck)
 			{
-				foreach (IConnection connection in connections.Where (selector))
-					connection.Send (message);
+				foreach (IConnection c in this.connections.Where (selector))
+					c.Send (message);
+			}
+		}
+
+		public void Send (MessageBase message, Func<PlayerInfo, bool> selector)
+		{
+			lock (lck)
+			{
+				foreach (var kvp in this.players)
+				{
+					if (!selector (kvp.Value))
+						continue;
+
+					kvp.Key.Send (message);
+				}
 			}
 		}
 

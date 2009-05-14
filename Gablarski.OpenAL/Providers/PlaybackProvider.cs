@@ -25,11 +25,11 @@ namespace Gablarski.OpenAL.Providers
 
 		public void QueuePlayback (IMediaSource mediaSource, byte[] data)
 		{
-			if (this.context == null)
-			{
+			if (!this.device.IsOpen)
 				this.device.Open();
+
+			if (this.context == null)
 				this.context = this.device.CreateAndActivateContext();
-			}
 
 			Source source = this.pool.RequestSource (mediaSource);
 			if (source.ProcessedBuffers > 0)
@@ -73,6 +73,11 @@ namespace Gablarski.OpenAL.Providers
 		public IEnumerable<IDevice> GetDevices ()
 		{
 			return OpenAL.PlaybackDevices.Cast<IDevice>();
+		}
+
+		public IDevice DefaultDevice
+		{
+			get { return OpenAL.DefaultPlaybackDevice; }
 		}
 
 		#endregion

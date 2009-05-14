@@ -5,6 +5,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Security;
+using Gablarski.Client;
 
 namespace Gablarski.OpenAL
 {
@@ -12,7 +13,7 @@ namespace Gablarski.OpenAL
 	public class CaptureDevice
 		: Device
 	{
-		public CaptureDevice (string deviceName)
+		internal CaptureDevice (string deviceName)
 			: base (deviceName)
 		{
 		}
@@ -251,18 +252,5 @@ namespace Gablarski.OpenAL
 		}
 	}
 
-	public class SamplesAvailableEventArgs
-		: EventArgs
-	{
-		public SamplesAvailableEventArgs (int samples)
-		{
-			this.Samples = samples;
-		}
-		
-		public int Samples
-		{
-			get;
-			private set;
-		}
-	}
+	
 }

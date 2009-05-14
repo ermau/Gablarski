@@ -9,7 +9,7 @@ namespace Gablarski.OpenAL
 	public class PlaybackDevice
 		: Device
 	{
-		public PlaybackDevice (string deviceName)
+		internal PlaybackDevice (string deviceName)
 			: base (deviceName)
 		{
 		}

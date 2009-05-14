@@ -24,6 +24,7 @@ namespace Gablarski.Network
 		}
 
 		#region IConnection Members
+		public event EventHandler Disconnected;
 
 		public event EventHandler<MessageReceivedEventArgs> MessageReceived;
 
@@ -39,11 +40,7 @@ namespace Gablarski.Network
 
 		public void Disconnect ()
 		{
-			this.running = false;
-			tcp.Close ();
-
-			if (this.runnerThread != null)
-				this.runnerThread.Join ();
+			this.Shutdown();
 		}
 
 		protected Thread runnerThread;
@@ -64,6 +61,31 @@ namespace Gablarski.Network
 
 		protected volatile bool rwaiting;
 		protected volatile bool uwaiting;
+
+		protected virtual void OnDisconnected (EventArgs e)
+		{
+			var dced = this.Disconnected;
+			if (dced != null)
+				dced (this, e);
+		}
+
+		protected void Shutdown()
+		{
+			this.running = false;
+
+			try
+			{
+				tcp.Close();
+			}
+			catch
+			{
+			}
+
+			if (this.runnerThread != null)
+				this.runnerThread.Join ();
+
+			this.OnDisconnected (EventArgs.Empty);
+		}
 
 		protected void StartListener ()
 		{
@@ -90,8 +112,17 @@ namespace Gablarski.Network
 		{
 			MessageBase msg = null;
 
-			this.rstream.EndRead (read);
-			byte[] mbuffer = (byte[])read.AsyncState;
+			byte[] mbuffer;
+			try
+			{
+				this.rstream.EndRead (read);
+				mbuffer = (byte[]) read.AsyncState;
+			}
+			catch
+			{
+				this.Shutdown();
+				return;
+			}
 
 			try
 			{
@@ -109,7 +140,7 @@ namespace Gablarski.Network
 #if DEBUG
 				throw e;
 #else
-				Trace.WriteLine ("Error reading payload, disconnecting.");
+				Trace.WriteLine ("Error reading payload, disconnecting: " + e.Message);
 				this.Disconnect ();
 				return;
 #endif

@@ -13,10 +13,15 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public LoginResultMessage (LoginResult result)
+		public LoginResultMessage (LoginResult result, PlayerInfo playerInfo)
 			: this()
 		{
 			this.Result = result;
+
+			if (!this.Result.Succeeded && this.PlayerInfo == null)
+				throw new ArgumentNullException ("playerInfo");
+
+			this.PlayerInfo = playerInfo;
 		}
 
 		public LoginResult Result
@@ -25,14 +30,26 @@ namespace Gablarski.Messages
 			set;
 		}
 
+		public PlayerInfo PlayerInfo
+		{
+			get;
+			set;
+		}
+
 		public override void ReadPayload (IValueReader reader)
 		{
 			this.Result = new LoginResult(reader);
+
+			if (this.Result.Succeeded)
+				this.PlayerInfo = new PlayerInfo (reader);
 		}
 
 		public override void WritePayload (IValueWriter writer)
 		{
 			this.Result.Serialize (writer);
+
+			if (this.Result.Succeeded)
+				this.PlayerInfo.Serialize (writer);
 		}
 	}
 }

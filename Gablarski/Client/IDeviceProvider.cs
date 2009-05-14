@@ -5,9 +5,9 @@ using System.Text;
 
 namespace Gablarski.Client
 {
-	public interface IDevice
-		: IDisposable
+	public interface IDeviceProvider
 	{
-		string Name { get; }
+		IEnumerable<IDevice> GetDevices ();
+		IDevice DefaultDevice { get; }
 	}
 }

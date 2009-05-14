@@ -8,7 +8,7 @@ using Gablarski.Client;
 namespace Gablarski.OpenAL
 {
 	public abstract class Device
-		: IDevice, IDisposable
+		: IDevice
 	{
 		protected Device (string deviceName)
 		{
@@ -29,7 +29,7 @@ namespace Gablarski.OpenAL
 		/// </summary>
 		public bool IsOpen
 		{
-			get { return (this.Handle == IntPtr.Zero); }
+			get { return (this.Handle != IntPtr.Zero); }
 		}
 
 		internal IntPtr Handle;
