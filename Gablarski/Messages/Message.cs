@@ -29,6 +29,7 @@ namespace Gablarski.Messages
 		ServerInfoReceived = 12,
 		PlayerListReceived = 14,
 		SourceListReceived = 16,
+		PlayerDisconnected = 17,
 	}
 
 	public abstract class Message<TMessage>

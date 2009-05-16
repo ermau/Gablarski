@@ -2,14 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Net.Sockets;
-using System.Threading;
-using Gablarski.Server;
+using System.Text;
 
-namespace Gablarski.Network
+namespace Gablarski.Server.Telnet
 {
-	public class ServerNetworkConnectionProvider
+	public class TelnetConnectionProvider
 		: ConnectionProviderBase
 	{
 		private TcpListener listener;
@@ -28,7 +26,7 @@ namespace Gablarski.Network
 
 		protected override IConnection CheckForConnection ()
 		{
-			return new ServerNetworkConnection (this.listener.AcceptTcpClient ());
+			return new TelnetConnection (this.listener.AcceptTcpClient());
 		}
 	}
 }

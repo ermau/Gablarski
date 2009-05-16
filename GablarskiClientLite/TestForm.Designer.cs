@@ -52,12 +52,14 @@
 			this.label8 = new System.Windows.Forms.Label ();
 			this.nickname = new System.Windows.Forms.TextBox ();
 			this.login = new System.Windows.Forms.Button ();
+			this.userProviderSelect = new System.Windows.Forms.ComboBox ();
+			this.label9 = new System.Windows.Forms.Label ();
 			this.SuspendLayout ();
 			// 
 			// label1
 			// 
 			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point (12, 160);
+			this.label1.Location = new System.Drawing.Point (9, 287);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size (41, 13);
 			this.label1.TabIndex = 0;
@@ -65,7 +67,7 @@
 			// 
 			// ServerHost
 			// 
-			this.ServerHost.Location = new System.Drawing.Point (114, 157);
+			this.ServerHost.Location = new System.Drawing.Point (111, 284);
 			this.ServerHost.Name = "ServerHost";
 			this.ServerHost.Size = new System.Drawing.Size (189, 20);
 			this.ServerHost.TabIndex = 6;
@@ -73,7 +75,7 @@
 			// 
 			// connectButton
 			// 
-			this.connectButton.Location = new System.Drawing.Point (309, 155);
+			this.connectButton.Location = new System.Drawing.Point (306, 282);
 			this.connectButton.Name = "connectButton";
 			this.connectButton.Size = new System.Drawing.Size (66, 23);
 			this.connectButton.TabIndex = 7;
@@ -86,18 +88,18 @@
 			this.log.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
 						| System.Windows.Forms.AnchorStyles.Left)
 						| System.Windows.Forms.AnchorStyles.Right)));
-			this.log.Location = new System.Drawing.Point (12, 264);
+			this.log.Location = new System.Drawing.Point (12, 391);
 			this.log.Multiline = true;
 			this.log.Name = "log";
 			this.log.ReadOnly = true;
-			this.log.Size = new System.Drawing.Size (566, 437);
+			this.log.Size = new System.Drawing.Size (566, 143);
 			this.log.TabIndex = 8;
 			this.log.TabStop = false;
 			// 
 			// label2
 			// 
 			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point (12, 131);
+			this.label2.Location = new System.Drawing.Point (9, 258);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size (34, 13);
 			this.label2.TabIndex = 4;
@@ -108,7 +110,7 @@
 			this.inputSelect.DisplayMember = "Name";
 			this.inputSelect.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.inputSelect.FormattingEnabled = true;
-			this.inputSelect.Location = new System.Drawing.Point (114, 128);
+			this.inputSelect.Location = new System.Drawing.Point (111, 255);
 			this.inputSelect.Name = "inputSelect";
 			this.inputSelect.Size = new System.Drawing.Size (261, 21);
 			this.inputSelect.TabIndex = 5;
@@ -117,7 +119,7 @@
 			// label3
 			// 
 			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point (12, 44);
+			this.label3.Location = new System.Drawing.Point (9, 171);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size (96, 13);
 			this.label3.TabIndex = 6;
@@ -128,7 +130,7 @@
 			this.playbackProviderSelect.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.playbackProviderSelect.Enabled = false;
 			this.playbackProviderSelect.FormattingEnabled = true;
-			this.playbackProviderSelect.Location = new System.Drawing.Point (114, 41);
+			this.playbackProviderSelect.Location = new System.Drawing.Point (111, 168);
 			this.playbackProviderSelect.Name = "playbackProviderSelect";
 			this.playbackProviderSelect.Size = new System.Drawing.Size (261, 21);
 			this.playbackProviderSelect.TabIndex = 2;
@@ -139,7 +141,7 @@
 			this.captureProviderSelect.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.captureProviderSelect.Enabled = false;
 			this.captureProviderSelect.FormattingEnabled = true;
-			this.captureProviderSelect.Location = new System.Drawing.Point (114, 99);
+			this.captureProviderSelect.Location = new System.Drawing.Point (111, 226);
 			this.captureProviderSelect.Name = "captureProviderSelect";
 			this.captureProviderSelect.Size = new System.Drawing.Size (261, 21);
 			this.captureProviderSelect.TabIndex = 4;
@@ -148,7 +150,7 @@
 			// label4
 			// 
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point (12, 102);
+			this.label4.Location = new System.Drawing.Point (9, 229);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size (89, 13);
 			this.label4.TabIndex = 9;
@@ -157,7 +159,7 @@
 			// label5
 			// 
 			this.label5.AutoSize = true;
-			this.label5.Location = new System.Drawing.Point (12, 73);
+			this.label5.Location = new System.Drawing.Point (9, 200);
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size (42, 13);
 			this.label5.TabIndex = 10;
@@ -168,7 +170,7 @@
 			this.outputSelect.DisplayMember = "Name";
 			this.outputSelect.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.outputSelect.FormattingEnabled = true;
-			this.outputSelect.Location = new System.Drawing.Point (114, 70);
+			this.outputSelect.Location = new System.Drawing.Point (111, 197);
 			this.outputSelect.Name = "outputSelect";
 			this.outputSelect.Size = new System.Drawing.Size (261, 21);
 			this.outputSelect.TabIndex = 3;
@@ -176,7 +178,7 @@
 			// 
 			// startServerButton
 			// 
-			this.startServerButton.Location = new System.Drawing.Point (300, 12);
+			this.startServerButton.Location = new System.Drawing.Point (299, 35);
 			this.startServerButton.Name = "startServerButton";
 			this.startServerButton.Size = new System.Drawing.Size (75, 23);
 			this.startServerButton.TabIndex = 1;
@@ -187,7 +189,7 @@
 			// label6
 			// 
 			this.label6.AutoSize = true;
-			this.label6.Location = new System.Drawing.Point (13, 17);
+			this.label6.Location = new System.Drawing.Point (12, 40);
 			this.label6.Name = "label6";
 			this.label6.Size = new System.Drawing.Size (70, 13);
 			this.label6.TabIndex = 13;
@@ -195,7 +197,7 @@
 			// 
 			// ServerName
 			// 
-			this.ServerName.Location = new System.Drawing.Point (114, 14);
+			this.ServerName.Location = new System.Drawing.Point (113, 37);
 			this.ServerName.Name = "ServerName";
 			this.ServerName.Size = new System.Drawing.Size (167, 20);
 			this.ServerName.TabIndex = 0;
@@ -205,14 +207,14 @@
 			// 
 			this.sourceRequestSelect.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.sourceRequestSelect.FormattingEnabled = true;
-			this.sourceRequestSelect.Location = new System.Drawing.Point (15, 210);
+			this.sourceRequestSelect.Location = new System.Drawing.Point (12, 337);
 			this.sourceRequestSelect.Name = "sourceRequestSelect";
 			this.sourceRequestSelect.Size = new System.Drawing.Size (262, 21);
 			this.sourceRequestSelect.TabIndex = 14;
 			// 
 			// requestSource
 			// 
-			this.requestSource.Location = new System.Drawing.Point (283, 208);
+			this.requestSource.Location = new System.Drawing.Point (280, 335);
 			this.requestSource.Name = "requestSource";
 			this.requestSource.Size = new System.Drawing.Size (92, 23);
 			this.requestSource.TabIndex = 15;
@@ -222,7 +224,7 @@
 			// 
 			// transmit
 			// 
-			this.transmit.Location = new System.Drawing.Point (283, 235);
+			this.transmit.Location = new System.Drawing.Point (280, 362);
 			this.transmit.Name = "transmit";
 			this.transmit.Size = new System.Drawing.Size (92, 23);
 			this.transmit.TabIndex = 16;
@@ -234,7 +236,7 @@
 			// 
 			this.sourceSelect.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.sourceSelect.FormattingEnabled = true;
-			this.sourceSelect.Location = new System.Drawing.Point (15, 237);
+			this.sourceSelect.Location = new System.Drawing.Point (12, 364);
 			this.sourceSelect.Name = "sourceSelect";
 			this.sourceSelect.Size = new System.Drawing.Size (262, 21);
 			this.sourceSelect.TabIndex = 17;
@@ -244,7 +246,7 @@
 			// 
 			this.playerList.Location = new System.Drawing.Point (381, 30);
 			this.playerList.Name = "playerList";
-			this.playerList.Size = new System.Drawing.Size (197, 228);
+			this.playerList.Size = new System.Drawing.Size (197, 355);
 			this.playerList.TabIndex = 18;
 			// 
 			// label7
@@ -259,7 +261,7 @@
 			// label8
 			// 
 			this.label8.AutoSize = true;
-			this.label8.Location = new System.Drawing.Point (12, 185);
+			this.label8.Location = new System.Drawing.Point (9, 312);
 			this.label8.Name = "label8";
 			this.label8.Size = new System.Drawing.Size (58, 13);
 			this.label8.TabIndex = 20;
@@ -268,7 +270,7 @@
 			// nickname
 			// 
 			this.nickname.Enabled = false;
-			this.nickname.Location = new System.Drawing.Point (114, 182);
+			this.nickname.Location = new System.Drawing.Point (111, 309);
 			this.nickname.Name = "nickname";
 			this.nickname.Size = new System.Drawing.Size (189, 20);
 			this.nickname.TabIndex = 21;
@@ -277,7 +279,7 @@
 			// login
 			// 
 			this.login.Enabled = false;
-			this.login.Location = new System.Drawing.Point (309, 180);
+			this.login.Location = new System.Drawing.Point (306, 307);
 			this.login.Name = "login";
 			this.login.Size = new System.Drawing.Size (66, 23);
 			this.login.TabIndex = 22;
@@ -285,11 +287,31 @@
 			this.login.UseVisualStyleBackColor = true;
 			this.login.Click += new System.EventHandler (this.login_Click);
 			// 
+			// userProviderSelect
+			// 
+			this.userProviderSelect.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.userProviderSelect.FormattingEnabled = true;
+			this.userProviderSelect.Location = new System.Drawing.Point (113, 8);
+			this.userProviderSelect.Name = "userProviderSelect";
+			this.userProviderSelect.Size = new System.Drawing.Size (259, 21);
+			this.userProviderSelect.TabIndex = 23;
+			// 
+			// label9
+			// 
+			this.label9.AutoSize = true;
+			this.label9.Location = new System.Drawing.Point (12, 11);
+			this.label9.Name = "label9";
+			this.label9.Size = new System.Drawing.Size (74, 13);
+			this.label9.TabIndex = 24;
+			this.label9.Text = "User Provider:";
+			// 
 			// TestForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF (6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size (590, 713);
+			this.ClientSize = new System.Drawing.Size (590, 546);
+			this.Controls.Add (this.label9);
+			this.Controls.Add (this.userProviderSelect);
 			this.Controls.Add (this.login);
 			this.Controls.Add (this.nickname);
 			this.Controls.Add (this.label8);
@@ -317,6 +339,7 @@
 			this.Name = "TestForm";
 			this.Text = "Gablarski Test";
 			this.Load += new System.EventHandler (this.TestForm_Load);
+			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler (this.TestForm_FormClosed);
 			this.ResumeLayout (false);
 			this.PerformLayout ();
 
@@ -348,6 +371,8 @@
 		private System.Windows.Forms.Label label8;
 		private System.Windows.Forms.TextBox nickname;
 		private System.Windows.Forms.Button login;
+		private System.Windows.Forms.ComboBox userProviderSelect;
+		private System.Windows.Forms.Label label9;
 	}
 }
 

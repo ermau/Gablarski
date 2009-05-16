@@ -129,6 +129,9 @@ namespace GablarskiClientLite
 
 		private void TestForm_Load (object sender, EventArgs e)
 		{
+			this.userProviderSelect.Items.Add (typeof (GuestUserProvider));
+			this.userProviderSelect.SelectedIndex = 0;
+
 			this.playbackProviderSelect.Items.Add (typeof (PlaybackProvider));
 			this.playbackProviderSelect.SelectedIndex = 0;
 
@@ -266,6 +269,12 @@ namespace GablarskiClientLite
 		{
 			this.source = (this.sourceSelect.SelectedItem as IMediaSource);
 			this.transmit.Enabled = (this.sourceSelect.SelectedItem != null);
+		}
+
+		private void TestForm_FormClosed (object sender, FormClosedEventArgs e)
+		{
+			if (this.client != null)
+				this.client.Disconnect();
 		}
 	}
 }
