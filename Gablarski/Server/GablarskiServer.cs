@@ -11,7 +11,7 @@ namespace Gablarski.Server
 {
 	public class GablarskiServer
 	{
-		public static readonly Version MinimumClientVersion = new Version (0,0,1,0);
+		public static readonly Version MinimumAPIVersion = new Version (0,1,0,0);
 
 		public GablarskiServer (ServerInfo serverInfo, IUserProvider userProvider)
 		{
@@ -20,6 +20,7 @@ namespace Gablarski.Server
 
 			this.Handlers = new Dictionary<ClientMessageType, Action<MessageReceivedEventArgs>>
 			{
+				{ ClientMessageType.Disconnect, ClientDisconnected },
 				{ ClientMessageType.Login, UserLoginAttempt },
 				{ ClientMessageType.RequestSource, ClientRequestsSource },
 				{ ClientMessageType.AudioData, AudioDataReceived }
@@ -108,6 +109,11 @@ namespace Gablarski.Server
 			this.Handlers[msg.MessageType] (e);
 		}
 
+		protected void ClientDisconnected (MessageReceivedEventArgs e)
+		{
+			
+		}
+
 		protected void AudioDataReceived (MessageReceivedEventArgs e)
 		{
 			var msg = (SendAudioDataMessage) e.Message;
@@ -190,7 +196,12 @@ namespace Gablarski.Server
 			{
 				info = new PlayerInfo (login.Nickname, result.PlayerId);
 
-				this.connections.Add (e.Connection, info);
+				if (!this.connections.PlayerLoggedIn (login.Nickname))
+					this.connections.Add (e.Connection, info);
+				else
+				{
+					result.ResultState = LoginResultState.FailedNicknameInUse;
+				}
 			}
 			
 			var msg = new LoginResultMessage (result, info);
@@ -200,7 +211,7 @@ namespace Gablarski.Server
 			else
 				e.Connection.Send (msg);
 
-			Trace.WriteLine ("[Server]" + login.Username + " Login: " + result.Succeeded + ". " + (result.FailureReason ?? String.Empty));
+			Trace.WriteLine ("[Server]" + login.Username + " Login: " + result.ResultState);
 		}
 
 		private void OnClientDisconnected (object sender, EventArgs e)

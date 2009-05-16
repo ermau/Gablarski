@@ -58,7 +58,8 @@ namespace Gablarski.OpenAL
 		/// </summary>
 		public AudioFormat Format
 		{
-			get { return this.format; }
+			get;
+			private set;
 		}
 
 		/// <summary>
@@ -66,7 +67,8 @@ namespace Gablarski.OpenAL
 		/// </summary>
 		public uint Frequency
 		{
-			get { return this.frequency; }
+			get;
+			private set;
 		}
 
 		/// <summary>
@@ -85,10 +87,10 @@ namespace Gablarski.OpenAL
 		/// <returns>Returns <c>this</c>.</returns>
 		public unsafe CaptureDevice Open (uint frequency, AudioFormat format)
 		{
-			this.format = format;
-			this.frequency = frequency;
+			this.Format = format;
+			this.Frequency = frequency;
 
-			uint bufferSize = format.GetBytes (format.GetSamplesPerSecond(44100)) * 2;
+			uint bufferSize = format.GetBytes (format.GetSamplesPerSecond (frequency)) * 2;
 
 			this.Handle = alcCaptureOpenDevice (this.Name, frequency, format, (int)bufferSize);
 			OpenAL.ErrorCheck ();
@@ -191,8 +193,6 @@ namespace Gablarski.OpenAL
 		#endregion
 
 		private EventHandler<SamplesAvailableEventArgs> samplesAvailable;
-		private AudioFormat format;
-		private uint frequency;
 
 		private int minimumSamples = 1400;
 		private volatile bool listening;

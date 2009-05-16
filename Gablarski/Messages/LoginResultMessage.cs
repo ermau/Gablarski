@@ -18,7 +18,7 @@ namespace Gablarski.Messages
 		{
 			this.Result = result;
 
-			if (!this.Result.Succeeded && this.PlayerInfo == null)
+			if (this.Result.Succeeded && playerInfo == null)
 				throw new ArgumentNullException ("playerInfo");
 
 			this.PlayerInfo = playerInfo;

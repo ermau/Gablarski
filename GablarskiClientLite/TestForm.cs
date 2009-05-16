@@ -43,7 +43,7 @@ namespace GablarskiClientLite
 			client.ReceivedSource += client_ReceivedSource;
 			client.ReceivedPlayerList += client_ReceivedPlayerList;
 			client.ReceivedSourceList += client_ReceivedSourceList;
-			client.ReceivedAudioData += new EventHandler<ReceivedAudioEventArgs> (client_ReceivedAudioData);
+			client.ReceivedAudioData += client_ReceivedAudioData;
 
 			client.Connect (serverName, 6112);
 		}
@@ -112,7 +112,10 @@ namespace GablarskiClientLite
 		void client_ReceivedLogin (object sender, ReceivedLoginEventArgs e)
 		{
 			if (!e.Result.Succeeded)
+			{
+				MessageBox.Show (e.Result.ResultState.ToString());
 				return;
+			}
 
 			this.sourceRequestSelect.Enabled = true;
 			this.requestSource.Enabled = true;

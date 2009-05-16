@@ -72,6 +72,7 @@
     <Compile Include="Messages\ServerInfoMessage.cs" />
     <Compile Include="Messages\SourceListMessage.cs" />
     <Compile Include="Messages\SourceResultMessage.cs" />
+    <Compile Include="ModuleLoader.cs" />
     <Compile Include="Network\ClientNetworkConnection.cs" />
     <Compile Include="Network\NetworkConnectionBase.cs" />
     <Compile Include="Network\ServerNetworkConnection.cs" />
@@ -98,6 +99,7 @@
     <Compile Include="OrderedDictionary.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sources\IMediaSource.cs" />
+    <Compile Include="Sources\MusicSource.cs" />
     <Compile Include="Sources\Sources.cs" />
     <Compile Include="Sources\VoiceSource.cs" />
     <Compile Include="StreamValueReader.cs" />

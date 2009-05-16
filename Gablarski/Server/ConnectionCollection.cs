@@ -33,6 +33,14 @@ namespace Gablarski.Server
 			}
 		}
 
+		public bool PlayerLoggedIn (string nickname)
+		{
+			lock (lck)
+			{
+				return this.players.Values.Any (p => p.Nickname == nickname);
+			}
+		}
+
 		/// <summary>
 		/// Gets the player Id for the connection, 0 if the connection wasn't found.
 		/// </summary>

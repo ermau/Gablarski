@@ -209,7 +209,7 @@ namespace Gablarski.Client
 
 			var args = new ReceivedLoginEventArgs (msg.Result, msg.PlayerInfo);
 
-			if (msg.Result.Succeeded && msg.PlayerInfo.Nickname == this.nickname)
+			if (!msg.Result.Succeeded || (msg.Result.Succeeded && msg.PlayerInfo.Nickname == this.nickname))
 			{
 				this.userId = msg.Result.PlayerId;
 				OnReceivedLoginResult (args);

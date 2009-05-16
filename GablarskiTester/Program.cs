@@ -99,7 +99,7 @@ namespace GablarskiTester
 
 		static void client_ReceivedLogin (object sender, ReceivedLoginEventArgs e)
 		{
-			Trace.WriteLine ("Login result: " + e.Result.Succeeded + " " + e.Result.FailureReason);
+			Trace.WriteLine ("Login result: " + e.Result.Succeeded + " " + e.Result.ResultState);
 
 			client.RequestSource (typeof(VoiceSource), 1);
 		}

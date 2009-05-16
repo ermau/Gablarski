@@ -14,7 +14,7 @@ namespace Gablarski.Server
 
 		public LoginResult Login (string username, string password)
 		{
-			return new LoginResult (Interlocked.Increment (ref this.nextUserId), true);
+			return new LoginResult (Interlocked.Increment (ref this.nextUserId), LoginResultState.Success);
 		}
 
 		#endregion
