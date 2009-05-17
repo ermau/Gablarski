@@ -16,7 +16,7 @@ namespace Gablarski.Media.Sources
 	/// </remarks>
 	public static class MediaSources
 	{
-		public static IMediaSource Create (Type sourceType, int sourceID)
+		public static IMediaSource Create (Type sourceType, int sourceId)
 		{
 			if (sourceType == null)
 				throw new ArgumentNullException("sourceType");
@@ -49,7 +49,7 @@ namespace Gablarski.Media.Sources
 
 			IMediaSource source = null;
 			if (types.ContainsKey (sourceType))
-				source = types[sourceType] (sourceID);
+				source = types[sourceType] (sourceId);
 
 			rwl.ExitUpgradeableReadLock ();
 

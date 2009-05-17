@@ -113,6 +113,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Client\GablarskiClient.Internal.cs" />
+    <Compile Include="Messages\PlayerDisconnectedMessage.cs" />
+    <Compile Include="Server\ConnectionProviderBase.cs" />
+    <Compile Include="Server\Telnet\TelnetConnection.cs" />
+    <Compile Include="Server\Telnet\TelnetConnectionProvider.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -18,8 +18,7 @@ namespace Gablarski.Server.Telnet
 		#region IConnection Members
 
 		public event EventHandler<MessageReceivedEventArgs> MessageReceived;
-
-		public event EventHandler Disconnected;
+		public event EventHandler<ConnectionEventArgs> Disconnected;
 
 		public void Send (MessageBase message)
 		{

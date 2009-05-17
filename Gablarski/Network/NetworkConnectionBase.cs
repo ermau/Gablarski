@@ -24,8 +24,7 @@ namespace Gablarski.Network
 		}
 
 		#region IConnection Members
-		public event EventHandler Disconnected;
-
+		public event EventHandler<ConnectionEventArgs> Disconnected;
 		public event EventHandler<MessageReceivedEventArgs> MessageReceived;
 
 		public void Send (MessageBase message)
@@ -62,33 +61,39 @@ namespace Gablarski.Network
 		protected volatile bool rwaiting;
 		protected volatile bool uwaiting;
 
-		protected virtual void OnDisconnected (EventArgs e)
+		protected virtual void OnDisconnected (ConnectionEventArgs e)
 		{
 			var dced = this.Disconnected;
 			if (dced != null)
 				dced (this, e);
 		}
 
-		protected void Shutdown()
+		protected void Shutdown ()
 		{
+			if (!this.running)
+				return;
+
 			this.running = false;
 
 			try
 			{
 				tcp.Close();
 			}
+			// ReSharper disable EmptyGeneralCatchClause
 			catch
 			{
 			}
+			// ReSharper restore EmptyGeneralCatchClause
 
 			if (this.runnerThread != null)
 				this.runnerThread.Join ();
 
-			this.OnDisconnected (EventArgs.Empty);
+			this.OnDisconnected (new ConnectionEventArgs (this));
 		}
 
 		protected void StartListener ()
 		{
+			this.running = true;
 			(this.runnerThread = new Thread (Runner)
 			{
 				IsBackground = true,

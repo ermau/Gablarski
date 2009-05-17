@@ -111,7 +111,7 @@ namespace Gablarski.Server
 
 		protected void ClientDisconnected (MessageReceivedEventArgs e)
 		{
-			
+			OnClientDisconnected (this, new ConnectionEventArgs (e.Connection));
 		}
 
 		protected void AudioDataReceived (MessageReceivedEventArgs e)
@@ -214,9 +214,15 @@ namespace Gablarski.Server
 			Trace.WriteLine ("[Server]" + login.Username + " Login: " + result.ResultState);
 		}
 
-		private void OnClientDisconnected (object sender, EventArgs e)
+		private void OnClientDisconnected (object sender, ConnectionEventArgs e)
 		{
 			Trace.WriteLine ("[Server] Client disconnected");
+
+			e.Connection.Disconnect();
+
+			long playerId;
+			if (this.connections.Remove (e.Connection, out playerId))
+				this.connections.Send (new PlayerDisconnectedMessage (playerId));
 		}
 		
 		private void OnConnectionMade (object sender, ConnectionEventArgs e)

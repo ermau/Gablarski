@@ -38,14 +38,24 @@ namespace GablarskiClientLite
 
 			client = new GablarskiClient (new ClientNetworkConnection());
 			client.Connected += client_Connected;
-			client.ReceivedLoginResult += client_ReceivedLogin;
-			client.ReceivedNewLogin += client_ReceivedNewLogin;
+			client.LoginResult += client_ReceivedLogin;
+			client.PlayerLoggedIn += client_ReceivedNewLogin;
 			client.ReceivedSource += client_ReceivedSource;
 			client.ReceivedPlayerList += client_ReceivedPlayerList;
 			client.ReceivedSourceList += client_ReceivedSourceList;
 			client.ReceivedAudioData += client_ReceivedAudioData;
+			client.PlayerDisconnected += client_PlayerDisconnected;
 
 			client.Connect (serverName, 6112);
+		}
+
+		void client_PlayerDisconnected (object sender, PlayerDisconnectedEventArgs e)
+		{
+			this.Invoke ((Action) delegate
+          	{
+          		this.playerList.Nodes.Remove (
+          			this.playerList.Nodes.Cast<TreeNode>().Where (n => (long) n.Tag == e.Player.PlayerId).First());
+          	});
 		}
 
 		void client_ReceivedAudioData (object sender, ReceivedAudioEventArgs e)

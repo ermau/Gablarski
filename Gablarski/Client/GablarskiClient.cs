@@ -13,45 +13,34 @@ namespace Gablarski.Client
 {
 	public partial class GablarskiClient
 	{
-		public static readonly Version ClientVersion = Assembly.GetAssembly (typeof (GablarskiClient)).GetName ().Version;
-
-		protected GablarskiClient ()
-		{
-		}
+		public static readonly Version APIVersion = Assembly.GetAssembly (typeof (GablarskiClient)).GetName ().Version;
 
 		public GablarskiClient (IClientConnection connection)
+			: this()
 		{
 			this.connection = connection;
 			this.connection.Connected += this.OnConnected;
 			this.connection.Disconnected += this.OnDisconnected;
-
-			this.Handlers = new Dictionary<ServerMessageType, Action<MessageReceivedEventArgs>>
-			{
-				{ ServerMessageType.ServerInfoReceived, OnServerInfoReceived },
-				{ ServerMessageType.PlayerListReceived, OnPlayerListReceived },
-				{ ServerMessageType.SourceListReceived, OnSourceListReceived },
-				{ ServerMessageType.LoginResult, OnLoginResult },
-				{ ServerMessageType.SourceResult, OnSourceReceived },
-				{ ServerMessageType.AudioDataReceived, OnReceivedAudio }
-			};
 		}
 
 		#region Events
 		public event EventHandler Connected;
 		public event EventHandler Disconnected;
-		public event EventHandler<ReceivedLoginEventArgs> ReceivedLoginResult;
-		public event EventHandler<ReceivedLoginEventArgs> ReceivedNewLogin;
+		public event EventHandler<ReceivedLoginEventArgs> LoginResult;
+		public event EventHandler<ReceivedLoginEventArgs> PlayerLoggedIn;
+		public event EventHandler<PlayerDisconnectedEventArgs> PlayerDisconnected;
 		public event EventHandler<ReceivedSourceEventArgs> ReceivedSource;
 		public event EventHandler<ReceivedAudioEventArgs> ReceivedAudioData;
 		public event EventHandler<ReceivedListEventArgs<PlayerInfo>> ReceivedPlayerList;
 		public event EventHandler<ReceivedListEventArgs<MediaSourceInfo>> ReceivedSourceList;
 		#endregion
 
+		#region Public Properties
 		public IMediaSource VoiceSource
 		{
 			get
 			{
-				IMediaSource source = null;
+				IMediaSource source;
 				lock (sourceLock)
 				{
 					this.clientSources.TryGetValue (MediaType.Voice, out source);
@@ -60,6 +49,22 @@ namespace Gablarski.Client
 				return source;
 			}
 		}
+
+		public IEnumerable<PlayerInfo> Players
+		{
+			get
+			{
+				PlayerInfo[] playerCopy;
+				lock (playerLock)
+				{
+					playerCopy = new PlayerInfo[this.players.Count];
+					this.players.Values.CopyTo (playerCopy, 0);
+				}
+
+				return playerCopy;
+			}
+		}
+		#endregion
 
 		#region Public Methods
 		public void Connect (string host, int port)
@@ -110,9 +115,89 @@ namespace Gablarski.Client
 			this.connection.Send (new SendAudioDataMessage (source.ID, encoded));
 		}
 		#endregion
+
+		#region Event Invokers
+		private void OnConnected (object sender, EventArgs e)
+		{
+			var connected = this.Connected;
+			if (connected != null)
+				connected (this, e);
+		}
+
+		private void OnDisconnected (object sender, EventArgs e)
+		{
+			var disconnected = this.Disconnected;
+			if (disconnected != null)
+				disconnected (this, e);
+		}
+
+		protected virtual void OnPlayerDisconnected (PlayerDisconnectedEventArgs e)
+		{
+			var disconnected = this.PlayerDisconnected;
+			if (disconnected != null)
+				disconnected (this, e);
+		}
+
+		protected virtual void OnReceivedPlayerList (ReceivedListEventArgs<PlayerInfo> e)
+		{
+			var received = this.ReceivedPlayerList;
+			if (received != null)
+				received (this, e);
+		}
+
+		protected virtual void OnReceivedSourceList (ReceivedListEventArgs<MediaSourceInfo> e)
+		{
+			var received = this.ReceivedSourceList;
+			if (received != null)
+				received (this, e);
+		}
+
+		protected virtual void OnPlayerLoggedIn (ReceivedLoginEventArgs e)
+		{
+			var result = this.PlayerLoggedIn;
+			if (result != null)
+				result (this, e);
+		}
+
+		protected virtual void OnLoginResult (ReceivedLoginEventArgs e)
+		{
+			var result = this.LoginResult;
+			if (result != null)
+				result (this, e);
+		}
+
+		protected virtual void OnReceivedSource (ReceivedSourceEventArgs e)
+		{
+			var received = this.ReceivedSource;
+			if (received != null)
+				received (this, e);
+		}
+
+		protected virtual void OnReceivedAudioData (ReceivedAudioEventArgs e)
+		{
+			var received = this.ReceivedAudioData;
+			if (received != null)
+				received (this, e);
+		}
+		#endregion
 	}
 
 	#region Event Args
+	public class PlayerDisconnectedEventArgs
+		: EventArgs
+	{
+		public PlayerDisconnectedEventArgs (PlayerInfo player)
+		{
+			this.Player = player;
+		}
+
+		public PlayerInfo Player
+		{
+			get;
+			private set;
+		}
+	}
+
 	public class ReceivedListEventArgs<T>
 		: EventArgs
 	{

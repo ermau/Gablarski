@@ -9,7 +9,7 @@ namespace Gablarski
 	public interface IConnection
 	{
 		event EventHandler<MessageReceivedEventArgs> MessageReceived;
-		event EventHandler Disconnected;
+		event EventHandler<ConnectionEventArgs> Disconnected;
 
 		void Send (MessageBase message);
 
@@ -35,18 +35,12 @@ namespace Gablarski
 	}
 
 	public class MessageReceivedEventArgs
-		: EventArgs
+		: ConnectionEventArgs
 	{
 		public MessageReceivedEventArgs (IConnection connection, MessageBase message)
+			: base (connection)
 		{
-			this.Connection = connection;
 			this.Message = message;
-		}
-
-		public IConnection Connection
-		{
-			get;
-			private set;
 		}
 
 		/// <summary>

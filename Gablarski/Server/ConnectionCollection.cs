@@ -65,6 +65,7 @@ namespace Gablarski.Server
 			}
 		}
 
+
 		public void Add (IConnection connection, PlayerInfo player)
 		{
 			lock (lck)
@@ -73,6 +74,33 @@ namespace Gablarski.Server
 					this.connections.Add (connection);
 
 				this.players[connection] = player;
+			}
+		}
+
+		public bool Remove (IConnection connection)
+		{
+			lock (lck)
+			{
+				this.players.Remove (connection);
+				return this.connections.Remove (connection);
+			}
+		}
+
+		public bool Remove (IConnection connection, out long playerId)
+		{
+			playerId = 0;
+
+			lock (lck)
+			{
+				this.connections.Remove (connection);
+				if (!this.players.ContainsKey (connection))
+					return false;
+
+				var info = this.players[connection];
+				playerId = info.PlayerId;
+				this.players.Remove (connection);
+
+				return true;
 			}
 		}
 

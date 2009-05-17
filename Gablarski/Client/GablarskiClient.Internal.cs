@@ -10,7 +10,20 @@ namespace Gablarski.Client
 {
 	public partial class GablarskiClient
 	{
-		#region Internals
+		protected GablarskiClient()
+		{
+			this.Handlers = new Dictionary<ServerMessageType, Action<MessageReceivedEventArgs>>
+			{
+				{ ServerMessageType.ServerInfoReceived, OnServerInfoReceivedMessage },
+				{ ServerMessageType.PlayerListReceived, OnPlayerListReceivedMessage },
+				{ ServerMessageType.SourceListReceived, OnSourceListReceivedMessage },
+				{ ServerMessageType.LoginResult, OnLoginResultMessage },
+				{ ServerMessageType.SourceResult, OnSourceResultMessage },
+				{ ServerMessageType.AudioDataReceived, OnAudioDataReceivedMessage },
+				{ ServerMessageType.PlayerDisconnected, OnPlayerDisconnectedMessage },
+			};
+		}
+		
 		protected ServerInfo serverInfo;
 
 		private string nickname;
@@ -23,7 +36,10 @@ namespace Gablarski.Client
 		private readonly Dictionary<MediaType, IMediaSource> clientSources = new Dictionary<MediaType, IMediaSource> ();
 		private readonly Dictionary<int, IMediaSource> allSources = new Dictionary<int, IMediaSource> ();
 
-		protected void AddSource (IMediaSource source, bool mine)
+		private object playerLock = new object();
+		private readonly Dictionary<long, PlayerInfo> players = new Dictionary<long, PlayerInfo>();
+
+		private void AddSource (IMediaSource source, bool mine)
 		{
 			lock (sourceLock)
 			{
@@ -32,23 +48,9 @@ namespace Gablarski.Client
 				if (mine)
 					this.clientSources.Add (source.Type, source);
 			}
-		}
+		}	
 
-		private void OnConnected (object sender, EventArgs e)
-		{
-			EventHandler connected = this.Connected;
-			if (connected != null)
-				connected (this, e);
-		}
-
-		private void OnDisconnected (object sender, EventArgs e)
-		{
-			EventHandler disconnected = this.Disconnected;
-			if (disconnected != null)
-				disconnected (this, e);
-		}
-
-		protected virtual void OnMessageReceived (object sender, MessageReceivedEventArgs e)
+		private void OnMessageReceived (object sender, MessageReceivedEventArgs e)
 		{
 			var msg = (e.Message as ServerMessage);
 			if (msg == null)
@@ -70,7 +72,21 @@ namespace Gablarski.Client
 				this.Handlers[msg.MessageType] (e);
 		}
 
-		protected void OnServerInfoReceived (MessageReceivedEventArgs e)
+		private void OnPlayerDisconnectedMessage (MessageReceivedEventArgs e)
+		{
+			var msg = (PlayerDisconnectedMessage) e.Message;
+
+			PlayerInfo info;
+			lock (playerLock)
+			{
+				info = this.players[msg.PlayerId];
+				this.players.Remove (msg.PlayerId);
+			}
+
+			OnPlayerDisconnected (new PlayerDisconnectedEventArgs (info));
+		}
+
+		private void OnServerInfoReceivedMessage (MessageReceivedEventArgs e)
 		{
 			this.serverInfo = ((ServerInfoMessage)e.Message).ServerInfo;
 			Trace.WriteLine ("[Client] Received server information: ");
@@ -78,20 +94,20 @@ namespace Gablarski.Client
 			Trace.WriteLine ("Server description: " + this.serverInfo.ServerDescription);
 		}
 
-		private void OnPlayerListReceived (MessageReceivedEventArgs e)
+		private void OnPlayerListReceivedMessage (MessageReceivedEventArgs e)
 		{
 			var msg = (PlayerListMessage)e.Message;
+
+			lock (playerLock)
+			{
+				foreach (PlayerInfo player in msg.Players)
+					this.players.Add (player.PlayerId, player);
+			}
+
 			OnReceivedPlayerList (new ReceivedListEventArgs<PlayerInfo> (msg.Players));
 		}
 
-		protected virtual void OnReceivedPlayerList (ReceivedListEventArgs<PlayerInfo> e)
-		{
-			var received = this.ReceivedPlayerList;
-			if (received != null)
-				received (this, e);
-		}
-
-		private void OnSourceListReceived (MessageReceivedEventArgs e)
+		private void OnSourceListReceivedMessage (MessageReceivedEventArgs e)
 		{
 			var msg = (SourceListMessage)e.Message;
 			foreach (var sourceInfo in msg.Sources)
@@ -100,14 +116,7 @@ namespace Gablarski.Client
 			OnReceivedSourceList (new ReceivedListEventArgs<MediaSourceInfo> (msg.Sources));
 		}
 
-		protected virtual void OnReceivedSourceList (ReceivedListEventArgs<MediaSourceInfo> e)
-		{
-			var received = this.ReceivedSourceList;
-			if (received != null)
-				received (this, e);
-		}
-
-		protected void OnLoginResult (MessageReceivedEventArgs e)
+		private void OnLoginResultMessage (MessageReceivedEventArgs e)
 		{
 			var msg = (LoginResultMessage)e.Message;
 
@@ -116,28 +125,20 @@ namespace Gablarski.Client
 			if (!msg.Result.Succeeded || (msg.Result.Succeeded && msg.PlayerInfo.Nickname == this.nickname))
 			{
 				this.userId = msg.Result.PlayerId;
-				OnReceivedLoginResult (args);
+				OnLoginResult (args);
 			}
 			else
-				OnReceivedNewLogin (args);
+			{
+				lock (playerLock)
+				{
+					this.players.Add (msg.Result.PlayerId, msg.PlayerInfo);
+				}
+
+				OnPlayerLoggedIn (args);
+			}
 		}
-
-		protected virtual void OnReceivedNewLogin (ReceivedLoginEventArgs e)
-		{
-			var result = this.ReceivedNewLogin;
-			if (result != null)
-				result (this, e);
-		}
-
-
-		protected virtual void OnReceivedLoginResult (ReceivedLoginEventArgs e)
-		{
-			var result = this.ReceivedLoginResult;
-			if (result != null)
-				result (this, e);
-		}
-
-		protected void OnSourceReceived (MessageReceivedEventArgs e)
+	
+		private void OnSourceResultMessage (MessageReceivedEventArgs e)
 		{
 			IMediaSource source = null;
 
@@ -152,28 +153,13 @@ namespace Gablarski.Client
 				this.AddSource (source, (sourceMessage.SourceResult == SourceResult.Succeeded));
 			}
 
-			OnReceivedSourceResult (new ReceivedSourceEventArgs (source, sourceMessage.SourceInfo, sourceMessage.SourceResult));
+			OnReceivedSource (new ReceivedSourceEventArgs (source, sourceMessage.SourceInfo, sourceMessage.SourceResult));
 		}
 
-		protected virtual void OnReceivedSourceResult (ReceivedSourceEventArgs e)
-		{
-			var received = this.ReceivedSource;
-			if (received != null)
-				received (this, e);
-		}
-
-		protected void OnReceivedAudio (MessageReceivedEventArgs e)
+		private void OnAudioDataReceivedMessage (MessageReceivedEventArgs e)
 		{
 			var msg = (AudioDataReceivedMessage)e.Message;
 			OnReceivedAudioData (new ReceivedAudioEventArgs (this.allSources[msg.SourceId], msg.Data));
 		}
-
-		protected virtual void OnReceivedAudioData (ReceivedAudioEventArgs e)
-		{
-			var received = this.ReceivedAudioData;
-			if (received != null)
-				received (this, e);
-		}
-		#endregion
 	}
 }

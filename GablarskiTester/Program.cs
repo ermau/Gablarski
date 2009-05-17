@@ -47,11 +47,11 @@ namespace GablarskiTester
 				ServerDescription = "Development Server",
 			}, new GuestUserProvider ());
 
-			server.AddConnectionProvider (new ServerNetworkConnectionProvider { Port = 6112 });
+			server.AddConnectionProvider (new ServerNetworkConnectionProvider());
 
 			client = new GablarskiClient (new ClientNetworkConnection ());
 			client.Login (username);
-			client.ReceivedLoginResult += client_ReceivedLogin;
+			client.LoginResult += client_ReceivedLogin;
 			client.ReceivedSource += client_ReceivedSource;
 			client.ReceivedAudioData += client_ReceivedAudioData;
 			client.Connect ("localhost", 6112);
