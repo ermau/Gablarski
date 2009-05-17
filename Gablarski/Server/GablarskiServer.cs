@@ -229,6 +229,8 @@ namespace Gablarski.Server
 		{
 			Trace.WriteLine ("[Server] Connection Made");
 
+			this.connections.Add (e.Connection);
+
 			e.Connection.MessageReceived += this.OnMessageReceived;
 			e.Connection.Disconnected += this.OnClientDisconnected;
 			e.Connection.Send (new ServerInfoMessage (this.serverInfo));
