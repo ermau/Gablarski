@@ -13,7 +13,8 @@ namespace Gablarski.Client
 {
 	public partial class GablarskiClient
 	{
-		public static readonly Version APIVersion = Assembly.GetAssembly (typeof (GablarskiClient)).GetName ().Version;
+		//public static readonly Version ApiVersion = Assembly.GetAssembly (typeof (GablarskiClient)).GetName ().Version;
+		public static readonly Version ApiVersion = new Version (0, 0, 1, 0);
 
 		public GablarskiClient (IClientConnection connection)
 			: this()
@@ -25,6 +26,7 @@ namespace Gablarski.Client
 
 		#region Events
 		public event EventHandler Connected;
+		public event EventHandler<RejectedConnectionEventArgs> ConnectionRejected;
 		public event EventHandler Disconnected;
 		public event EventHandler<ReceivedLoginEventArgs> LoginResult;
 		public event EventHandler<ReceivedLoginEventArgs> PlayerLoggedIn;
@@ -54,14 +56,13 @@ namespace Gablarski.Client
 		{
 			get
 			{
-				PlayerInfo[] playerCopy;
 				lock (playerLock)
 				{
-					playerCopy = new PlayerInfo[this.players.Count];
+					PlayerInfo[] playerCopy = new PlayerInfo[this.players.Count];
 					this.players.Values.CopyTo (playerCopy, 0);
-				}
 
-				return playerCopy;
+					return playerCopy;
+				}
 			}
 		}
 		#endregion
@@ -71,6 +72,7 @@ namespace Gablarski.Client
 		{
 			connection.MessageReceived += OnMessageReceived;
 			connection.Connect (host, port);
+			connection.Send (new ConnectMessage (ApiVersion));
 		}
 
 		public void Disconnect()
@@ -99,11 +101,11 @@ namespace Gablarski.Client
 			if (mediaSourceType.GetInterface ("IMediaSource") == null)
 				throw new InvalidOperationException ("Can not request a source that is not a media source.");
 
-			//lock (sourceLock)
-			//{
-			//    if (this.clientSources.Values.Any (s => s.GetType () == mediaSourceType))
-			//        throw new InvalidOperationException ("Client already owns a source of this type.");
-			//}
+			lock (sourceLock)
+			{
+				if (this.clientSources.Values.Any (s => s.GetType () == mediaSourceType))
+					throw new InvalidOperationException ("Client already owns a source of this type.");
+			}
 
 			this.connection.Send (new RequestSourceMessage (mediaSourceType, channels));
 		}
@@ -117,18 +119,25 @@ namespace Gablarski.Client
 		#endregion
 
 		#region Event Invokers
-		private void OnConnected (object sender, EventArgs e)
+		protected virtual void OnConnected (object sender, EventArgs e)
 		{
 			var connected = this.Connected;
 			if (connected != null)
 				connected (this, e);
 		}
 
-		private void OnDisconnected (object sender, EventArgs e)
+		protected virtual void OnDisconnected (object sender, EventArgs e)
 		{
 			var disconnected = this.Disconnected;
 			if (disconnected != null)
 				disconnected (this, e);
+		}
+
+		protected virtual void OnConnectionRejected (RejectedConnectionEventArgs e)
+		{
+			var rejected = this.ConnectionRejected;
+			if (rejected != null)
+				rejected (this, e);
 		}
 
 		protected virtual void OnPlayerDisconnected (PlayerDisconnectedEventArgs e)
@@ -183,6 +192,21 @@ namespace Gablarski.Client
 	}
 
 	#region Event Args
+	public class RejectedConnectionEventArgs
+		: EventArgs
+	{
+		public RejectedConnectionEventArgs (ConnectionRejectedReason reason)
+		{
+			this.Reason = reason;
+		}
+
+		public ConnectionRejectedReason Reason
+		{
+			get;
+			private set;
+		}
+	}
+
 	public class PlayerDisconnectedEventArgs
 		: EventArgs
 	{

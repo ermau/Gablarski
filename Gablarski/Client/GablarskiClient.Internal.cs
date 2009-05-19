@@ -21,6 +21,7 @@ namespace Gablarski.Client
 				{ ServerMessageType.SourceResult, OnSourceResultMessage },
 				{ ServerMessageType.AudioDataReceived, OnAudioDataReceivedMessage },
 				{ ServerMessageType.PlayerDisconnected, OnPlayerDisconnectedMessage },
+				{ ServerMessageType.ConnectionRejected, OnConnectionRejectedMessage },
 			};
 		}
 		
@@ -70,6 +71,13 @@ namespace Gablarski.Client
 			}
 			else
 				this.Handlers[msg.MessageType] (e);
+		}
+
+		private void OnConnectionRejectedMessage (MessageReceivedEventArgs e)
+		{
+			var msg = (ConnectionRejectedMessage)e.Message;
+
+			OnConnectionRejected (new RejectedConnectionEventArgs (msg.Reason));
 		}
 
 		private void OnPlayerDisconnectedMessage (MessageReceivedEventArgs e)

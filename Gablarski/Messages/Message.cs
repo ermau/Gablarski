@@ -8,7 +8,7 @@ namespace Gablarski.Messages
 	public enum ClientMessageType
 		: ushort
 	{
-		RequestToken = 1,
+		Connect = 1,
 		Login = 3,
 		Disconnect = 5,
 		RequestSource = 7,
@@ -21,7 +21,7 @@ namespace Gablarski.Messages
 	public enum ServerMessageType
 		: ushort
 	{
-		TokenResult = 2,
+		ConnectionRejected = 2,
 		LoginResult = 4,
 		Disconnect = 6,
 		SourceResult = 8,

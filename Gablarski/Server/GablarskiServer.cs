@@ -9,22 +9,15 @@ using Gablarski.Media.Sources;
 
 namespace Gablarski.Server
 {
-	public class GablarskiServer
+	public partial class GablarskiServer
 	{
 		public static readonly Version MinimumAPIVersion = new Version (0,1,0,0);
 
 		public GablarskiServer (ServerInfo serverInfo, IUserProvider userProvider)
+			: this()
 		{
 			this.serverInfo = serverInfo;
 			this.userProvider = userProvider;
-
-			this.Handlers = new Dictionary<ClientMessageType, Action<MessageReceivedEventArgs>>
-			{
-				{ ClientMessageType.Disconnect, ClientDisconnected },
-				{ ClientMessageType.Login, UserLoginAttempt },
-				{ ClientMessageType.RequestSource, ClientRequestsSource },
-				{ ClientMessageType.AudioData, AudioDataReceived }
-			};
 		}
 
 		#region Public Methods
@@ -93,7 +86,23 @@ namespace Gablarski.Server
 
 		private readonly ConnectionCollection connections = new ConnectionCollection();
 
-		private readonly Dictionary<ClientMessageType, Action<MessageReceivedEventArgs>> Handlers;
+		private IEnumerable<MediaSourceInfo> GetSourceInfoList ()
+		{
+			IEnumerable<MediaSourceInfo> agrSources = Enumerable.Empty<MediaSourceInfo> ();
+			lock (this.sourceLock)
+			{
+				foreach (var kvp in this.sources)
+				{
+					IConnection connection = kvp.Key;
+					agrSources = agrSources.Concat (
+							kvp.Value.Select (s => new MediaSourceInfo (s) { PlayerId = this.connections.GetPlayerId (connection) }));
+				}
+
+				agrSources = agrSources.ToList ();
+			}
+
+			return agrSources;
+		}
 
 		protected virtual void OnMessageReceived (object sender, MessageReceivedEventArgs e)
 		{
@@ -107,11 +116,6 @@ namespace Gablarski.Server
 			Trace.WriteLine ("[Server] Message Received: " + msg.MessageType);
 
 			this.Handlers[msg.MessageType] (e);
-		}
-
-		protected void ClientDisconnected (MessageReceivedEventArgs e)
-		{
-			OnClientDisconnected (this, new ConnectionEventArgs (e.Connection));
 		}
 
 		protected void AudioDataReceived (MessageReceivedEventArgs e)
@@ -214,6 +218,11 @@ namespace Gablarski.Server
 			Trace.WriteLine ("[Server]" + login.Username + " Login: " + result.ResultState);
 		}
 
+		protected void ClientDisconnected (MessageReceivedEventArgs e)
+		{
+			OnClientDisconnected (this, new ConnectionEventArgs (e.Connection));
+		}
+
 		private void OnClientDisconnected (object sender, ConnectionEventArgs e)
 		{
 			Trace.WriteLine ("[Server] Client disconnected");
@@ -233,23 +242,6 @@ namespace Gablarski.Server
 
 			e.Connection.MessageReceived += this.OnMessageReceived;
 			e.Connection.Disconnected += this.OnClientDisconnected;
-			e.Connection.Send (new ServerInfoMessage (this.serverInfo));
-			e.Connection.Send (new PlayerListMessage (this.connections.Players));
-
-			IEnumerable<MediaSourceInfo> agrSources = Enumerable.Empty<MediaSourceInfo> ();
-			lock (this.sourceLock)
-			{
-				foreach (var kvp in this.sources)
-				{
-					IConnection connection = kvp.Key;
-					agrSources = agrSources.Concat (
-							kvp.Value.Select (s => new MediaSourceInfo (s) { PlayerId = this.connections.GetPlayerId (connection) }));
-				}
-
-				agrSources = agrSources.ToList();
-			}
-
-			e.Connection.Send (new SourceListMessage (agrSources));
 		}
 	}
 }

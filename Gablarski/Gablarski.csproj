@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{7347052B-DA5B-4CCA-AB28-3963766E3CDB}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -12,6 +12,10 @@
     <AssemblyName>Gablarski</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -65,6 +69,8 @@
     <Compile Include="MediaSourceInfo.cs" />
     <Compile Include="MediaType.cs" />
     <Compile Include="Messages\AudioDataReceivedMessage.cs" />
+    <Compile Include="Messages\ConnectionRejectedMessage.cs" />
+    <Compile Include="Messages\ConnectMessage.cs" />
     <Compile Include="Messages\LoginResultMessage.cs" />
     <Compile Include="Messages\SendAudioDataMessage.cs" />
     <Compile Include="Messages\PlayerListMessage.cs" />
@@ -82,6 +88,7 @@
     <Compile Include="ReadOnlyDictionary.cs" />
     <Compile Include="ServerInfo.cs" />
     <Compile Include="Server\ConnectionCollection.cs" />
+    <Compile Include="Server\GablarskiServer.MessageHandling.cs" />
     <Compile Include="Server\GuestUserProvider.cs" />
     <Compile Include="Server\IChannelProvider.cs" />
     <Compile Include="Server\IPermissionsProvider.cs" />
