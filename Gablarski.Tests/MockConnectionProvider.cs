@@ -1,0 +1,37 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Gablarski.Server;
+
+namespace Gablarski.Tests
+{
+	public class MockConnectionProvider
+		: IConnectionProvider
+	{
+		public void EstablishConnection ()
+		{
+			var connectionMade = this.ConnectionMade;
+			if (connectionMade != null)
+				connectionMade (this, new ConnectionEventArgs (new MockServerConnection ()));
+		}
+
+		#region IConnectionProvider Members
+
+		public event EventHandler<ConnectionEventArgs> ConnectionMade;
+
+		public void StartListening ()
+		{
+			this.listening = true;
+		}
+
+		public void StopListening ()
+		{
+			this.listening = false;
+		}
+
+		#endregion
+
+		private bool listening = false;
+	}
+}
