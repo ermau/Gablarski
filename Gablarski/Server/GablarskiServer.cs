@@ -72,6 +72,21 @@ namespace Gablarski.Server
 			connection.Disconnect ();
 			connection.MessageReceived -= this.OnMessageReceived;
 		}
+
+		public void Shutdown ()
+		{
+			lock (this.availableConnectionLock)
+			{
+				for (int i = 0; i < this.availableConnections.Count;)
+				{
+					var provider = this.availableConnections[i];
+
+					provider.StopListening ();
+					provider.ConnectionMade -= OnConnectionMade;
+					this.RemoveConnectionProvider (provider);
+				}
+			}
+		}
 		#endregion
 
 		private readonly ServerInfo serverInfo = new ServerInfo();

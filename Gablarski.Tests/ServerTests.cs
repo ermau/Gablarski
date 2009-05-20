@@ -5,6 +5,8 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Gablarski.Server;
 using Gablarski.Client;
+using System.Diagnostics.Contracts;
+using Gablarski.Messages;
 
 namespace Gablarski.Tests
 {
@@ -47,15 +49,31 @@ namespace Gablarski.Tests
 		public void ServerTestInitialize ()
 		{
 			this.server = new GablarskiServer (new ServerInfo { ServerName = "Test Server", ServerDescription = "Test Server" }, new GuestUserProvider ());
-			this.server.AddConnectionProvider (new MockConnectionProvider ());
+			this.server.AddConnectionProvider (this.provider = new MockConnectionProvider ());
+		}
+
+		[TestCleanup]
+		public void ServerTestCleanup ()
+		{
+			this.server.Shutdown ();
+			this.server = null;
+			this.provider = null;
 		}
 
 		private GablarskiServer server;
+		private MockConnectionProvider provider;
 
 		[TestMethod]
 		public void TestConnection ()
 		{
-			
+			IConnection connection = provider.EstablishConnection ();
+		}
+
+		[TestMethod]
+		public void TestGarbageLogin ()
+		{
+			IConnection connection = provider.EstablishConnection ();
+			connection.Send (new LoginMessage { Nickname = null, Username = null });
 		}
 	}
 }

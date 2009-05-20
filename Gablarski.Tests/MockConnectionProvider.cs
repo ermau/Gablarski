@@ -9,11 +9,15 @@ namespace Gablarski.Tests
 	public class MockConnectionProvider
 		: IConnectionProvider
 	{
-		public void EstablishConnection ()
+		public IConnection EstablishConnection ()
 		{
+			var connection = new MockServerConnection ();
+
 			var connectionMade = this.ConnectionMade;
 			if (connectionMade != null)
-				connectionMade (this, new ConnectionEventArgs (new MockServerConnection ()));
+				connectionMade (this, new ConnectionEventArgs (connection));
+
+			return connection;
 		}
 
 		#region IConnectionProvider Members
