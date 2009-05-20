@@ -125,69 +125,7 @@ namespace Gablarski.Server
 			this.connections.Send (new AudioDataReceivedMessage (msg.SourceId, msg.Data), (IConnection c) => c != e.Connection);
 		}
 
-		protected void ClientRequestsSource (MessageReceivedEventArgs e)
-		{
-			var request = (RequestSourceMessage)e.Message;
-			
-			SourceResult result = SourceResult.FailedUnknown;
-			int sourceId = -1;
-
-			IMediaSource source = null;
-			try
-			{
-				int index = 0;
-				lock (sourceLock)
-				{
-					if (!sources.ContainsKey (e.Connection))
-						sources.Add (e.Connection, new List<IMediaSource> ());
-
-					if (!sources[e.Connection].Any (s => s != null && s.GetType () == request.MediaSourceType))
-					{
-						sourceId = sources.Sum (kvp => kvp.Value.Count);
-						index = sources[e.Connection].Count;
-						sources[e.Connection].Add (null);
-					}
-					else
-						result = SourceResult.FailedPermittedSingleSourceOfType;
-				}
-
-				if (result == SourceResult.FailedUnknown)
-				{
-					source = MediaSources.Create (request.MediaSourceType, sourceId);
-					if (source != null)
-					{
-						lock (sourceLock)
-						{
-							sources[e.Connection][index] = source;
-						}
-
-						result = SourceResult.Succeeded;
-					}
-					else
-						result = SourceResult.FailedNotSupportedType;
-				}
-			}
-			catch (OverflowException)
-			{
-				result = SourceResult.FailedLimit;
-			}
-			finally
-			{
-				MediaSourceInfo sourceInfo = new MediaSourceInfo
-				                             	{
-				                             		SourceId = sourceId,
-													PlayerId = this.connections.GetPlayerId (e.Connection),
-													MediaType = (source != null) ? source.Type : MediaType.None,
-													SourceTypeName = request.MediaSourceType.AssemblyQualifiedName
-				                             	};
-
-				e.Connection.Send (new SourceResultMessage (result, sourceInfo));
-				if (result == SourceResult.Succeeded)
-				{
-					connections.Send (new SourceResultMessage (SourceResult.NewSource, sourceInfo), (IConnection c) => c != e.Connection);
-				}
-			}
-		}
+		
 
 		protected void UserLoginAttempt (MessageReceivedEventArgs e)
 		{
@@ -232,6 +170,11 @@ namespace Gablarski.Server
 			long playerId;
 			if (this.connections.Remove (e.Connection, out playerId))
 				this.connections.Send (new PlayerDisconnectedMessage (playerId));
+
+			lock (sourceLock)
+			{
+				this.sources.Remove (e.Connection);
+			}
 		}
 		
 		private void OnConnectionMade (object sender, ConnectionEventArgs e)

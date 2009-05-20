@@ -31,6 +31,8 @@ namespace GablarskiTester
 			foreach (var device in OpenAL.PlaybackDevices)
 				Console.WriteLine (device.Name);
 
+			Console.WriteLine ();
+
 			Console.WriteLine ("Capture devices:");
 			foreach (var device in OpenAL.CaptureDevices)
 				Console.WriteLine (device.Name);

@@ -13,8 +13,7 @@ namespace Gablarski.Client
 {
 	public partial class GablarskiClient
 	{
-		//public static readonly Version ApiVersion = Assembly.GetAssembly (typeof (GablarskiClient)).GetName ().Version;
-		public static readonly Version ApiVersion = new Version (0, 0, 1, 0);
+		public static readonly Version ApiVersion = Assembly.GetAssembly (typeof (GablarskiClient)).GetName ().Version;
 
 		public GablarskiClient (IClientConnection connection)
 			: this()

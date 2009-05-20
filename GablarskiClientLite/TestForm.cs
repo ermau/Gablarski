@@ -107,6 +107,8 @@ namespace GablarskiClientLite
 				this.Invoke ((Action)delegate
 				             	{
 				             		this.sourceSelect.Items.Add (e.Source);
+									this.sourceSelect.Enabled = true;
+									this.transmit.Enabled = true;
 				             	});
 			}
 			else if (e.Result == SourceResult.NewSource)
@@ -127,8 +129,11 @@ namespace GablarskiClientLite
 				return;
 			}
 
-			this.sourceRequestSelect.Enabled = true;
-			this.requestSource.Enabled = true;
+			this.Invoke ((Action)delegate
+			{
+				this.sourceRequestSelect.Enabled = true;
+				this.requestSource.Enabled = true;
+			});
 		}
 
 		void client_Connected (object sender, EventArgs e)
@@ -252,6 +257,7 @@ namespace GablarskiClientLite
 
 		private void requestSource_Click (object sender, EventArgs e)
 		{
+			this.requestSource.Enabled = false;
 			Type sourceType = (this.sourceRequestSelect.SelectedItem as Type);
 			if (sourceType == null)
 				return;
@@ -278,13 +284,19 @@ namespace GablarskiClientLite
 		private void sourceSelect_SelectedIndexChanged (object sender, EventArgs e)
 		{
 			this.source = (this.sourceSelect.SelectedItem as IMediaSource);
-			this.transmit.Enabled = (this.sourceSelect.SelectedItem != null);
+			this.transmit.Enabled = (this.source != null);
 		}
 
 		private void TestForm_FormClosed (object sender, FormClosedEventArgs e)
 		{
 			if (this.client != null)
 				this.client.Disconnect();
+		}
+
+		private void sourceRequestSelect_SelectedIndexChanged (object sender, EventArgs e)
+		{
+			if (this.source != null)
+				this.sourceRequestSelect.Enabled = this.sourceSelect.Items.Contains (this.source);
 		}
 	}
 }

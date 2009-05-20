@@ -5,6 +5,7 @@ using System.Text;
 using Gablarski.Messages;
 using System.Net.Sockets;
 using System.Threading;
+using System.Diagnostics;
 
 namespace Gablarski.Network
 {
@@ -142,13 +143,9 @@ namespace Gablarski.Network
 			}
 			catch (Exception e)
 			{
-#if DEBUG
-				throw e;
-#else
 				Trace.WriteLine ("Error reading payload, disconnecting: " + e.Message);
 				this.Disconnect ();
 				return;
-#endif
 			}
 			finally
 			{
@@ -184,11 +181,20 @@ namespace Gablarski.Network
 					}
 
 					var writer = GetWriter (message);
-					
-					writer.WriteByte (0x2A);
-					writer.WriteUInt16 (message.MessageTypeCode);
 
-					message.WritePayload (writer);
+					try
+					{
+						writer.WriteByte (0x2A);
+						writer.WriteUInt16 (message.MessageTypeCode);
+
+						message.WritePayload (writer);
+					}
+					catch (Exception e)
+					{
+						Trace.WriteLine ("Error sending payload, disconnecting: " + e.Message);
+						this.Disconnect ();
+						return;
+					}
 				}
 
 				Thread.Sleep (1);

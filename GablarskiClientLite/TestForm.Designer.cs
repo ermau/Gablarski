@@ -206,14 +206,17 @@
 			// sourceRequestSelect
 			// 
 			this.sourceRequestSelect.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.sourceRequestSelect.Enabled = false;
 			this.sourceRequestSelect.FormattingEnabled = true;
 			this.sourceRequestSelect.Location = new System.Drawing.Point (12, 337);
 			this.sourceRequestSelect.Name = "sourceRequestSelect";
 			this.sourceRequestSelect.Size = new System.Drawing.Size (262, 21);
 			this.sourceRequestSelect.TabIndex = 14;
+			this.sourceRequestSelect.SelectedIndexChanged += new System.EventHandler (this.sourceRequestSelect_SelectedIndexChanged);
 			// 
 			// requestSource
 			// 
+			this.requestSource.Enabled = false;
 			this.requestSource.Location = new System.Drawing.Point (280, 335);
 			this.requestSource.Name = "requestSource";
 			this.requestSource.Size = new System.Drawing.Size (92, 23);
@@ -224,6 +227,7 @@
 			// 
 			// transmit
 			// 
+			this.transmit.Enabled = false;
 			this.transmit.Location = new System.Drawing.Point (280, 362);
 			this.transmit.Name = "transmit";
 			this.transmit.Size = new System.Drawing.Size (92, 23);
@@ -235,6 +239,7 @@
 			// sourceSelect
 			// 
 			this.sourceSelect.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.sourceSelect.Enabled = false;
 			this.sourceSelect.FormattingEnabled = true;
 			this.sourceSelect.Location = new System.Drawing.Point (12, 364);
 			this.sourceSelect.Name = "sourceSelect";
@@ -338,8 +343,8 @@
 			this.Controls.Add (this.label1);
 			this.Name = "TestForm";
 			this.Text = "Gablarski Test";
-			this.Load += new System.EventHandler (this.TestForm_Load);
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler (this.TestForm_FormClosed);
+			this.Load += new System.EventHandler (this.TestForm_Load);
 			this.ResumeLayout (false);
 			this.PerformLayout ();
 
