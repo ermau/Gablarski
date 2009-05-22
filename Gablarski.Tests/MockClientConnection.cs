@@ -16,9 +16,22 @@ namespace Gablarski.Tests
 
 		public void Receive (MessageBase message)
 		{
+			lock (this.messages)
+			{
+				this.messages.Enqueue (message);
+			}
+
 			var received = this.MessageReceived;
 			if (received != null)
 				received (this, new MessageReceivedEventArgs (this, message));
+		}
+
+		public MessageBase DequeueMessage()
+		{
+			lock (this.messages)
+			{
+				return this.messages.Dequeue();
+			}
 		}
 
 		#region IClientConnection Members
@@ -52,5 +65,7 @@ namespace Gablarski.Tests
 		#endregion
 
 		private readonly MockServerConnection server;
+
+        private Queue<MessageBase> messages = new Queue<MessageBase>();
 	}
 }

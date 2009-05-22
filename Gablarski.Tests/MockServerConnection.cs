@@ -40,5 +40,7 @@ namespace Gablarski.Tests
 		#endregion
 
 		private readonly MockClientConnection client;
+
+        private Queue<MessageBase> messages = new Queue<MessageBase>();
 	}
 }

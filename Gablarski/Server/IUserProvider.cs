@@ -12,7 +12,7 @@ namespace Gablarski
 		/// </summary>
 		/// <param name="username">The username to check.</param>
 		/// <returns><c>true</c> if the username exists, <c>false</c> otherwise</returns>
-		bool UserExists (string username);
+		//bool UserExists (string username);
 
 		/// <summary>
 		/// Attempts to login a user using the supplied username and password.

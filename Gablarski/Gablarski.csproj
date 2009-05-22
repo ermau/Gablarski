@@ -49,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AES.cs" />
     <Compile Include="Channel.cs" />
     <Compile Include="Client\GablarskiClient.cs" />
     <Compile Include="Client\ICaptureProvider.cs" />
@@ -81,6 +82,7 @@
     <Compile Include="Network\ServerNetworkConnectionProvider.cs" />
     <Compile Include="PlayerInfo.cs" />
     <Compile Include="PlayerInfoCollection.cs" />
+    <Compile Include="ProviderUtils.cs" />
     <Compile Include="ReadOnlyDictionary.cs" />
     <Compile Include="ServerInfo.cs" />
     <Compile Include="Server\ConnectionCollection.cs" />
