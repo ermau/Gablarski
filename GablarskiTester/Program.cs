@@ -47,7 +47,7 @@ namespace GablarskiTester
 			{
 				ServerName = "Rogue Jedi's Server",
 				ServerDescription = "Development Server",
-			}, new GuestUserProvider ());
+			}, new GuestUserProvider (), new GuestPermissionProvider());
 
 			server.AddConnectionProvider (new ServerNetworkConnectionProvider());
 

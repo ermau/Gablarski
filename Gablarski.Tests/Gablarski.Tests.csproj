@@ -42,7 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MockConnectionBase.cs" />
-    <Compile Include="Properties\MockClientConnection.cs" />
+    <Compile Include="MockClientConnection.cs" />
     <Compile Include="MockConnectionProvider.cs" />
     <Compile Include="MockServerConnection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

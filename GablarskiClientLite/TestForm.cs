@@ -242,7 +242,7 @@ namespace GablarskiClientLite
 		private GablarskiServer server;
 		private void startServerButton_Click (object sender, EventArgs e)
 		{
-			server = new GablarskiServer (new ServerInfo { ServerName = this.ServerName.Text }, new GuestUserProvider());
+			server = new GablarskiServer (new ServerInfo { ServerName = this.ServerName.Text }, new GuestUserProvider(), new GuestPermissionProvider());
 			server.AddConnectionProvider (new ServerNetworkConnectionProvider());
 		}
 

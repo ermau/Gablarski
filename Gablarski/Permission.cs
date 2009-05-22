@@ -3,22 +3,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Gablarski.Server
+namespace Gablarski
 {
+	public enum PermissionName
+	{
+		Login = 1,
+		KickPlayer = 2
+	}
+
 	public class Permission
 	{
-		public Permission (string name)
+		public Permission (PermissionName name)
 		{
 			this.Name = name;
 		}
 
-		public Permission (string name, bool isAllowed)
+		public Permission (PermissionName name, bool isAllowed)
 			: this (name)
 		{
 			this.IsAllowed = isAllowed;
 		}
 
-		public virtual string Name
+		public virtual PermissionName Name
 		{
 			get;
 			private set;
@@ -29,5 +35,5 @@ namespace Gablarski.Server
 			get;
 			set;
 		}
-	}
+	}	
 }

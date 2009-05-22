@@ -80,6 +80,7 @@
     <Compile Include="Network\NetworkConnectionBase.cs" />
     <Compile Include="Network\ServerNetworkConnection.cs" />
     <Compile Include="Network\ServerNetworkConnectionProvider.cs" />
+    <Compile Include="Permissions.cs" />
     <Compile Include="PlayerInfo.cs" />
     <Compile Include="PlayerInfoCollection.cs" />
     <Compile Include="ProviderUtils.cs" />
@@ -87,6 +88,7 @@
     <Compile Include="ServerInfo.cs" />
     <Compile Include="Server\ConnectionCollection.cs" />
     <Compile Include="Server\GablarskiServer.MessageHandling.cs" />
+    <Compile Include="Server\GuestPermissionProvider.cs" />
     <Compile Include="Server\GuestUserProvider.cs" />
     <Compile Include="Server\IChannelProvider.cs" />
     <Compile Include="Server\IPermissionsProvider.cs" />
@@ -100,7 +102,7 @@
     <Compile Include="Messages\ServerMessage.cs" />
     <Compile Include="Server\GablarskiServer.cs" />
     <Compile Include="Server\IUserProvider.cs" />
-    <Compile Include="Server\Permission.cs" />
+    <Compile Include="Permission.cs" />
     <Compile Include="OrderedDictionary.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sources\IMediaSource.cs" />

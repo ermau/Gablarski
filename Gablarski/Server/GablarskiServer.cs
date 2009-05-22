@@ -13,7 +13,7 @@ namespace Gablarski.Server
 	{
 		public static readonly Version MinimumAPIVersion = new Version (0,2,0,0);
 
-		public GablarskiServer (ServerInfo serverInfo, IUserProvider userProvider)
+		public GablarskiServer (ServerInfo serverInfo, IUserProvider userProvider, IPermissionsProvider permissionProvider)
 			: this()
 		{
 			this.serverInfo = serverInfo;
@@ -93,7 +93,8 @@ namespace Gablarski.Server
 
 		private readonly object availableConnectionLock = new object();
 		private List<IConnectionProvider> availableConnections = new List<IConnectionProvider> ();
-		
+
+		private readonly IPermissionsProvider permissionProvider;
 		private readonly IUserProvider userProvider;
 
 		private object sourceLock = new object ();
