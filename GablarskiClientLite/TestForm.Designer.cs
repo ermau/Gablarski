@@ -31,7 +31,6 @@
 			this.label1 = new System.Windows.Forms.Label ();
 			this.ServerHost = new System.Windows.Forms.TextBox ();
 			this.connectButton = new System.Windows.Forms.Button ();
-			this.log = new System.Windows.Forms.TextBox ();
 			this.label2 = new System.Windows.Forms.Label ();
 			this.inputSelect = new System.Windows.Forms.ComboBox ();
 			this.label3 = new System.Windows.Forms.Label ();
@@ -54,6 +53,10 @@
 			this.login = new System.Windows.Forms.Button ();
 			this.userProviderSelect = new System.Windows.Forms.ComboBox ();
 			this.label9 = new System.Windows.Forms.Label ();
+			this.username = new System.Windows.Forms.TextBox ();
+			this.password = new System.Windows.Forms.TextBox ();
+			this.label10 = new System.Windows.Forms.Label ();
+			this.label11 = new System.Windows.Forms.Label ();
 			this.SuspendLayout ();
 			// 
 			// label1
@@ -82,19 +85,6 @@
 			this.connectButton.Text = "Connect";
 			this.connectButton.UseVisualStyleBackColor = true;
 			this.connectButton.Click += new System.EventHandler (this.connectButton_Click);
-			// 
-			// log
-			// 
-			this.log.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-						| System.Windows.Forms.AnchorStyles.Left)
-						| System.Windows.Forms.AnchorStyles.Right)));
-			this.log.Location = new System.Drawing.Point (12, 391);
-			this.log.Multiline = true;
-			this.log.Name = "log";
-			this.log.ReadOnly = true;
-			this.log.Size = new System.Drawing.Size (566, 143);
-			this.log.TabIndex = 8;
-			this.log.TabStop = false;
 			// 
 			// label2
 			// 
@@ -208,19 +198,19 @@
 			this.sourceRequestSelect.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.sourceRequestSelect.Enabled = false;
 			this.sourceRequestSelect.FormattingEnabled = true;
-			this.sourceRequestSelect.Location = new System.Drawing.Point (12, 337);
+			this.sourceRequestSelect.Location = new System.Drawing.Point (12, 373);
 			this.sourceRequestSelect.Name = "sourceRequestSelect";
 			this.sourceRequestSelect.Size = new System.Drawing.Size (262, 21);
-			this.sourceRequestSelect.TabIndex = 14;
+			this.sourceRequestSelect.TabIndex = 12;
 			this.sourceRequestSelect.SelectedIndexChanged += new System.EventHandler (this.sourceRequestSelect_SelectedIndexChanged);
 			// 
 			// requestSource
 			// 
 			this.requestSource.Enabled = false;
-			this.requestSource.Location = new System.Drawing.Point (280, 335);
+			this.requestSource.Location = new System.Drawing.Point (280, 371);
 			this.requestSource.Name = "requestSource";
 			this.requestSource.Size = new System.Drawing.Size (92, 23);
-			this.requestSource.TabIndex = 15;
+			this.requestSource.TabIndex = 13;
 			this.requestSource.Text = "Request Source";
 			this.requestSource.UseVisualStyleBackColor = true;
 			this.requestSource.Click += new System.EventHandler (this.requestSource_Click);
@@ -228,10 +218,10 @@
 			// transmit
 			// 
 			this.transmit.Enabled = false;
-			this.transmit.Location = new System.Drawing.Point (280, 362);
+			this.transmit.Location = new System.Drawing.Point (280, 398);
 			this.transmit.Name = "transmit";
 			this.transmit.Size = new System.Drawing.Size (92, 23);
-			this.transmit.TabIndex = 16;
+			this.transmit.TabIndex = 15;
 			this.transmit.Text = "Transmit";
 			this.transmit.UseVisualStyleBackColor = true;
 			this.transmit.Click += new System.EventHandler (this.transmit_Click);
@@ -241,10 +231,10 @@
 			this.sourceSelect.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.sourceSelect.Enabled = false;
 			this.sourceSelect.FormattingEnabled = true;
-			this.sourceSelect.Location = new System.Drawing.Point (12, 364);
+			this.sourceSelect.Location = new System.Drawing.Point (12, 400);
 			this.sourceSelect.Name = "sourceSelect";
 			this.sourceSelect.Size = new System.Drawing.Size (262, 21);
-			this.sourceSelect.TabIndex = 17;
+			this.sourceSelect.TabIndex = 14;
 			this.sourceSelect.SelectedIndexChanged += new System.EventHandler (this.sourceSelect_SelectedIndexChanged);
 			// 
 			// playerList
@@ -266,7 +256,7 @@
 			// label8
 			// 
 			this.label8.AutoSize = true;
-			this.label8.Location = new System.Drawing.Point (9, 312);
+			this.label8.Location = new System.Drawing.Point (12, 338);
 			this.label8.Name = "label8";
 			this.label8.Size = new System.Drawing.Size (58, 13);
 			this.label8.TabIndex = 20;
@@ -275,19 +265,19 @@
 			// nickname
 			// 
 			this.nickname.Enabled = false;
-			this.nickname.Location = new System.Drawing.Point (111, 309);
+			this.nickname.Location = new System.Drawing.Point (111, 334);
 			this.nickname.Name = "nickname";
 			this.nickname.Size = new System.Drawing.Size (189, 20);
-			this.nickname.TabIndex = 21;
+			this.nickname.TabIndex = 10;
 			this.nickname.Text = "asdf";
 			// 
 			// login
 			// 
 			this.login.Enabled = false;
-			this.login.Location = new System.Drawing.Point (306, 307);
+			this.login.Location = new System.Drawing.Point (306, 332);
 			this.login.Name = "login";
 			this.login.Size = new System.Drawing.Size (66, 23);
-			this.login.TabIndex = 22;
+			this.login.TabIndex = 11;
 			this.login.Text = "Login";
 			this.login.UseVisualStyleBackColor = true;
 			this.login.Click += new System.EventHandler (this.login_Click);
@@ -310,11 +300,48 @@
 			this.label9.TabIndex = 24;
 			this.label9.Text = "User Provider:";
 			// 
+			// username
+			// 
+			this.username.Location = new System.Drawing.Point (111, 310);
+			this.username.Name = "username";
+			this.username.Size = new System.Drawing.Size (101, 20);
+			this.username.TabIndex = 8;
+			// 
+			// password
+			// 
+			this.password.Location = new System.Drawing.Point (280, 310);
+			this.password.Name = "password";
+			this.password.Size = new System.Drawing.Size (92, 20);
+			this.password.TabIndex = 9;
+			this.password.UseSystemPasswordChar = true;
+			// 
+			// label10
+			// 
+			this.label10.AutoSize = true;
+			this.label10.Location = new System.Drawing.Point (12, 313);
+			this.label10.Name = "label10";
+			this.label10.Size = new System.Drawing.Size (58, 13);
+			this.label10.TabIndex = 27;
+			this.label10.Text = "Username:";
+			// 
+			// label11
+			// 
+			this.label11.AutoSize = true;
+			this.label11.Location = new System.Drawing.Point (218, 313);
+			this.label11.Name = "label11";
+			this.label11.Size = new System.Drawing.Size (56, 13);
+			this.label11.TabIndex = 28;
+			this.label11.Text = "Password:";
+			// 
 			// TestForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF (6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size (590, 546);
+			this.Controls.Add (this.label11);
+			this.Controls.Add (this.label10);
+			this.Controls.Add (this.password);
+			this.Controls.Add (this.username);
 			this.Controls.Add (this.label9);
 			this.Controls.Add (this.userProviderSelect);
 			this.Controls.Add (this.login);
@@ -337,7 +364,6 @@
 			this.Controls.Add (this.label3);
 			this.Controls.Add (this.inputSelect);
 			this.Controls.Add (this.label2);
-			this.Controls.Add (this.log);
 			this.Controls.Add (this.connectButton);
 			this.Controls.Add (this.ServerHost);
 			this.Controls.Add (this.label1);
@@ -355,7 +381,6 @@
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.TextBox ServerHost;
 		private System.Windows.Forms.Button connectButton;
-		private System.Windows.Forms.TextBox log;
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.ComboBox inputSelect;
 		private System.Windows.Forms.Label label3;
@@ -378,6 +403,10 @@
 		private System.Windows.Forms.Button login;
 		private System.Windows.Forms.ComboBox userProviderSelect;
 		private System.Windows.Forms.Label label9;
+		private System.Windows.Forms.TextBox username;
+		private System.Windows.Forms.TextBox password;
+		private System.Windows.Forms.Label label10;
+		private System.Windows.Forms.Label label11;
 	}
 }
 

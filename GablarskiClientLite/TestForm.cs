@@ -252,7 +252,15 @@ namespace GablarskiClientLite
 			if (String.IsNullOrEmpty (nick))
 				return;
 
-			this.client.Login (nick);
+			string uname = this.username.Text.Trim ();
+			if (String.IsNullOrEmpty (uname))
+				return;
+
+			string pword = this.password.Text.Trim ();
+			if (String.IsNullOrEmpty (pword))
+				return;
+
+			this.client.Login (nick, uname, pword);
 		}
 
 		private void requestSource_Click (object sender, EventArgs e)

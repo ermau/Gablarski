@@ -25,15 +25,23 @@ namespace Gablarski.Messages
 			set;
 		}
 
+		public string EncryptionKey
+		{
+			get;
+			set;
+		}
+
 		public override void WritePayload (IValueWriter writer)
 		{
 			this.ServerInfo.Serialize (writer);
+			writer.WriteString (this.EncryptionKey);
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
 			this.ServerInfo = new ServerInfo();
 			this.ServerInfo.Deserialize (reader);
+			this.EncryptionKey = reader.ReadString ();
 		}
 	}
 }

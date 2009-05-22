@@ -11,7 +11,7 @@ namespace Gablarski.Server
 {
 	public partial class GablarskiServer
 	{
-		public static readonly Version MinimumAPIVersion = new Version (0,1,0,0);
+		public static readonly Version MinimumAPIVersion = new Version (0,2,0,0);
 
 		public GablarskiServer (ServerInfo serverInfo, IUserProvider userProvider)
 			: this()
@@ -139,8 +139,6 @@ namespace Gablarski.Server
 
 			this.connections.Send (new AudioDataReceivedMessage (msg.SourceId, msg.Data), (IConnection c) => c != e.Connection);
 		}
-
-		
 
 		protected void UserLoginAttempt (MessageReceivedEventArgs e)
 		{
