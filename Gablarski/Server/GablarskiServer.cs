@@ -18,6 +18,7 @@ namespace Gablarski.Server
 		{
 			this.serverInfo = serverInfo;
 			this.userProvider = userProvider;
+			this.permissionProvider = permissionProvider;
 		}
 
 		#region Public Methods
@@ -25,7 +26,7 @@ namespace Gablarski.Server
 		{
 			get
 			{
-				lock (availableConnectionLock)
+				lock (this.availableConnections)
 				{
 					return this.availableConnections.ToArray ();
 				}
@@ -45,7 +46,7 @@ namespace Gablarski.Server
 			connection.ConnectionMade += OnConnectionMade;
 			connection.StartListening ();
 
-			lock (availableConnectionLock)
+			lock (this.availableConnections)
 			{
 				this.availableConnections.Add (connection);
 			}
@@ -58,7 +59,7 @@ namespace Gablarski.Server
 			connection.StopListening ();
 			connection.ConnectionMade -= this.OnConnectionMade;
 
-			lock (availableConnectionLock)
+			lock (this.availableConnections)
 			{
 				this.availableConnections.Remove (connection);
 			}
@@ -75,7 +76,7 @@ namespace Gablarski.Server
 
 		public void Shutdown ()
 		{
-			lock (this.availableConnectionLock)
+			lock (this.availableConnections)
 			{
 				for (int i = 0; i < this.availableConnections.Count;)
 				{
@@ -91,7 +92,6 @@ namespace Gablarski.Server
 
 		private readonly ServerInfo serverInfo = new ServerInfo();
 
-		private readonly object availableConnectionLock = new object();
 		private List<IConnectionProvider> availableConnections = new List<IConnectionProvider> ();
 
 		private readonly IPermissionsProvider permissionProvider;
@@ -152,12 +152,12 @@ namespace Gablarski.Server
 			{
 				info = new PlayerInfo (login.Nickname, result.PlayerId);
 
-				if (!this.connections.PlayerLoggedIn (login.Nickname))
+				if (!this.permissionProvider.GetPermissions (info.PlayerId).CanLogin())
+					result.ResultState = LoginResultState.FailedPermissions;
+				else if (!this.connections.PlayerLoggedIn (login.Nickname))
 					this.connections.Add (e.Connection, info);
 				else
-				{
 					result.ResultState = LoginResultState.FailedNicknameInUse;
-				}
 			}
 			
 			var msg = new LoginResultMessage (result, info);

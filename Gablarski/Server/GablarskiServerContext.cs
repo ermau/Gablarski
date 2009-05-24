@@ -5,8 +5,9 @@ using System.Text;
 
 namespace Gablarski.Server
 {
-	public interface IPermissionsProvider
+	internal class GablarskiServerContext
+		: GablarskiContext
 	{
-		IEnumerable<Permission> GetPermissions (long playerId);
+
 	}
 }

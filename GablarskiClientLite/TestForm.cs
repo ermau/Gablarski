@@ -105,20 +105,23 @@ namespace GablarskiClientLite
 			if (e.Result == SourceResult.Succeeded)
 			{
 				this.Invoke ((Action)delegate
-				             	{
-				             		this.sourceSelect.Items.Add (e.Source);
+								{
+									this.requestSource.Enabled = false;
+									this.sourceSelect.Items.Add (e.Source);
 									this.sourceSelect.Enabled = true;
 									this.transmit.Enabled = true;
-				             	});
+								});
 			}
 			else if (e.Result == SourceResult.NewSource)
 			{
-				this.Invoke ((Action) delegate
-				                      	{
-				                      		this.playerList.Nodes.Cast<TreeNode>().Where (n => (long) n.Tag == e.SourceInfo.PlayerId).
-				                      			First().Nodes.Add (e.SourceInfo.SourceTypeName);
-				                      	});
+				this.Invoke ((Action)delegate
+										{
+											this.playerList.Nodes.Cast<TreeNode> ().Where (n => (long)n.Tag == e.SourceInfo.PlayerId).
+												First ().Nodes.Add (e.SourceInfo.SourceTypeName);
+										});
 			}
+			else
+				MessageBox.Show (e.Result.ToString ());
 		}
 
 		void client_ReceivedLogin (object sender, ReceivedLoginEventArgs e)
@@ -265,7 +268,6 @@ namespace GablarskiClientLite
 
 		private void requestSource_Click (object sender, EventArgs e)
 		{
-			this.requestSource.Enabled = false;
 			Type sourceType = (this.sourceRequestSelect.SelectedItem as Type);
 			if (sourceType == null)
 				return;

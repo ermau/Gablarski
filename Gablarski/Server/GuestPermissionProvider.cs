@@ -8,25 +8,26 @@ namespace Gablarski.Server
 	public class GuestPermissionProvider
 		: IPermissionsProvider
 	{
-		public IEnumerable<Permission> GetPermissions (string username)
+		public IEnumerable<Permission> GetPermissions (long playerId)
 		{
-			if (this.admins.Contains (username))
+			if (this.admins.Contains (playerId))
 			{
 				return GetNamesAsPermissions (
 					PermissionName.Login,
+					PermissionName.RequestSource,
 					PermissionName.KickPlayer);
 			}
 
-			return GetNamesAsPermissions (PermissionName.Login);
+			return GetNamesAsPermissions (PermissionName.Login, PermissionName.RequestSource);
 		}
 
-		public void SetAdmin (string username)
+		public void SetAdmin (long playerId)
 		{
-			if (!this.admins.Contains (username))
-				this.admins.Add (username);
+			if (!this.admins.Contains (playerId))
+				this.admins.Add (playerId);
 		}
 
-		private readonly HashSet<string> admins = new HashSet<string> ();
+		private readonly HashSet<long> admins = new HashSet<long> ();
 
 		private IEnumerable<Permission> GetNamesAsPermissions(params PermissionName[] names)
 		{

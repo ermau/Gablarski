@@ -138,7 +138,15 @@ namespace Gablarski.Network
 					return;
 				}
 
-				msg = MessageBase.MessageTypes[this.rreader.ReadUInt16 ()] ();
+				ushort type = this.rreader.ReadUInt16 ();
+
+				if (!MessageBase.MessageTypes.ContainsKey (type))
+				{
+					this.Disconnect ();
+					return;
+				}
+
+				msg = MessageBase.MessageTypes[type] ();
 				msg.ReadPayload (this.rreader);
 			}
 			catch (Exception e)

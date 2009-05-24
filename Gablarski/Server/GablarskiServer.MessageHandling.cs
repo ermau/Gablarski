@@ -47,7 +47,7 @@ namespace Gablarski.Server
 			int sourceId = -1;
 
 			long playerId = this.connections.GetPlayerId (e.Connection);
-			if (playerId == 0)
+			if (playerId == 0 || !this.permissionProvider.GetPermissions (playerId).CanRequestSource())
 				result = SourceResult.FailedPermissions;
 
 			IMediaSource source = null;

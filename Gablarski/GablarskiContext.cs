@@ -7,6 +7,8 @@ namespace Gablarski
 {
 	internal class GablarskiContext
 	{
-		
+
+
+		private readonly Dictionary<long, PlayerInfo> players = new Dictionary<long, PlayerInfo> ();
 	}
 }

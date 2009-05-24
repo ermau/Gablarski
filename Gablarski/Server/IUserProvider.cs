@@ -56,6 +56,8 @@ namespace Gablarski
 		/// Failed because the nickname is already in use.
 		/// </summary>
 		FailedNicknameInUse = 5,
+
+		FailedPermissions = 6,
 	}
 
 	/// <summary>
