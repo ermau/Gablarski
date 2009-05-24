@@ -269,7 +269,7 @@ namespace Gablarski.OpenAL
 
 					strings.Add (Marshal.PtrToStringAnsi (location, i));
 					location = new IntPtr ((long)location + i + 1);
-					i = 0;
+					i = -1;
 				}
 				else
 					lastNull = false;
