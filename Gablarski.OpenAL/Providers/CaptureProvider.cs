@@ -66,7 +66,7 @@ namespace Gablarski.OpenAL.Providers
 
 		public void Dispose ()
 		{
-			throw new NotImplementedException ();
+			this.device.Dispose ();
 		}
 
 		#endregion

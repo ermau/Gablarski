@@ -11,12 +11,7 @@ namespace Gablarski.Server
 		public IEnumerable<Permission> GetPermissions (long playerId)
 		{
 			if (this.admins.Contains (playerId))
-			{
-				return GetNamesAsPermissions (
-					PermissionName.Login,
-					PermissionName.RequestSource,
-					PermissionName.KickPlayer);
-			}
+				return GetNamesAsPermissions (Permission.GetAllNames());
 
 			return GetNamesAsPermissions (PermissionName.Login, PermissionName.RequestSource);
 		}
@@ -29,7 +24,12 @@ namespace Gablarski.Server
 
 		private readonly HashSet<long> admins = new HashSet<long> ();
 
-		private IEnumerable<Permission> GetNamesAsPermissions(params PermissionName[] names)
+		private IEnumerable<Permission> GetNamesAsPermissions (IEnumerable<PermissionName> names)
+		{
+			return names.Select (n => new Permission (n, true));
+		}
+
+		private IEnumerable<Permission> GetNamesAsPermissions (params PermissionName[] names)
 		{
 			for (int i = 0; i < names.Length; ++i)
 				yield return new Permission (names[i], true);

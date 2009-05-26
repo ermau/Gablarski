@@ -48,7 +48,7 @@ namespace Gablarski.Tests
 		[TestInitialize]
 		public void ServerTestInitialize ()
 		{
-			this.server = new GablarskiServer (new ServerInfo { ServerName = "Test Server", ServerDescription = "Test Server" }, new GuestUserProvider (), new GuestPermissionProvider());
+			this.server = new GablarskiServer (new ServerInfo { ServerName = "Test Server", ServerDescription = "Test Server" }, new GuestUserProvider (), new GuestPermissionProvider(), new LobbyChannelProvider());
 			this.server.AddConnectionProvider (this.provider = new MockConnectionProvider ());
 		}
 

@@ -33,10 +33,10 @@ namespace Gablarski.Messages
 			set;
 		}
 
-	/*	public override bool Reliable
-		{
-			get { return false; }
-		}*/
+		//public override bool Reliable
+		//{
+		//    get { return false; }
+		//}
 
 		public override void WritePayload (IValueWriter writer)
 		{

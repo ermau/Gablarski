@@ -58,17 +58,25 @@
     <Compile Include="Client\IPlaybackProvider.cs" />
     <Compile Include="Codecs\IMediaCodec.cs" />
     <Compile Include="Codecs\RawCodec.cs" />
+    <Compile Include="en-US.Designer.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="GablarskiContext.cs" />
     <Compile Include="IClientConnection.cs" />
     <Compile Include="IConnection.cs" />
     <Compile Include="IConnectionProvider.cs" />
+    <Compile Include="LoginResult.cs" />
     <Compile Include="MediaSourceInfo.cs" />
     <Compile Include="MediaType.cs" />
     <Compile Include="Messages\AudioDataReceivedMessage.cs" />
+    <Compile Include="Messages\ChangeChannelMessage.cs" />
+    <Compile Include="Messages\ChannelListMessage.cs" />
+    <Compile Include="Messages\ChannelChangedMessage.cs" />
+    <Compile Include="Messages\ChannelMoveInfo.cs" />
     <Compile Include="Messages\ConnectionRejectedMessage.cs" />
     <Compile Include="Messages\ConnectMessage.cs" />
     <Compile Include="Messages\LoginResultMessage.cs" />
+    <Compile Include="Messages\RequestChannelList.cs" />
+    <Compile Include="Messages\RequestPlayerList.cs" />
+    <Compile Include="Messages\RequestSourceList.cs" />
     <Compile Include="Messages\SendAudioDataMessage.cs" />
     <Compile Include="Messages\PlayerListMessage.cs" />
     <Compile Include="Messages\RequestSourceMessage.cs" />
@@ -118,6 +126,12 @@
     <Compile Include="Server\ConnectionProviderBase.cs" />
     <Compile Include="Server\Telnet\TelnetConnection.cs" />
     <Compile Include="Server\Telnet\TelnetConnectionProvider.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Server\LobbyChannelProvider.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="en-US.resx" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

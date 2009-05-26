@@ -25,6 +25,7 @@ namespace GablarskiClientLite
 			//Trace.Listeners.Add (new TextBoxTracer (this.log));
 		}
 
+		private GuestPermissionProvider permProvider = new GuestPermissionProvider ();
 		private IPlaybackProvider playback;
 		private ICaptureProvider capture;
 		private GablarskiClient client;
@@ -41,6 +42,7 @@ namespace GablarskiClientLite
 			client.LoginResult += client_ReceivedLogin;
 			client.PlayerLoggedIn += client_ReceivedNewLogin;
 			client.ReceivedSource += client_ReceivedSource;
+			client.ReceivedChannelList += client_ReceivedChannelList;
 			client.ReceivedPlayerList += client_ReceivedPlayerList;
 			client.ReceivedSourceList += client_ReceivedSourceList;
 			client.ReceivedAudioData += client_ReceivedAudioData;
@@ -81,24 +83,69 @@ namespace GablarskiClientLite
 		{
 			this.Invoke ((Action)delegate
 			{
-				var lookup = e.Data.ToLookup (m => m.PlayerId);
-				foreach (TreeNode node in this.playerList.Nodes)
+				this.playerList.BeginUpdate ();
+				foreach (var s in this.sourceNodes.Values)
+					s.Remove ();
+
+				this.sourceNodes.Clear ();
+
+				foreach (var s in e.Data)
 				{
-					long playerId = (long)node.Tag;
-					foreach (var source in lookup[playerId])
-						node.Nodes.Add (source.SourceTypeName);
+					if (!this.playerNodes.ContainsKey (s.PlayerId))
+						continue;
+
+					this.sourceNodes.Add (s.SourceId, this.playerNodes[s.PlayerId].Nodes.Add (s.SourceTypeName));
 				}
+
+				this.playerList.EndUpdate ();
 			});
+		}
+
+		void client_ReceivedChannelList (object sender, ReceivedListEventArgs<Channel> e)
+		{
+			this.Invoke ((Action)delegate
+			{
+				this.playerList.BeginUpdate ();
+				this.playerList.Nodes.Clear ();
+
+				foreach (Channel channel in e.Data)
+					this.channelNodes.Add (channel.ChannelId, this.playerList.Nodes.Add (channel.Name));
+
+				this.playerList.EndUpdate ();
+
+				this.AddPlayers (this.client.Players);
+			});
+		}
+
+		private void AddPlayers (IEnumerable<PlayerInfo> players)
+		{
+			this.playerList.BeginUpdate ();
+
+			foreach (var node in this.playerNodes.Values)
+				node.Remove ();
+
+			this.playerNodes.Clear ();
+
+			foreach (var p in players)
+			{
+				if (!this.channelNodes.ContainsKey (p.CurrentChannelId))
+					continue;
+
+				this.playerNodes[p.PlayerId] = this.channelNodes[p.CurrentChannelId].Nodes.Add (p.Nickname);
+				this.channelNodes[p.CurrentChannelId].Expand ();
+			}
+
+			this.playerList.EndUpdate ();
 		}
 
 		void client_ReceivedPlayerList (object sender, ReceivedListEventArgs<PlayerInfo> e)
 		{
-			this.Invoke ((Action)delegate
-			{
-				foreach (PlayerInfo player in e.Data)
-					this.playerList.Nodes.Add (player.Nickname).Tag = player.PlayerId;
-			});
+			this.Invoke ((Action<IEnumerable<PlayerInfo>>)AddPlayers, e.Data);
 		}
+
+		private Dictionary<long, TreeNode> channelNodes = new Dictionary<long, TreeNode> ();
+		private Dictionary<long, TreeNode> playerNodes = new Dictionary<long, TreeNode> ();
+		private Dictionary<int, TreeNode> sourceNodes = new Dictionary<int, TreeNode> ();
 
 		void client_ReceivedSource (object sender, ReceivedSourceEventArgs e)
 		{
@@ -112,13 +159,28 @@ namespace GablarskiClientLite
 									this.transmit.Enabled = true;
 								});
 			}
-			else if (e.Result == SourceResult.NewSource)
+			
+			if (e.Result == SourceResult.NewSource || e.Result == SourceResult.Succeeded)
 			{
 				this.Invoke ((Action)delegate
-										{
-											this.playerList.Nodes.Cast<TreeNode> ().Where (n => (long)n.Tag == e.SourceInfo.PlayerId).
-												First ().Nodes.Add (e.SourceInfo.SourceTypeName);
-										});
+				{
+					if (!this.playerNodes.ContainsKey (e.SourceInfo.PlayerId))
+						return;
+
+					this.sourceNodes[e.SourceInfo.SourceId] = this.playerNodes[e.SourceInfo.PlayerId].Nodes.Add (e.SourceInfo.SourceTypeName);
+					this.playerNodes[e.SourceInfo.PlayerId].Expand ();
+				});
+			}
+			else if (e.Result == SourceResult.SourceRemoved)
+			{
+				this.Invoke ((Action)delegate
+				{
+					if (!this.sourceNodes.ContainsKey (e.SourceInfo.SourceId))
+						return;
+
+					this.sourceNodes[e.SourceInfo.SourceId].Remove ();
+					this.sourceNodes.Remove (e.SourceInfo.SourceId);
+				});
 			}
 			else
 				MessageBox.Show (e.Result.ToString ());
@@ -131,6 +193,8 @@ namespace GablarskiClientLite
 				MessageBox.Show (e.Result.ResultState.ToString());
 				return;
 			}
+
+			permProvider.SetAdmin (e.Result.PlayerId);
 
 			this.Invoke ((Action)delegate
 			{
@@ -245,7 +309,7 @@ namespace GablarskiClientLite
 		private GablarskiServer server;
 		private void startServerButton_Click (object sender, EventArgs e)
 		{
-			server = new GablarskiServer (new ServerInfo { ServerName = this.ServerName.Text }, new GuestUserProvider(), new GuestPermissionProvider());
+			server = new GablarskiServer (new ServerInfo { ServerName = this.ServerName.Text }, new GuestUserProvider(), new GuestPermissionProvider(), new LobbyChannelProvider());
 			server.AddConnectionProvider (new ServerNetworkConnectionProvider());
 		}
 

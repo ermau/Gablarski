@@ -8,8 +8,27 @@ namespace Gablarski
 	public enum PermissionName
 	{
 		Login = 1,
-		KickPlayer = 2,
-		RequestSource = 3
+		KickPlayerFromChannel = 2,
+		KickPlayerFromServer = 9,
+
+		#region Channels
+		/// <summary>
+		/// Move yourself from channel to channel
+		/// </summary>
+		ChangeChannel = 7,
+		
+		/// <summary>
+		/// Move a different player from channel to channel
+		/// </summary>
+		ChangePlayersChannel = 8,
+		#endregion
+
+		RequestSource = 3,
+		SendAudioToCurrentChannel = 4,
+		SendAudioToAll = 5,
+		SendAudioToDifferentChannel = 6,
+
+		RequestChannelList = 10,
 	}
 
 	public class Permission
@@ -36,25 +55,15 @@ namespace Gablarski
 			get;
 			set;
 		}
+
+		public static IEnumerable<PermissionName> GetAllNames ()
+		{
+			return Enum.GetValues (typeof (PermissionName)).Cast<PermissionName> ();
+		}
 	}
 
 	public static class PermissionExtensions
 	{
-		public static bool CanLogin (this IEnumerable<Permission> self)
-		{
-			return self.GetPermission (PermissionName.Login);
-		}
-
-		public static bool CanRequestSource (this IEnumerable<Permission> self)
-		{
-			return self.GetPermission (PermissionName.RequestSource);
-		}
-
-		public static bool CanKickPlayer (this IEnumerable<Permission> self)
-		{
-			return self.GetPermission (PermissionName.KickPlayer);
-		}
-
 		public static bool GetPermission (this IEnumerable<Permission> self, PermissionName name)
 		{
 			var perm = self.Where (p => p.Name == name).FirstOrDefault ();

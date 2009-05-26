@@ -19,7 +19,8 @@ namespace Gablarski.Server
 			this.Start();
 			(this.listenerThread = new Thread (this.ListenChecker)
 			{
-				Name = this.GetType().Name + " Listen checker thread"
+				Name = this.GetType().Name + " Listen checker thread",
+				IsBackground = true
 			}).Start();
 		}
 

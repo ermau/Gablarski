@@ -28,10 +28,15 @@ namespace Gablarski.Client
 		public event EventHandler<RejectedConnectionEventArgs> ConnectionRejected;
 		public event EventHandler Disconnected;
 		public event EventHandler<ReceivedLoginEventArgs> LoginResult;
+
 		public event EventHandler<ReceivedLoginEventArgs> PlayerLoggedIn;
 		public event EventHandler<PlayerDisconnectedEventArgs> PlayerDisconnected;
+		public event EventHandler<ChannelChangedEventArgs> PlayerChangedChannel;
+
 		public event EventHandler<ReceivedSourceEventArgs> ReceivedSource;
 		public event EventHandler<ReceivedAudioEventArgs> ReceivedAudioData;
+
+		public event EventHandler<ReceivedListEventArgs<Channel>> ReceivedChannelList;
 		public event EventHandler<ReceivedListEventArgs<PlayerInfo>> ReceivedPlayerList;
 		public event EventHandler<ReceivedListEventArgs<MediaSourceInfo>> ReceivedSourceList;
 		#endregion
@@ -61,6 +66,20 @@ namespace Gablarski.Client
 					this.players.Values.CopyTo (playerCopy, 0);
 
 					return playerCopy;
+				}
+			}
+		}
+
+		public IEnumerable<Channel> Channels
+		{
+			get
+			{
+				lock (channelLock)
+				{
+					Channel[] channelCopy = new Channel[this.channels.Count];
+					this.channels.Values.CopyTo (channelCopy, 0);
+
+					return channelCopy;
 				}
 			}
 		}
@@ -160,9 +179,23 @@ namespace Gablarski.Client
 				received (this, e);
 		}
 
+		protected virtual void OnReceivedChannelList (ReceivedListEventArgs<Channel> e)
+		{
+			var received = this.ReceivedChannelList;
+			if (received != null)
+				received (this, e);
+		}
+
 		protected virtual void OnPlayerLoggedIn (ReceivedLoginEventArgs e)
 		{
 			var result = this.PlayerLoggedIn;
+			if (result != null)
+				result (this, e);
+		}
+
+		protected virtual void OnPlayerChangedChannnel (ChannelChangedEventArgs e)
+		{
+			var result = this.PlayerChangedChannel;
 			if (result != null)
 				result (this, e);
 		}
@@ -191,6 +224,21 @@ namespace Gablarski.Client
 	}
 
 	#region Event Args
+	public class ChannelChangedEventArgs
+		: EventArgs
+	{
+		public ChannelChangedEventArgs (ChannelChangeInfo moveInfo)
+		{
+			this.MoveInfo = moveInfo;
+		}
+
+		public ChannelChangeInfo MoveInfo
+		{
+			get;
+			private set;
+		}
+	}
+
 	public class RejectedConnectionEventArgs
 		: EventArgs
 	{

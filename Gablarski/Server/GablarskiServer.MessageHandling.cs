@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Gablarski.Messages;
 using Gablarski.Media.Sources;
+using System.Diagnostics;
 
 namespace Gablarski.Server
 {
@@ -18,6 +19,10 @@ namespace Gablarski.Server
 				{ ClientMessageType.Login, UserLoginAttempt },
 				{ ClientMessageType.RequestSource, ClientRequestsSource },
 				{ ClientMessageType.AudioData, AudioDataReceived },
+
+				{ ClientMessageType.RequestChannelList, ClientRequestsChannelList },
+				{ ClientMessageType.RequestPlayerList, ClientRequestsPlayerList },
+				{ ClientMessageType.RequestSourceList, ClientRequestsSourceList },
 			};
 		}
 
@@ -27,16 +32,110 @@ namespace Gablarski.Server
 		{
 			var msg = (ConnectMessage)e.Message;
 
-			if (msg.ApiVersion < MinimumAPIVersion)
+			if (msg.ApiVersion < MinimumApiVersion)
 			{
 				e.Connection.Send (new ConnectionRejectedMessage (ConnectionRejectedReason.IncompatibleVersion));
 				e.Connection.Disconnect ();
 				return;
 			}
+		}
 
-			e.Connection.Send (new ServerInfoMessage (this.serverInfo));
+		#region Channels
+		private void ClientRequestsChannelList (MessageReceivedEventArgs e)
+		{
+			if (GetPermission (PermissionName.RequestChannelList, e.Connection))
+			{
+				lock (this.channelLock)
+				{
+					e.Connection.Send (new ChannelListMessage (this.channels.Values));
+				}
+			}
+		}
+
+		private void ClientRequestsChannelChange (MessageReceivedEventArgs e)
+		{
+			var change = (ChangeChannelMessage)e.Message;
+
+			ChannelChangeResult resultState = ChannelChangeResult.FailedUnknown;
+			lock (this.channelLock)
+			{
+				if (!this.channels.ContainsKey (change.MoveInfo.TargetChannelId))
+					resultState = ChannelChangeResult.FailedUnknownChannel;
+			}
+
+			PlayerInfo requestingPlayer = null;
+			if (resultState == ChannelChangeResult.FailedUnknown)
+			{
+				requestingPlayer = this.connections.GetPlayer (e.Connection);
+
+				if (requestingPlayer.PlayerId == change.MoveInfo.TargetPlayerId && !GetPermission (PermissionName.ChangeChannel, requestingPlayer.PlayerId))
+					resultState = ChannelChangeResult.FailedPermissions;
+				else if (!GetPermission (PermissionName.ChangePlayersChannel, requestingPlayer.PlayerId))
+					resultState = ChannelChangeResult.FailedPermissions;
+				else
+				{
+					requestingPlayer.CurrentChannelId = change.MoveInfo.TargetChannelId;
+					this.connections.Send (new ChannelChangeResultMessage (requestingPlayer.PlayerId, change.MoveInfo));
+					return;
+				}
+			}
+
+			e.Connection.Send (new ChannelChangeResultMessage { Result = resultState });
+		}
+		#endregion
+
+		#region Players
+		protected void UserLoginAttempt (MessageReceivedEventArgs e)
+		{
+			var login = (LoginMessage)e.Message;
+
+			LoginResult result = this.userProvider.Login (login.Username, login.Password);
+			PlayerInfo info = null;
+
+			if (result.Succeeded)
+			{
+				info = new PlayerInfo (login.Nickname, result.PlayerId, this.defaultChannel.ChannelId);
+
+				if (!this.GetPermission (PermissionName.Login, result.PlayerId))
+					result.ResultState = LoginResultState.FailedPermissions;
+				else if (!this.connections.PlayerLoggedIn (login.Nickname))
+					this.connections.Add (e.Connection, info);
+				else
+					result.ResultState = LoginResultState.FailedNicknameInUse;
+			}
+
+			var msg = new LoginResultMessage (result, info);
+
+			if (result.Succeeded)
+			{
+				e.Connection.Send (new ServerInfoMessage (this.serverInfo));
+
+				lock (this.channelLock)
+				{
+					e.Connection.Send (new ChannelListMessage (this.channels.Values));
+				}
+				
+				e.Connection.Send (new PlayerListMessage (this.connections.Players));
+				e.Connection.Send (new SourceListMessage (this.GetSourceInfoList ()));
+
+				this.connections.Send (msg);
+			}
+			else
+				e.Connection.Send (msg);
+
+			Trace.WriteLine ("[Server]" + login.Username + " Login: " + result.ResultState);
+		}
+
+		private void ClientRequestsPlayerList (MessageReceivedEventArgs e)
+		{
 			e.Connection.Send (new PlayerListMessage (this.connections.Players));
-			e.Connection.Send (new SourceListMessage (this.GetSourceInfoList()));
+		}
+		#endregion
+
+		#region Sources
+		private void ClientRequestsSourceList (MessageReceivedEventArgs e)
+		{
+			e.Connection.Send (new SourceListMessage (this.GetSourceInfoList ()));
 		}
 
 		protected void ClientRequestsSource (MessageReceivedEventArgs e)
@@ -47,7 +146,7 @@ namespace Gablarski.Server
 			int sourceId = -1;
 
 			long playerId = this.connections.GetPlayerId (e.Connection);
-			if (playerId == 0 || !this.permissionProvider.GetPermissions (playerId).CanRequestSource())
+			if (playerId == 0 || !this.GetPermission (PermissionName.RequestSource, playerId))
 				result = SourceResult.FailedPermissions;
 
 			IMediaSource source = null;
@@ -106,5 +205,6 @@ namespace Gablarski.Server
 				}
 			}
 		}
+		#endregion
 	}
 }

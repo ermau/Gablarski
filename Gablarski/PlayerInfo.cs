@@ -12,10 +12,11 @@ namespace Gablarski
 
 		}
 
-		internal PlayerInfo (string nickname, long playerId)
+		internal PlayerInfo (string nickname, long playerId, long currentChannelId)
 		{
 			this.Nickname = nickname;
 			this.PlayerId = playerId;
+			this.CurrentChannelId = currentChannelId;
 		}
 
 		internal PlayerInfo (IValueReader reader)
@@ -35,21 +36,24 @@ namespace Gablarski
 			private set;
 		}
 
-		/// <summary>
-		/// Server use.
-		/// </summary>
-		internal IConnection connection;
+		public long CurrentChannelId
+		{
+			get;
+			set;
+		}
 
 		internal void Serialize (IValueWriter writer)
 		{
 			writer.WriteInt64 (this.PlayerId);
+			writer.WriteInt64 (this.CurrentChannelId);
 			writer.WriteString (this.Nickname);
 		}
 
 		internal void Deserialize (IValueReader reader)
 		{
 			this.PlayerId = reader.ReadInt64();
-			this.Nickname = reader.ReadString();
+			this.CurrentChannelId = reader.ReadInt64 ();
+			this.Nickname = reader.ReadString();			
 		}
 	}
 }

@@ -17,11 +17,15 @@ namespace Gablarski.Client
 				{ ServerMessageType.ServerInfoReceived, OnServerInfoReceivedMessage },
 				{ ServerMessageType.PlayerListReceived, OnPlayerListReceivedMessage },
 				{ ServerMessageType.SourceListReceived, OnSourceListReceivedMessage },
+				{ ServerMessageType.ChannelListReceived, OnChannelListReceivedMessage },
+
+				{ ServerMessageType.ConnectionRejected, OnConnectionRejectedMessage },
 				{ ServerMessageType.LoginResult, OnLoginResultMessage },
+				{ ServerMessageType.PlayerDisconnected, OnPlayerDisconnectedMessage },
+				{ ServerMessageType.ChangeChannelResult, OnChangeChannelResultMessage },
+
 				{ ServerMessageType.SourceResult, OnSourceResultMessage },
 				{ ServerMessageType.AudioDataReceived, OnAudioDataReceivedMessage },
-				{ ServerMessageType.PlayerDisconnected, OnPlayerDisconnectedMessage },
-				{ ServerMessageType.ConnectionRejected, OnConnectionRejectedMessage },
 			};
 		}
 		
@@ -34,11 +38,14 @@ namespace Gablarski.Client
 		protected readonly IClientConnection connection;
 
 		private object sourceLock = new object ();
-		private readonly Dictionary<MediaType, IMediaSource> clientSources = new Dictionary<MediaType, IMediaSource> ();
-		private readonly Dictionary<int, IMediaSource> allSources = new Dictionary<int, IMediaSource> ();
+		private Dictionary<MediaType, IMediaSource> clientSources = new Dictionary<MediaType, IMediaSource> ();
+		private Dictionary<int, IMediaSource> allSources = new Dictionary<int, IMediaSource> ();
 
 		private object playerLock = new object();
-		private readonly Dictionary<long, PlayerInfo> players = new Dictionary<long, PlayerInfo>();
+		private Dictionary<long, PlayerInfo> players = new Dictionary<long, PlayerInfo>();
+
+		private object channelLock = new object();
+		private Dictionary<long, Channel> channels = new Dictionary<long, Channel> ();
 
 		private void AddSource (IMediaSource source, bool mine)
 		{
@@ -102,26 +109,49 @@ namespace Gablarski.Client
 			Trace.WriteLine ("Server description: " + this.serverInfo.ServerDescription);
 		}
 
+		#region Channels
+		private void OnChangeChannelResultMessage (MessageReceivedEventArgs e)
+		{
+			var msg = (ChannelChangeResultMessage)e.Message;
+
+			if (msg.Result == ChannelChangeResult.Success)
+			{
+				lock (playerLock)
+				{
+					if (!this.players.ContainsKey (msg.MoveInfo.TargetPlayerId))
+						return;
+
+					this.players[msg.MoveInfo.TargetPlayerId].CurrentChannelId = msg.MoveInfo.TargetChannelId;
+				}
+
+				OnPlayerChangedChannnel (new ChannelChangedEventArgs (msg.MoveInfo));
+			}
+		}
+
+		private void OnChannelListReceivedMessage (MessageReceivedEventArgs e)
+		{
+			var msg = (ChannelListMessage)e.Message;
+
+			lock (channelLock)
+			{
+				this.channels = msg.Channels.ToDictionary (c => c.ChannelId);
+			}
+
+			OnReceivedChannelList (new ReceivedListEventArgs<Channel> (msg.Channels));
+		}
+		#endregion
+
+		#region Players
 		private void OnPlayerListReceivedMessage (MessageReceivedEventArgs e)
 		{
 			var msg = (PlayerListMessage)e.Message;
 
 			lock (playerLock)
 			{
-				foreach (PlayerInfo player in msg.Players)
-					this.players.Add (player.PlayerId, player);
+				this.players = msg.Players.ToDictionary (p => p.PlayerId);
 			}
 
 			OnReceivedPlayerList (new ReceivedListEventArgs<PlayerInfo> (msg.Players));
-		}
-
-		private void OnSourceListReceivedMessage (MessageReceivedEventArgs e)
-		{
-			var msg = (SourceListMessage)e.Message;
-			foreach (var sourceInfo in msg.Sources)
-				this.AddSource (MediaSources.Create (Type.GetType (sourceInfo.SourceTypeName), sourceInfo.SourceId), sourceInfo.PlayerId == this.userId);
-
-			OnReceivedSourceList (new ReceivedListEventArgs<MediaSourceInfo> (msg.Sources));
 		}
 
 		private void OnLoginResultMessage (MessageReceivedEventArgs e)
@@ -145,7 +175,18 @@ namespace Gablarski.Client
 				OnPlayerLoggedIn (args);
 			}
 		}
-	
+		#endregion
+
+		#region Sources
+		private void OnSourceListReceivedMessage (MessageReceivedEventArgs e)
+		{
+			var msg = (SourceListMessage)e.Message;
+			foreach (var sourceInfo in msg.Sources)
+				this.AddSource (MediaSources.Create (Type.GetType (sourceInfo.SourceTypeName), sourceInfo.SourceId), sourceInfo.PlayerId == this.userId);
+
+			OnReceivedSourceList (new ReceivedListEventArgs<MediaSourceInfo> (msg.Sources));
+		}
+
 		private void OnSourceResultMessage (MessageReceivedEventArgs e)
 		{
 			IMediaSource source = null;
@@ -169,5 +210,6 @@ namespace Gablarski.Client
 			var msg = (AudioDataReceivedMessage)e.Message;
 			OnReceivedAudioData (new ReceivedAudioEventArgs (this.allSources[msg.SourceId], msg.Data));
 		}
+		#endregion
 	}
 }

@@ -26,26 +26,7 @@ namespace Gablarski.Media.Sources
 
 			rwl.EnterUpgradeableReadLock ();
 			if (!types.ContainsKey (sourceType))
-			{
-				rwl.EnterWriteLock ();
-				if (!types.ContainsKey (sourceType))
-				{
-					Type[] argTypes = new Type[] { typeof (int) };
-
-					ConstructorInfo ctor = sourceType.GetConstructor (argTypes);
-					if (ctor == null)
-						throw new InvalidOperationException ("Source constructor not found.");
-
-					DynamicMethod method = new DynamicMethod ("Create" + sourceType.Name, sourceType, argTypes);
-					ILGenerator gen = method.GetILGenerator ();
-					gen.Emit (OpCodes.Ldarg_0);
-					gen.Emit (OpCodes.Newobj, ctor);
-					gen.Emit (OpCodes.Ret);
-
-					types.Add (sourceType, (Func<int, IMediaSource>)method.CreateDelegate (typeof (Func<int, IMediaSource>)));
-				}
-				rwl.ExitWriteLock ();
-			}
+				InitType (sourceType);
 
 			IMediaSource source = null;
 			if (types.ContainsKey (sourceType))
@@ -58,5 +39,27 @@ namespace Gablarski.Media.Sources
 
 		private static Dictionary<Type, Func<int, IMediaSource>> types = new Dictionary<Type, Func<int, IMediaSource>> ();
 		private static ReaderWriterLockSlim rwl = new ReaderWriterLockSlim ();
+
+		private static void InitType (Type sourceType)
+		{
+			rwl.EnterWriteLock ();
+			if (!types.ContainsKey (sourceType))
+			{
+				Type[] argTypes = new Type[] { typeof (int) };
+
+				ConstructorInfo ctor = sourceType.GetConstructor (argTypes);
+				if (ctor == null)
+					throw new InvalidOperationException ("Source constructor not found.");
+
+				DynamicMethod method = new DynamicMethod ("Create" + sourceType.Name, sourceType, argTypes);
+				ILGenerator gen = method.GetILGenerator ();
+				gen.Emit (OpCodes.Ldarg_0);
+				gen.Emit (OpCodes.Newobj, ctor);
+				gen.Emit (OpCodes.Ret);
+
+				types.Add (sourceType, (Func<int, IMediaSource>)method.CreateDelegate (typeof (Func<int, IMediaSource>)));
+			}
+			rwl.ExitWriteLock ();
+		}
 	}
 }

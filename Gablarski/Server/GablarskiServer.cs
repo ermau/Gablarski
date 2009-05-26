@@ -11,14 +11,18 @@ namespace Gablarski.Server
 {
 	public partial class GablarskiServer
 	{
-		public static readonly Version MinimumAPIVersion = new Version (0,2,0,0);
+		public static readonly Version MinimumApiVersion = new Version (0,3,0,0);
 
-		public GablarskiServer (ServerInfo serverInfo, IUserProvider userProvider, IPermissionsProvider permissionProvider)
+		public GablarskiServer (ServerInfo serverInfo, IUserProvider userProvider, IPermissionsProvider permissionProvider, IChannelProvider channelProvider)
 			: this()
 		{
 			this.serverInfo = serverInfo;
 			this.userProvider = userProvider;
 			this.permissionProvider = permissionProvider;
+			
+			this.channelProvider = channelProvider;
+			this.channelProvider.ChannelsUpdatedExternally += OnChannelsUpdatedExternally;
+			this.UpdateChannels ();
 		}
 
 		#region Public Methods
@@ -96,11 +100,31 @@ namespace Gablarski.Server
 
 		private readonly IPermissionsProvider permissionProvider;
 		private readonly IUserProvider userProvider;
+		private readonly IChannelProvider channelProvider;
 
 		private object sourceLock = new object ();
 		private readonly Dictionary<IConnection, List<IMediaSource>> sources = new Dictionary<IConnection, List<IMediaSource>> ();
 
 		private readonly ConnectionCollection connections = new ConnectionCollection();
+
+		private readonly object channelLock = new object ();
+		private Channel defaultChannel;
+		private Dictionary<long, Channel> channels;
+
+		private void UpdateChannels ()
+		{
+			this.channels = this.channelProvider.GetChannels ().ToDictionary (c => c.ChannelId);
+			this.defaultChannel = this.channelProvider.DefaultChannel;
+		}
+
+		private void OnChannelsUpdatedExternally (object sender, EventArgs e)
+		{
+			lock (channelLock)
+			{
+				this.UpdateChannels ();
+				this.connections.Send (new ChannelListMessage (this.channels.Values));
+			}
+		}
 
 		private IEnumerable<MediaSourceInfo> GetSourceInfoList ()
 		{
@@ -120,6 +144,16 @@ namespace Gablarski.Server
 			return agrSources;
 		}
 
+		protected bool GetPermission (PermissionName name, long playerId)
+		{
+			return this.permissionProvider.GetPermissions (playerId).GetPermission (name);
+		}
+
+		protected bool GetPermission (PermissionName name, IConnection connection)
+		{
+			return GetPermission (name, this.connections.GetPlayerId (connection));
+		}
+
 		protected virtual void OnMessageReceived (object sender, MessageReceivedEventArgs e)
 		{
 			var msg = (e.Message as ClientMessage);
@@ -131,7 +165,10 @@ namespace Gablarski.Server
 
 			Trace.WriteLine ("[Server] Message Received: " + msg.MessageType);
 
-			this.Handlers[msg.MessageType] (e);
+			#if !DEBUG
+				if (this.Handlers.ContainsKey (msg.MessageType))
+			#endif
+					this.Handlers[msg.MessageType] (e);
 		}
 
 		protected void AudioDataReceived (MessageReceivedEventArgs e)
@@ -139,35 +176,6 @@ namespace Gablarski.Server
 			var msg = (SendAudioDataMessage) e.Message;
 
 			this.connections.Send (new AudioDataReceivedMessage (msg.SourceId, msg.Data), (IConnection c) => c != e.Connection);
-		}
-
-		protected void UserLoginAttempt (MessageReceivedEventArgs e)
-		{
-			var login = (LoginMessage)e.Message;
-
-			LoginResult result = this.userProvider.Login (login.Username, login.Password);
-			PlayerInfo info = null;
-
-			if (result.Succeeded)
-			{
-				info = new PlayerInfo (login.Nickname, result.PlayerId);
-
-				if (!this.permissionProvider.GetPermissions (info.PlayerId).CanLogin())
-					result.ResultState = LoginResultState.FailedPermissions;
-				else if (!this.connections.PlayerLoggedIn (login.Nickname))
-					this.connections.Add (e.Connection, info);
-				else
-					result.ResultState = LoginResultState.FailedNicknameInUse;
-			}
-			
-			var msg = new LoginResultMessage (result, info);
-
-			if (result.Succeeded)
-				this.connections.Send (msg);
-			else
-				e.Connection.Send (msg);
-
-			Trace.WriteLine ("[Server]" + login.Username + " Login: " + result.ResultState);
 		}
 
 		protected void ClientDisconnected (MessageReceivedEventArgs e)

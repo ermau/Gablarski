@@ -66,6 +66,11 @@ namespace Gablarski.Messages
 		NewSource = 0,
 
 		/// <summary>
+		/// The source was removed.
+		/// </summary>
+		SourceRemoved = 8,
+
+		/// <summary>
 		/// The source was successfully requested.
 		/// </summary>
 		Succeeded = 1,

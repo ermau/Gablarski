@@ -41,6 +41,19 @@ namespace Gablarski.Server
 			}
 		}
 
+		public PlayerInfo GetPlayer (IConnection connection)
+		{
+			PlayerInfo player = null;
+
+			lock (lck)
+			{
+				if (this.players.ContainsKey (connection))
+					player = this.players[connection];
+			}
+
+			return player;
+		}
+
 		/// <summary>
 		/// Gets the player Id for the connection, 0 if the connection wasn't found.
 		/// </summary>
