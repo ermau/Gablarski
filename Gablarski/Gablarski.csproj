@@ -70,7 +70,7 @@
     <Compile Include="Messages\ChangeChannelMessage.cs" />
     <Compile Include="Messages\ChannelListMessage.cs" />
     <Compile Include="Messages\ChannelChangedMessage.cs" />
-    <Compile Include="Messages\ChannelMoveInfo.cs" />
+    <Compile Include="Messages\ChannelChangeInfo.cs" />
     <Compile Include="Messages\ConnectionRejectedMessage.cs" />
     <Compile Include="Messages\ConnectMessage.cs" />
     <Compile Include="Messages\LoginResultMessage.cs" />
