@@ -5,10 +5,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski", "Gablarski\Gabl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.OpenAL", "Gablarski.OpenAL\Gablarski.OpenAL.csproj", "{1EFCB570-3B06-47AF-9130-531C5625AE79}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GablarskiClientLite", "GablarskiClientLite\GablarskiClientLite.csproj", "{043E20A2-310D-41C0-94BC-766E3BAACAFB}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GablarskiTester", "GablarskiTester\GablarskiTester.csproj", "{DABD979A-6930-4250-A770-E746736F4AAF}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.Tests", "Gablarski.Tests\Gablarski.Tests.csproj", "{7F9DB2AA-BA94-4C4F-9CD5-536B9B087D2E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6A109469-1A29-4967-BB7A-B9DEDD48C4A5}"
@@ -19,6 +15,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.LocalServer", "Gablarski.LocalServer\Gablarski.LocalServer.csproj", "{64869D2A-B532-4586-A0AC-750FCB66C63B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.Clients.Lite", "Clients\Lite\Gablarski.Clients.Lite.csproj", "{043E20A2-310D-41C0-94BC-766E3BAACAFB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.Clients.CLI", "Clients\CLI\Gablarski.Clients.CLI.csproj", "{DABD979A-6930-4250-A770-E746736F4AAF}"
 EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
@@ -37,6 +37,13 @@ Global
 		{1EFCB570-3B06-47AF-9130-531C5625AE79}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1EFCB570-3B06-47AF-9130-531C5625AE79}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1EFCB570-3B06-47AF-9130-531C5625AE79}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F9DB2AA-BA94-4C4F-9CD5-536B9B087D2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F9DB2AA-BA94-4C4F-9CD5-536B9B087D2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F9DB2AA-BA94-4C4F-9CD5-536B9B087D2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F9DB2AA-BA94-4C4F-9CD5-536B9B087D2E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64869D2A-B532-4586-A0AC-750FCB66C63B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64869D2A-B532-4586-A0AC-750FCB66C63B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64869D2A-B532-4586-A0AC-750FCB66C63B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{043E20A2-310D-41C0-94BC-766E3BAACAFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{043E20A2-310D-41C0-94BC-766E3BAACAFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{043E20A2-310D-41C0-94BC-766E3BAACAFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -45,13 +52,6 @@ Global
 		{DABD979A-6930-4250-A770-E746736F4AAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DABD979A-6930-4250-A770-E746736F4AAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DABD979A-6930-4250-A770-E746736F4AAF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7F9DB2AA-BA94-4C4F-9CD5-536B9B087D2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7F9DB2AA-BA94-4C4F-9CD5-536B9B087D2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7F9DB2AA-BA94-4C4F-9CD5-536B9B087D2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7F9DB2AA-BA94-4C4F-9CD5-536B9B087D2E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{64869D2A-B532-4586-A0AC-750FCB66C63B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{64869D2A-B532-4586-A0AC-750FCB66C63B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{64869D2A-B532-4586-A0AC-750FCB66C63B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

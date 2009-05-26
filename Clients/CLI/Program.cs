@@ -13,7 +13,7 @@ using Gablarski.Messages;
 using Gablarski;
 using Gablarski.Media.Sources;
 
-namespace GablarskiTester
+namespace Gablarski.Clients.CLI
 {
 	class Program
 	{

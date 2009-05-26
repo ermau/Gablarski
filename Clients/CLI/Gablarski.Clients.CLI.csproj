@@ -8,8 +8,8 @@
     <ProjectGuid>{DABD979A-6930-4250-A770-E746736F4AAF}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GablarskiTester</RootNamespace>
-    <AssemblyName>GablarskiTester</AssemblyName>
+    <RootNamespace>Gablarski.Clients.CLI</RootNamespace>
+    <AssemblyName>GablarskiCLIClient</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <StartupObject>GablarskiTester.Program</StartupObject>
@@ -54,11 +54,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Gablarski.OpenAL\Gablarski.OpenAL.csproj">
+    <ProjectReference Include="..\..\Gablarski.OpenAL\Gablarski.OpenAL.csproj">
       <Project>{1EFCB570-3B06-47AF-9130-531C5625AE79}</Project>
       <Name>Gablarski.OpenAL</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Gablarski\Gablarski.csproj">
+    <ProjectReference Include="..\..\Gablarski\Gablarski.csproj">
       <Project>{7347052B-DA5B-4CCA-AB28-3963766E3CDB}</Project>
       <Name>Gablarski</Name>
     </ProjectReference>

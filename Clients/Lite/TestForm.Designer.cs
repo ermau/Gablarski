@@ -1,4 +1,4 @@
-﻿namespace GablarskiClientLite
+﻿namespace Gablarski.Clients.Lite
 {
 	partial class TestForm
 	{

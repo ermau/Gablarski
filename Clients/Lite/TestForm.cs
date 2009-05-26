@@ -15,7 +15,7 @@ using Gablarski.Network;
 using Gablarski.OpenAL.Providers;
 using Gablarski.Server;
 
-namespace GablarskiClientLite
+namespace Gablarski.Clients.Lite
 {
 	public partial class TestForm : Form
 	{
