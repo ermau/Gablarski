@@ -171,13 +171,6 @@ namespace Gablarski.Server
 					this.Handlers[msg.MessageType] (e);
 		}
 
-		protected void AudioDataReceived (MessageReceivedEventArgs e)
-		{
-			var msg = (SendAudioDataMessage) e.Message;
-
-			this.connections.Send (new AudioDataReceivedMessage (msg.SourceId, msg.Data), (IConnection c) => c != e.Connection);
-		}
-
 		protected void ClientDisconnected (MessageReceivedEventArgs e)
 		{
 			OnClientDisconnected (this, new ConnectionEventArgs (e.Connection));

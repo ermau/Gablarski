@@ -69,7 +69,7 @@ namespace Gablarski.Clients.Lite
 		void capture_SamplesAvailable (object sender, SamplesAvailableEventArgs e)
 		{
 			if (this.source != null)
-				this.client.SendAudioData (this.source, capture.ReadSamples());
+				this.client.SendAudioData ((Channel)this.channelNodes[this.client.Self.CurrentChannelId].Tag, this.source, capture.ReadSamples());
 		}
 
 		void client_ReceivedNewLogin (object sender, ReceivedLoginEventArgs e)
@@ -147,7 +147,8 @@ namespace Gablarski.Clients.Lite
 			if (chan.ParentChannelId != 0 && !this.channelNodes.ContainsKey (chan.ParentChannelId))
 				SetupChannelTree (channels, channels.Where (c => c.ChannelId == chan.ParentChannelId).FirstOrDefault ());
 
-			this.channelNodes.Add (chan.ChannelId, ((chan.ParentChannelId == 0) ? this.playerList.Nodes : this.channelNodes[chan.ParentChannelId].Nodes).Add (chan.Name));			
+			this.channelNodes.Add (chan.ChannelId, ((chan.ParentChannelId == 0) ? this.playerList.Nodes : this.channelNodes[chan.ParentChannelId].Nodes).Add (chan.Name));
+			this.channelNodes[chan.ChannelId].Tag = chan;
 		}
 
 		private void AddPlayers (IEnumerable<PlayerInfo> players)
@@ -416,8 +417,8 @@ namespace Gablarski.Clients.Lite
 			if (!this.channelNodes.ContainsValue (e.Node))
 				return;
 
-			long channelId = this.channelNodes.Where (kvp => kvp.Value == e.Node).First ().Key;
-			this.client.MovePlayerToChannel (this.client.Self.PlayerId, channelId);
+			Channel channel = (Channel)this.channelNodes.Where (kvp => kvp.Value == e.Node).First ().Value.Tag;
+			this.client.MovePlayerToChannel (this.client.Self, channel);
 
 			e.Node.Expand ();
 		}

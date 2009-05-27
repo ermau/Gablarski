@@ -129,21 +129,16 @@ namespace Gablarski.Client
 			this.connection.Send (new RequestSourceMessage (mediaSourceType, channels));
 		}
 
-		public void SendAudioData (IMediaSource source, byte[] data)
+		public void SendAudioData (Channel channel, IMediaSource source, byte[] data)
 		{
 			// TODO: Add bitrate transmision etc
 			byte[] encoded = source.AudioCodec.Encode (data, source.AudioCodec.Bitrates.First(), source.AudioCodec.MaxQuality);
-			this.connection.Send (new SendAudioDataMessage (source.ID, encoded));
-		}
-
-		public void MovePlayerToChannel (long playerId, long channelId)
-		{
-			this.connection.Send (new ChangeChannelMessage (playerId, channelId));
+			this.connection.Send (new SendAudioDataMessage (channel.ChannelId, source.ID, encoded));
 		}
 
 		public void MovePlayerToChannel (PlayerInfo targetPlayer, Channel targetChannel)
 		{
-			this.MovePlayerToChannel (targetPlayer.PlayerId, targetChannel.ChannelId);
+			this.connection.Send (new ChangeChannelMessage (targetPlayer.PlayerId, targetChannel.ChannelId));
 		}
 		#endregion
 

@@ -149,6 +149,20 @@ namespace Gablarski.Server
 			}
 		}
 
+		public void Send (MessageBase message, Func<IConnection, PlayerInfo, bool> selector)
+		{
+			lock (lck)
+			{
+				foreach (var kvp in this.players)
+				{
+					if (!selector (kvp.Key, kvp.Value))
+						continue;
+
+					kvp.Key.Send (message);
+				}
+			}
+		}
+
 		private object lck = new object();
 		private readonly List<IConnection> connections = new List<IConnection>();
 		private readonly Dictionary<IConnection, PlayerInfo> players = new Dictionary<IConnection, PlayerInfo>();

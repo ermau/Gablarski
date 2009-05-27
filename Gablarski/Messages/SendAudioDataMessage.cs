@@ -14,11 +14,18 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public SendAudioDataMessage (int sourceId, byte[] data)
+		public SendAudioDataMessage (long targetChannelId, int sourceId, byte[] data)
 			: base (ClientMessageType.AudioData)
 		{
+			this.TargetChannelId = targetChannelId;
 			this.SourceId = sourceId;
 			this.Data = data;
+		}
+
+		public long TargetChannelId
+		{
+			get;
+			set;
 		}
 
 		public int SourceId
@@ -40,12 +47,14 @@ namespace Gablarski.Messages
 
 		public override void WritePayload (IValueWriter writer)
 		{
+			writer.WriteInt64 (this.TargetChannelId);
 			writer.WriteInt32 (this.SourceId);
 			writer.WriteBytes (this.Data);
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
+			this.TargetChannelId = reader.ReadInt64 ();
 			this.SourceId = reader.ReadInt32();
 			this.Data = reader.ReadBytes();
 		}

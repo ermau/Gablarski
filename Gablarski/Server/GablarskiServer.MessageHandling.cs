@@ -138,6 +138,8 @@ namespace Gablarski.Server
 		}
 		#endregion
 
+		#region Media
+
 		#region Sources
 		private void ClientRequestsSourceList (MessageReceivedEventArgs e)
 		{
@@ -210,6 +212,14 @@ namespace Gablarski.Server
 					connections.Send (new SourceResultMessage (SourceResult.NewSource, sourceInfo), (IConnection c) => c != e.Connection);
 				}
 			}
+		}
+		#endregion
+
+		protected void AudioDataReceived (MessageReceivedEventArgs e)
+		{
+			var msg = (SendAudioDataMessage)e.Message;
+
+			this.connections.Send (new AudioDataReceivedMessage (msg.SourceId, msg.Data), (c, p) => c != e.Connection && p.CurrentChannelId == msg.TargetChannelId);
 		}
 		#endregion
 	}

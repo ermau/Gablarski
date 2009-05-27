@@ -38,6 +38,8 @@ namespace Gablarski.Clients.CLI
 				{ "u=|username=", u => username = u },
 				{ "pw=|password=", p => password = p },
 				{ "n=|nickname=", n => nickname = n }
+
+
 			};
 
 			foreach (string unused in options.Parse (args))
@@ -51,15 +53,15 @@ namespace Gablarski.Clients.CLI
 			{
 				options.WriteOptionDescriptions (Console.Out);
 			}
-
-			client = new GablarskiClient (new ClientNetworkConnection ());
-			Console.WriteLine ("Connecting...");
-			client.Connect (host, port);
 		}
 
 		private static GablarskiClient SetupClient (string host, int port, string nickname, string username, string password)
 		{
-			throw new NotImplementedException ();
+			GablarskiClient sclient = new GablarskiClient (new ClientNetworkConnection ());
+			sclient.Connect (host, port);
+			sclient.Login (nickname, username, password);
+
+			return sclient;
 		}
 	}
 }
