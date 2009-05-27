@@ -134,6 +134,16 @@ namespace Gablarski.Client
 			byte[] encoded = source.AudioCodec.Encode (data, source.AudioCodec.Bitrates.First(), source.AudioCodec.MaxQuality);
 			this.connection.Send (new SendAudioDataMessage (source.ID, encoded));
 		}
+
+		public void MovePlayerToChannel (long playerId, long channelId)
+		{
+			this.connection.Send (new ChangeChannelMessage (playerId, channelId));
+		}
+
+		public void MovePlayerToChannel (PlayerInfo targetPlayer, Channel targetChannel)
+		{
+			this.MovePlayerToChannel (targetPlayer.PlayerId, targetChannel.ChannelId);
+		}
 		#endregion
 
 		#region Event Invokers

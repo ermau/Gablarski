@@ -9,7 +9,7 @@ namespace Gablarski.Server
 	{
 		public LobbyChannelProvider ()
 		{
-			this.lobby = new Channel 
+			this.lobby = new Channel (1)
 			{
 				Name = "Lobby",
 				Description = String.Empty
@@ -42,7 +42,7 @@ namespace Gablarski.Server
 			{
 				if (channel.ChannelId == 0)
 				{
-					long id = this.lastId++;
+					long id = ++this.lastId;
 					channels.Add (id, new Channel (id, channel));
 				}
 				//else if (!Channel.ReferenceEquals (channel, channel[channel.ChannelId]))

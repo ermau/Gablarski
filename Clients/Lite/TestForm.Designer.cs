@@ -243,6 +243,7 @@
 			this.playerList.Name = "playerList";
 			this.playerList.Size = new System.Drawing.Size (197, 355);
 			this.playerList.TabIndex = 18;
+			this.playerList.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler (this.playerList_NodeMouseDoubleClick);
 			// 
 			// label7
 			// 

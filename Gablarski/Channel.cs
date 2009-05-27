@@ -32,10 +32,10 @@ namespace Gablarski
 		public Channel (long channelId, Channel channel)
 			: this (channelId, channel.ReadOnly)
 		{
+			this.ParentChannelId = channel.ParentChannelId;
 			this.Name = channel.Name;
 			this.Description = channel.Description;
 			this.PlayerLimit = channel.PlayerLimit;
-			
 		}
 
 		/// <summary>

@@ -12,98 +12,54 @@ using System.Threading;
 using Gablarski.Messages;
 using Gablarski;
 using Gablarski.Media.Sources;
+using NDesk.Options;
 
 namespace Gablarski.Clients.CLI
 {
-	class Program
+	public class Program
 	{
-		static GablarskiServer server;
-		static GablarskiClient client;
-		static string username = "Rogue Jedi";
-		static CaptureDevice microphone;
-		static PlaybackProvider speakers;
-		static SourcePool<IMediaSource> sources;
-		static Context c;
+		public static GablarskiClient client;
 
-		static void Main (string[] args)
+		public static void Main (string[] args)
 		{
-			Console.WriteLine ("Playback devices:");
-			foreach (var device in OpenAL.PlaybackDevices)
-				Console.WriteLine (device.Name);
+			string host = String.Empty;
+			int port = 6112;
+			bool trace = false;
 
-			Console.WriteLine ();
+			string username = String.Empty;
+			string password = String.Empty;
+			string nickname = String.Empty;
 
-			Console.WriteLine ("Capture devices:");
-			foreach (var device in OpenAL.CaptureDevices)
-				Console.WriteLine (device.Name);
-
-			microphone = OpenAL.DefaultCaptureDevice.Open (44100, AudioFormat.Mono16Bit);
-			microphone.SamplesAvailable += microphone_SamplesAvailable;
-
-			speakers = new PlaybackProvider();
-			speakers.Device = OpenAL.DefaultPlaybackDevice.Open();
-
-			server = new GablarskiServer (new ServerInfo
+			OptionSet options = new OptionSet
 			{
-				ServerName = "Rogue Jedi's Server",
-				ServerDescription = "Development Server",
-			}, new GuestUserProvider (), new GuestPermissionProvider(), new LobbyChannelProvider());
+				{ "h=|host=", h => host = h },
+				{ "p:|port:", (int p) => port = p },
+				{ "t|trace", v => trace = true },
+				{ "u=|username=", u => username = u },
+				{ "pw=|password=", p => password = p },
+				{ "n=|nickname=", n => nickname = n }
+			};
 
-			server.AddConnectionProvider (new ServerNetworkConnectionProvider());
+			foreach (string unused in options.Parse (args))
+				Console.WriteLine ("Unrecognized option: " + unused);
+
+			if (trace)
+				Trace.Listeners.Add (new ConsoleTraceListener ());
+			
+			if (String.IsNullOrEmpty (nickname)
+				|| String.IsNullOrEmpty (host))
+			{
+				options.WriteOptionDescriptions (Console.Out);
+			}
 
 			client = new GablarskiClient (new ClientNetworkConnection ());
-			client.Login (username);
-			client.LoginResult += client_ReceivedLogin;
-			client.ReceivedSource += client_ReceivedSource;
-			client.ReceivedAudioData += client_ReceivedAudioData;
-			client.Connect ("localhost", 6112);
-
-			bool recording = false;
-			ConsoleKeyInfo key;
-			while (true)
-			{
-				key = Console.ReadKey(true);
-				if (key.Key != ConsoleKey.V)
-				{
-					Thread.Sleep (1);
-					continue;
-				}
-
-				if (!recording)
-				{
-					Console.WriteLine ("Starting capture.");
-					microphone.StartCapture();
-					recording = true;
-				}
-				else
-				{
-					Console.WriteLine ("Ending capture.");
-					microphone.StopCapture();
-					recording = false;
-				}
-			}
+			Console.WriteLine ("Connecting...");
+			client.Connect (host, port);
 		}
 
-		static void client_ReceivedAudioData (object sender, ReceivedAudioEventArgs e)
+		private static GablarskiClient SetupClient (string host, int port, string nickname, string username, string password)
 		{
-			speakers.QueuePlayback (e.Source, e.AudioData);
-		}
-
-		static void microphone_SamplesAvailable (object sender, SamplesAvailableEventArgs e)
-		{
-			client.SendAudioData (client.VoiceSource, microphone.GetSamples());
-		}
-
-		static void client_ReceivedSource (object sender, ReceivedSourceEventArgs e)
-		{
-			Trace.WriteLine ("Source received: " + e.Result + " " + e.Source.GetType ());
-		}
-
-		static void client_ReceivedLogin (object sender, ReceivedLoginEventArgs e)
-		{
-			Trace.WriteLine ("Login result: " + e.Result.Succeeded + " " + e.Result.ResultState);
-
-			client.RequestSource (typeof(VoiceSource), 1);
+			throw new NotImplementedException ();
 		}
 	}
 }

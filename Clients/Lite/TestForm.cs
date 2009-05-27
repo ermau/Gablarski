@@ -109,12 +109,30 @@ namespace Gablarski.Clients.Lite
 				this.playerList.Nodes.Clear ();
 
 				foreach (Channel channel in e.Data)
-					this.channelNodes.Add (channel.ChannelId, this.playerList.Nodes.Add (channel.Name));
+				{
+					if (this.channelNodes.ContainsKey (channel.ChannelId))
+						continue;
+
+					SetupChannelTree (e.Data, channel);
+				}
 
 				this.playerList.EndUpdate ();
 
 				this.AddPlayers (this.client.Players);
+
+				this.playerList.ExpandAll ();
 			});
+		}
+
+		private void SetupChannelTree (IEnumerable<Channel> channels, Channel chan)
+		{
+			if (chan == null)
+				return;
+
+			if (chan.ParentChannelId != 0 && !this.channelNodes.ContainsKey (chan.ParentChannelId))
+				SetupChannelTree (channels, channels.Where (c => c.ChannelId == chan.ParentChannelId).FirstOrDefault ());
+
+			this.channelNodes.Add (chan.ChannelId, ((chan.ParentChannelId == 0) ? this.playerList.Nodes : this.channelNodes[chan.ParentChannelId].Nodes).Add (chan.Name));			
 		}
 
 		private void AddPlayers (IEnumerable<PlayerInfo> players)
@@ -309,7 +327,12 @@ namespace Gablarski.Clients.Lite
 		private GablarskiServer server;
 		private void startServerButton_Click (object sender, EventArgs e)
 		{
-			server = new GablarskiServer (new ServerInfo { ServerName = this.ServerName.Text }, new GuestUserProvider(), new GuestPermissionProvider(), new LobbyChannelProvider());
+			var channels = new LobbyChannelProvider();
+			channels.SaveChannel (new Channel { Name = "Sub Test 2", Description = "Testing Subchannels", ParentChannelId = 4 });
+			channels.SaveChannel (new Channel { Name = "Test 1", Description = "Testing Channel" });
+			channels.SaveChannel (new Channel { Name = "Sub Test 1", Description = "Testing Subchannels", ParentChannelId = 1 });
+
+			server = new GablarskiServer (new ServerInfo { ServerName = this.ServerName.Text }, new GuestUserProvider(), new GuestPermissionProvider(), channels);
 			server.AddConnectionProvider (new ServerNetworkConnectionProvider());
 		}
 
@@ -371,6 +394,18 @@ namespace Gablarski.Clients.Lite
 		{
 			if (this.source != null)
 				this.sourceRequestSelect.Enabled = this.sourceSelect.Items.Contains (this.source);
+		}
+
+		private void playerList_NodeMouseDoubleClick (object sender, TreeNodeMouseClickEventArgs e)
+		{
+			if (!this.channelNodes.ContainsValue (e.Node))
+				return;
+
+			var pair = this.channelNodes.Where (kvp => kvp.Value == e.Node).FirstOrDefault ();
+			//if (pair == null)
+			//    return;
+
+
 		}
 	}
 }

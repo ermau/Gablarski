@@ -11,6 +11,18 @@ namespace Gablarski.Messages
 		{
 		}
 
+		public ChannelChangeInfo (long targetPlayerId, long targetChannelId)
+		{
+			this.TargetPlayerId = TargetPlayerId;
+			this.TargetChannelId = targetChannelId;
+		}
+
+		public ChannelChangeInfo (long targetPlayerId, long targetChannelId, long requestingPlayerId)
+			: this (targetPlayerId, targetChannelId)
+		{
+			this.RequestingPlayerId = requestingPlayerId;
+		}
+
 		public ChannelChangeInfo (IValueReader reader)
 		{
 			this.Deserialize (reader);
@@ -22,7 +34,7 @@ namespace Gablarski.Messages
 		public long RequestingPlayerId
 		{
 			get;
-			private set;
+			set;
 		}
 
 		/// <summary>
