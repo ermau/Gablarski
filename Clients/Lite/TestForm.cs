@@ -47,6 +47,7 @@ namespace Gablarski.Clients.Lite
 			client.ReceivedSourceList += client_ReceivedSourceList;
 			client.ReceivedAudioData += client_ReceivedAudioData;
 			client.PlayerDisconnected += client_PlayerDisconnected;
+			client.PlayerChangedChannel += client_PlayerChangedChannel;
 
 			client.Connect (serverName, 6112);
 		}
@@ -98,6 +99,20 @@ namespace Gablarski.Clients.Lite
 				}
 
 				this.playerList.EndUpdate ();
+			});
+		}
+
+		void client_PlayerChangedChannel (object sender, ChannelChangedEventArgs e)
+		{
+			this.Invoke ((Action)delegate
+			{
+				if (!this.playerNodes.ContainsKey (e.MoveInfo.TargetPlayerId) || !this.channelNodes.ContainsKey (e.MoveInfo.TargetChannelId))
+					return;
+
+				var node = this.playerNodes[e.MoveInfo.TargetPlayerId];
+				node.Remove();
+
+				this.channelNodes[e.MoveInfo.TargetChannelId].Nodes.Add (node);
 			});
 		}
 
@@ -401,11 +416,10 @@ namespace Gablarski.Clients.Lite
 			if (!this.channelNodes.ContainsValue (e.Node))
 				return;
 
-			var pair = this.channelNodes.Where (kvp => kvp.Value == e.Node).FirstOrDefault ();
-			//if (pair == null)
-			//    return;
+			long channelId = this.channelNodes.Where (kvp => kvp.Value == e.Node).First ().Key;
+			this.client.MovePlayerToChannel (this.client.Self.PlayerId, channelId);
 
-
+			e.Node.Expand ();
 		}
 	}
 }

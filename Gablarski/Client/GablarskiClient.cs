@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Gablarski.Server;
-using Gablarski.Network;
-using Gablarski.Messages;
-using System.Diagnostics;
 using System.Reflection;
 using Gablarski.Media.Sources;
+using Gablarski.Messages;
 
 namespace Gablarski.Client
 {
@@ -54,6 +50,11 @@ namespace Gablarski.Client
 
 				return source;
 			}
+		}
+
+		public PlayerInfo Self
+		{
+			get { return this.self; }
 		}
 
 		public IEnumerable<PlayerInfo> Players

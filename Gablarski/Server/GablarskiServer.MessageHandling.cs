@@ -23,6 +23,8 @@ namespace Gablarski.Server
 				{ ClientMessageType.RequestChannelList, ClientRequestsChannelList },
 				{ ClientMessageType.RequestPlayerList, ClientRequestsPlayerList },
 				{ ClientMessageType.RequestSourceList, ClientRequestsSourceList },
+
+				{ ClientMessageType.ChangeChannel, ClientRequestsChannelChange }
 			};
 		}
 
@@ -68,11 +70,15 @@ namespace Gablarski.Server
 			{
 				requestingPlayer = this.connections.GetPlayer (e.Connection);
 
-				if (requestingPlayer.PlayerId == change.MoveInfo.TargetPlayerId && !GetPermission (PermissionName.ChangeChannel, requestingPlayer.PlayerId))
-					resultState = ChannelChangeResult.FailedPermissions;
+				if (requestingPlayer.PlayerId == change.MoveInfo.TargetPlayerId)
+				{
+					if (!GetPermission (PermissionName.ChangeChannel, requestingPlayer.PlayerId))
+						resultState = ChannelChangeResult.FailedPermissions;
+				}
 				else if (!GetPermission (PermissionName.ChangePlayersChannel, requestingPlayer.PlayerId))
 					resultState = ChannelChangeResult.FailedPermissions;
-				else
+				
+				if (resultState == ChannelChangeResult.FailedUnknown)
 				{
 					requestingPlayer.CurrentChannelId = change.MoveInfo.TargetChannelId;
 					this.connections.Send (new ChannelChangeResultMessage (requestingPlayer.PlayerId, change.MoveInfo));

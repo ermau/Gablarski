@@ -13,7 +13,7 @@ namespace Gablarski.Messages
 
 		public ChannelChangeInfo (long targetPlayerId, long targetChannelId)
 		{
-			this.TargetPlayerId = TargetPlayerId;
+			this.TargetPlayerId = targetPlayerId;
 			this.TargetChannelId = targetChannelId;
 		}
 

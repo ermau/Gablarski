@@ -47,13 +47,17 @@ namespace Gablarski.Messages
 		public override void WritePayload (IValueWriter writer)
 		{
 			writer.WriteByte ((byte)this.Result);
-			this.MoveInfo.Serialize (writer);
+			
+			if (this.Result == ChannelChangeResult.Success)
+				this.MoveInfo.Serialize (writer);
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
 			this.Result = (ChannelChangeResult)reader.ReadByte ();
-			this.MoveInfo = new ChannelChangeInfo (reader);
+
+			if (this.Result == ChannelChangeResult.Success)
+				this.MoveInfo = new ChannelChangeInfo (reader);
 		}
 	}
 }

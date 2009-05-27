@@ -12,6 +12,8 @@ namespace Gablarski.Network
 	public class ServerNetworkConnection
 		: NetworkConnectionBase
 	{
+		public const int DefaultPort = 6112;
+
 		public ServerNetworkConnection (TcpClient client)
 			: base (client)
 		{

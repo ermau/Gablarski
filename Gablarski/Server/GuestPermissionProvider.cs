@@ -13,7 +13,7 @@ namespace Gablarski.Server
 			if (this.admins.Contains (playerId))
 				return GetNamesAsPermissions (Permission.GetAllNames());
 
-			return GetNamesAsPermissions (PermissionName.Login, PermissionName.RequestSource);
+			return GetNamesAsPermissions (PermissionName.Login, PermissionName.RequestSource, PermissionName.ChangeChannel);
 		}
 
 		public void SetAdmin (long playerId)
