@@ -25,6 +25,16 @@ namespace Gablarski.Server
 			this.UpdateChannels ();
 		}
 
+		public GablarskiServer (ServerInfo serverInfo, IBackendProvider provider)
+			: this()
+		{
+			this.serverInfo = serverInfo;
+
+			this.backendProvider = provider;
+			this.backendProvider.ChannelsUpdatedExternally += OnChannelsUpdatedExternally;
+			this.UpdateChannels ();
+		}
+
 		#region Public Methods
 		public IEnumerable<IConnectionProvider> ConnectionProviders
 		{
@@ -98,9 +108,31 @@ namespace Gablarski.Server
 
 		private List<IConnectionProvider> availableConnections = new List<IConnectionProvider> ();
 
+		private readonly IBackendProvider backendProvider;
+
+		private readonly IChannelProvider channelProvider;
 		private readonly IPermissionsProvider permissionProvider;
 		private readonly IUserProvider userProvider;
-		private readonly IChannelProvider channelProvider;
+
+		protected IBackendProvider BackendProvider
+		{
+			get { return backendProvider; }
+		}
+
+		protected IChannelProvider ChannelProvider
+		{
+			get { return (backendProvider ?? channelProvider); }
+		}
+
+		protected IPermissionsProvider PermissionProvider
+		{
+			get { return (backendProvider ?? permissionProvider); }
+		}
+
+		protected IUserProvider UserProvider
+		{
+			get { return (backendProvider ?? userProvider); }
+		}
 
 		private object sourceLock = new object ();
 		private readonly Dictionary<IConnection, List<IMediaSource>> sources = new Dictionary<IConnection, List<IMediaSource>> ();
@@ -113,8 +145,8 @@ namespace Gablarski.Server
 
 		private void UpdateChannels ()
 		{
-			this.channels = this.channelProvider.GetChannels ().ToDictionary (c => c.ChannelId);
-			this.defaultChannel = this.channelProvider.DefaultChannel;
+			this.channels = this.ChannelProvider.GetChannels ().ToDictionary (c => c.ChannelId);
+			this.defaultChannel = this.ChannelProvider.DefaultChannel;
 		}
 
 		private void OnChannelsUpdatedExternally (object sender, EventArgs e)
@@ -144,14 +176,24 @@ namespace Gablarski.Server
 			return agrSources;
 		}
 
-		protected bool GetPermission (PermissionName name, long playerId)
+		protected bool GetPermission (PermissionName name, long channelId, long playerId)
 		{
-			return this.permissionProvider.GetPermissions (playerId).GetPermission (name);
+			if (this.BackendProvider != null)
+				return this.BackendProvider.GetPermissions (channelId, playerId).GetPermission (name);
+			else
+				return this.PermissionProvider.GetPermissions (playerId).GetPermission (name);
 		}
 
 		protected bool GetPermission (PermissionName name, IConnection connection)
 		{
-			return GetPermission (name, this.connections.GetPlayerId (connection));
+			var player = this.connections[connection];
+
+			return GetPermission (name, player.CurrentChannelId, player.PlayerId);
+		}
+
+		protected bool GetPermission (PermissionName name, PlayerInfo player)
+		{
+			return GetPermission (name, player.CurrentChannelId, player.PlayerId);
 		}
 
 		protected virtual void OnMessageReceived (object sender, MessageReceivedEventArgs e)

@@ -98,6 +98,7 @@
     <Compile Include="Server\GablarskiServerContext.cs" />
     <Compile Include="Server\GuestPermissionProvider.cs" />
     <Compile Include="Server\GuestUserProvider.cs" />
+    <Compile Include="Server\IBackendProvider.cs" />
     <Compile Include="Server\IChannelProvider.cs" />
     <Compile Include="Server\IPermissionsProvider.cs" />
     <Compile Include="IValueReader.cs" />

@@ -72,10 +72,10 @@ namespace Gablarski.Server
 
 				if (requestingPlayer.PlayerId == change.MoveInfo.TargetPlayerId)
 				{
-					if (!GetPermission (PermissionName.ChangeChannel, requestingPlayer.PlayerId))
+					if (!GetPermission (PermissionName.ChangeChannel, requestingPlayer))
 						resultState = ChannelChangeResult.FailedPermissions;
 				}
-				else if (!GetPermission (PermissionName.ChangePlayersChannel, requestingPlayer.PlayerId))
+				else if (!GetPermission (PermissionName.ChangePlayersChannel, requestingPlayer))
 					resultState = ChannelChangeResult.FailedPermissions;
 				
 				if (resultState == ChannelChangeResult.FailedUnknown)
@@ -95,14 +95,14 @@ namespace Gablarski.Server
 		{
 			var login = (LoginMessage)e.Message;
 
-			LoginResult result = this.userProvider.Login (login.Username, login.Password);
+			LoginResult result = this.UserProvider.Login (login.Username, login.Password);
 			PlayerInfo info = null;
 
 			if (result.Succeeded)
 			{
 				info = new PlayerInfo (login.Nickname, result.PlayerId, this.defaultChannel.ChannelId);
 
-				if (!this.GetPermission (PermissionName.Login, result.PlayerId))
+				if (!this.GetPermission (PermissionName.Login, info))
 					result.ResultState = LoginResultState.FailedPermissions;
 				else if (!this.connections.PlayerLoggedIn (login.Nickname))
 					this.connections.Add (e.Connection, info);
@@ -153,8 +153,8 @@ namespace Gablarski.Server
 			SourceResult result = SourceResult.FailedUnknown;
 			int sourceId = -1;
 
-			long playerId = this.connections.GetPlayerId (e.Connection);
-			if (playerId == 0 || !this.GetPermission (PermissionName.RequestSource, playerId))
+			var player = this.connections[e.Connection];
+			if (player == null || !this.GetPermission (PermissionName.RequestSource, player))
 				result = SourceResult.FailedPermissions;
 
 			IMediaSource source = null;
@@ -201,7 +201,7 @@ namespace Gablarski.Server
 				MediaSourceInfo sourceInfo = new MediaSourceInfo
 				{
 					SourceId = sourceId,
-					PlayerId = playerId,
+					PlayerId = player.PlayerId,
 					MediaType = (source != null) ? source.Type : MediaType.None,
 					SourceTypeName = request.MediaSourceType.AssemblyQualifiedName
 				};

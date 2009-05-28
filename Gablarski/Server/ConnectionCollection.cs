@@ -14,8 +14,11 @@ namespace Gablarski.Server
 			{
 				lock (lck)
 				{
-					return this.players[key];
+					if (this.players.ContainsKey (key))
+						return this.players[key];
 				}
+
+				return null;
 			}
 		}
 
