@@ -32,7 +32,7 @@ namespace Gablarski.Client
 		protected ServerInfo serverInfo;
 
 		private string nickname;
-		private PlayerInfo self;
+		private long playerId;
 
 		protected readonly Dictionary<ServerMessageType, Action<MessageReceivedEventArgs>> Handlers;
 		protected readonly IClientConnection connection;
@@ -162,7 +162,7 @@ namespace Gablarski.Client
 
 			if (!msg.Result.Succeeded || (msg.Result.Succeeded && msg.PlayerInfo.Nickname == this.nickname))
 			{
-				this.self = msg.PlayerInfo;
+				this.playerId = msg.PlayerInfo.PlayerId;
 				OnLoginResult (args);
 			}
 			else
@@ -182,7 +182,7 @@ namespace Gablarski.Client
 		{
 			var msg = (SourceListMessage)e.Message;
 			foreach (var sourceInfo in msg.Sources)
-				this.AddSource (MediaSources.Create (Type.GetType (sourceInfo.SourceTypeName), sourceInfo.SourceId), sourceInfo.PlayerId == this.self.PlayerId);
+				this.AddSource (MediaSources.Create (Type.GetType (sourceInfo.SourceTypeName), sourceInfo.SourceId), sourceInfo.PlayerId == this.Self.PlayerId);
 
 			OnReceivedSourceList (new ReceivedListEventArgs<MediaSourceInfo> (msg.Sources));
 		}

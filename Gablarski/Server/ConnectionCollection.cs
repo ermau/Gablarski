@@ -156,6 +156,7 @@ namespace Gablarski.Server
 		{
 			lock (lck)
 			{
+				int i = 0;
 				foreach (var kvp in this.players)
 				{
 					if (!selector (kvp.Key, kvp.Value))

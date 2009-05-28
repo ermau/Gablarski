@@ -54,7 +54,13 @@ namespace Gablarski.Client
 
 		public PlayerInfo Self
 		{
-			get { return this.self; }
+			get
+			{
+				lock (this.players)
+				{
+					return this.players[this.playerId];
+				}
+			}
 		}
 
 		public IEnumerable<PlayerInfo> Players

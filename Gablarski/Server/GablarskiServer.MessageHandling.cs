@@ -114,6 +114,8 @@ namespace Gablarski.Server
 
 			if (result.Succeeded)
 			{
+				this.connections.Send (msg);
+
 				e.Connection.Send (new ServerInfoMessage (this.serverInfo));
 
 				lock (this.channelLock)
@@ -123,8 +125,6 @@ namespace Gablarski.Server
 				
 				e.Connection.Send (new PlayerListMessage (this.connections.Players));
 				e.Connection.Send (new SourceListMessage (this.GetSourceInfoList ()));
-
-				this.connections.Send (msg);
 			}
 			else
 				e.Connection.Send (msg);

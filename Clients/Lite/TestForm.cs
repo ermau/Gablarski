@@ -56,8 +56,8 @@ namespace Gablarski.Clients.Lite
 		{
 			this.Invoke ((Action) delegate
           	{
-          		this.playerList.Nodes.Remove (
-          			this.playerList.Nodes.Cast<TreeNode>().Where (n => (long) n.Tag == e.Player.PlayerId).First());
+				//if (this.playerNodes.ContainsKey (e.Player.PlayerId))
+				this.playerNodes[e.Player.PlayerId].Remove ();
           	});
 		}
 
@@ -76,7 +76,7 @@ namespace Gablarski.Clients.Lite
 		{
 			this.Invoke ((Action) delegate
           	{
-          		this.playerList.Nodes.Add (e.PlayerInfo.Nickname).Tag = e.PlayerInfo.PlayerId;
+				this.playerNodes[e.PlayerInfo.PlayerId] = this.channelNodes[e.PlayerInfo.CurrentChannelId].Nodes.Add (e.PlayerInfo.Nickname);
           	});
 		}
 
