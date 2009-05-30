@@ -13,6 +13,13 @@ namespace Gablarski.Server
 	{
 		public static readonly Version MinimumApiVersion = new Version (0,3,0,0);
 
+		/// <summary>
+		/// Initializes a new <c>GablarskiServer</c> instance.
+		/// </summary>
+		/// <param name="serverInfo">The info for the server, providing name, description, etc.</param>
+		/// <param name="userProvider">The user authentication provider for the server to use.</param>
+		/// <param name="permissionProvider">The user permissions provider for the server to use.</param>
+		/// <param name="channelProvider">The channel provider for the server to use.</param>
 		public GablarskiServer (ServerInfo serverInfo, IUserProvider userProvider, IPermissionsProvider permissionProvider, IChannelProvider channelProvider)
 			: this()
 		{
@@ -22,9 +29,14 @@ namespace Gablarski.Server
 			
 			this.channelProvider = channelProvider;
 			this.channelProvider.ChannelsUpdatedExternally += OnChannelsUpdatedExternally;
-			this.UpdateChannels ();
+			this.UpdateChannels (false);
 		}
 
+		/// <summary>
+		/// Initializes a new <c>GablarskiServer</c> instance.
+		/// </summary>
+		/// <param name="serverInfo">The info for the server, providing name, description, etc.</param>
+		/// <param name="provider">The backend provider for the server to use.</param>
 		public GablarskiServer (ServerInfo serverInfo, IBackendProvider provider)
 			: this()
 		{
@@ -32,10 +44,13 @@ namespace Gablarski.Server
 
 			this.backendProvider = provider;
 			this.backendProvider.ChannelsUpdatedExternally += OnChannelsUpdatedExternally;
-			this.UpdateChannels ();
+			this.UpdateChannels (false);
 		}
 
 		#region Public Methods
+		/// <summary>
+		/// Gets or sets the list of <c>IConnectionProvider</c>'s for the server to use.
+		/// </summary>
 		public IEnumerable<IConnectionProvider> ConnectionProviders
 		{
 			get
@@ -48,44 +63,58 @@ namespace Gablarski.Server
 
 			set
 			{
-				this.availableConnections = value.ToList();
+				lock (this.availableConnections)
+				{
+					foreach (var provider in this.availableConnections)
+						RemoveConnectionProvider (provider, false);
+
+					this.availableConnections.Clear ();
+
+					foreach (var provider in value)
+						this.AddConnectionProvider (provider);
+				}
 			}
 		}
 
-		public void AddConnectionProvider (IConnectionProvider connection)
+		/// <summary>
+		/// Adds and starts an <c>IConnectionProvider</c>.
+		/// </summary>
+		/// <param name="provider">The <c>IConnectionProvider</c> to add and start listening.</param>
+		public void AddConnectionProvider (IConnectionProvider provider)
 		{
-			Trace.WriteLine ("[Server] " + connection.GetType().Name + " added.");
+			Trace.WriteLine ("[Server] " + provider.GetType().Name + " added.");
 
 			// MUST provide a gaurantee of persona
-			connection.ConnectionMade += OnConnectionMade;
-			connection.StartListening ();
+			provider.ConnectionMade += OnConnectionMade;
+			provider.StartListening ();
 
 			lock (this.availableConnections)
 			{
-				this.availableConnections.Add (connection);
+				this.availableConnections.Add (provider);
 			}
 		}
 
+		/// <summary>
+		/// Stops and removes an <c>IConnectionProvider</c>.
+		/// </summary>
+		/// <param name="connection"></param>
 		public void RemoveConnectionProvider (IConnectionProvider connection)
 		{
-			Trace.WriteLine ("[Server] " + connection.GetType ().Name + " removed.");
-
-			connection.StopListening ();
-			connection.ConnectionMade -= this.OnConnectionMade;
-
-			lock (this.availableConnections)
-			{
-				this.availableConnections.Remove (connection);
-			}
+			RemoveConnectionProvider (connection, true);
 		}
 
-		public void Disconnect (IConnection connection, string reason)
+		/// <summary>
+		/// Disconnections an <c>IConnection</c>.
+		/// </summary>
+		/// <param name="connection">The connection to disconnect.</param>
+		public void Disconnect (PlayerInfo player)
 		{
-			if (connection == null)
-				throw new ArgumentNullException ("connection");
+			if (player == null)
+				throw new ArgumentNullException ("player");
 
-			connection.Disconnect ();
-			connection.MessageReceived -= this.OnMessageReceived;
+			var playerConnection = this.connections[player];
+			if (playerConnection != null)
+				this.Disconnect (playerConnection);
 		}
 
 		public void Shutdown ()
@@ -143,18 +172,45 @@ namespace Gablarski.Server
 		private Channel defaultChannel;
 		private Dictionary<long, Channel> channels;
 
-		private void UpdateChannels ()
+		private void Disconnect (IConnection connection)
+		{
+			if (connection == null)
+				throw new ArgumentNullException ("connection");
+
+			connection.Disconnect ();
+			connection.MessageReceived -= this.OnMessageReceived;
+		}
+
+		private void RemoveConnectionProvider (IConnectionProvider provider, bool listRemove)
+		{
+			Trace.WriteLine ("[Server] " + provider.GetType ().Name + " removed.");
+
+			provider.StopListening ();
+			provider.ConnectionMade -= this.OnConnectionMade;
+
+			if (listRemove)
+			{
+				lock (this.availableConnections)
+				{
+					this.availableConnections.Remove (provider);
+				}
+			}
+		}
+
+		private void UpdateChannels (bool sendUpdate)
 		{
 			this.channels = this.ChannelProvider.GetChannels ().ToDictionary (c => c.ChannelId);
 			this.defaultChannel = this.ChannelProvider.DefaultChannel;
+
+			if (sendUpdate)
+				this.connections.Send (new ChannelListMessage (this.channels.Values));
 		}
 
 		private void OnChannelsUpdatedExternally (object sender, EventArgs e)
 		{
 			lock (channelLock)
 			{
-				this.UpdateChannels ();
-				this.connections.Send (new ChannelListMessage (this.channels.Values));
+				this.UpdateChannels (true);
 			}
 		}
 
@@ -167,7 +223,7 @@ namespace Gablarski.Server
 				{
 					IConnection connection = kvp.Key;
 					agrSources = agrSources.Concat (
-							kvp.Value.Select (s => new MediaSourceInfo (s) { PlayerId = this.connections.GetPlayerId (connection) }));
+							kvp.Value.Select (s => new MediaSourceInfo (s) { PlayerId = this.connections[connection].PlayerId }));
 				}
 
 				agrSources = agrSources.ToList ();
@@ -182,6 +238,11 @@ namespace Gablarski.Server
 				return this.BackendProvider.GetPermissions (channelId, playerId).GetPermission (name);
 			else
 				return this.PermissionProvider.GetPermissions (playerId).GetPermission (name);
+		}
+
+		protected bool GetPermission (PermissionName name, long channelId, IConnection connection)
+		{
+			return GetPermission (name, channelId, this.connections[connection].PlayerId);
 		}
 
 		protected bool GetPermission (PermissionName name, IConnection connection)
@@ -201,7 +262,7 @@ namespace Gablarski.Server
 			var msg = (e.Message as ClientMessage);
 			if (msg == null)
 			{
-				Disconnect (e.Connection, "Invalid message.");
+				Disconnect (e.Connection);
 				return;
 			}
 

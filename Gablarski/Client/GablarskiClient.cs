@@ -95,6 +95,9 @@ namespace Gablarski.Client
 		#region Public Methods
 		public void Connect (string host, int port)
 		{
+			if (host.IsEmpty ())
+				throw new ArgumentException ("host must not be null or empty", "host");
+
 			connection.MessageReceived += OnMessageReceived;
 			connection.Connect (host, port);
 			connection.Send (new ConnectMessage (ApiVersion));
@@ -112,6 +115,9 @@ namespace Gablarski.Client
 
 		public void Login (string nickname, string username, string password)
 		{
+			if (nickname.IsEmpty())
+				throw new ArgumentException ("nickname must not be null or empty", "nickname");
+
 			this.nickname = nickname;
 			this.connection.Send (new LoginMessage
 			{
@@ -123,6 +129,8 @@ namespace Gablarski.Client
 
 		public void RequestSource (Type mediaSourceType, byte channels)
 		{
+			if (mediaSourceType == null)
+				throw new ArgumentNullException ("mediaSourceType");
 			if (mediaSourceType.GetInterface ("IMediaSource") == null)
 				throw new InvalidOperationException ("Can not request a source that is not a media source.");
 
@@ -137,6 +145,11 @@ namespace Gablarski.Client
 
 		public void SendAudioData (Channel channel, IMediaSource source, byte[] data)
 		{
+			if (channel == null)
+				throw new ArgumentNullException ("channel");
+			if (source == null)
+				throw new ArgumentNullException ("source");
+
 			// TODO: Add bitrate transmision etc
 			byte[] encoded = source.AudioCodec.Encode (data, source.AudioCodec.Bitrates.First(), source.AudioCodec.MaxQuality);
 			this.connection.Send (new SendAudioDataMessage (channel.ChannelId, source.ID, encoded));
@@ -144,7 +157,34 @@ namespace Gablarski.Client
 
 		public void MovePlayerToChannel (PlayerInfo targetPlayer, Channel targetChannel)
 		{
+			if (targetPlayer == null)
+				throw new ArgumentNullException ("targetPlayer");
+			if (targetChannel == null)
+				throw new ArgumentNullException ("targetChannel");
+
 			this.connection.Send (new ChangeChannelMessage (targetPlayer.PlayerId, targetChannel.ChannelId));
+		}
+
+		public void CreateChannel (Channel channel)
+		{
+			if (channel == null)
+				throw new ArgumentNullException ("channel");
+
+			if (channel.ChannelId != 0)
+				throw new ArgumentException ("Can not create an existing channel", "channel");
+
+			this.connection.Send (new ChannelEditMessage (channel));
+		}
+
+		public void EditChannel (Channel channel)
+		{
+			if (channel == null)
+				throw new ArgumentNullException ("channel");
+
+			if (channel.ChannelId == 0)
+				throw new ArgumentException ("channel must be an existing channel", "channel");
+
+			this.connection.Send (new ChannelEditMessage (channel));
 		}
 		#endregion
 

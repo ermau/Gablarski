@@ -122,11 +122,12 @@ namespace Gablarski.Clients.Lite
 			{
 				this.playerList.BeginUpdate ();
 				this.playerList.Nodes.Clear ();
+				this.channelNodes.Clear ();
 
 				foreach (Channel channel in e.Data)
 				{
 					if (this.channelNodes.ContainsKey (channel.ChannelId))
-						continue;
+					    continue;
 
 					SetupChannelTree (e.Data, channel);
 				}
@@ -348,7 +349,7 @@ namespace Gablarski.Clients.Lite
 			channels.SaveChannel (new Channel { Name = "Test 1", Description = "Testing Channel" });
 			channels.SaveChannel (new Channel { Name = "Sub Test 1", Description = "Testing Subchannels", ParentChannelId = 1 });
 
-			server = new GablarskiServer (new ServerInfo { ServerName = this.ServerName.Text }, new GuestUserProvider(), new GuestPermissionProvider(), channels);
+			server = new GablarskiServer (new ServerInfo { ServerName = this.ServerName.Text }, new GuestUserProvider(), permProvider, channels);
 			server.AddConnectionProvider (new ServerNetworkConnectionProvider());
 		}
 
@@ -421,6 +422,43 @@ namespace Gablarski.Clients.Lite
 			this.client.MovePlayerToChannel (this.client.Self, channel);
 
 			e.Node.Expand ();
+		}
+
+		private void playerList_AfterSelect (object sender, TreeViewEventArgs e)
+		{
+			if (e.Node != null)
+			{
+				var channel = (e.Node.Tag as Channel);
+				if (channel != null)
+				{
+					this.channelName.Text = channel.Name;
+					this.channelDescription.Text = channel.Description;
+					this.btnUpdateChannel.Text = "Update";
+					return;
+				}
+			}
+
+			this.btnUpdateChannel.Text = "Create";
+			this.channelName.Clear ();
+			this.channelDescription.Clear ();
+		}
+
+		private void btnUpdateChannel_Click (object sender, EventArgs e)
+		{
+			if (this.playerList.SelectedNode != null)
+			{
+				var channel = (this.playerList.SelectedNode.Tag as Channel);
+				if (channel != null)
+				{
+					channel.Name = this.channelName.Text.Trim();
+					channel.Description = this.channelDescription.Text.Trim();
+					this.client.EditChannel (channel);
+
+					return;
+				}
+			}
+			
+			this.client.CreateChannel (new Channel { Name = this.channelName.Text.Trim (), Description = this.channelDescription.Text.Trim () });
 		}
 	}
 }

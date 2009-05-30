@@ -22,6 +22,17 @@ namespace Gablarski.Server
 			}
 		}
 
+		public IConnection this[PlayerInfo key]
+		{
+			get
+			{
+				lock (lck)
+				{
+					return (from kvp in this.players where kvp.Value == key select kvp.Key).FirstOrDefault();
+				}
+			}
+		}
+
 		public IEnumerable<PlayerInfo> Players
 		{
 			get
@@ -42,35 +53,6 @@ namespace Gablarski.Server
 			{
 				return this.players.Values.Any (p => p.Nickname == nickname);
 			}
-		}
-
-		public PlayerInfo GetPlayer (IConnection connection)
-		{
-			PlayerInfo player = null;
-
-			lock (lck)
-			{
-				if (this.players.ContainsKey (connection))
-					player = this.players[connection];
-			}
-
-			return player;
-		}
-
-		/// <summary>
-		/// Gets the player Id for the connection, 0 if the connection wasn't found.
-		/// </summary>
-		public long GetPlayerId (IConnection connection)
-		{
-			long id = 0;
-			
-			lock (lck)
-			{
-				if (this.players.ContainsKey (connection))
-					id = this.players[connection].PlayerId;
-			}
-
-			return id;
 		}
 
 		public void Add (IConnection connection)

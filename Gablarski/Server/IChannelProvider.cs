@@ -5,6 +5,9 @@ using System.Text;
 
 namespace Gablarski.Server
 {
+	/// <summary>
+	/// Contract for providers of channels
+	/// </summary>
 	public interface IChannelProvider
 	{
 		/// <summary>
@@ -46,6 +49,11 @@ namespace Gablarski.Server
 
 	public static class ChannelProviderExtensions
 	{
+		/// <summary>
+		/// Gets the default channel or the first channel if no default set.
+		/// </summary>
+		/// <param name="self">The <c>IChannelProvider</c> to retrieve the channels from.</param>
+		/// <returns>The default channel or the first channel if no default set.</returns>
 		public static Channel GetDefaultOrFirst (this IChannelProvider self)
 		{
 			return (self.DefaultChannel ?? self.GetChannels ().FirstOrDefault ());

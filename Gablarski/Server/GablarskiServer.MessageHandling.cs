@@ -24,7 +24,8 @@ namespace Gablarski.Server
 				{ ClientMessageType.RequestPlayerList, ClientRequestsPlayerList },
 				{ ClientMessageType.RequestSourceList, ClientRequestsSourceList },
 
-				{ ClientMessageType.ChangeChannel, ClientRequestsChannelChange }
+				{ ClientMessageType.ChangeChannel, ClientRequestsChannelChange },
+				{ ClientMessageType.EditChannel, ClientEditsChannel },
 			};
 		}
 
@@ -68,7 +69,7 @@ namespace Gablarski.Server
 			PlayerInfo requestingPlayer = null;
 			if (resultState == ChannelChangeResult.FailedUnknown)
 			{
-				requestingPlayer = this.connections.GetPlayer (e.Connection);
+				requestingPlayer = this.connections[e.Connection];
 
 				if (requestingPlayer.PlayerId == change.MoveInfo.TargetPlayerId)
 				{
@@ -87,6 +88,21 @@ namespace Gablarski.Server
 			}
 
 			e.Connection.Send (new ChannelChangeResultMessage { Result = resultState });
+		}
+
+		private void ClientEditsChannel (MessageReceivedEventArgs e)
+		{
+			var msg = (ChannelEditMessage)e.Message;
+
+			if (!this.channelProvider.UpdateSupported || (msg.Channel.ChannelId != 0 && !GetPermission (PermissionName.EditChannel, msg.Channel.ChannelId, e.Connection))
+				|| (msg.Channel.ChannelId == 0 && !GetPermission (PermissionName.AddChannel, e.Connection)))
+			{
+				// TODO reject
+				return;
+			}
+
+			this.channelProvider.SaveChannel (msg.Channel);
+			this.UpdateChannels (true);
 		}
 		#endregion
 

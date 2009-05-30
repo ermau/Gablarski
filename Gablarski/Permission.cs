@@ -21,6 +21,10 @@ namespace Gablarski
 		/// Move a different player from channel to channel
 		/// </summary>
 		ChangePlayersChannel = 8,
+
+		AddChannel = 11,
+		EditChannel = 12,
+		DeleteChannel = 13,
 		#endregion
 
 		RequestSource = 3,

@@ -20,7 +20,8 @@ namespace Gablarski.Messages
 		RequestPlayerList = 13,
 		
 		RequestChannelList = 18,
-		ChangeChannel = 20
+		ChangeChannel = 20,
+		EditChannel = 22
 	}
 
 	public enum ServerMessageType

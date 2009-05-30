@@ -56,6 +56,7 @@
     <Compile Include="Client\IDevice.cs" />
     <Compile Include="Client\IDeviceProvider.cs" />
     <Compile Include="Client\IPlaybackProvider.cs" />
+    <Compile Include="Client\VoiceActivation.cs" />
     <Compile Include="Codecs\IMediaCodec.cs" />
     <Compile Include="Codecs\RawCodec.cs" />
     <Compile Include="en-US.Designer.cs" />
@@ -68,6 +69,7 @@
     <Compile Include="MediaType.cs" />
     <Compile Include="Messages\AudioDataReceivedMessage.cs" />
     <Compile Include="Messages\ChangeChannelMessage.cs" />
+    <Compile Include="Messages\ChannelEditMessage.cs" />
     <Compile Include="Messages\ChannelListMessage.cs" />
     <Compile Include="Messages\ChannelChangedMessage.cs" />
     <Compile Include="Messages\ChannelChangeInfo.cs" />

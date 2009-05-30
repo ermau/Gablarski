@@ -57,6 +57,13 @@
 			this.password = new System.Windows.Forms.TextBox ();
 			this.label10 = new System.Windows.Forms.Label ();
 			this.label11 = new System.Windows.Forms.Label ();
+			this.channelGroup = new System.Windows.Forms.GroupBox ();
+			this.channelName = new System.Windows.Forms.TextBox ();
+			this.channelDescription = new System.Windows.Forms.TextBox ();
+			this.label12 = new System.Windows.Forms.Label ();
+			this.label13 = new System.Windows.Forms.Label ();
+			this.btnUpdateChannel = new System.Windows.Forms.Button ();
+			this.channelGroup.SuspendLayout ();
 			this.SuspendLayout ();
 			// 
 			// label1
@@ -241,8 +248,9 @@
 			// 
 			this.playerList.Location = new System.Drawing.Point (381, 30);
 			this.playerList.Name = "playerList";
-			this.playerList.Size = new System.Drawing.Size (197, 355);
+			this.playerList.Size = new System.Drawing.Size (197, 300);
 			this.playerList.TabIndex = 18;
+			this.playerList.AfterSelect += new System.Windows.Forms.TreeViewEventHandler (this.playerList_AfterSelect);
 			this.playerList.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler (this.playerList_NodeMouseDoubleClick);
 			// 
 			// label7
@@ -334,11 +342,68 @@
 			this.label11.TabIndex = 28;
 			this.label11.Text = "Password:";
 			// 
+			// channelGroup
+			// 
+			this.channelGroup.Controls.Add (this.btnUpdateChannel);
+			this.channelGroup.Controls.Add (this.label13);
+			this.channelGroup.Controls.Add (this.label12);
+			this.channelGroup.Controls.Add (this.channelDescription);
+			this.channelGroup.Controls.Add (this.channelName);
+			this.channelGroup.Location = new System.Drawing.Point (381, 338);
+			this.channelGroup.Name = "channelGroup";
+			this.channelGroup.Size = new System.Drawing.Size (197, 112);
+			this.channelGroup.TabIndex = 29;
+			this.channelGroup.TabStop = false;
+			this.channelGroup.Text = "Channel";
+			// 
+			// channelName
+			// 
+			this.channelName.Location = new System.Drawing.Point (91, 19);
+			this.channelName.Name = "channelName";
+			this.channelName.Size = new System.Drawing.Size (100, 20);
+			this.channelName.TabIndex = 0;
+			// 
+			// channelDescription
+			// 
+			this.channelDescription.Location = new System.Drawing.Point (91, 45);
+			this.channelDescription.Name = "channelDescription";
+			this.channelDescription.Size = new System.Drawing.Size (100, 20);
+			this.channelDescription.TabIndex = 1;
+			// 
+			// label12
+			// 
+			this.label12.AutoSize = true;
+			this.label12.Location = new System.Drawing.Point (6, 22);
+			this.label12.Name = "label12";
+			this.label12.Size = new System.Drawing.Size (38, 13);
+			this.label12.TabIndex = 2;
+			this.label12.Text = "Name:";
+			// 
+			// label13
+			// 
+			this.label13.AutoSize = true;
+			this.label13.Location = new System.Drawing.Point (6, 48);
+			this.label13.Name = "label13";
+			this.label13.Size = new System.Drawing.Size (63, 13);
+			this.label13.TabIndex = 3;
+			this.label13.Text = "Description:";
+			// 
+			// btnUpdateChannel
+			// 
+			this.btnUpdateChannel.Location = new System.Drawing.Point (91, 71);
+			this.btnUpdateChannel.Name = "btnUpdateChannel";
+			this.btnUpdateChannel.Size = new System.Drawing.Size (75, 23);
+			this.btnUpdateChannel.TabIndex = 4;
+			this.btnUpdateChannel.Text = "Update";
+			this.btnUpdateChannel.UseVisualStyleBackColor = true;
+			this.btnUpdateChannel.Click += new System.EventHandler (this.btnUpdateChannel_Click);
+			// 
 			// TestForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF (6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size (590, 546);
+			this.ClientSize = new System.Drawing.Size (590, 464);
+			this.Controls.Add (this.channelGroup);
 			this.Controls.Add (this.label11);
 			this.Controls.Add (this.label10);
 			this.Controls.Add (this.password);
@@ -372,6 +437,8 @@
 			this.Text = "Gablarski Test";
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler (this.TestForm_FormClosed);
 			this.Load += new System.EventHandler (this.TestForm_Load);
+			this.channelGroup.ResumeLayout (false);
+			this.channelGroup.PerformLayout ();
 			this.ResumeLayout (false);
 			this.PerformLayout ();
 
@@ -408,6 +475,12 @@
 		private System.Windows.Forms.TextBox password;
 		private System.Windows.Forms.Label label10;
 		private System.Windows.Forms.Label label11;
+		private System.Windows.Forms.GroupBox channelGroup;
+		private System.Windows.Forms.Button btnUpdateChannel;
+		private System.Windows.Forms.Label label13;
+		private System.Windows.Forms.Label label12;
+		private System.Windows.Forms.TextBox channelDescription;
+		private System.Windows.Forms.TextBox channelName;
 	}
 }
 

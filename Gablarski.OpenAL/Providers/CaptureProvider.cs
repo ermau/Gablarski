@@ -46,6 +46,11 @@ namespace Gablarski.OpenAL.Providers
 			return this.device.GetSamples();
 		}
 
+		public byte[] ReadSamples (int samples)
+		{
+			return this.device.GetSamples (samples);
+		}
+
 		#endregion
 
 		#region IDeviceProvider Members

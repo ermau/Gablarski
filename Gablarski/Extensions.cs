@@ -22,5 +22,10 @@ namespace Gablarski
 
 			return buffer;
 		}
+
+		public static bool IsEmpty (this string self)
+		{
+			return (String.IsNullOrEmpty (self) || self.Trim () == String.Empty);
+		}
 	}
 }

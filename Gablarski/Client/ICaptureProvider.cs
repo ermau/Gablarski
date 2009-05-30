@@ -16,6 +16,7 @@ namespace Gablarski.Client
 		void EndCapture ();
 
 		byte[] ReadSamples ();
+		byte[] ReadSamples (int samples);
 	}
 
 	public class SamplesAvailableEventArgs
