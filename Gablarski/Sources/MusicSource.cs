@@ -28,7 +28,7 @@ namespace Gablarski.Sources
 			get { return MediaType.Music; }
 		}
 
-		public IMediaCodec AudioCodec
+		public IAudioCodec AudioCodec
 		{
 			get { throw new NotImplementedException (); }
 		}

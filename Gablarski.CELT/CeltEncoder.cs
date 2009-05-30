@@ -9,9 +9,16 @@ namespace Gablarski.CELT
 	public class CeltEncoder
 		: IDisposable
 	{
-		private CeltEncoder (IntPtr encoderState)
+		private CeltEncoder (CeltMode mode, IntPtr encoderState)
 		{
+			this.Mode = mode;
 			this.encoderState = encoderState;
+		}
+
+		public CeltMode Mode
+		{
+			get;
+			private set;
 		}
 
 		public bool LongTermPredictor
@@ -43,30 +50,6 @@ namespace Gablarski.CELT
 		}
 
 		/// <summary>
-		/// Gets the number of channels used in the current mode.
-		/// </summary>
-		public int NumberOfChannels
-		{
-			get { return GetValue (Request.GET_NB_CHANNELS); }
-		}
-
-		/// <summary>
-		/// Gets the lookahead used in the current mode.
-		/// </summary>
-		public int LookAhead
-		{
-			get { return GetValue (Request.GET_LOOKAHEAD); }
-		}
-
-		/// <summary>
-		/// Gets the frame size used in the current mode.
-		/// </summary>
-		public int FrameSize
-		{
-			get { return GetValue (Request.GET_LOOKAHEAD); }
-		}
-
-		/// <summary>
 		/// Gets the bit-stream version for compatibility checks.
 		/// </summary>
 		public int BitStreamVersion
@@ -82,27 +65,42 @@ namespace Gablarski.CELT
 			get { return this.disposed; }
 		}
 
-		public byte[] Encode (short[] pcm)
+		public unsafe byte[] Encode (byte[] pcm, int bitrate, out int length)
 		{
 			ThrowIfDisposed ();
 
-			int maxCompressedBytes;
-			byte[] encoded;
-			int compressedBytes = celt_encode (this, pcm, null, out encoded, out maxCompressedBytes);
+			int nbCompressedBytes = (bitrate / 8) / (this.Mode.SampleRate / this.Mode.FrameSize);
+
+			IntPtr encodedPtr;
+			byte[] encoded = new byte[nbCompressedBytes];
+			fixed (byte* benc = encoded)
+				encodedPtr = new IntPtr ((void*)benc);
+
+			length = celt_encode (this, pcm, IntPtr.Zero, encodedPtr, nbCompressedBytes);
 
 			return encoded;
 		}
 
-		public byte[] Encode (short[] pcm, out short[] compressed)
-		{
-			ThrowIfDisposed ();
+		//public unsafe byte[] Encode (byte[] pcm, int bitrate, out int length, out short[] synthesis)
+		//{
+		//    ThrowIfDisposed ();
 
-			int maxCompressedBytes;
-			byte[] encoded;
-			int compressedBytes = celt_encode (this, pcm, out compressed, out encoded, out maxCompressedBytes);
+		//    int nbCompressedBytes = (bitrate / 8) / (this.Mode.SampleRate / this.Mode.FrameSize);
 
-			return encoded;
-		}
+		//    IntPtr encodedPtr;
+		//    byte[] encoded = new byte[nbCompressedBytes];
+		//    fixed (byte* benc = encoded)
+		//        encodedPtr = new IntPtr ((void*)benc);
+
+		//    IntPtr synthPtr;
+		//    synthesis = new short[nbCompressedBytes / 2];
+		//    fixed (short* synth = synthesis)
+		//        synthPtr = new IntPtr ((void*)synth);
+
+		//    length = celt_encode (this, pcm, synthPtr, encodedPtr, nbCompressedBytes);
+
+		//    return encoded;
+		//}
 
 		#region IDisposable Members
 		public void Dispose ()
@@ -167,7 +165,7 @@ namespace Gablarski.CELT
 			if (mode == null)
 				throw new ArgumentNullException ("mode");
 
-			return new CeltEncoder (celt_encoder_create (mode));
+			return new CeltEncoder (mode, celt_encoder_create (mode));
 		}
 
 		public static CeltEncoder Create (int samplingRate, int channels, int samplesPerChannel)
@@ -177,22 +175,16 @@ namespace Gablarski.CELT
 			return Create (mode);
 		}
 
-		[DllImport ("libcelt.dll")]
+		[DllImport ("libcelt.dll", CallingConvention = CallingConvention.Cdecl)]
 		private static extern IntPtr celt_encoder_create (IntPtr mode);
 
-		[DllImport ("libcelt.dll")]
+		[DllImport ("libcelt.dll", CallingConvention = CallingConvention.Cdecl)]
 		private static extern void celt_encoder_destroy (IntPtr encoderState);
 
-		[DllImport ("libcelt.dll")]
-		[return: MarshalAs (UnmanagedType.SysInt)]
-		private static extern int celt_encode (IntPtr encoderState, short[] pcm, out short[] optional_synthesis, out byte[] compressed, [MarshalAs (UnmanagedType.SysInt)] out int maxCompressedBytes);
+		[DllImport ("libcelt.dll", CallingConvention = CallingConvention.Cdecl)]
+		private static extern int celt_encode (IntPtr encoderState, byte[] pcm, IntPtr optional_synthesis, IntPtr compressed, int nbCompressedBytes);
 
-		[DllImport ("libcelt.dll")]
-		[return: MarshalAs (UnmanagedType.SysInt)]
-		private static extern int celt_encode (IntPtr encoderState, short[] pcm, short[] optional_synthesis, out byte[] compressed, [MarshalAs (UnmanagedType.SysInt)] out int maxCompressedBytes);
-
-		[DllImport ("libcelt.dll")]
-		[return: MarshalAs (UnmanagedType.SysInt)]
-		private static extern ErrorCode celt_encoder_ctl (IntPtr encoderState, [MarshalAs (UnmanagedType.SysInt)] Request request, [MarshalAs (UnmanagedType.SysInt)] ref int value);
+		[DllImport ("libcelt.dll", CallingConvention = CallingConvention.Cdecl)]
+		private static extern ErrorCode celt_encoder_ctl (IntPtr encoderState, Request request, ref int value);
 	}
 }

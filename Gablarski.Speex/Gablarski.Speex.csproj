@@ -51,12 +51,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SpeexMode.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Gablarski\Gablarski.csproj">
-      <Project>{7347052B-DA5B-4CCA-AB28-3963766E3CDB}</Project>
-      <Name>Gablarski</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

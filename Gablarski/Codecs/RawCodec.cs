@@ -6,7 +6,7 @@ using System.Text;
 namespace Gablarski.Media.Codecs
 {
 	public class RawCodec
-		: IMediaCodec
+		: IAudioCodec
 	{
 		#region IMediaCodec Members
 
@@ -20,9 +20,14 @@ namespace Gablarski.Media.Codecs
 			get { return MediaTypes.All; }
 		}
 
-		public IEnumerable<uint> Bitrates
+		public uint MinSampleRate
 		{
-			get { return new uint[] { 705600 }; }
+			get { return 1; }
+		}
+
+		public uint MaxSampleRate
+		{
+			get { return 96000; }
 		}
 
 		public uint MaxQuality
@@ -35,12 +40,12 @@ namespace Gablarski.Media.Codecs
 			get { return 1; }
 		}
 
-		public byte[] Encode (byte[] data, uint bitrate, uint quality)
+		public byte[] Encode (byte[] data, uint sampleRate, uint quality)
 		{
 			return data;
 		}
 
-		public byte[] Decode (byte[] encoded, uint bitrate, uint quality)
+		public byte[] Decode (byte[] encoded, uint sampleRate, uint quality)
 		{
 			return encoded;
 		}

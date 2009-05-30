@@ -9,6 +9,30 @@ namespace Gablarski.CELT
 	public class CeltDecoder
 		: IDisposable
 	{
+		private CeltDecoder (IntPtr state, CeltMode mode)
+		{
+			this.decoderState = state;
+			this.Mode = mode;
+		}
+
+		public CeltMode Mode
+		{
+			get;
+			private set;
+		}
+
+		public unsafe byte[] Decode (byte[] encoded)
+		{
+			IntPtr pcmptr;
+			byte[] pcm = new byte[this.Mode.FrameSize*2];
+			fixed (byte* bpcm = pcm)
+				pcmptr = new IntPtr((void*)bpcm);
+
+			celt_decode (this.decoderState, encoded, encoded.Length, pcmptr).ThrowIfError();
+
+			return pcm;
+		}
+
 		private IntPtr decoderState;
 
 		#region IDisposable Members
@@ -30,8 +54,18 @@ namespace Gablarski.CELT
 		}
 		#endregion
 
-		[DllImport ("libcert.dll")]
-		[return: MarshalAs (UnmanagedType.SysInt)]
-		private static extern ErrorCode celt_decode (IntPtr decoderState, byte[] data, int length, out short[] pcm);
+		[DllImport ("libcelt.dll", CallingConvention = CallingConvention.Cdecl)]
+		private static extern IntPtr celt_decoder_create (IntPtr mode);
+
+		[DllImport ("libcelt.dll", CallingConvention = CallingConvention.Cdecl)]
+		private static extern void celt_decoder_destroy (IntPtr decoderState);
+
+		[DllImport ("libcelt.dll", CallingConvention = CallingConvention.Cdecl)]
+		private static extern ErrorCode celt_decode (IntPtr decoderState, byte[] data, int length, IntPtr pcm);
+
+		public static CeltDecoder Create (CeltMode mode)
+		{
+			return new CeltDecoder (celt_decoder_create (mode), mode);
+		}
 	}
 }

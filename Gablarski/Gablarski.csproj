@@ -34,6 +34,24 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>default</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>default</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -57,8 +75,11 @@
     <Compile Include="Client\IDeviceProvider.cs" />
     <Compile Include="Client\IPlaybackProvider.cs" />
     <Compile Include="Client\VoiceActivation.cs" />
+    <Compile Include="Codecs\CeltCodec.cs" />
+    <Compile Include="Codecs\IAudioCodec.cs" />
     <Compile Include="Codecs\IMediaCodec.cs" />
     <Compile Include="Codecs\RawCodec.cs" />
+    <Compile Include="Codecs\SpeexCodec.cs" />
     <Compile Include="en-US.Designer.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="IClientConnection.cs" />
@@ -136,6 +157,16 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="en-US.resx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Gablarski.CELT\Gablarski.CELT.csproj">
+      <Project>{A55BF3FF-7D5F-4BA6-8C2E-2A6F59FD032B}</Project>
+      <Name>Gablarski.CELT</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Gablarski.Speex\Gablarski.Speex.csproj">
+      <Project>{EA65B7E2-026A-4CC0-9E63-EA4BCCFCD906}</Project>
+      <Name>Gablarski.Speex</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

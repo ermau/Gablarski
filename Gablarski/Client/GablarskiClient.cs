@@ -152,7 +152,7 @@ namespace Gablarski.Client
 				throw new ArgumentNullException ("source");
 
 			// TODO: Add bitrate transmision etc
-			byte[] encoded = source.AudioCodec.Encode (data, source.AudioCodec.Bitrates.First(), source.AudioCodec.MaxQuality);
+			byte[] encoded = source.AudioCodec.Encode (data, 44100, source.AudioCodec.MaxQuality);
 			this.connection.Send (new SendAudioDataMessage (channel.ChannelId, source.ID, encoded));
 		}
 

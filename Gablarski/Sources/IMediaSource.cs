@@ -18,7 +18,7 @@ namespace Gablarski.Media.Sources
 		/// </summary>
 		MediaType Type { get; }
 
-		IMediaCodec AudioCodec { get; }
+		IAudioCodec AudioCodec { get; }
 		IMediaCodec VideoCodec { get; }
 	}
 }

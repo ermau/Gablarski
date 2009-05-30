@@ -27,7 +27,7 @@ namespace Gablarski.Media.Sources
 			get { return MediaType.Voice; }
 		}
 
-		public IMediaCodec AudioCodec
+		public IAudioCodec AudioCodec
 		{
 			get { return this.codec; }
 		}
