@@ -70,6 +70,7 @@
     <Compile Include="Messages\AudioDataReceivedMessage.cs" />
     <Compile Include="Messages\ChangeChannelMessage.cs" />
     <Compile Include="Messages\ChannelEditMessage.cs" />
+    <Compile Include="Messages\ChannelEditResultMessage.cs" />
     <Compile Include="Messages\ChannelListMessage.cs" />
     <Compile Include="Messages\ChannelChangedMessage.cs" />
     <Compile Include="Messages\ChannelChangeInfo.cs" />

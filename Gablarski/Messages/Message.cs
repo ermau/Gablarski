@@ -41,6 +41,7 @@ namespace Gablarski.Messages
 
 		ChannelListReceived = 19,
 		ChangeChannelResult = 21,
+		ChannelEditResult = 23,
 	}
 
 	public abstract class Message<TMessage>

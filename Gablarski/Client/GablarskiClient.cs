@@ -25,16 +25,17 @@ namespace Gablarski.Client
 		public event EventHandler Disconnected;
 		public event EventHandler<ReceivedLoginEventArgs> LoginResult;
 
+		public event EventHandler<ReceivedListEventArgs<PlayerInfo>> ReceivedPlayerList;
 		public event EventHandler<ReceivedLoginEventArgs> PlayerLoggedIn;
 		public event EventHandler<PlayerDisconnectedEventArgs> PlayerDisconnected;
-		public event EventHandler<ChannelChangedEventArgs> PlayerChangedChannel;
-
-		public event EventHandler<ReceivedSourceEventArgs> ReceivedSource;
-		public event EventHandler<ReceivedAudioEventArgs> ReceivedAudioData;
 
 		public event EventHandler<ReceivedListEventArgs<Channel>> ReceivedChannelList;
-		public event EventHandler<ReceivedListEventArgs<PlayerInfo>> ReceivedPlayerList;
+		public event EventHandler<ChannelChangedEventArgs> PlayerChangedChannel;
+		public event EventHandler<ChannelEditResultEventArgs> ReceivedChannelEditResult;
+		
 		public event EventHandler<ReceivedListEventArgs<MediaSourceInfo>> ReceivedSourceList;
+		public event EventHandler<ReceivedSourceEventArgs> ReceivedSource;
+		public event EventHandler<ReceivedAudioEventArgs> ReceivedAudioData;
 		#endregion
 
 		#region Public Properties
@@ -252,6 +253,13 @@ namespace Gablarski.Client
 				result (this, e);
 		}
 
+		protected virtual void OnReceivedChannelEditResult (ChannelEditResultEventArgs e)
+		{
+			var received = this.ReceivedChannelEditResult;
+			if (received != null)
+				received (this, e);
+		}
+
 		protected virtual void OnLoginResult (ReceivedLoginEventArgs e)
 		{
 			var result = this.LoginResult;
@@ -276,6 +284,28 @@ namespace Gablarski.Client
 	}
 
 	#region Event Args
+	public class ChannelEditResultEventArgs
+		: EventArgs
+	{
+		public ChannelEditResultEventArgs (Channel channel, ChannelEditResult result)
+		{
+			this.Channel = channel;
+			this.Result = result;
+		}
+
+		public Channel Channel
+		{
+			get;
+			private set;
+		}
+
+		public ChannelEditResult Result
+		{
+			get;
+			private set;
+		}
+	}
+
 	public class ChannelChangedEventArgs
 		: EventArgs
 	{

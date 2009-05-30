@@ -94,15 +94,30 @@ namespace Gablarski.Server
 		{
 			var msg = (ChannelEditMessage)e.Message;
 
-			if (!this.channelProvider.UpdateSupported || (msg.Channel.ChannelId != 0 && !GetPermission (PermissionName.EditChannel, msg.Channel.ChannelId, e.Connection))
-				|| (msg.Channel.ChannelId == 0 && !GetPermission (PermissionName.AddChannel, e.Connection)))
+			ChannelEditResult result = ChannelEditResult.FailedUnknown;
+
+			Channel realChannel;
+			lock (channelLock)
 			{
-				// TODO reject
-				return;
+				realChannel = this.channels[msg.Channel.ChannelId];
 			}
 
-			this.channelProvider.SaveChannel (msg.Channel);
-			this.UpdateChannels (true);
+			if (!this.channelProvider.UpdateSupported)
+				result = ChannelEditResult.FailedChannelsReadOnly;
+			else if (realChannel.ReadOnly)
+				result = ChannelEditResult.FailedChannelReadOnly;
+			else if ((msg.Channel.ChannelId != 0 && !GetPermission (PermissionName.EditChannel, msg.Channel.ChannelId, e.Connection))
+					|| (msg.Channel.ChannelId == 0 && !GetPermission (PermissionName.AddChannel, e.Connection)))
+				result = ChannelEditResult.FailedPermissions;
+
+			if (result == ChannelEditResult.FailedUnknown)
+			{
+				this.channelProvider.SaveChannel (msg.Channel);
+				this.UpdateChannels (true);
+				result = ChannelEditResult.Success;
+			}
+
+			e.Connection.Send (new ChannelEditResultMessage (msg.Channel, result));
 		}
 		#endregion
 

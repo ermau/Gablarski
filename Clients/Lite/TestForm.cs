@@ -43,6 +43,7 @@ namespace Gablarski.Clients.Lite
 			client.PlayerLoggedIn += client_ReceivedNewLogin;
 			client.ReceivedSource += client_ReceivedSource;
 			client.ReceivedChannelList += client_ReceivedChannelList;
+			client.ReceivedChannelEditResult += client_ReceivedChannelEditResult;
 			client.ReceivedPlayerList += client_ReceivedPlayerList;
 			client.ReceivedSourceList += client_ReceivedSourceList;
 			client.ReceivedAudioData += client_ReceivedAudioData;
@@ -459,6 +460,12 @@ namespace Gablarski.Clients.Lite
 			}
 			
 			this.client.CreateChannel (new Channel { Name = this.channelName.Text.Trim (), Description = this.channelDescription.Text.Trim () });
+		}
+
+		private void client_ReceivedChannelEditResult (object sender, ChannelEditResultEventArgs e)
+		{
+			if (e.Result != ChannelEditResult.Success)
+				MessageBox.Show (e.Result.ToString());
 		}
 	}
 }

@@ -45,10 +45,8 @@ namespace Gablarski.Server
 					long id = ++this.lastId;
 					channels.Add (id, new Channel (id, channel));
 				}
-				//else if (!Channel.ReferenceEquals (channel, channel[channel.ChannelId]))
-				//{
-
-				//}
+				else if (channels.ContainsKey (channel.ChannelId))
+					channels[channel.ChannelId] = channel;
 			}
 		}
 

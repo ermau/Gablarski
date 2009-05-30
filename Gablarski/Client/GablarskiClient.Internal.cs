@@ -17,13 +17,15 @@ namespace Gablarski.Client
 				{ ServerMessageType.ServerInfoReceived, OnServerInfoReceivedMessage },
 				{ ServerMessageType.PlayerListReceived, OnPlayerListReceivedMessage },
 				{ ServerMessageType.SourceListReceived, OnSourceListReceivedMessage },
+				
 				{ ServerMessageType.ChannelListReceived, OnChannelListReceivedMessage },
+				{ ServerMessageType.ChangeChannelResult, OnChangeChannelResultMessage },
+				{ ServerMessageType.ChannelEditResult, OnChannelEditResultMessage },
 
 				{ ServerMessageType.ConnectionRejected, OnConnectionRejectedMessage },
 				{ ServerMessageType.LoginResult, OnLoginResultMessage },
 				{ ServerMessageType.PlayerDisconnected, OnPlayerDisconnectedMessage },
-				{ ServerMessageType.ChangeChannelResult, OnChangeChannelResultMessage },
-
+				
 				{ ServerMessageType.SourceResult, OnSourceResultMessage },
 				{ ServerMessageType.AudioDataReceived, OnAudioDataReceivedMessage },
 			};
@@ -138,6 +140,19 @@ namespace Gablarski.Client
 			}
 
 			OnReceivedChannelList (new ReceivedListEventArgs<Channel> (msg.Channels));
+		}
+
+		private void OnChannelEditResultMessage (MessageReceivedEventArgs e)
+		{
+			var msg = (ChannelEditResultMessage)e.Message;
+
+			Channel channel;
+			lock (this.channelLock)
+			{
+				this.channels.TryGetValue (msg.ChannelId, out channel);
+			}
+
+			OnReceivedChannelEditResult (new ChannelEditResultEventArgs (channel, msg.Result));
 		}
 		#endregion
 
