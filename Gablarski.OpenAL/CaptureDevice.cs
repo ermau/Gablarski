@@ -221,10 +221,10 @@ namespace Gablarski.OpenAL
 			if (diff > 0)
 			{
 				numSamples -= diff;
-				for (int i = 0; i < (diff * 2); i++)
+				for (int i = diff * 2; i < samples.Length; i++)
 				{
-					samples[numSamples - i] = 0;
-					samples[numSamples - ++i] = 0;
+					samples[i] = 0;
+					samples[++i] = 0;
 				}
 			}
 

@@ -100,6 +100,8 @@ namespace Gablarski.Client
 				this.players.Remove (msg.PlayerId);
 			}
 
+			// TODO: remove sources
+
 			OnPlayerDisconnected (new PlayerDisconnectedEventArgs (info));
 		}
 

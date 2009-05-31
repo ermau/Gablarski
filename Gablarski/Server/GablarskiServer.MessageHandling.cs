@@ -99,22 +99,22 @@ namespace Gablarski.Server
 			Channel realChannel;
 			lock (channelLock)
 			{
-				realChannel = this.channels[msg.Channel.ChannelId];
-			}
+				if (!this.channels.TryGetValue (msg.Channel.ChannelId, out realChannel))
+					result = ChannelEditResult.FailedChannelDoesntExist;
+				else if (!this.channelProvider.UpdateSupported)
+					result = ChannelEditResult.FailedChannelsReadOnly;
+				else if (realChannel.ReadOnly)
+					result = ChannelEditResult.FailedChannelReadOnly;
+				else if ((msg.Channel.ChannelId != 0 && !GetPermission (PermissionName.EditChannel, msg.Channel.ChannelId, e.Connection))
+						|| (msg.Channel.ChannelId == 0 && !GetPermission (PermissionName.AddChannel, e.Connection)))
+					result = ChannelEditResult.FailedPermissions;
 
-			if (!this.channelProvider.UpdateSupported)
-				result = ChannelEditResult.FailedChannelsReadOnly;
-			else if (realChannel.ReadOnly)
-				result = ChannelEditResult.FailedChannelReadOnly;
-			else if ((msg.Channel.ChannelId != 0 && !GetPermission (PermissionName.EditChannel, msg.Channel.ChannelId, e.Connection))
-					|| (msg.Channel.ChannelId == 0 && !GetPermission (PermissionName.AddChannel, e.Connection)))
-				result = ChannelEditResult.FailedPermissions;
-
-			if (result == ChannelEditResult.FailedUnknown)
-			{
-				this.channelProvider.SaveChannel (msg.Channel);
-				this.UpdateChannels (true);
-				result = ChannelEditResult.Success;
+				if (result == ChannelEditResult.FailedUnknown)
+				{
+					this.channelProvider.SaveChannel (msg.Channel);
+					this.UpdateChannels (true);
+					result = ChannelEditResult.Success;
+				}
 			}
 
 			e.Connection.Send (new ChannelEditResultMessage (msg.Channel, result));
