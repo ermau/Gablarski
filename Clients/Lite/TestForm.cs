@@ -64,13 +64,13 @@ namespace Gablarski.Clients.Lite
 
 		void client_ReceivedAudioData (object sender, ReceivedAudioEventArgs e)
 		{
-			this.playback.QueuePlayback (e.Source, e.AudioData);
+			this.playback.QueuePlayback (e.Source, e.Source.AudioCodec.Decode (e.AudioData, 44100, 10), 44100);
 		}
 
 		void capture_SamplesAvailable (object sender, SamplesAvailableEventArgs e)
 		{
 			if (this.source != null)
-				this.client.SendAudioData ((Channel)this.channelNodes[this.client.Self.CurrentChannelId].Tag, this.source, capture.ReadSamples());
+				this.client.SendAudioData ((Channel)this.channelNodes[this.client.Self.CurrentChannelId].Tag, this.source, capture.ReadSamples (128));
 		}
 
 		void client_ReceivedNewLogin (object sender, ReceivedLoginEventArgs e)

@@ -39,6 +39,6 @@ namespace Gablarski.Media.Sources
 
 		#endregion
 
-		private RawCodec codec = new RawCodec();
+		private CeltCodec codec = new CeltCodec();
 	}
 }

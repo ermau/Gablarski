@@ -54,6 +54,7 @@ namespace Gablarski.CELT
 		}
 		#endregion
 
+		#region Imports
 		[DllImport ("libcelt.dll", CallingConvention = CallingConvention.Cdecl)]
 		private static extern IntPtr celt_decoder_create (IntPtr mode);
 
@@ -62,6 +63,7 @@ namespace Gablarski.CELT
 
 		[DllImport ("libcelt.dll", CallingConvention = CallingConvention.Cdecl)]
 		private static extern ErrorCode celt_decode (IntPtr decoderState, byte[] data, int length, IntPtr pcm);
+		#endregion
 
 		public static CeltDecoder Create (CeltMode mode)
 		{

@@ -11,7 +11,7 @@ namespace Gablarski.Client
 	{
 		IDevice Device { get; set; }
 
-		void QueuePlayback (IMediaSource source, byte[] data);
+		void QueuePlayback (IMediaSource source, byte[] data, int frequency);
 
 		
 	}

@@ -23,7 +23,7 @@ namespace Gablarski.OpenAL.Providers
 			}
 		}
 
-		public void QueuePlayback (IMediaSource mediaSource, byte[] data)
+		public void QueuePlayback (IMediaSource mediaSource, byte[] data, int frequency)
 		{
 			if (!this.device.IsOpen)
 				this.device.Open();
@@ -66,7 +66,7 @@ namespace Gablarski.OpenAL.Providers
 			}
 
 			//var buffer = SourceBuffer.Generate ();
-			buffer.Buffer (data, AudioFormat.Mono16Bit, 44100);
+			buffer.Buffer (data, AudioFormat.Mono16Bit, (uint)frequency);
 			source.QueueAndPlay (buffer);
 		}
 

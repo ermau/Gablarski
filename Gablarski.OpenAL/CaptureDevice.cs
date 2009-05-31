@@ -194,7 +194,7 @@ namespace Gablarski.OpenAL
 
 		private EventHandler<SamplesAvailableEventArgs> samplesAvailable;
 
-		private int minimumSamples = 1400;
+		private int minimumSamples = 1;
 		private volatile bool listening;
 		private Thread listenerThread;
 		private byte[] pcm;
@@ -246,7 +246,7 @@ namespace Gablarski.OpenAL
 				//if (numSamples == this.minimumSamples)
 				//	numSamples = 0;
 
-				Thread.Sleep (20);
+				Thread.Sleep (1);
 				//Thread.Sleep ((int)(((this.minimumSamples - numSamples) / sps) * 1000));
 			}
 		}

@@ -93,7 +93,7 @@ namespace Gablarski.CELT
 		//        encodedPtr = new IntPtr ((void*)benc);
 
 		//    IntPtr synthPtr;
-		//    synthesis = new short[nbCompressedBytes / 2];
+		//    synthesis = new short[this.Mode.FrameSize * 2];
 		//    fixed (short* synth = synthesis)
 		//        synthPtr = new IntPtr ((void*)synth);
 
@@ -141,8 +141,7 @@ namespace Gablarski.CELT
 
 		private int GetValue (Request request)
 		{
-			if (this.IsDisposed)
-				throw new ObjectDisposedException (null);
+			ThrowIfDisposed ();
 
 			int ret = 0;
 			celt_encoder_ctl (this.encoderState, request, ref ret).ThrowIfError();
