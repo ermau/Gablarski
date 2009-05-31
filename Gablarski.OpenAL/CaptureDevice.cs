@@ -107,6 +107,7 @@ namespace Gablarski.OpenAL
 		/// </summary>
 		public void StartCapture ()
 		{
+			this.capturing = true;
 			alcCaptureStart (this.Handle);
 			OpenAL.ErrorCheck ();
 		}
@@ -116,6 +117,7 @@ namespace Gablarski.OpenAL
 		/// </summary>
 		public void StopCapture ()
 		{
+			this.capturing = false;
 			alcCaptureStop (this.Handle);
 			OpenAL.ErrorCheck ();
 		}
@@ -194,6 +196,7 @@ namespace Gablarski.OpenAL
 
 		private EventHandler<SamplesAvailableEventArgs> samplesAvailable;
 
+		private volatile bool capturing;
 		private int minimumSamples = 1;
 		private volatile bool listening;
 		private Thread listenerThread;
@@ -211,7 +214,19 @@ namespace Gablarski.OpenAL
 		{
 			byte[] samples = new byte[numSamples * 2];
 
-			while (block && this.AvailableSamples < numSamples) ;
+			while (this.capturing && block && this.AvailableSamples < numSamples)
+				Thread.Sleep (1);
+
+			int diff = numSamples - this.AvailableSamples;
+			if (diff > 0)
+			{
+				numSamples -= diff;
+				for (int i = 0; i < (diff * 2); i++)
+				{
+					samples[numSamples - i] = 0;
+					samples[numSamples - ++i] = 0;
+				}
+			}
 
 			alcCaptureSamples (this.Handle, pcmPtr, numSamples);
 			OpenAL.ErrorCheck ();

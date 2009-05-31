@@ -266,7 +266,7 @@ namespace Gablarski.Server
 				return;
 			}
 
-			Trace.WriteLine ("[Server] Message Received: " + msg.MessageType);
+			Trace.WriteLineIf ((msg.MessageType != ClientMessageType.AudioData), "[Server] Message Received: " + msg.MessageType);
 
 			#if !DEBUG
 				if (this.Handlers.ContainsKey (msg.MessageType))

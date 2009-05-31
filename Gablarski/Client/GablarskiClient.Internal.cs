@@ -69,7 +69,7 @@ namespace Gablarski.Client
 				return;
 			}
 
-			Trace.WriteLine ("[Client] Message Received: " + msg.MessageType);
+			Trace.WriteLineIf ((msg.MessageType != ServerMessageType.AudioDataReceived), "[Client] Message Received: " + msg.MessageType);
 
 			if (msg.MessageType == ServerMessageType.AudioDataReceived)
 			{
