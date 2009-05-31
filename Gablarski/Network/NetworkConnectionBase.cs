@@ -171,7 +171,17 @@ namespace Gablarski.Network
 				{
 					this.rwaiting = true;
 					byte[] mbuffer = new byte[1];
-					this.rstream.BeginRead (mbuffer, 0, 1, this.Received, mbuffer);
+
+					try
+					{
+						this.rstream.BeginRead (mbuffer, 0, 1, this.Received, mbuffer);
+					}
+					catch (Exception ex)
+					{
+						Trace.WriteLine ("Error starting read, disconnecting: " + ex.Message);
+						this.Disconnect ();
+						return;
+					}
 				}
 
 				//if (!this.uwaiting)
