@@ -124,8 +124,9 @@ namespace Gablarski.Network
 				this.rstream.EndRead (read);
 				mbuffer = (byte[]) read.AsyncState;
 			}
-			catch
+			catch (Exception ex)
 			{
+				Trace.WriteLine ("Error ending read: " + ex.Message);
 				this.Shutdown();
 				return;
 			}
