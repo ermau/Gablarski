@@ -105,13 +105,23 @@ namespace Gablarski.Server
 					result = ChannelEditResult.FailedChannelsReadOnly;
 				else if (realChannel.ReadOnly)
 					result = ChannelEditResult.FailedChannelReadOnly;
-				else if ((msg.Channel.ChannelId != 0 && !GetPermission (PermissionName.EditChannel, msg.Channel.ChannelId, e.Connection))
-						|| (msg.Channel.ChannelId == 0 && !GetPermission (PermissionName.AddChannel, e.Connection)))
+				else if (msg.Channel.ChannelId != 0)
+				{
+					if (msg.Delete && !GetPermission (PermissionName.DeleteChannel, msg.Channel.ChannelId, e.Connection))
+						result = ChannelEditResult.FailedPermissions;
+					else if (!msg.Delete && !GetPermission (PermissionName.EditChannel, msg.Channel.ChannelId, e.Connection))
+						result = ChannelEditResult.FailedPermissions;
+				}
+				else if (msg.Channel.ChannelId == 0 && !GetPermission (PermissionName.AddChannel, e.Connection))
 					result = ChannelEditResult.FailedPermissions;
 
 				if (result == ChannelEditResult.FailedUnknown)
 				{
-					this.channelProvider.SaveChannel (msg.Channel);
+					if (!msg.Delete)
+						this.channelProvider.SaveChannel (msg.Channel);
+					else
+						this.channelProvider.DeleteChannel (msg.Channel);
+
 					this.UpdateChannels (true);
 					result = ChannelEditResult.Success;
 				}

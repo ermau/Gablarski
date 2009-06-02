@@ -25,14 +25,22 @@ namespace Gablarski.Messages
 			set;
 		}
 
+		public bool Delete
+		{
+			get;
+			set;
+		}
+
 		public override void WritePayload (IValueWriter writer)
 		{
 			this.Channel.Serialize (writer);
+			writer.WriteBool (this.Delete);
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
 			this.Channel = new Channel (reader);
+			this.Delete = reader.ReadBool ();
 		}
 	}
 }

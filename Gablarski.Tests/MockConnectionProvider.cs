@@ -21,22 +21,26 @@ namespace Gablarski.Tests
 			return connection;
 		}
 
+		public bool IsListening
+		{
+			get;
+			private set;
+		}
+
 		#region IConnectionProvider Members
 
 		public event EventHandler<ConnectionEventArgs> ConnectionMade;
 
 		public void StartListening ()
 		{
-			this.listening = true;
+			this.IsListening = true;
 		}
 
 		public void StopListening ()
 		{
-			this.listening = false;
+			this.IsListening = false;
 		}
 
 		#endregion
-
-		private bool listening = false;
 	}
 }
