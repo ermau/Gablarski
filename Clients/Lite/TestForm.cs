@@ -350,7 +350,7 @@ namespace Gablarski.Clients.Lite
 			channels.SaveChannel (new Channel { Name = "Test 1", Description = "Testing Channel" });
 			channels.SaveChannel (new Channel { Name = "Sub Test 1", Description = "Testing Subchannels", ParentChannelId = 1 });
 
-			server = new GablarskiServer (new ServerInfo { ServerName = this.ServerName.Text }, new GuestUserProvider(), permProvider, channels);
+			server = new GablarskiServer (new ServerSettings { Name = this.ServerName.Text }, new GuestUserProvider(), permProvider, channels);
 			server.AddConnectionProvider (new ServerNetworkConnectionProvider());
 		}
 

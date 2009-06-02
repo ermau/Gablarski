@@ -157,7 +157,7 @@ namespace Gablarski.Server
 			{
 				this.connections.Send (msg);
 
-				e.Connection.Send (new ServerInfoMessage (this.serverInfo));
+				e.Connection.Send (new ServerInfoMessage (new ServerInfo (this.settings)));
 
 				lock (this.channelLock)
 				{

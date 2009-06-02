@@ -39,8 +39,7 @@ namespace Gablarski.Messages
 
 		public override void ReadPayload (IValueReader reader)
 		{
-			this.ServerInfo = new ServerInfo();
-			this.ServerInfo.Deserialize (reader);
+			this.ServerInfo = new ServerInfo(reader);
 			this.EncryptionKey = reader.ReadString ();
 		}
 	}

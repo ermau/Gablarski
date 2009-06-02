@@ -1,24 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project name="Gablarski" default="build" basedir=".">
 	<target name="build" depends="clean">
-		<!-- Build Release quality binary -->
-		<exec program="${msbuild.location}">
-			<arg value="/target:Rebuild"/>
-			<arg value="/p:Configuration=Release"/>
-		</exec>
-
 		<!-- Build Debug quality binary -->
 		<exec program="${msbuild.location}">
 			<arg value="/target:Rebuild"/>
 			<arg value="/p:Configuration=Debug"/>
 		</exec>
-
-		<!-- Zip the Release quality artifacts -->
-		<zip zipfile="Gablarskie-Release.zip">
-			<fileset basedir="Clients\Lite\bin\x86\Release">
-				<include name="**/*"/>
-			</fileset>
-		</zip>
 
 		<!-- Zip the Debug quality artifacts -->
 		<zip zipfile="Gablarski-Debug.zip">

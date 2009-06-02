@@ -11,7 +11,7 @@ namespace Gablarski.Server
 {
 	public partial class GablarskiServer
 	{
-		public static readonly Version MinimumApiVersion = new Version (0,3,0,0);
+		public static readonly Version MinimumApiVersion = new Version (0,4,0,0);
 
 		/// <summary>
 		/// Initializes a new <c>GablarskiServer</c> instance.
@@ -20,10 +20,10 @@ namespace Gablarski.Server
 		/// <param name="userProvider">The user authentication provider for the server to use.</param>
 		/// <param name="permissionProvider">The user permissions provider for the server to use.</param>
 		/// <param name="channelProvider">The channel provider for the server to use.</param>
-		public GablarskiServer (ServerInfo serverInfo, IUserProvider userProvider, IPermissionsProvider permissionProvider, IChannelProvider channelProvider)
+		public GablarskiServer (ServerSettings settings, IUserProvider userProvider, IPermissionsProvider permissionProvider, IChannelProvider channelProvider)
 			: this()
 		{
-			this.serverInfo = serverInfo;
+			this.settings = settings;
 			this.userProvider = userProvider;
 			this.permissionProvider = permissionProvider;
 			
@@ -37,10 +37,10 @@ namespace Gablarski.Server
 		/// </summary>
 		/// <param name="serverInfo">The info for the server, providing name, description, etc.</param>
 		/// <param name="provider">The backend provider for the server to use.</param>
-		public GablarskiServer (ServerInfo serverInfo, IBackendProvider provider)
+		public GablarskiServer (ServerSettings settings, IBackendProvider provider)
 			: this()
 		{
-			this.serverInfo = serverInfo;
+			this.settings = settings;
 
 			this.backendProvider = provider;
 			this.backendProvider.ChannelsUpdatedExternally += OnChannelsUpdatedExternally;
@@ -133,7 +133,7 @@ namespace Gablarski.Server
 		}
 		#endregion
 
-		private readonly ServerInfo serverInfo = new ServerInfo();
+		private readonly ServerSettings settings;
 
 		private List<IConnectionProvider> availableConnections = new List<IConnectionProvider> ();
 
