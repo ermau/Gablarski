@@ -5,7 +5,6 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Gablarski.Server;
 using Gablarski.Client;
-using System.Diagnostics.Contracts;
 using Gablarski.Messages;
 
 namespace Gablarski.Tests
