@@ -1,28 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project name="Gablarski" default="build" basedir=".">
-	<target name="build" depends="clean">
-		<!-- Build Debug quality binary -->
-		<exec program="${msbuild.location}">
-			<arg value="/target:Rebuild"/>
-			<arg value="/p:Configuration=Debug"/>
+	<property name="nant.settings.currentframework" value="net-3.5" />
+	
+	<target name="build">
+		<exec program="${DotNetFramework3.5_x86_Path}\msbuild.exe">
+			<arg value="/property:Configuration=Debug" />
+			<arg value="Gablarski.sln" />
 		</exec>
 
-		<!-- Zip the Debug quality artifacts -->
 		<zip zipfile="Gablarski-Debug.zip">
 			<fileset basedir="Clients\Lite\bin\x86\Debug">
 				<include name="**/*"/>
 			</fileset>
 		</zip>
-	</target>
-
-	<target name="clean" description="Clean previously built artifacts">
-		<delete dir="Clients\Lite\bin"/>
-		<delete dir="Clients\Lite\obj"/>
-		
-		<delete dir="Clients\CLI\bin" />
-		<delete dir="Clients\CLI\obj" />
-
-		<delete dir="Clients\Windows\bin" />
-		<delete dir="Clients\Windows\obj" />
 	</target>
 </project>
