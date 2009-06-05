@@ -5,10 +5,10 @@ using System.Text;
 
 namespace Gablarski.Messages
 {
-	public class RequestPlayerList
+	public class RequestPlayerListMessage
 		: ClientMessage
 	{
-		public RequestPlayerList ()
+		public RequestPlayerListMessage ()
 			: base (ClientMessageType.RequestPlayerList)
 		{
 		}

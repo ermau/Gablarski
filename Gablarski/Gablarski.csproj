@@ -98,9 +98,9 @@
     <Compile Include="Messages\ConnectionRejectedMessage.cs" />
     <Compile Include="Messages\ConnectMessage.cs" />
     <Compile Include="Messages\LoginResultMessage.cs" />
-    <Compile Include="Messages\RequestChannelList.cs" />
-    <Compile Include="Messages\RequestPlayerList.cs" />
-    <Compile Include="Messages\RequestSourceList.cs" />
+    <Compile Include="Messages\RequestChannelListMessage.cs" />
+    <Compile Include="Messages\RequestPlayerListMessage.cs" />
+    <Compile Include="Messages\RequestSourceListMessage.cs" />
     <Compile Include="Messages\SendAudioDataMessage.cs" />
     <Compile Include="Messages\PlayerListMessage.cs" />
     <Compile Include="Messages\RequestSourceMessage.cs" />

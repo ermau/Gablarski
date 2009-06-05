@@ -5,11 +5,11 @@ using System.Text;
 
 namespace Gablarski.Messages
 {
-	public class RequestSourceList
+	public class RequestChannelListMessage
 		: ClientMessage
 	{
-		public RequestSourceList()
-			: base (ClientMessageType.RequestSourceList)
+		public RequestChannelListMessage ()
+			: base (ClientMessageType.RequestChannelList)
 		{
 		}
 
