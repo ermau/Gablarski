@@ -51,5 +51,16 @@ namespace Gablarski.Tests
 			Assert.IsNotNull (msg);
 			Assert.AreEqual (ConnectionRejectedReason.IncompatibleVersion, msg.Reason);
 		}
+
+		[TestMethod]
+		public void TestRequestChannelList ()
+		{
+			MockServerConnection connection = provider.EstablishConnection ();
+			connection.Client.Send (new RequestChannelListMessage ());
+
+			var msg = (connection.Client.DequeueMessage () as ChannelListMessage);
+			Assert.IsNotNull (msg);
+			Assert.IsTrue (msg.Channels.Count () > 0);
+		}
 	}
 }
