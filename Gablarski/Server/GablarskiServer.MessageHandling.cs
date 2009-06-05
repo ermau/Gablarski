@@ -44,7 +44,7 @@ namespace Gablarski.Server
 			{
 				if (mqueue.Count == 0)
 				{
-					Thread.Sleep (0);
+					Thread.Sleep (1);
 					continue;
 				}
 
