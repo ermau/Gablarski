@@ -2,31 +2,31 @@
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Gablarski.Server;
 using Gablarski.Client;
 using Gablarski.Messages;
+
+#if MSTEST
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+#else
+using TestInitialize = NUnit.Framework.SetUpAttribute;
+using TestCleanup = NUnit.Framework.TearDownAttribute;
+using TestClass = NUnit.Framework.TestFixtureAttribute;
+using TestMethod = NUnit.Framework.TestAttribute;
+using Assert = NUnit.Framework.Assert;
+#endif
 
 namespace Gablarski.Tests
 {
 	[TestClass]
 	public class ServerTests
 	{
-		/// <summary>
-		///Gets or sets the test context which provides
-		///information about and functionality for the current test run.
-		///</summary>
-		public TestContext TestContext
-		{
-			get;
-			set;
-		}
-
 		[TestInitialize]
 		public void ServerTestInitialize ()
 		{
 			this.server = new GablarskiServer (new ServerSettings { Name = "Test Server", Description = "Test Server" }, new GuestUserProvider (), new GuestPermissionProvider(), new LobbyChannelProvider());
 			this.server.AddConnectionProvider (this.provider = new MockConnectionProvider ());
+			this.server.Start ();
 		}
 
 		[TestCleanup]
@@ -41,16 +41,15 @@ namespace Gablarski.Tests
 		private MockConnectionProvider provider;
 
 		[TestMethod]
-		public void TestConnection ()
+		public void TestOldVersionReject ()
 		{
-			IConnection connection = provider.EstablishConnection ();
-		}
+			MockServerConnection connection = provider.EstablishConnection ();
 
-		[TestMethod]
-		public void TestGarbageLogin ()
-		{
-			IConnection connection = provider.EstablishConnection ();
-			connection.Send (new LoginMessage { Nickname = null, Username = null });
+			connection.Client.Send (new ConnectMessage (new Version (0,0,0,1)));
+
+			var msg = (connection.Client.DequeueMessage () as ConnectionRejectedMessage);
+			Assert.IsNotNull (msg);
+			Assert.AreEqual (ConnectionRejectedReason.IncompatibleVersion, msg.Reason);
 		}
 	}
 }

@@ -287,6 +287,7 @@ namespace Gablarski.Server
 		{
 			Trace.WriteLine ("[Server] Client disconnected");
 
+			e.Connection.Disconnected -= this.OnClientDisconnected;
 			e.Connection.Disconnect();
 
 			long playerId;

@@ -10,7 +10,7 @@ namespace Gablarski.Tests
 	public class MockConnectionProvider
 		: IConnectionProvider
 	{
-		public IConnection EstablishConnection ()
+		public MockServerConnection EstablishConnection ()
 		{
 			var connection = new MockServerConnection ();
 
