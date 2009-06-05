@@ -1,19 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Gablarski.OpenAL;
-using Gablarski.OpenAL.Providers;
-using Gablarski.Server;
-using Gablarski.Network;
 using System.Diagnostics;
 using Gablarski.Client;
-using System.Threading;
-using Gablarski.Messages;
-using Gablarski;
-using Gablarski.Media.Sources;
-using NDesk.Options;
-using Gablarski.OpenAL;
+using Gablarski.Network;
+using Mono.Options;
 
 namespace Gablarski.Clients.CLI
 {
@@ -34,14 +23,12 @@ namespace Gablarski.Clients.CLI
 
 			OptionSet options = new OptionSet
 			{
-				{ "h=|host=", h => host = h },
-				{ "p:|port:", (int p) => port = p },
-				{ "t|trace", v => trace = true },
-				{ "u=|username=", u => username = u },
-				{ "pw=|password=", p => password = p },
-				{ "n=|nickname=", n => nickname = n }
-
-
+				{ "h=|host=",		h => host = h },
+				{ "p:|port:",		(int p) => port = p },
+				{ "t|trace",		v => trace = true },
+				{ "u=|username=",	u => username = u },
+				{ "pw=|password=",	p => password = p },
+				{ "n=|nickname=",	n => nickname = n }
 			};
 
 			foreach (string unused in options.Parse (args))
