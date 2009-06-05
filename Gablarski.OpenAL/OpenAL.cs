@@ -16,7 +16,7 @@ namespace Gablarski.OpenAL
 			OpenAL.ErrorChecking = true;
 			#endif
 
-			if (GetIsExtensionPresent (null, "ALC_EXT_CAPTURE"))
+			if (GetIsExtensionPresent ("ALC_EXT_CAPTURE"))
 			{
 				OpenAL.IsCaptureSupported = true;
 				
@@ -41,7 +41,7 @@ namespace Gablarski.OpenAL
 
 			OpenAL.DefaultPlaybackDevice = new PlaybackDevice (Marshal.PtrToStringAnsi (alcGetString (IntPtr.Zero, ALC_DEFAULT_DEVICE_SPECIFIER)));
 
-			if (GetIsExtensionPresent (null, "ALC_ENUMERATE_ALL_EXT"))
+			if (GetIsExtensionPresent ("ALC_ENUMERATE_ALL_EXT"))
 			{
 				string defaultName = Marshal.PtrToStringAnsi (alcGetString (IntPtr.Zero, ALC_DEFAULT_ALL_DEVICES_SPECIFIER));
 
@@ -61,7 +61,7 @@ namespace Gablarski.OpenAL
 				if (OpenAL.DefaultPlaybackDevice == null)
 					OpenAL.DefaultPlaybackDevice = new PlaybackDevice (defaultName);
 			}
-			else if (GetIsExtensionPresent (null, "ALC_ENUMERATION_EXT"))
+			else if (GetIsExtensionPresent ("ALC_ENUMERATION_EXT"))
 			{
 				string defaultName = Marshal.PtrToStringAnsi (alcGetString (IntPtr.Zero, ALC_DEFAULT_DEVICE_SPECIFIER));
 
@@ -235,19 +235,28 @@ namespace Gablarski.OpenAL
 		internal static extern sbyte alcIsExtensionPresent ([In] IntPtr device, string extensionName);
 
 		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
-		internal static extern sbyte alIsExtensionPresent (IntPtr device, string extensionName);
+		internal static extern sbyte alIsExtensionPresent (string extensionName);
 
 		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
 		internal static extern void alDistanceModel (DistanceModel model);
 		#endregion
 
+		internal static bool GetIsExtensionPresent (string extension)
+		{
+			sbyte result = extension.StartsWith ("ALC")
+							? alcIsExtensionPresent (IntPtr.Zero, extension)
+							: alIsExtensionPresent (extension);
+			
+			OpenAL.ErrorCheck ();
+
+			return (result == 1);
+		}
+
 		internal static bool GetIsExtensionPresent (Device device, string extension)
 		{
-			IntPtr handle = (device != null) ? device.Handle : IntPtr.Zero;
-
 			sbyte result = extension.StartsWith("ALC")
-							? alcIsExtensionPresent(handle, extension)
-							: alIsExtensionPresent(handle, extension);
+							? alcIsExtensionPresent(device.Handle, extension)
+							: alIsExtensionPresent(extension);
 
 			OpenAL.ErrorCheck ();
 

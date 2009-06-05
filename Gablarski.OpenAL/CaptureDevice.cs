@@ -16,6 +16,11 @@ namespace Gablarski.OpenAL
 		internal CaptureDevice (string deviceName)
 			: base (deviceName)
 		{
+			this.listenerThread = new Thread (this.SampleListener)
+			{
+				Name = "OpenAL Sample Listener",
+				IsBackground = true
+			};
 		}
 
 		/// <summary>
@@ -27,19 +32,14 @@ namespace Gablarski.OpenAL
 			set { this.minimumSamples = value; }
 		}
 
+		/// <summary>
+		/// Fired when samples are available for an existing capture.
+		/// </summary>
 		public event EventHandler<SamplesAvailableEventArgs> SamplesAvailable
 		{
 			add
 			{
-				if (this.listenerThread == null || !this.listening)
-				{
-					this.listening = true;
-					(this.listenerThread = new Thread (this.SampleListener)
-					{
-						Name = "OpenAL Sample Listener",
-						IsBackground = true
-					}).Start ();
-				}
+				this.StartSampleListener ();
 
 				this.samplesAvailable += value;
 			}
@@ -49,7 +49,7 @@ namespace Gablarski.OpenAL
 				this.samplesAvailable -= value;
 
 				if (this.samplesAvailable == null)
-					this.StopSampleListener ();
+					this.mre.Reset ();
 			}
 		}
 
@@ -128,7 +128,8 @@ namespace Gablarski.OpenAL
 		public void StopSampleListener ()
 		{
 			this.listening = false;
-			if (this.listenerThread != null)
+			this.mre.Set ();
+			if (this.listenerThread.IsAlive)
 				this.listenerThread.Join ();
 		}
 
@@ -196,12 +197,30 @@ namespace Gablarski.OpenAL
 
 		private EventHandler<SamplesAvailableEventArgs> samplesAvailable;
 
+		private readonly ManualResetEvent mre = new ManualResetEvent (true);
 		private volatile bool capturing;
 		private int minimumSamples = 1;
 		private volatile bool listening;
 		private Thread listenerThread;
 		private byte[] pcm;
 		private IntPtr pcmPtr;
+
+		protected void StartSampleListener ()
+		{
+			this.mre.Set ();
+
+			if (this.listening || this.listenerThread.IsAlive)
+				return;
+			
+			lock (this.listenerThread)
+			{
+				if (!this.listening && !this.listenerThread.IsAlive)
+				{
+					this.listening = true;
+					this.listenerThread.Start ();
+				}
+			}
+		}
 
 		protected virtual void OnCaptureSamplesAvailable (SamplesAvailableEventArgs e)
 		{
@@ -245,24 +264,16 @@ namespace Gablarski.OpenAL
 
 		private void SampleListener (object state)
 		{
-			//uint sps = this.format.GetSamplesPerSecond (this.frequency);
-
 			while (this.listening)
 			{
-				int numSamples = AvailableSamples;
-				if (numSamples > this.minimumSamples)
+				if (this.IsOpen)
 				{
-					//alcCaptureSamples (this.Handle, this.pcmPtr, numSamples);
-					//OpenAL.ErrorCheck ();
-
-					OnCaptureSamplesAvailable (new SamplesAvailableEventArgs (numSamples));
+					int numSamples = AvailableSamples;
+					if (numSamples > this.minimumSamples)
+						OnCaptureSamplesAvailable (new SamplesAvailableEventArgs (numSamples));
 				}
 
-				//if (numSamples == this.minimumSamples)
-				//	numSamples = 0;
-
 				Thread.Sleep (1);
-				//Thread.Sleep ((int)(((this.minimumSamples - numSamples) / sps) * 1000));
 			}
 		}
 	}

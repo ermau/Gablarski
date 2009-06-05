@@ -27,12 +27,14 @@ namespace Gablarski.OpenAL.Providers
 					throw new ArgumentException ("Device must be a OpenAL.CaptureDevice", "value");
 
 				this.device = cdevice;
-				this.device.Open (44100, AudioFormat.Mono16Bit);
 			}
 		}
 
 		public void StartCapture ()
 		{
+			if (!this.device.IsOpen)
+				this.device.Open (44100, AudioFormat.Mono16Bit);
+
 			this.device.StartCapture();
 		}
 

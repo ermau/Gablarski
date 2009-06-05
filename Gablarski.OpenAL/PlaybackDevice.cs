@@ -23,6 +23,9 @@ namespace Gablarski.OpenAL
 			this.Handle = alcOpenDevice (this.Name);
 			OpenAL.ErrorCheck ();
 
+			if (this.Handle == IntPtr.Zero)
+				throw new Exception ("Device failed to open for an unknown reason.");
+
 			return this;
 		}
 
