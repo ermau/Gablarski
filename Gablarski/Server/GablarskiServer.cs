@@ -11,7 +11,7 @@ namespace Gablarski.Server
 {
 	public partial class GablarskiServer
 	{
-		public static readonly Version MinimumApiVersion = new Version (0,4,0,0);
+		public static readonly Version MinimumApiVersion = new Version (0,6,0,0);
 
 		/// <summary>
 		/// Initializes a new <c>GablarskiServer</c> instance.
@@ -77,6 +77,15 @@ namespace Gablarski.Server
 		}
 
 		/// <summary>
+		/// Starts the server.
+		/// </summary>
+		public void Start ()
+		{
+			this.running = true;
+			this.messageRunnerThread.Start ();
+		}
+
+		/// <summary>
 		/// Adds and starts an <c>IConnectionProvider</c>.
 		/// </summary>
 		/// <param name="provider">The <c>IConnectionProvider</c> to add and start listening.</param>
@@ -85,11 +94,11 @@ namespace Gablarski.Server
 			Trace.WriteLine ("[Server] " + provider.GetType().Name + " added.");
 
 			// MUST provide a gaurantee of persona
-			provider.ConnectionMade += OnConnectionMade;
-			provider.StartListening ();
-
 			lock (this.availableConnections)
 			{
+				provider.ConnectionMade += OnConnectionMade;
+				provider.StartListening ();
+		
 				this.availableConnections.Add (provider);
 			}
 		}
@@ -117,19 +126,28 @@ namespace Gablarski.Server
 				this.Disconnect (playerConnection);
 		}
 
+		/// <summary>
+		/// Removes all connection providers, disconnects all users and shuts the server down.
+		/// </summary>
 		public void Shutdown ()
 		{
+			this.running = false;
+			
 			lock (this.availableConnections)
 			{
 				for (int i = 0; i < this.availableConnections.Count;)
 				{
 					var provider = this.availableConnections[i];
 
-					provider.StopListening ();
 					provider.ConnectionMade -= OnConnectionMade;
 					this.RemoveConnectionProvider (provider);
 				}
 			}
+
+			this.messageRunnerThread.Join ();
+
+			while (this.connections.ConnectionCount > 0)
+				this.Disconnect (this.connections[0].Key);
 		}
 		#endregion
 
@@ -142,6 +160,7 @@ namespace Gablarski.Server
 		private readonly IChannelProvider channelProvider;
 		private readonly IPermissionsProvider permissionProvider;
 		private readonly IUserProvider userProvider;
+		private volatile bool running = true;
 
 		protected IBackendProvider BackendProvider
 		{
@@ -179,6 +198,8 @@ namespace Gablarski.Server
 
 			connection.Disconnect ();
 			connection.MessageReceived -= this.OnMessageReceived;
+			connection.Disconnected -= this.OnClientDisconnected;
+			this.connections.Remove (connection);
 		}
 
 		private void RemoveConnectionProvider (IConnectionProvider provider, bool listRemove)
@@ -255,23 +276,6 @@ namespace Gablarski.Server
 		protected bool GetPermission (PermissionName name, PlayerInfo player)
 		{
 			return GetPermission (name, player.CurrentChannelId, player.PlayerId);
-		}
-
-		protected virtual void OnMessageReceived (object sender, MessageReceivedEventArgs e)
-		{
-			var msg = (e.Message as ClientMessage);
-			if (msg == null)
-			{
-				Disconnect (e.Connection);
-				return;
-			}
-
-			Trace.WriteLineIf ((msg.MessageType != ClientMessageType.AudioData), "[Server] Message Received: " + msg.MessageType);
-
-			#if !DEBUG
-				if (this.Handlers.ContainsKey (msg.MessageType))
-			#endif
-					this.Handlers[msg.MessageType] (e);
 		}
 
 		protected void ClientDisconnected (MessageReceivedEventArgs e)

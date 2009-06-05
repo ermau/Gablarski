@@ -13,6 +13,7 @@ using Gablarski.Messages;
 using Gablarski;
 using Gablarski.Media.Sources;
 using NDesk.Options;
+using Gablarski.OpenAL;
 
 namespace Gablarski.Clients.CLI
 {
@@ -20,6 +21,7 @@ namespace Gablarski.Clients.CLI
 	{
 		public static GablarskiClient client;
 
+		[STAThread]
 		public static void Main (string[] args)
 		{
 			string host = String.Empty;

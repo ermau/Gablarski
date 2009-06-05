@@ -6,8 +6,13 @@ using Gablarski.Messages;
 
 namespace Gablarski.Server
 {
-	public class ConnectionCollection
+	internal class ConnectionCollection
 	{
+		public int ConnectionCount
+		{
+			get { return this.connections.Count; }
+		}
+
 		public PlayerInfo this[IConnection key]
 		{
 			get
@@ -29,6 +34,21 @@ namespace Gablarski.Server
 				lock (lck)
 				{
 					return (from kvp in this.players where kvp.Value == key select kvp.Key).FirstOrDefault();
+				}
+			}
+		}
+
+		public KeyValuePair<IConnection, PlayerInfo> this[int index]
+		{
+			get
+			{
+				lock (lck)
+				{
+					IConnection c = this.connections[index];
+					PlayerInfo p;
+					this.players.TryGetValue (c, out p);
+
+					return new KeyValuePair<IConnection, PlayerInfo> (c, p);
 				}
 			}
 		}

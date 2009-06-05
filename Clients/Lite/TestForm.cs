@@ -351,6 +351,7 @@ namespace Gablarski.Clients.Lite
 			channels.SaveChannel (new Channel { Name = "Sub Test 1", Description = "Testing Subchannels", ParentChannelId = 1 });
 
 			server = new GablarskiServer (new ServerSettings { Name = this.ServerName.Text }, new GuestUserProvider(), permProvider, channels);
+			server.Start ();
 			server.AddConnectionProvider (new ServerNetworkConnectionProvider());
 		}
 
@@ -406,6 +407,9 @@ namespace Gablarski.Clients.Lite
 		{
 			if (this.client != null)
 				this.client.Disconnect();
+
+			if (this.server != null)
+				this.server.Shutdown ();
 		}
 
 		private void sourceRequestSelect_SelectedIndexChanged (object sender, EventArgs e)

@@ -5,6 +5,7 @@ using System.Text;
 using Gablarski.Messages;
 using Gablarski.Media.Sources;
 using System.Diagnostics;
+using System.Threading;
 
 namespace Gablarski.Server
 {
@@ -27,9 +28,55 @@ namespace Gablarski.Server
 				{ ClientMessageType.ChangeChannel, ClientRequestsChannelChange },
 				{ ClientMessageType.EditChannel, ClientEditsChannel },
 			};
+
+			this.messageRunnerThread = new Thread (this.MessageRunner);
+			this.messageRunnerThread.Name = "Gablarski Server Message Runner";
 		}
 
 		private readonly Dictionary<ClientMessageType, Action<MessageReceivedEventArgs>> Handlers;
+
+		private readonly Thread messageRunnerThread;
+		private readonly Queue<MessageReceivedEventArgs> mqueue = new Queue<MessageReceivedEventArgs> (1000);
+
+		private void MessageRunner ()
+		{
+			while (this.running)
+			{
+				if (mqueue.Count == 0)
+				{
+					Thread.Sleep (0);
+					continue;
+				}
+
+				MessageReceivedEventArgs e;
+				lock (mqueue)
+				{
+					e = mqueue.Dequeue ();
+				}
+
+				var msg = (e.Message as ClientMessage);
+				if (msg == null)
+				{
+					Disconnect (e.Connection);
+					return;
+				}
+
+				Trace.WriteLineIf ((msg.MessageType != ClientMessageType.AudioData), "[Server] Message Received: " + msg.MessageType);
+
+				#if !DEBUG
+				if (this.Handlers.ContainsKey (msg.MessageType))
+				#endif
+					this.Handlers[msg.MessageType] (e);
+			}
+		}
+
+		protected virtual void OnMessageReceived (object sender, MessageReceivedEventArgs e)
+		{
+			lock (mqueue)
+			{
+				mqueue.Enqueue (e);
+			}
+		}
 
 		private void ClientConnected (MessageReceivedEventArgs e)
 		{
@@ -46,7 +93,7 @@ namespace Gablarski.Server
 		#region Channels
 		private void ClientRequestsChannelList (MessageReceivedEventArgs e)
 		{
-			if (GetPermission (PermissionName.RequestChannelList, e.Connection))
+			if (!GetPermission (PermissionName.RequestChannelList, e.Connection))
 			{
 				lock (this.channelLock)
 				{

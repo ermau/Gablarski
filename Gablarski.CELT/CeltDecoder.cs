@@ -15,12 +15,20 @@ namespace Gablarski.CELT
 			this.Mode = mode;
 		}
 
+		/// <summary>
+		/// Gets the current mode for this decoder.
+		/// </summary>
 		public CeltMode Mode
 		{
 			get;
 			private set;
 		}
 
+		/// <summary>
+		/// Decodes CELT compressed data to PCM.
+		/// </summary>
+		/// <param name="encoded">The CELT encoded data.</param>
+		/// <returns>The CELT decoded PCM.</returns>
 		public unsafe byte[] Decode (byte[] encoded)
 		{
 			IntPtr pcmptr;
@@ -65,6 +73,11 @@ namespace Gablarski.CELT
 		private static extern ErrorCode celt_decode (IntPtr decoderState, byte[] data, int length, IntPtr pcm);
 		#endregion
 
+		/// <summary>
+		/// Creates a new <c>CeltDecoder</c> with the specified <paramref name="mode"/>.
+		/// </summary>
+		/// <param name="mode">The mode to create the decoder with.</param>
+		/// <returns>A new <c>CeltDecoder</c>.</returns>
 		public static CeltDecoder Create (CeltMode mode)
 		{
 			return new CeltDecoder (celt_decoder_create (mode), mode);

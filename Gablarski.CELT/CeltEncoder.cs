@@ -15,12 +15,18 @@ namespace Gablarski.CELT
 			this.encoderState = encoderState;
 		}
 
+		/// <summary>
+		/// Gets the encoder's current mode.
+		/// </summary>
 		public CeltMode Mode
 		{
 			get;
 			private set;
 		}
 
+		/// <summary>
+		/// Gets or sets whether or not to use the long term predictor.
+		/// </summary>
 		public bool LongTermPredictor
 		{
 			get { return this.longTermPredictor; }
@@ -65,6 +71,13 @@ namespace Gablarski.CELT
 			get { return this.disposed; }
 		}
 
+		/// <summary>
+		/// Encodes PCM to the specified bitrate.
+		/// </summary>
+		/// <param name="pcm">PCM data.</param>
+		/// <param name="bitrate">Target bitrate.</param>
+		/// <param name="length">The actual compressed length.</param>
+		/// <returns>CELT encoded audio of the supplied PCM.</returns>
 		public unsafe byte[] Encode (byte[] pcm, int bitrate, out int length)
 		{
 			ThrowIfDisposed ();
@@ -159,6 +172,11 @@ namespace Gablarski.CELT
 			return encoder.encoderState;
 		}
 
+		/// <summary>
+		/// Creates a new <c>CeltEncoder</c> with the specified <paramref name="mode"/>
+		/// </summary>
+		/// <param name="mode">The mode to use for the encoder.</param>
+		/// <returns>A new <c>CeltEncoder</c>.</returns>
 		public static CeltEncoder Create (CeltMode mode)
 		{
 			if (mode == null)
@@ -167,6 +185,17 @@ namespace Gablarski.CELT
 			return new CeltEncoder (mode, celt_encoder_create (mode));
 		}
 
+		/// <summary>
+		/// Creates a new <c>CeltEncoder</c> with the specified mode settings.
+		/// </summary>
+		/// <param name="samplingRate">The sampling rate.</param>
+		/// <param name="channels">Number of audio channels.</param>
+		/// <param name="samplesPerChannel">Number of samples per second per channel.</param>
+		/// <returns>A new <c>CeltEncoder</c>.</returns>
+		/// <remarks>
+		/// This creates a new <see cref="CeltMode"/> before creating the encoder. The mode can
+		/// be accessed via the <see cref="CeltEncoder.Mode"/> property.
+		/// </remarks>
 		public static CeltEncoder Create (int samplingRate, int channels, int samplesPerChannel)
 		{
 			CeltMode mode = CeltMode.Create (samplingRate, channels, samplesPerChannel);

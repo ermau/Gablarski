@@ -113,4 +113,8 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /Y "$(SolutionDir)Gablarski.CELT\libcelt.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Gablarski.CELT\libcelt.license.txt" "$(SolutionDir)Clients\Lite\$(OutDir)"</PostBuildEvent>
+  </PropertyGroup>
 </Project>

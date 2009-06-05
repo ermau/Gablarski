@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Gablarski.Media.Sources;
 using Gablarski.Messages;
+using System.Threading;
 
 namespace Gablarski.Client
 {
@@ -29,6 +30,10 @@ namespace Gablarski.Client
 				{ ServerMessageType.SourceResult, OnSourceResultMessage },
 				{ ServerMessageType.AudioDataReceived, OnAudioDataReceivedMessage },
 			};
+
+			this.messageRunnerThread = new Thread (this.MessageRunner);
+			this.messageRunnerThread.Name = "Gablarski Client Message Runner";
+			this.messageRunnerThread.SetApartmentState (ApartmentState.STA);
 		}
 		
 		protected ServerInfo serverInfo;
@@ -58,28 +63,55 @@ namespace Gablarski.Client
 				if (mine)
 					this.clientSources.Add (source.Type, source);
 			}
-		}	
+		}
+
+		private volatile bool running;
+		private readonly Queue<MessageReceivedEventArgs> mqueue = new Queue<MessageReceivedEventArgs> (100);
+		private readonly Thread messageRunnerThread;
+
+		private void MessageRunner ()
+		{
+			while (this.running)
+			{
+				if (mqueue.Count == 0)
+				{
+					Thread.Sleep (0);
+					continue;
+				}
+
+				MessageReceivedEventArgs e;
+				lock (mqueue)
+				{
+					e = mqueue.Dequeue ();
+				}
+
+				var msg = (e.Message as ServerMessage);
+				if (msg == null)
+				{
+					connection.Disconnect ();
+					return;
+				}
+
+				Trace.WriteLineIf ((msg.MessageType != ServerMessageType.AudioDataReceived), "[Client] Message Received: " + msg.MessageType);
+
+				if (msg.MessageType == ServerMessageType.AudioDataReceived)
+				{
+					var amsg = (AudioDataReceivedMessage)msg;
+					var received = this.ReceivedAudioData;
+					if (received != null)
+						received (this, new ReceivedAudioEventArgs (this.allSources[amsg.SourceId], amsg.Data));
+				}
+				else
+					this.Handlers[msg.MessageType] (e);
+			}
+		}
 
 		private void OnMessageReceived (object sender, MessageReceivedEventArgs e)
 		{
-			var msg = (e.Message as ServerMessage);
-			if (msg == null)
+			lock (mqueue)
 			{
-				connection.Disconnect ();
-				return;
+				mqueue.Enqueue (e);
 			}
-
-			Trace.WriteLineIf ((msg.MessageType != ServerMessageType.AudioDataReceived), "[Client] Message Received: " + msg.MessageType);
-
-			if (msg.MessageType == ServerMessageType.AudioDataReceived)
-			{
-				var amsg = (AudioDataReceivedMessage)msg;
-				var received = this.ReceivedAudioData;
-				if (received != null)
-					received (this, new ReceivedAudioEventArgs (this.allSources[amsg.SourceId], amsg.Data));
-			}
-			else
-				this.Handlers[msg.MessageType] (e);
 		}
 
 		private void OnConnectionRejectedMessage (MessageReceivedEventArgs e)

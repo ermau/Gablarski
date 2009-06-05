@@ -96,6 +96,9 @@ namespace Gablarski.Client
 		#region Public Methods
 		public void Connect (string host, int port)
 		{
+			this.running = true;
+			this.messageRunnerThread.Start ();
+
 			if (host.IsEmpty ())
 				throw new ArgumentException ("host must not be null or empty", "host");
 
@@ -107,6 +110,8 @@ namespace Gablarski.Client
 		public void Disconnect()
 		{
 			this.connection.Disconnect();
+			this.running = false;
+			this.messageRunnerThread.Join ();
 		}
 
 		public void Login (string nickname)

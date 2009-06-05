@@ -28,7 +28,24 @@ namespace Gablarski.Network
 
 		protected override IConnection CheckForConnection ()
 		{
-			return new ServerNetworkConnection (this.listener.AcceptTcpClient ());
+			try
+			{
+				if (this.listener == null)
+					return null;
+
+				return new ServerNetworkConnection (this.listener.AcceptTcpClient ());
+			}
+			catch (SocketException sex)
+			{
+				switch (sex.SocketErrorCode)
+				{
+					case SocketError.Interrupted:
+						return null;
+
+					default:
+						throw;
+				}
+			}
 		}
 	}
 }

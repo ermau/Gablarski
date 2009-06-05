@@ -58,11 +58,11 @@
 			this.label10 = new System.Windows.Forms.Label ();
 			this.label11 = new System.Windows.Forms.Label ();
 			this.channelGroup = new System.Windows.Forms.GroupBox ();
-			this.channelName = new System.Windows.Forms.TextBox ();
-			this.channelDescription = new System.Windows.Forms.TextBox ();
-			this.label12 = new System.Windows.Forms.Label ();
-			this.label13 = new System.Windows.Forms.Label ();
 			this.btnUpdateChannel = new System.Windows.Forms.Button ();
+			this.label13 = new System.Windows.Forms.Label ();
+			this.label12 = new System.Windows.Forms.Label ();
+			this.channelDescription = new System.Windows.Forms.TextBox ();
+			this.channelName = new System.Windows.Forms.TextBox ();
 			this.channelGroup.SuspendLayout ();
 			this.SuspendLayout ();
 			// 
@@ -356,28 +356,15 @@
 			this.channelGroup.TabStop = false;
 			this.channelGroup.Text = "Channel";
 			// 
-			// channelName
+			// btnUpdateChannel
 			// 
-			this.channelName.Location = new System.Drawing.Point (91, 19);
-			this.channelName.Name = "channelName";
-			this.channelName.Size = new System.Drawing.Size (100, 20);
-			this.channelName.TabIndex = 0;
-			// 
-			// channelDescription
-			// 
-			this.channelDescription.Location = new System.Drawing.Point (91, 45);
-			this.channelDescription.Name = "channelDescription";
-			this.channelDescription.Size = new System.Drawing.Size (100, 20);
-			this.channelDescription.TabIndex = 1;
-			// 
-			// label12
-			// 
-			this.label12.AutoSize = true;
-			this.label12.Location = new System.Drawing.Point (6, 22);
-			this.label12.Name = "label12";
-			this.label12.Size = new System.Drawing.Size (38, 13);
-			this.label12.TabIndex = 2;
-			this.label12.Text = "Name:";
+			this.btnUpdateChannel.Location = new System.Drawing.Point (91, 71);
+			this.btnUpdateChannel.Name = "btnUpdateChannel";
+			this.btnUpdateChannel.Size = new System.Drawing.Size (75, 23);
+			this.btnUpdateChannel.TabIndex = 4;
+			this.btnUpdateChannel.Text = "Update";
+			this.btnUpdateChannel.UseVisualStyleBackColor = true;
+			this.btnUpdateChannel.Click += new System.EventHandler (this.btnUpdateChannel_Click);
 			// 
 			// label13
 			// 
@@ -388,15 +375,28 @@
 			this.label13.TabIndex = 3;
 			this.label13.Text = "Description:";
 			// 
-			// btnUpdateChannel
+			// label12
 			// 
-			this.btnUpdateChannel.Location = new System.Drawing.Point (91, 71);
-			this.btnUpdateChannel.Name = "btnUpdateChannel";
-			this.btnUpdateChannel.Size = new System.Drawing.Size (75, 23);
-			this.btnUpdateChannel.TabIndex = 4;
-			this.btnUpdateChannel.Text = "Update";
-			this.btnUpdateChannel.UseVisualStyleBackColor = true;
-			this.btnUpdateChannel.Click += new System.EventHandler (this.btnUpdateChannel_Click);
+			this.label12.AutoSize = true;
+			this.label12.Location = new System.Drawing.Point (6, 22);
+			this.label12.Name = "label12";
+			this.label12.Size = new System.Drawing.Size (38, 13);
+			this.label12.TabIndex = 2;
+			this.label12.Text = "Name:";
+			// 
+			// channelDescription
+			// 
+			this.channelDescription.Location = new System.Drawing.Point (91, 45);
+			this.channelDescription.Name = "channelDescription";
+			this.channelDescription.Size = new System.Drawing.Size (100, 20);
+			this.channelDescription.TabIndex = 1;
+			// 
+			// channelName
+			// 
+			this.channelName.Location = new System.Drawing.Point (91, 19);
+			this.channelName.Name = "channelName";
+			this.channelName.Size = new System.Drawing.Size (100, 20);
+			this.channelName.TabIndex = 0;
 			// 
 			// TestForm
 			// 
