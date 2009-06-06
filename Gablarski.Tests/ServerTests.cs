@@ -5,16 +5,7 @@ using System.Linq;
 using Gablarski.Server;
 using Gablarski.Client;
 using Gablarski.Messages;
-
-#if MSTEST
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-#else
-using TestInitialize = NUnit.Framework.SetUpAttribute;
-using TestCleanup = NUnit.Framework.TearDownAttribute;
-using TestClass = NUnit.Framework.TestFixtureAttribute;
-using TestMethod = NUnit.Framework.TestAttribute;
-using Assert = NUnit.Framework.Assert;
-#endif
 
 namespace Gablarski.Tests
 {

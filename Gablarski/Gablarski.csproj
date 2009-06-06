@@ -108,6 +108,7 @@
     <Compile Include="Messages\SourceListMessage.cs" />
     <Compile Include="Messages\SourceResultMessage.cs" />
     <Compile Include="ModuleLoader.cs" />
+    <Compile Include="MutableLookup.cs" />
     <Compile Include="Network\ClientNetworkConnection.cs" />
     <Compile Include="Network\NetworkConnectionBase.cs" />
     <Compile Include="Network\ServerNetworkConnection.cs" />

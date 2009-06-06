@@ -7,8 +7,19 @@ namespace Gablarski
 {
 	public enum PermissionName
 	{
+		/// <summary>
+		/// Login to the server.
+		/// </summary>
 		Login = 1,
+
+		/// <summary>
+		/// Kick a player from the channel (to the default channel.)
+		/// </summary>
 		KickPlayerFromChannel = 2,
+
+		/// <summary>
+		/// Kick a player from the server entirely.
+		/// </summary>
 		KickPlayerFromServer = 9,
 
 		#region Channels
@@ -22,16 +33,45 @@ namespace Gablarski
 		/// </summary>
 		ChangePlayersChannel = 8,
 
+		/// <summary>
+		/// Create a new channel.
+		/// </summary>
 		AddChannel = 11,
+
+		/// <summary>
+		/// Edit an existing channel.
+		/// </summary>
 		EditChannel = 12,
+
+		/// <summary>
+		/// Delete a channel.
+		/// </summary>
 		DeleteChannel = 13,
 		#endregion
 
+		/// <summary>
+		/// Request a media source.
+		/// </summary>
 		RequestSource = 3,
+
+		/// <summary>
+		/// Broadcast audio to the current channel.
+		/// </summary>
 		SendAudioToCurrentChannel = 4,
+
+		/// <summary>
+		/// Broadcast audio to the entire server.
+		/// </summary>
 		SendAudioToAll = 5,
+
+		/// <summary>
+		/// Broadcast audio to a different channel then the player is in.
+		/// </summary>
 		SendAudioToDifferentChannel = 6,
 
+		/// <summary>
+		/// Request a channel list.
+		/// </summary>
 		RequestChannelList = 10,
 	}
 
