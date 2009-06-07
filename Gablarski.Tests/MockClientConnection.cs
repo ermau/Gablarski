@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Gablarski.Messages;
 using System.Threading;
+using System.Net;
 
 namespace Gablarski.Tests
 {
@@ -12,6 +13,7 @@ namespace Gablarski.Tests
 	{
 		public MockClientConnection (MockServerConnection server)
 		{
+			this.connected = true;
 			this.server = server;
 		}
 
@@ -47,12 +49,22 @@ namespace Gablarski.Tests
 			throw new NotSupportedException ();
 		}
 
+		public void Connect (IPEndPoint endpoint)
+		{
+			throw new NotSupportedException ();
+		}
+
 		#endregion
 
 		#region IConnection Members
 
 		public event EventHandler<MessageReceivedEventArgs> MessageReceived;
 		public event EventHandler<ConnectionEventArgs> Disconnected;
+
+		public bool IsConnected
+		{
+			get { return this.connected; }
+		}
 
 		public void Send (MessageBase message)
 		{
@@ -61,6 +73,7 @@ namespace Gablarski.Tests
 
 		public void Disconnect ()
 		{
+			this.connected = false;
 			var dced = this.Disconnected;
 			if (dced != null)
 				dced (this, new ConnectionEventArgs (this));
@@ -69,6 +82,7 @@ namespace Gablarski.Tests
 		#endregion
 
 		private readonly MockServerConnection server;
+		private bool connected;
 
         private Queue<MessageBase> messages = new Queue<MessageBase>();
 	}

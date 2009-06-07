@@ -12,6 +12,7 @@ namespace Gablarski.Tests
 	{
 		public MockServerConnection ()
 		{
+			this.connected = true;
 			this.client = new MockClientConnection (this);
 		}
 
@@ -47,6 +48,11 @@ namespace Gablarski.Tests
 		public event EventHandler<MessageReceivedEventArgs> MessageReceived;
 		public event EventHandler<ConnectionEventArgs> Disconnected;
 
+		public bool IsConnected
+		{
+			get { return this.connected; }
+		}
+
 		public void Send (MessageBase message)
 		{
 			this.client.Receive (message);
@@ -54,6 +60,7 @@ namespace Gablarski.Tests
 
 		public void Disconnect ()
 		{
+			this.connected = false;
 			var dced = this.Disconnected;
 			if (dced != null)
 				dced (this, new ConnectionEventArgs (this));
@@ -61,6 +68,7 @@ namespace Gablarski.Tests
 
 		#endregion
 
+		private bool connected;
 		private readonly MockClientConnection client;
 
         private Queue<MessageBase> messages = new Queue<MessageBase>();

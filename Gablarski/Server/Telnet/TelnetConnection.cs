@@ -20,6 +20,11 @@ namespace Gablarski.Server.Telnet
 		public event EventHandler<MessageReceivedEventArgs> MessageReceived;
 		public event EventHandler<ConnectionEventArgs> Disconnected;
 
+		public bool IsConnected
+		{
+			get { return this.client.Connected; }
+		}
+
 		public void Send (MessageBase message)
 		{
 			throw new NotImplementedException ();

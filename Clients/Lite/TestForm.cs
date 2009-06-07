@@ -39,7 +39,7 @@ namespace Gablarski.Clients.Lite
 
 			client = new GablarskiClient (new ClientNetworkConnection());
 			client.Connected += client_Connected;
-			client.LoginResult += client_ReceivedLogin;
+			client.ReceivedLoginResult += client_ReceivedLogin;
 			client.PlayerLoggedIn += client_ReceivedNewLogin;
 			client.ReceivedSource += client_ReceivedSource;
 			client.ReceivedChannelList += client_ReceivedChannelList;

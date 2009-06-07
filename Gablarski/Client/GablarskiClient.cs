@@ -20,21 +20,69 @@ namespace Gablarski.Client
 		}
 
 		#region Events
+		/// <summary>
+		/// The client has connected to the server.
+		/// </summary>
 		public event EventHandler Connected;
+		
+		/// <summary>
+		/// The connection to the server has been rejected.
+		/// </summary>
 		public event EventHandler<RejectedConnectionEventArgs> ConnectionRejected;
-		public event EventHandler Disconnected;
-		public event EventHandler<ReceivedLoginEventArgs> LoginResult;
 
+		/// <summary>
+		/// The connection to the server has been lost (or forcibly closed.)
+		/// </summary>
+		public event EventHandler Disconnected;
+
+		/// <summary>
+		/// A login result has been received.
+		/// </summary>
+		public event EventHandler<ReceivedLoginEventArgs> ReceivedLoginResult;
+
+		/// <summary>
+		/// An new or updated player list has been received.
+		/// </summary>
 		public event EventHandler<ReceivedListEventArgs<PlayerInfo>> ReceivedPlayerList;
+
+		/// <summary>
+		/// A new player has logged in.
+		/// </summary>
 		public event EventHandler<ReceivedLoginEventArgs> PlayerLoggedIn;
+
+		/// <summary>
+		/// A player has disconnected.
+		/// </summary>
 		public event EventHandler<PlayerDisconnectedEventArgs> PlayerDisconnected;
 
+		/// <summary>
+		/// A new or updated player list has been received.
+		/// </summary>
 		public event EventHandler<ReceivedListEventArgs<Channel>> ReceivedChannelList;
+
+		/// <summary>
+		/// A player has changed channels.
+		/// </summary>
 		public event EventHandler<ChannelChangedEventArgs> PlayerChangedChannel;
+
+		/// <summary>
+		/// The result of a channel edit request has been received.
+		/// </summary>
 		public event EventHandler<ChannelEditResultEventArgs> ReceivedChannelEditResult;
 		
+		/// <summary>
+		/// A new  or updated source list has been received.
+		/// </summary>
 		public event EventHandler<ReceivedListEventArgs<MediaSourceInfo>> ReceivedSourceList;
+
+		/// <summary>
+		/// A new media source has been received.
+		/// </summary>
 		public event EventHandler<ReceivedSourceEventArgs> ReceivedSource;
+
+		/// <summary>
+		/// Audio data has been received.
+		/// </summary>
 		public event EventHandler<ReceivedAudioEventArgs> ReceivedAudioData;
 		#endregion
 
@@ -53,6 +101,9 @@ namespace Gablarski.Client
 			}
 		}
 
+		/// <summary>
+		/// Gets the current player's own <c>PlayerInfo</c>.
+		/// </summary>
 		public PlayerInfo Self
 		{
 			get
@@ -94,19 +145,29 @@ namespace Gablarski.Client
 		#endregion
 
 		#region Public Methods
+		/// <summary>
+		/// Connects to a server server at <paramref name="host"/>:<paramref name="port"/>
+		/// </summary>
+		/// <param name="host">The hostname of the server to connect to.</param>
+		/// <param name="port">The port of the server to connect to.</param>
+		/// <exception cref="System.ArgumentNullException"><paramref name="host"/> is <c>null</c>.</exception>
+		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="port" /> is outside the acceptable port range.</exception>
 		public void Connect (string host, int port)
 		{
-			this.running = true;
-			this.messageRunnerThread.Start ();
-
 			if (host.IsEmpty ())
 				throw new ArgumentException ("host must not be null or empty", "host");
+
+			this.running = true;
+			this.messageRunnerThread.Start ();	
 
 			connection.MessageReceived += OnMessageReceived;
 			connection.Connect (host, port);
 			connection.Send (new ConnectMessage (ApiVersion));
 		}
 
+		/// <summary>
+		/// Disconnects from the current server.
+		/// </summary>
 		public void Disconnect()
 		{
 			this.connection.Disconnect();
@@ -114,15 +175,27 @@ namespace Gablarski.Client
 			this.messageRunnerThread.Join ();
 		}
 
+		/// <summary>
+		/// Logs into the connected server with <paramref name="nickname"/>.
+		/// </summary>
+		/// <param name="nickname">The nickname to log in with.</param>
+		/// <exception cref="System.ArgumentNullException"><paramref name="nickname"/> is null or empty.</exception>
 		public void Login (string nickname)
 		{
 			Login (nickname, null, null);
 		}
 
+		/// <summary>
+		/// Logs into the connected server with <paramref name="nickname"/>.
+		/// </summary>
+		/// <param name="nickname">The nickname to log in with.</param>
+		/// <param name="username">The username to log in with.</param>
+		/// <param name="password">The password to log in with.</param>
+		/// <exception cref="System.ArgumentNullException"><paramref name="nickname"/> is null or empty.</exception>
 		public void Login (string nickname, string username, string password)
 		{
 			if (nickname.IsEmpty())
-				throw new ArgumentException ("nickname must not be null or empty", "nickname");
+				throw new ArgumentNullException ("nickname", "nickname must not be null or empty");
 
 			this.nickname = nickname;
 			this.connection.Send (new LoginMessage
@@ -267,7 +340,7 @@ namespace Gablarski.Client
 
 		protected virtual void OnLoginResult (ReceivedLoginEventArgs e)
 		{
-			var result = this.LoginResult;
+			var result = this.ReceivedLoginResult;
 			if (result != null)
 				result (this, e);
 		}

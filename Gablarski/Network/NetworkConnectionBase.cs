@@ -20,6 +20,9 @@ namespace Gablarski.Network
 
 		protected NetworkConnectionBase (TcpClient client)
 		{
+			if (client == null)
+				throw new ArgumentNullException ("client");
+
 			this.tcp = client;
 			this.udp = new UdpClient ();
 		}
@@ -28,8 +31,16 @@ namespace Gablarski.Network
 		public event EventHandler<ConnectionEventArgs> Disconnected;
 		public event EventHandler<MessageReceivedEventArgs> MessageReceived;
 
+		public bool IsConnected
+		{
+			get { return this.tcp.Connected; }
+		}
+
 		public void Send (MessageBase message)
 		{
+			if (message == null)
+				throw new ArgumentNullException ("message");
+
 			lock (queuel)
 			{
 				mqueue.Enqueue (message);
@@ -80,11 +91,9 @@ namespace Gablarski.Network
 			{
 				tcp.Close();
 			}
-			// ReSharper disable EmptyGeneralCatchClause
-			catch
+			catch (SocketException) // We're shutting down anyway, *shrug*
 			{
 			}
-			// ReSharper restore EmptyGeneralCatchClause
 
 			if (this.runnerThread != null)
 				this.runnerThread.Join ();
