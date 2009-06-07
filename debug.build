@@ -4,7 +4,7 @@
 	
 	<target name="build">
 		<exec program="${DotNetFramework3.5_x86_Path}\msbuild.exe">
-			<arg value="/property:Configuration=Debug;Platform=AnyCPU" />
+			<arg value='/property:Configuration=Debug;Platform="Any CPU"' />
 			<arg value="Gablarski.sln" />
 		</exec>
 
