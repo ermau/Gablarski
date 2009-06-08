@@ -5,14 +5,14 @@ using System.Linq;
 using Gablarski.Server;
 using Gablarski.Client;
 using Gablarski.Messages;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Gablarski.Tests
 {
-	[TestClass]
+	[TestFixture]
 	public class ServerTests
 	{
-		[TestInitialize]
+		[SetUp]
 		public void ServerTestInitialize ()
 		{
 			this.server = new GablarskiServer (new ServerSettings { Name = "Test Server", Description = "Test Server" }, new GuestUserProvider (), new GuestPermissionProvider(), new LobbyChannelProvider());
@@ -20,7 +20,7 @@ namespace Gablarski.Tests
 			this.server.Start ();
 		}
 
-		[TestCleanup]
+		[TearDown]
 		public void ServerTestCleanup ()
 		{
 			this.server.Shutdown ();
@@ -31,7 +31,7 @@ namespace Gablarski.Tests
 		private GablarskiServer server;
 		private MockConnectionProvider provider;
 
-		[TestMethod]
+		[Test]
 		public void TestOldVersionReject ()
 		{
 			MockServerConnection connection = provider.EstablishConnection ();
@@ -43,7 +43,7 @@ namespace Gablarski.Tests
 			Assert.AreEqual (ConnectionRejectedReason.IncompatibleVersion, msg.Reason);
 		}
 
-		[TestMethod]
+		[Test]
 		public void TestRequestChannelList ()
 		{
 			MockServerConnection connection = provider.EstablishConnection ();
