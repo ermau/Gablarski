@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski", "Gablarski\Gablarski.csproj", "{7347052B-DA5B-4CCA-AB28-3963766E3CDB}"
@@ -21,6 +21,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.Speex", "Gablarski.Speex\Gablarski.Speex.csproj", "{EA65B7E2-026A-4CC0-9E63-EA4BCCFCD906}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.CELT", "Gablarski.CELT\Gablarski.CELT.csproj", "{A55BF3FF-7D5F-4BA6-8C2E-2A6F59FD032B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.Tests", "Gablarski.Tests\Gablarski.Tests.csproj", "{7F9DB2AA-BA94-4C4F-9CD5-536B9B087D2E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -94,6 +96,14 @@ Global
 		{A55BF3FF-7D5F-4BA6-8C2E-2A6F59FD032B}.Release|Any CPU.Build.0 = Release|x86
 		{A55BF3FF-7D5F-4BA6-8C2E-2A6F59FD032B}.Release|x64.ActiveCfg = Release|x86
 		{A55BF3FF-7D5F-4BA6-8C2E-2A6F59FD032B}.Release|x64.Build.0 = Release|x86
+		{7F9DB2AA-BA94-4C4F-9CD5-536B9B087D2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F9DB2AA-BA94-4C4F-9CD5-536B9B087D2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F9DB2AA-BA94-4C4F-9CD5-536B9B087D2E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7F9DB2AA-BA94-4C4F-9CD5-536B9B087D2E}.Debug|x64.Build.0 = Debug|Any CPU
+		{7F9DB2AA-BA94-4C4F-9CD5-536B9B087D2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F9DB2AA-BA94-4C4F-9CD5-536B9B087D2E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F9DB2AA-BA94-4C4F-9CD5-536B9B087D2E}.Release|x64.ActiveCfg = Release|Any CPU
+		{7F9DB2AA-BA94-4C4F-9CD5-536B9B087D2E}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
