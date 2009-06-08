@@ -8,6 +8,10 @@
 			<arg value="Gablarski.sln" />
 		</exec>
 
+		<nunit2>
+			<test assemblyname="Gablarski.Tests\bin\Debug\Gablarski.Tests.dll" />
+		</nunit2>
+
 		<zip zipfile="Gablarski-Debug.zip">
 			<fileset basedir="Clients\Lite\bin\x86\Debug">
 				<include name="**/*"/>
