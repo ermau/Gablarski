@@ -40,9 +40,11 @@ namespace Gablarski.Tests
 
 			connection.Client.Send (new ConnectMessage (new Version (0,0,0,1)));
 
-			var msg = (connection.Client.DequeueMessage () as ConnectionRejectedMessage);
-			Assert.IsNotNull (msg, "Expected ConnectionRejectedMessage, received " + msg.GetType ().Name);
-			Assert.AreEqual (ConnectionRejectedReason.IncompatibleVersion, msg.Reason);
+			MessageBase message = connection.Client.DequeueMessage ();
+			Assert.IsInstanceOf<ConnectionRejectedMessage> (message);
+			var rejected = (ConnectionRejectedMessage)message;
+
+			Assert.AreEqual (ConnectionRejectedReason.IncompatibleVersion, rejected.Reason);
 		}
 
 		[Test]
@@ -52,11 +54,13 @@ namespace Gablarski.Tests
 
 			connection.Client.Send (new RequestChannelListMessage ());
 
-			var msg = (connection.Client.DequeueMessage () as ChannelListMessage);
-			Assert.IsNotNull (msg, "Expected ChannelListMessage, received " + msg.GetType ().Name);
-			Assert.AreEqual (GenericResult.Success, msg.Result);
-			Assert.IsNotNull (msg.Channels);
-			Assert.IsTrue (msg.Channels.Count () > 0);
+			MessageBase message = connection.Client.DequeueMessage ();
+			Assert.IsInstanceOf<ChannelListMessage> (message);
+			var list = (ChannelListMessage)message;
+
+			Assert.AreEqual (GenericResult.Success, list.Result);
+			Assert.IsNotNull (list.Channels);
+			Assert.IsTrue (list.Channels.Count () > 0);
 		}
 
 		[Test]
@@ -66,10 +70,12 @@ namespace Gablarski.Tests
 
 			connection.Client.Send (new LoginMessage { Nickname = null, Username = null, Password = null });
 
-			var msg = (connection.Client.DequeueMessage () as LoginResultMessage);
-			Assert.IsNotNull (msg, "Expected LoginResultMessage, received " + msg.GetType ().Name);
-			Assert.IsFalse (msg.Result.Succeeded);
-			Assert.AreEqual (LoginResultState.FailedInvalidNickname, msg.Result.ResultState);
+			MessageBase message = connection.Client.DequeueMessage ();
+			Assert.IsInstanceOf<LoginResultMessage> (message);
+			var login = (LoginResultMessage)message;
+
+			Assert.IsFalse (login.Result.Succeeded);
+			Assert.AreEqual (LoginResultState.FailedInvalidNickname, login.Result.ResultState);
 		}
 
 		[Test]
@@ -79,10 +85,12 @@ namespace Gablarski.Tests
 
 			connection.Client.Send (new LoginMessage { Nickname = "Foo", Username = null, Password = null });
 
-			var msg = (connection.Client.DequeueMessage () as LoginResultMessage);
-			Assert.IsNotNull (msg, "Expected LoginResultMessage, received " + msg.GetType ().Name);
-			Assert.IsTrue (msg.Result.Succeeded);
-			Assert.AreEqual ("Foo", msg.PlayerInfo.Nickname);
+			MessageBase message = connection.Client.DequeueMessage ();
+			Assert.IsInstanceOf<LoginResultMessage> (message);
+
+			var login = (LoginResultMessage)message;
+			Assert.IsTrue (login.Result.Succeeded);
+			Assert.AreEqual ("Foo", login.PlayerInfo.Nickname);
 		}
 
 		[Test]
@@ -91,16 +99,21 @@ namespace Gablarski.Tests
 			MockServerConnection connection = provider.EstablishConnection ();
 
 			connection.Client.Send (new LoginMessage { Nickname = "Foo", Username = null, Password = null });
-			var msg = (connection.Client.DequeueMessage () as LoginResultMessage);
-			Assert.IsNotNull (msg, "Expected LoginResultMessage, received " + msg.GetType ().Name);
-			Assert.IsTrue (msg.Result.Succeeded);
-			Assert.AreEqual ("Foo", msg.PlayerInfo.Nickname);
+			MessageBase message = connection.Client.DequeueMessage ();
+			Assert.IsInstanceOf<LoginResultMessage> (message);
+			
+			LoginResultMessage login = (LoginResultMessage)message;
+			Assert.IsTrue (login.Result.Succeeded);
+			Assert.AreEqual ("Foo", login.PlayerInfo.Nickname);
+
 
 			connection.Client.Send (new LoginMessage { Nickname = "Foo", Username = null, Password = null });
-			msg = (connection.Client.DequeueMessage () as LoginResultMessage);
-			Assert.IsNotNull (msg, "Expected LoginResultMessage, received " + msg.GetType().Name);
-			Assert.IsFalse (msg.Result.Succeeded);
-			Assert.AreEqual (LoginResultState.FailedNicknameInUse, msg.Result.ResultState);
+			message = connection.Client.DequeueMessage ();
+			Assert.IsInstanceOf<LoginResultMessage> (message);
+
+			login = (LoginResultMessage)message;
+			Assert.IsFalse (login.Result.Succeeded);
+			Assert.AreEqual (LoginResultState.FailedNicknameInUse, login.Result.ResultState);
 		}
 	}
 }
