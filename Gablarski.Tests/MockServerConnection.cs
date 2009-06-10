@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Gablarski.Messages;
 using System.Threading;
+using NUnit.Framework;
 
 namespace Gablarski.Tests
 {
@@ -42,6 +43,15 @@ namespace Gablarski.Tests
 			{
 				return this.messages.Dequeue ();
 			}
+		}
+
+		public T DequeueAndAssertMessage<T> ()
+			where T : MessageBase
+		{
+			var message = this.DequeueMessage ();
+			Assert.IsInstanceOf<T> (message);
+
+			return (T)message;
 		}
 
 		#region IConnection Members

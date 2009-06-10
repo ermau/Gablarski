@@ -40,6 +40,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClientChannelManagerTests.cs" />
     <Compile Include="MockClientConnection.cs" />
     <Compile Include="MockConnectionProvider.cs" />
     <Compile Include="MockServerConnection.cs" />
