@@ -12,11 +12,16 @@ namespace Gablarski.Client
 		public static readonly Version ApiVersion = Assembly.GetAssembly (typeof (GablarskiClient)).GetName ().Version;
 
 		public GablarskiClient (IClientConnection connection)
-			: this()
+			: this (connection, new ClientChannelManager (connection))
 		{
-			this.connection = connection;
-			this.connection.Connected += this.OnConnected;
-			this.connection.Disconnected += this.OnDisconnected;
+		}
+
+		public GablarskiClient (IClientConnection connection, ClientChannelManager channelManager)
+			: this (channelManager)
+		{
+			this.Connection = connection;
+			this.Connection.Connected += this.OnConnected;
+			this.Connection.Disconnected += this.OnDisconnected;
 		}
 
 		#region Events
@@ -56,19 +61,9 @@ namespace Gablarski.Client
 		public event EventHandler<PlayerDisconnectedEventArgs> PlayerDisconnected;
 
 		/// <summary>
-		/// A new or updated player list has been received.
-		/// </summary>
-		public event EventHandler<ReceivedListEventArgs<Channel>> ReceivedChannelList;
-
-		/// <summary>
 		/// A player has changed channels.
 		/// </summary>
 		public event EventHandler<ChannelChangedEventArgs> PlayerChangedChannel;
-
-		/// <summary>
-		/// The result of a channel edit request has been received.
-		/// </summary>
-		public event EventHandler<ChannelEditResultEventArgs> ReceivedChannelEditResult;
 		
 		/// <summary>
 		/// A new  or updated source list has been received.
@@ -87,6 +82,12 @@ namespace Gablarski.Client
 		#endregion
 
 		#region Public Properties
+		public ClientChannelManager Channels
+		{
+			get;
+			private set;
+		}
+
 		public IMediaSource VoiceSource
 		{
 			get
@@ -128,25 +129,11 @@ namespace Gablarski.Client
 				}
 			}
 		}
-
-		public IEnumerable<Channel> Channels
-		{
-			get
-			{
-				lock (channelLock)
-				{
-					Channel[] channelCopy = new Channel[this.channels.Count];
-					this.channels.Values.CopyTo (channelCopy, 0);
-
-					return channelCopy;
-				}
-			}
-		}
 		#endregion
 
 		#region Public Methods
 		/// <summary>
-		/// Connects to a server server at <paramref name="host"/>:<paramref name="port"/>
+		/// Connects to a server server at <paramref name="host"/>:<paramref name="port"/>.
 		/// </summary>
 		/// <param name="host">The hostname of the server to connect to.</param>
 		/// <param name="port">The port of the server to connect to.</param>
@@ -160,9 +147,9 @@ namespace Gablarski.Client
 			this.running = true;
 			this.messageRunnerThread.Start ();	
 
-			connection.MessageReceived += OnMessageReceived;
-			connection.Connect (host, port);
-			connection.Send (new ConnectMessage (ApiVersion));
+			Connection.MessageReceived += OnMessageReceived;
+			Connection.Connect (host, port);
+			Connection.Send (new ConnectMessage (ApiVersion));
 		}
 
 		/// <summary>
@@ -170,7 +157,7 @@ namespace Gablarski.Client
 		/// </summary>
 		public void Disconnect()
 		{
-			this.connection.Disconnect();
+			this.Connection.Disconnect();
 			this.running = false;
 			this.messageRunnerThread.Join ();
 		}
@@ -198,7 +185,7 @@ namespace Gablarski.Client
 				throw new ArgumentNullException ("nickname", "nickname must not be null or empty");
 
 			this.nickname = nickname;
-			this.connection.Send (new LoginMessage
+			this.Connection.Send (new LoginMessage
 			{
 				Nickname = nickname,
 				Username = username,
@@ -219,7 +206,7 @@ namespace Gablarski.Client
 					throw new InvalidOperationException ("Client already owns a source of this type.");
 			}
 
-			this.connection.Send (new RequestSourceMessage (mediaSourceType, channels));
+			this.Connection.Send (new RequestSourceMessage (mediaSourceType, channels));
 		}
 
 		public void SendAudioData (Channel channel, IMediaSource source, byte[] data)
@@ -231,7 +218,7 @@ namespace Gablarski.Client
 
 			// TODO: Add bitrate transmision etc
 			byte[] encoded = source.AudioCodec.Encode (data, 44100, source.AudioCodec.MaxQuality);
-			this.connection.Send (new SendAudioDataMessage (channel.ChannelId, source.ID, encoded));
+			this.Connection.Send (new SendAudioDataMessage (channel.ChannelId, source.ID, encoded));
 		}
 
 		public void MovePlayerToChannel (PlayerInfo targetPlayer, Channel targetChannel)
@@ -241,29 +228,7 @@ namespace Gablarski.Client
 			if (targetChannel == null)
 				throw new ArgumentNullException ("targetChannel");
 
-			this.connection.Send (new ChangeChannelMessage (targetPlayer.PlayerId, targetChannel.ChannelId));
-		}
-
-		public void CreateChannel (Channel channel)
-		{
-			if (channel == null)
-				throw new ArgumentNullException ("channel");
-
-			if (channel.ChannelId != 0)
-				throw new ArgumentException ("Can not create an existing channel", "channel");
-
-			this.connection.Send (new ChannelEditMessage (channel));
-		}
-
-		public void EditChannel (Channel channel)
-		{
-			if (channel == null)
-				throw new ArgumentNullException ("channel");
-
-			if (channel.ChannelId == 0)
-				throw new ArgumentException ("channel must be an existing channel", "channel");
-
-			this.connection.Send (new ChannelEditMessage (channel));
+			this.Connection.Send (new ChangeChannelMessage (targetPlayer.PlayerId, targetChannel.ChannelId));
 		}
 		#endregion
 
@@ -310,12 +275,7 @@ namespace Gablarski.Client
 				received (this, e);
 		}
 
-		protected virtual void OnReceivedChannelList (ReceivedListEventArgs<Channel> e)
-		{
-			var received = this.ReceivedChannelList;
-			if (received != null)
-				received (this, e);
-		}
+		
 
 		protected virtual void OnPlayerLoggedIn (ReceivedLoginEventArgs e)
 		{
@@ -329,13 +289,6 @@ namespace Gablarski.Client
 			var result = this.PlayerChangedChannel;
 			if (result != null)
 				result (this, e);
-		}
-
-		protected virtual void OnReceivedChannelEditResult (ChannelEditResultEventArgs e)
-		{
-			var received = this.ReceivedChannelEditResult;
-			if (received != null)
-				received (this, e);
 		}
 
 		protected virtual void OnLoginResult (ReceivedLoginEventArgs e)
@@ -371,12 +324,18 @@ namespace Gablarski.Client
 			this.Result = result;
 		}
 
+		/// <summary>
+		/// Gets the channel the edit request was for.
+		/// </summary>
 		public Channel Channel
 		{
 			get;
 			private set;
 		}
 
+		/// <summary>
+		/// Gets the result of the channel edit request.
+		/// </summary>
 		public ChannelEditResult Result
 		{
 			get;
@@ -392,6 +351,9 @@ namespace Gablarski.Client
 			this.MoveInfo = moveInfo;
 		}
 
+		/// <summary>
+		/// Gets the move information.
+		/// </summary>
 		public ChannelChangeInfo MoveInfo
 		{
 			get;
@@ -407,6 +369,9 @@ namespace Gablarski.Client
 			this.Reason = reason;
 		}
 
+		/// <summary>
+		/// Gets the reason for rejecting the connection.
+		/// </summary>
 		public ConnectionRejectedReason Reason
 		{
 			get;
@@ -422,6 +387,9 @@ namespace Gablarski.Client
 			this.Player = player;
 		}
 
+		/// <summary>
+		/// Gets the player that disconnected.
+		/// </summary>
 		public PlayerInfo Player
 		{
 			get;
@@ -453,12 +421,18 @@ namespace Gablarski.Client
 			this.AudioData = data;
 		}
 
+		/// <summary>
+		/// Gets the media source audio was received for.
+		/// </summary>
 		public IMediaSource Source
 		{
 			get;
 			set;
 		}
 
+		/// <summary>
+		/// Gets the audio data.
+		/// </summary>
 		public byte[] AudioData
 		{
 			get;
@@ -475,6 +449,9 @@ namespace Gablarski.Client
 			this.PlayerInfo = info;
 		}
 
+		/// <summary>
+		/// Gets the information of the newly logged in player.
+		/// </summary>
 		public PlayerInfo PlayerInfo
 		{
 			get;

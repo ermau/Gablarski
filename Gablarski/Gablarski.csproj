@@ -69,6 +69,7 @@
   <ItemGroup>
     <Compile Include="AES.cs" />
     <Compile Include="Channel.cs" />
+    <Compile Include="Client\ClientChannelManager.cs" />
     <Compile Include="Client\GablarskiClient.cs" />
     <Compile Include="Client\ICaptureProvider.cs" />
     <Compile Include="Client\IDevice.cs" />

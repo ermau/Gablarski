@@ -11,17 +11,19 @@ namespace Gablarski.Client
 {
 	public partial class GablarskiClient
 	{
-		protected GablarskiClient()
+		protected GablarskiClient (ClientChannelManager channelManager)
 		{
+			this.Channels = channelManager;
+
 			this.Handlers = new Dictionary<ServerMessageType, Action<MessageReceivedEventArgs>>
 			{
 				{ ServerMessageType.ServerInfoReceived, OnServerInfoReceivedMessage },
 				{ ServerMessageType.PlayerListReceived, OnPlayerListReceivedMessage },
 				{ ServerMessageType.SourceListReceived, OnSourceListReceivedMessage },
 				
-				{ ServerMessageType.ChannelListReceived, OnChannelListReceivedMessage },
+				{ ServerMessageType.ChannelListReceived, this.Channels.OnChannelListReceivedMessage },
 				{ ServerMessageType.ChangeChannelResult, OnChangeChannelResultMessage },
-				{ ServerMessageType.ChannelEditResult, OnChannelEditResultMessage },
+				{ ServerMessageType.ChannelEditResult, this.Channels.OnChannelEditResultMessage },
 
 				{ ServerMessageType.ConnectionRejected, OnConnectionRejectedMessage },
 				{ ServerMessageType.LoginResult, OnLoginResultMessage },
@@ -42,7 +44,11 @@ namespace Gablarski.Client
 		private long playerId;
 
 		protected readonly Dictionary<ServerMessageType, Action<MessageReceivedEventArgs>> Handlers;
-		protected readonly IClientConnection connection;
+		protected internal IClientConnection Connection
+		{
+			get;
+			private set;
+		}
 
 		private object sourceLock = new object ();
 		private Dictionary<MediaType, IMediaSource> clientSources = new Dictionary<MediaType, IMediaSource> ();
@@ -88,7 +94,7 @@ namespace Gablarski.Client
 				var msg = (e.Message as ServerMessage);
 				if (msg == null)
 				{
-					connection.Disconnect ();
+					Connection.Disconnect ();
 					return;
 				}
 
@@ -162,32 +168,7 @@ namespace Gablarski.Client
 
 				OnPlayerChangedChannnel (new ChannelChangedEventArgs (msg.MoveInfo));
 			}
-		}
-
-		private void OnChannelListReceivedMessage (MessageReceivedEventArgs e)
-		{
-			var msg = (ChannelListMessage)e.Message;
-
-			lock (channelLock)
-			{
-				this.channels = msg.Channels.ToDictionary (c => c.ChannelId);
-			}
-
-			OnReceivedChannelList (new ReceivedListEventArgs<Channel> (msg.Channels));
-		}
-
-		private void OnChannelEditResultMessage (MessageReceivedEventArgs e)
-		{
-			var msg = (ChannelEditResultMessage)e.Message;
-
-			Channel channel;
-			lock (this.channelLock)
-			{
-				this.channels.TryGetValue (msg.ChannelId, out channel);
-			}
-
-			OnReceivedChannelEditResult (new ChannelEditResultEventArgs (channel, msg.Result));
-		}
+		}	
 		#endregion
 
 		#region Players

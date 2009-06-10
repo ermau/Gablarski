@@ -16,6 +16,11 @@ namespace Gablarski.Server
 		event EventHandler ChannelsUpdatedExternally;
 
 		/// <summary>
+		/// Gets the type used to uniquely identify a channel.
+		/// </summary>
+		//Type IdentifyingType { get; }
+
+		/// <summary>
 		/// Gets whether or not clients can create/update/delete channels.
 		/// </summary>
 		bool UpdateSupported { get; }
