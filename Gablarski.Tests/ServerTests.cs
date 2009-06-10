@@ -15,7 +15,8 @@ namespace Gablarski.Tests
 		[SetUp]
 		public void ServerTestInitialize ()
 		{
-			this.server = new GablarskiServer (new ServerSettings { Name = "Test Server", Description = "Test Server" }, new GuestUserProvider (), new GuestPermissionProvider(), new LobbyChannelProvider());
+			this.permissions = new GuestPermissionProvider ();
+			this.server = new GablarskiServer (new ServerSettings { Name = "Test Server", Description = "Test Server" }, new GuestUserProvider (), this.permissions, new LobbyChannelProvider());
 			this.server.AddConnectionProvider (this.provider = new MockConnectionProvider ());
 			this.server.Start ();
 		}
@@ -28,6 +29,7 @@ namespace Gablarski.Tests
 			this.provider = null;
 		}
 
+		private GuestPermissionProvider permissions;
 		private GablarskiServer server;
 		private MockConnectionProvider provider;
 
@@ -55,6 +57,46 @@ namespace Gablarski.Tests
 			Assert.AreEqual (GenericResult.Success, msg.Result);
 			Assert.IsNotNull (msg.Channels);
 			Assert.IsTrue (msg.Channels.Count () > 0);
+		}
+
+		[Test]
+		public void TestBadNickname ()
+		{
+			MockServerConnection connection = provider.EstablishConnection ();
+
+			connection.Client.Send (new LoginMessage { Nickname = null, Username = null, Password = null });
+
+			var msg = (connection.Client.DequeueMessage () as LoginResultMessage);
+			Assert.IsFalse (msg.Result.Succeeded);
+			Assert.AreEqual (LoginResultState.FailedInvalidNickname, msg.Result.ResultState);
+		}
+
+		[Test]
+		public void TestGuestLogin ()
+		{
+			MockServerConnection connection = provider.EstablishConnection ();
+
+			connection.Client.Send (new LoginMessage { Nickname = "Foo", Username = null, Password = null });
+
+			var msg = (connection.Client.DequeueMessage () as LoginResultMessage);
+			Assert.IsTrue (msg.Result.Succeeded);
+			Assert.AreEqual ("Foo", msg.PlayerInfo.Nickname);
+		}
+
+		[Test]
+		public void TestNicknameInUse ()
+		{
+			MockServerConnection connection = provider.EstablishConnection ();
+
+			connection.Client.Send (new LoginMessage { Nickname = "Foo", Username = null, Password = null });
+			var msg = (connection.Client.DequeueMessage () as LoginResultMessage);
+			Assert.IsTrue (msg.Result.Succeeded);
+			Assert.AreEqual ("Foo", msg.PlayerInfo.Nickname);
+
+			connection.Client.Send (new LoginMessage { Nickname = "Foo", Username = null, Password = null });
+			msg = (connection.Client.DequeueMessage () as LoginResultMessage);
+			Assert.IsFalse (msg.Result.Succeeded);
+			Assert.AreEqual (LoginResultState.FailedNicknameInUse, msg.Result.ResultState);
 		}
 	}
 }

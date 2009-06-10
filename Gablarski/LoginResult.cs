@@ -40,6 +40,11 @@ namespace Gablarski
 		FailedNicknameInUse = 5,
 
 		FailedPermissions = 6,
+
+		/// <summary>
+		/// Failed because the supplied nickname is invalid.
+		/// </summary>
+		FailedInvalidNickname = 7,
 	}
 
 	/// <summary>

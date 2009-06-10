@@ -185,6 +185,12 @@ namespace Gablarski.Server
 		{
 			var login = (LoginMessage)e.Message;
 
+			if (login.Nickname.IsEmpty ())
+			{
+				e.Connection.Send (new LoginResultMessage (new LoginResult (0, LoginResultState.FailedInvalidNickname), null));
+				return;
+			}
+
 			LoginResult result = this.UserProvider.Login (login.Username, login.Password);
 			PlayerInfo info = null;
 
