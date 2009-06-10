@@ -47,10 +47,13 @@ namespace Gablarski.Tests
 		public void TestRequestChannelList ()
 		{
 			MockServerConnection connection = provider.EstablishConnection ();
+
 			connection.Client.Send (new RequestChannelListMessage ());
 
 			var msg = (connection.Client.DequeueMessage () as ChannelListMessage);
 			Assert.IsNotNull (msg);
+			Assert.AreEqual (GenericResult.Success, msg.Result);
+			Assert.IsNotNull (msg.Channels);
 			Assert.IsTrue (msg.Channels.Count () > 0);
 		}
 	}

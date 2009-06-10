@@ -270,7 +270,7 @@ namespace Gablarski.Server
 		{
 			var player = this.connections[connection];
 
-			return GetPermission (name, player.CurrentChannelId, player.PlayerId);
+			return GetPermission (name, (player != null) ? player.CurrentChannelId : 0, (player != null) ? player.PlayerId : 0);
 		}
 
 		protected bool GetPermission (PermissionName name, PlayerInfo player)

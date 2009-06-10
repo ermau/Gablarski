@@ -18,6 +18,9 @@ namespace Gablarski.Server
 
 		public void SetAdmin (long playerId)
 		{
+			if (playerId == 0)
+				throw new ArgumentException ("Guests can not be admins.");
+
 			if (!this.admins.Contains (playerId))
 				this.admins.Add (playerId);
 		}
