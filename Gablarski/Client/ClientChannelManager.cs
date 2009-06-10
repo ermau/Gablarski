@@ -130,9 +130,6 @@ namespace Gablarski.Client
 			lock (this.channelLock)
 			{
 				this.channels.TryGetValue (msg.ChannelId, out channel);
-
-				if (channel != null && msg.Result == ChannelEditResult.Success)
-					this.channels[msg.ChannelId] = channel;
 			}
 
 			OnReceivedChannelEditResult (new ChannelEditResultEventArgs (channel, msg.Result));

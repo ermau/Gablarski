@@ -153,40 +153,6 @@ namespace Gablarski.Tests
 		}
 
 		[Test]
-		public void UpdateChannelResult ()
-		{
-			Channel c1 = new Channel (1)
-			{
-				Name = "Channel 1",
-				Description = "Description 1"
-			};
-
-			Channel sc1 = new Channel (2)
-			{
-				Name = "SubChannel 1",
-				Description = "Description 2",
-				ParentChannelId = c1.ChannelId
-			};
-
-			Channel c2 = new Channel (3)
-			{
-				Name = "Channel 2",
-				Description = "Description 3"
-			};
-
-			manager.OnChannelListReceivedMessage (new MessageReceivedEventArgs (this.server,
-				new ChannelListMessage (new[] { c1, sc1, c2 })));
-
-			Channel updated = new Channel (1, c1) { Name = "Updated 1", Description = "U Description 1" };
-			manager.OnChannelEditResultMessage (new MessageReceivedEventArgs (this.server,
-				new ChannelEditResultMessage (updated, ChannelEditResult.Success)));
-
-			Assert.AreEqual (3, manager.Count ());
-			Assert.AreEqual (1, manager.Count (c => c.ChannelId == c1.ChannelId
-				&& c.Name == updated.Name && c.Description == updated.Description));
-		}
-
-		[Test]
 		public void UpdateChannelFailed ()
 		{
 			Channel c1 = new Channel (1)
