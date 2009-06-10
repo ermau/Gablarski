@@ -41,7 +41,7 @@ namespace Gablarski.Tests
 			connection.Client.Send (new ConnectMessage (new Version (0,0,0,1)));
 
 			var msg = (connection.Client.DequeueMessage () as ConnectionRejectedMessage);
-			Assert.IsNotNull (msg);
+			Assert.IsNotNull (msg, "Expected ConnectionRejectedMessage, received " + msg.GetType ().Name);
 			Assert.AreEqual (ConnectionRejectedReason.IncompatibleVersion, msg.Reason);
 		}
 
@@ -53,7 +53,7 @@ namespace Gablarski.Tests
 			connection.Client.Send (new RequestChannelListMessage ());
 
 			var msg = (connection.Client.DequeueMessage () as ChannelListMessage);
-			Assert.IsNotNull (msg);
+			Assert.IsNotNull (msg, "Expected ChannelListMessage, received " + msg.GetType ().Name);
 			Assert.AreEqual (GenericResult.Success, msg.Result);
 			Assert.IsNotNull (msg.Channels);
 			Assert.IsTrue (msg.Channels.Count () > 0);
@@ -67,6 +67,7 @@ namespace Gablarski.Tests
 			connection.Client.Send (new LoginMessage { Nickname = null, Username = null, Password = null });
 
 			var msg = (connection.Client.DequeueMessage () as LoginResultMessage);
+			Assert.IsNotNull (msg, "Expected LoginResultMessage, received " + msg.GetType ().Name);
 			Assert.IsFalse (msg.Result.Succeeded);
 			Assert.AreEqual (LoginResultState.FailedInvalidNickname, msg.Result.ResultState);
 		}
@@ -79,6 +80,7 @@ namespace Gablarski.Tests
 			connection.Client.Send (new LoginMessage { Nickname = "Foo", Username = null, Password = null });
 
 			var msg = (connection.Client.DequeueMessage () as LoginResultMessage);
+			Assert.IsNotNull (msg, "Expected LoginResultMessage, received " + msg.GetType ().Name);
 			Assert.IsTrue (msg.Result.Succeeded);
 			Assert.AreEqual ("Foo", msg.PlayerInfo.Nickname);
 		}
@@ -90,11 +92,13 @@ namespace Gablarski.Tests
 
 			connection.Client.Send (new LoginMessage { Nickname = "Foo", Username = null, Password = null });
 			var msg = (connection.Client.DequeueMessage () as LoginResultMessage);
+			Assert.IsNotNull (msg, "Expected LoginResultMessage, received " + msg.GetType ().Name);
 			Assert.IsTrue (msg.Result.Succeeded);
 			Assert.AreEqual ("Foo", msg.PlayerInfo.Nickname);
 
 			connection.Client.Send (new LoginMessage { Nickname = "Foo", Username = null, Password = null });
 			msg = (connection.Client.DequeueMessage () as LoginResultMessage);
+			Assert.IsNotNull (msg, "Expected LoginResultMessage, received " + msg.GetType().Name);
 			Assert.IsFalse (msg.Result.Succeeded);
 			Assert.AreEqual (LoginResultState.FailedNicknameInUse, msg.Result.ResultState);
 		}
