@@ -33,6 +33,25 @@ namespace Gablarski.Tests
 		private GablarskiServer server;
 		private MockConnectionProvider provider;
 
+		private MockServerConnection Login (string nickname)
+		{
+			MockServerConnection connection = provider.EstablishConnection ();
+
+			connection.Client.Send (new LoginMessage { Nickname = "Foo", Username = null, Password = null });
+			var message = connection.Client.DequeueMessage ();
+			Assert.IsInstanceOf<LoginResultMessage> (message);
+			var login = (LoginResultMessage)message;
+			Assert.IsTrue (login.Result.Succeeded);
+			Assert.AreEqual ("Foo", login.PlayerInfo.Nickname);
+
+			Assert.IsInstanceOf<ServerInfoMessage> (connection.Client.DequeueMessage ());
+			Assert.IsInstanceOf<ChannelListMessage> (connection.Client.DequeueMessage ());
+			Assert.IsInstanceOf<PlayerListMessage> (connection.Client.DequeueMessage ());
+			Assert.IsInstanceOf<SourceListMessage> (connection.Client.DequeueMessage ());
+
+			return connection;
+		}
+
 		[Test]
 		public void TestOldVersionReject ()
 		{
@@ -81,37 +100,19 @@ namespace Gablarski.Tests
 		[Test]
 		public void TestGuestLogin ()
 		{
-			MockServerConnection connection = provider.EstablishConnection ();
-
-			connection.Client.Send (new LoginMessage { Nickname = "Foo", Username = null, Password = null });
-
-			MessageBase message = connection.Client.DequeueMessage ();
-			Assert.IsInstanceOf<LoginResultMessage> (message);
-
-			var login = (LoginResultMessage)message;
-			Assert.IsTrue (login.Result.Succeeded);
-			Assert.AreEqual ("Foo", login.PlayerInfo.Nickname);
+			Login ("Foo");
 		}
 
 		[Test]
 		public void TestNicknameInUse ()
 		{
-			MockServerConnection connection = provider.EstablishConnection ();
+			var connection = Login ("Foo");
 
 			connection.Client.Send (new LoginMessage { Nickname = "Foo", Username = null, Password = null });
 			MessageBase message = connection.Client.DequeueMessage ();
 			Assert.IsInstanceOf<LoginResultMessage> (message);
-			
-			LoginResultMessage login = (LoginResultMessage)message;
-			Assert.IsTrue (login.Result.Succeeded);
-			Assert.AreEqual ("Foo", login.PlayerInfo.Nickname);
 
-
-			connection.Client.Send (new LoginMessage { Nickname = "Foo", Username = null, Password = null });
-			message = connection.Client.DequeueMessage ();
-			Assert.IsInstanceOf<LoginResultMessage> (message);
-
-			login = (LoginResultMessage)message;
+			var login = (LoginResultMessage)message;
 			Assert.IsFalse (login.Result.Succeeded);
 			Assert.AreEqual (LoginResultState.FailedNicknameInUse, login.Result.ResultState);
 		}
