@@ -41,5 +41,10 @@ namespace Gablarski
 		{
 			writer.WriteString (value.AssemblyQualifiedName);
 		}
+
+		public static void WriteGenericResult (this IValueWriter writer, GenericResult result)
+		{
+			writer.WriteByte ((byte)result);
+		}
 	}
 }

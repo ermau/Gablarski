@@ -82,6 +82,7 @@
     <Compile Include="Codecs\SpeexCodec.cs" />
     <Compile Include="en-US.Designer.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="GenericResult.cs" />
     <Compile Include="IClientConnection.cs" />
     <Compile Include="IConnection.cs" />
     <Compile Include="IConnectionProvider.cs" />

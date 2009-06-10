@@ -38,5 +38,10 @@ namespace Gablarski
 		{
 			return Type.GetType (reader.ReadString ());
 		}
+
+		public static GenericResult ReadGenericResult (this IValueReader reader)
+		{
+			return (GenericResult)reader.ReadByte ();
+		}
 	}
 }

@@ -94,6 +94,8 @@ namespace Gablarski.Server
 		private void ClientRequestsChannelList (MessageReceivedEventArgs e)
 		{
 			if (!GetPermission (PermissionName.RequestChannelList, e.Connection))
+				e.Connection.Send (new ChannelListMessage (GenericResult.FailedPermissions));
+			else
 			{
 				lock (this.channelLock)
 				{
