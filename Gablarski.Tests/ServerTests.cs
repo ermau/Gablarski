@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Text;
-using System.Collections.Generic;
 using System.Linq;
-using Gablarski.Server;
-using Gablarski.Client;
 using Gablarski.Messages;
+using Gablarski.Server;
 using NUnit.Framework;
 
 namespace Gablarski.Tests
@@ -37,7 +34,7 @@ namespace Gablarski.Tests
 		{
 			MockServerConnection connection = provider.EstablishConnection ();
 
-			connection.Client.Send (new LoginMessage { Nickname = "Foo", Username = null, Password = null });
+			connection.Client.Send (new LoginMessage { Nickname = nickname, Username = null, Password = null });
 			var message = connection.Client.DequeueMessage ();
 			Assert.IsInstanceOf<LoginResultMessage> (message);
 			var login = (LoginResultMessage)message;

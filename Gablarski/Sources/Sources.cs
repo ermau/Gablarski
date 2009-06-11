@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Threading;
@@ -24,27 +22,28 @@ namespace Gablarski.Media.Sources
 			if (sourceType.GetInterface ("IMediaSource") == null)
 				throw new InvalidOperationException ("Not media source type.");
 
-			rwl.EnterUpgradeableReadLock ();
-			if (!types.ContainsKey (sourceType))
-				InitType (sourceType);
-
 			IMediaSource source = null;
-			if (types.ContainsKey (sourceType))
-				source = types[sourceType] (sourceId);
+			lock (types)
+			{
+				if (!types.ContainsKey (sourceType))
+					InitType (sourceType);
 
-			rwl.ExitUpgradeableReadLock ();
+				if (types.ContainsKey (sourceType))
+					source = types[sourceType] (sourceId);
+			}
 
 			return source;
 		}
 
-		private static Dictionary<Type, Func<int, IMediaSource>> types = new Dictionary<Type, Func<int, IMediaSource>> ();
-		private static ReaderWriterLockSlim rwl = new ReaderWriterLockSlim ();
+		private static readonly Dictionary<Type, Func<int, IMediaSource>> types = new Dictionary<Type, Func<int, IMediaSource>> ();
 
 		private static void InitType (Type sourceType)
 		{
-			rwl.EnterWriteLock ();
-			if (!types.ContainsKey (sourceType))
+			lock (types)
 			{
+				if (types.ContainsKey (sourceType))
+					return;
+			
 				Type[] argTypes = new Type[] { typeof (int) };
 
 				ConstructorInfo ctor = sourceType.GetConstructor (argTypes);
@@ -59,7 +58,6 @@ namespace Gablarski.Media.Sources
 
 				types.Add (sourceType, (Func<int, IMediaSource>)method.CreateDelegate (typeof (Func<int, IMediaSource>)));
 			}
-			rwl.ExitWriteLock ();
 		}
 	}
 }

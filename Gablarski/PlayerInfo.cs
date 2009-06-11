@@ -14,6 +14,9 @@ namespace Gablarski
 
 		internal PlayerInfo (string nickname, long playerId, long currentChannelId)
 		{
+			if (nickname.IsEmpty())
+				throw new ArgumentNullException ("nickname");
+
 			this.Nickname = nickname;
 			this.PlayerId = playerId;
 			this.CurrentChannelId = currentChannelId;
