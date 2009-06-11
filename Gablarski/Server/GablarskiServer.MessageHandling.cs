@@ -210,8 +210,10 @@ namespace Gablarski.Server
 
 			if (result.Succeeded)
 			{
-				this.connections.Send (msg);
+				e.Connection.Send (msg);
 
+				this.connections.Send (new PlayerLoggedIn (info));
+	
 				e.Connection.Send (new ServerInfoMessage (new ServerInfo (this.settings)));
 
 				lock (this.channelLock)

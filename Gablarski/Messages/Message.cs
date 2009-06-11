@@ -36,6 +36,7 @@ namespace Gablarski.Messages
 		SourceResult = 8,
 		AudioDataReceived = 10,
 	
+		PlayerLoggedIn = 24,
 		PlayerListReceived = 14,
 		PlayerDisconnected = 17,
 

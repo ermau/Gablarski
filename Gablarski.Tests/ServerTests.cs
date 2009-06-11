@@ -35,16 +35,21 @@ namespace Gablarski.Tests
 			MockServerConnection connection = provider.EstablishConnection ();
 
 			connection.Client.Send (new LoginMessage { Nickname = nickname, Username = null, Password = null });
-			var message = connection.Client.DequeueMessage ();
-			Assert.IsInstanceOf<LoginResultMessage> (message);
-			var login = (LoginResultMessage)message;
-			Assert.IsTrue (login.Result.Succeeded);
-			Assert.AreEqual ("Foo", login.PlayerInfo.Nickname);
+			var message = connection.Client.DequeueAndAssertMessage<LoginResultMessage>();
 
-			Assert.IsInstanceOf<ServerInfoMessage> (connection.Client.DequeueMessage ());
-			Assert.IsInstanceOf<ChannelListMessage> (connection.Client.DequeueMessage ());
-			Assert.IsInstanceOf<PlayerListMessage> (connection.Client.DequeueMessage ());
-			Assert.IsInstanceOf<SourceListMessage> (connection.Client.DequeueMessage ());
+			Assert.IsTrue (message.Result.Succeeded);
+			Assert.AreEqual (nickname, message.PlayerInfo.Nickname);
+
+			var login = connection.Client.DequeueAndAssertMessage<PlayerLoggedIn>();
+			Assert.AreEqual (nickname, login.PlayerInfo.Nickname);
+			Assert.AreEqual (message.Result.PlayerId, login.PlayerInfo.PlayerId);
+			Assert.AreEqual (message.PlayerInfo.PlayerId, login.PlayerInfo.PlayerId);
+			Assert.AreEqual (message.PlayerInfo.CurrentChannelId, login.PlayerInfo.CurrentChannelId);
+
+			connection.Client.DequeueAndAssertMessage<ServerInfoMessage>();
+			connection.Client.DequeueAndAssertMessage<ChannelListMessage>();
+			connection.Client.DequeueAndAssertMessage<PlayerListMessage>();
+			connection.Client.DequeueAndAssertMessage<SourceListMessage>();
 
 			return connection;
 		}

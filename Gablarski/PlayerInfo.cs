@@ -9,7 +9,6 @@ namespace Gablarski
 	{
 		internal PlayerInfo()
 		{
-
 		}
 
 		internal PlayerInfo (string nickname, long playerId, long currentChannelId)

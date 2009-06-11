@@ -23,25 +23,25 @@ namespace Gablarski.Media.Sources
 				throw new InvalidOperationException ("Not media source type.");
 
 			IMediaSource source = null;
-			lock (types)
+			lock (SourceTypes)
 			{
-				if (!types.ContainsKey (sourceType))
+				if (!SourceTypes.ContainsKey (sourceType))
 					InitType (sourceType);
 
-				if (types.ContainsKey (sourceType))
-					source = types[sourceType] (sourceId);
+				if (SourceTypes.ContainsKey (sourceType))
+					source = SourceTypes[sourceType] (sourceId);
 			}
 
 			return source;
 		}
 
-		private static readonly Dictionary<Type, Func<int, IMediaSource>> types = new Dictionary<Type, Func<int, IMediaSource>> ();
+		private static readonly Dictionary<Type, Func<int, IMediaSource>> SourceTypes = new Dictionary<Type, Func<int, IMediaSource>> ();
 
 		private static void InitType (Type sourceType)
 		{
-			lock (types)
+			lock (SourceTypes)
 			{
-				if (types.ContainsKey (sourceType))
+				if (SourceTypes.ContainsKey (sourceType))
 					return;
 			
 				Type[] argTypes = new Type[] { typeof (int) };
@@ -56,7 +56,7 @@ namespace Gablarski.Media.Sources
 				gen.Emit (OpCodes.Newobj, ctor);
 				gen.Emit (OpCodes.Ret);
 
-				types.Add (sourceType, (Func<int, IMediaSource>)method.CreateDelegate (typeof (Func<int, IMediaSource>)));
+				SourceTypes.Add (sourceType, (Func<int, IMediaSource>)method.CreateDelegate (typeof (Func<int, IMediaSource>)));
 			}
 		}
 	}
