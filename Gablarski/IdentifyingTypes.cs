@@ -49,10 +49,10 @@ namespace Gablarski
 			private set;
 		}
 
-		private static Action<IValueWriter, object> GetSerializationMethod (Type idType)
+		internal static Action<IValueWriter, object> GetSerializationMethod (Type idType)
 		{
 			if (typeof(Guid) == idType)
-				return (w, o) => w.WriteString (o.ToString());
+				return (w, o) => w.WriteBytes (((Guid)o).ToByteArray());
 
 			var method = (from mi in typeof (IValueWriter).GetMethods()
 							let param = mi.GetParameters()
@@ -68,13 +68,14 @@ namespace Gablarski
 			gen.Emit (OpCodes.Ldarg_0);
 			gen.Emit (OpCodes.Ldarg_1);
 			gen.EmitCalli (OpCodes.Calli, CallingConventions.Any, typeof(void), args, Type.EmptyTypes);
+
 			return (Action<IValueWriter, object>)dm.CreateDelegate (typeof (Action<IValueWriter, object>));
 		}
 
-		private static Func<IValueReader, object> GetDeserializationMethod (Type idType)
+		internal static Func<IValueReader, object> GetDeserializationMethod (Type idType)
 		{
 			if (typeof(Guid) == idType)
-				return r => r.ReadString();
+				return r => new Guid (r.ReadBytes());
 
 			var method = typeof (IValueReader).GetMethods().Where (m => m.ReturnType == idType).FirstOrDefault();
 
@@ -87,6 +88,7 @@ namespace Gablarski
 			gen.Emit (OpCodes.Ldarg_0);
 			gen.EmitCalli (OpCodes.Calli, CallingConventions.Any, idType, args, Type.EmptyTypes);
 			gen.Emit (OpCodes.Ret);
+
 			return (Func<IValueReader, object>)dm.CreateDelegate (typeof (Func<IValueReader, object>));
 		}
 	}

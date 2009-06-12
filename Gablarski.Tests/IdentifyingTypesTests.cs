@@ -9,6 +9,6 @@ namespace Gablarski.Tests
 	[TestFixture]
 	public class IdentifyingTypesTests
 	{
-
+		
 	}
 }
