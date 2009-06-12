@@ -88,6 +88,12 @@ namespace Gablarski.Server
 				e.Connection.Disconnect ();
 				return;
 			}
+
+            e.Connection.Send (new ServerInfoMessage (new ServerInfo (this.settings)
+            {
+            	ChannelIdentifyingType = this.ChannelProvider.IdentifyingType,
+				UserIdentifyingType = this.UserProvider.IdentifyingType
+            }));
 		}
 
 		#region Channels
@@ -213,8 +219,6 @@ namespace Gablarski.Server
 				e.Connection.Send (msg);
 
 				this.connections.Send (new PlayerLoggedIn (info));
-	
-				e.Connection.Send (new ServerInfoMessage (new ServerInfo (this.settings)));
 
 				lock (this.channelLock)
 				{

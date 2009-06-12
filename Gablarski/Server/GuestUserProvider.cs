@@ -7,6 +7,11 @@ namespace Gablarski.Server
 		: IUserProvider
 	{
 		#region IUserProvider Members
+		public Type IdentifyingType
+		{
+			get { return typeof (Int32);}
+		}
+
 		public bool UserExists (string username)
 		{
 			return false;

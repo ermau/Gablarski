@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Gablarski.Server;
 
 namespace Gablarski
@@ -31,16 +28,32 @@ namespace Gablarski
 			set;
 		}
 
+		public Type ChannelIdentifyingType
+		{
+			get;
+			set;
+		}
+
+		public Type UserIdentifyingType
+		{
+			get;
+			set;
+		}
+
 		internal void Serialize (IValueWriter writer)
 		{
 			writer.WriteString (this.ServerName);
 			writer.WriteString (this.ServerDescription);
+			writer.WriteString (this.ChannelIdentifyingType.AssemblyQualifiedName);
+			writer.WriteString (this.UserIdentifyingType.AssemblyQualifiedName);
 		}
 
 		internal void Deserialize (IValueReader reader)
 		{
 			this.ServerName = reader.ReadString();
 			this.ServerDescription = reader.ReadString();
+			this.ChannelIdentifyingType = Type.GetType (reader.ReadString());
+			this.UserIdentifyingType = Type.GetType (reader.ReadString());
 		}
 	}
 }

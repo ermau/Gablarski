@@ -16,7 +16,7 @@ namespace Gablarski.Server
 		/// <summary>
 		/// Initializes a new <c>GablarskiServer</c> instance.
 		/// </summary>
-		/// <param name="serverInfo">The info for the server, providing name, description, etc.</param>
+		/// <param name="settings">The settings for the server, providing name, description, etc.</param>
 		/// <param name="userProvider">The user authentication provider for the server to use.</param>
 		/// <param name="permissionProvider">The user permissions provider for the server to use.</param>
 		/// <param name="channelProvider">The channel provider for the server to use.</param>
@@ -35,7 +35,7 @@ namespace Gablarski.Server
 		/// <summary>
 		/// Initializes a new <c>GablarskiServer</c> instance.
 		/// </summary>
-		/// <param name="serverInfo">The info for the server, providing name, description, etc.</param>
+		/// <param name="settings">The settings for the server, providing name, description, etc.</param>
 		/// <param name="provider">The backend provider for the server to use.</param>
 		public GablarskiServer (ServerSettings settings, IBackendProvider provider)
 			: this()
@@ -115,7 +115,7 @@ namespace Gablarski.Server
 		/// <summary>
 		/// Disconnections an <c>IConnection</c>.
 		/// </summary>
-		/// <param name="connection">The connection to disconnect.</param>
+		/// <param name="player">The player to disconnect.</param>
 		public void Disconnect (PlayerInfo player)
 		{
 			if (player == null)
@@ -182,7 +182,7 @@ namespace Gablarski.Server
 			get { return (backendProvider ?? userProvider); }
 		}
 
-		private object sourceLock = new object ();
+		private readonly object sourceLock = new object ();
 		private readonly Dictionary<IConnection, List<IMediaSource>> sources = new Dictionary<IConnection, List<IMediaSource>> ();
 
 		private readonly ConnectionCollection connections = new ConnectionCollection();

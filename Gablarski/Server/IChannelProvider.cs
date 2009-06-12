@@ -18,7 +18,7 @@ namespace Gablarski.Server
 		/// <summary>
 		/// Gets the type used to uniquely identify a channel.
 		/// </summary>
-		//Type IdentifyingType { get; }
+		Type IdentifyingType { get; }
 
 		/// <summary>
 		/// Gets whether or not clients can create/update/delete channels.

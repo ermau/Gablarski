@@ -7,7 +7,7 @@ using Gablarski.Server;
 namespace Gablarski.LocalServer
 {
 	public class LocalChannelProvider
-		: IChannelProvider
+		//: IChannelProvider
 	{
 		public event EventHandler ChannelsUpdatedExternally;
 

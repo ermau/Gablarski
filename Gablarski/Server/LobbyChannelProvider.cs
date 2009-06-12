@@ -18,6 +18,11 @@ namespace Gablarski.Server
 
 		public event EventHandler ChannelsUpdatedExternally;
 
+		public Type IdentifyingType
+		{
+			get { return typeof (Int32); }
+		}
+
 		public bool UpdateSupported
 		{
 			get { return true; }

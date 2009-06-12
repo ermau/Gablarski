@@ -7,7 +7,7 @@ using Gablarski.Server;
 namespace Gablarski.LocalServer
 {
 	public class LocalUserProvider
-		: IUserProvider
+		//: IUserProvider
 	{
 		public LoginResult Login (string username, string password)
 		{

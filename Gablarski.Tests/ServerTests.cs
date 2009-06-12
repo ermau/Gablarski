@@ -12,8 +12,11 @@ namespace Gablarski.Tests
 		[SetUp]
 		public void ServerTestInitialize ()
 		{
+			this.settings = new ServerSettings {Name = "Test Server", Description = "Test Server"};
 			this.permissions = new GuestPermissionProvider ();
-			this.server = new GablarskiServer (new ServerSettings { Name = "Test Server", Description = "Test Server" }, new GuestUserProvider (), this.permissions, new LobbyChannelProvider());
+			this.channels = new LobbyChannelProvider();
+			this.users = new GuestUserProvider();
+			this.server = new GablarskiServer (this.settings, this.users, this.permissions, this.channels);
 			this.server.AddConnectionProvider (this.provider = new MockConnectionProvider ());
 			this.server.Start ();
 		}
@@ -24,8 +27,15 @@ namespace Gablarski.Tests
 			this.server.Shutdown ();
 			this.server = null;
 			this.provider = null;
+			this.users = null;
+			this.channels = null;
+			this.permissions = null;
+			this.settings = null;
 		}
 
+		private IUserProvider users;
+		private IChannelProvider channels;
+		private ServerSettings settings;
 		private GuestPermissionProvider permissions;
 		private GablarskiServer server;
 		private MockConnectionProvider provider;
@@ -33,6 +43,8 @@ namespace Gablarski.Tests
 		private MockServerConnection Login (string nickname)
 		{
 			MockServerConnection connection = provider.EstablishConnection ();
+			connection.Client.Send (new ConnectMessage (GablarskiServer.MinimumApiVersion));
+			connection.Client.DequeueAndAssertMessage<ServerInfoMessage>();
 
 			connection.Client.Send (new LoginMessage { Nickname = nickname, Username = null, Password = null });
 			var message = connection.Client.DequeueAndAssertMessage<LoginResultMessage>();
@@ -46,7 +58,6 @@ namespace Gablarski.Tests
 			Assert.AreEqual (message.PlayerInfo.PlayerId, login.PlayerInfo.PlayerId);
 			Assert.AreEqual (message.PlayerInfo.CurrentChannelId, login.PlayerInfo.CurrentChannelId);
 
-			connection.Client.DequeueAndAssertMessage<ServerInfoMessage>();
 			connection.Client.DequeueAndAssertMessage<ChannelListMessage>();
 			connection.Client.DequeueAndAssertMessage<PlayerListMessage>();
 			connection.Client.DequeueAndAssertMessage<SourceListMessage>();
@@ -55,7 +66,7 @@ namespace Gablarski.Tests
 		}
 
 		[Test]
-		public void TestOldVersionReject ()
+		public void OldVersionReject ()
 		{
 			MockServerConnection connection = provider.EstablishConnection ();
 
@@ -69,7 +80,21 @@ namespace Gablarski.Tests
 		}
 
 		[Test]
-		public void TestRequestChannelList ()
+		public void ServerInfo()
+		{
+			MockServerConnection connection = provider.EstablishConnection();
+
+			connection.Client.Send (new ConnectMessage (GablarskiServer.MinimumApiVersion));
+
+			var msg = connection.Client.DequeueAndAssertMessage<ServerInfoMessage>();
+			Assert.AreEqual (this.settings.Name, msg.ServerInfo.ServerName);
+			Assert.AreEqual (this.settings.Description, msg.ServerInfo.ServerDescription);
+			Assert.AreEqual (this.channels.IdentifyingType, msg.ServerInfo.ChannelIdentifyingType);
+			Assert.AreEqual (this.users.IdentifyingType, msg.ServerInfo.UserIdentifyingType);
+		}
+
+		[Test]
+		public void RequestChannelList ()
 		{
 			MockServerConnection connection = provider.EstablishConnection ();
 
@@ -85,7 +110,7 @@ namespace Gablarski.Tests
 		}
 
 		[Test]
-		public void TestBadNickname ()
+		public void BadNickname ()
 		{
 			MockServerConnection connection = provider.EstablishConnection ();
 
@@ -100,13 +125,13 @@ namespace Gablarski.Tests
 		}
 
 		[Test]
-		public void TestGuestLogin ()
+		public void GuestLogin ()
 		{
 			Login ("Foo");
 		}
 
 		[Test]
-		public void TestNicknameInUse ()
+		public void NicknameInUse ()
 		{
 			var connection = Login ("Foo");
 

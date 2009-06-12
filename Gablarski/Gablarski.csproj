@@ -118,7 +118,6 @@
     <Compile Include="PlayerInfo.cs" />
     <Compile Include="PlayerInfoCollection.cs" />
     <Compile Include="ProviderUtils.cs" />
-    <Compile Include="ReadOnlyDictionary.cs" />
     <Compile Include="ServerInfo.cs" />
     <Compile Include="Server\ConnectionCollection.cs" />
     <Compile Include="Server\GablarskiServer.MessageHandling.cs" />
@@ -171,6 +170,10 @@
     <ProjectReference Include="..\Gablarski.Speex\Gablarski.Speex.csproj">
       <Project>{EA65B7E2-026A-4CC0-9E63-EA4BCCFCD906}</Project>
       <Name>Gablarski.Speex</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Mono.Rocks\Mono.Rocks.csproj">
+      <Project>{F656F792-2CDE-4E17-BB5F-6A6F1C266CB8}</Project>
+      <Name>Mono.Rocks</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
