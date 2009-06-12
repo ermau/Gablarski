@@ -104,7 +104,7 @@ namespace Gablarski.Server
 			}
 		}
 
-		public bool Remove (IConnection connection, out long userId)
+		public bool Remove (IConnection connection, out object userId)
 		{
 			userId = 0;
 

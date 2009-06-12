@@ -54,7 +54,7 @@ namespace Gablarski.Messages
 			this.Result = result;
 		}
 
-		public long ChannelId
+		public object ChannelId
 		{
 			get;
 			set;
@@ -66,15 +66,15 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (IValueWriter writer, IdentifyingTypes idTypes)
 		{
-			writer.WriteInt64 (this.ChannelId);
+			idTypes.WriteChannel (writer, this.ChannelId);
 			writer.WriteByte ((byte)this.Result);
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (IValueReader reader, IdentifyingTypes idTypes)
 		{
-			this.ChannelId = reader.ReadInt64 ();
+			this.ChannelId = idTypes.ReadChannel (reader);
 			this.Result = (ChannelEditResult)reader.ReadByte();
 		}
 	}

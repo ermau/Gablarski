@@ -155,6 +155,7 @@
     <Compile Include="Server\Telnet\TelnetConnectionProvider.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IdentifyingTypes.cs" />
     <Compile Include="Messages\UserLoggedIn.cs" />
     <Compile Include="Server\LobbyChannelProvider.cs" />
   </ItemGroup>

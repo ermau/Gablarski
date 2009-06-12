@@ -31,15 +31,15 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (IValueWriter writer, IdentifyingTypes idTypes)
 		{
-			this.Channel.Serialize (writer);
+			this.Channel.Serialize (writer, idTypes);
 			writer.WriteBool (this.Delete);
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (IValueReader reader, IdentifyingTypes idTypes)
 		{
-			this.Channel = new Channel (reader);
+			this.Channel = new Channel (reader, idTypes);
 			this.Delete = reader.ReadBool ();
 		}
 	}

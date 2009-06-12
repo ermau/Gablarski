@@ -17,6 +17,11 @@ namespace Gablarski
 		bool IsConnected { get; }
 
 		/// <summary>
+		/// Gets the identifying types for various data structures.
+		/// </summary>
+		IdentifyingTypes IdentifyingTypes { set; }
+
+		/// <summary>
 		/// A message was received from the underlying transport.
 		/// </summary>
 		event EventHandler<MessageReceivedEventArgs> MessageReceived;

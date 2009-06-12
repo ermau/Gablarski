@@ -8,28 +8,28 @@ namespace Gablarski
 	public class Channel
 	{
 		public Channel ()
-			: this (0)
+			: this (null)
 		{
 		}
 
-		public Channel (IValueReader reader)
+		public Channel (IValueReader reader, IdentifyingTypes idTypes)
 		{
-			Deserialize (reader);
+			Deserialize (reader, idTypes);
 		}
 
-		public Channel (long channelId)
+		public Channel (object channelId)
 			: this (channelId, false)
 		{
 			this.ChannelId = channelId;
 		}
 
-		public Channel (long channelId, bool readOnly)
+		public Channel (object channelId, bool readOnly)
 		{
 			this.ReadOnly = readOnly;
 			this.ChannelId = channelId;
 		}
 
-		public Channel (long channelId, Channel channel)
+		public Channel (object channelId, Channel channel)
 			: this (channelId, channel.ReadOnly)
 		{
 			this.ParentChannelId = channel.ParentChannelId;
@@ -41,7 +41,7 @@ namespace Gablarski
 		/// <summary>
 		/// Gets the ID of this channel.
 		/// </summary>
-		public long ChannelId
+		public object ChannelId
 		{
 			get;
 			private set;
@@ -50,7 +50,7 @@ namespace Gablarski
 		/// <summary>
 		/// Gets or sets the channel ID this is a subchannel of. 0 if a main channel.
 		/// </summary>
-		public long ParentChannelId
+		public object ParentChannelId
 		{
 			get;
 			set;
@@ -114,19 +114,19 @@ namespace Gablarski
 		private string description;
 		private int playerLimit;
 
-		internal void Serialize (IValueWriter writer)
+		internal void Serialize (IValueWriter writer, IdentifyingTypes idTypes)
 		{
-			writer.WriteInt64 (this.ChannelId);
-			writer.WriteInt64 (this.ParentChannelId);
+			idTypes.WriteChannel (writer, this.ChannelId);
+			idTypes.WriteChannel (writer, this.ParentChannelId);
 			writer.WriteInt32 (this.PlayerLimit);
 			writer.WriteString (this.Name);
 			writer.WriteString (this.Description);
 		}
 
-		internal void Deserialize (IValueReader reader)
+		internal void Deserialize (IValueReader reader, IdentifyingTypes idTypes)
 		{
-			this.ChannelId = reader.ReadInt64 ();
-			this.ParentChannelId = reader.ReadInt64 ();
+			this.ChannelId = idTypes.ReadChannel (reader);
+			this.ParentChannelId = idTypes.ReadChannel (reader);
 			this.PlayerLimit = reader.ReadInt32 ();
 			this.Name = reader.ReadString ();
 			this.Description = reader.ReadString ();

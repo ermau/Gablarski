@@ -20,8 +20,8 @@ namespace Gablarski.Messages
 			get { return true; }
 		}
 
-		public abstract void WritePayload (IValueWriter writer);
-		public abstract void ReadPayload (IValueReader reader);
+		public abstract void WritePayload (IValueWriter writer, IdentifyingTypes idTypes);
+		public abstract void ReadPayload (IValueReader reader, IdentifyingTypes idTypes);
 
 		public static ReadOnlyDictionary<ushort, Func<MessageBase>> MessageTypes
 		{

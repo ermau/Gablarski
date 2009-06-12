@@ -44,16 +44,16 @@ namespace Gablarski.Messages
 			return MediaSources.Create (this.MediaSourceType, this.SourceInfo.SourceId);
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (IValueWriter writer, IdentifyingTypes idTypes)
 		{
 			writer.WriteByte ((byte)this.SourceResult);
-			this.SourceInfo.Serialize (writer);
+			this.SourceInfo.Serialize (writer, idTypes);
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (IValueReader reader, IdentifyingTypes idTypes)
 		{
 			this.SourceResult = (SourceResult)reader.ReadByte ();
-			this.SourceInfo = new MediaSourceInfo (reader);
+			this.SourceInfo = new MediaSourceInfo (reader, idTypes);
 		}
 	}
 

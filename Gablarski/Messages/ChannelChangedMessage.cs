@@ -25,7 +25,7 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public ChannelChangeResultMessage (long requestingPlayer, ChannelChangeInfo moveInfo)
+		public ChannelChangeResultMessage (ChannelChangeInfo moveInfo)
 			: this ()
 		{
 			this.Result = ChannelChangeResult.Success;
@@ -44,20 +44,20 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (IValueWriter writer, IdentifyingTypes idTypes)
 		{
 			writer.WriteByte ((byte)this.Result);
 			
 			if (this.Result == ChannelChangeResult.Success)
-				this.MoveInfo.Serialize (writer);
+				this.MoveInfo.Serialize (writer, idTypes);
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (IValueReader reader, IdentifyingTypes idTypes)
 		{
 			this.Result = (ChannelChangeResult)reader.ReadByte ();
 
 			if (this.Result == ChannelChangeResult.Success)
-				this.MoveInfo = new ChannelChangeInfo (reader);
+				this.MoveInfo = new ChannelChangeInfo (reader, idTypes);
 		}
 	}
 }

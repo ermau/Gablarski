@@ -76,6 +76,12 @@ namespace Gablarski.Tests
 			get { return this.connected; }
 		}
 
+		public IdentifyingTypes IdentifyingTypes
+		{
+			get;
+			set;
+		}
+
 		public void Send (MessageBase message)
 		{
 			this.server.Receive (message);

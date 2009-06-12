@@ -35,7 +35,7 @@ namespace Gablarski.Client
 			if (channel == null)
 				throw new ArgumentNullException ("channel");
 
-			if (channel.ChannelId != 0)
+			if (channel.ChannelId != null)
 				throw new ArgumentException ("Can not create an existing channel", "channel");
 
 			this.connection.Send (new ChannelEditMessage (channel));
@@ -50,7 +50,7 @@ namespace Gablarski.Client
 			if (channel == null)
 				throw new ArgumentNullException ("channel");
 
-			if (channel.ChannelId == 0)
+			if (channel.ChannelId == null)
 				throw new ArgumentException ("channel must be an existing channel", "channel");
 
 			this.connection.Send (new ChannelEditMessage (channel));
@@ -65,7 +65,7 @@ namespace Gablarski.Client
 			if (channel == null)
 				throw new ArgumentNullException ("channel");
 
-			if (channel.ChannelId == 0)
+			if (channel.ChannelId == null)
 				throw new ArgumentException ("channel must be an existing channel", "channel");
 
 			this.connection.Send (new ChannelEditMessage (channel) { Delete = true });
@@ -90,10 +90,10 @@ namespace Gablarski.Client
 		private readonly IClientConnection connection;
 
 		private readonly object channelLock = new object ();
-		private Dictionary<long, Channel> channels;
+		private Dictionary<object, Channel> channels;
 
 		/// <returns><c>null</c> if no channel exists by the identifier.</returns>
-		protected internal Channel this[long identifier]
+		protected internal Channel this[object identifier]
 		{
 			get
 			{

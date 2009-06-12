@@ -45,7 +45,7 @@ namespace Gablarski.Server
 		{
 			lock (this.channels)
 			{
-				if (channel.ChannelId == 0)
+				if (channel.ChannelId == null)
 				{
 					long id = ++this.lastId;
 					channels.Add (id, new Channel (id, channel));
@@ -65,6 +65,6 @@ namespace Gablarski.Server
 
 		private long lastId = 1;
 		private readonly Channel lobby;
-		private readonly Dictionary<long, Channel> channels = new Dictionary<long, Channel> ();
+		private readonly Dictionary<object, Channel> channels = new Dictionary<object, Channel> ();
 	}
 }

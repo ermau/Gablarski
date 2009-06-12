@@ -41,7 +41,7 @@ namespace Gablarski.Client
 		protected ServerInfo serverInfo;
 
 		private string nickname;
-		private long playerId;
+		private object playerId;
 
 		protected readonly Dictionary<ServerMessageType, Action<MessageReceivedEventArgs>> Handlers;
 		protected internal IClientConnection Connection
@@ -55,10 +55,10 @@ namespace Gablarski.Client
 		private Dictionary<int, IMediaSource> allSources = new Dictionary<int, IMediaSource> ();
 
 		private object playerLock = new object();
-		private Dictionary<long, UserInfo> players = new Dictionary<long, UserInfo>();
+		private Dictionary<object, UserInfo> players = new Dictionary<object, UserInfo>();
 
 		private object channelLock = new object();
-		private Dictionary<long, Channel> channels = new Dictionary<long, Channel> ();
+		private Dictionary<object, Channel> channels = new Dictionary<object, Channel> ();
 
 		private void AddSource (IMediaSource source, bool mine)
 		{
@@ -156,18 +156,18 @@ namespace Gablarski.Client
 		{
 			var msg = (ChannelChangeResultMessage)e.Message;
 
-			if (msg.Result == ChannelChangeResult.Success)
+			if (msg.Result != ChannelChangeResult.Success)
+				return;
+
+			lock (this.playerLock)
 			{
-				lock (playerLock)
-				{
-					if (!this.players.ContainsKey (msg.MoveInfo.TargetUserId))
-						return;
+				if (!this.players.ContainsKey (msg.MoveInfo.TargetUserId))
+					return;
 
-					this.players[msg.MoveInfo.TargetUserId].CurrentChannelId = msg.MoveInfo.TargetChannelId;
-				}
-
-				OnPlayerChangedChannnel (new ChannelChangedEventArgs (msg.MoveInfo));
+				this.players[msg.MoveInfo.TargetUserId].CurrentChannelId = msg.MoveInfo.TargetChannelId;
 			}
+
+			this.OnPlayerChangedChannnel (new ChannelChangedEventArgs (msg.MoveInfo));
 		}	
 		#endregion
 

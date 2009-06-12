@@ -13,13 +13,13 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public ChangeChannelMessage (long targetUserId, long targetChannelId)
+		public ChangeChannelMessage (object targetUserId, object targetChannelId)
 			: this()
 		{
 			this.MoveInfo = new ChannelChangeInfo (targetUserId, targetChannelId);
 		}
 
-		public ChangeChannelMessage (long targetUserId, long targetChannelId, long requestingPlayerId)
+		public ChangeChannelMessage (object targetUserId, object targetChannelId, object requestingPlayerId)
 			: this ()
 		{
 			this.MoveInfo = new ChannelChangeInfo (targetUserId, targetChannelId, requestingPlayerId);
@@ -31,14 +31,14 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (IValueWriter writer, IdentifyingTypes idTypes)
 		{
-			this.MoveInfo.Serialize (writer);
+			this.MoveInfo.Serialize (writer, idTypes);
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (IValueReader reader, IdentifyingTypes idTypes)
 		{
-			this.MoveInfo = new ChannelChangeInfo (reader);
+			this.MoveInfo = new ChannelChangeInfo (reader, idTypes);
 		}
 	}
 }

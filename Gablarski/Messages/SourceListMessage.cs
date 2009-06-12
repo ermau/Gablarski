@@ -27,18 +27,18 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (IValueWriter writer, IdentifyingTypes idTypes)
 		{
 			writer.WriteInt32 (this.Sources.Count());
 			foreach (MediaSourceInfo source in this.Sources)
-				source.Serialize (writer);
+				source.Serialize (writer, idTypes);
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (IValueReader reader, IdentifyingTypes idTypes)
 		{
 			MediaSourceInfo[] sourceInfos = new MediaSourceInfo[reader.ReadInt32()];
 			for (int i = 0; i < sourceInfos.Length; ++i)
-				sourceInfos[i] = new MediaSourceInfo (reader);
+				sourceInfos[i] = new MediaSourceInfo (reader, idTypes);
 
 			this.Sources = sourceInfos;
 		}

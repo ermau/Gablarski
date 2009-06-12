@@ -87,7 +87,7 @@ namespace Gablarski.Tests
 		public void DeleteInvalidChannel ()
 		{
 			Assert.Throws<ArgumentNullException> (() => manager.Delete (null));
-			Assert.Throws<ArgumentException> (() => manager.Delete (new Channel (0)));
+			Assert.Throws<ArgumentException> (() => manager.Delete (new Channel (null)));
 		}
 
 		[Test]

@@ -33,13 +33,13 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (IValueWriter writer, IdentifyingTypes idTypes)
 		{
 			writer.WriteInt32 (this.SourceId);
 			writer.WriteBytes (this.Data);
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (IValueReader reader, IdentifyingTypes idTypes)
 		{
 			this.SourceId = reader.ReadInt32 ();
 			this.Data = reader.ReadBytes ();

@@ -26,6 +26,8 @@ namespace Gablarski.Server
 			this.settings = settings;
 			this.userProvider = userProvider;
 			this.permissionProvider = permissionProvider;
+
+			this.IdentifyingTypes = new IdentifyingTypes (userProvider.IdentifyingType, channelProvider.IdentifyingType);
 			
 			this.channelProvider = channelProvider;
 			this.channelProvider.ChannelsUpdatedExternally += OnChannelsUpdatedExternally;
@@ -46,6 +48,8 @@ namespace Gablarski.Server
 			this.backendProvider.ChannelsUpdatedExternally += OnChannelsUpdatedExternally;
 			this.UpdateChannels (false);
 		}
+
+		public IdentifyingTypes IdentifyingTypes { get; private set; }
 
 		#region Public Methods
 		/// <summary>
@@ -189,7 +193,7 @@ namespace Gablarski.Server
 
 		private readonly object channelLock = new object ();
 		private Channel defaultChannel;
-		private Dictionary<long, Channel> channels;
+		private Dictionary<object, Channel> channels;
 
 		private void Disconnect (IConnection connection)
 		{
@@ -253,15 +257,15 @@ namespace Gablarski.Server
 			return agrSources;
 		}
 
-		protected bool GetPermission (PermissionName name, long channelId, long playerId)
+		protected bool GetPermission (PermissionName name, object channelId, object playerId)
 		{
 			if (this.BackendProvider != null)
 				return this.BackendProvider.GetPermissions (channelId, playerId).GetPermission (name);
 			else
-				return this.PermissionProvider.GetPermissions (playerId).GetPermission (name);
+				return this.PermissionProvider.GetPermissions (playerId, this.IdentifyingTypes).GetPermission (name);
 		}
 
-		protected bool GetPermission (PermissionName name, long channelId, IConnection connection)
+		protected bool GetPermission (PermissionName name, object channelId, IConnection connection)
 		{
 			return GetPermission (name, channelId, this.connections[connection].UserId);
 		}
@@ -290,7 +294,7 @@ namespace Gablarski.Server
 			e.Connection.Disconnected -= this.OnClientDisconnected;
 			e.Connection.Disconnect();
 
-			long playerId;
+			object playerId;
 			if (this.connections.Remove (e.Connection, out playerId))
 				this.connections.Send (new UserDisconnectedMessage (playerId));
 

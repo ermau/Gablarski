@@ -25,18 +25,18 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (IValueWriter writer, IdentifyingTypes idTypes)
 		{
 			writer.WriteInt32 (this.Users.Count());
 			foreach (UserInfo info in this.Users)
-				info.Serialize (writer);
+				info.Serialize (writer, idTypes);
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (IValueReader reader, IdentifyingTypes idTypes)
 		{
 			UserInfo[] users = new UserInfo[reader.ReadInt32()];
 			for (int i = 0; i < users.Length; ++i)
-				users[i] = new UserInfo (reader);
+				users[i] = new UserInfo (reader, idTypes);
 
 			this.Users = users;
 		}

@@ -11,19 +11,23 @@ namespace Gablarski
 		{
 		}
 
-		internal UserInfo (string nickname, long userId, long currentChannelId)
+		internal UserInfo (string nickname, object userId, object	currentChannelId)
 		{
 			if (nickname.IsEmpty())
 				throw new ArgumentNullException ("nickname");
+			if (userId == null)
+				throw new ArgumentNullException("userId");
+			if (currentChannelId == null)
+				throw new ArgumentNullException("currentChannelId");
 
 			this.Nickname = nickname;
 			this.UserId = userId;
 			this.CurrentChannelId = currentChannelId;
 		}
 
-		internal UserInfo (IValueReader reader)
+		internal UserInfo (IValueReader reader, IdentifyingTypes idTypes)
 		{
-			this.Deserialize (reader);
+			this.Deserialize (reader, idTypes);
 		}
 
 		public string Nickname
@@ -32,29 +36,29 @@ namespace Gablarski
 			private set;
 		}
 
-		public long UserId
+		public object UserId
 		{
 			get;
 			private set;
 		}
 
-		public long CurrentChannelId
+		public object CurrentChannelId
 		{
 			get;
 			set;
 		}
 
-		internal void Serialize (IValueWriter writer)
+		internal void Serialize (IValueWriter writer, IdentifyingTypes idTypes)
 		{
-			writer.WriteInt64 (this.UserId);
-			writer.WriteInt64 (this.CurrentChannelId);
+			idTypes.WriteUser (writer, this.UserId);
+			idTypes.WriteChannel (writer, this.CurrentChannelId);
 			writer.WriteString (this.Nickname);
 		}
 
-		internal void Deserialize (IValueReader reader)
+		internal void Deserialize (IValueReader reader, IdentifyingTypes idTypes)
 		{
-			this.UserId = reader.ReadInt64();
-			this.CurrentChannelId = reader.ReadInt64 ();
+			this.UserId = idTypes.ReadUser (reader);
+			this.CurrentChannelId = idTypes.ReadChannel (reader);
 			this.Nickname = reader.ReadString();			
 		}
 	}

@@ -36,6 +36,12 @@ namespace Gablarski.Network
 			get { return this.tcp.Connected; }
 		}
 
+		public IdentifyingTypes IdentifyingTypes
+		{
+			get;
+			set;
+		}
+
 		public void Send (MessageBase message)
 		{
 			if (message == null)
@@ -157,7 +163,7 @@ namespace Gablarski.Network
 				}
 
 				msg = MessageBase.MessageTypes[type] ();
-				msg.ReadPayload (this.rreader);
+				msg.ReadPayload (this.rreader, this.IdentifyingTypes);
 			}
 			catch (Exception e)
 			{
@@ -215,7 +221,7 @@ namespace Gablarski.Network
 						writer.WriteByte (0x2A);
 						writer.WriteUInt16 (message.MessageTypeCode);
 
-						message.WritePayload (writer);
+						message.WritePayload (writer, this.IdentifyingTypes);
 					}
 					catch (Exception e)
 					{

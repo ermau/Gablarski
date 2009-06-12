@@ -25,6 +25,11 @@ namespace Gablarski.Server.Telnet
 			get { return this.client.Connected; }
 		}
 
+		public IdentifyingTypes IdentifyingTypes
+		{
+			get; set;
+		}
+
 		public void Send (MessageBase message)
 		{
 			throw new NotImplementedException ();

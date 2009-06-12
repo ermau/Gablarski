@@ -32,13 +32,13 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (IValueWriter writer, IdentifyingTypes idTypes)
 		{
 			writer.WriteString (this.MediaSourceType.AssemblyQualifiedName);
 			writer.WriteByte ((byte)this.Channels);
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (IValueReader reader, IdentifyingTypes idTypes)
 		{
 			this.MediaSourceType = Type.GetType (reader.ReadString ());
 			this.Channels = reader.ReadByte ();

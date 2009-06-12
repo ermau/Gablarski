@@ -45,27 +45,27 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (IValueWriter writer, IdentifyingTypes idTypes)
 		{
-			if (this.Result == GenericResult.Success)
-			{
-				writer.WriteInt32 (this.Channels.Count ());
-				foreach (var c in this.Channels)
-					c.Serialize (writer);
-			}
+			if (this.Result != GenericResult.Success)
+				return;
+
+			writer.WriteInt32 (this.Channels.Count ());
+			foreach (var c in this.Channels)
+				c.Serialize (writer, idTypes);
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (IValueReader reader, IdentifyingTypes idTypes)
 		{
 			this.Result = reader.ReadGenericResult ();
-			if (this.Result == GenericResult.Success)
-			{
-				Channel[] channels = new Channel[reader.ReadInt32 ()];
-				for (int i = 0; i < channels.Length; ++i)
-					channels[i] = new Channel (reader);
+			if (this.Result != GenericResult.Success)
+				return;
 
-				this.Channels = channels;
-			}
+			Channel[] channels = new Channel[reader.ReadInt32 ()];
+			for (int i = 0; i < channels.Length; ++i)
+				channels[i] = new Channel (reader, idTypes);
+
+			this.Channels = channels;
 		}
 	}
 }

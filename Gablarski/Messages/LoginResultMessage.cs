@@ -36,20 +36,20 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (IValueReader reader, IdentifyingTypes idTypes)
 		{
 			this.Result = new LoginResult(reader);
 
 			if (this.Result.Succeeded)
-				this.UserInfo = new UserInfo (reader);
+				this.UserInfo = new UserInfo (reader, idTypes);
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (IValueWriter writer, IdentifyingTypes idTypes)
 		{
 			this.Result.Serialize (writer);
 
 			if (this.Result.Succeeded)
-				this.UserInfo.Serialize (writer);
+				this.UserInfo.Serialize (writer, idTypes);
 		}
 	}
 }
