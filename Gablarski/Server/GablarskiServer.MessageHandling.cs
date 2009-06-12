@@ -255,18 +255,18 @@ namespace Gablarski.Server
 			SourceResult result = SourceResult.FailedUnknown;
 			int sourceId = -1;
 
-			var player = this.connections[e.Connection];
-			if (player == null || !this.GetPermission (PermissionName.RequestSource, player))
+			var user = this.connections[e.Connection];
+			if (user == null || !this.GetPermission (PermissionName.RequestSource, user))
 				result = SourceResult.FailedPermissions;
 
-			IMediaSource source = null;
+			MediaSourceBase source = null;
 			try
 			{
 				int index = 0;
 				lock (sourceLock)
 				{
 					if (!sources.ContainsKey (e.Connection))
-						sources.Add (e.Connection, new List<IMediaSource> ());
+						sources.Add (e.Connection, new List<MediaSourceBase> ());
 
 					if (!sources[e.Connection].Any (s => s != null && s.GetType () == request.MediaSourceType))
 					{
@@ -280,7 +280,7 @@ namespace Gablarski.Server
 
 				if (result == SourceResult.FailedUnknown)
 				{
-					source = MediaSources.Create (request.MediaSourceType, sourceId);
+					source = MediaSources.Create (request.MediaSourceType, sourceId, user.UserId);
 					if (source != null)
 					{
 						lock (sourceLock)
@@ -303,7 +303,7 @@ namespace Gablarski.Server
 				MediaSourceInfo sourceInfo = new MediaSourceInfo
 				{
 					SourceId = sourceId,
-					PlayerId = player.UserId,
+					UserId = user.UserId,
 					MediaType = (source != null) ? source.Type : MediaType.None,
 					SourceTypeName = request.MediaSourceType.AssemblyQualifiedName
 				};

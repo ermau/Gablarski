@@ -39,9 +39,9 @@ namespace Gablarski.Messages
 			set { this.SourceInfo.SourceTypeName = value.AssemblyQualifiedName; }
 		}
 
-		public IMediaSource GetSource ()
+		public MediaSourceBase GetSource (object userId)
 		{
-			return MediaSources.Create (this.MediaSourceType, this.SourceInfo.SourceId);
+			return MediaSources.Create (this.MediaSourceType, this.SourceInfo.SourceId, userId);
 		}
 
 		public override void WritePayload (IValueWriter writer, IdentifyingTypes idTypes)

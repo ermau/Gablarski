@@ -12,10 +12,10 @@ namespace Gablarski
 		{
 		}
 
-		public MediaSourceInfo (IMediaSource source)
+		public MediaSourceInfo (MediaSourceBase source)
 		{
 			this.SourceTypeName = source.GetType().AssemblyQualifiedName;
-			this.SourceId = source.ID;
+			this.SourceId = source.Id;
 			this.MediaType = source.Type;
 		}
 
@@ -42,7 +42,7 @@ namespace Gablarski
 			set;
 		}
 
-		public object PlayerId
+		public object UserId
 		{
 			get;
 			set;
@@ -52,14 +52,14 @@ namespace Gablarski
 		{
 			writer.WriteInt32 (this.SourceId);
 			writer.WriteString (this.SourceTypeName);
-			idTypes.WriteUser (writer, this.PlayerId);
+			idTypes.WriteUser (writer, this.UserId);
 		}
 
 		internal void Deserialize (IValueReader reader, IdentifyingTypes idTypes)
 		{
 			this.SourceId = reader.ReadInt32();
 			this.SourceTypeName = reader.ReadString();
-			this.PlayerId = idTypes.ReadUser (reader);
+			this.UserId = idTypes.ReadUser (reader);
 		}
 	}
 }

@@ -88,11 +88,11 @@ namespace Gablarski.Client
 			private set;
 		}
 
-		public IMediaSource VoiceSource
+		public MediaSourceBase VoiceSource
 		{
 			get
 			{
-				IMediaSource source;
+				MediaSourceBase source;
 				lock (sourceLock)
 				{
 					this.clientSources.TryGetValue (MediaType.Voice, out source);
@@ -197,7 +197,7 @@ namespace Gablarski.Client
 		{
 			if (mediaSourceType == null)
 				throw new ArgumentNullException ("mediaSourceType");
-			if (mediaSourceType.GetInterface ("IMediaSource") == null)
+			if (mediaSourceType.GetInterface ("MediaSourceBase") == null)
 				throw new InvalidOperationException ("Can not request a source that is not a media source.");
 
 			lock (sourceLock)
@@ -209,7 +209,7 @@ namespace Gablarski.Client
 			this.Connection.Send (new RequestSourceMessage (mediaSourceType, channels));
 		}
 
-		public void SendAudioData (Channel channel, IMediaSource source, byte[] data)
+		public void SendAudioData (Channel channel, MediaSourceBase source, byte[] data)
 		{
 			if (channel == null)
 				throw new ArgumentNullException ("channel");
@@ -218,7 +218,7 @@ namespace Gablarski.Client
 
 			// TODO: Add bitrate transmision etc
 			byte[] encoded = source.AudioCodec.Encode (data, 44100, source.AudioCodec.MaxQuality);
-			this.Connection.Send (new SendAudioDataMessage (channel.ChannelId, source.ID, encoded));
+			this.Connection.Send (new SendAudioDataMessage (channel.ChannelId, source.Id, encoded));
 		}
 
 		public void MovePlayerToChannel (UserInfo targetPlayer, Channel targetChannel)
@@ -415,7 +415,7 @@ namespace Gablarski.Client
 	public class ReceivedAudioEventArgs
 		: EventArgs
 	{
-		public ReceivedAudioEventArgs (IMediaSource source, byte[] data)
+		public ReceivedAudioEventArgs (MediaSourceBase source, byte[] data)
 		{
 			this.Source = source;
 			this.AudioData = data;
@@ -424,7 +424,7 @@ namespace Gablarski.Client
 		/// <summary>
 		/// Gets the media source audio was received for.
 		/// </summary>
-		public IMediaSource Source
+		public MediaSourceBase Source
 		{
 			get;
 			set;
@@ -468,7 +468,7 @@ namespace Gablarski.Client
 	public class ReceivedSourceEventArgs
 		: EventArgs
 	{
-		public ReceivedSourceEventArgs (IMediaSource source, MediaSourceInfo sourceInfo, SourceResult result)
+		public ReceivedSourceEventArgs (MediaSourceBase source, MediaSourceInfo sourceInfo, SourceResult result)
 		{
 			this.Result = result;
 			this.SourceInfo = sourceInfo;
@@ -487,7 +487,7 @@ namespace Gablarski.Client
 			set;
 		}
 
-		public IMediaSource Source
+		public MediaSourceBase Source
 		{
 			get;
 			set;

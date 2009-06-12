@@ -51,8 +51,8 @@ namespace Gablarski.Client
 		}
 
 		private object sourceLock = new object ();
-		private Dictionary<MediaType, IMediaSource> clientSources = new Dictionary<MediaType, IMediaSource> ();
-		private Dictionary<int, IMediaSource> allSources = new Dictionary<int, IMediaSource> ();
+		private Dictionary<MediaType, MediaSourceBase> clientSources = new Dictionary<MediaType, MediaSourceBase> ();
+		private Dictionary<int, MediaSourceBase> allSources = new Dictionary<int, MediaSourceBase> ();
 
 		private object playerLock = new object();
 		private Dictionary<object, UserInfo> players = new Dictionary<object, UserInfo>();
@@ -60,11 +60,11 @@ namespace Gablarski.Client
 		private object channelLock = new object();
 		private Dictionary<object, Channel> channels = new Dictionary<object, Channel> ();
 
-		private void AddSource (IMediaSource source, bool mine)
+		private void AddSource (MediaSourceBase source, bool mine)
 		{
 			lock (sourceLock)
 			{
-				this.allSources.Add (source.ID, source);
+				this.allSources.Add (source.Id, source);
 
 				if (mine)
 					this.clientSources.Add (source.Type, source);
@@ -212,14 +212,14 @@ namespace Gablarski.Client
 		{
 			var msg = (SourceListMessage)e.Message;
 			foreach (var sourceInfo in msg.Sources)
-				this.AddSource (MediaSources.Create (Type.GetType (sourceInfo.SourceTypeName), sourceInfo.SourceId), sourceInfo.PlayerId == this.Self.UserId);
+				this.AddSource (MediaSources.Create (Type.GetType (sourceInfo.SourceTypeName), sourceInfo.SourceId, sourceInfo.UserId), sourceInfo.UserId == this.Self.UserId);
 
 			OnReceivedSourceList (new ReceivedListEventArgs<MediaSourceInfo> (msg.Sources));
 		}
 
 		private void OnSourceResultMessage (MessageReceivedEventArgs e)
 		{
-			IMediaSource source = null;
+			MediaSourceBase source = null;
 
 			var sourceMessage = (SourceResultMessage)e.Message;
 			if (sourceMessage.MediaSourceType == null)
@@ -228,7 +228,7 @@ namespace Gablarski.Client
 			}
 			else if (sourceMessage.SourceResult == SourceResult.Succeeded || sourceMessage.SourceResult == SourceResult.NewSource)
 			{
-				source = sourceMessage.GetSource ();
+				source = sourceMessage.GetSource (this.Self.UserId);
 				this.AddSource (source, (sourceMessage.SourceResult == SourceResult.Succeeded));
 			}
 

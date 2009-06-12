@@ -187,7 +187,7 @@ namespace Gablarski.Server
 		}
 
 		private readonly object sourceLock = new object ();
-		private readonly Dictionary<IConnection, List<IMediaSource>> sources = new Dictionary<IConnection, List<IMediaSource>> ();
+		private readonly Dictionary<IConnection, List<MediaSourceBase>> sources = new Dictionary<IConnection, List<MediaSourceBase>> ();
 
 		private readonly ConnectionCollection connections = new ConnectionCollection();
 
@@ -248,7 +248,7 @@ namespace Gablarski.Server
 				{
 					IConnection connection = kvp.Key;
 					agrSources = agrSources.Concat (
-							kvp.Value.Select (s => new MediaSourceInfo (s) { PlayerId = this.connections[connection].UserId }));
+							kvp.Value.Select (s => new MediaSourceInfo (s) { UserId = this.connections[connection].UserId }));
 				}
 
 				agrSources = agrSources.ToList ();

@@ -14,28 +14,28 @@ namespace Gablarski.Media.Sources
 	/// </remarks>
 	public static class MediaSources
 	{
-		public static IMediaSource Create (Type sourceType, int sourceId)
+		public static MediaSourceBase Create (Type sourceType, int sourceId, object ownerId)
 		{
 			if (sourceType == null)
 				throw new ArgumentNullException("sourceType");
 
-			if (sourceType.GetInterface ("IMediaSource") == null)
+			if (sourceType.GetInterface ("MediaSourceBase") == null)
 				throw new InvalidOperationException ("Not media source type.");
 
-			IMediaSource source = null;
+			MediaSourceBase source = null;
 			lock (SourceTypes)
 			{
 				if (!SourceTypes.ContainsKey (sourceType))
 					InitType (sourceType);
 
 				if (SourceTypes.ContainsKey (sourceType))
-					source = SourceTypes[sourceType] (sourceId);
+					source = SourceTypes[sourceType] (sourceId, ownerId);
 			}
 
 			return source;
 		}
 
-		private static readonly Dictionary<Type, Func<int, IMediaSource>> SourceTypes = new Dictionary<Type, Func<int, IMediaSource>> ();
+		private static readonly Dictionary<Type, Func<int, object, MediaSourceBase>> SourceTypes = new Dictionary<Type, Func<int, object, MediaSourceBase>> ();
 
 		private static void InitType (Type sourceType)
 		{
@@ -44,7 +44,7 @@ namespace Gablarski.Media.Sources
 				if (SourceTypes.ContainsKey (sourceType))
 					return;
 			
-				Type[] argTypes = new Type[] { typeof (int) };
+				Type[] argTypes = new [] { typeof (int), typeof(object) };
 
 				ConstructorInfo ctor = sourceType.GetConstructor (argTypes);
 				if (ctor == null)
@@ -53,10 +53,11 @@ namespace Gablarski.Media.Sources
 				DynamicMethod method = new DynamicMethod ("Create" + sourceType.Name, sourceType, argTypes);
 				ILGenerator gen = method.GetILGenerator ();
 				gen.Emit (OpCodes.Ldarg_0);
+				gen.Emit (OpCodes.Ldarg_1);
 				gen.Emit (OpCodes.Newobj, ctor);
 				gen.Emit (OpCodes.Ret);
 
-				SourceTypes.Add (sourceType, (Func<int, IMediaSource>)method.CreateDelegate (typeof (Func<int, IMediaSource>)));
+				SourceTypes.Add (sourceType, (Func<int, object, MediaSourceBase>)method.CreateDelegate (typeof (Func<int, object, MediaSourceBase>)));
 			}
 		}
 	}

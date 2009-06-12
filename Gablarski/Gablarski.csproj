@@ -76,11 +76,11 @@
     <Compile Include="Client\IDeviceProvider.cs" />
     <Compile Include="Client\IPlaybackProvider.cs" />
     <Compile Include="Client\VoiceActivation.cs" />
-    <Compile Include="Codecs\CeltCodec.cs" />
-    <Compile Include="Codecs\IAudioCodec.cs" />
-    <Compile Include="Codecs\IMediaCodec.cs" />
-    <Compile Include="Codecs\RawCodec.cs" />
-    <Compile Include="Codecs\SpeexCodec.cs" />
+    <Compile Include="Media\Codecs\CeltCodec.cs" />
+    <Compile Include="Media\Codecs\IAudioCodec.cs" />
+    <Compile Include="Media\Codecs\IMediaCodec.cs" />
+    <Compile Include="Media\Codecs\RawCodec.cs" />
+    <Compile Include="Media\Codecs\SpeexCodec.cs" />
     <Compile Include="en-US.Designer.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="GenericResult.cs" />
@@ -140,10 +140,10 @@
     <Compile Include="OrderedDictionary.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Server\ServerSettings.cs" />
-    <Compile Include="Sources\IMediaSource.cs" />
-    <Compile Include="Sources\MusicSource.cs" />
-    <Compile Include="Sources\Sources.cs" />
-    <Compile Include="Sources\VoiceSource.cs" />
+    <Compile Include="Media\Sources\MediaSourceBase.cs" />
+    <Compile Include="Media\Sources\MusicSource.cs" />
+    <Compile Include="Media\Sources\Sources.cs" />
+    <Compile Include="Media\Sources\VoiceSource.cs" />
     <Compile Include="StreamValueReader.cs" />
     <Compile Include="StreamValueWriter.cs" />
   </ItemGroup>
@@ -155,6 +155,7 @@
     <Compile Include="Server\Telnet\TelnetConnectionProvider.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GablarskiContext.cs" />
     <Compile Include="IdentifyingTypes.cs" />
     <Compile Include="Messages\UserLoggedIn.cs" />
     <Compile Include="Server\LobbyChannelProvider.cs" />

@@ -5,35 +5,24 @@ using System.Text;
 using Gablarski.Media.Codecs;
 using Gablarski.Media.Sources;
 
-namespace Gablarski.Sources
+namespace Gablarski.Media.Sources
 {
 	public class MusicSource
-		: IMediaSource
+		: MediaSourceBase
 	{
-		public MusicSource (int sourceID)
+		public MusicSource (int sourceId, object ownerId)
+			: base (MediaType.Music, sourceId, ownerId)
 		{
-			this.ID = sourceID;
 		}
 
-		#region IMediaSource Members
+		#region MediaSourceBase Members
 
-		public int ID
-		{
-			get;
-			private set;
-		}
-
-		public MediaType Type
-		{
-			get { return MediaType.Music; }
-		}
-
-		public IAudioCodec AudioCodec
+		public override IAudioCodec AudioCodec
 		{
 			get { throw new NotImplementedException (); }
 		}
 
-		public IMediaCodec VideoCodec
+		public override IMediaCodec VideoCodec
 		{
 			get { throw new NotSupportedException (); }
 		}

@@ -23,7 +23,7 @@ namespace Gablarski.OpenAL.Providers
 			}
 		}
 
-		public void QueuePlayback (IMediaSource mediaSource, byte[] data, int frequency)
+		public void QueuePlayback (MediaSourceBase mediaSource, byte[] data, int frequency)
 		{
 			if (!this.device.IsOpen)
 				this.device.Open();
@@ -93,11 +93,11 @@ namespace Gablarski.OpenAL.Providers
 
 		private Context context;
 		private PlaybackDevice device;
-		private readonly SourcePool<IMediaSource> pool = new SourcePool<IMediaSource>();
+		private readonly SourcePool<MediaSourceBase> pool = new SourcePool<MediaSourceBase>();
 		private object bufferLock = new object ();
-		private readonly Dictionary<IMediaSource, Stack<SourceBuffer>> buffers = new Dictionary<IMediaSource, Stack<SourceBuffer>> ();
+		private readonly Dictionary<MediaSourceBase, Stack<SourceBuffer>> buffers = new Dictionary<MediaSourceBase, Stack<SourceBuffer>> ();
 
-		private void PushBuffers (IMediaSource mediaSource, int number)
+		private void PushBuffers (MediaSourceBase mediaSource, int number)
 		{
 			SourceBuffer[] sbuffers = SourceBuffer.Generate (number);
 			for (int i = 0; i < sbuffers.Length; ++i)

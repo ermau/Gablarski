@@ -6,6 +6,7 @@ using System.Text;
 namespace Gablarski.Server
 {
 	internal class GablarskiServerContext
+		: GablarskiContext
 	{
 		
 	}
