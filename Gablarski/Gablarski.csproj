@@ -101,10 +101,10 @@
     <Compile Include="Messages\ConnectMessage.cs" />
     <Compile Include="Messages\LoginResultMessage.cs" />
     <Compile Include="Messages\RequestChannelListMessage.cs" />
-    <Compile Include="Messages\RequestPlayerListMessage.cs" />
+    <Compile Include="Messages\RequestUserListMessage.cs" />
     <Compile Include="Messages\RequestSourceListMessage.cs" />
     <Compile Include="Messages\SendAudioDataMessage.cs" />
-    <Compile Include="Messages\PlayerListMessage.cs" />
+    <Compile Include="Messages\UserListMessage.cs" />
     <Compile Include="Messages\RequestSourceMessage.cs" />
     <Compile Include="Messages\ServerInfoMessage.cs" />
     <Compile Include="Messages\SourceListMessage.cs" />
@@ -115,8 +115,7 @@
     <Compile Include="Network\NetworkConnectionBase.cs" />
     <Compile Include="Network\ServerNetworkConnection.cs" />
     <Compile Include="Network\ServerNetworkConnectionProvider.cs" />
-    <Compile Include="PlayerInfo.cs" />
-    <Compile Include="PlayerInfoCollection.cs" />
+    <Compile Include="UserInfo.cs" />
     <Compile Include="ProviderUtils.cs" />
     <Compile Include="ServerInfo.cs" />
     <Compile Include="Server\ConnectionCollection.cs" />
@@ -150,13 +149,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Client\GablarskiClient.Internal.cs" />
-    <Compile Include="Messages\PlayerDisconnectedMessage.cs" />
+    <Compile Include="Messages\UserDisconnectedMessage.cs" />
     <Compile Include="Server\ConnectionProviderBase.cs" />
     <Compile Include="Server\Telnet\TelnetConnection.cs" />
     <Compile Include="Server\Telnet\TelnetConnectionProvider.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Messages\PlayerLoggedIn.cs" />
+    <Compile Include="Messages\UserLoggedIn.cs" />
     <Compile Include="Server\LobbyChannelProvider.cs" />
   </ItemGroup>
   <ItemGroup>

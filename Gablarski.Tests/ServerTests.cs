@@ -50,16 +50,16 @@ namespace Gablarski.Tests
 			var message = connection.Client.DequeueAndAssertMessage<LoginResultMessage>();
 
 			Assert.IsTrue (message.Result.Succeeded);
-			Assert.AreEqual (nickname, message.PlayerInfo.Nickname);
+			Assert.AreEqual (nickname, message.UserInfo.Nickname);
 
-			var login = connection.Client.DequeueAndAssertMessage<PlayerLoggedIn>();
-			Assert.AreEqual (nickname, login.PlayerInfo.Nickname);
-			Assert.AreEqual (message.Result.PlayerId, login.PlayerInfo.PlayerId);
-			Assert.AreEqual (message.PlayerInfo.PlayerId, login.PlayerInfo.PlayerId);
-			Assert.AreEqual (message.PlayerInfo.CurrentChannelId, login.PlayerInfo.CurrentChannelId);
+			var login = connection.Client.DequeueAndAssertMessage<UserLoggedIn>();
+			Assert.AreEqual (nickname, login.UserInfo.Nickname);
+			Assert.AreEqual (message.Result.UserId, login.UserInfo.UserId);
+			Assert.AreEqual (message.UserInfo.UserId, login.UserInfo.UserId);
+			Assert.AreEqual (message.UserInfo.CurrentChannelId, login.UserInfo.CurrentChannelId);
 
 			connection.Client.DequeueAndAssertMessage<ChannelListMessage>();
-			connection.Client.DequeueAndAssertMessage<PlayerListMessage>();
+			connection.Client.DequeueAndAssertMessage<UserListMessage>();
 			connection.Client.DequeueAndAssertMessage<SourceListMessage>();
 
 			return connection;

@@ -121,12 +121,12 @@ namespace Gablarski.Server
 					resultState = ChannelChangeResult.FailedUnknownChannel;
 			}
 
-			PlayerInfo requestingPlayer = null;
+			UserInfo requestingPlayer = null;
 			if (resultState == ChannelChangeResult.FailedUnknown)
 			{
 				requestingPlayer = this.connections[e.Connection];
 
-				if (requestingPlayer.PlayerId == change.MoveInfo.TargetPlayerId)
+				if (requestingPlayer.UserId == change.MoveInfo.TargetUserId)
 				{
 					if (!GetPermission (PermissionName.ChangeChannel, requestingPlayer))
 						resultState = ChannelChangeResult.FailedPermissions;
@@ -137,7 +137,7 @@ namespace Gablarski.Server
 				if (resultState == ChannelChangeResult.FailedUnknown)
 				{
 					requestingPlayer.CurrentChannelId = change.MoveInfo.TargetChannelId;
-					this.connections.Send (new ChannelChangeResultMessage (requestingPlayer.PlayerId, change.MoveInfo));
+					this.connections.Send (new ChannelChangeResultMessage (requestingPlayer.UserId, change.MoveInfo));
 					return;
 				}
 			}
@@ -186,7 +186,7 @@ namespace Gablarski.Server
 		}
 		#endregion
 
-		#region Players
+		#region Users
 		protected void UserLoginAttempt (MessageReceivedEventArgs e)
 		{
 			var login = (LoginMessage)e.Message;
@@ -198,15 +198,15 @@ namespace Gablarski.Server
 			}
 
 			LoginResult result = this.UserProvider.Login (login.Username, login.Password);
-			PlayerInfo info = null;
+			UserInfo info = null;
 
 			if (result.Succeeded)
 			{
-				info = new PlayerInfo (login.Nickname, result.PlayerId, this.defaultChannel.ChannelId);
+				info = new UserInfo (login.Nickname, result.UserId, this.defaultChannel.ChannelId);
 
 				if (!this.GetPermission (PermissionName.Login, info))
 					result.ResultState = LoginResultState.FailedPermissions;
-				else if (!this.connections.PlayerLoggedIn (login.Nickname))
+				else if (!this.connections.UserLoggedIn (login.Nickname))
 					this.connections.Add (e.Connection, info);
 				else
 					result.ResultState = LoginResultState.FailedNicknameInUse;
@@ -218,14 +218,14 @@ namespace Gablarski.Server
 			{
 				e.Connection.Send (msg);
 
-				this.connections.Send (new PlayerLoggedIn (info));
+				this.connections.Send (new UserLoggedIn (info));
 
 				lock (this.channelLock)
 				{
 					e.Connection.Send (new ChannelListMessage (this.channels.Values));
 				}
 				
-				e.Connection.Send (new PlayerListMessage (this.connections.Players));
+				e.Connection.Send (new UserListMessage (this.connections.Users));
 				e.Connection.Send (new SourceListMessage (this.GetSourceInfoList ()));
 			}
 			else
@@ -236,7 +236,7 @@ namespace Gablarski.Server
 
 		private void ClientRequestsPlayerList (MessageReceivedEventArgs e)
 		{
-			e.Connection.Send (new PlayerListMessage (this.connections.Players));
+			e.Connection.Send (new UserListMessage (this.connections.Users));
 		}
 		#endregion
 
@@ -303,7 +303,7 @@ namespace Gablarski.Server
 				MediaSourceInfo sourceInfo = new MediaSourceInfo
 				{
 					SourceId = sourceId,
-					PlayerId = player.PlayerId,
+					PlayerId = player.UserId,
 					MediaType = (source != null) ? source.Type : MediaType.None,
 					SourceTypeName = request.MediaSourceType.AssemblyQualifiedName
 				};

@@ -116,7 +116,7 @@ namespace Gablarski.Server
 		/// Disconnections an <c>IConnection</c>.
 		/// </summary>
 		/// <param name="player">The player to disconnect.</param>
-		public void Disconnect (PlayerInfo player)
+		public void Disconnect (UserInfo player)
 		{
 			if (player == null)
 				throw new ArgumentNullException ("player");
@@ -244,7 +244,7 @@ namespace Gablarski.Server
 				{
 					IConnection connection = kvp.Key;
 					agrSources = agrSources.Concat (
-							kvp.Value.Select (s => new MediaSourceInfo (s) { PlayerId = this.connections[connection].PlayerId }));
+							kvp.Value.Select (s => new MediaSourceInfo (s) { PlayerId = this.connections[connection].UserId }));
 				}
 
 				agrSources = agrSources.ToList ();
@@ -263,19 +263,19 @@ namespace Gablarski.Server
 
 		protected bool GetPermission (PermissionName name, long channelId, IConnection connection)
 		{
-			return GetPermission (name, channelId, this.connections[connection].PlayerId);
+			return GetPermission (name, channelId, this.connections[connection].UserId);
 		}
 
 		protected bool GetPermission (PermissionName name, IConnection connection)
 		{
 			var player = this.connections[connection];
 
-			return GetPermission (name, (player != null) ? player.CurrentChannelId : 0, (player != null) ? player.PlayerId : 0);
+			return GetPermission (name, (player != null) ? player.CurrentChannelId : 0, (player != null) ? player.UserId : 0);
 		}
 
-		protected bool GetPermission (PermissionName name, PlayerInfo player)
+		protected bool GetPermission (PermissionName name, UserInfo player)
 		{
-			return GetPermission (name, player.CurrentChannelId, player.PlayerId);
+			return GetPermission (name, player.CurrentChannelId, player.UserId);
 		}
 
 		protected void ClientDisconnected (MessageReceivedEventArgs e)
@@ -292,7 +292,7 @@ namespace Gablarski.Server
 
 			long playerId;
 			if (this.connections.Remove (e.Connection, out playerId))
-				this.connections.Send (new PlayerDisconnectedMessage (playerId));
+				this.connections.Send (new UserDisconnectedMessage (playerId));
 
 			lock (sourceLock)
 			{

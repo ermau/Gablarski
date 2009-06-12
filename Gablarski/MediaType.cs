@@ -12,7 +12,7 @@ namespace Gablarski
 		None = 0,
 
 		/// <summary>
-		/// Voice (Players talking)
+		/// Voice (Users talking)
 		/// </summary>
 		Voice = 1,
 

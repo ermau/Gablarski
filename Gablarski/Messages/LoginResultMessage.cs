@@ -13,7 +13,7 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public LoginResultMessage (LoginResult result, PlayerInfo playerInfo)
+		public LoginResultMessage (LoginResult result, UserInfo playerInfo)
 			: this()
 		{
 			this.Result = result;
@@ -21,7 +21,7 @@ namespace Gablarski.Messages
 			if (this.Result.Succeeded && playerInfo == null)
 				throw new ArgumentNullException ("playerInfo");
 
-			this.PlayerInfo = playerInfo;
+			this.UserInfo = playerInfo;
 		}
 
 		public LoginResult Result
@@ -30,7 +30,7 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public PlayerInfo PlayerInfo
+		public UserInfo UserInfo
 		{
 			get;
 			set;
@@ -41,7 +41,7 @@ namespace Gablarski.Messages
 			this.Result = new LoginResult(reader);
 
 			if (this.Result.Succeeded)
-				this.PlayerInfo = new PlayerInfo (reader);
+				this.UserInfo = new UserInfo (reader);
 		}
 
 		public override void WritePayload (IValueWriter writer)
@@ -49,7 +49,7 @@ namespace Gablarski.Messages
 			this.Result.Serialize (writer);
 
 			if (this.Result.Succeeded)
-				this.PlayerInfo.Serialize (writer);
+				this.UserInfo.Serialize (writer);
 		}
 	}
 }

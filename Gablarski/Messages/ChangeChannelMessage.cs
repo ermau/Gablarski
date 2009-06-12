@@ -13,16 +13,16 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public ChangeChannelMessage (long targetPlayerId, long targetChannelId)
+		public ChangeChannelMessage (long targetUserId, long targetChannelId)
 			: this()
 		{
-			this.MoveInfo = new ChannelChangeInfo (targetPlayerId, targetChannelId);
+			this.MoveInfo = new ChannelChangeInfo (targetUserId, targetChannelId);
 		}
 
-		public ChangeChannelMessage (long targetPlayerId, long targetChannelId, long requestingPlayerId)
+		public ChangeChannelMessage (long targetUserId, long targetChannelId, long requestingPlayerId)
 			: this ()
 		{
-			this.MoveInfo = new ChannelChangeInfo (targetPlayerId, targetChannelId, requestingPlayerId);
+			this.MoveInfo = new ChannelChangeInfo (targetUserId, targetChannelId, requestingPlayerId);
 		}
 
 		public ChannelChangeInfo MoveInfo

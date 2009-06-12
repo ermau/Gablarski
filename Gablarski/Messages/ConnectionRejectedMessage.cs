@@ -7,6 +7,7 @@ namespace Gablarski.Messages
 {
 	public enum ConnectionRejectedReason
 	{
+		Unknown = 0,
 		IncompatibleVersion = 1
 	}
 

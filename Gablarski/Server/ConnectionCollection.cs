@@ -13,65 +13,65 @@ namespace Gablarski.Server
 			get { return this.connections.Count; }
 		}
 
-		public PlayerInfo this[IConnection key]
+		public UserInfo this[IConnection key]
 		{
 			get
 			{
 				lock (lck)
 				{
-					if (this.players.ContainsKey (key))
-						return this.players[key];
+					if (this.users.ContainsKey (key))
+						return this.users[key];
 				}
 
 				return null;
 			}
 		}
 
-		public IConnection this[PlayerInfo key]
+		public IConnection this[UserInfo key]
 		{
 			get
 			{
 				lock (lck)
 				{
-					return (from kvp in this.players where kvp.Value == key select kvp.Key).FirstOrDefault();
+					return (from kvp in this.users where kvp.Value == key select kvp.Key).FirstOrDefault();
 				}
 			}
 		}
 
-		public KeyValuePair<IConnection, PlayerInfo> this[int index]
+		public KeyValuePair<IConnection, UserInfo> this[int index]
 		{
 			get
 			{
 				lock (lck)
 				{
 					IConnection c = this.connections[index];
-					PlayerInfo p;
-					this.players.TryGetValue (c, out p);
+					UserInfo p;
+					this.users.TryGetValue (c, out p);
 
-					return new KeyValuePair<IConnection, PlayerInfo> (c, p);
+					return new KeyValuePair<IConnection, UserInfo> (c, p);
 				}
 			}
 		}
 
-		public IEnumerable<PlayerInfo> Players
+		public IEnumerable<UserInfo> Users
 		{
 			get
 			{
 				lock (lck)
 				{
-					PlayerInfo[] copiedPlayers = new PlayerInfo[this.players.Count];
-					this.players.Values.CopyTo (copiedPlayers, 0);
+					UserInfo[] copiedPlayers = new UserInfo[this.users.Count];
+					this.users.Values.CopyTo (copiedPlayers, 0);
 
 					return copiedPlayers;
 				}
 			}
 		}
 
-		public bool PlayerLoggedIn (string nickname)
+		public bool UserLoggedIn (string nickname)
 		{
 			lock (lck)
 			{
-				return this.players.Values.Any (p => p.Nickname == nickname);
+				return this.users.Values.Any (p => p.Nickname == nickname);
 			}
 		}
 
@@ -84,14 +84,14 @@ namespace Gablarski.Server
 		}
 
 
-		public void Add (IConnection connection, PlayerInfo player)
+		public void Add (IConnection connection, UserInfo user)
 		{
 			lock (lck)
 			{
 				if (!this.connections.Contains (connection))
 					this.connections.Add (connection);
 
-				this.players[connection] = player;
+				this.users[connection] = user;
 			}
 		}
 
@@ -99,24 +99,24 @@ namespace Gablarski.Server
 		{
 			lock (lck)
 			{
-				this.players.Remove (connection);
+				this.users.Remove (connection);
 				return this.connections.Remove (connection);
 			}
 		}
 
-		public bool Remove (IConnection connection, out long playerId)
+		public bool Remove (IConnection connection, out long userId)
 		{
-			playerId = 0;
+			userId = 0;
 
 			lock (lck)
 			{
 				this.connections.Remove (connection);
-				if (!this.players.ContainsKey (connection))
+				if (!this.users.ContainsKey (connection))
 					return false;
 
-				var info = this.players[connection];
-				playerId = info.PlayerId;
-				this.players.Remove (connection);
+				var info = this.users[connection];
+				userId = info.UserId;
+				this.users.Remove (connection);
 
 				return true;
 			}
@@ -140,11 +140,11 @@ namespace Gablarski.Server
 			}
 		}
 
-		public void Send (MessageBase message, Func<PlayerInfo, bool> selector)
+		public void Send (MessageBase message, Func<UserInfo, bool> selector)
 		{
 			lock (lck)
 			{
-				foreach (var kvp in this.players)
+				foreach (var kvp in this.users)
 				{
 					if (!selector (kvp.Value))
 						continue;
@@ -154,11 +154,11 @@ namespace Gablarski.Server
 			}
 		}
 
-		public void Send (MessageBase message, Func<IConnection, PlayerInfo, bool> selector)
+		public void Send (MessageBase message, Func<IConnection, UserInfo, bool> selector)
 		{
 			lock (lck)
 			{
-				foreach (var kvp in this.players)
+				foreach (var kvp in this.users)
 				{
 					if (!selector (kvp.Key, kvp.Value))
 						continue;
@@ -170,6 +170,6 @@ namespace Gablarski.Server
 
 		private object lck = new object();
 		private readonly List<IConnection> connections = new List<IConnection>();
-		private readonly Dictionary<IConnection, PlayerInfo> players = new Dictionary<IConnection, PlayerInfo>();
+		private readonly Dictionary<IConnection, UserInfo> users = new Dictionary<IConnection, UserInfo>();
 	}
 }

@@ -55,7 +55,7 @@ namespace Gablarski.Client
 		private Dictionary<int, IMediaSource> allSources = new Dictionary<int, IMediaSource> ();
 
 		private object playerLock = new object();
-		private Dictionary<long, PlayerInfo> players = new Dictionary<long, PlayerInfo>();
+		private Dictionary<long, UserInfo> players = new Dictionary<long, UserInfo>();
 
 		private object channelLock = new object();
 		private Dictionary<long, Channel> channels = new Dictionary<long, Channel> ();
@@ -129,9 +129,9 @@ namespace Gablarski.Client
 
 		private void OnPlayerDisconnectedMessage (MessageReceivedEventArgs e)
 		{
-			var msg = (PlayerDisconnectedMessage) e.Message;
+			var msg = (UserDisconnectedMessage) e.Message;
 
-			PlayerInfo info;
+			UserInfo info;
 			lock (playerLock)
 			{
 				info = this.players[msg.PlayerId];
@@ -160,10 +160,10 @@ namespace Gablarski.Client
 			{
 				lock (playerLock)
 				{
-					if (!this.players.ContainsKey (msg.MoveInfo.TargetPlayerId))
+					if (!this.players.ContainsKey (msg.MoveInfo.TargetUserId))
 						return;
 
-					this.players[msg.MoveInfo.TargetPlayerId].CurrentChannelId = msg.MoveInfo.TargetChannelId;
+					this.players[msg.MoveInfo.TargetUserId].CurrentChannelId = msg.MoveInfo.TargetChannelId;
 				}
 
 				OnPlayerChangedChannnel (new ChannelChangedEventArgs (msg.MoveInfo));
@@ -171,35 +171,35 @@ namespace Gablarski.Client
 		}	
 		#endregion
 
-		#region Players
+		#region Users
 		private void OnPlayerListReceivedMessage (MessageReceivedEventArgs e)
 		{
-			var msg = (PlayerListMessage)e.Message;
+			var msg = (UserListMessage)e.Message;
 
 			lock (playerLock)
 			{
-				this.players = msg.Players.ToDictionary (p => p.PlayerId);
+				this.players = msg.Users.ToDictionary (p => p.UserId);
 			}
 
-			OnReceivedPlayerList (new ReceivedListEventArgs<PlayerInfo> (msg.Players));
+			OnReceivedPlayerList (new ReceivedListEventArgs<UserInfo> (msg.Users));
 		}
 
 		private void OnLoginResultMessage (MessageReceivedEventArgs e)
 		{
 			var msg = (LoginResultMessage)e.Message;
 
-			var args = new ReceivedLoginEventArgs (msg.Result, msg.PlayerInfo);
+			var args = new ReceivedLoginEventArgs (msg.Result, msg.UserInfo);
 
-			if (!msg.Result.Succeeded || (msg.Result.Succeeded && msg.PlayerInfo.Nickname == this.nickname))
+			if (!msg.Result.Succeeded || (msg.Result.Succeeded && msg.UserInfo.Nickname == this.nickname))
 			{
-				this.playerId = msg.PlayerInfo.PlayerId;
+				this.playerId = msg.UserInfo.UserId;
 				OnLoginResult (args);
 			}
 			else
 			{
 				lock (playerLock)
 				{
-					this.players.Add (msg.Result.PlayerId, msg.PlayerInfo);
+					this.players.Add (msg.Result.UserId, msg.UserInfo);
 				}
 
 				OnPlayerLoggedIn (args);
@@ -212,7 +212,7 @@ namespace Gablarski.Client
 		{
 			var msg = (SourceListMessage)e.Message;
 			foreach (var sourceInfo in msg.Sources)
-				this.AddSource (MediaSources.Create (Type.GetType (sourceInfo.SourceTypeName), sourceInfo.SourceId), sourceInfo.PlayerId == this.Self.PlayerId);
+				this.AddSource (MediaSources.Create (Type.GetType (sourceInfo.SourceTypeName), sourceInfo.SourceId), sourceInfo.PlayerId == this.Self.UserId);
 
 			OnReceivedSourceList (new ReceivedListEventArgs<MediaSourceInfo> (msg.Sources));
 		}

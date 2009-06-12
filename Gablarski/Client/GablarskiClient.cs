@@ -48,7 +48,7 @@ namespace Gablarski.Client
 		/// <summary>
 		/// An new or updated player list has been received.
 		/// </summary>
-		public event EventHandler<ReceivedListEventArgs<PlayerInfo>> ReceivedPlayerList;
+		public event EventHandler<ReceivedListEventArgs<UserInfo>> ReceivedPlayerList;
 
 		/// <summary>
 		/// A new player has logged in.
@@ -103,9 +103,9 @@ namespace Gablarski.Client
 		}
 
 		/// <summary>
-		/// Gets the current player's own <c>PlayerInfo</c>.
+		/// Gets the current player's own <c>UserInfo</c>.
 		/// </summary>
-		public PlayerInfo Self
+		public UserInfo Self
 		{
 			get
 			{
@@ -116,13 +116,13 @@ namespace Gablarski.Client
 			}
 		}
 
-		public IEnumerable<PlayerInfo> Players
+		public IEnumerable<UserInfo> Players
 		{
 			get
 			{
 				lock (playerLock)
 				{
-					PlayerInfo[] playerCopy = new PlayerInfo[this.players.Count];
+					UserInfo[] playerCopy = new UserInfo[this.players.Count];
 					this.players.Values.CopyTo (playerCopy, 0);
 
 					return playerCopy;
@@ -221,14 +221,14 @@ namespace Gablarski.Client
 			this.Connection.Send (new SendAudioDataMessage (channel.ChannelId, source.ID, encoded));
 		}
 
-		public void MovePlayerToChannel (PlayerInfo targetPlayer, Channel targetChannel)
+		public void MovePlayerToChannel (UserInfo targetPlayer, Channel targetChannel)
 		{
 			if (targetPlayer == null)
 				throw new ArgumentNullException ("targetPlayer");
 			if (targetChannel == null)
 				throw new ArgumentNullException ("targetChannel");
 
-			this.Connection.Send (new ChangeChannelMessage (targetPlayer.PlayerId, targetChannel.ChannelId));
+			this.Connection.Send (new ChangeChannelMessage (targetPlayer.UserId, targetChannel.ChannelId));
 		}
 		#endregion
 
@@ -261,7 +261,7 @@ namespace Gablarski.Client
 				disconnected (this, e);
 		}
 
-		protected virtual void OnReceivedPlayerList (ReceivedListEventArgs<PlayerInfo> e)
+		protected virtual void OnReceivedPlayerList (ReceivedListEventArgs<UserInfo> e)
 		{
 			var received = this.ReceivedPlayerList;
 			if (received != null)
@@ -382,7 +382,7 @@ namespace Gablarski.Client
 	public class PlayerDisconnectedEventArgs
 		: EventArgs
 	{
-		public PlayerDisconnectedEventArgs (PlayerInfo player)
+		public PlayerDisconnectedEventArgs (UserInfo player)
 		{
 			this.Player = player;
 		}
@@ -390,7 +390,7 @@ namespace Gablarski.Client
 		/// <summary>
 		/// Gets the player that disconnected.
 		/// </summary>
-		public PlayerInfo Player
+		public UserInfo Player
 		{
 			get;
 			private set;
@@ -443,7 +443,7 @@ namespace Gablarski.Client
 	public class ReceivedLoginEventArgs
 		: EventArgs
 	{
-		public ReceivedLoginEventArgs (LoginResult result, PlayerInfo info)
+		public ReceivedLoginEventArgs (LoginResult result, UserInfo info)
 		{
 			this.Result = result;
 			this.PlayerInfo = info;
@@ -452,7 +452,7 @@ namespace Gablarski.Client
 		/// <summary>
 		/// Gets the information of the newly logged in player.
 		/// </summary>
-		public PlayerInfo PlayerInfo
+		public UserInfo PlayerInfo
 		{
 			get;
 			private set;

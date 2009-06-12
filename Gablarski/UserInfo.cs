@@ -5,23 +5,23 @@ using System.Text;
 
 namespace Gablarski
 {
-	public class PlayerInfo
+	public class UserInfo
 	{
-		internal PlayerInfo()
+		internal UserInfo()
 		{
 		}
 
-		internal PlayerInfo (string nickname, long playerId, long currentChannelId)
+		internal UserInfo (string nickname, long userId, long currentChannelId)
 		{
 			if (nickname.IsEmpty())
 				throw new ArgumentNullException ("nickname");
 
 			this.Nickname = nickname;
-			this.PlayerId = playerId;
+			this.UserId = userId;
 			this.CurrentChannelId = currentChannelId;
 		}
 
-		internal PlayerInfo (IValueReader reader)
+		internal UserInfo (IValueReader reader)
 		{
 			this.Deserialize (reader);
 		}
@@ -32,7 +32,7 @@ namespace Gablarski
 			private set;
 		}
 
-		public long PlayerId
+		public long UserId
 		{
 			get;
 			private set;
@@ -46,14 +46,14 @@ namespace Gablarski
 
 		internal void Serialize (IValueWriter writer)
 		{
-			writer.WriteInt64 (this.PlayerId);
+			writer.WriteInt64 (this.UserId);
 			writer.WriteInt64 (this.CurrentChannelId);
 			writer.WriteString (this.Nickname);
 		}
 
 		internal void Deserialize (IValueReader reader)
 		{
-			this.PlayerId = reader.ReadInt64();
+			this.UserId = reader.ReadInt64();
 			this.CurrentChannelId = reader.ReadInt64 ();
 			this.Nickname = reader.ReadString();			
 		}

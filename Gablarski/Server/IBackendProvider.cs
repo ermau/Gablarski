@@ -15,8 +15,8 @@ namespace Gablarski.Server
 		/// Gets user permissions for a specific channel.
 		/// </summary>
 		/// <param name="channelId">The channel to check the user's permissions on.</param>
-		/// <param name="playerId">The player to check the permissions on.</param>
+		/// <param name="userId">The player to check the permissions on.</param>
 		/// <returns>The permissions for the player in the specific channel.</returns>
-		IEnumerable<Permission> GetPermissions (long channelId, long playerId);
+		IEnumerable<Permission> GetPermissions (long channelId, long userId);
 	}
 }

@@ -59,14 +59,14 @@ namespace Gablarski
 
 		public LoginResult (long userId, LoginResultState state)
 		{
-			this.PlayerId = userId;
+			this.UserId = userId;
 			this.ResultState = state;
 		}
 
 		/// <summary>
 		/// Gets the logged-in players ID.
 		/// </summary>
-		public long PlayerId
+		public long UserId
 		{
 			get;
 			private set;
@@ -91,13 +91,13 @@ namespace Gablarski
 
 		internal void Serialize (IValueWriter writer)
 		{
-			writer.WriteInt64 (this.PlayerId);
+			writer.WriteInt64 (this.UserId);
 			writer.WriteByte ((byte)this.ResultState);
 		}
 
 		internal void Deserialize (IValueReader reader)
 		{
-			this.PlayerId = reader.ReadInt64 ();
+			this.UserId = reader.ReadInt64 ();
 			this.ResultState = (LoginResultState)reader.ReadByte ();
 		}
 	}

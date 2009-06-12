@@ -5,16 +5,16 @@ using System.Text;
 
 namespace Gablarski.Messages
 {
-	public class PlayerDisconnectedMessage
+	public class UserDisconnectedMessage
 		: ServerMessage
 	{
-		public PlayerDisconnectedMessage()
+		public UserDisconnectedMessage()
 			: base (ServerMessageType.PlayerDisconnected)
 		{
 			
 		}
 
-		public PlayerDisconnectedMessage (long playerId)
+		public UserDisconnectedMessage (long playerId)
 			: this()
 		{
 			this.PlayerId = playerId;

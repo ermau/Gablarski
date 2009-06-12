@@ -5,21 +5,21 @@ using System.Text;
 
 namespace Gablarski.Messages
 {
-	public class PlayerLoggedIn
+	public class UserLoggedIn
 		: ServerMessage
 	{
-		public PlayerLoggedIn()
+		public UserLoggedIn()
 			: base (ServerMessageType.PlayerLoggedIn)
 		{
 		}
 
-		public PlayerLoggedIn (PlayerInfo playerInfo)
+		public UserLoggedIn (UserInfo playerInfo)
 			: base (ServerMessageType.PlayerLoggedIn)
 		{
-			this.PlayerInfo = playerInfo;
+			this.UserInfo = playerInfo;
 		}
 
-		public PlayerInfo PlayerInfo
+		public UserInfo UserInfo
 		{
 			get;
 			set;
@@ -27,12 +27,12 @@ namespace Gablarski.Messages
 
 		public override void WritePayload (IValueWriter writer)
 		{
-			this.PlayerInfo.Serialize (writer);
+			this.UserInfo.Serialize (writer);
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
-			this.PlayerInfo = new PlayerInfo (reader);
+			this.UserInfo = new UserInfo (reader);
 		}
 	}
 }

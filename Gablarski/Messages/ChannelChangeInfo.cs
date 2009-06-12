@@ -11,16 +11,16 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public ChannelChangeInfo (long targetPlayerId, long targetChannelId)
+		public ChannelChangeInfo (long targetUserId, long targetChannelId)
 		{
-			this.TargetPlayerId = targetPlayerId;
+			this.TargetUserId = targetUserId;
 			this.TargetChannelId = targetChannelId;
 		}
 
-		public ChannelChangeInfo (long targetPlayerId, long targetChannelId, long requestingPlayerId)
-			: this (targetPlayerId, targetChannelId)
+		public ChannelChangeInfo (long targetUserId, long targetChannelId, long requestingUserId)
+			: this (targetUserId, targetChannelId)
 		{
-			this.RequestingPlayerId = requestingPlayerId;
+			this.RequestingUserId = requestingUserId;
 		}
 
 		public ChannelChangeInfo (IValueReader reader)
@@ -31,7 +31,7 @@ namespace Gablarski.Messages
 		/// <summary>
 		/// Gets the ID of the player who moved the target player.
 		/// </summary>
-		public long RequestingPlayerId
+		public long RequestingUserId
 		{
 			get;
 			set;
@@ -40,7 +40,7 @@ namespace Gablarski.Messages
 		/// <summary>
 		/// Gets the ID of the player being moved.
 		/// </summary>
-		public long TargetPlayerId
+		public long TargetUserId
 		{
 			get;
 			private set;
@@ -57,15 +57,15 @@ namespace Gablarski.Messages
 
 		internal void Serialize (IValueWriter writer)
 		{
-			writer.WriteInt64 (this.RequestingPlayerId);
-			writer.WriteInt64 (this.TargetPlayerId);
+			writer.WriteInt64 (this.RequestingUserId);
+			writer.WriteInt64 (this.TargetUserId);
 			writer.WriteInt64 (this.TargetChannelId);
 		}
 
 		internal void Deserialize (IValueReader reader)
 		{
-			this.RequestingPlayerId = reader.ReadInt64 ();
-			this.TargetPlayerId = reader.ReadInt64 ();
+			this.RequestingUserId = reader.ReadInt64 ();
+			this.TargetUserId = reader.ReadInt64 ();
 			this.TargetChannelId = reader.ReadInt64 ();
 		}
 	}
