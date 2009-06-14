@@ -11,7 +11,7 @@ namespace Gablarski
 		{
 		}
 
-		internal UserInfo (string nickname, object userId, object	currentChannelId)
+		internal UserInfo (string nickname, object userId, object currentChannelId)
 		{
 			if (nickname.IsEmpty())
 				throw new ArgumentNullException ("nickname");

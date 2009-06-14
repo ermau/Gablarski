@@ -95,7 +95,7 @@
     <Compile Include="Messages\ChannelEditMessage.cs" />
     <Compile Include="Messages\ChannelEditResultMessage.cs" />
     <Compile Include="Messages\ChannelListMessage.cs" />
-    <Compile Include="Messages\ChannelChangedMessage.cs" />
+    <Compile Include="Messages\ChannelChangeResultMessage.cs" />
     <Compile Include="Messages\ChannelChangeInfo.cs" />
     <Compile Include="Messages\ConnectionRejectedMessage.cs" />
     <Compile Include="Messages\ConnectMessage.cs" />
@@ -155,9 +155,16 @@
     <Compile Include="Server\Telnet\TelnetConnectionProvider.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GablarskiContext.cs" />
+    <Compile Include="Client\ClientUser.cs" />
+    <Compile Include="Client\ClientUserManager.cs" />
+    <Compile Include="Client\ClientSourceManager.cs" />
+    <Compile Include="Client\CurrentUser.cs" />
+    <Compile Include="Client\GablarskiContext.cs" />
     <Compile Include="IdentifyingTypes.cs" />
-    <Compile Include="Messages\UserLoggedIn.cs" />
+    <Compile Include="IClientContext.cs" />
+    <Compile Include="Messages\SourcesRemovedMessage.cs" />
+    <Compile Include="Messages\UserChangedChannelMessage.cs" />
+    <Compile Include="Messages\UserLoggedInMessage.cs" />
     <Compile Include="Server\LobbyChannelProvider.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -11,25 +11,27 @@ namespace Gablarski.Client
 {
 	public partial class GablarskiClient
 	{
-		protected GablarskiClient (ClientChannelManager channelManager)
+		protected GablarskiClient (ClientChannelManager channelManager, ClientUserManager userManager, ClientSourceManager sourceManager)
 		{
 			this.Channels = channelManager;
+			this.Users = userManager;
 
 			this.Handlers = new Dictionary<ServerMessageType, Action<MessageReceivedEventArgs>>
 			{
 				{ ServerMessageType.ServerInfoReceived, OnServerInfoReceivedMessage },
-				{ ServerMessageType.PlayerListReceived, OnPlayerListReceivedMessage },
-				{ ServerMessageType.SourceListReceived, OnSourceListReceivedMessage },
+				{ ServerMessageType.UserListReceived, this.Users.OnUserListReceivedMessage },
+				//{ ServerMessageType.SourceListReceived, OnSourceListReceivedMessage },
 				
 				{ ServerMessageType.ChannelListReceived, this.Channels.OnChannelListReceivedMessage },
-				{ ServerMessageType.ChangeChannelResult, OnChangeChannelResultMessage },
+				//{ ServerMessageType.ChangeChannelResult, OnChangeChannelResultMessage },
 				{ ServerMessageType.ChannelEditResult, this.Channels.OnChannelEditResultMessage },
 
 				{ ServerMessageType.ConnectionRejected, OnConnectionRejectedMessage },
-				{ ServerMessageType.LoginResult, OnLoginResultMessage },
-				{ ServerMessageType.PlayerDisconnected, OnPlayerDisconnectedMessage },
+				//{ ServerMessageType.LoginResult, OnLoginResultMessage },
+				{ ServerMessageType.UserLoggedIn, this.Users.OnUserLoggedInMessage },
+				{ ServerMessageType.UserDisconnected, this.Users.OnUserDisconnectedMessage },
 				
-				{ ServerMessageType.SourceResult, OnSourceResultMessage },
+				//{ ServerMessageType.SourceResult, OnSourceResultMessage },
 				{ ServerMessageType.AudioDataReceived, OnAudioDataReceivedMessage },
 			};
 
@@ -53,9 +55,6 @@ namespace Gablarski.Client
 		private object sourceLock = new object ();
 		private Dictionary<MediaType, MediaSourceBase> clientSources = new Dictionary<MediaType, MediaSourceBase> ();
 		private Dictionary<int, MediaSourceBase> allSources = new Dictionary<int, MediaSourceBase> ();
-
-		private object playerLock = new object();
-		private Dictionary<object, UserInfo> players = new Dictionary<object, UserInfo>();
 
 		private object channelLock = new object();
 		private Dictionary<object, Channel> channels = new Dictionary<object, Channel> ();
@@ -127,22 +126,6 @@ namespace Gablarski.Client
 			OnConnectionRejected (new RejectedConnectionEventArgs (msg.Reason));
 		}
 
-		private void OnPlayerDisconnectedMessage (MessageReceivedEventArgs e)
-		{
-			var msg = (UserDisconnectedMessage) e.Message;
-
-			UserInfo info;
-			lock (playerLock)
-			{
-				info = this.players[msg.PlayerId];
-				this.players.Remove (msg.PlayerId);
-			}
-
-			// TODO: remove sources
-
-			OnPlayerDisconnected (new PlayerDisconnectedEventArgs (info));
-		}
-
 		private void OnServerInfoReceivedMessage (MessageReceivedEventArgs e)
 		{
 			this.serverInfo = ((ServerInfoMessage)e.Message).ServerInfo;
@@ -151,89 +134,35 @@ namespace Gablarski.Client
 			Trace.WriteLine ("Server description: " + this.serverInfo.ServerDescription);
 		}
 
-		#region Channels
-		private void OnChangeChannelResultMessage (MessageReceivedEventArgs e)
-		{
-			var msg = (ChannelChangeResultMessage)e.Message;
-
-			if (msg.Result != ChannelChangeResult.Success)
-				return;
-
-			lock (this.playerLock)
-			{
-				if (!this.players.ContainsKey (msg.MoveInfo.TargetUserId))
-					return;
-
-				this.players[msg.MoveInfo.TargetUserId].CurrentChannelId = msg.MoveInfo.TargetChannelId;
-			}
-
-			this.OnPlayerChangedChannnel (new ChannelChangedEventArgs (msg.MoveInfo));
-		}	
-		#endregion
-
-		#region Users
-		private void OnPlayerListReceivedMessage (MessageReceivedEventArgs e)
-		{
-			var msg = (UserListMessage)e.Message;
-
-			lock (playerLock)
-			{
-				this.players = msg.Users.ToDictionary (p => p.UserId);
-			}
-
-			OnReceivedPlayerList (new ReceivedListEventArgs<UserInfo> (msg.Users));
-		}
-
-		private void OnLoginResultMessage (MessageReceivedEventArgs e)
-		{
-			var msg = (LoginResultMessage)e.Message;
-
-			var args = new ReceivedLoginEventArgs (msg.Result, msg.UserInfo);
-
-			if (!msg.Result.Succeeded || (msg.Result.Succeeded && msg.UserInfo.Nickname == this.nickname))
-			{
-				this.playerId = msg.UserInfo.UserId;
-				OnLoginResult (args);
-			}
-			else
-			{
-				lock (playerLock)
-				{
-					this.players.Add (msg.Result.UserId, msg.UserInfo);
-				}
-
-				OnPlayerLoggedIn (args);
-			}
-		}
-		#endregion
+		
 
 		#region Sources
-		private void OnSourceListReceivedMessage (MessageReceivedEventArgs e)
-		{
-			var msg = (SourceListMessage)e.Message;
-			foreach (var sourceInfo in msg.Sources)
-				this.AddSource (MediaSources.Create (Type.GetType (sourceInfo.SourceTypeName), sourceInfo.SourceId, sourceInfo.UserId), sourceInfo.UserId == this.Self.UserId);
+		//private void OnSourceListReceivedMessage (MessageReceivedEventArgs e)
+		//{
+		//    var msg = (SourceListMessage)e.Message;
+		//    foreach (var sourceInfo in msg.Sources)
+		//        this.AddSource (MediaSources.Create (Type.GetType (sourceInfo.SourceTypeName), sourceInfo.SourceId, sourceInfo.UserId), sourceInfo.UserId == this.Self.UserId);
 
-			OnReceivedSourceList (new ReceivedListEventArgs<MediaSourceInfo> (msg.Sources));
-		}
+		//    OnReceivedSourceList (new ReceivedListEventArgs<MediaSourceInfo> (msg.Sources));
+		//}
 
-		private void OnSourceResultMessage (MessageReceivedEventArgs e)
-		{
-			MediaSourceBase source = null;
+		//private void OnSourceResultMessage (MessageReceivedEventArgs e)
+		//{
+		//    MediaSourceBase source = null;
 
-			var sourceMessage = (SourceResultMessage)e.Message;
-			if (sourceMessage.MediaSourceType == null)
-			{
-				Trace.WriteLine ("[Client] Source type " + sourceMessage.SourceInfo.SourceTypeName + " not found.");
-			}
-			else if (sourceMessage.SourceResult == SourceResult.Succeeded || sourceMessage.SourceResult == SourceResult.NewSource)
-			{
-				source = sourceMessage.GetSource (this.Self.UserId);
-				this.AddSource (source, (sourceMessage.SourceResult == SourceResult.Succeeded));
-			}
+		//    var sourceMessage = (SourceResultMessage)e.Message;
+		//    if (sourceMessage.MediaSourceType == null)
+		//    {
+		//        Trace.WriteLine ("[Client] Source type " + sourceMessage.SourceInfo.SourceTypeName + " not found.");
+		//    }
+		//    else if (sourceMessage.SourceResult == SourceResult.Succeeded || sourceMessage.SourceResult == SourceResult.NewSource)
+		//    {
+		//        source = sourceMessage.GetSource (this.Self.UserId);
+		//        this.AddSource (source, (sourceMessage.SourceResult == SourceResult.Succeeded));
+		//    }
 
-			OnReceivedSource (new ReceivedSourceEventArgs (source, sourceMessage.SourceInfo, sourceMessage.SourceResult));
-		}
+		//    OnReceivedSource (new ReceivedSourceEventArgs (source, sourceMessage.SourceInfo, sourceMessage.SourceResult));
+		//}
 
 		private void OnAudioDataReceivedMessage (MessageReceivedEventArgs e)
 		{

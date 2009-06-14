@@ -8,16 +8,17 @@ using Gablarski.Messages;
 namespace Gablarski.Client
 {
 	public partial class GablarskiClient
+		: IClientContext
 	{
 		public static readonly Version ApiVersion = Assembly.GetAssembly (typeof (GablarskiClient)).GetName ().Version;
 
 		public GablarskiClient (IClientConnection connection)
-			: this (connection, new ClientChannelManager (connection))
+			: this (connection, new ClientChannelManager (connection), new ClientUserManager (connection), new ClientSourceManager (connection))
 		{
 		}
 
-		public GablarskiClient (IClientConnection connection, ClientChannelManager channelManager)
-			: this (channelManager)
+		public GablarskiClient (IClientConnection connection, ClientChannelManager channelManager, ClientUserManager userManager, ClientSourceManager sourceManager)
+			: this (channelManager, userManager, sourceManager)
 		{
 			this.Connection = connection;
 			this.Connection.Connected += this.OnConnected;
@@ -43,27 +44,7 @@ namespace Gablarski.Client
 		/// <summary>
 		/// A login result has been received.
 		/// </summary>
-		public event EventHandler<ReceivedLoginEventArgs> ReceivedLoginResult;
-
-		/// <summary>
-		/// An new or updated player list has been received.
-		/// </summary>
-		public event EventHandler<ReceivedListEventArgs<UserInfo>> ReceivedPlayerList;
-
-		/// <summary>
-		/// A new player has logged in.
-		/// </summary>
-		public event EventHandler<ReceivedLoginEventArgs> PlayerLoggedIn;
-
-		/// <summary>
-		/// A player has disconnected.
-		/// </summary>
-		public event EventHandler<PlayerDisconnectedEventArgs> PlayerDisconnected;
-
-		/// <summary>
-		/// A player has changed channels.
-		/// </summary>
-		public event EventHandler<ChannelChangedEventArgs> PlayerChangedChannel;
+		public event EventHandler<ReceivedLoginResultEventArgs> ReceivedLoginResult;
 		
 		/// <summary>
 		/// A new  or updated source list has been received.
@@ -102,32 +83,16 @@ namespace Gablarski.Client
 			}
 		}
 
-		/// <summary>
-		/// Gets the current player's own <c>UserInfo</c>.
-		/// </summary>
-		public UserInfo Self
+		public ClientUserManager Users
 		{
-			get
-			{
-				lock (this.players)
-				{
-					return this.players[this.playerId];
-				}
-			}
+			get; 
+			private set;
 		}
 
-		public IEnumerable<UserInfo> Players
+		public ClientSourceManager Sources
 		{
-			get
-			{
-				lock (playerLock)
-				{
-					UserInfo[] playerCopy = new UserInfo[this.players.Count];
-					this.players.Values.CopyTo (playerCopy, 0);
-
-					return playerCopy;
-				}
-			}
+			get;
+			private set;
 		}
 		#endregion
 
@@ -254,44 +219,14 @@ namespace Gablarski.Client
 				rejected (this, e);
 		}
 
-		protected virtual void OnPlayerDisconnected (PlayerDisconnectedEventArgs e)
-		{
-			var disconnected = this.PlayerDisconnected;
-			if (disconnected != null)
-				disconnected (this, e);
-		}
-
-		protected virtual void OnReceivedPlayerList (ReceivedListEventArgs<UserInfo> e)
-		{
-			var received = this.ReceivedPlayerList;
-			if (received != null)
-				received (this, e);
-		}
-
 		protected virtual void OnReceivedSourceList (ReceivedListEventArgs<MediaSourceInfo> e)
 		{
 			var received = this.ReceivedSourceList;
 			if (received != null)
 				received (this, e);
 		}
-
-		
-
-		protected virtual void OnPlayerLoggedIn (ReceivedLoginEventArgs e)
-		{
-			var result = this.PlayerLoggedIn;
-			if (result != null)
-				result (this, e);
-		}
-
-		protected virtual void OnPlayerChangedChannnel (ChannelChangedEventArgs e)
-		{
-			var result = this.PlayerChangedChannel;
-			if (result != null)
-				result (this, e);
-		}
-
-		protected virtual void OnLoginResult (ReceivedLoginEventArgs e)
+	
+		protected virtual void OnLoginResult (ReceivedLoginResultEventArgs e)
 		{
 			var result = this.ReceivedLoginResult;
 			if (result != null)
@@ -312,55 +247,33 @@ namespace Gablarski.Client
 				received (this, e);
 		}
 		#endregion
+
+		#region IClientContext Members
+
+		IClientConnection IClientContext.Connection
+		{
+			get { return this.Connection; }
+		}
+
+		IEnumerable<Channel> IClientContext.Channels
+		{
+			get { return this.Channels; }
+		}
+
+		IEnumerable<MediaSourceBase> IClientContext.Sources
+		{
+			get { return this.Sources; }
+		}
+
+		IEnumerable<ClientUser> IClientContext.Users
+		{
+			get { throw new NotImplementedException (); }
+		}
+
+		#endregion
 	}
 
 	#region Event Args
-	public class ChannelEditResultEventArgs
-		: EventArgs
-	{
-		public ChannelEditResultEventArgs (Channel channel, ChannelEditResult result)
-		{
-			this.Channel = channel;
-			this.Result = result;
-		}
-
-		/// <summary>
-		/// Gets the channel the edit request was for.
-		/// </summary>
-		public Channel Channel
-		{
-			get;
-			private set;
-		}
-
-		/// <summary>
-		/// Gets the result of the channel edit request.
-		/// </summary>
-		public ChannelEditResult Result
-		{
-			get;
-			private set;
-		}
-	}
-
-	public class ChannelChangedEventArgs
-		: EventArgs
-	{
-		public ChannelChangedEventArgs (ChannelChangeInfo moveInfo)
-		{
-			this.MoveInfo = moveInfo;
-		}
-
-		/// <summary>
-		/// Gets the move information.
-		/// </summary>
-		public ChannelChangeInfo MoveInfo
-		{
-			get;
-			private set;
-		}
-	}
-
 	public class RejectedConnectionEventArgs
 		: EventArgs
 	{
@@ -373,24 +286,6 @@ namespace Gablarski.Client
 		/// Gets the reason for rejecting the connection.
 		/// </summary>
 		public ConnectionRejectedReason Reason
-		{
-			get;
-			private set;
-		}
-	}
-
-	public class PlayerDisconnectedEventArgs
-		: EventArgs
-	{
-		public PlayerDisconnectedEventArgs (UserInfo player)
-		{
-			this.Player = player;
-		}
-
-		/// <summary>
-		/// Gets the player that disconnected.
-		/// </summary>
-		public UserInfo Player
 		{
 			get;
 			private set;
@@ -440,22 +335,12 @@ namespace Gablarski.Client
 		}
 	}
 
-	public class ReceivedLoginEventArgs
+	public class ReceivedLoginResultEventArgs
 		: EventArgs
 	{
-		public ReceivedLoginEventArgs (LoginResult result, UserInfo info)
+		public ReceivedLoginResultEventArgs (LoginResult result)
 		{
 			this.Result = result;
-			this.PlayerInfo = info;
-		}
-
-		/// <summary>
-		/// Gets the information of the newly logged in player.
-		/// </summary>
-		public UserInfo PlayerInfo
-		{
-			get;
-			private set;
 		}
 
 		public LoginResult Result

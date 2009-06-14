@@ -8,12 +8,24 @@ namespace Gablarski.Messages
 	public enum ChannelChangeResult
 		: byte
 	{
+		/// <summary>
+		/// Failed for an unknown reason.
+		/// </summary>
 		FailedUnknown = 0,
 
+		/// <summary>
+		/// Succeeded.
+		/// </summary>
 		Success = 1,
 
+		/// <summary>
+		/// Failed due to insufficient permissions.
+		/// </summary>
 		FailedPermissions = 2,
 
+		/// <summary>
+		/// Failed because the target channel wasn't found.
+		/// </summary>
 		FailedUnknownChannel = 3
 	}
 

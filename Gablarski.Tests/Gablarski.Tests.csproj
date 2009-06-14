@@ -43,6 +43,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClientChannelManagerTests.cs" />
+    <Compile Include="ClientSourceManagerTests.cs" />
+    <Compile Include="ClientUserManagerTests.cs" />
     <Compile Include="IdentifyingTypesTests.cs" />
     <Compile Include="MockClientConnection.cs" />
     <Compile Include="MockConnectionProvider.cs" />
