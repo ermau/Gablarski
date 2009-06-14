@@ -157,7 +157,7 @@ namespace Gablarski.Server
 
 		private readonly ServerSettings settings;
 
-		private List<IConnectionProvider> availableConnections = new List<IConnectionProvider> ();
+		private readonly List<IConnectionProvider> availableConnections = new List<IConnectionProvider> ();
 
 		private readonly IBackendProvider backendProvider;
 
@@ -300,7 +300,11 @@ namespace Gablarski.Server
 
 			lock (sourceLock)
 			{
-				this.sources.Remove (e.Connection);
+				if (this.sources.ContainsKey (e.Connection))
+				{
+					this.connections.Send (new SourcesRemovedMessage (this.sources[e.Connection]));
+					this.sources.Remove (e.Connection);
+				}
 			}
 		}
 		

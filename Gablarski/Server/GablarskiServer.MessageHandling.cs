@@ -22,7 +22,7 @@ namespace Gablarski.Server
 				{ ClientMessageType.AudioData, AudioDataReceived },
 
 				{ ClientMessageType.RequestChannelList, ClientRequestsChannelList },
-				{ ClientMessageType.RequestPlayerList, ClientRequestsPlayerList },
+				{ ClientMessageType.RequestUserList, this.ClientRequestsUserList },
 				{ ClientMessageType.RequestSourceList, ClientRequestsSourceList },
 
 				{ ClientMessageType.ChangeChannel, ClientRequestsChannelChange },
@@ -218,7 +218,7 @@ namespace Gablarski.Server
 			{
 				e.Connection.Send (msg);
 
-				this.connections.Send (new UserLoggedIn (info));
+				this.connections.Send (new UserLoggedInMessage (info));
 
 				lock (this.channelLock)
 				{
@@ -234,7 +234,7 @@ namespace Gablarski.Server
 			Trace.WriteLine ("[Server]" + login.Username + " Login: " + result.ResultState);
 		}
 
-		private void ClientRequestsPlayerList (MessageReceivedEventArgs e)
+		private void ClientRequestsUserList (MessageReceivedEventArgs e)
 		{
 			e.Connection.Send (new UserListMessage (this.connections.Users));
 		}
