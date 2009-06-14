@@ -5,18 +5,18 @@ using System.Text;
 
 namespace Gablarski.Messages
 {
-	public class UserLoggedIn
+	public class UserLoggedInMessage
 		: ServerMessage
 	{
-		public UserLoggedIn()
-			: base (ServerMessageType.PlayerLoggedIn)
+		public UserLoggedInMessage()
+			: base (ServerMessageType.UserLoggedIn)
 		{
 		}
 
-		public UserLoggedIn (UserInfo playerInfo)
-			: base (ServerMessageType.PlayerLoggedIn)
+		public UserLoggedInMessage (UserInfo userInfo)
+			: base (ServerMessageType.UserLoggedIn)
 		{
-			this.UserInfo = playerInfo;
+			this.UserInfo = userInfo;
 		}
 
 		public UserInfo UserInfo

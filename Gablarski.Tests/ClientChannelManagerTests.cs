@@ -29,7 +29,12 @@ namespace Gablarski.Tests
 		private MockServerConnection server;
 		private ClientChannelManager manager;
 		private MockConnectionProvider provider;
-		private Channel channel;
+
+		[Test]
+		public void NullConnection()
+		{
+			Assert.Throws<ArgumentNullException> (() => new ClientChannelManager (null));
+		}
 
 		[Test]
 		public void CreateInvalidChannel ()

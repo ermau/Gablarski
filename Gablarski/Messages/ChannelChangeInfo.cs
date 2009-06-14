@@ -13,6 +13,11 @@ namespace Gablarski.Messages
 
 		public ChannelChangeInfo (object targetUserId, object targetChannelId)
 		{
+			if (targetUserId == null)
+				throw new ArgumentNullException ("targetUserId");
+			if (targetChannelId == null)
+				throw new ArgumentNullException ("targetChannelId");
+
 			this.TargetUserId = targetUserId;
 			this.TargetChannelId = targetChannelId;
 		}
@@ -20,11 +25,19 @@ namespace Gablarski.Messages
 		public ChannelChangeInfo (object targetUserId, object targetChannelId, object requestingUserId)
 			: this (targetUserId, targetChannelId)
 		{
+			if (requestingUserId == null)
+				throw new ArgumentNullException ("requestingUserId");
+
 			this.RequestingUserId = requestingUserId;
 		}
 
 		public ChannelChangeInfo (IValueReader reader, IdentifyingTypes idTypes)
 		{
+			if (reader == null)
+				throw new ArgumentNullException("reader");
+			if (idTypes == null)
+				throw new ArgumentNullException("idTypes");
+
 			this.Deserialize (reader, idTypes);
 		}
 

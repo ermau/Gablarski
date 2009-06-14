@@ -15,9 +15,10 @@ namespace Gablarski.Messages
 		RequestSourceList = 15,
 		RequestSource = 7,
 		AudioData = 9,
+		RemoveSource = 26,
 
 		RequestServerInfo = 11,
-		RequestPlayerList = 13,
+		RequestUserList = 13,
 		
 		RequestChannelList = 18,
 		ChangeChannel = 20,
@@ -35,10 +36,12 @@ namespace Gablarski.Messages
 		SourceListReceived = 16,
 		SourceResult = 8,
 		AudioDataReceived = 10,
+		SourcesRemoved = 25,
 	
-		PlayerLoggedIn = 24,
-		PlayerListReceived = 14,
-		PlayerDisconnected = 17,
+		UserLoggedIn = 24,
+		UserListReceived = 14,
+		UserDisconnected = 17,
+		UserChangedChannel = 27,
 
 		ChannelListReceived = 19,
 		ChangeChannelResult = 21,

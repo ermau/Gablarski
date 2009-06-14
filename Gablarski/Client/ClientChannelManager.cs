@@ -11,6 +11,9 @@ namespace Gablarski.Client
 	{
 		internal ClientChannelManager (IClientConnection connection)
 		{
+			if (connection == null)
+				throw new ArgumentNullException ("connection");
+
 			this.connection = connection;
 		}
 
@@ -71,6 +74,7 @@ namespace Gablarski.Client
 			this.connection.Send (new ChannelEditMessage (channel) { Delete = true });
 		}
 
+		#region IEnumerable<Channel> members
 		public IEnumerator<Channel> GetEnumerator ()
 		{
 			if (this.channels == null || this.channels.Count == 0)
@@ -86,6 +90,7 @@ namespace Gablarski.Client
 		{
 			return this.GetEnumerator ();
 		}
+		#endregion
 
 		private readonly IClientConnection connection;
 
@@ -149,4 +154,34 @@ namespace Gablarski.Client
 				received (this, e);
 		}
 	}
+
+	#region Event Args
+	public class ChannelEditResultEventArgs
+		: EventArgs
+	{
+		public ChannelEditResultEventArgs (Channel channel, ChannelEditResult result)
+		{
+			this.Channel = channel;
+			this.Result = result;
+		}
+
+		/// <summary>
+		/// Gets the channel the edit request was for.
+		/// </summary>
+		public Channel Channel
+		{
+			get;
+			private set;
+		}
+
+		/// <summary>
+		/// Gets the result of the channel edit request.
+		/// </summary>
+		public ChannelEditResult Result
+		{
+			get;
+			private set;
+		}
+	}
+	#endregion
 }

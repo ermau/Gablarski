@@ -52,7 +52,7 @@ namespace Gablarski.Tests
 			Assert.IsTrue (message.Result.Succeeded);
 			Assert.AreEqual (nickname, message.UserInfo.Nickname);
 
-			var login = connection.Client.DequeueAndAssertMessage<UserLoggedIn>();
+			var login = connection.Client.DequeueAndAssertMessage<UserLoggedInMessage>();
 			Assert.AreEqual (nickname, login.UserInfo.Nickname);
 			Assert.AreEqual (message.Result.UserId, login.UserInfo.UserId);
 			Assert.AreEqual (message.UserInfo.UserId, login.UserInfo.UserId);

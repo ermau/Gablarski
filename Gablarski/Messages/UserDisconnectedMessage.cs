@@ -9,18 +9,18 @@ namespace Gablarski.Messages
 		: ServerMessage
 	{
 		public UserDisconnectedMessage()
-			: base (ServerMessageType.PlayerDisconnected)
+			: base (ServerMessageType.UserDisconnected)
 		{
 			
 		}
 
-		public UserDisconnectedMessage (object playerId)
+		public UserDisconnectedMessage (object userId)
 			: this()
 		{
-			this.PlayerId = playerId;
+			this.UserId = userId;
 		}
 
-		public object PlayerId
+		public object UserId
 		{
 			get;
 			private set;
@@ -28,12 +28,12 @@ namespace Gablarski.Messages
 
 		public override void WritePayload (IValueWriter writer, IdentifyingTypes idTypes)
 		{
-			idTypes.WriteUser (writer, this.PlayerId);
+			idTypes.WriteUser (writer, this.UserId);
 		}
 
 		public override void ReadPayload (IValueReader reader, IdentifyingTypes idTypes)
 		{
-			this.PlayerId = idTypes.ReadUser (reader);
+			this.UserId = idTypes.ReadUser (reader);
 		}
 	}
 }

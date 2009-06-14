@@ -9,7 +9,7 @@ namespace Gablarski.Messages
 		: ServerMessage
 	{
 		public UserListMessage()
-			: base (ServerMessageType.PlayerListReceived)
+			: base (ServerMessageType.UserListReceived)
 		{
 		}
 
