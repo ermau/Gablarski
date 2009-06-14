@@ -9,12 +9,12 @@ namespace Gablarski.Client
 	public class ClientChannelManager
 		: IEnumerable<Channel>
 	{
-		internal ClientChannelManager (IClientConnection connection)
+		internal ClientChannelManager (IClientContext context)
 		{
-			if (connection == null)
-				throw new ArgumentNullException ("connection");
+			if (context == null)
+				throw new ArgumentNullException ("context");
 
-			this.connection = connection;
+			this.context = context;
 		}
 
 		#region Events
@@ -41,7 +41,7 @@ namespace Gablarski.Client
 			if (channel.ChannelId != null)
 				throw new ArgumentException ("Can not create an existing channel", "channel");
 
-			this.connection.Send (new ChannelEditMessage (channel));
+			this.context.Connection.Send (new ChannelEditMessage (channel));
 		}
 
 		/// <summary>
@@ -56,7 +56,7 @@ namespace Gablarski.Client
 			if (channel.ChannelId == null)
 				throw new ArgumentException ("channel must be an existing channel", "channel");
 
-			this.connection.Send (new ChannelEditMessage (channel));
+			this.context.Connection.Send (new ChannelEditMessage (channel));
 		}
 
 		/// <summary>
@@ -71,7 +71,7 @@ namespace Gablarski.Client
 			if (channel.ChannelId == null)
 				throw new ArgumentException ("channel must be an existing channel", "channel");
 
-			this.connection.Send (new ChannelEditMessage (channel) { Delete = true });
+			this.context.Connection.Send (new ChannelEditMessage (channel) { Delete = true });
 		}
 
 		#region IEnumerable<Channel> members
@@ -92,7 +92,7 @@ namespace Gablarski.Client
 		}
 		#endregion
 
-		private readonly IClientConnection connection;
+		private readonly IClientContext context;
 
 		private readonly object channelLock = new object ();
 		private Dictionary<object, Channel> channels;

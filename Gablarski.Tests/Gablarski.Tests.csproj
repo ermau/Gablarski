@@ -47,6 +47,7 @@
     <Compile Include="ClientUserManagerTests.cs" />
     <Compile Include="IdentifyingTypesTests.cs" />
     <Compile Include="MockClientConnection.cs" />
+    <Compile Include="MockClientContext.cs" />
     <Compile Include="MockConnectionProvider.cs" />
     <Compile Include="MockServerConnection.cs" />
     <Compile Include="ModuleLoaderTests.cs" />

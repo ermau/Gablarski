@@ -120,7 +120,6 @@
     <Compile Include="ServerInfo.cs" />
     <Compile Include="Server\ConnectionCollection.cs" />
     <Compile Include="Server\GablarskiServer.MessageHandling.cs" />
-    <Compile Include="Server\GablarskiServerContext.cs" />
     <Compile Include="Server\GuestPermissionProvider.cs" />
     <Compile Include="Server\GuestUserProvider.cs" />
     <Compile Include="Server\IBackendProvider.cs" />
@@ -159,7 +158,6 @@
     <Compile Include="Client\ClientUserManager.cs" />
     <Compile Include="Client\ClientSourceManager.cs" />
     <Compile Include="Client\CurrentUser.cs" />
-    <Compile Include="Client\GablarskiContext.cs" />
     <Compile Include="IdentifyingTypes.cs" />
     <Compile Include="IClientContext.cs" />
     <Compile Include="Messages\SourcesRemovedMessage.cs" />

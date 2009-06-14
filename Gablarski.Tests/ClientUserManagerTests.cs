@@ -17,7 +17,15 @@ namespace Gablarski.Tests
 		{
 			this.provider = new MockConnectionProvider ();
 			this.server = this.provider.EstablishConnection ();
-			this.manager = new ClientUserManager (this.server.Client);
+
+			var context = new MockClientContext { Connection = this.server.Client };
+
+			var channels = new ClientChannelManager (context);
+			ClientChannelManagerTests.PopulateChannels (channels, this.server);
+
+			this.manager = new ClientUserManager (context);
+			context.Users = this.manager;
+			context.Channels = channels;
 		}
 
 		[TearDown]
@@ -40,7 +48,7 @@ namespace Gablarski.Tests
 			VerifyDefaultUsers (manager);
 		}
 
-		private static void VerifyDefaultUsers (IEnumerable<UserInfo> manager)
+		private static void VerifyDefaultUsers (IEnumerable<ClientUser> manager)
 		{
 			Assert.AreEqual (1, manager.Count (u => (int)u.UserId == 1 && u.Nickname == "Foo" && (int)u.CurrentChannelId == 1));
 			Assert.AreEqual (1, manager.Count (u => (int)u.UserId == 2 && u.Nickname == "Bar" && (int)u.CurrentChannelId == 1));

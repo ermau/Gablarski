@@ -16,7 +16,7 @@ namespace Gablarski.Tests
 		{
 			this.provider = new MockConnectionProvider ();
 			this.server = this.provider.EstablishConnection ();
-			this.manager = new ClientChannelManager (this.server.Client);
+			this.manager = new ClientChannelManager (new MockClientContext { Connection = this.server.Client });
 		}
 
 		[TearDown]
@@ -116,7 +116,12 @@ namespace Gablarski.Tests
 		}
 
 		[Test]
-		public void PopulateChannels ()
+		public void PopulateChannels()
+		{
+			PopulateChannels (this.manager, this.server);
+		}
+
+		public static void PopulateChannels (ClientChannelManager manager, IConnection server)
 		{
 			Channel c1 = new Channel (1)
 			{
@@ -137,7 +142,7 @@ namespace Gablarski.Tests
 				Description = "Description 3"
 			};
 
-			manager.OnChannelListReceivedMessage (new MessageReceivedEventArgs (this.server,
+			manager.OnChannelListReceivedMessage (new MessageReceivedEventArgs (server,
 				new ChannelListMessage (new[] { c1, sc1, c2 })));
 
 			Assert.AreEqual (3, manager.Count ());

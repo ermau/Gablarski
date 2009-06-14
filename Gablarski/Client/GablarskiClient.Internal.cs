@@ -11,12 +11,42 @@ namespace Gablarski.Client
 {
 	public partial class GablarskiClient
 	{
-		protected GablarskiClient (ClientChannelManager channelManager, ClientUserManager userManager, ClientSourceManager sourceManager)
-		{
-			this.Channels = channelManager;
-			this.Users = userManager;
+		protected ServerInfo serverInfo;
 
-			this.Handlers = new Dictionary<ServerMessageType, Action<MessageReceivedEventArgs>>
+		private string nickname;
+		private object playerId;
+
+		protected Dictionary<ServerMessageType, Action<MessageReceivedEventArgs>> handlers;
+		protected internal IClientConnection Connection
+		{
+			get;
+			private set;
+		}
+
+		private readonly object sourceLock = new object ();
+		private Dictionary<MediaType, MediaSourceBase> clientSources = new Dictionary<MediaType, MediaSourceBase> ();
+		private Dictionary<int, MediaSourceBase> allSources = new Dictionary<int, MediaSourceBase> ();
+
+
+		private volatile bool running;
+		private readonly Queue<MessageReceivedEventArgs> mqueue = new Queue<MessageReceivedEventArgs> (100);
+		private Thread messageRunnerThread;
+
+		protected void Setup ()
+		{
+			if (this.handlers != null)
+				return;
+
+			if (this.Users == null)
+				this.Users = new ClientUserManager (this);
+
+			if (this.Channels == null)
+				this.Channels = new ClientChannelManager (this);
+
+			if (this.Sources == null)
+				this.Sources = new ClientSourceManager (this);
+
+			this.handlers = new Dictionary<ServerMessageType, Action<MessageReceivedEventArgs>>
 			{
 				{ ServerMessageType.ServerInfoReceived, OnServerInfoReceivedMessage },
 				{ ServerMessageType.UserListReceived, this.Users.OnUserListReceivedMessage },
@@ -39,40 +69,6 @@ namespace Gablarski.Client
 			this.messageRunnerThread.Name = "Gablarski Client Message Runner";
 			this.messageRunnerThread.SetApartmentState (ApartmentState.STA);
 		}
-		
-		protected ServerInfo serverInfo;
-
-		private string nickname;
-		private object playerId;
-
-		protected readonly Dictionary<ServerMessageType, Action<MessageReceivedEventArgs>> Handlers;
-		protected internal IClientConnection Connection
-		{
-			get;
-			private set;
-		}
-
-		private object sourceLock = new object ();
-		private Dictionary<MediaType, MediaSourceBase> clientSources = new Dictionary<MediaType, MediaSourceBase> ();
-		private Dictionary<int, MediaSourceBase> allSources = new Dictionary<int, MediaSourceBase> ();
-
-		private object channelLock = new object();
-		private Dictionary<object, Channel> channels = new Dictionary<object, Channel> ();
-
-		private void AddSource (MediaSourceBase source, bool mine)
-		{
-			lock (sourceLock)
-			{
-				this.allSources.Add (source.Id, source);
-
-				if (mine)
-					this.clientSources.Add (source.Type, source);
-			}
-		}
-
-		private volatile bool running;
-		private readonly Queue<MessageReceivedEventArgs> mqueue = new Queue<MessageReceivedEventArgs> (100);
-		private readonly Thread messageRunnerThread;
 
 		private void MessageRunner ()
 		{
@@ -107,7 +103,7 @@ namespace Gablarski.Client
 						received (this, new ReceivedAudioEventArgs (this.allSources[amsg.SourceId], amsg.Data));
 				}
 				else
-					this.Handlers[msg.MessageType] (e);
+					this.handlers[msg.MessageType] (e);
 			}
 		}
 

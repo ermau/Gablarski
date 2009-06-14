@@ -8,7 +8,7 @@ using Gablarski.Messages;
 namespace Gablarski.Client
 {
 	public class ClientUserManager
-		: IEnumerable<UserInfo>
+		: IEnumerable<ClientUser>
 	{
 		public ClientUserManager (IClientContext context)
 		{
@@ -50,7 +50,7 @@ namespace Gablarski.Client
 		/// A <see cref="T:System.Collections.Generic.IEnumerator`1"/> that can be used to iterate through the collection.
 		/// </returns>
 		/// <filterpriority>1</filterpriority>
-		public IEnumerator<UserInfo> GetEnumerator()
+		public IEnumerator<ClientUser> GetEnumerator()
 		{
 			if (this.users == null)
 				yield break;
@@ -145,6 +145,10 @@ namespace Gablarski.Client
 		{
 			var msg = (UserChangedChannelMessage)e.Message;
 
+			Channel channel = this.context.Channels.FirstOrDefault (c => c.ChannelId.Equals (msg.ChangeInfo.TargetChannelId));
+			if (channel == null)
+				return;
+
 			ClientUser user;
 			ClientUser movedBy = null;
 			lock (userLock)
@@ -160,10 +164,7 @@ namespace Gablarski.Client
 					this.users.TryGetValue (msg.ChangeInfo.RequestingUserId, out movedBy);
 			}
 
-			this.OnUserChangedChannnel (new ChannelChangedEventArgs (user,
-			                                                         this.context.Channels.FirstOrDefault (
-			                                                         	c => c.ChannelId == msg.ChangeInfo.TargetChannelId),
-			                                                         movedBy));
+			this.OnUserChangedChannnel (new ChannelChangedEventArgs (user, channel, movedBy));
 		}
 		#endregion
 
@@ -251,8 +252,6 @@ namespace Gablarski.Client
 				throw new ArgumentNullException ("target");
 			if (targetChannel == null)
 				throw new ArgumentNullException ("targetChannel");
-			if (movedBy == null)
-				throw new ArgumentNullException ("movedBy");
 
 			this.TargetUser = target;
 			this.TargetChannel = targetChannel;

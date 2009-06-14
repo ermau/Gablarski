@@ -13,12 +13,6 @@ namespace Gablarski.Client
 		public static readonly Version ApiVersion = Assembly.GetAssembly (typeof (GablarskiClient)).GetName ().Version;
 
 		public GablarskiClient (IClientConnection connection)
-			: this (connection, new ClientChannelManager (connection), new ClientUserManager (connection), new ClientSourceManager (connection))
-		{
-		}
-
-		public GablarskiClient (IClientConnection connection, ClientChannelManager channelManager, ClientUserManager userManager, ClientSourceManager sourceManager)
-			: this (channelManager, userManager, sourceManager)
 		{
 			this.Connection = connection;
 			this.Connection.Connected += this.OnConnected;
@@ -66,7 +60,7 @@ namespace Gablarski.Client
 		public ClientChannelManager Channels
 		{
 			get;
-			private set;
+			set;
 		}
 
 		public MediaSourceBase VoiceSource
@@ -86,13 +80,13 @@ namespace Gablarski.Client
 		public ClientUserManager Users
 		{
 			get; 
-			private set;
+			set;
 		}
 
 		public ClientSourceManager Sources
 		{
 			get;
-			private set;
+			set;
 		}
 		#endregion
 
@@ -108,6 +102,8 @@ namespace Gablarski.Client
 		{
 			if (host.IsEmpty ())
 				throw new ArgumentException ("host must not be null or empty", "host");
+
+			this.Setup ();
 
 			this.running = true;
 			this.messageRunnerThread.Start ();	
