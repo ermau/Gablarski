@@ -16,15 +16,5 @@ namespace Gablarski.Media.Codecs
 		/// Gets the supported media types.
 		/// </summary>
 		MediaTypes SupportedTypes { get; }
-
-		/// <summary>
-		/// Gets the maximum quality setting.
-		/// </summary>
-		uint MaxQuality { get; }
-
-		/// <summary>
-		/// Gets the minimum quality setting.
-		/// </summary>
-		uint MinQuality { get; }
 	}
 }

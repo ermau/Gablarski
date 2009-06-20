@@ -40,6 +40,10 @@ namespace Gablarski.Client
 		public event EventHandler<ChannelChangedEventArgs> UserChangedChannel;
 		#endregion
 
+		public CurrentUser Current
+		{
+			get { return this.context.CurrentUser; }
+		}
 
 		#region Implementation of IEnumerable
 

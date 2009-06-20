@@ -23,7 +23,7 @@ namespace Gablarski
 		IEnumerable<Channel> Channels { get; }
 
 		/// <summary>
-		/// Gets teh source manager in this context
+		/// Gets the sources in this context.
 		/// </summary>
 		IEnumerable<MediaSourceBase> Sources { get; }
 
@@ -31,5 +31,10 @@ namespace Gablarski
 		/// Gets the user associated with this context
 		/// </summary>
 		IEnumerable<ClientUser> Users { get; }
+
+		/// <summary>
+		/// Gets the current logged in user.
+		/// </summary>
+		CurrentUser CurrentUser { get; }
 	}
 }

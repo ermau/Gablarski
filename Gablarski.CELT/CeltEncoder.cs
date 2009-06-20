@@ -88,7 +88,7 @@ namespace Gablarski.CELT
 			byte[] encoded = new byte[nbCompressedBytes];
 			fixed (byte* benc = encoded)
 				encodedPtr = new IntPtr ((void*)benc);
-
+			
 			length = celt_encode (this, pcm, IntPtr.Zero, encodedPtr, nbCompressedBytes);
 
 			return encoded;

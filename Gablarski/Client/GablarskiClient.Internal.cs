@@ -23,11 +23,6 @@ namespace Gablarski.Client
 			private set;
 		}
 
-		private readonly object sourceLock = new object ();
-		private Dictionary<MediaType, MediaSourceBase> clientSources = new Dictionary<MediaType, MediaSourceBase> ();
-		private Dictionary<int, MediaSourceBase> allSources = new Dictionary<int, MediaSourceBase> ();
-
-
 		private volatile bool running;
 		private readonly Queue<MessageReceivedEventArgs> mqueue = new Queue<MessageReceivedEventArgs> (100);
 		private Thread messageRunnerThread;
@@ -50,7 +45,7 @@ namespace Gablarski.Client
 			{
 				{ ServerMessageType.ServerInfoReceived, OnServerInfoReceivedMessage },
 				{ ServerMessageType.UserListReceived, this.Users.OnUserListReceivedMessage },
-				//{ ServerMessageType.SourceListReceived, OnSourceListReceivedMessage },
+				{ ServerMessageType.SourceListReceived, this.Sources.OnSourceListReceivedMessage },
 				
 				{ ServerMessageType.ChannelListReceived, this.Channels.OnChannelListReceivedMessage },
 				//{ ServerMessageType.ChangeChannelResult, OnChangeChannelResultMessage },
@@ -62,7 +57,7 @@ namespace Gablarski.Client
 				{ ServerMessageType.UserDisconnected, this.Users.OnUserDisconnectedMessage },
 				
 				//{ ServerMessageType.SourceResult, OnSourceResultMessage },
-				{ ServerMessageType.AudioDataReceived, OnAudioDataReceivedMessage },
+				{ ServerMessageType.AudioDataReceived, this.Sources.OnAudioDataReceivedMessage },
 			};
 
 			this.messageRunnerThread = new Thread (this.MessageRunner);
@@ -95,15 +90,7 @@ namespace Gablarski.Client
 
 				Trace.WriteLineIf ((msg.MessageType != ServerMessageType.AudioDataReceived), "[Client] Message Received: " + msg.MessageType);
 
-				if (msg.MessageType == ServerMessageType.AudioDataReceived)
-				{
-					var amsg = (AudioDataReceivedMessage)msg;
-					var received = this.ReceivedAudioData;
-					if (received != null)
-						received (this, new ReceivedAudioEventArgs (this.allSources[amsg.SourceId], amsg.Data));
-				}
-				else
-					this.handlers[msg.MessageType] (e);
+				this.handlers[msg.MessageType] (e);
 			}
 		}
 
@@ -129,42 +116,5 @@ namespace Gablarski.Client
 			Trace.WriteLine ("Server name: " + this.serverInfo.ServerName);
 			Trace.WriteLine ("Server description: " + this.serverInfo.ServerDescription);
 		}
-
-		
-
-		#region Sources
-		//private void OnSourceListReceivedMessage (MessageReceivedEventArgs e)
-		//{
-		//    var msg = (SourceListMessage)e.Message;
-		//    foreach (var sourceInfo in msg.Sources)
-		//        this.AddSource (MediaSources.Create (Type.GetType (sourceInfo.SourceTypeName), sourceInfo.SourceId, sourceInfo.UserId), sourceInfo.UserId == this.Self.UserId);
-
-		//    OnReceivedSourceList (new ReceivedListEventArgs<MediaSourceInfo> (msg.Sources));
-		//}
-
-		//private void OnSourceResultMessage (MessageReceivedEventArgs e)
-		//{
-		//    MediaSourceBase source = null;
-
-		//    var sourceMessage = (SourceResultMessage)e.Message;
-		//    if (sourceMessage.MediaSourceType == null)
-		//    {
-		//        Trace.WriteLine ("[Client] Source type " + sourceMessage.SourceInfo.SourceTypeName + " not found.");
-		//    }
-		//    else if (sourceMessage.SourceResult == SourceResult.Succeeded || sourceMessage.SourceResult == SourceResult.NewSource)
-		//    {
-		//        source = sourceMessage.GetSource (this.Self.UserId);
-		//        this.AddSource (source, (sourceMessage.SourceResult == SourceResult.Succeeded));
-		//    }
-
-		//    OnReceivedSource (new ReceivedSourceEventArgs (source, sourceMessage.SourceInfo, sourceMessage.SourceResult));
-		//}
-
-		private void OnAudioDataReceivedMessage (MessageReceivedEventArgs e)
-		{
-			var msg = (AudioDataReceivedMessage)e.Message;
-			OnReceivedAudioData (new ReceivedAudioEventArgs (this.allSources[msg.SourceId], msg.Data));
-		}
-		#endregion
 	}
 }

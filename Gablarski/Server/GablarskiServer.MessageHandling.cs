@@ -268,30 +268,35 @@ namespace Gablarski.Server
 					if (!sources.ContainsKey (e.Connection))
 						sources.Add (e.Connection, new List<MediaSourceBase> ());
 
-					if (!sources[e.Connection].Any (s => s != null && s.GetType () == request.MediaSourceType))
-					{
-						sourceId = sources.Sum (kvp => kvp.Value.Count);
-						index = sources[e.Connection].Count;
-						sources[e.Connection].Add (null);
-					}
-					else
-						result = SourceResult.FailedPermittedSingleSourceOfType;
+					//if (!sources[e.Connection].Any (s => s != null && s.GetType () == request.MediaSourceType))
+					//{
+					sourceId = sources.Sum (kvp => kvp.Value.Count);
+					index = sources[e.Connection].Count;
+					sources[e.Connection].Add (null);
+					//}
+					//else
+					//    result = SourceResult.FailedPermittedSingleSourceOfType;
 				}
 
 				if (result == SourceResult.FailedUnknown)
 				{
-					source = MediaSources.Create (request.MediaSourceType, sourceId, user.UserId);
-					if (source != null)
-					{
-						lock (sourceLock)
-						{
-							sources[e.Connection][index] = source;
-						}
+					int bitrate = settings.DefaultAudioBitrate;
+					if (request.TargetBitrate != 0)
+						bitrate = request.TargetBitrate.Trim (settings.MinimumAudioBitrate, settings.MaximumAudioBitrate);
 
-						result = SourceResult.Succeeded;
+					//source = MediaSources.Create (request.MediaSourceType, sourceId, user.UserId);
+					source = new AudioSource (sourceId, user.UserId, 1, bitrate, 44100, 256);
+					//if (source != null)
+					//{
+					lock (sourceLock)
+					{
+						sources[e.Connection][index] = source;
 					}
-					else
-						result = SourceResult.FailedNotSupportedType;
+
+					result = SourceResult.Succeeded;
+					//}
+					//else
+					//    result = SourceResult.FailedNotSupportedType;
 				}
 			}
 			catch (OverflowException)
@@ -300,18 +305,18 @@ namespace Gablarski.Server
 			}
 			finally
 			{
-				MediaSourceInfo sourceInfo = new MediaSourceInfo
-				{
-					SourceId = sourceId,
-					UserId = user.UserId,
-					MediaType = (source != null) ? source.Type : MediaType.None,
-					SourceTypeName = request.MediaSourceType.AssemblyQualifiedName
-				};
+				//MediaSourceInfo sourceInfo = new MediaSourceInfo
+				//{
+				//    SourceId = sourceId,
+				//    UserId = user.UserId,
+				//    MediaType = (source != null) ? source.Type : MediaType.None,
+				//    SourceTypeName = request.MediaSourceType.AssemblyQualifiedName
+				//};
 
-				e.Connection.Send (new SourceResultMessage (result, sourceInfo));
+				e.Connection.Send (new SourceResultMessage (result, source));
 				if (result == SourceResult.Succeeded)
 				{
-					connections.Send (new SourceResultMessage (SourceResult.NewSource, sourceInfo), (IConnection c) => c != e.Connection);
+					connections.Send (new SourceResultMessage (SourceResult.NewSource, source), (IConnection c) => c != e.Connection);
 				}
 			}
 		}

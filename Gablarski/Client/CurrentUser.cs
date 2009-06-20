@@ -6,7 +6,12 @@ using System.Text;
 namespace Gablarski.Client
 {
 	public class CurrentUser
+		: ClientUser
 	{
+		internal CurrentUser()
+		{
+		}
+
 		//private void OnChangeChannelResultMessage (MessageReceivedEventArgs e)
 		//{
 		//    var msg = (ChannelChangeResultMessage)e.Message;
@@ -25,7 +30,7 @@ namespace Gablarski.Client
 		//    this.OnPlayerChangedChannnel (new ChannelChangedEventArgs (msg.MoveInfo));
 		//}	
 	
-
+		// TODO: Deserialize
 		//private void OnLoginResultMessage (MessageReceivedEventArgs e)
 		//{
 		//    var msg = (LoginResultMessage)e.Message;

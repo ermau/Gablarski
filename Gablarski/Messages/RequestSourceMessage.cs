@@ -13,17 +13,14 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public RequestSourceMessage (Type mediaSourceType, byte channels)
+		public RequestSourceMessage (int channels, int targetBitrate)
 			: this ()
 		{
-			this.MediaSourceType = mediaSourceType;
-			this.Channels = channels;
-		}
+			if (channels < 1 || channels > 2)
+				throw new ArgumentOutOfRangeException ("channels");
 
-		public Type MediaSourceType
-		{
-			get;
-			set;
+			this.Channels = channels;
+			this.TargetBitrate = targetBitrate;
 		}
 
 		public int Channels
@@ -32,16 +29,25 @@ namespace Gablarski.Messages
 			set;
 		}
 
+		/// <summary>
+		/// Gets or sets the target bitrate to be requested (0 leaves it to the server.)
+		/// </summary>
+		public int TargetBitrate
+		{
+			get;
+			set;
+		}
+
 		public override void WritePayload (IValueWriter writer, IdentifyingTypes idTypes)
 		{
-			writer.WriteString (this.MediaSourceType.AssemblyQualifiedName);
 			writer.WriteByte ((byte)this.Channels);
+			writer.WriteInt32 (this.TargetBitrate);
 		}
 
 		public override void ReadPayload (IValueReader reader, IdentifyingTypes idTypes)
 		{
-			this.MediaSourceType = Type.GetType (reader.ReadString ());
 			this.Channels = reader.ReadByte ();
+			this.TargetBitrate = reader.ReadInt32();
 		}
 	}
 }

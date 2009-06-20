@@ -24,7 +24,7 @@ namespace Gablarski.Media.Codecs
 		/// <param name="data">The data to be encoded.</param>
 		/// <param name="sampleRate">The sample rate of the data.</param>
 		/// <param name="quality">The quality setting to encode with.</param>
-		byte[] Encode (byte[] data, uint sampleRate, uint quality);
+		byte[] Encode (byte[] data, uint sampleRate, int quality);
 
 		/// <summary>
 		/// Decodes the supplied <paramref name="encoded"/> data with the known <paramref name="bitrate"/> and <paramref name="quality"/>.
@@ -33,6 +33,6 @@ namespace Gablarski.Media.Codecs
 		/// <param name="sampleRate">The sample rate of the data.</param>
 		/// <param name="quality">The quality setting to decode with.</param>
 		/// <returns></returns>
-		byte[] Decode (byte[] encoded, uint sampleRate, uint quality);
+		byte[] Decode (byte[] encoded, uint sampleRate, int quality);
 	}
 }

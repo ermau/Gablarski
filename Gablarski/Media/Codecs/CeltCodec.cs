@@ -25,7 +25,7 @@ namespace Gablarski.Media.Codecs
 			get { return 96000; }
 		}
 
-		public byte[] Encode (byte[] data, uint sampleRate, uint quality)
+		public byte[] Encode (byte[] data, uint sampleRate, int quality)
 		{
 			int length;
 			byte[] encoded = encoder.Encode (data, 64500, out length);
@@ -36,7 +36,7 @@ namespace Gablarski.Media.Codecs
 			return copy;
 		}
 
-		public byte[] Decode (byte[] encoded, uint sampleRate, uint quality)
+		public byte[] Decode (byte[] encoded, uint sampleRate, int quality)
 		{
 			return decoder.Decode (encoded);
 		}
@@ -61,7 +61,6 @@ namespace Gablarski.Media.Codecs
 			get { return 0; }
 		}
 
-		private CeltEncoder encoder;
-		private CeltDecoder decoder;
+		
 	}
 }

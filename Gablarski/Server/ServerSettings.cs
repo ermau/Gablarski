@@ -14,13 +14,23 @@ namespace Gablarski.Server
 		private string name = "Gablarski Server";
 		public virtual string Name
 		{
-			get { return this.name; }
+			get
+			{
+				lock (settingsLock)
+				{
+					return this.name;
+				}
+			}
+
 			set
 			{
-				if (value != this.name)
+				lock (settingsLock)
 				{
+					if (value == this.name)
+						return;
+
 					this.name = value;
-					OnPropertyChanged ("Name");
+					this.OnPropertyChanged ("Name");
 				}
 			}
 		}
@@ -28,16 +38,100 @@ namespace Gablarski.Server
 		private string description = "Default Gablarski Server";
 		public virtual string Description
 		{
-			get { return this.description; }
+			get
+			{
+				lock (settingsLock)
+				{
+					return this.description;
+				}
+			}
+
 			set
 			{
-				if (value != this.description)
+				lock (settingsLock)
 				{
+					if (value == this.description)
+						return;
+
 					this.description = value;
-					OnPropertyChanged ("Description");
+					this.OnPropertyChanged ("Description");
 				}
 			}
 		}
+
+		private int minbitrate = 32000;
+		public virtual int MinimumAudioBitrate
+		{
+			get
+			{
+				lock (settingsLock)
+				{
+					return this.minbitrate;
+				}
+			}
+
+			set
+			{
+				lock (settingsLock)
+				{
+					if (value == this.minbitrate)
+						return;
+
+					this.minbitrate = value;
+					this.OnPropertyChanged ("MinimumAudioBitrate");
+				}
+			}
+		}
+
+		private int maxbitrate = 96000;
+		public virtual int MaximumAudioBitrate
+		{
+			get
+			{
+				lock (settingsLock)
+				{
+					return this.maxbitrate;
+				}
+			}
+
+			set
+			{
+				lock (settingsLock)
+				{
+					if (value == this.maxbitrate)
+						return;
+
+					this.maxbitrate = value;
+					this.OnPropertyChanged ("MaximumAudioBitrate");
+				}
+			}
+		}
+
+		private int defaultbitrate = 96000;
+		public virtual int DefaultAudioBitrate
+		{
+			get
+			{
+				lock (settingsLock)
+				{
+					return this.defaultbitrate;
+				}
+			}
+
+			set
+			{
+				lock (settingsLock)
+				{
+					if (value == this.defaultbitrate)
+						return;
+
+					this.defaultbitrate = value;
+					this.OnPropertyChanged ("DefaultAudioBitrate");
+				}
+			}
+		}
+
+		protected readonly object settingsLock = new object();
 
 		protected void OnPropertyChanged (string propertyName)
 		{

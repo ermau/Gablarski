@@ -32,6 +32,11 @@ namespace Gablarski.Tests
 		/// </summary>
 		public IEnumerable<ClientUser> Users { get; set; }
 
+		/// <summary>
+		/// Gets the current logged in user.
+		/// </summary>
+		public CurrentUser CurrentUser { get; set; }
+
 		#endregion
 	}
 }

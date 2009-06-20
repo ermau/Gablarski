@@ -76,11 +76,6 @@
     <Compile Include="Client\IDeviceProvider.cs" />
     <Compile Include="Client\IPlaybackProvider.cs" />
     <Compile Include="Client\VoiceActivation.cs" />
-    <Compile Include="Media\Codecs\CeltCodec.cs" />
-    <Compile Include="Media\Codecs\IAudioCodec.cs" />
-    <Compile Include="Media\Codecs\IMediaCodec.cs" />
-    <Compile Include="Media\Codecs\RawCodec.cs" />
-    <Compile Include="Media\Codecs\SpeexCodec.cs" />
     <Compile Include="en-US.Designer.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="GenericResult.cs" />
@@ -88,7 +83,6 @@
     <Compile Include="IConnection.cs" />
     <Compile Include="IConnectionProvider.cs" />
     <Compile Include="LoginResult.cs" />
-    <Compile Include="MediaSourceInfo.cs" />
     <Compile Include="MediaType.cs" />
     <Compile Include="Messages\AudioDataReceivedMessage.cs" />
     <Compile Include="Messages\ChangeChannelMessage.cs" />
@@ -139,10 +133,6 @@
     <Compile Include="OrderedDictionary.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Server\ServerSettings.cs" />
-    <Compile Include="Media\Sources\MediaSourceBase.cs" />
-    <Compile Include="Media\Sources\MusicSource.cs" />
-    <Compile Include="Media\Sources\Sources.cs" />
-    <Compile Include="Media\Sources\VoiceSource.cs" />
     <Compile Include="StreamValueReader.cs" />
     <Compile Include="StreamValueWriter.cs" />
   </ItemGroup>
@@ -154,12 +144,15 @@
     <Compile Include="Server\Telnet\TelnetConnectionProvider.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AudioSource.cs" />
+    <Compile Include="Client\ClientMediaSource.cs" />
     <Compile Include="Client\ClientUser.cs" />
     <Compile Include="Client\ClientUserManager.cs" />
     <Compile Include="Client\ClientSourceManager.cs" />
     <Compile Include="Client\CurrentUser.cs" />
     <Compile Include="IdentifyingTypes.cs" />
     <Compile Include="IClientContext.cs" />
+    <Compile Include="Media\Sources\MediaSourceBase.cs" />
     <Compile Include="Messages\SourcesRemovedMessage.cs" />
     <Compile Include="Messages\UserChangedChannelMessage.cs" />
     <Compile Include="Messages\UserLoggedInMessage.cs" />

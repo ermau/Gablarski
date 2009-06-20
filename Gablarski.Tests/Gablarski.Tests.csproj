@@ -42,22 +42,33 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AudioSourceTests.cs" />
     <Compile Include="ClientChannelManagerTests.cs" />
     <Compile Include="ClientSourceManagerTests.cs" />
     <Compile Include="ClientUserManagerTests.cs" />
+    <Compile Include="ExtensionTests.cs" />
     <Compile Include="IdentifyingTypesTests.cs" />
     <Compile Include="MockClientConnection.cs" />
     <Compile Include="MockClientContext.cs" />
     <Compile Include="MockConnectionProvider.cs" />
     <Compile Include="MockServerConnection.cs" />
     <Compile Include="ModuleLoaderTests.cs" />
+    <Compile Include="OptionParseExtensionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServerTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Clients\CLI\Gablarski.Clients.CLI.csproj">
+      <Project>{DABD979A-6930-4250-A770-E746736F4AAF}</Project>
+      <Name>Gablarski.Clients.CLI</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Gablarski\Gablarski.csproj">
       <Project>{7347052B-DA5B-4CCA-AB28-3963766E3CDB}</Project>
       <Name>Gablarski</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Mono.Rocks\Mono.Rocks.csproj">
+      <Project>{F656F792-2CDE-4E17-BB5F-6A6F1C266CB8}</Project>
+      <Name>Mono.Rocks</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

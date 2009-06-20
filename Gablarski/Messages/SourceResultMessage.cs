@@ -14,11 +14,11 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public SourceResultMessage (SourceResult result, MediaSourceInfo sourceInfo)
+		public SourceResultMessage (SourceResult result, MediaSourceBase source)
 			: this ()
 		{
 			this.SourceResult = result;
-			this.SourceInfo = sourceInfo;
+			this.Source = source;
 		}
 
 		public SourceResult SourceResult
@@ -27,33 +27,22 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public MediaSourceInfo SourceInfo
+		public MediaSourceBase Source
 		{
 			get;
 			set;
 		}
 
-		public Type MediaSourceType
-		{
-			get { return Type.GetType (this.SourceInfo.SourceTypeName); }
-			set { this.SourceInfo.SourceTypeName = value.AssemblyQualifiedName; }
-		}
-
-		public MediaSourceBase GetSource (object userId)
-		{
-			return MediaSources.Create (this.MediaSourceType, this.SourceInfo.SourceId, userId);
-		}
-
 		public override void WritePayload (IValueWriter writer, IdentifyingTypes idTypes)
 		{
 			writer.WriteByte ((byte)this.SourceResult);
-			this.SourceInfo.Serialize (writer, idTypes);
+			this.Source.SerializeCore (writer, idTypes);
 		}
 
 		public override void ReadPayload (IValueReader reader, IdentifyingTypes idTypes)
 		{
 			this.SourceResult = (SourceResult)reader.ReadByte ();
-			this.SourceInfo = new MediaSourceInfo (reader, idTypes);
+			this.Source = new AudioSource (reader, idTypes);
 		}
 	}
 

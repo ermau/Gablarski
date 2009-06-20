@@ -9,6 +9,10 @@ namespace Gablarski.Client
 	public class ClientUser
 		: UserInfo
 	{
+		internal ClientUser ()
+		{
+		}
+
 		public ClientUser (UserInfo user, IClientConnection client)
 			: base (user.Nickname, user.UserId, user.CurrentChannelId)
 		{

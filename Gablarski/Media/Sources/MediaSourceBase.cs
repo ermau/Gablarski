@@ -2,32 +2,36 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Gablarski.Media.Codecs;
 
 namespace Gablarski.Media.Sources
 {
 	public abstract class MediaSourceBase
 	{
-		protected MediaSourceBase (MediaType type, int sourceId, object ownerId)
+		protected MediaSourceBase (int sourceId, object ownerId)
 		{
-			this.Type = type;
+			if (sourceId < 0)
+				throw new ArgumentOutOfRangeException ("sourceId");
+			if (ownerId == null)
+				throw new ArgumentNullException ("ownerId");
+
 			this.Id = sourceId;
 			this.OwnerId = ownerId;
+		}
+
+		protected MediaSourceBase (IValueReader reader, IdentifyingTypes idTypes)
+		{
+			if (reader == null)
+				throw new ArgumentNullException ("reader");
+			if (idTypes == null)
+				throw new ArgumentNullException ("idTypes");
+
+			this.DeserializeCore (reader, idTypes);
 		}
 
 		/// <summary>
 		/// Gets the ID of the source.
 		/// </summary>
 		public int Id
-		{
-			get;
-			private set;
-		}
-		
-		/// <summary>
-		/// Gets the type of media source.
-		/// </summary>
-		public MediaType Type
 		{
 			get;
 			private set;
@@ -41,8 +45,32 @@ namespace Gablarski.Media.Sources
 			get;
 			private set;
 		}
-		
-		public abstract IAudioCodec AudioCodec { get; }
-		public abstract IMediaCodec VideoCodec { get; }
+
+		public abstract byte[] Encode (byte[] data);
+		public abstract byte[] Decode (byte[] data);
+
+		internal void SerializeCore (IValueWriter writer, IdentifyingTypes idTypes)
+		{
+			writer.WriteInt32 (this.Id);
+			idTypes.WriteUser (writer, this.OwnerId);
+
+			this.Serialize (writer, idTypes);
+		}
+
+		protected virtual void Serialize (IValueWriter writer, IdentifyingTypes idTypes)
+		{
+		}
+
+		internal void DeserializeCore (IValueReader reader, IdentifyingTypes idTypes)
+		{
+			this.Id = reader.ReadInt32 ();
+			this.OwnerId = idTypes.ReadUser (reader);
+
+			this.Deserialize (reader, idTypes);
+		}
+
+		protected virtual void Deserialize (IValueReader reader, IdentifyingTypes idTypes)
+		{
+		}
 	}
 }

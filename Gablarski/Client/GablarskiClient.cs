@@ -40,20 +40,7 @@ namespace Gablarski.Client
 		/// </summary>
 		public event EventHandler<ReceivedLoginResultEventArgs> ReceivedLoginResult;
 		
-		/// <summary>
-		/// A new  or updated source list has been received.
-		/// </summary>
-		public event EventHandler<ReceivedListEventArgs<MediaSourceInfo>> ReceivedSourceList;
-
-		/// <summary>
-		/// A new media source has been received.
-		/// </summary>
-		public event EventHandler<ReceivedSourceEventArgs> ReceivedSource;
-
-		/// <summary>
-		/// Audio data has been received.
-		/// </summary>
-		public event EventHandler<ReceivedAudioEventArgs> ReceivedAudioData;
+	
 		#endregion
 
 		#region Public Properties
@@ -61,20 +48,6 @@ namespace Gablarski.Client
 		{
 			get;
 			set;
-		}
-
-		public MediaSourceBase VoiceSource
-		{
-			get
-			{
-				MediaSourceBase source;
-				lock (sourceLock)
-				{
-					this.clientSources.TryGetValue (MediaType.Voice, out source);
-				}
-
-				return source;
-			}
 		}
 
 		public ClientUserManager Users
@@ -124,72 +97,34 @@ namespace Gablarski.Client
 		}
 
 		/// <summary>
-		/// Logs into the connected server with <paramref name="nickname"/>.
+		/// Logs into the connected server with <paramref name="nick"/>.
 		/// </summary>
-		/// <param name="nickname">The nickname to log in with.</param>
-		/// <exception cref="System.ArgumentNullException"><paramref name="nickname"/> is null or empty.</exception>
-		public void Login (string nickname)
+		/// <param name="nick">The nickname to log in with.</param>
+		/// <exception cref="System.ArgumentNullException"><paramref name="nick"/> is null or empty.</exception>
+		public void Login (string nick)
 		{
-			Login (nickname, null, null);
+			Login (nick, null, null);
 		}
 
 		/// <summary>
-		/// Logs into the connected server with <paramref name="nickname"/>.
+		/// Logs into the connected server with <paramref name="nick"/>.
 		/// </summary>
-		/// <param name="nickname">The nickname to log in with.</param>
+		/// <param name="nick">The nickname to log in with.</param>
 		/// <param name="username">The username to log in with.</param>
 		/// <param name="password">The password to log in with.</param>
-		/// <exception cref="System.ArgumentNullException"><paramref name="nickname"/> is null or empty.</exception>
-		public void Login (string nickname, string username, string password)
+		/// <exception cref="System.ArgumentNullException"><paramref name="nick"/> is null or empty.</exception>
+		public void Login (string nick, string username, string password)
 		{
-			if (nickname.IsEmpty())
-				throw new ArgumentNullException ("nickname", "nickname must not be null or empty");
+			if (nick.IsEmpty())
+				throw new ArgumentNullException ("nick", "nick must not be null or empty");
 
-			this.nickname = nickname;
+			this.nickname = nick;
 			this.Connection.Send (new LoginMessage
 			{
-				Nickname = nickname,
+				Nickname = nick,
 				Username = username,
 				Password = password
 			});
-		}
-
-		public void RequestSource (Type mediaSourceType, byte channels)
-		{
-			if (mediaSourceType == null)
-				throw new ArgumentNullException ("mediaSourceType");
-			if (mediaSourceType.GetInterface ("MediaSourceBase") == null)
-				throw new InvalidOperationException ("Can not request a source that is not a media source.");
-
-			lock (sourceLock)
-			{
-				if (this.clientSources.Values.Any (s => s.GetType () == mediaSourceType))
-					throw new InvalidOperationException ("Client already owns a source of this type.");
-			}
-
-			this.Connection.Send (new RequestSourceMessage (mediaSourceType, channels));
-		}
-
-		public void SendAudioData (Channel channel, MediaSourceBase source, byte[] data)
-		{
-			if (channel == null)
-				throw new ArgumentNullException ("channel");
-			if (source == null)
-				throw new ArgumentNullException ("source");
-
-			// TODO: Add bitrate transmision etc
-			byte[] encoded = source.AudioCodec.Encode (data, 44100, source.AudioCodec.MaxQuality);
-			this.Connection.Send (new SendAudioDataMessage (channel.ChannelId, source.Id, encoded));
-		}
-
-		public void MovePlayerToChannel (UserInfo targetPlayer, Channel targetChannel)
-		{
-			if (targetPlayer == null)
-				throw new ArgumentNullException ("targetPlayer");
-			if (targetChannel == null)
-				throw new ArgumentNullException ("targetChannel");
-
-			this.Connection.Send (new ChangeChannelMessage (targetPlayer.UserId, targetChannel.ChannelId));
 		}
 		#endregion
 
@@ -214,33 +149,12 @@ namespace Gablarski.Client
 			if (rejected != null)
 				rejected (this, e);
 		}
-
-		protected virtual void OnReceivedSourceList (ReceivedListEventArgs<MediaSourceInfo> e)
-		{
-			var received = this.ReceivedSourceList;
-			if (received != null)
-				received (this, e);
-		}
 	
 		protected virtual void OnLoginResult (ReceivedLoginResultEventArgs e)
 		{
 			var result = this.ReceivedLoginResult;
 			if (result != null)
 				result (this, e);
-		}
-
-		protected virtual void OnReceivedSource (ReceivedSourceEventArgs e)
-		{
-			var received = this.ReceivedSource;
-			if (received != null)
-				received (this, e);
-		}
-
-		protected virtual void OnReceivedAudioData (ReceivedAudioEventArgs e)
-		{
-			var received = this.ReceivedAudioData;
-			if (received != null)
-				received (this, e);
 		}
 		#endregion
 
@@ -264,6 +178,12 @@ namespace Gablarski.Client
 		IEnumerable<ClientUser> IClientContext.Users
 		{
 			get { throw new NotImplementedException (); }
+		}
+
+		private readonly CurrentUser currentUser = new CurrentUser ();
+		CurrentUser IClientContext.CurrentUser
+		{
+			get { return this.currentUser; }
 		}
 
 		#endregion
@@ -303,34 +223,6 @@ namespace Gablarski.Client
 		}
 	}
 
-	public class ReceivedAudioEventArgs
-		: EventArgs
-	{
-		public ReceivedAudioEventArgs (MediaSourceBase source, byte[] data)
-		{
-			this.Source = source;
-			this.AudioData = data;
-		}
-
-		/// <summary>
-		/// Gets the media source audio was received for.
-		/// </summary>
-		public MediaSourceBase Source
-		{
-			get;
-			set;
-		}
-
-		/// <summary>
-		/// Gets the audio data.
-		/// </summary>
-		public byte[] AudioData
-		{
-			get;
-			set;
-		}
-	}
-
 	public class ReceivedLoginResultEventArgs
 		: EventArgs
 	{
@@ -343,35 +235,6 @@ namespace Gablarski.Client
 		{
 			get;
 			private set;
-		}
-	}
-
-	public class ReceivedSourceEventArgs
-		: EventArgs
-	{
-		public ReceivedSourceEventArgs (MediaSourceBase source, MediaSourceInfo sourceInfo, SourceResult result)
-		{
-			this.Result = result;
-			this.SourceInfo = sourceInfo;
-			this.Source = source;
-		}
-
-		public SourceResult Result
-		{
-			get;
-			set;
-		}
-
-		public MediaSourceInfo SourceInfo
-		{
-			get;
-			set;
-		}
-
-		public MediaSourceBase Source
-		{
-			get;
-			set;
 		}
 	}
 	#endregion

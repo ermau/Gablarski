@@ -27,5 +27,22 @@ namespace Gablarski
 		{
 			return (String.IsNullOrEmpty (self) || self.Trim () == String.Empty);
 		}
+
+		public static T Trim<T> (this T self, T maximum)
+			where T : struct, IComparable<T>
+		{
+			return (self.CompareTo (maximum) >= 1) ? maximum : self;
+		}
+
+		public static T Trim<T> (this T self, T minimum, T maximum)
+			where T : struct, IComparable<T>
+		{
+			if (self.CompareTo (maximum) >= 1)
+				return maximum;
+			else if (self.CompareTo (minimum) <= -1)
+				return minimum;
+			else
+				return self;
+		}
 	}
 }

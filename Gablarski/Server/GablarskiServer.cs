@@ -239,16 +239,14 @@ namespace Gablarski.Server
 			}
 		}
 
-		private IEnumerable<MediaSourceInfo> GetSourceInfoList ()
+		private IEnumerable<MediaSourceBase> GetSourceInfoList ()
 		{
-			IEnumerable<MediaSourceInfo> agrSources = Enumerable.Empty<MediaSourceInfo> ();
+			IEnumerable<MediaSourceBase> agrSources = Enumerable.Empty<MediaSourceBase> ();
 			lock (this.sourceLock)
 			{
 				foreach (var kvp in this.sources)
 				{
-					IConnection connection = kvp.Key;
-					agrSources = agrSources.Concat (
-							kvp.Value.Select (s => new MediaSourceInfo (s) { UserId = this.connections[connection].UserId }));
+					agrSources = agrSources.Concat (kvp.Value.Select (s => (MediaSourceBase)new AudioSource (s)));
 				}
 
 				agrSources = agrSources.ToList ();

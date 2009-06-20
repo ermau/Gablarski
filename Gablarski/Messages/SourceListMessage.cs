@@ -15,13 +15,13 @@ namespace Gablarski.Messages
 
 		}
 
-		public SourceListMessage (IEnumerable<MediaSourceInfo> sources)
+		public SourceListMessage (IEnumerable<MediaSourceBase> sources)
 			: this()
 		{
 			this.Sources = sources;
 		}
 
-		public IEnumerable<MediaSourceInfo> Sources
+		public IEnumerable<MediaSourceBase> Sources
 		{
 			get;
 			set;
@@ -30,15 +30,15 @@ namespace Gablarski.Messages
 		public override void WritePayload (IValueWriter writer, IdentifyingTypes idTypes)
 		{
 			writer.WriteInt32 (this.Sources.Count());
-			foreach (MediaSourceInfo source in this.Sources)
-				source.Serialize (writer, idTypes);
+			foreach (MediaSourceBase source in this.Sources)
+				source.SerializeCore (writer, idTypes);
 		}
 
 		public override void ReadPayload (IValueReader reader, IdentifyingTypes idTypes)
 		{
-			MediaSourceInfo[] sourceInfos = new MediaSourceInfo[reader.ReadInt32()];
+			MediaSourceBase[] sourceInfos = new MediaSourceBase[reader.ReadInt32()];
 			for (int i = 0; i < sourceInfos.Length; ++i)
-				sourceInfos[i] = new MediaSourceInfo (reader, idTypes);
+				sourceInfos[i] = new AudioSource (reader, idTypes);
 
 			this.Sources = sourceInfos;
 		}

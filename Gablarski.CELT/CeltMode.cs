@@ -116,10 +116,10 @@ namespace Gablarski.CELT
 				throw new ArgumentOutOfRangeException ("samplingRate");
 
 			if (frameSize < 64 || frameSize > 512)
-				throw new ArgumentOutOfRangeException ("samplesPerChannel");
+				throw new ArgumentOutOfRangeException ("frameSize");
 
 			if (frameSize % 2 != 0)
-				throw new ArgumentException ("You must have an even number of samples per channel", "samplesPerChannel");
+				throw new ArgumentException ("You must have an even number of samples per channel", "frameSize");
 
 			IntPtr error;
 			IntPtr mode = celt_mode_create (samplingRate, channels, frameSize, out error);
