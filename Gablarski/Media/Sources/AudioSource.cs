@@ -20,8 +20,8 @@ namespace Gablarski.Media.Sources
 		{
 		}
 
-		public AudioSource (int id, object ownerId, byte channels, int targetBitrate, int frequency, short frameSize)
-			: base (id, ownerId, targetBitrate)
+		public AudioSource (int id, object ownerId, byte channels, int bitrate, int frequency, short frameSize)
+			: base (id, ownerId, bitrate)
 		{
 			if (id <= 0)
 				throw new ArgumentOutOfRangeException ("id");
@@ -29,21 +29,18 @@ namespace Gablarski.Media.Sources
 				throw new ArgumentNullException ("ownerId");
 			if (channels <= 0 || channels > 2)
 				throw new ArgumentOutOfRangeException ("channels");
-			if (targetBitrate <= 32000)
-				throw new ArgumentOutOfRangeException ("targetBitrate");
 			if (frequency < 20000 || frequency > 96000)
 				throw new ArgumentOutOfRangeException ("frequency");
 			if (frameSize < 64 || frameSize > 512)
 				throw new ArgumentOutOfRangeException ("frameSize");
 			
 			this.Channels = channels;
-			this.TargetBitrate = targetBitrate;
 			this.Frequency = frequency;
 			this.FrameSize = frameSize;
 		}
 
-		public AudioSource (int id, object ownerId, byte channels, int targetBitrate, int frequency, short frameSize, byte complexity)
-			: this (id, ownerId, channels, targetBitrate, frequency, frameSize)
+		public AudioSource (int id, object ownerId, byte channels, int bitrate, int frequency, short frameSize, byte complexity)
+			: this (id, ownerId, channels, bitrate, frequency, frameSize)
 		{
 			if (complexity < 1 || complexity > 10)
 				throw new ArgumentOutOfRangeException ("complexity");
@@ -66,7 +63,7 @@ namespace Gablarski.Media.Sources
 			}
 
 			int len;
-			byte[] encoded = this.encoder.Encode (data, this.TargetBitrate, out len);
+			byte[] encoded = this.encoder.Encode (data, this.Bitrate, out len);
 			byte[] final = new byte[len];
 			Array.Copy (encoded, final, len);
 
@@ -119,15 +116,6 @@ namespace Gablarski.Media.Sources
 		}
 
 		/// <summary>
-		/// Gets the target bitrate of the encoded audio.
-		/// </summary>
-		public int TargetBitrate
-		{
-			get;
-			private set;
-		}
-
-		/// <summary>
 		/// Gets the frame size for the encoded packets.
 		/// </summary>
 		public short FrameSize
@@ -145,14 +133,12 @@ namespace Gablarski.Media.Sources
 		{
 			writer.WriteByte (this.Channels);
 			writer.WriteInt32 (this.Frequency);
-			writer.WriteInt32 (this.TargetBitrate);
 		}
 
 		protected override void Deserialize (IValueReader reader, IdentifyingTypes idTypes)
 		{
 			this.Channels = reader.ReadByte();
 			this.Frequency = reader.ReadInt32();
-			this.TargetBitrate = reader.ReadInt32();
 		}
 	}
 }

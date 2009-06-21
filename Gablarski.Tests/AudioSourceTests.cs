@@ -40,7 +40,7 @@ namespace Gablarski.Tests
 			Assert.AreEqual (1,		source.Id);
 			Assert.AreEqual (user,	source.OwnerId);
 			Assert.AreEqual (1,		source.Channels);
-			Assert.AreEqual (64000, source.TargetBitrate);
+			Assert.AreEqual (64000, source.Bitrate);
 			Assert.AreEqual (44100, source.Frequency);
 			Assert.AreEqual (512,	source.FrameSize);
 			Assert.AreEqual (10,	source.Complexity);

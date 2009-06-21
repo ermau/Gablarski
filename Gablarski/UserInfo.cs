@@ -33,13 +33,13 @@ namespace Gablarski
 		public string Nickname
 		{
 			get;
-			private set;
+			protected set;
 		}
 
 		public object UserId
 		{
 			get;
-			private set;
+			protected set;
 		}
 
 		public object CurrentChannelId

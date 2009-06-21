@@ -17,6 +17,18 @@ namespace Gablarski.Client
 			this.context = context;
 		}
 
+		internal CurrentUser (IClientContext context, object userId, string nickname)
+			: this (context)
+		{
+			if (userId == null)
+				throw new ArgumentNullException("userId");
+			if (nickname.IsEmpty())
+				throw new ArgumentNullException("nickname", "nickname is null or empty.");
+
+			this.UserId = userId;
+			this.Nickname = nickname;
+		}
+
 		#region Events
 		/// <summary>
 		/// A login result has been received.
@@ -46,7 +58,6 @@ namespace Gablarski.Client
 			if (nick.IsEmpty())
 				throw new ArgumentNullException ("nick", "nick must not be null or empty");
 
-			this.nickname = nick;
 			this.context.Connection.Send (new LoginMessage
 			{
 				Nickname = nick,
@@ -55,8 +66,6 @@ namespace Gablarski.Client
 			});
 		}
 
-		private string nickname;
-		private object playerId;
 		private readonly IClientContext context;
 
 		protected virtual void OnLoginResult (ReceivedLoginResultEventArgs e)
@@ -70,7 +79,7 @@ namespace Gablarski.Client
 		internal void OnLoginResultMessage (MessageReceivedEventArgs e)
 		{
 		    var msg = (LoginResultMessage)e.Message;
-			this.playerId = msg.UserInfo.UserId;
+			this.UserId = msg.UserInfo.UserId;
 
 			var args = new ReceivedLoginResultEventArgs (msg.Result);
 			this.OnLoginResult (args);

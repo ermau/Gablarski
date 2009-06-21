@@ -18,6 +18,7 @@ namespace Gablarski.Media.Sources
 
 			this.Id = sourceId;
 			this.OwnerId = ownerId;
+			this.Bitrate = bitrate;
 		}
 
 		protected MediaSourceBase (IValueReader reader, IdentifyingTypes idTypes)
@@ -48,6 +49,9 @@ namespace Gablarski.Media.Sources
 			private set;
 		}
 
+		/// <summary>
+		/// The bitrate of the media data.
+		/// </summary>
 		public int Bitrate
 		{
 			get;
@@ -61,6 +65,7 @@ namespace Gablarski.Media.Sources
 		{
 			writer.WriteInt32 (this.Id);
 			idTypes.WriteUser (writer, this.OwnerId);
+			writer.WriteInt32 (this.Bitrate);
 
 			this.Serialize (writer, idTypes);
 		}
@@ -71,6 +76,7 @@ namespace Gablarski.Media.Sources
 		{
 			this.Id = reader.ReadInt32 ();
 			this.OwnerId = idTypes.ReadUser (reader);
+			this.Bitrate = reader.ReadInt32();
 
 			this.Deserialize (reader, idTypes);
 		}
