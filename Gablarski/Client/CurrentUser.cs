@@ -2,55 +2,93 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Gablarski.Messages;
 
 namespace Gablarski.Client
 {
 	public class CurrentUser
 		: ClientUser
 	{
-		internal CurrentUser()
+		internal CurrentUser (IClientContext context)
 		{
+			if (context == null)
+				throw new ArgumentNullException ("context");
+
+			this.context = context;
 		}
 
-		//private void OnChangeChannelResultMessage (MessageReceivedEventArgs e)
-		//{
-		//    var msg = (ChannelChangeResultMessage)e.Message;
+		#region Events
+		/// <summary>
+		/// A login result has been received.
+		/// </summary>
+		public event EventHandler<ReceivedLoginResultEventArgs> ReceivedLoginResult;
+		#endregion
 
-		//    if (msg.Result != ChannelChangeResult.Success)
-		//        return;
+		/// <summary>
+		/// Logs into the connected server with <paramref name="nick"/>.
+		/// </summary>
+		/// <param name="nick">The nickname to log in with.</param>
+		/// <exception cref="System.ArgumentNullException"><paramref name="nick"/> is null or empty.</exception>
+		public void Login (string nick)
+		{
+			Login (nick, null, null);
+		}
 
-		//    lock (this.playerLock)
-		//    {
-		//        if (!this.players.ContainsKey (msg.MoveInfo.TargetUserId))
-		//            return;
+		/// <summary>
+		/// Logs into the connected server with <paramref name="nick"/>.
+		/// </summary>
+		/// <param name="nick">The nickname to log in with.</param>
+		/// <param name="username">The username to log in with.</param>
+		/// <param name="password">The password to log in with.</param>
+		/// <exception cref="System.ArgumentNullException"><paramref name="nick"/> is null or empty.</exception>
+		public void Login (string nick, string username, string password)
+		{
+			if (nick.IsEmpty())
+				throw new ArgumentNullException ("nick", "nick must not be null or empty");
 
-		//        this.players[msg.MoveInfo.TargetUserId].CurrentChannelId = msg.MoveInfo.TargetChannelId;
-		//    }
+			this.nickname = nick;
+			this.context.Connection.Send (new LoginMessage
+			{
+				Nickname = nick,
+				Username = username,
+				Password = password
+			});
+		}
 
-		//    this.OnPlayerChangedChannnel (new ChannelChangedEventArgs (msg.MoveInfo));
-		//}	
-	
+		private string nickname;
+		private object playerId;
+		private readonly IClientContext context;
+
+		protected virtual void OnLoginResult (ReceivedLoginResultEventArgs e)
+		{
+			var result = this.ReceivedLoginResult;
+			if (result != null)
+				result (this, e);
+		}
+
 		// TODO: Deserialize
-		//private void OnLoginResultMessage (MessageReceivedEventArgs e)
-		//{
-		//    var msg = (LoginResultMessage)e.Message;
+		internal void OnLoginResultMessage (MessageReceivedEventArgs e)
+		{
+		    var msg = (LoginResultMessage)e.Message;
+			this.playerId = msg.UserInfo.UserId;
 
-		//    var args = new ReceivedLoginResultEventArgs (msg.Result, msg.UserInfo);
+			var args = new ReceivedLoginResultEventArgs (msg.Result);
+			this.OnLoginResult (args);
+		}
+	}
 
-		//    if (!msg.Result.Succeeded || (msg.Result.Succeeded && msg.UserInfo.Nickname == this.nickname))
-		//    {
-		//        this.playerId = msg.UserInfo.UserId;
-		//        OnLoginResult (args);
-		//    }
-		//    else
-		//    {
-		//        lock (playerLock)
-		//        {
-		//            this.players.Add (msg.Result.UserId, msg.UserInfo);
-		//        }
+	public class ReceivedLoginResultEventArgs
+		: EventArgs
+	{
+		public ReceivedLoginResultEventArgs (LoginResult result)
+		{
+			this.Result = result;
+		}
 
-		//        OnPlayerLoggedIn (args);
-		//    }
-		//}
+		public LoginResult Result
+		{
+			get;
+			private set;
+		}
 	}
 }

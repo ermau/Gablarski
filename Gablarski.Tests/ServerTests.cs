@@ -59,7 +59,8 @@ namespace Gablarski.Tests
 			Assert.AreEqual (message.UserInfo.CurrentChannelId, login.UserInfo.CurrentChannelId);
 
 			connection.Client.DequeueAndAssertMessage<ChannelListMessage>();
-			connection.Client.DequeueAndAssertMessage<UserListMessage>();
+			var users = connection.Client.DequeueAndAssertMessage<UserListMessage>();
+			Assert.IsNotNull (users.Users.FirstOrDefault (u => u.UserId == login.UserInfo.UserId));
 			connection.Client.DequeueAndAssertMessage<SourceListMessage>();
 
 			return connection;

@@ -13,9 +13,6 @@ namespace Gablarski.Client
 	{
 		protected ServerInfo serverInfo;
 
-		private string nickname;
-		private object playerId;
-
 		protected Dictionary<ServerMessageType, Action<MessageReceivedEventArgs>> handlers;
 		protected internal IClientConnection Connection
 		{
@@ -31,6 +28,9 @@ namespace Gablarski.Client
 		{
 			if (this.handlers != null)
 				return;
+
+			if (this.CurrentUser == null)
+				this.CurrentUser = new CurrentUser (this);
 
 			if (this.Users == null)
 				this.Users = new ClientUserManager (this);
@@ -52,11 +52,11 @@ namespace Gablarski.Client
 				{ ServerMessageType.ChannelEditResult, this.Channels.OnChannelEditResultMessage },
 
 				{ ServerMessageType.ConnectionRejected, OnConnectionRejectedMessage },
-				//{ ServerMessageType.LoginResult, OnLoginResultMessage },
+				{ ServerMessageType.LoginResult, this.CurrentUser.OnLoginResultMessage },
 				{ ServerMessageType.UserLoggedIn, this.Users.OnUserLoggedInMessage },
 				{ ServerMessageType.UserDisconnected, this.Users.OnUserDisconnectedMessage },
 				
-				//{ ServerMessageType.SourceResult, OnSourceResultMessage },
+				{ ServerMessageType.SourceResult, this.Sources.OnSourceResultMessage },
 				{ ServerMessageType.AudioDataReceived, this.Sources.OnAudioDataReceivedMessage },
 			};
 

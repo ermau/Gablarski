@@ -40,7 +40,7 @@ namespace Gablarski.Client
 			if (targetChannel == null)
 				throw new ArgumentNullException ("targetChannel");
 
-			this.client.Send (new ChangeChannelMessage (this.UserId, targetChannel.ChannelId));
+			this.client.Send (new ChannelChangeMessage (this.UserId, targetChannel.ChannelId));
 		}
 
 		private readonly IClientConnection client;

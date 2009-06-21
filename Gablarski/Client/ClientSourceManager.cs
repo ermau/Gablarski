@@ -12,7 +12,7 @@ namespace Gablarski.Client
 	public class ClientSourceManager
 		: IEnumerable<MediaSourceBase>
 	{
-		public ClientSourceManager (IClientContext context)
+		protected internal ClientSourceManager (IClientContext context)
 		{
 			if (context == null)
 				throw new ArgumentNullException ("context");
@@ -37,6 +37,14 @@ namespace Gablarski.Client
 		public event EventHandler<ReceivedAudioEventArgs> ReceivedAudio;
 		#endregion
 
+		/// <summary>
+		/// Gets a listing of the sources that belong to the current user.
+		/// </summary>
+		public IEnumerable<ClientMediaSource> Mine
+		{
+			get { return this.OfType<ClientMediaSource>(); }
+		}
+
 		#region Implementation of IEnumerable
 
 		/// <summary>
@@ -48,7 +56,17 @@ namespace Gablarski.Client
 		/// <filterpriority>1</filterpriority>
 		public IEnumerator<MediaSourceBase> GetEnumerator()
 		{
-			throw new NotImplementedException();
+			if (this.sources == null)
+				yield break;
+
+			lock (this.sourceLock)
+			{
+				if (this.sources == null)
+					yield break;
+
+				foreach (var source in this.sources.Values)
+					yield return source;
+			}
 		}
 
 		/// <summary>
@@ -65,31 +83,28 @@ namespace Gablarski.Client
 
 		#endregion
 
+		/// <summary>
+		/// Requests a channel with <paramref name="channels"/> and a default bitrate.
+		/// </summary>
+		/// <param name="channels">The number of channels to request. 1-2 is the valid range.</param>
 		public void Request (int channels)
 		{
 			Request (channels, 0);
 		}
 
+		/// <summary>
+		/// Requests a channel with <paramref name="channels"/> and a <paramref name="targetBitrate"/>
+		/// </summary>
+		/// <param name="channels">The number of channels to request. 1-2 is the valid range.</param>
+		/// <param name="targetBitrate">The target bitrate to request.</param>
+		/// <remarks>
+		/// The server may not agree with the bitrate you request, do not set up audio based on this
+		/// target, but on the bitrate of the source you actually receive.
+		/// </remarks>
 		public void Request (int channels, int targetBitrate)
 		{
 			this.context.Connection.Send (new RequestSourceMessage (channels, targetBitrate));
 		}
-
-		//public void RequestSource (Type mediaSourceType, byte channels)
-		//{
-		//    if (mediaSourceType == null)
-		//        throw new ArgumentNullException ("mediaSourceType");
-		//    if (mediaSourceType.GetInterface ("MediaSourceBase") == null)
-		//        throw new InvalidOperationException ("Can not request a source that is not a media source.");
-
-		//    lock (sourceLock)
-		//    {
-		//        if (this.clientSources.Values.Any (s => s.GetType () == mediaSourceType))
-		//            throw new InvalidOperationException ("Client already owns a source of this type.");
-		//    }
-
-		//    this.Connection.Send (new RequestSourceMessage (mediaSourceType, channels));
-		//}
 
 		private readonly IClientContext context;
 		private readonly object sourceLock = new object();
@@ -101,7 +116,7 @@ namespace Gablarski.Client
 
 			lock (sourceLock)
 			{
-				this.sources = msg.Sources.ToDictionary (s => s.Id);
+				this.sources = msg.Sources.ToDictionary (s => s.Id, s => (s.OwnerId == context.CurrentUser.UserId) ? new ClientMediaSource (s, this.context.Connection) : s);
 			}
 
 			OnReceivedSourceList (new ReceivedListEventArgs<MediaSourceBase> (msg.Sources));
@@ -118,7 +133,7 @@ namespace Gablarski.Client
 		        	if (sources == null)
 						sources = new Dictionary<int, MediaSourceBase>();
 
-					sources.Add (source.Id, source);
+					sources.Add (source.Id, (source.OwnerId == context.CurrentUser.UserId) ? new ClientMediaSource (source, this.context.Connection) : source);
 		        }
 		    }
 
@@ -137,7 +152,7 @@ namespace Gablarski.Client
 			}
 
 			if (source != null)
-				OnReceivedAudio (new ReceivedAudioEventArgs (source, msg.Data));
+				OnReceivedAudio (new ReceivedAudioEventArgs (source, source.Decode (msg.Data)));
 		}
 
 		#region Event Invokers
@@ -180,7 +195,7 @@ namespace Gablarski.Client
 		public AudioSource Source
 		{
 			get;
-			set;
+			private set;
 		}
 
 		/// <summary>
@@ -189,7 +204,7 @@ namespace Gablarski.Client
 		public byte[] AudioData
 		{
 			get;
-			set;
+			private set;
 		}
 	}
 
@@ -202,10 +217,13 @@ namespace Gablarski.Client
 			this.Source = source;
 		}
 
+		/// <summary>
+		/// Gets the result of the source request.
+		/// </summary>
 		public SourceResult Result
 		{
 			get;
-			set;
+			private set;
 		}
 
 		/// <summary>
@@ -214,7 +232,7 @@ namespace Gablarski.Client
 		public MediaSourceBase Source
 		{
 			get;
-			set;
+			private set;
 		}
 	}
 	#endregion

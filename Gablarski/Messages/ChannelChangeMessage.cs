@@ -5,21 +5,21 @@ using System.Text;
 
 namespace Gablarski.Messages
 {
-	public class ChangeChannelMessage
+	public class ChannelChangeMessage
 		: ClientMessage
 	{
-		public ChangeChannelMessage ()
+		public ChannelChangeMessage ()
 			: base (ClientMessageType.ChangeChannel)
 		{
 		}
 
-		public ChangeChannelMessage (object targetUserId, object targetChannelId)
+		public ChannelChangeMessage (object targetUserId, object targetChannelId)
 			: this()
 		{
 			this.MoveInfo = new ChannelChangeInfo (targetUserId, targetChannelId);
 		}
 
-		public ChangeChannelMessage (object targetUserId, object targetChannelId, object requestingPlayerId)
+		public ChannelChangeMessage (object targetUserId, object targetChannelId, object requestingPlayerId)
 			: this ()
 		{
 			this.MoveInfo = new ChannelChangeInfo (targetUserId, targetChannelId, requestingPlayerId);

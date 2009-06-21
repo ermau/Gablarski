@@ -7,12 +7,14 @@ namespace Gablarski.Media.Sources
 {
 	public abstract class MediaSourceBase
 	{
-		protected MediaSourceBase (int sourceId, object ownerId)
+		protected MediaSourceBase (int sourceId, object ownerId, int bitrate)
 		{
 			if (sourceId < 0)
 				throw new ArgumentOutOfRangeException ("sourceId");
 			if (ownerId == null)
 				throw new ArgumentNullException ("ownerId");
+			if (bitrate <= 0)
+				throw new ArgumentOutOfRangeException ("bitrate");
 
 			this.Id = sourceId;
 			this.OwnerId = ownerId;
@@ -46,6 +48,12 @@ namespace Gablarski.Media.Sources
 			private set;
 		}
 
+		public int Bitrate
+		{
+			get;
+			private set;
+		}
+
 		public abstract byte[] Encode (byte[] data);
 		public abstract byte[] Decode (byte[] data);
 
@@ -57,9 +65,7 @@ namespace Gablarski.Media.Sources
 			this.Serialize (writer, idTypes);
 		}
 
-		protected virtual void Serialize (IValueWriter writer, IdentifyingTypes idTypes)
-		{
-		}
+		protected abstract void Serialize (IValueWriter writer, IdentifyingTypes idTypes);
 
 		internal void DeserializeCore (IValueReader reader, IdentifyingTypes idTypes)
 		{
@@ -69,8 +75,6 @@ namespace Gablarski.Media.Sources
 			this.Deserialize (reader, idTypes);
 		}
 
-		protected virtual void Deserialize (IValueReader reader, IdentifyingTypes idTypes)
-		{
-		}
+		protected abstract void Deserialize (IValueReader reader, IdentifyingTypes idTypes);
 	}
 }

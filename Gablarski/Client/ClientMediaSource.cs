@@ -11,7 +11,7 @@ namespace Gablarski.Client
 		: MediaSourceBase
 	{
 		internal ClientMediaSource (MediaSourceBase source, IClientConnection client)
-			: base (source.Id, source.OwnerId)
+			: base (source.Id, source.OwnerId, source.Bitrate)
 		{
 			this.source = source;
 			this.client = client;
@@ -37,6 +37,14 @@ namespace Gablarski.Client
 		#endregion
 
 		private readonly IClientConnection client;
-		private readonly MediaSourceBase source;	
+		private readonly MediaSourceBase source;
+
+		protected override void Deserialize (IValueReader reader, IdentifyingTypes idTypes)
+		{
+		}
+
+		protected override void Serialize (IValueWriter writer, IdentifyingTypes idTypes)
+		{
+		}
 	}
 }

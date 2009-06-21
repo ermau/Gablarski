@@ -22,7 +22,7 @@ namespace Gablarski.Server
 				{ ClientMessageType.AudioData, AudioDataReceived },
 
 				{ ClientMessageType.RequestChannelList, ClientRequestsChannelList },
-				{ ClientMessageType.RequestUserList, this.ClientRequestsUserList },
+				{ ClientMessageType.RequestUserList, ClientRequestsUserList },
 				{ ClientMessageType.RequestSourceList, ClientRequestsSourceList },
 
 				{ ClientMessageType.ChangeChannel, ClientRequestsChannelChange },
@@ -112,7 +112,7 @@ namespace Gablarski.Server
 
 		private void ClientRequestsChannelChange (MessageReceivedEventArgs e)
 		{
-			var change = (ChangeChannelMessage)e.Message;
+			var change = (ChannelChangeMessage)e.Message;
 
 			ChannelChangeResult resultState = ChannelChangeResult.FailedUnknown;
 			lock (this.channelLock)
@@ -137,7 +137,7 @@ namespace Gablarski.Server
 				if (resultState == ChannelChangeResult.FailedUnknown)
 				{
 					requestingPlayer.CurrentChannelId = change.MoveInfo.TargetChannelId;
-					this.connections.Send (new ChannelChangeResultMessage (change.MoveInfo));
+					this.connections.Send (new ChannelChangeMessage (change.MoveInfo.TargetUserId, change.MoveInfo.TargetChannelId, requestingPlayer));
 					return;
 				}
 			}
@@ -253,7 +253,6 @@ namespace Gablarski.Server
 			var request = (RequestSourceMessage)e.Message;
 
 			SourceResult result = SourceResult.FailedUnknown;
-			int sourceId = -1;
 
 			var user = this.connections[e.Connection];
 			if (user == null || !this.GetPermission (PermissionName.RequestSource, user))
@@ -262,7 +261,8 @@ namespace Gablarski.Server
 			MediaSourceBase source = null;
 			try
 			{
-				int index = 0;
+				int index;
+				int sourceId;
 				lock (sourceLock)
 				{
 					if (!sources.ContainsKey (e.Connection))

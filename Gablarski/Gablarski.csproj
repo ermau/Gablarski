@@ -85,7 +85,7 @@
     <Compile Include="LoginResult.cs" />
     <Compile Include="MediaType.cs" />
     <Compile Include="Messages\AudioDataReceivedMessage.cs" />
-    <Compile Include="Messages\ChangeChannelMessage.cs" />
+    <Compile Include="Messages\ChannelChangeMessage.cs" />
     <Compile Include="Messages\ChannelEditMessage.cs" />
     <Compile Include="Messages\ChannelEditResultMessage.cs" />
     <Compile Include="Messages\ChannelListMessage.cs" />
@@ -144,7 +144,7 @@
     <Compile Include="Server\Telnet\TelnetConnectionProvider.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AudioSource.cs" />
+    <Compile Include="Media\Sources\AudioSource.cs" />
     <Compile Include="Client\ClientMediaSource.cs" />
     <Compile Include="Client\ClientUser.cs" />
     <Compile Include="Client\ClientUserManager.cs" />

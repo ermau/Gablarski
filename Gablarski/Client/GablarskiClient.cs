@@ -35,28 +35,37 @@ namespace Gablarski.Client
 		/// </summary>
 		public event EventHandler Disconnected;
 
-		/// <summary>
-		/// A login result has been received.
-		/// </summary>
-		public event EventHandler<ReceivedLoginResultEventArgs> ReceivedLoginResult;
-		
-	
 		#endregion
 
 		#region Public Properties
+		/// <summary>
+		/// Gets the channel manager for this client.
+		/// </summary>
 		public ClientChannelManager Channels
 		{
 			get;
 			set;
 		}
 
+		/// <summary>
+		/// Gets the user manager for this client.
+		/// </summary>
 		public ClientUserManager Users
 		{
 			get; 
 			set;
 		}
 
+		/// <summary>
+		/// Gets the source manager for this client.
+		/// </summary>
 		public ClientSourceManager Sources
+		{
+			get;
+			set;
+		}
+
+		public CurrentUser CurrentUser
 		{
 			get;
 			set;
@@ -95,37 +104,6 @@ namespace Gablarski.Client
 			this.running = false;
 			this.messageRunnerThread.Join ();
 		}
-
-		/// <summary>
-		/// Logs into the connected server with <paramref name="nick"/>.
-		/// </summary>
-		/// <param name="nick">The nickname to log in with.</param>
-		/// <exception cref="System.ArgumentNullException"><paramref name="nick"/> is null or empty.</exception>
-		public void Login (string nick)
-		{
-			Login (nick, null, null);
-		}
-
-		/// <summary>
-		/// Logs into the connected server with <paramref name="nick"/>.
-		/// </summary>
-		/// <param name="nick">The nickname to log in with.</param>
-		/// <param name="username">The username to log in with.</param>
-		/// <param name="password">The password to log in with.</param>
-		/// <exception cref="System.ArgumentNullException"><paramref name="nick"/> is null or empty.</exception>
-		public void Login (string nick, string username, string password)
-		{
-			if (nick.IsEmpty())
-				throw new ArgumentNullException ("nick", "nick must not be null or empty");
-
-			this.nickname = nick;
-			this.Connection.Send (new LoginMessage
-			{
-				Nickname = nick,
-				Username = username,
-				Password = password
-			});
-		}
 		#endregion
 
 		#region Event Invokers
@@ -149,13 +127,6 @@ namespace Gablarski.Client
 			if (rejected != null)
 				rejected (this, e);
 		}
-	
-		protected virtual void OnLoginResult (ReceivedLoginResultEventArgs e)
-		{
-			var result = this.ReceivedLoginResult;
-			if (result != null)
-				result (this, e);
-		}
 		#endregion
 
 		#region IClientContext Members
@@ -177,15 +148,8 @@ namespace Gablarski.Client
 
 		IEnumerable<ClientUser> IClientContext.Users
 		{
-			get { throw new NotImplementedException (); }
+			get { return this.Users; }
 		}
-
-		private readonly CurrentUser currentUser = new CurrentUser ();
-		CurrentUser IClientContext.CurrentUser
-		{
-			get { return this.currentUser; }
-		}
-
 		#endregion
 	}
 
@@ -217,21 +181,6 @@ namespace Gablarski.Client
 		}
 
 		public IEnumerable<T> Data
-		{
-			get;
-			private set;
-		}
-	}
-
-	public class ReceivedLoginResultEventArgs
-		: EventArgs
-	{
-		public ReceivedLoginResultEventArgs (LoginResult result)
-		{
-			this.Result = result;
-		}
-
-		public LoginResult Result
 		{
 			get;
 			private set;

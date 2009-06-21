@@ -48,7 +48,7 @@ namespace Gablarski.Clients.CLI
 		{
 			GablarskiClient sclient = new GablarskiClient (new ClientNetworkConnection ());
 			sclient.Connect (host, port);
-			sclient.Login (nickname, username, password);
+			sclient.CurrentUser.Login (nickname, username, password);
 
 			return sclient;
 		}

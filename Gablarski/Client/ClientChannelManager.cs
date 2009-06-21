@@ -9,7 +9,7 @@ namespace Gablarski.Client
 	public class ClientChannelManager
 		: IEnumerable<Channel>
 	{
-		internal ClientChannelManager (IClientContext context)
+		protected internal ClientChannelManager (IClientContext context)
 		{
 			if (context == null)
 				throw new ArgumentNullException ("context");

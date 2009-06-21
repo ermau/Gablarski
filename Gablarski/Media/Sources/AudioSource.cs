@@ -5,13 +5,13 @@ using System.Text;
 using Gablarski.CELT;
 using Gablarski.Media.Sources;
 
-namespace Gablarski
+namespace Gablarski.Media.Sources
 {
 	public class AudioSource
 		: MediaSourceBase
 	{
 		public AudioSource (MediaSourceBase sourceBase)
-			: base (sourceBase.Id, sourceBase.OwnerId)
+			: base (sourceBase.Id, sourceBase.OwnerId, sourceBase.Bitrate)
 		{
 		}
 
@@ -21,7 +21,7 @@ namespace Gablarski
 		}
 
 		public AudioSource (int id, object ownerId, byte channels, int targetBitrate, int frequency, short frameSize)
-			: base (id, ownerId)
+			: base (id, ownerId, targetBitrate)
 		{
 			if (id <= 0)
 				throw new ArgumentOutOfRangeException ("id");

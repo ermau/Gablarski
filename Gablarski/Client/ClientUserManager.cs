@@ -10,7 +10,7 @@ namespace Gablarski.Client
 	public class ClientUserManager
 		: IEnumerable<ClientUser>
 	{
-		public ClientUserManager (IClientContext context)
+		protected internal ClientUserManager (IClientContext context)
 		{
 			if (context == null)
 				throw new ArgumentNullException ("context");
@@ -38,6 +38,11 @@ namespace Gablarski.Client
 		/// A player has changed channels.
 		/// </summary>
 		public event EventHandler<ChannelChangedEventArgs> UserChangedChannel;
+
+		/// <summary>
+		/// Received an unsucessful result of a change channel request.
+		/// </summary>
+		public event EventHandler<ReceivedChannelChannelResultEventArgs> ReceivedChannelChangeResult;
 		#endregion
 
 		public CurrentUser Current
@@ -145,6 +150,24 @@ namespace Gablarski.Client
 			this.OnUserLoggedIn (new UserLoggedInEventArgs (user));
 		}
 
+		internal void OnChangeChannelResultMessage (MessageReceivedEventArgs e)
+		{
+		    var msg = (ChannelChangeResultMessage)e.Message;
+
+		    if (msg.Result != ChannelChangeResult.Success)
+		        return;
+
+			//lock (this.playerLock)
+			//{
+			//    if (!this.players.ContainsKey (msg.MoveInfo.TargetUserId))
+			//        return;
+
+			//    this.players[msg.MoveInfo.TargetUserId].CurrentChannelId = msg.MoveInfo.TargetChannelId;
+			//}
+
+			//this.OnPlayerChangedChannnel (new ChannelChangedEventArgs (msg.MoveInfo));
+		}
+
 		internal void OnUserChangedChannelMessage (MessageReceivedEventArgs e)
 		{
 			var msg = (UserChangedChannelMessage)e.Message;
@@ -201,6 +224,12 @@ namespace Gablarski.Client
 				result (this, e);
 		}
 
+		protected virtual void OnReceivedChannelChangeResult (ReceivedChannelChannelResultEventArgs e)
+		{
+			var result = this.ReceivedChannelChangeResult;
+			if (result != null)
+				result (this, e);
+		}
 		#endregion
 	}
 
@@ -284,6 +313,24 @@ namespace Gablarski.Client
 		public ClientUser MovedBy
 		{
 			get; private set;
+		}
+	}
+
+	public class ReceivedChannelChannelResultEventArgs
+		: EventArgs
+	{
+		public ReceivedChannelChannelResultEventArgs (ChannelChangeResult result)
+		{
+			this.Result = result;
+		}
+
+		/// <summary>
+		/// Gets the result of the change channel request.
+		/// </summary>
+		public ChannelChangeResult Result
+		{
+			get;
+			private set;
 		}
 	}
 	#endregion
