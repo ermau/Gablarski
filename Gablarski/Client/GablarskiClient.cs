@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using Gablarski.Media.Sources;
 using Gablarski.Messages;
 
@@ -13,10 +14,23 @@ namespace Gablarski.Client
 		public static readonly Version ApiVersion = Assembly.GetAssembly (typeof (GablarskiClient)).GetName ().Version;
 
 		public GablarskiClient (IClientConnection connection)
+			: this (connection, true)
+		{
+		}
+		
+		public GablarskiClient (IClientConnection connection, ClientUserManager userMananger, ClientChannelManager channelManager, ClientSourceManager sourceManager, CurrentUser currentUser)
+			: this (connection, false)
+		{
+			this.Setup (userMananger, channelManager, sourceManager, currentUser);
+		}
+
+		private GablarskiClient (IClientConnection connection, bool setupDefaults)
 		{
 			this.Connection = connection;
-			this.Connection.Connected += this.OnConnected;
 			this.Connection.Disconnected += this.OnDisconnected;
+
+			if (setupDefaults)
+				this.Setup (new ClientUserManager (this), new ClientChannelManager (this), new ClientSourceManager (this), new CurrentUser (this));
 		}
 
 		#region Events
@@ -44,7 +58,7 @@ namespace Gablarski.Client
 		public ClientChannelManager Channels
 		{
 			get;
-			set;
+			private set;
 		}
 
 		/// <summary>
@@ -53,7 +67,7 @@ namespace Gablarski.Client
 		public ClientUserManager Users
 		{
 			get; 
-			set;
+			private set;
 		}
 
 		/// <summary>
@@ -62,13 +76,13 @@ namespace Gablarski.Client
 		public ClientSourceManager Sources
 		{
 			get;
-			set;
+			private set;
 		}
 
 		public CurrentUser CurrentUser
 		{
 			get;
-			set;
+			private set;
 		}
 		#endregion
 
@@ -85,9 +99,11 @@ namespace Gablarski.Client
 			if (host.IsEmpty ())
 				throw new ArgumentException ("host must not be null or empty", "host");
 
-			this.Setup ();
-
 			this.running = true;
+
+			this.messageRunnerThread = new Thread (this.MessageRunner);
+			this.messageRunnerThread.Name = "Gablarski Client Message Runner";
+			this.messageRunnerThread.SetApartmentState (ApartmentState.STA);
 			this.messageRunnerThread.Start ();	
 
 			Connection.MessageReceived += OnMessageReceived;
@@ -100,6 +116,7 @@ namespace Gablarski.Client
 		/// </summary>
 		public void Disconnect()
 		{
+			Connection.Disconnected -= this.OnDisconnected;
 			Connection.MessageReceived -= this.OnMessageReceived;
 			Connection.Disconnect();
 			this.running = false;

@@ -44,6 +44,8 @@ namespace Gablarski.Server
 		{
 			this.settings = settings;
 
+			this.IdentifyingTypes = new IdentifyingTypes (userProvider.IdentifyingType, channelProvider.IdentifyingType);
+
 			this.backendProvider = provider;
 			this.backendProvider.ChannelsUpdatedExternally += OnChannelsUpdatedExternally;
 			this.UpdateChannels (false);
@@ -312,6 +314,7 @@ namespace Gablarski.Server
 
 			this.connections.Add (e.Connection);
 
+			e.Connection.IdentifyingTypes = this.IdentifyingTypes;
 			e.Connection.MessageReceived += this.OnMessageReceived;
 			e.Connection.Disconnected += this.OnClientDisconnected;
 		}

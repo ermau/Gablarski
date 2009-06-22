@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -12,16 +13,29 @@ namespace Gablarski.Network
 	public class ServerNetworkConnectionProvider
 		: ConnectionProviderBase
 	{
+		public ServerNetworkConnectionProvider (int port)
+		{
+			this.Port = port;
+		}
+
+		public int Port
+		{
+			get;
+			private set;
+		}
+
 		private TcpListener listener;
 
 		protected override void Start ()
 		{
-			this.listener = new TcpListener (IPAddress.Any, 6112);
+			Trace.WriteLine ("[Network] Server listening on port " + this.Port);
+			this.listener = new TcpListener (IPAddress.Any, this.Port);
 			this.listener.Start();
 		}
 
 		protected override void Stop ()
 		{
+			Trace.WriteLine ("[Network] Server stopped listening to port " + this.Port);
 			this.listener.Stop();
 			this.listener = null;
 		}

@@ -13,23 +13,23 @@ namespace Gablarski.Tests
 		[Test]
 		public void InvalidSource()
 		{
-			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource (0, new object(), 1, 64000, 44100, 512, 10));
+			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource (0, 1, 1, 64000, 44100, 512, 10));
 
 			Assert.Throws<ArgumentNullException> (() => new AudioSource (0, null, 1, 64000, 44100, 512, 10));
 
-			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource (1, new object(), 0, 0, 41000, 512, 10));
-			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource (1, new object(), 3, 0, 41000, 512, 10));
+			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource (1, 1, 0, 0, 41000, 512, 10));
+			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource (1, 1, 3, 0, 41000, 512, 10));
 
-			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource (1, new object(), 1, 0, 41000, 512, 10));
+			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource (1, 1, 1, 0, 41000, 512, 10));
 
-			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource (1, new object(), 1, 64000, 0, 512, 10));
-			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource (1, new object(), 1, 64000, 100000, 512, 10));
+			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource (1, 1, 1, 64000, 0, 512, 10));
+			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource (1, 1, 1, 64000, 100000, 512, 10));
 
-			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource (1, new object(), 1, 64000, 44100, 32, 10));
-			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource (1, new object(), 1, 64000, 44100, 1024, 10));
+			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource (1, 1, 1, 64000, 44100, 32, 10));
+			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource (1, 1, 1, 64000, 44100, 1024, 10));
 
-			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource (1, new object(), 1, 64000, 100000, 512, 0));
-			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource (1, new object(), 1, 64000, 100000, 512, 11));
+			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource (1, 1, 1, 64000, 100000, 512, 0));
+			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource (1, 1, 1, 64000, 100000, 512, 11));
 		}
 
 		[Test]

@@ -24,22 +24,15 @@ namespace Gablarski.Client
 		private readonly Queue<MessageReceivedEventArgs> mqueue = new Queue<MessageReceivedEventArgs> (100);
 		private Thread messageRunnerThread;
 
-		protected void Setup ()
+		protected void Setup (ClientUserManager userMananger, ClientChannelManager channelManager, ClientSourceManager sourceManager, CurrentUser currentUser)
 		{
 			if (this.handlers != null)
 				return;
 
-			if (this.CurrentUser == null)
-				this.CurrentUser = new CurrentUser (this);
-
-			if (this.Users == null)
-				this.Users = new ClientUserManager (this);
-
-			if (this.Channels == null)
-				this.Channels = new ClientChannelManager (this);
-
-			if (this.Sources == null)
-				this.Sources = new ClientSourceManager (this);
+			this.CurrentUser = currentUser;
+			this.Users = userMananger;
+			this.Channels = channelManager;
+			this.Sources = sourceManager;
 
 			this.handlers = new Dictionary<ServerMessageType, Action<MessageReceivedEventArgs>>
 			{
@@ -59,10 +52,6 @@ namespace Gablarski.Client
 				{ ServerMessageType.SourceResult, this.Sources.OnSourceResultMessage },
 				{ ServerMessageType.AudioDataReceived, this.Sources.OnAudioDataReceivedMessage },
 			};
-
-			this.messageRunnerThread = new Thread (this.MessageRunner);
-			this.messageRunnerThread.Name = "Gablarski Client Message Runner";
-			this.messageRunnerThread.SetApartmentState (ApartmentState.STA);
 		}
 
 		private void MessageRunner ()
@@ -112,9 +101,15 @@ namespace Gablarski.Client
 		private void OnServerInfoReceivedMessage (MessageReceivedEventArgs e)
 		{
 			this.serverInfo = ((ServerInfoMessage)e.Message).ServerInfo;
+			this.Connection.IdentifyingTypes = new IdentifyingTypes (this.serverInfo.UserIdentifyingType, this.serverInfo.ChannelIdentifyingType);
+
 			Trace.WriteLine ("[Client] Received server information: ");
 			Trace.WriteLine ("Server name: " + this.serverInfo.ServerName);
 			Trace.WriteLine ("Server description: " + this.serverInfo.ServerDescription);
+			Trace.WriteLine ("User identifying type: " + this.serverInfo.UserIdentifyingType);
+			Trace.WriteLine ("Channel identifying type: " + this.serverInfo.ChannelIdentifyingType);
+
+			this.OnConnected (this, EventArgs.Empty);
 		}
 	}
 }
