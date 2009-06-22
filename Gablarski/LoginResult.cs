@@ -52,12 +52,12 @@ namespace Gablarski
 	/// </summary>
 	public class LoginResult
 	{
-		internal LoginResult (IValueReader reader)
+		internal LoginResult (IValueReader reader, IdentifyingTypes idTypes)
 		{
-			this.Deserialize (reader);
+			this.Deserialize (reader, idTypes);
 		}
 
-		public LoginResult (long userId, LoginResultState state)
+		public LoginResult (object userId, LoginResultState state)
 		{
 			this.UserId = userId;
 			this.ResultState = state;
@@ -66,7 +66,7 @@ namespace Gablarski
 		/// <summary>
 		/// Gets the logged-in players ID.
 		/// </summary>
-		public long UserId
+		public object UserId
 		{
 			get;
 			private set;
@@ -89,15 +89,15 @@ namespace Gablarski
 			internal set;
 		}
 
-		internal void Serialize (IValueWriter writer)
+		internal void Serialize (IValueWriter writer, IdentifyingTypes idTypes)
 		{
-			writer.WriteInt64 (this.UserId);
+			idTypes.WriteUser (writer, this.UserId);
 			writer.WriteByte ((byte)this.ResultState);
 		}
 
-		internal void Deserialize (IValueReader reader)
+		internal void Deserialize (IValueReader reader, IdentifyingTypes idTypes)
 		{
-			this.UserId = reader.ReadInt64 ();
+			this.UserId = idTypes.ReadUser (reader);
 			this.ResultState = (LoginResultState)reader.ReadByte ();
 		}
 	}

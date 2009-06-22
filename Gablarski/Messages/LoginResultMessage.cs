@@ -38,7 +38,7 @@ namespace Gablarski.Messages
 
 		public override void ReadPayload (IValueReader reader, IdentifyingTypes idTypes)
 		{
-			this.Result = new LoginResult(reader);
+			this.Result = new LoginResult(reader, idTypes);
 
 			if (this.Result.Succeeded)
 				this.UserInfo = new UserInfo (reader, idTypes);
@@ -46,7 +46,7 @@ namespace Gablarski.Messages
 
 		public override void WritePayload (IValueWriter writer, IdentifyingTypes idTypes)
 		{
-			this.Result.Serialize (writer);
+			this.Result.Serialize (writer, idTypes);
 
 			if (this.Result.Succeeded)
 				this.UserInfo.Serialize (writer, idTypes);

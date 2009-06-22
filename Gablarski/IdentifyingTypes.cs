@@ -66,8 +66,14 @@ namespace Gablarski
 			var dm = new DynamicMethod ("SerializeUser", typeof(void), args);
 			var gen = dm.GetILGenerator();
 			gen.Emit (OpCodes.Ldarg_0);
-			gen.Emit (OpCodes.Ldarg_1);
-			gen.EmitCall (OpCodes.Call, method, null);
+			gen.Emit (OpCodes.Ldarg_1);		
+			if (idType.IsByRef)
+				gen.Emit (OpCodes.Castclass, idType);
+			else
+				gen.Emit (OpCodes.Unbox_Any, idType);
+
+			gen.Emit (OpCodes.Callvirt, method);
+			gen.Emit (OpCodes.Ret);
 
 			return (Action<IValueWriter, object>)dm.CreateDelegate (typeof (Action<IValueWriter, object>));
 		}
@@ -86,7 +92,11 @@ namespace Gablarski
 			var dm = new DynamicMethod ("SerializeUser", typeof(object), args);
 			var gen = dm.GetILGenerator();
 			gen.Emit (OpCodes.Ldarg_0);
-			gen.EmitCall (OpCodes.Call, method, null);
+			gen.Emit (OpCodes.Callvirt, method);
+			gen.Emit (OpCodes.Box, idType);
+			gen.Emit (OpCodes.Stloc_0);
+			//gen.Emit (OpCodes.Br_S);
+			gen.Emit (OpCodes.Ldloc_0);
 			gen.Emit (OpCodes.Ret);
 
 			return (Func<IValueReader, object>)dm.CreateDelegate (typeof (Func<IValueReader, object>));
