@@ -100,7 +100,8 @@ namespace Gablarski.Client
 		/// </summary>
 		public void Disconnect()
 		{
-			this.Connection.Disconnect();
+			Connection.MessageReceived -= this.OnMessageReceived;
+			Connection.Disconnect();
 			this.running = false;
 			this.messageRunnerThread.Join ();
 		}
