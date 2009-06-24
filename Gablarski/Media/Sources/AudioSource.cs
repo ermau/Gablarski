@@ -23,7 +23,7 @@ namespace Gablarski.Media.Sources
 		public AudioSource (int id, object ownerId, byte channels, int bitrate, int frequency, short frameSize)
 			: base (id, ownerId, bitrate)
 		{
-			if (id <= 0)
+			if (id < 0)
 				throw new ArgumentOutOfRangeException ("id");
 			if (ownerId == null)
 				throw new ArgumentNullException ("ownerId");
