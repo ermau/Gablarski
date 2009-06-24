@@ -71,14 +71,13 @@ namespace Gablarski
 			var value = gen.DeclareLocal (idType);
 
 			Label call = gen.DefineLabel();
-			Label def = gen.DefineLabel();
+			Label supplied = gen.DefineLabel();
 
-			// Check if value is null
+			// Check if value is not null
 			gen.Emit (OpCodes.Ldarg_1);
-			gen.Emit (OpCodes.Brfalse, def);
+			gen.Emit (OpCodes.Brtrue, supplied);
 
 			// Use the default value
-			gen.MarkLabel (def);
 			gen.Emit (OpCodes.Ldarg_0);
 			
 			if (idType.IsByRef)
@@ -94,6 +93,7 @@ namespace Gablarski
 			gen.Emit (OpCodes.Br, call);
 
 			// Use the supplied value
+			gen.MarkLabel (supplied);
 			gen.Emit (OpCodes.Ldarg_0);
 			gen.Emit (OpCodes.Ldarg_1);
 			if (idType.IsByRef)
