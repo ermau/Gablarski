@@ -76,6 +76,12 @@ namespace Gablarski.Clients.CLI
 			client.Sources.ReceivedSource += Sources_ReceivedSource;
 
 			client.Connect (host, port);
+
+			string command;
+			while ((command = Console.ReadLine()) != null)
+			{
+				
+			}
 		}
 
 		static void client_Disconnected (object sender, EventArgs e)

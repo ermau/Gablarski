@@ -47,6 +47,7 @@ namespace Gablarski.Messages
 
 		public override void WritePayload (IValueWriter writer, IdentifyingTypes idTypes)
 		{
+			writer.WriteGenericResult (this.Result);
 			if (this.Result != GenericResult.Success)
 				return;
 

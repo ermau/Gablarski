@@ -51,6 +51,9 @@ namespace Gablarski
 
 		internal static Action<IValueWriter, object> GetSerializationMethod (Type idType)
 		{
+			if (idType == null)
+				throw new ArgumentNullException ("idType");
+
 			if (typeof(Guid) == idType)
 				return (w, o) => w.WriteBytes (((Guid)o).ToByteArray());
 
@@ -108,6 +111,9 @@ namespace Gablarski
 
 		internal static Func<IValueReader, object> GetDeserializationMethod (Type idType)
 		{
+			if (idType == null)
+				throw new ArgumentNullException ("idType");
+
 			if (typeof(Guid) == idType)
 				return r => new Guid (r.ReadBytes());
 
