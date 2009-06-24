@@ -65,13 +65,41 @@ namespace Gablarski
 			var args = new[] { typeof (IValueWriter), typeof (object) };
 			var dm = new DynamicMethod ("SerializeUser", typeof(void), args);
 			var gen = dm.GetILGenerator();
+			var value = gen.DeclareLocal (idType);
+
+			Label call = gen.DefineLabel();
+			Label def = gen.DefineLabel();
+
+			// Check if value is null
+			gen.Emit (OpCodes.Ldarg_1);
+			gen.Emit (OpCodes.Brfalse, def);
+
+			// Use the default value
+			gen.MarkLabel (def);
 			gen.Emit (OpCodes.Ldarg_0);
-			gen.Emit (OpCodes.Ldarg_1);		
+			
+			if (idType.IsClass)
+				gen.Emit (OpCodes.Ldnull);
+			else
+			{
+				gen.Emit (OpCodes.Ldloca_S, value);
+				gen.Emit (OpCodes.Initobj, idType);
+				gen.Emit (OpCodes.Ldloca_S, value);
+				gen.Emit (OpCodes.Ldobj, idType);
+			}
+
+			gen.Emit (OpCodes.Br, call);
+
+			// Use the supplied value
+			gen.Emit (OpCodes.Ldarg_0);
+			gen.Emit (OpCodes.Ldarg_1);
 			if (idType.IsByRef)
 				gen.Emit (OpCodes.Castclass, idType);
 			else
 				gen.Emit (OpCodes.Unbox_Any, idType);
 
+			// Call the serialization
+			gen.MarkLabel (call);
 			gen.Emit (OpCodes.Callvirt, method);
 			gen.Emit (OpCodes.Ret);
 
@@ -94,9 +122,6 @@ namespace Gablarski
 			gen.Emit (OpCodes.Ldarg_0);
 			gen.Emit (OpCodes.Callvirt, method);
 			gen.Emit (OpCodes.Box, idType);
-			gen.Emit (OpCodes.Stloc_0);
-			//gen.Emit (OpCodes.Br_S);
-			gen.Emit (OpCodes.Ldloc_0);
 			gen.Emit (OpCodes.Ret);
 
 			return (Func<IValueReader, object>)dm.CreateDelegate (typeof (Func<IValueReader, object>));
