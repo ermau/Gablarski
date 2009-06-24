@@ -63,7 +63,7 @@ namespace Gablarski
 				throw new ArgumentException("No suitable serializer could be found.");
 
 			var args = new[] { typeof (IValueWriter), typeof (object) };
-			var dm = new DynamicMethod ("SerializeUser", typeof(void), args);
+			var dm = new DynamicMethod ("Serialize", typeof(void), args);
 			var gen = dm.GetILGenerator();
 			var value = gen.DeclareLocal (idType);
 
@@ -78,7 +78,7 @@ namespace Gablarski
 			gen.MarkLabel (def);
 			gen.Emit (OpCodes.Ldarg_0);
 			
-			if (idType.IsClass)
+			if (idType.IsByRef)
 				gen.Emit (OpCodes.Ldnull);
 			else
 			{
@@ -117,7 +117,7 @@ namespace Gablarski
 				throw new ArgumentException("No suitable deserializer could be found.");
 
 			var args = new[] { typeof (IValueReader) };
-			var dm = new DynamicMethod ("SerializeUser", typeof(object), args);
+			var dm = new DynamicMethod ("Deserialize", typeof(object), args);
 			var gen = dm.GetILGenerator();
 			gen.Emit (OpCodes.Ldarg_0);
 			gen.Emit (OpCodes.Callvirt, method);
