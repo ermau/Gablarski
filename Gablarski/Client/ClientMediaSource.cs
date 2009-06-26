@@ -19,7 +19,12 @@ namespace Gablarski.Client
 
 		public void SendAudioData (byte[] data, Channel targetChannel)
 		{
-			this.client.Send (new SendAudioDataMessage (targetChannel.ChannelId, this.Id, Encode (data)));
+			SendAudioData (data, targetChannel.ChannelId);
+		}
+
+		public void SendAudioData (byte[] data, object targetChannelId)
+		{
+			this.client.Send (new SendAudioDataMessage (targetChannelId, this.Id, Encode (data)));
 		}
 
 		#region Overrides of MediaSourceBase

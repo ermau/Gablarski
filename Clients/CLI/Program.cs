@@ -22,10 +22,11 @@ namespace Gablarski.Clients.CLI
 		private static string nickname;
 		private static bool voiceSource = false;
 
-		private readonly static List<AudioSource> sources = new List<AudioSource>();
+		private readonly static List<MediaSourceBase> sources = new List<MediaSourceBase>();
 
 		private readonly static IPlaybackProvider playbackProvider = new PlaybackProvider();
 		private	readonly static ICaptureProvider captureProvider = new CaptureProvider();
+		private static ClientMediaSource captureSource;
 
 		[STAThread]
 		public static void Main (string[] args)
@@ -213,6 +214,39 @@ namespace Gablarski.Clients.CLI
 						};
 						coptions.Parse (cmdopts);
 
+						if (stop)
+						{
+							if (captureProvider.IsCapturing)
+								captureProvider.EndCapture();
+						}
+						else
+						{
+							ClientMediaSource source;
+
+							lock (sources)
+							{
+								if (sources.Count == 0)
+								{
+									Console.WriteLine ("No sources to capture to.");
+									break;
+								}
+
+								source = (sourceId != 0) ? sources.OfType<ClientMediaSource>().FirstOrDefault (s => s.Id == sourceId) : sources.OfType<ClientMediaSource>().First();
+							}
+
+							if (source == null)
+								Console.WriteLine ("Source not found.");
+							else
+							{
+								if (captureSource == null)
+									captureProvider.SamplesAvailable += OnSamplesAvailable;
+
+								captureSource = source;
+								if (!captureProvider.IsCapturing)
+									captureProvider.StartCapture();
+							}
+						}
+
 						break;
 
 					default:
@@ -222,12 +256,18 @@ namespace Gablarski.Clients.CLI
 			}
 		}
 
+		static void OnSamplesAvailable (object sender, SamplesAvailableEventArgs e)
+		{
+			if (captureSource != null)
+				captureSource.SendAudioData (captureProvider.ReadSamples(e.Samples), client.Users.Current.CurrentChannelId);
+		}
+
 		static void ListSources (TextWriter writer)
 		{
 			lock (sources)
 			{
 				foreach (var source in sources)
-					writer.WriteLine (source.GetType().Name + ": " + source.Id + " Bitrate: " + source.Bitrate + " Channels: " + source.Channels);
+					writer.WriteLine (source.GetType().Name + ": " + source.Id + " Bitrate: " + source.Bitrate);
 			}
 		}
 		
@@ -236,11 +276,11 @@ namespace Gablarski.Clients.CLI
 			if (!e.Source.OwnerId.Equals (client.CurrentUser.UserId))
 				return;
 
-			Console.WriteLine ("Received own source. Id: " + e.Source.Id + " Owner: " + e.Source.OwnerId + " Bitrate: " + e.Source.Bitrate + " Channels: " + ((AudioSource)e.Source).Channels);
+			Console.WriteLine ("Received own source. Id: " + e.Source.Id + " Owner: " + e.Source.OwnerId + " Bitrate: " + e.Source.Bitrate);
 			
 			lock (sources)
 			{
-				sources.Add ((AudioSource)e.Source);
+				sources.Add (e.Source);
 			}
 		}
 

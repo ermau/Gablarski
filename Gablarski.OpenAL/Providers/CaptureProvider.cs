@@ -12,8 +12,17 @@ namespace Gablarski.OpenAL.Providers
 		#region ICaptureProvider Members
 		public event EventHandler<SamplesAvailableEventArgs> SamplesAvailable
 		{
-			add { this.device.SamplesAvailable += value; }
-			remove { this.device.SamplesAvailable -= value; }
+			add
+			{
+				this.CheckDevice();
+				this.device.SamplesAvailable += value;
+			}
+
+			remove
+			{
+				this.CheckDevice();
+				this.device.SamplesAvailable -= value;
+			}
 		}
 
 		public IDevice Device
