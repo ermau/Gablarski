@@ -133,12 +133,14 @@ namespace Gablarski.Media.Sources
 		{
 			writer.WriteByte (this.Channels);
 			writer.WriteInt32 (this.Frequency);
+			writer.WriteInt16 (this.FrameSize);
 		}
 
 		protected override void Deserialize (IValueReader reader, IdentifyingTypes idTypes)
 		{
 			this.Channels = reader.ReadByte();
 			this.Frequency = reader.ReadInt32();
+			this.FrameSize = reader.ReadInt16();
 		}
 	}
 }
