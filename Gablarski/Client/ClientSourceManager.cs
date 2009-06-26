@@ -32,6 +32,11 @@ namespace Gablarski.Client
 		public event EventHandler<ReceivedSourceEventArgs> ReceivedSource;
 
 		/// <summary>
+		/// A media source was removed.
+		/// </summary>
+		public event EventHandler<ReceivedListEventArgs<MediaSourceBase>> SourcesRemoved;
+
+		/// <summary>
 		/// Audio has been received.
 		/// </summary>
 		public event EventHandler<ReceivedAudioEventArgs> ReceivedAudio;
@@ -144,6 +149,26 @@ namespace Gablarski.Client
 		    OnReceivedSource (new ReceivedSourceEventArgs (source, sourceMessage.SourceResult));
 		}
 
+		internal void OnSourcesRemovedMessage (MessageReceivedEventArgs e)
+		{
+			var sourceMessage = (SourcesRemovedMessage)e.Message;
+
+			List<MediaSourceBase> removed = new List<MediaSourceBase>();
+			lock (sourceLock)
+			{
+				foreach (int id in sourceMessage.SourceIds)
+				{
+					if (!this.sources.ContainsKey (id))
+						continue;
+
+					removed.Add (this.sources[id]);
+					this.sources.Remove (id);
+				}
+			}
+
+			this.OnSourcesRemoved (new ReceivedListEventArgs<MediaSourceBase> (removed));
+		}
+
 		internal void OnAudioDataReceivedMessage (MessageReceivedEventArgs e)
 		{
 			var msg = (AudioDataReceivedMessage)e.Message;
@@ -179,6 +204,13 @@ namespace Gablarski.Client
 			var received = this.ReceivedSourceList;
 			if (received != null)
 				received (this, e);
+		}
+
+		protected virtual void OnSourcesRemoved (ReceivedListEventArgs<MediaSourceBase> e)
+		{
+			var removed = this.SourcesRemoved;
+			if (removed != null)
+				removed (this, e);
 		}
 		#endregion
 	}

@@ -39,6 +39,7 @@ namespace Gablarski.Client
 				{ ServerMessageType.ServerInfoReceived, OnServerInfoReceivedMessage },
 				{ ServerMessageType.UserListReceived, this.Users.OnUserListReceivedMessage },
 				{ ServerMessageType.SourceListReceived, this.Sources.OnSourceListReceivedMessage },
+				{ ServerMessageType.SourcesRemoved, this.Sources.OnSourcesRemovedMessage },
 				
 				{ ServerMessageType.ChannelListReceived, this.Channels.OnChannelListReceivedMessage },
 				//{ ServerMessageType.ChangeChannelResult, OnChangeChannelResultMessage },
