@@ -13,7 +13,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void InvalidSource()
 		{
-			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource (-1, 1, 1, 64000, 44100, 512, 10));
+			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource (0, 1, 1, 64000, 44100, 512, 10));
 
 			Assert.Throws<ArgumentNullException> (() => new AudioSource (0, null, 1, 64000, 44100, 512, 10));
 

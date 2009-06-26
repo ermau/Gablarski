@@ -32,6 +32,11 @@ namespace Gablarski.OpenAL
 			get { return (this.Handle != IntPtr.Zero); }
 		}
 
+		public override string ToString ()
+		{
+			return this.Name;
+		}
+
 		internal IntPtr Handle;
 		protected bool disposed;
 

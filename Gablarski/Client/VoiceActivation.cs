@@ -12,6 +12,11 @@ namespace Gablarski.Client
 			this.capture = provider;
 			this.capture.SamplesAvailable += OnSamplesAvailable;
 		}
+		
+		~VoiceActivation ()
+		{
+			this.capture.SamplesAvailable -= OnSamplesAvailable;
+		}
 
 		private readonly Queue<byte[]> samples = new Queue<byte[]> ();
 		private readonly ICaptureProvider capture;

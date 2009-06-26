@@ -270,7 +270,7 @@ namespace Gablarski.Server
 
 					//if (!sources[e.Connection].Any (s => s != null && s.GetType () == request.MediaSourceType))
 					//{
-					sourceId = sources.Sum (kvp => kvp.Value.Count);
+					sourceId = sources.Sum (kvp => kvp.Value.Count) + 1;
 					index = sources[e.Connection].Count;
 					sources[e.Connection].Add (null);
 					//}

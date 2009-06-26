@@ -13,6 +13,11 @@ namespace Gablarski.Network
 	public class ServerNetworkConnectionProvider
 		: ConnectionProviderBase
 	{
+		public ServerNetworkConnectionProvider ()
+			: this (6112)
+		{
+		}
+
 		public ServerNetworkConnectionProvider (int port)
 		{
 			this.Port = port;
