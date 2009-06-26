@@ -101,4 +101,8 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <PropertyGroup>
+    <PreBuildEvent>xcopy /Y "$(SolutionDir)Gablarski.CELT\libcelt.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Gablarski.CELT\libcelt.license.txt" "$(TargetDir)"</PreBuildEvent>
+  </PropertyGroup>
 </Project>
