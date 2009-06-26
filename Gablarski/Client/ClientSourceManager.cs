@@ -133,7 +133,11 @@ namespace Gablarski.Client
 		        	if (sources == null)
 						sources = new Dictionary<int, MediaSourceBase>();
 
-					sources.Add (source.Id, (source.OwnerId == context.CurrentUser.UserId) ? new ClientMediaSource (source, this.context.Connection) : source);
+		        	source = (source.OwnerId.Equals (context.CurrentUser.UserId))
+		        	         	? new ClientMediaSource (source, this.context.Connection)
+		        	         	: source;
+					
+					sources.Add (source.Id, source);
 		        }
 		    }
 
