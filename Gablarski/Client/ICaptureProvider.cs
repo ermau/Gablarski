@@ -9,6 +9,7 @@ namespace Gablarski.Client
 		: IDeviceProvider, IDisposable
 	{
 		IDevice Device { get; set; }
+		bool IsCapturing { get; }
 
 		event EventHandler<SamplesAvailableEventArgs> SamplesAvailable;
 

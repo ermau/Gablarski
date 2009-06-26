@@ -30,26 +30,42 @@ namespace Gablarski.OpenAL.Providers
 			}
 		}
 
+		public bool IsCapturing
+		{
+			get;
+			private set;
+		}
+
 		public void StartCapture ()
 		{
+			CheckDevice();
+
 			if (!this.device.IsOpen)
 				this.device.Open (44100, AudioFormat.Mono16Bit);
 
+			this.IsCapturing = true;
 			this.device.StartCapture();
 		}
 
 		public void EndCapture ()
 		{
+			CheckDevice();
+
+			this.IsCapturing = false;
 			this.device.StopCapture();
 		}
 
 		public byte[] ReadSamples ()
 		{
+			CheckDevice();
+
 			return this.device.GetSamples();
 		}
 
 		public byte[] ReadSamples (int samples)
 		{
+			CheckDevice();
+
 			return this.device.GetSamples (samples);
 		}
 
@@ -79,5 +95,11 @@ namespace Gablarski.OpenAL.Providers
 		#endregion
 
 		private CaptureDevice device;
+
+		private void CheckDevice()
+		{
+			if (this.device == null)
+				throw new InvalidOperationException ("No device set.");
+		}
 	}
 }
