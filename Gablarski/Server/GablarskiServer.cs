@@ -44,7 +44,7 @@ namespace Gablarski.Server
 		{
 			this.settings = settings;
 
-			this.IdentifyingTypes = new IdentifyingTypes (userProvider.IdentifyingType, channelProvider.IdentifyingType);
+			this.IdentifyingTypes = new IdentifyingTypes (((IUserProvider)provider).IdentifyingType, ((IChannelProvider)provider).IdentifyingType);
 
 			this.backendProvider = provider;
 			this.backendProvider.ChannelsUpdatedExternally += OnChannelsUpdatedExternally;
