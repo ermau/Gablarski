@@ -234,5 +234,28 @@ namespace Gablarski.Tests
 			Assert.AreEqual (length, stream.Position);
 			Assert.AreEqual (id, msg.UserId);
 		}
+
+		[Test]
+		public void SourcesRemovedTest()
+		{
+			var sources = new List<MediaSourceBase>
+			{
+				new AudioSource (1, UserId, 1, 64000, 44100, 256, 10),
+				new AudioSource (2, UserId2, 2, 128000, 48000, 512, 10)
+			};
+
+			var msg = new SourcesRemovedMessage (sources);
+			Assert.AreEqual (1, msg.SourceIds.Count (sid => sid == sources[0].Id));
+			Assert.AreEqual (1, msg.SourceIds.Count (sid => sid == sources[1].Id));
+			msg.WritePayload (writer, types);
+			long length = stream.Position;
+			stream.Position = 0;
+
+			msg = new SourcesRemovedMessage();
+			msg.ReadPayload (reader, types);
+			Assert.AreEqual (length, stream.Position);
+			Assert.AreEqual (1, msg.SourceIds.Count (sid => sid == sources[0].Id));
+			Assert.AreEqual (1, msg.SourceIds.Count (sid => sid == sources[1].Id));
+		}
 	}
 }

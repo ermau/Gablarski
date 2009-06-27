@@ -29,6 +29,7 @@ namespace Gablarski.Messages
 		public override void WritePayload (IValueWriter writer, IdentifyingTypes idTypes)
 		{
 			int count = this.SourceIds.Count();
+			writer.WriteInt32 (count);
 			using (var iter = this.SourceIds.GetEnumerator())
 			{
 				for (int i = 0; i < count && iter.MoveNext(); ++i)
