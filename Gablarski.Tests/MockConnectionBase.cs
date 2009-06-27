@@ -40,7 +40,7 @@ namespace Gablarski.Tests
 		{
 			UInt16 tick = 0;
 			while (this.waiting == 0 && tick++ < (UInt16.MaxValue - 1))
-				Thread.Sleep (0);
+				Thread.Sleep (1);
 
 			if (tick == UInt16.MaxValue)
 				Assert.Fail ("[" + Name + "] Message never arrived.");
