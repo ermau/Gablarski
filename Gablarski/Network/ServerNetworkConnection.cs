@@ -23,5 +23,10 @@ namespace Gablarski.Network
 
 			this.StartListener ();
 		}
+
+		protected override string Name
+		{
+			get { return "Server"; }
+		}
 	}
 }

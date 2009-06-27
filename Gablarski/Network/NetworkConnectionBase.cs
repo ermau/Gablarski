@@ -79,6 +79,11 @@ namespace Gablarski.Network
 		protected volatile bool rwaiting;
 		protected volatile bool uwaiting;
 
+		protected abstract string Name
+		{
+			get;
+		}
+
 		protected virtual void OnDisconnected (ConnectionEventArgs e)
 		{
 			var dced = this.Disconnected;
@@ -113,7 +118,7 @@ namespace Gablarski.Network
 			(this.runnerThread = new Thread (Runner)
 			{
 				IsBackground = true,
-				Name = "NetworkConnectionBase Listener"
+				Name = Name + " Listener"
 			}).Start();
 		}
 
@@ -141,7 +146,7 @@ namespace Gablarski.Network
 			}
 			catch (Exception ex)
 			{
-				Trace.WriteLine ("Error ending read: " + ex.Message);
+				Trace.WriteLine (Name + ": Error ending read: " + ex.Message);
 				this.Shutdown();
 				return;
 			}
@@ -150,6 +155,7 @@ namespace Gablarski.Network
 			{
 				if (mbuffer[0] != 0x2A)
 				{
+					Trace.WriteLine (Name + ": Packet did not start with 42. Invalid message serialization?");
 					this.Disconnect ();
 					return;
 				}
@@ -167,7 +173,7 @@ namespace Gablarski.Network
 			}
 			catch (Exception e)
 			{
-				Trace.WriteLine ("Error reading payload, disconnecting: " + e.Message);
+				Trace.WriteLine (Name + ": Error reading payload, disconnecting: " + e.Message);
 				this.Disconnect ();
 				return;
 			}
@@ -194,7 +200,7 @@ namespace Gablarski.Network
 					}
 					catch (Exception ex)
 					{
-						Trace.WriteLine ("Error starting read, disconnecting: " + ex.Message);
+						Trace.WriteLine (Name + ": Error starting read, disconnecting: " + ex.Message);
 						this.Disconnect ();
 						return;
 					}
@@ -225,7 +231,7 @@ namespace Gablarski.Network
 					}
 					catch (Exception e)
 					{
-						Trace.WriteLine ("Error sending payload, disconnecting: " + e.Message);
+						Trace.WriteLine (Name + ": Error sending payload, disconnecting: " + e.Message);
 						this.Disconnect ();
 						return;
 					}

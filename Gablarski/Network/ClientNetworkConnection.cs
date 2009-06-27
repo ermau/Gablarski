@@ -35,6 +35,11 @@ namespace Gablarski.Network
 
 		#endregion
 
+		protected override string Name
+		{
+			get { return "Client"; }
+		}
+
 		private void OnConnected (EventArgs e)
 		{
 			EventHandler connected = this.Connected;
