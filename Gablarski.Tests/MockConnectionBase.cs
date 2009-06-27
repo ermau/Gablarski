@@ -38,11 +38,11 @@ namespace Gablarski.Tests
 
 		public MessageBase DequeueMessage ()
 		{
-			Byte tick = 0;
-			while (this.waiting == 0 && tick++ < Byte.MaxValue)
-				Thread.Sleep (1);
+			UInt16 tick = 0;
+			while (this.waiting == 0 && tick++ < (UInt16.MaxValue - 1))
+				Thread.Sleep (0);
 
-			if (tick == Byte.MaxValue)
+			if (tick == UInt16.MaxValue)
 				Assert.Fail ("[" + Name + "] Message never arrived.");
 
 			MessageBase msg;

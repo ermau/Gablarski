@@ -118,6 +118,7 @@ namespace Gablarski
 		{
 			idTypes.WriteChannel (writer, this.ChannelId);
 			idTypes.WriteChannel (writer, this.ParentChannelId);
+			writer.WriteBool (this.ReadOnly);
 			writer.WriteInt32 (this.PlayerLimit);
 			writer.WriteString (this.Name);
 			writer.WriteString (this.Description);
@@ -127,9 +128,10 @@ namespace Gablarski
 		{
 			this.ChannelId = idTypes.ReadChannel (reader);
 			this.ParentChannelId = idTypes.ReadChannel (reader);
-			this.PlayerLimit = reader.ReadInt32 ();
-			this.Name = reader.ReadString ();
-			this.Description = reader.ReadString ();
+			this.ReadOnly = reader.ReadBool();
+			this.playerLimit = reader.ReadInt32 ();
+			this.name = reader.ReadString ();
+			this.description = reader.ReadString ();
 		}
 	}
 }
