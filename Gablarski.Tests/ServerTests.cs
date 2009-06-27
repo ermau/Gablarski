@@ -45,6 +45,12 @@ namespace Gablarski.Tests
 
 		private MockServerConnection Login (string nickname)
 		{
+			UserInfo user;
+			return Login (nickname, out user);
+		}
+
+		private MockServerConnection Login (string nickname, out UserInfo user)
+		{
 			connection.Client.Send (new ConnectMessage (GablarskiServer.MinimumApiVersion));
 			connection.Client.DequeueAndAssertMessage<ServerInfoMessage>();
 
@@ -55,6 +61,7 @@ namespace Gablarski.Tests
 			Assert.AreEqual (nickname, message.UserInfo.Nickname);
 
 			var login = connection.Client.DequeueAndAssertMessage<UserLoggedInMessage>();
+			user = login.UserInfo;
 			Assert.AreEqual (nickname, login.UserInfo.Nickname);
 			Assert.AreEqual (message.Result.UserId, login.UserInfo.UserId);
 			Assert.AreEqual (message.UserInfo.UserId, login.UserInfo.UserId);
@@ -137,6 +144,19 @@ namespace Gablarski.Tests
 			var login = (LoginResultMessage)message;
 			Assert.IsFalse (login.Result.Succeeded);
 			Assert.AreEqual (LoginResultState.FailedNicknameInUse, login.Result.ResultState);
+		}
+
+		[Test]
+		public void UserDisconnected()
+		{
+			UserInfo foo;
+			var fooc = Login ("Foo", out foo);
+			var barc = Login ("Bar");
+
+			fooc.Disconnect();
+
+			var msg = barc.Client.DequeueAndAssertMessage<UserDisconnectedMessage>();
+			Assert.AreEqual (foo.UserId, msg.UserId);
 		}
 	}
 }
