@@ -78,7 +78,7 @@ namespace Gablarski.Clients.CLI
 			if (trace)
 			{
 				if (tracers.Count == 0)
-					Trace.Listeners.Add (new ConsoleTraceListener());
+					Trace.Listeners.Add (new DetailedConsoleTraceListener { TraceOutputOptions = TraceOptions.Timestamp });
 				else
 					FindTypes<TraceListener> (tracers, t => Trace.Listeners.Add (t));
 			}
