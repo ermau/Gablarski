@@ -25,7 +25,7 @@ namespace Gablarski.Tests
 
 			context.Users = new ClientUserManager (context);
 			context.Channels = channels;
-			context.CurrentUser = new CurrentUser (context, 1, "Foo");
+			context.CurrentUser = new CurrentUser (context, 1, "Foo", channels.First());
 
 			this.manager = new ClientSourceManager (context);
 		}

@@ -105,7 +105,9 @@ namespace Gablarski.Clients.CLI
 			client.Connected += ClientConnected;
 			client.ConnectionRejected += ClientConnectionRejected;
 			client.Disconnected += ClientDisconnected;
+			
 			client.Sources.ReceivedSource += SourcesReceivedSource;
+			client.Sources.ReceivedAudio += SourcesReceivedAudio;
 
 			client.Connect (host, port);
 
@@ -254,6 +256,11 @@ namespace Gablarski.Clients.CLI
 						break;
 				}
 			}
+		}
+
+		static void SourcesReceivedAudio (object sender, ReceivedAudioEventArgs e)
+		{
+			playbackProvider.QueuePlayback (e.Source, e.AudioData, e.Source.Frequency);
 		}
 
 		static void OnSamplesAvailable (object sender, SamplesAvailableEventArgs e)

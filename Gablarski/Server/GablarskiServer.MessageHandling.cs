@@ -326,7 +326,7 @@ namespace Gablarski.Server
 		{
 			var msg = (SendAudioDataMessage)e.Message;
 
-			this.connections.Send (new AudioDataReceivedMessage (msg.SourceId, msg.Data), (c, p) => c != e.Connection && p.CurrentChannelId == msg.TargetChannelId);
+			this.connections.Send (new AudioDataReceivedMessage (msg.SourceId, msg.Data), (c, p) => c != e.Connection && p.CurrentChannelId.Equals (msg.TargetChannelId));
 		}
 		#endregion
 	}
