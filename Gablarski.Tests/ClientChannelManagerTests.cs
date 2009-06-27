@@ -15,7 +15,7 @@ namespace Gablarski.Tests
 		public void ManagerSetup ()
 		{
 			this.provider = new MockConnectionProvider ();
-			this.server = this.provider.EstablishConnection ();
+			this.server = this.provider.EstablishConnection (new IdentifyingTypes (typeof(Int32), typeof(Int32)));
 			this.manager = new ClientChannelManager (new MockClientContext { Connection = this.server.Client });
 		}
 

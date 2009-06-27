@@ -19,6 +19,8 @@ namespace Gablarski.Tests
 			this.server = new GablarskiServer (this.settings, this.users, this.permissions, this.channels);
 			this.server.AddConnectionProvider (this.provider = new MockConnectionProvider ());
 			this.server.Start ();
+
+			this.connection = provider.EstablishConnection (this.server.IdentifyingTypes);
 		}
 
 		[TearDown]
@@ -39,10 +41,10 @@ namespace Gablarski.Tests
 		private GuestPermissionProvider permissions;
 		private GablarskiServer server;
 		private MockConnectionProvider provider;
+		private MockServerConnection connection;
 
 		private MockServerConnection Login (string nickname)
 		{
-			MockServerConnection connection = provider.EstablishConnection ();
 			connection.Client.Send (new ConnectMessage (GablarskiServer.MinimumApiVersion));
 			connection.Client.DequeueAndAssertMessage<ServerInfoMessage>();
 
@@ -60,7 +62,7 @@ namespace Gablarski.Tests
 
 			connection.Client.DequeueAndAssertMessage<ChannelListMessage>();
 			var users = connection.Client.DequeueAndAssertMessage<UserListMessage>();
-			Assert.IsNotNull (users.Users.FirstOrDefault (u => u.UserId == login.UserInfo.UserId));
+			Assert.IsNotNull (users.Users.FirstOrDefault (u => u.UserId.Equals (login.UserInfo.UserId)));
 			connection.Client.DequeueAndAssertMessage<SourceListMessage>();
 
 			return connection;
@@ -69,8 +71,6 @@ namespace Gablarski.Tests
 		[Test]
 		public void OldVersionReject ()
 		{
-			MockServerConnection connection = provider.EstablishConnection ();
-
 			connection.Client.Send (new ConnectMessage (new Version (0,0,0,1)));
 
 			MessageBase message = connection.Client.DequeueMessage ();
@@ -83,8 +83,6 @@ namespace Gablarski.Tests
 		[Test]
 		public void ServerInfo()
 		{
-			MockServerConnection connection = provider.EstablishConnection();
-
 			connection.Client.Send (new ConnectMessage (GablarskiServer.MinimumApiVersion));
 
 			var msg = connection.Client.DequeueAndAssertMessage<ServerInfoMessage>();
@@ -97,8 +95,6 @@ namespace Gablarski.Tests
 		[Test]
 		public void RequestChannelList ()
 		{
-			MockServerConnection connection = provider.EstablishConnection ();
-
 			connection.Client.Send (new RequestChannelListMessage ());
 
 			MessageBase message = connection.Client.DequeueMessage ();
@@ -113,8 +109,6 @@ namespace Gablarski.Tests
 		[Test]
 		public void BadNickname ()
 		{
-			MockServerConnection connection = provider.EstablishConnection ();
-
 			connection.Client.Send (new LoginMessage { Nickname = null, Username = null, Password = null });
 
 			MessageBase message = connection.Client.DequeueMessage ();
@@ -134,7 +128,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void NicknameInUse ()
 		{
-			var connection = Login ("Foo");
+			Login ("Foo");
 
 			connection.Client.Send (new LoginMessage { Nickname = "Foo", Username = null, Password = null });
 			MessageBase message = connection.Client.DequeueMessage ();

@@ -10,9 +10,10 @@ namespace Gablarski.Tests
 	public class MockConnectionProvider
 		: IConnectionProvider
 	{
-		public MockServerConnection EstablishConnection ()
+		public MockServerConnection EstablishConnection (IdentifyingTypes types)
 		{
 			var connection = new MockServerConnection ();
+			connection.IdentifyingTypes = types;
 
 			var connectionMade = this.ConnectionMade;
 			if (connectionMade != null)

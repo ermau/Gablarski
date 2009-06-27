@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Gablarski.Messages;
@@ -10,44 +11,11 @@ using NUnit.Framework;
 namespace Gablarski.Tests
 {
 	public class MockClientConnection
-		: IClientConnection
+		: MockConnectionBase, IClientConnection
 	{
 		public MockClientConnection (MockServerConnection server)
 		{
-			this.connected = true;
 			this.server = server;
-		}
-
-		public void Receive (MessageBase message)
-		{
-			lock (this.messages)
-			{
-				this.messages.Enqueue (message);
-			}
-
-			var received = this.MessageReceived;
-			if (received != null)
-				received (this, new MessageReceivedEventArgs (this, message));
-		}
-
-		public MessageBase DequeueMessage()
-		{
-			while (this.messages.Count == 0)
-				Thread.Sleep (1);
-
-			lock (this.messages)
-			{
-				return this.messages.Dequeue();
-			}
-		}
-
-		public T DequeueAndAssertMessage<T> ()
-			where T : MessageBase
-		{
-			var message = this.DequeueMessage ();
-			Assert.IsInstanceOf<T> (message);
-
-			return (T)message;
 		}
 
 		#region IClientConnection Members
@@ -63,43 +31,13 @@ namespace Gablarski.Tests
 		{
 			throw new NotSupportedException ();
 		}
-
 		#endregion
 
-		#region IConnection Members
-
-		public event EventHandler<MessageReceivedEventArgs> MessageReceived;
-		public event EventHandler<ConnectionEventArgs> Disconnected;
-
-		public bool IsConnected
-		{
-			get { return this.connected; }
-		}
-
-		public IdentifyingTypes IdentifyingTypes
-		{
-			get;
-			set;
-		}
-
-		public void Send (MessageBase message)
+		public override void Send (MessageBase message)
 		{
 			this.server.Receive (message);
 		}
 
-		public void Disconnect ()
-		{
-			this.connected = false;
-			var dced = this.Disconnected;
-			if (dced != null)
-				dced (this, new ConnectionEventArgs (this));
-		}
-
-		#endregion
-
 		private readonly MockServerConnection server;
-		private bool connected;
-
-        private Queue<MessageBase> messages = new Queue<MessageBase>();
 	}
 }
