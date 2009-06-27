@@ -38,19 +38,23 @@ namespace Gablarski.Tests
 
 		public MessageBase DequeueMessage ()
 		{
-			while (this.waiting == 0)
+			Byte tick = 0;
+			while (this.waiting == 0 && tick++ < Byte.MaxValue)
 				Thread.Sleep (1);
+
+			if (tick == Byte.MaxValue)
+				Assert.Fail ("[" + Name + "] Message never arrived.");
 
 			MessageBase msg;
 			lock (this.buffer)
 			{
 				byte sanity = this.reader.ReadByte();
 				if (sanity != 0x2A)
-					Assert.Fail ("Header does not begin with 42.");
+					Assert.Fail ("[" + Name + "] Header does not begin with 42.");
 
 				ushort type = this.reader.ReadUInt16();
 				if (!MessageBase.MessageTypes.ContainsKey (type))
-					Assert.Fail ("Type " + type + " does not exist.");
+					Assert.Fail ("[" + Name + "] Type " + type + " does not exist.");
 
 				msg = MessageBase.MessageTypes[type]();
 				msg.ReadPayload (this.reader, this.IdentifyingTypes);
@@ -105,5 +109,10 @@ namespace Gablarski.Tests
 		private readonly MemoryStream readStream;
 		private readonly MemoryStream writeStream;
 		private int waiting = 0;
+
+		protected abstract string Name
+		{
+			get;
+		}
 	}
 }

@@ -6,6 +6,7 @@ using System.Text;
 namespace Gablarski
 {
 	public interface IValueWriter
+		: IDisposable
 	{
 		void WriteBytes (byte[] value);
 

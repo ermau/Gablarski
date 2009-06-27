@@ -6,6 +6,7 @@ using System.Text;
 namespace Gablarski
 {
 	public interface IValueReader
+		: IDisposable
 	{
 		byte[] ReadBytes ();
 

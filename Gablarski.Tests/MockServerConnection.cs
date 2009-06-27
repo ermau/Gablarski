@@ -37,5 +37,10 @@ namespace Gablarski.Tests
 		}
 		
 		private MockClientConnection client;
+
+		protected override string Name
+		{
+			get { return "Server"; }
+		}
 	}
 }

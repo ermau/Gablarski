@@ -84,5 +84,15 @@ namespace Gablarski
 			if (this.AutoFlush)
 				baseStream.Flush ();
 		}
+
+		#region IDisposable Members
+
+		public void Dispose ()
+		{
+			if (baseStream != null)
+				baseStream.Close();
+		}
+
+		#endregion
 	}
 }

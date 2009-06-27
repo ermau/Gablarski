@@ -83,5 +83,15 @@ namespace Gablarski
 		#endregion
 
 		private readonly Stream baseStream;
+
+		#region IDisposable Members
+
+		public void Dispose ()
+		{
+			if (baseStream != null)
+				baseStream.Close();
+		}
+
+		#endregion
 	}
 }

@@ -27,6 +27,11 @@ namespace Gablarski
 
 		internal UserInfo (IValueReader reader, IdentifyingTypes idTypes)
 		{
+			if (reader == null)
+				throw new ArgumentNullException("reader");
+			if (idTypes == null)
+				throw new ArgumentNullException("idTypes");
+
 			this.Deserialize (reader, idTypes);
 		}
 
