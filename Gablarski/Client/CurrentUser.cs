@@ -17,16 +17,19 @@ namespace Gablarski.Client
 			this.context = context;
 		}
 
-		internal CurrentUser (IClientContext context, object userId, string nickname)
+		internal CurrentUser (IClientContext context, object userId, string nickname, object currentChannelId)
 			: this (context)
 		{
 			if (userId == null)
 				throw new ArgumentNullException("userId");
 			if (nickname.IsEmpty())
 				throw new ArgumentNullException("nickname", "nickname is null or empty.");
+			if (currentChannelId == null)
+				throw new ArgumentNullException("currentChannelId");
 
 			this.UserId = userId;
 			this.Nickname = nickname;
+			this.CurrentChannelId = currentChannelId;
 		}
 
 		#region Events
@@ -75,11 +78,12 @@ namespace Gablarski.Client
 				result (this, e);
 		}
 
-		// TODO: Deserialize
 		internal void OnLoginResultMessage (MessageReceivedEventArgs e)
 		{
 		    var msg = (LoginResultMessage)e.Message;
 			this.UserId = msg.UserInfo.UserId;
+			this.Nickname = msg.UserInfo.Nickname;
+			this.CurrentChannelId = msg.UserInfo.CurrentChannelId;
 
 			var args = new ReceivedLoginResultEventArgs (msg.Result);
 			this.OnLoginResult (args);
