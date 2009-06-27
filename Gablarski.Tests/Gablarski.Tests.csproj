@@ -56,7 +56,6 @@
     <Compile Include="MockConnectionProvider.cs" />
     <Compile Include="MockServerConnection.cs" />
     <Compile Include="ModuleLoaderTests.cs" />
-    <Compile Include="OptionParseExtensionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServerMessageTests.cs" />
     <Compile Include="ServerTests.cs" />
