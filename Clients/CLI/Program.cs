@@ -114,6 +114,9 @@ namespace Gablarski.Clients.CLI
 			string fullcommand;
 			while ((fullcommand = Console.ReadLine()) != null)
 			{
+				if (fullcommand.IsEmpty())
+					continue;
+
 				int spacei = fullcommand.IndexOf (' ');
 				spacei = (spacei != -1) ? spacei : fullcommand.Length - 1;
 				string cmd = fullcommand.Substring (0, spacei + 1).Trim();
@@ -266,7 +269,7 @@ namespace Gablarski.Clients.CLI
 		static void OnSamplesAvailable (object sender, SamplesAvailableEventArgs e)
 		{
 			if (captureSource != null)
-				captureSource.SendAudioData (captureProvider.ReadSamples(e.Samples), client.Users.Current.CurrentChannelId);
+				captureSource.SendAudioData (captureProvider.ReadSamples (captureSource.FrameSize), client.Users.Current.CurrentChannelId);
 		}
 
 		static void ListSources (TextWriter writer)

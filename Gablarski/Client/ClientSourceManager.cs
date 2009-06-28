@@ -177,7 +177,7 @@ namespace Gablarski.Client
 			lock (this.sourceLock)
 			{
 				if (this.sources != null && this.sources.ContainsKey (msg.SourceId))
-					source = (this.sources[msg.SourceId] as AudioSource);
+					source = this.sources[msg.SourceId];
 			}
 
 			if (source != null)

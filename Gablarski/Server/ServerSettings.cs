@@ -107,7 +107,7 @@ namespace Gablarski.Server
 			}
 		}
 
-		private int defaultbitrate = 96000;
+		private int defaultbitrate = 64500;
 		public virtual int DefaultAudioBitrate
 		{
 			get
