@@ -14,7 +14,7 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public SourceResultMessage (SourceResult result, MediaSourceBase source)
+		public SourceResultMessage (SourceResult result, AudioSource source)
 			: this ()
 		{
 			this.SourceResult = result;
@@ -27,7 +27,7 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public MediaSourceBase Source
+		public AudioSource Source
 		{
 			get;
 			set;
@@ -36,7 +36,7 @@ namespace Gablarski.Messages
 		public override void WritePayload (IValueWriter writer, IdentifyingTypes idTypes)
 		{
 			writer.WriteByte ((byte)this.SourceResult);
-			this.Source.SerializeCore (writer, idTypes);
+			this.Source.Serialize (writer, idTypes);
 		}
 
 		public override void ReadPayload (IValueReader reader, IdentifyingTypes idTypes)

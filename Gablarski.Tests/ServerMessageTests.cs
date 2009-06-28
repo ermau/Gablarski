@@ -164,7 +164,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void SourceList()
 		{
-			var sources = new List<MediaSourceBase>
+			var sources = new List<AudioSource>
 			{
 				new AudioSource (1, UserId, 1, 64000, 44100, 256, 10),
 				new AudioSource (2, UserId2, 2, 128000, 48000, 512, 10)
@@ -188,7 +188,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void EmptySourceList()
 		{
-			var msg = new SourceListMessage (new List<MediaSourceBase>());
+			var msg = new SourceListMessage (new List<AudioSource>());
 			Assert.AreEqual (0, msg.Sources.Count());
 			msg.WritePayload (writer, types);
 			long length = stream.Position;
@@ -238,7 +238,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void SourcesRemovedTest()
 		{
-			var sources = new List<MediaSourceBase>
+			var sources = new List<AudioSource>
 			{
 				new AudioSource (1, UserId, 1, 64000, 44100, 256, 10),
 				new AudioSource (2, UserId2, 2, 128000, 48000, 512, 10)

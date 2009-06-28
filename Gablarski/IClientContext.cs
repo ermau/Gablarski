@@ -25,7 +25,7 @@ namespace Gablarski
 		/// <summary>
 		/// Gets the sources in this context.
 		/// </summary>
-		IEnumerable<MediaSourceBase> Sources { get; }
+		IEnumerable<AudioSource> Sources { get; }
 
 		/// <summary>
 		/// Gets the user associated with this context

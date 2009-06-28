@@ -189,7 +189,7 @@ namespace Gablarski.Server
 		}
 
 		private readonly object sourceLock = new object ();
-		private readonly Dictionary<IConnection, List<MediaSourceBase>> sources = new Dictionary<IConnection, List<MediaSourceBase>> ();
+		private readonly Dictionary<IConnection, List<AudioSource>> sources = new Dictionary<IConnection, List<AudioSource>> ();
 
 		private readonly ConnectionCollection connections = new ConnectionCollection();
 
@@ -241,14 +241,14 @@ namespace Gablarski.Server
 			}
 		}
 
-		private IEnumerable<MediaSourceBase> GetSourceInfoList ()
+		private IEnumerable<AudioSource> GetSourceInfoList ()
 		{
-			IEnumerable<MediaSourceBase> agrSources = Enumerable.Empty<MediaSourceBase> ();
+			IEnumerable<AudioSource> agrSources = Enumerable.Empty<AudioSource> ();
 			lock (this.sourceLock)
 			{
 				foreach (var kvp in this.sources)
 				{
-					agrSources = agrSources.Concat (kvp.Value.Select (s => (MediaSourceBase)new AudioSource (s)));
+					agrSources = agrSources.Concat (kvp.Value);
 				}
 
 				agrSources = agrSources.ToList ();

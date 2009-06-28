@@ -258,7 +258,7 @@ namespace Gablarski.Server
 			if (user == null || !this.GetPermission (PermissionName.RequestSource, user))
 				result = SourceResult.FailedPermissions;
 
-			MediaSourceBase source = null;
+			AudioSource source = null;
 			try
 			{
 				int index;
@@ -266,7 +266,7 @@ namespace Gablarski.Server
 				lock (sourceLock)
 				{
 					if (!sources.ContainsKey (e.Connection))
-						sources.Add (e.Connection, new List<MediaSourceBase> ());
+						sources.Add (e.Connection, new List<AudioSource> ());
 
 					//if (!sources[e.Connection].Any (s => s != null && s.GetType () == request.MediaSourceType))
 					//{
@@ -285,7 +285,7 @@ namespace Gablarski.Server
 						bitrate = request.TargetBitrate.Trim (settings.MinimumAudioBitrate, settings.MaximumAudioBitrate);
 
 					//source = MediaSources.Create (request.MediaSourceType, sourceId, user.UserId);
-					source = new AudioSource (sourceId, user.UserId, 1, bitrate, 44100, 256);
+					source = new AudioSource (sourceId, user.UserId, 1, bitrate, 44100, 128);
 					//if (source != null)
 					//{
 					lock (sourceLock)

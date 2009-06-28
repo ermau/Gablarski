@@ -14,7 +14,7 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public SourcesRemovedMessage(IEnumerable<MediaSourceBase> sources)
+		public SourcesRemovedMessage(IEnumerable<AudioSource> sources)
 			: this()
 		{
 			this.SourceIds = sources.Select (s => s.Id);

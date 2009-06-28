@@ -22,11 +22,11 @@ namespace Gablarski.Clients.CLI
 		private static string nickname;
 		private static bool voiceSource = false;
 
-		private readonly static List<MediaSourceBase> sources = new List<MediaSourceBase>();
+		private readonly static List<AudioSource> sources = new List<AudioSource>();
 
 		private readonly static IPlaybackProvider playbackProvider = new PlaybackProvider();
 		private	readonly static ICaptureProvider captureProvider = new CaptureProvider();
-		private static ClientMediaSource captureSource;
+		private static ClientAudioSource captureSource;
 
 		[STAThread]
 		public static void Main (string[] args)
@@ -223,7 +223,7 @@ namespace Gablarski.Clients.CLI
 						}
 						else
 						{
-							ClientMediaSource source;
+							ClientAudioSource source;
 
 							lock (sources)
 							{
@@ -233,7 +233,7 @@ namespace Gablarski.Clients.CLI
 									break;
 								}
 
-								source = (sourceId != 0) ? sources.OfType<ClientMediaSource>().FirstOrDefault (s => s.Id == sourceId) : sources.OfType<ClientMediaSource>().First();
+								source = (sourceId != 0) ? sources.OfType<ClientAudioSource>().FirstOrDefault (s => s.Id == sourceId) : sources.OfType<ClientAudioSource>().First();
 							}
 
 							if (source == null)

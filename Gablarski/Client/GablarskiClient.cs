@@ -159,7 +159,7 @@ namespace Gablarski.Client
 			get { return this.Channels; }
 		}
 
-		IEnumerable<MediaSourceBase> IClientContext.Sources
+		IEnumerable<AudioSource> IClientContext.Sources
 		{
 			get { return this.Sources; }
 		}

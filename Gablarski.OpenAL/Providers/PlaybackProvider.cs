@@ -23,7 +23,7 @@ namespace Gablarski.OpenAL.Providers
 			}
 		}
 
-		public void QueuePlayback (MediaSourceBase mediaSource, byte[] data, int frequency)
+		public void QueuePlayback (AudioSource audioSource, byte[] data, int frequency)
 		{
 			if (!this.device.IsOpen)
 				this.device.Open();
@@ -31,7 +31,7 @@ namespace Gablarski.OpenAL.Providers
 			if (this.context == null)
 				this.context = this.device.CreateAndActivateContext();
 
-			Source source = this.pool.RequestSource (mediaSource);
+			Source source = this.pool.RequestSource (audioSource);
 			if (source.ProcessedBuffers > 0)
 			{
 				SourceBuffer[] freeBuffers = source.Dequeue ();
@@ -39,10 +39,10 @@ namespace Gablarski.OpenAL.Providers
 				{
 					lock (bufferLock)
 					{
-						if (!this.buffers.ContainsKey (mediaSource))
-							this.buffers[mediaSource] = new Stack<SourceBuffer> ();
+						if (!this.buffers.ContainsKey (audioSource))
+							this.buffers[audioSource] = new Stack<SourceBuffer> ();
 
-						this.buffers[mediaSource].Push (freeBuffers[i]);
+						this.buffers[audioSource].Push (freeBuffers[i]);
 					}
 				}
 			}
@@ -53,16 +53,16 @@ namespace Gablarski.OpenAL.Providers
 			SourceBuffer buffer = null;
 			lock (bufferLock)
 			{
-				if (!this.buffers.ContainsKey (mediaSource))
+				if (!this.buffers.ContainsKey (audioSource))
 				{
-					this.buffers[mediaSource] = new Stack<SourceBuffer> ();
-					this.PushBuffers (mediaSource, 10);
+					this.buffers[audioSource] = new Stack<SourceBuffer> ();
+					this.PushBuffers (audioSource, 10);
 				}
 
-				if (this.buffers[mediaSource].Count == 0)
-					this.PushBuffers (mediaSource, 10);
+				if (this.buffers[audioSource].Count == 0)
+					this.PushBuffers (audioSource, 10);
 
-				buffer = this.buffers[mediaSource].Pop ();
+				buffer = this.buffers[audioSource].Pop ();
 			}
 
 			//var buffer = SourceBuffer.Generate ();
@@ -93,15 +93,15 @@ namespace Gablarski.OpenAL.Providers
 
 		private Context context;
 		private PlaybackDevice device;
-		private readonly SourcePool<MediaSourceBase> pool = new SourcePool<MediaSourceBase>();
+		private readonly SourcePool<AudioSource> pool = new SourcePool<AudioSource>();
 		private object bufferLock = new object ();
-		private readonly Dictionary<MediaSourceBase, Stack<SourceBuffer>> buffers = new Dictionary<MediaSourceBase, Stack<SourceBuffer>> ();
+		private readonly Dictionary<AudioSource, Stack<SourceBuffer>> buffers = new Dictionary<AudioSource, Stack<SourceBuffer>> ();
 
-		private void PushBuffers (MediaSourceBase mediaSource, int number)
+		private void PushBuffers (AudioSource audioSource, int number)
 		{
 			SourceBuffer[] sbuffers = SourceBuffer.Generate (number);
 			for (int i = 0; i < sbuffers.Length; ++i)
-				this.buffers[mediaSource].Push (sbuffers[i]);
+				this.buffers[audioSource].Push (sbuffers[i]);
 		}
 	}
 }

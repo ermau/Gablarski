@@ -10,7 +10,7 @@ using Gablarski.Messages;
 namespace Gablarski.Client
 {
 	public class ClientSourceManager
-		: IEnumerable<MediaSourceBase>
+		: IEnumerable<AudioSource>
 	{
 		protected internal ClientSourceManager (IClientContext context)
 		{
@@ -24,7 +24,7 @@ namespace Gablarski.Client
 		/// <summary>
 		/// A new  or updated source list has been received.
 		/// </summary>
-		public event EventHandler<ReceivedListEventArgs<MediaSourceBase>> ReceivedSourceList;
+		public event EventHandler<ReceivedListEventArgs<AudioSource>> ReceivedSourceList;
 
 		/// <summary>
 		/// A new media source has been received.
@@ -34,7 +34,7 @@ namespace Gablarski.Client
 		/// <summary>
 		/// A media source was removed.
 		/// </summary>
-		public event EventHandler<ReceivedListEventArgs<MediaSourceBase>> SourcesRemoved;
+		public event EventHandler<ReceivedListEventArgs<AudioSource>> SourcesRemoved;
 
 		/// <summary>
 		/// Audio has been received.
@@ -45,9 +45,9 @@ namespace Gablarski.Client
 		/// <summary>
 		/// Gets a listing of the sources that belong to the current user.
 		/// </summary>
-		public IEnumerable<ClientMediaSource> Mine
+		public IEnumerable<ClientAudioSource> Mine
 		{
-			get { return this.OfType<ClientMediaSource>(); }
+			get { return this.OfType<ClientAudioSource>(); }
 		}
 
 		#region Implementation of IEnumerable
@@ -59,7 +59,7 @@ namespace Gablarski.Client
 		/// A <see cref="T:System.Collections.Generic.IEnumerator`1"/> that can be used to iterate through the collection.
 		/// </returns>
 		/// <filterpriority>1</filterpriority>
-		public IEnumerator<MediaSourceBase> GetEnumerator()
+		public IEnumerator<AudioSource> GetEnumerator()
 		{
 			if (this.sources == null)
 				yield break;
@@ -113,7 +113,7 @@ namespace Gablarski.Client
 
 		private readonly IClientContext context;
 		private readonly object sourceLock = new object();
-		private Dictionary<int, MediaSourceBase> sources;
+		private Dictionary<int, AudioSource> sources;
 
 		internal void OnSourceListReceivedMessage (MessageReceivedEventArgs e)
 		{
@@ -121,10 +121,10 @@ namespace Gablarski.Client
 
 			lock (sourceLock)
 			{
-				this.sources = msg.Sources.ToDictionary (s => s.Id, s => (s.OwnerId == context.CurrentUser.UserId) ? new ClientMediaSource (s, this.context.Connection) : s);
+				this.sources = msg.Sources.ToDictionary (s => s.Id, s => (s.OwnerId == context.CurrentUser.UserId) ? new ClientAudioSource (s, this.context.Connection) : s);
 			}
 
-			OnReceivedSourceList (new ReceivedListEventArgs<MediaSourceBase> (msg.Sources));
+			OnReceivedSourceList (new ReceivedListEventArgs<AudioSource> (msg.Sources));
 		}
 
 		internal void OnSourceResultMessage (MessageReceivedEventArgs e)
@@ -136,10 +136,10 @@ namespace Gablarski.Client
 		        lock (sourceLock)
 		        {
 		        	if (sources == null)
-						sources = new Dictionary<int, MediaSourceBase>();
+						sources = new Dictionary<int, AudioSource>();
 
 		        	source = (source.OwnerId.Equals (context.CurrentUser.UserId))
-		        	         	? new ClientMediaSource (source, this.context.Connection)
+		        	         	? new ClientAudioSource (source, this.context.Connection)
 		        	         	: source;
 					
 					sources.Add (source.Id, source);
@@ -153,7 +153,7 @@ namespace Gablarski.Client
 		{
 			var sourceMessage = (SourcesRemovedMessage)e.Message;
 
-			List<MediaSourceBase> removed = new List<MediaSourceBase>();
+			List<AudioSource> removed = new List<AudioSource>();
 			lock (sourceLock)
 			{
 				foreach (int id in sourceMessage.SourceIds)
@@ -166,7 +166,7 @@ namespace Gablarski.Client
 				}
 			}
 
-			this.OnSourcesRemoved (new ReceivedListEventArgs<MediaSourceBase> (removed));
+			this.OnSourcesRemoved (new ReceivedListEventArgs<AudioSource> (removed));
 		}
 
 		internal void OnAudioDataReceivedMessage (MessageReceivedEventArgs e)
@@ -199,14 +199,14 @@ namespace Gablarski.Client
 				received (this, e);
 		}
 
-		protected virtual void OnReceivedSourceList (ReceivedListEventArgs<MediaSourceBase> e)
+		protected virtual void OnReceivedSourceList (ReceivedListEventArgs<AudioSource> e)
 		{
 			var received = this.ReceivedSourceList;
 			if (received != null)
 				received (this, e);
 		}
 
-		protected virtual void OnSourcesRemoved (ReceivedListEventArgs<MediaSourceBase> e)
+		protected virtual void OnSourcesRemoved (ReceivedListEventArgs<AudioSource> e)
 		{
 			var removed = this.SourcesRemoved;
 			if (removed != null)
@@ -247,7 +247,7 @@ namespace Gablarski.Client
 	public class ReceivedSourceEventArgs
 		: EventArgs
 	{
-		public ReceivedSourceEventArgs (MediaSourceBase source, SourceResult result)
+		public ReceivedSourceEventArgs (AudioSource source, SourceResult result)
 		{
 			this.Result = result;
 			this.Source = source;
@@ -265,7 +265,7 @@ namespace Gablarski.Client
 		/// <summary>
 		/// Gets the media source of the event.
 		/// </summary>
-		public MediaSourceBase Source
+		public AudioSource Source
 		{
 			get;
 			private set;

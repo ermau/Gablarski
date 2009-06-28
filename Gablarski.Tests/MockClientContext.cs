@@ -25,7 +25,7 @@ namespace Gablarski.Tests
 		/// <summary>
 		/// Gets teh source manager in this context
 		/// </summary>
-		public IEnumerable<MediaSourceBase> Sources { get; set; }
+		public IEnumerable<AudioSource> Sources { get; set; }
 
 		/// <summary>
 		/// Gets the user associated with this context
