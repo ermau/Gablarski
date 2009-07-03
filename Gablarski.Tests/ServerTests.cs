@@ -97,6 +97,7 @@ namespace Gablarski.Tests
 			Assert.AreEqual (this.settings.Description, msg.ServerInfo.ServerDescription);
 			Assert.AreEqual (this.channels.IdentifyingType, msg.ServerInfo.ChannelIdentifyingType);
 			Assert.AreEqual (this.users.IdentifyingType, msg.ServerInfo.UserIdentifyingType);
+			Assert.AreEqual (String.Empty, msg.ServerInfo.ServerLogo);
 		}
 
 		[Test]

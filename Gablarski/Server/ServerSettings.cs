@@ -131,6 +131,30 @@ namespace Gablarski.Server
 			}
 		}
 
+		private string serverLogo = null;
+		public virtual string ServerLogo
+		{
+			get
+			{
+				lock(settingsLock)
+				{
+					return this.serverLogo;
+				}
+			}
+
+			set
+			{
+				lock (settingsLock)
+				{
+					if (value == this.serverLogo)
+						return;
+
+					this.serverLogo = value;
+					this.OnPropertyChanged ("ServerLogo");
+				}
+			}
+		}
+
 		protected readonly object settingsLock = new object();
 
 		protected void OnPropertyChanged (string propertyName)

@@ -40,20 +40,28 @@ namespace Gablarski
 			set;
 		}
 
+		public string ServerLogo
+		{
+			get;
+			set;
+		}
+
 		internal void Serialize (IValueWriter writer)
 		{
-			writer.WriteString (this.ServerName);
-			writer.WriteString (this.ServerDescription);
 			writer.WriteString (this.ChannelIdentifyingType.AssemblyQualifiedName);
 			writer.WriteString (this.UserIdentifyingType.AssemblyQualifiedName);
+			writer.WriteString (this.ServerName);
+			writer.WriteString (this.ServerDescription);
+			writer.WriteString (this.ServerLogo);
 		}
 
 		internal void Deserialize (IValueReader reader)
 		{
-			this.ServerName = reader.ReadString();
-			this.ServerDescription = reader.ReadString();
 			this.ChannelIdentifyingType = Type.GetType (reader.ReadString());
 			this.UserIdentifyingType = Type.GetType (reader.ReadString());
+			this.ServerName = reader.ReadString();
+			this.ServerDescription = reader.ReadString();
+			this.ServerLogo = reader.ReadString();
 		}
 	}
 }

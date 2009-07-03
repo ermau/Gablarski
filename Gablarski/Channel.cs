@@ -41,7 +41,7 @@ namespace Gablarski
 		/// <summary>
 		/// Gets the ID of this channel.
 		/// </summary>
-		public object ChannelId
+		public virtual object ChannelId
 		{
 			get;
 			private set;
@@ -50,7 +50,7 @@ namespace Gablarski
 		/// <summary>
 		/// Gets or sets the channel ID this is a subchannel of. 0 if a main channel.
 		/// </summary>
-		public object ParentChannelId
+		public virtual object ParentChannelId
 		{
 			get;
 			set;
@@ -59,7 +59,7 @@ namespace Gablarski
 		/// <summary>
 		/// Gets the name of the channel.
 		/// </summary>
-		public string Name
+		public virtual string Name
 		{
 			get { return this.name; }
 			set
@@ -74,7 +74,7 @@ namespace Gablarski
 		/// <summary>
 		/// Gets the description of the channel.
 		/// </summary>
-		public string Description
+		public virtual string Description
 		{
 			get { return this.description; }
 			set
@@ -89,7 +89,7 @@ namespace Gablarski
 		/// <summary>
 		/// Gets the player limit. 0 for no limit.
 		/// </summary>
-		public int PlayerLimit
+		public virtual int PlayerLimit
 		{
 			get { return this.playerLimit; }
 			set
@@ -104,7 +104,7 @@ namespace Gablarski
 		/// <summary>
 		/// Gets whether this individual channel can be modified or not.
 		/// </summary>
-		public bool ReadOnly
+		public virtual bool ReadOnly
 		{
 			get;
 			private set;
