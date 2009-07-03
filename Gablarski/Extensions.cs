@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.IO;
 
@@ -44,5 +45,21 @@ namespace Gablarski
 			else
 				return self;
 		}
+
+
+		private static readonly Dictionary<Type, object> CachedValues = new Dictionary<Type, object>();
+		public static object GetDefaultValue (this Type self)
+        {
+			if (!self.IsValueType)
+				return null;
+
+			lock (CachedValues)
+			{
+				if (!CachedValues.ContainsKey (self))
+					CachedValues.Add (self, Activator.CreateInstance (self));
+
+				return CachedValues[self];
+			}
+        } 
 	}
 }

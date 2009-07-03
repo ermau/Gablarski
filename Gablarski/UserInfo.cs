@@ -66,5 +66,16 @@ namespace Gablarski
 			this.CurrentChannelId = idTypes.ReadChannel (reader);
 			this.Nickname = reader.ReadString();			
 		}
+
+		/// <summary>
+		/// Gets whether <paramref name="userId"/> is the default value (basically null) or not.
+		/// </summary>
+		/// <param name="userId">The user identifier to check.</param>
+		/// <param name="types">The <see cref="IdentifyingTypes"/> instance to check against.</param>
+		/// <returns><c>true</c> if <paramref name="userId"/> is default, <c>false</c> otherwise.</returns>
+		public static bool IsDefault (object userId, IdentifyingTypes types)
+		{
+			return userId.Equals (types.UserIdType.GetDefaultValue());
+		}
 	}
 }

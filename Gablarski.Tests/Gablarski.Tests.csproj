@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AudioSourceTests.cs" />
+    <Compile Include="ChannelTests.cs" />
     <Compile Include="ClientChannelManagerTests.cs" />
     <Compile Include="ClientSourceManagerTests.cs" />
     <Compile Include="ClientUserManagerTests.cs" />

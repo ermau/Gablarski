@@ -54,5 +54,13 @@ namespace Gablarski.Tests
 			Assert.AreEqual (chanid, info.CurrentChannelId);
 			Assert.AreEqual (nickname, info.Nickname);
 		}
+
+		[Test]
+		public void IsDefault()
+		{
+			var idtypes = new IdentifyingTypes (typeof (Int32), typeof (Int32));
+			Assert.IsTrue (UserInfo.IsDefault (default (Int32), idtypes));
+			Assert.IsFalse (UserInfo.IsDefault (1, idtypes));
+		}
 	}
 }

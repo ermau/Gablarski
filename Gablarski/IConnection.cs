@@ -19,7 +19,7 @@ namespace Gablarski
 		/// <summary>
 		/// Gets the identifying types for various data structures.
 		/// </summary>
-		IdentifyingTypes IdentifyingTypes { set; }
+		IdentifyingTypes IdentifyingTypes { get; set; }
 
 		/// <summary>
 		/// A message was received from the underlying transport.

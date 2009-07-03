@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Gablarski.Client;
 
 namespace Gablarski
 {
@@ -48,7 +49,7 @@ namespace Gablarski
 		}
 
 		/// <summary>
-		/// Gets or sets the channel ID this is a subchannel of. 0 if a main channel.
+		/// Gets or sets the channel ID this is a subchannel of. default if a main channel.
 		/// </summary>
 		public virtual object ParentChannelId
 		{
@@ -132,6 +133,17 @@ namespace Gablarski
 			this.playerLimit = reader.ReadInt32 ();
 			this.name = reader.ReadString ();
 			this.description = reader.ReadString ();
+		}
+
+		/// <summary>
+		/// Gets whether the channelId is the default value (basically null) or not.
+		/// </summary>
+		/// <param name="channelId">The channel identifier to check.</param>
+		/// <param name="types">The <see cref="IdentifyingTypes"/> instance to check against.</param>
+		/// <returns><c>true</c> if <paramref name="channelId"/> is default, <c>false</c> otherwise.</returns>
+		public static bool IsDefault (object channelId, IdentifyingTypes types)
+		{
+			return channelId.Equals (types.ChannelIdType.GetDefaultValue());
 		}
 	}
 }
