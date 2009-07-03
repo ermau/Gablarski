@@ -84,6 +84,14 @@ namespace Gablarski.Client
 			get;
 			private set;
 		}
+
+		/// <summary>
+		/// Gets the <see cref="IdentifyingTypes"/> for this client's connection. <c>null</c> if not connected.
+		/// </summary>
+		public IdentifyingTypes IdentifyingTypes
+		{
+			get { return this.Connection.IdentifyingTypes; }
+		}
 		#endregion
 
 		#region Public Methods
