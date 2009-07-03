@@ -1,9 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Windows.Forms;
+using FluentNHibernate.Cfg;
+using FluentNHibernate.Cfg.Db;
+using Gablarski.Clients.Windows.Entities;
+using NHibernate;
+using NHibernate.Cfg;
+using NHibernate.Tool.hbm2ddl;
 
-namespace Gablarski.Clients.Lite
+namespace Gablarski.Clients.Windows
 {
 	static class Program
 	{
@@ -15,7 +23,10 @@ namespace Gablarski.Clients.Lite
 		{
 			Application.EnableVisualStyles ();
 			Application.SetCompatibleTextRenderingDefault (false);
-			//Application.Run (new TestForm ());
+
+			var login = new LoginForm();
+			if (login.ShowDialog() == DialogResult.OK)
+				Application.Run (new MainForm (login.Entry));
 		}
 	}
 }

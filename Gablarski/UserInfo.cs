@@ -7,7 +7,7 @@ namespace Gablarski
 {
 	public class UserInfo
 	{
-		internal UserInfo()
+		public UserInfo()
 		{
 		}
 
@@ -35,13 +35,13 @@ namespace Gablarski
 			this.Deserialize (reader, idTypes);
 		}
 
-		public string Nickname
+		public virtual string Nickname
 		{
 			get;
 			protected set;
 		}
 
-		public object UserId
+		public virtual object UserId
 		{
 			get;
 			protected set;

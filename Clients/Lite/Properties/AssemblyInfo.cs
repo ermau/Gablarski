@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle ("Gablarski Lite Client")]
+[assembly: AssemblyTitle ("Gablarski Windows Client")]
 [assembly: AssemblyDescription ("")]
 [assembly: AssemblyConfiguration ("")]
 [assembly: AssemblyCompany ("Eric Maupin")]
-[assembly: AssemblyProduct ("Gablarski Lite Client")]
+[assembly: AssemblyProduct ("Gablarski Windows Client")]
 [assembly: AssemblyCopyright ("Copyright © Eric Maupin 2009")]
 [assembly: AssemblyTrademark ("")]
 [assembly: AssemblyCulture ("")]
