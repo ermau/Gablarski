@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Gablarski.Clients.Windows.Entities;
-using Gablarski.Clients.Lite.Properties;
 using Gablarski.Clients.Windows.Properties;
 
 namespace Gablarski.Clients.Windows
