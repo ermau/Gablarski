@@ -128,7 +128,7 @@ namespace Gablarski.Client
 			}
 
 			OnReceivedChannelList (new ReceivedListEventArgs<Channel> (msg.Channels));
-			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Reset, this.channels.Values.ToArray()));
+			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Reset));
 		}
 
 		internal void OnChannelEditResultMessage (MessageReceivedEventArgs e)

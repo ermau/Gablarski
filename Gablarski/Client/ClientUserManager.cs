@@ -120,7 +120,7 @@ namespace Gablarski.Client
 			}
 
 			OnReceivedUserList (new ReceivedListEventArgs<UserInfo> (msg.Users));
-			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Reset, this.users.Values.ToArray()));
+			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Reset));
 		}
 
 		internal void OnUserDisconnectedMessage (MessageReceivedEventArgs e)

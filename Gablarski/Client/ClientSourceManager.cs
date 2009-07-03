@@ -131,7 +131,7 @@ namespace Gablarski.Client
 			}
 
 			OnReceivedSourceList (new ReceivedListEventArgs<AudioSource> (msg.Sources));
-			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Reset, this.sources));
+			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Reset));
 		}
 
 		internal void OnSourceResultMessage (MessageReceivedEventArgs e)
