@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using Gablarski.Messages;
@@ -8,7 +9,7 @@ using Gablarski.Messages;
 namespace Gablarski.Client
 {
 	public class ClientUserManager
-		: IEnumerable<ClientUser>
+		: IEnumerable<ClientUser>, INotifyCollectionChanged
 	{
 		protected internal ClientUserManager (IClientContext context)
 		{
@@ -43,6 +44,8 @@ namespace Gablarski.Client
 		/// Received an unsucessful result of a change channel request.
 		/// </summary>
 		public event EventHandler<ReceivedChannelChannelResultEventArgs> ReceivedChannelChangeResult;
+
+		public event NotifyCollectionChangedEventHandler CollectionChanged;
 		#endregion
 
 		public CurrentUser Current
@@ -116,7 +119,8 @@ namespace Gablarski.Client
 				this.users = msg.Users.ToDictionary (p => p.UserId, p => new ClientUser (p, this.context.Connection));
 			}
 
-			this.OnReceivedUserList (new ReceivedListEventArgs<UserInfo> (msg.Users));
+			OnReceivedUserList (new ReceivedListEventArgs<UserInfo> (msg.Users));
+			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Reset, this.users.Values.ToArray()));
 		}
 
 		internal void OnUserDisconnectedMessage (MessageReceivedEventArgs e)
@@ -130,7 +134,8 @@ namespace Gablarski.Client
 				this.users.Remove (msg.UserId);
 			}
 
-			this.OnUserDisconnected (new UserDisconnectedEventArgs (user));
+			OnUserDisconnected (new UserDisconnectedEventArgs (user));
+			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Remove, user));
 		}
 
 		internal void OnUserLoggedInMessage (MessageReceivedEventArgs e)
@@ -147,7 +152,8 @@ namespace Gablarski.Client
 				this.users.Add (msg.UserInfo.UserId,user);
 			}
 
-			this.OnUserLoggedIn (new UserLoggedInEventArgs (user));
+			OnUserLoggedIn (new UserLoggedInEventArgs (user));
+			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Add, user));
 		}
 
 		internal void OnChangeChannelResultMessage (MessageReceivedEventArgs e)
@@ -176,6 +182,7 @@ namespace Gablarski.Client
 			if (channel == null)
 				return;
 
+			ClientUser old;
 			ClientUser user;
 			ClientUser movedBy = null;
 			lock (userLock)
@@ -183,7 +190,7 @@ namespace Gablarski.Client
 				if (!this.users.ContainsKey (msg.ChangeInfo.TargetUserId))
 					return;
 
-				var old = this.users[msg.ChangeInfo.TargetUserId];
+				old = this.users[msg.ChangeInfo.TargetUserId];
 				this.users[msg.ChangeInfo.TargetUserId] = new ClientUser (old.Nickname, old.UserId, msg.ChangeInfo.TargetChannelId, this.context.Connection);
 				user = this.users[msg.ChangeInfo.TargetUserId];
 
@@ -191,7 +198,8 @@ namespace Gablarski.Client
 					this.users.TryGetValue (msg.ChangeInfo.RequestingUserId, out movedBy);
 			}
 
-			this.OnUserChangedChannnel (new ChannelChangedEventArgs (user, channel, movedBy));
+			OnUserChangedChannnel (new ChannelChangedEventArgs (user, channel, movedBy));
+			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Replace, user, old));
 		}
 		#endregion
 
@@ -229,6 +237,13 @@ namespace Gablarski.Client
 			var result = this.ReceivedChannelChangeResult;
 			if (result != null)
 				result (this, e);
+		}
+
+		protected virtual void OnCollectionChanged (NotifyCollectionChangedEventArgs e)
+		{
+			var changed = this.CollectionChanged;
+			if (changed != null)
+				changed (this, e);
 		}
 		#endregion
 	}

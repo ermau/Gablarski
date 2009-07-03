@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using Gablarski.Messages;
@@ -7,7 +8,7 @@ using Gablarski.Messages;
 namespace Gablarski.Client
 {
 	public class ClientChannelManager
-		: IEnumerable<Channel>
+		: IEnumerable<Channel>, INotifyCollectionChanged
 	{
 		protected internal ClientChannelManager (IClientContext context)
 		{
@@ -27,6 +28,8 @@ namespace Gablarski.Client
 		/// A new or updated player list has been received.
 		/// </summary>
 		public event EventHandler<ReceivedListEventArgs<Channel>> ReceivedChannelList;
+
+		public event NotifyCollectionChangedEventHandler CollectionChanged;
 		#endregion
 
 		/// <summary>
@@ -125,6 +128,7 @@ namespace Gablarski.Client
 			}
 
 			OnReceivedChannelList (new ReceivedListEventArgs<Channel> (msg.Channels));
+			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Reset, this.channels.Values.ToArray()));
 		}
 
 		internal void OnChannelEditResultMessage (MessageReceivedEventArgs e)
@@ -152,6 +156,13 @@ namespace Gablarski.Client
 			var received = this.ReceivedChannelEditResult;
 			if (received != null)
 				received (this, e);
+		}
+
+		protected virtual void OnCollectionChanged (NotifyCollectionChangedEventArgs e)
+		{
+			var changed = this.CollectionChanged;
+			if (changed != null)
+				changed (this, e);
 		}
 	}
 

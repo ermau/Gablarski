@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -10,7 +11,7 @@ using Gablarski.Messages;
 namespace Gablarski.Client
 {
 	public class ClientSourceManager
-		: IEnumerable<AudioSource>
+		: IEnumerable<AudioSource>, INotifyCollectionChanged
 	{
 		protected internal ClientSourceManager (IClientContext context)
 		{
@@ -40,6 +41,11 @@ namespace Gablarski.Client
 		/// Audio has been received.
 		/// </summary>
 		public event EventHandler<ReceivedAudioEventArgs> ReceivedAudio;
+
+		/// <summary>
+		/// The collection of sources has changed.
+		/// </summary>
+		public event NotifyCollectionChangedEventHandler CollectionChanged;
 		#endregion
 
 		/// <summary>
@@ -125,6 +131,7 @@ namespace Gablarski.Client
 			}
 
 			OnReceivedSourceList (new ReceivedListEventArgs<AudioSource> (msg.Sources));
+			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Reset, this.sources));
 		}
 
 		internal void OnSourceResultMessage (MessageReceivedEventArgs e)
@@ -147,6 +154,7 @@ namespace Gablarski.Client
 		    }
 
 		    OnReceivedSource (new ReceivedSourceEventArgs (source, sourceMessage.SourceResult));
+			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Add, source));
 		}
 
 		internal void OnSourcesRemovedMessage (MessageReceivedEventArgs e)
@@ -166,7 +174,8 @@ namespace Gablarski.Client
 				}
 			}
 
-			this.OnSourcesRemoved (new ReceivedListEventArgs<AudioSource> (removed));
+			OnSourcesRemoved (new ReceivedListEventArgs<AudioSource> (removed));
+			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Remove, removed));
 		}
 
 		internal void OnAudioDataReceivedMessage (MessageReceivedEventArgs e)
@@ -211,6 +220,13 @@ namespace Gablarski.Client
 			var removed = this.SourcesRemoved;
 			if (removed != null)
 				removed (this, e);
+		}
+
+		protected virtual void OnCollectionChanged (NotifyCollectionChangedEventArgs e)
+		{
+			var changed = this.CollectionChanged;
+			if (changed != null)
+				changed (this, e);
 		}
 		#endregion
 	}
