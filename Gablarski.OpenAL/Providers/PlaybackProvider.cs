@@ -10,7 +10,13 @@ namespace Gablarski.OpenAL.Providers
 	public class PlaybackProvider
 		: IPlaybackProvider
 	{
+		public PlaybackProvider()
+		{
+			this.pool.SourceFinished += PoolSourceFinished;
+		}
+
 		#region IPlaybackProvider Members
+		public event EventHandler<SourceFinishedEventArgs> SourceFinished;
 
 		public IDevice Device
 		{
@@ -50,7 +56,7 @@ namespace Gablarski.OpenAL.Providers
 			if (data.Length == 0)
 				return;
 
-			SourceBuffer buffer = null;
+			SourceBuffer buffer;
 			lock (bufferLock)
 			{
 				if (!this.buffers.ContainsKey (audioSource))
@@ -94,7 +100,7 @@ namespace Gablarski.OpenAL.Providers
 		private Context context;
 		private PlaybackDevice device;
 		private readonly SourcePool<AudioSource> pool = new SourcePool<AudioSource>();
-		private object bufferLock = new object ();
+		private readonly object bufferLock = new object ();
 		private readonly Dictionary<AudioSource, Stack<SourceBuffer>> buffers = new Dictionary<AudioSource, Stack<SourceBuffer>> ();
 
 		private void PushBuffers (AudioSource audioSource, int number)
@@ -102,6 +108,18 @@ namespace Gablarski.OpenAL.Providers
 			SourceBuffer[] sbuffers = SourceBuffer.Generate (number);
 			for (int i = 0; i < sbuffers.Length; ++i)
 				this.buffers[audioSource].Push (sbuffers[i]);
+		}
+
+		private void OnSourceFinished (SourceFinishedEventArgs e)
+		{
+			var finished = this.SourceFinished;
+			if (finished != null)
+				finished (this, e);
+		}
+		
+		private void PoolSourceFinished (object sender, SourceFinishedEventArgs<AudioSource> e)
+		{
+			OnSourceFinished (new SourceFinishedEventArgs (e.Owner));
 		}
 	}
 }

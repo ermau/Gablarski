@@ -9,6 +9,15 @@ namespace Gablarski.OpenAL
 	public class SourcePool<T>
 		where T : class
 	{
+		public SourcePool()
+		{
+			this.sourcePollerThread = new Thread (this.SourcePoller);
+			this.sourcePollerThread.IsBackground = true;
+			this.sourcePollerThread.Start();
+		}
+
+		public event EventHandler<SourceFinishedEventArgs<T>> SourceFinished;
+
 		public Source RequestSource (T owner)
 		{
 			Source free = null;
@@ -21,7 +30,8 @@ namespace Gablarski.OpenAL
 						free = kvp.Key;
 						break;
 					}
-					else if (kvp.Value == owner)
+					
+					if (kvp.Value == owner)
 						return kvp.Key;
 				}
 			}
@@ -57,5 +67,52 @@ namespace Gablarski.OpenAL
 		private readonly Dictionary<Source, T> owners = new Dictionary<Source, T> ();
 		
 		private readonly object sourceLock = new object();
+		private readonly Thread sourcePollerThread;
+		private volatile bool listening = true;
+
+		private void OnSourceFinished (SourceFinishedEventArgs<T> e)
+		{
+			var finished = this.SourceFinished;
+			if (finished != null)
+				finished (this, e);
+		}
+
+		private void SourcePoller()
+		{
+			while (this.listening)
+			{
+				lock (sourceLock)
+				{
+					foreach (Source s in owners.Keys)
+					{
+						if (s.IsStopped)
+							OnSourceFinished (new SourceFinishedEventArgs<T> (owners[s], s));
+					}
+				}
+
+				Thread.Sleep (1);
+			}
+		}
+	}
+
+	public class SourceFinishedEventArgs<T>
+		: EventArgs
+		where T : class 
+	{
+		public SourceFinishedEventArgs (T owner, Source source)
+		{
+			this.Owner = owner;
+			this.Source = source;
+		}
+
+		public T Owner
+		{
+			get; private set;
+		}
+
+		public Source Source
+		{
+			get; private set;
+		}
 	}
 }

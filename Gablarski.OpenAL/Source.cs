@@ -172,7 +172,7 @@ namespace Gablarski.OpenAL
 			if (this.disposed)
 				return;
 
-			uint[] id = new uint[] { this.sourceID };
+			uint[] id = new [] { this.sourceID };
 			alDeleteSources (1, id);
 			OpenAL.ErrorCheck ();
 
@@ -207,7 +207,7 @@ namespace Gablarski.OpenAL
 
 			return sources;
 		}
-
+		// ReSharper disable InconsistentNaming
 		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
 		private static extern void alGetSourcei (uint sourceID, IntSourceProperty property, out int value);
 
@@ -237,10 +237,11 @@ namespace Gablarski.OpenAL
 
 		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
 		private static extern void alSourcef (uint sourceID, FloatSourceProperty property, float value);
+		// ReSharper restore InconsistentNaming
 
 		internal static float GetPropertyF (uint sourceID, FloatSourceProperty property)
 		{
-			float value = 0.0f;
+			float value;
 			alGetSourcef (sourceID, property, out value);
 			OpenAL.ErrorCheck ();
 
@@ -267,6 +268,7 @@ namespace Gablarski.OpenAL
 		Stopped = 0x1014
 	}
 
+	// ReSharper disable InconsistentNaming
 	internal enum IntSourceProperty
 	{
 		AL_SOURCE_STATE = 0x1010,
@@ -287,4 +289,5 @@ namespace Gablarski.OpenAL
 		AL_CONE_OUTER_ANGLE		= 0x1002,
 		AL_REFERENCE_DISTANCE	= 0x1020
 	}
+	// ReSharper restore InconsistentNaming
 }
