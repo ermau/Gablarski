@@ -263,7 +263,7 @@ namespace Gablarski.Clients.CLI
 
 		static void SourcesReceivedAudio (object sender, ReceivedAudioEventArgs e)
 		{
-			playbackProvider.QueuePlayback (e.Source, e.AudioData, e.Source.Frequency);
+			playbackProvider.QueuePlayback (e.Source, e.AudioData);
 		}
 
 		static void OnSamplesAvailable (object sender, SamplesAvailableEventArgs e)

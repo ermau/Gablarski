@@ -403,7 +403,7 @@ namespace Microsoft.WindowsAPICodePack
             return ShowCoreStatic(
                 text, 
                 TaskDialogDefaults.MainInstruction, 
-                TaskDialogDefaults.Caption);
+                TaskDialogDefaults.Caption, TaskDialogStandardIcon.None);
         }
 
         /// <summary>
@@ -416,7 +416,7 @@ namespace Microsoft.WindowsAPICodePack
         {
             return ShowCoreStatic(
                 text, instructionText, 
-                TaskDialogDefaults.Caption);
+                TaskDialogDefaults.Caption, TaskDialogStandardIcon.None);
         }
 
         /// <summary>
@@ -428,7 +428,19 @@ namespace Microsoft.WindowsAPICodePack
         /// <returns></returns>
         public static TaskDialogResult Show(string text, string instructionText, string caption)
         {
-            return ShowCoreStatic(text, instructionText, caption);
+            return ShowCoreStatic(text, instructionText, caption, TaskDialogStandardIcon.None);
+        }
+
+		/// <summary>
+        /// Show Task Dialog
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="instructionText"></param>
+        /// <param name="caption"></param>
+        /// <returns></returns>
+        public static TaskDialogResult Show(string text, string instructionText, string caption, TaskDialogStandardIcon icon)
+        {
+            return ShowCoreStatic(text, instructionText, caption, icon);
         }
         #endregion
 
@@ -455,7 +467,9 @@ namespace Microsoft.WindowsAPICodePack
         private static TaskDialogResult ShowCoreStatic(
             string text,
             string instructionText, 
-            string caption)
+            string caption,
+			TaskDialogStandardIcon icon
+			)
         {
             // If no instance cached yet, create it.
             if (staticDialog == null)
@@ -470,6 +484,7 @@ namespace Microsoft.WindowsAPICodePack
             staticDialog.text = text;
             staticDialog.instructionText = instructionText;
             staticDialog.caption = caption;
+        	staticDialog.Icon = icon;
 
             return staticDialog.Show();
         }

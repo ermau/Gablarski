@@ -20,10 +20,10 @@ namespace Gablarski.Clients.Windows
 				ColorDepth = ColorDepth.Depth24Bit
 			};
 
-			this.ImageList.Images.Add ("channel", Resources.UsersImage);
-			this.ImageList.Images.Add ("silent", Resources.SoundNoneImage);
-			this.ImageList.Images.Add ("talking", Resources.SoundImage);
-			this.ImageList.Images.Add ("music", Resources.MusicImage);
+			this.ImageList.Images.Add ("channel",	Resources.UsersImage);
+			this.ImageList.Images.Add ("silent",	Resources.SoundNoneImage);
+			this.ImageList.Images.Add ("talking",	Resources.SoundImage);
+			this.ImageList.Images.Add ("music",		Resources.MusicImage);
 		}
 
 		public void AddChanel (Channel channel, IdentifyingTypes idTypes)
@@ -44,7 +44,7 @@ namespace Gablarski.Clients.Windows
 
 			var node = parent.Add (channel.ChannelId.ToString(), channel.Name);
 			node.ImageKey = "channel";
-			node.ExpandAll();
+			node.SelectedImageKey = "channel";
 			this.channelNodes.Add (channel, node);
 		}
 
@@ -56,10 +56,13 @@ namespace Gablarski.Clients.Windows
 				return;
 			}
 
-			string channel = user.CurrentChannelId.ToString();
-
-			if (this.Nodes.ContainsKey (channel))
-				(this.userNodes[user] = this.Nodes[channel].Nodes.Add (user.Nickname)).ImageKey = "silent";
+			var channelPair = this.channelNodes.FirstOrDefault (c => c.Key.ChannelId.Equals (user.CurrentChannelId));
+			if (channelPair.Equals (default(KeyValuePair<Channel,TreeNode>)))
+				return;
+				
+			var node = channelPair.Value.Nodes.Add(user.Nickname);
+			node.ImageKey = "silent";
+			this.userNodes[user] = node;
 		}
 
 		public void MarkTalking (UserInfo user)
@@ -140,6 +143,8 @@ namespace Gablarski.Clients.Windows
 				this.AddChanel (c, idTypes);
 				this.AddChannels (idTypes, channels, c);
 			}
+
+			this.ExpandAll();
 		}
 	}
 }

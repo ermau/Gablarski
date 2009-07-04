@@ -10,6 +10,7 @@ using Gablarski.Client;
 using Gablarski.Clients.Windows.Entities;
 using Gablarski.Clients.Windows.Properties;
 using Gablarski.Media.Sources;
+using Gablarski.Messages;
 using Gablarski.Network;
 using Microsoft.WindowsAPICodePack;
 
@@ -28,27 +29,42 @@ namespace Gablarski.Clients.Windows
 			this.gablarski.Disconnected += this.GablarskiDisconnected;
 			this.gablarski.Channels.ReceivedChannelList += this.ChannelsReceivedChannelList;
 			this.gablarski.Users.ReceivedUserList += this.UsersReceivedUserList;
-			//this.gablarski.Sources.ReceivedSourceList += this.SourcesReceivedSourceList;
-			//this.gablarski.Sources.ReceivedSource += this.SourcesReceivedSource;
+			this.gablarski.Sources.ReceivedSource += this.SourcesReceivedSource;
 			this.gablarski.CurrentUser.ReceivedLoginResult += this.CurrentUserReceivedLoginResult;
 
 			this.InitializeComponent ();
 		}
 
+		private const string VoiceName = "voice";
+
+		private IPlaybackProvider playbackProvider;
+		private AudioSource voiceSource;
+
 		private void MainForm_Load (object sender, EventArgs e)
 		{
+			try
+			{
+				this.playbackProvider = new OpenAL.Providers.PlaybackProvider();
+				this.playbackProvider.Device = this.playbackProvider.DefaultDevice;
+			}
+			catch (Exception ex)
+			{
+				TaskDialog.Show (ex.ToDisplayString(), "An error as occured initializing OpenAL.", "OpenAL Initialization", TaskDialogStandardIcon.Error);
+			}
+
 			this.gablarski.Connect (this.server.Host, this.server.Port);
 		}
 
-		//void SourcesReceivedSource (object sender, ReceivedSourceEventArgs e)
-		//{
-			
-		//}
-
-		//void SourcesReceivedSourceList (object sender, ReceivedListEventArgs<AudioSource> e)
-		//{
-			
-		//}
+		void SourcesReceivedSource (object sender, ReceivedSourceEventArgs e)
+		{
+			if (e.Result == SourceResult.Succeeded)
+			{
+				if (e.Source.OwnerId.Equals (this.gablarski.CurrentUser.UserId) && e.Source.Name == VoiceName)
+					voiceSource = e.Source;
+			}
+			else
+				TaskDialog.Show (e.Result.ToString(), "Source request failed");
+		}
 
 		void UsersReceivedUserList (object sender, ReceivedListEventArgs<UserInfo> e)
 		{
