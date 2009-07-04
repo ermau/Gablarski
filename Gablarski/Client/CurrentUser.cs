@@ -81,9 +81,12 @@ namespace Gablarski.Client
 		internal void OnLoginResultMessage (MessageReceivedEventArgs e)
 		{
 		    var msg = (LoginResultMessage)e.Message;
-			this.UserId = msg.UserInfo.UserId;
-			this.Nickname = msg.UserInfo.Nickname;
-			this.CurrentChannelId = msg.UserInfo.CurrentChannelId;
+			if (msg.Result.ResultState == LoginResultState.Success)
+			{
+				this.UserId = msg.UserInfo.UserId;
+				this.Nickname = msg.UserInfo.Nickname;
+				this.CurrentChannelId = msg.UserInfo.CurrentChannelId;
+			}
 
 			var args = new ReceivedLoginResultEventArgs (msg.Result);
 			this.OnLoginResult (args);
