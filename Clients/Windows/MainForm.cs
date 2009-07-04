@@ -29,8 +29,10 @@ namespace Gablarski.Clients.Windows
 			this.gablarski.Disconnected += this.GablarskiDisconnected;
 			this.gablarski.Channels.ReceivedChannelList += this.ChannelsReceivedChannelList;
 			this.gablarski.Users.ReceivedUserList += this.UsersReceivedUserList;
-			this.gablarski.Sources.ReceivedSource += this.SourcesReceivedSource;
 			this.gablarski.CurrentUser.ReceivedLoginResult += this.CurrentUserReceivedLoginResult;
+
+			this.gablarski.Sources.ReceivedSource += this.SourcesReceivedSource;
+			this.gablarski.Sources.ReceivedAudio += SourcesReceivedAudio;
 
 			this.InitializeComponent ();
 		}
@@ -46,6 +48,7 @@ namespace Gablarski.Clients.Windows
 			{
 				this.playbackProvider = new OpenAL.Providers.PlaybackProvider();
 				this.playbackProvider.Device = this.playbackProvider.DefaultDevice;
+				this.playbackProvider.SourceFinished += PlaybackProviderSourceFinished;
 			}
 			catch (Exception ex)
 			{
@@ -53,6 +56,17 @@ namespace Gablarski.Clients.Windows
 			}
 
 			this.gablarski.Connect (this.server.Host, this.server.Port);
+		}
+
+		private void PlaybackProviderSourceFinished (object sender, SourceFinishedEventArgs e)
+		{
+			this.players.MarkSilent (this.gablarski.Users[e.Source.OwnerId]);
+		}
+
+		private void SourcesReceivedAudio (object sender, ReceivedAudioEventArgs e)
+		{
+			this.players.MarkTalking (this.gablarski.Users[e.Source.OwnerId]);
+			this.playbackProvider.QueuePlayback (e.Source, e.AudioData);
 		}
 
 		void SourcesReceivedSource (object sender, ReceivedSourceEventArgs e)
@@ -86,6 +100,8 @@ namespace Gablarski.Clients.Windows
 
 		void GablarskiDisconnected (object sender, EventArgs e)
 		{
+			this.players.Nodes.Clear();
+
 			this.btnConnect.Image = Resources.DisconnectImage;
 			this.btnConnect.Text = "Connect";
 			this.btnConnect.ToolTipText = "Connect (Disconnected)";

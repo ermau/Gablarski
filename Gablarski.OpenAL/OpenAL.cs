@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
@@ -287,6 +288,7 @@ namespace Gablarski.OpenAL
 			return strings.ToArray();
 		}
 
+		[DebuggerStepThrough]
 		internal static void ErrorCheck ()
 		{
 			if (!ErrorChecking)

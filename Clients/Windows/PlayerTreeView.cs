@@ -69,11 +69,11 @@ namespace Gablarski.Clients.Windows
 		{
 			if (this.InvokeRequired)
 			{
-				this.Invoke ((Action<UserInfo>)this.MarkTalking, user);
+				this.BeginInvoke ((Action<UserInfo>)this.MarkTalking, user);
 				return;
 			}
 
-			if (!userNodes.ContainsKey (user))
+			if (!userNodes.ContainsKey (user) || userNodes[user].ImageKey == "talking")
 				return;
 
 			userNodes[user].ImageKey = "talking";
@@ -83,7 +83,7 @@ namespace Gablarski.Clients.Windows
 		{
 			if (this.InvokeRequired)
 			{
-				this.Invoke ((Action<UserInfo>)this.MarkTalking, user);
+				this.BeginInvoke ((Action<UserInfo>)this.MarkTalking, user);
 				return;
 			}
 
@@ -97,11 +97,11 @@ namespace Gablarski.Clients.Windows
 		{
 			if (this.InvokeRequired)
 			{
-				this.Invoke ((Action<UserInfo>)this.MarkTalking, user);
+				this.BeginInvoke ((Action<UserInfo>)this.MarkSilent, user);
 				return;
 			}
 
-			if (!userNodes.ContainsKey (user))
+			if (!userNodes.ContainsKey (user) || userNodes[user].ImageKey == "silent")
 				return;
 
 			userNodes[user].ImageKey = "silent";

@@ -47,6 +47,15 @@ namespace Gablarski.OpenAL
 			return free;
 		}
 
+		public void PlayingSource (Source source)
+		{
+			lock (this.sourceLock)
+			{
+				if (!this.playing.Contains (source))
+					this.playing.Add (source);
+			}
+		}
+
 		public void FreeSource (Source source)
 		{
 			lock (this.sourceLock)
@@ -64,6 +73,7 @@ namespace Gablarski.OpenAL
 			}
 		}
 
+		private readonly HashSet<Source> playing = new HashSet<Source>();
 		private readonly Dictionary<Source, T> owners = new Dictionary<Source, T> ();
 		
 		private readonly object sourceLock = new object();
@@ -85,8 +95,11 @@ namespace Gablarski.OpenAL
 				{
 					foreach (Source s in owners.Keys)
 					{
-						if (s.IsStopped)
-							OnSourceFinished (new SourceFinishedEventArgs<T> (owners[s], s));
+						if (!playing.Contains (s) || !s.IsStopped)
+							continue;
+
+						OnSourceFinished (new SourceFinishedEventArgs<T> (owners[s], s));
+						playing.Remove (s);
 					}
 				}
 
