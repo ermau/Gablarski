@@ -31,6 +31,7 @@ namespace Gablarski.Clients.Windows
 				case 0:
 					this.ShowAddServer();
 					this.btnConnect.Enabled = false;
+					this.Entry = null;
 					break;
 
 				case 1:
@@ -42,6 +43,7 @@ namespace Gablarski.Clients.Windows
 				default:
 					this.btnConnect.Enabled = false;
 					this.btnAddServer.Enabled = false;
+					this.Entry = null;
 					break;
 			}
 		}
