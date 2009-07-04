@@ -11,7 +11,7 @@ namespace Gablarski.Client
 		: AudioSource
 	{
 		internal ClientAudioSource (AudioSource source, IClientConnection client)
-			: base (source.Id, source.OwnerId, source.Channels, source.Bitrate, source.Frequency, source.FrameSize, source.Complexity)
+			: base (source.Name, source.Id, source.OwnerId, source.Channels, source.Bitrate, source.Frequency, source.FrameSize, source.Complexity)
 		{
 			this.client = client;
 		}

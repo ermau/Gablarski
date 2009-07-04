@@ -13,14 +13,22 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public RequestSourceMessage (int channels, int targetBitrate)
+		public RequestSourceMessage (string name, int channels, int targetBitrate)
 			: this ()
 		{
+			if (name == null)
+				throw new ArgumentNullException("name");
 			if (channels < 1 || channels > 2)
 				throw new ArgumentOutOfRangeException ("channels");
 
+			this.Name = name;
 			this.Channels = channels;
 			this.TargetBitrate = targetBitrate;
+		}
+
+		public string Name
+		{
+			get; set;
 		}
 
 		public int Channels
@@ -40,12 +48,14 @@ namespace Gablarski.Messages
 
 		public override void WritePayload (IValueWriter writer, IdentifyingTypes idTypes)
 		{
+			writer.WriteString (this.Name);
 			writer.WriteByte ((byte)this.Channels);
 			writer.WriteInt32 (this.TargetBitrate);
 		}
 
 		public override void ReadPayload (IValueReader reader, IdentifyingTypes idTypes)
 		{
+			this.Name = reader.ReadString();
 			this.Channels = reader.ReadByte ();
 			this.TargetBitrate = reader.ReadInt32();
 		}

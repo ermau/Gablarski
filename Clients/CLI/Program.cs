@@ -135,25 +135,25 @@ namespace Gablarski.Clients.CLI
 					case "source":
 						int channels = 1;
 						int bitrate = 0;
-						bool request = false;
+						string request = null;
 						var sourceOptions = new OptionSet
 						{
 							{ "l|list",			"Lists current sources.",						v => ListSources (Console.Out)},
 
-							{ "r|request",		"Requests a source.",							v => request = (v != null) },
+							{ "r=|request=",	"Requests a source.",							v => request = v },
 							{ "b=|bitrate=",	"Bitrate of the source to request. (>32000)",	(int b) => bitrate = b },
 							{ "c=|channels=",	"Channels of the source to request. (1-2)",		(int c) => channels = c }
 						};
 						sourceOptions.Parse (cmdopts);
 
-						if (request)
+						if (request != null)
 						{
 							if (channels < 1 || channels > 2)
 								sourceOptions.WriteOptionDescriptions (Console.Out);
 							else if (bitrate < 32000 && bitrate != 0)
 								sourceOptions.WriteOptionDescriptions (Console.Out);
 
-							client.Sources.Request (channels, bitrate);
+							client.Sources.Request (request, channels, bitrate);
 						}
 
 						break;
@@ -286,7 +286,7 @@ namespace Gablarski.Clients.CLI
 			if (!e.Source.OwnerId.Equals (client.CurrentUser.UserId))
 				return;
 
-			Console.WriteLine ("Received own source. Id: " + e.Source.Id + " Owner: " + e.Source.OwnerId + " Bitrate: " + e.Source.Bitrate);
+			Console.WriteLine ("Received own source. Name: " + e.Source.Name + " Id: " + e.Source.Id + " Owner: " + e.Source.OwnerId + " Bitrate: " + e.Source.Bitrate);
 			
 			lock (sources)
 			{
@@ -371,7 +371,7 @@ namespace Gablarski.Clients.CLI
 				Console.WriteLine ("Login failed: " + e.Result.ResultState);
 
 			if (voiceSource)
-				client.Sources.Request (1);
+				client.Sources.Request ("voice", 1);
 		}
 
 		static void ClientConnectionRejected (object sender, RejectedConnectionEventArgs e)

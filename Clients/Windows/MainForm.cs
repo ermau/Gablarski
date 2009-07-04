@@ -65,7 +65,7 @@ namespace Gablarski.Clients.Windows
 			if (!e.Result.Succeeded)
 				TaskDialog.Show (e.Result.ResultState.ToString(), "Login Failed");
 			else
-				this.gablarski.Sources.Request (1, 64000);
+				this.gablarski.Sources.Request ("voice", 1, 64000);
 		}
 
 		void GablarskiDisconnected (object sender, EventArgs e)

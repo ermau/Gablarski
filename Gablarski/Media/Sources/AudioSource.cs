@@ -18,8 +18,10 @@ namespace Gablarski.Media.Sources
 			this.Deserialize (reader, idTypes);
 		}
 
-		public AudioSource (int sourceId, object ownerId, byte channels, int bitrate, int frequency, short frameSize)
+		public AudioSource (string name, int sourceId, object ownerId, byte channels, int bitrate, int frequency, short frameSize)
 		{
+			if (name == null)
+				throw new ArgumentNullException ("name");
 			if (sourceId <= 0)
 				throw new ArgumentOutOfRangeException ("sourceId");
 			if (ownerId == null)
@@ -42,13 +44,22 @@ namespace Gablarski.Media.Sources
 			this.FrameSize = frameSize;
 		}
 
-		public AudioSource (int id, object ownerId, byte channels, int bitrate, int frequency, short frameSize, byte complexity)
-			: this (id, ownerId, channels, bitrate, frequency, frameSize)
+		public AudioSource (string name, int id, object ownerId, byte channels, int bitrate, int frequency, short frameSize, byte complexity)
+			: this (name, id, ownerId, channels, bitrate, frequency, frameSize)
 		{
 			if (complexity < 1 || complexity > 10)
 				throw new ArgumentOutOfRangeException ("complexity");
 
 			this.complexity = complexity;
+		}
+
+		/// <summary>
+		/// Gets the user-local name of the source.
+		/// </summary>
+		public string Name
+		{
+			get;
+			private set;
 		}
 
 		/// <summary>
@@ -161,6 +172,7 @@ namespace Gablarski.Media.Sources
 
 		internal void Serialize (IValueWriter writer, IdentifyingTypes idTypes)
 		{
+			writer.WriteString (this.Name);
 			writer.WriteInt32 (this.Id);
 			idTypes.WriteUser (writer, this.OwnerId);
 			writer.WriteInt32 (this.Bitrate);
@@ -173,6 +185,7 @@ namespace Gablarski.Media.Sources
 
 		internal void Deserialize (IValueReader reader, IdentifyingTypes idTypes)
 		{
+			this.Name = reader.ReadString();
 			this.Id = reader.ReadInt32 ();
 			this.OwnerId = idTypes.ReadUser (reader);
 			this.Bitrate = reader.ReadInt32();

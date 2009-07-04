@@ -98,9 +98,10 @@ namespace Gablarski.Client
 		/// Requests a channel with <paramref name="channels"/> and a default bitrate.
 		/// </summary>
 		/// <param name="channels">The number of channels to request. 1-2 is the valid range.</param>
-		public void Request (int channels)
+		/// <param name="name">The user-local name of the source, used to identify the source later.</param>
+		public void Request (string name, int channels)
 		{
-			Request (channels, 0);
+			Request (name, channels, 0);
 		}
 
 		/// <summary>
@@ -108,13 +109,14 @@ namespace Gablarski.Client
 		/// </summary>
 		/// <param name="channels">The number of channels to request. 1-2 is the valid range.</param>
 		/// <param name="targetBitrate">The target bitrate to request.</param>
+		/// <param name="name">The user-local name of the source, used to identify the source later.</param>
 		/// <remarks>
 		/// The server may not agree with the bitrate you request, do not set up audio based on this
 		/// target, but on the bitrate of the source you actually receive.
 		/// </remarks>
-		public void Request (int channels, int targetBitrate)
+		public void Request (string name, int channels, int targetBitrate)
 		{
-			this.context.Connection.Send (new RequestSourceMessage (channels, targetBitrate));
+			this.context.Connection.Send (new RequestSourceMessage (name, channels, targetBitrate));
 		}
 
 		private readonly IClientContext context;

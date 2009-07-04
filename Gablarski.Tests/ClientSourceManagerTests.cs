@@ -44,7 +44,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void RequestDefaultBitrate()
 		{
-			this.manager.Request (1);
+			this.manager.Request ("voice", 1);
 
 			var msg = this.server.DequeueAndAssertMessage<RequestSourceMessage>();
 			Assert.AreEqual (1, msg.Channels);
@@ -54,7 +54,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void RequestBitRate()
 		{
-			this.manager.Request (2, 64000);
+			this.manager.Request ("voice", 2, 64000);
 
 			var msg = this.server.DequeueAndAssertMessage<RequestSourceMessage>();
 			Assert.AreEqual (2, msg.Channels);
@@ -67,8 +67,8 @@ namespace Gablarski.Tests
 			manager.OnSourceListReceivedMessage (new MessageReceivedEventArgs (this.client, 
 				new SourceListMessage (new []
 				{
-					new AudioSource (1, 1, 1, 64000, 44100, 256, 10),
-					new AudioSource (2, 2, 1, 96000, 44100, 512, 10),
+					new AudioSource ("voice", 1, 1, 1, 64000, 44100, 256, 10),
+					new AudioSource ("voice", 2, 2, 1, 96000, 44100, 512, 10),
 				})
 			));
 

@@ -166,8 +166,8 @@ namespace Gablarski.Tests
 		{
 			var sources = new List<AudioSource>
 			{
-				new AudioSource (1, UserId, 1, 64000, 44100, 256, 10),
-				new AudioSource (2, UserId2, 2, 128000, 48000, 512, 10)
+				new AudioSource ("voice", 1, UserId, 1, 64000, 44100, 256, 10),
+				new AudioSource ("voice", 2, UserId2, 2, 128000, 48000, 512, 10)
 			};
 
 			var msg = new SourceListMessage (sources);
@@ -240,8 +240,8 @@ namespace Gablarski.Tests
 		{
 			var sources = new List<AudioSource>
 			{
-				new AudioSource (1, UserId, 1, 64000, 44100, 256, 10),
-				new AudioSource (2, UserId2, 2, 128000, 48000, 512, 10)
+				new AudioSource ("voice", 1, UserId, 1, 64000, 44100, 256, 10),
+				new AudioSource ("voice", 2, UserId2, 2, 128000, 48000, 512, 10)
 			};
 
 			var msg = new SourcesRemovedMessage (sources);

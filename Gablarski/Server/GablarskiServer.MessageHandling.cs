@@ -285,7 +285,7 @@ namespace Gablarski.Server
 						bitrate = request.TargetBitrate.Trim (settings.MinimumAudioBitrate, settings.MaximumAudioBitrate);
 
 					//source = MediaSources.Create (request.MediaSourceType, sourceId, user.UserId);
-					source = new AudioSource (sourceId, user.UserId, 1, bitrate, 44100, 128);
+					source = new AudioSource (request.Name, sourceId, user.UserId, 1, bitrate, 44100, 128);
 					//if (source != null)
 					//{
 					lock (sourceLock)
