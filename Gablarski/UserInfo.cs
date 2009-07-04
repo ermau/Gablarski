@@ -77,5 +77,17 @@ namespace Gablarski
 		{
 			return userId.Equals (types.UserIdType.GetDefaultValue());
 		}
+
+		public override bool Equals (object obj)
+		{
+			var info = (obj as UserInfo);
+
+			return (info != null) ? this.UserId.Equals (info.UserId) : this.UserId.Equals (obj);
+		}
+
+		public override int GetHashCode ()
+		{
+			return this.UserId.GetHashCode();
+		}
 	}
 }
