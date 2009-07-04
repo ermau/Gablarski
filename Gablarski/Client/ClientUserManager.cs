@@ -48,9 +48,29 @@ namespace Gablarski.Client
 		public event NotifyCollectionChangedEventHandler CollectionChanged;
 		#endregion
 
+		/// <summary>
+		/// Gets the current user.
+		/// </summary>
 		public CurrentUser Current
 		{
 			get { return this.context.CurrentUser; }
+		}
+
+		public ClientUser this[object identifier]
+		{
+			get
+			{
+				if (users == null)
+					return null;
+
+				ClientUser user;
+				lock (userLock)
+				{
+					this.users.TryGetValue (identifier, out user);
+				}
+
+				return user;
+			}
 		}
 
 		#region Implementation of IEnumerable
@@ -91,23 +111,6 @@ namespace Gablarski.Client
 		private readonly object userLock = new object();
 		private Dictionary<object, ClientUser> users;
 		private readonly IClientContext context;
-
-		internal ClientUser this[object identifier]
-		{
-			get
-			{
-				if (users == null)
-					return null;
-
-				ClientUser user;
-				lock (userLock)
-				{
-					this.users.TryGetValue (identifier, out user);
-				}
-
-				return user;
-			}
-		}
 
 		#region Message handlers
 		internal void OnUserListReceivedMessage (MessageReceivedEventArgs e)
