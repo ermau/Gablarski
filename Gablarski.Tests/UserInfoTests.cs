@@ -62,5 +62,23 @@ namespace Gablarski.Tests
 			Assert.IsTrue (UserInfo.IsDefault (default (Int32), idtypes));
 			Assert.IsFalse (UserInfo.IsDefault (1, idtypes));
 		}
+
+		[Test]
+		public void Equals()
+		{
+			UserInfo foo = new UserInfo ("foo", 1, 2);
+			UserInfo bar = new UserInfo ("foo", 1, 2);
+
+			Assert.AreEqual (foo, bar);
+		}
+
+		[Test]
+		public void HashCode()
+		{
+			UserInfo foo = new UserInfo ("foo", 1, 2);
+			UserInfo bar = new UserInfo ("foo", 1, 2);
+
+			Assert.AreEqual (foo.GetHashCode(), bar.GetHashCode());
+		}
 	}
 }
