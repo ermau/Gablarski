@@ -67,6 +67,20 @@ namespace Gablarski.Clients.Windows.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap DisconnectImage {
+            get {
+                object obj = ResourceManager.GetObject("DisconnectImage", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap MusicImage {
+            get {
+                object obj = ResourceManager.GetObject("MusicImage", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap SaveImage {
             get {
                 object obj = ResourceManager.GetObject("SaveImage", resourceCulture);
@@ -105,6 +119,55 @@ namespace Gablarski.Clients.Windows.Properties {
         internal static System.Drawing.Bitmap ServerImage {
             get {
                 object obj = ResourceManager.GetObject("ServerImage", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap SoundAddImage {
+            get {
+                object obj = ResourceManager.GetObject("SoundAddImage", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap SoundDeleteImage {
+            get {
+                object obj = ResourceManager.GetObject("SoundDeleteImage", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap SoundImage {
+            get {
+                object obj = ResourceManager.GetObject("SoundImage", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap SoundLowImage {
+            get {
+                object obj = ResourceManager.GetObject("SoundLowImage", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap SoundMuteImage {
+            get {
+                object obj = ResourceManager.GetObject("SoundMuteImage", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap SoundNoneImage {
+            get {
+                object obj = ResourceManager.GetObject("SoundNoneImage", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap UsersImage {
+            get {
+                object obj = ResourceManager.GetObject("UsersImage", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

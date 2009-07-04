@@ -111,6 +111,9 @@
     <Compile Include="Mappings\ServerMap.cs" />
     <Compile Include="Mappings\SettingMap.cs" />
     <Compile Include="Persistance.cs" />
+    <Compile Include="PlayerTreeView.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="LoginForm.resx">
@@ -382,9 +385,36 @@
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\disconnect.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\sound.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\sound_add.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\sound_delete.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\sound_low.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\sound_mute.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\sound_none.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\music.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\group.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy /Y "$(SolutionDir)Gablarski.CELT\libcelt.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)Gablarski.CELT\libcelt.license.txt" "$(SolutionDir)Clients\Lite\$(OutDir)"</PostBuildEvent>
+xcopy /Y "$(SolutionDir)Gablarski.CELT\libcelt.license.txt" "$(SolutionDir)Clients\Windows\$(OutDir)"</PostBuildEvent>
   </PropertyGroup>
 </Project>

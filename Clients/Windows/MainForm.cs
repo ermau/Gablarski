@@ -6,7 +6,12 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Gablarski.Client;
 using Gablarski.Clients.Windows.Entities;
+using Gablarski.Clients.Windows.Properties;
+using Gablarski.Media.Sources;
+using Gablarski.Network;
+using Microsoft.WindowsAPICodePack;
 
 namespace Gablarski.Clients.Windows
 {
@@ -15,7 +20,89 @@ namespace Gablarski.Clients.Windows
 	{
 		public MainForm (ServerEntry entry)
 		{
+			this.server = entry;
+
+			this.gablarski = new GablarskiClient (new ClientNetworkConnection());
+			this.gablarski.ConnectionRejected += this.GablarskiConnectionRejected;
+			this.gablarski.Connected += this.GablarskiConnected;
+			this.gablarski.Disconnected += this.GablarskiDisconnected;
+			this.gablarski.Channels.ReceivedChannelList += this.ChannelsReceivedChannelList;
+			this.gablarski.Users.ReceivedUserList += this.UsersReceivedUserList;
+			//this.gablarski.Sources.ReceivedSourceList += this.SourcesReceivedSourceList;
+			//this.gablarski.Sources.ReceivedSource += this.SourcesReceivedSource;
+			this.gablarski.CurrentUser.ReceivedLoginResult += this.CurrentUserReceivedLoginResult;
+
 			this.InitializeComponent ();
+		}
+
+		private void MainForm_Load (object sender, EventArgs e)
+		{
+			this.gablarski.Connect (this.server.Host, this.server.Port);
+		}
+
+		//void SourcesReceivedSource (object sender, ReceivedSourceEventArgs e)
+		//{
+			
+		//}
+
+		//void SourcesReceivedSourceList (object sender, ReceivedListEventArgs<AudioSource> e)
+		//{
+			
+		//}
+
+		void UsersReceivedUserList (object sender, ReceivedListEventArgs<UserInfo> e)
+		{
+			this.players.Update (this.gablarski.IdentifyingTypes, this.gablarski.Channels, e.Data);
+		}
+
+		void ChannelsReceivedChannelList (object sender, ReceivedListEventArgs<Channel> e)
+		{
+			this.players.Update (this.gablarski.IdentifyingTypes, e.Data, this.gablarski.Users.Cast<UserInfo>());
+		}
+
+		void CurrentUserReceivedLoginResult (object sender, ReceivedLoginResultEventArgs e)
+		{
+			if (!e.Result.Succeeded)
+				TaskDialog.Show (e.Result.ResultState.ToString(), "Login Failed");
+			else
+				this.gablarski.Sources.Request (1, 64000);
+		}
+
+		void GablarskiDisconnected (object sender, EventArgs e)
+		{
+			this.btnConnect.Image = Resources.DisconnectImage;
+			this.btnConnect.Text = "Connect";
+			this.btnConnect.ToolTipText = "Connect (Disconnected)";
+		}
+
+		void GablarskiConnected (object sender, EventArgs e)
+		{
+			this.btnConnect.Image = Resources.ConnectImage;
+			this.btnConnect.Text = "Disconnect";
+			this.btnConnect.ToolTipText = "Disconnect (Connected)";
+
+			this.gablarski.CurrentUser.Login (this.server.UserNickname, this.server.UserName, this.server.UserPassword);
+		}
+
+		void GablarskiConnectionRejected (object sender, RejectedConnectionEventArgs e)
+		{
+			TaskDialog.Show (e.Reason.ToString(), "Connection rejected");
+		}
+
+		private readonly GablarskiClient gablarski;
+		private readonly ServerEntry server;
+
+		private void MainForm_FormClosing (object sender, FormClosingEventArgs e)
+		{
+			this.gablarski.Disconnect();
+		}
+
+		private void btnConnect_Click (object sender, EventArgs e)
+		{
+			if (this.gablarski.IsConnected)
+				this.gablarski.Disconnect();
+			else
+				this.gablarski.Connect (this.server.Host, this.server.Port);
 		}
 	}
 }

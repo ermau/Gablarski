@@ -24,9 +24,16 @@ namespace Gablarski.Clients.Windows
 			Application.EnableVisualStyles ();
 			Application.SetCompatibleTextRenderingDefault (false);
 
-			var login = new LoginForm();
-			if (login.ShowDialog() == DialogResult.OK)
-				Application.Run (new MainForm (login.Entry));
+			try
+			{
+				var login = new LoginForm();
+				if (login.ShowDialog() == DialogResult.OK)
+					Application.Run (new MainForm (login.Entry));
+			}
+			finally
+			{
+				Persistance.CurrentSession.Flush();
+			}
 		}
 	}
 }

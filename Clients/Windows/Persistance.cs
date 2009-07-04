@@ -20,12 +20,12 @@ namespace Gablarski.Clients.Windows
 			{
 				lock (DbFile)
 				{
-					if (currentSession == null)
-						currentSession = CreateSessionFactory().OpenSession();
+		            if (currentSession == null)
+		                currentSession = CreateSessionFactory().OpenSession();
 
-					return currentSession;
-				}
-			}
+		            return currentSession;
+		        }
+		    }
 		}
 
 		private static ISession currentSession;

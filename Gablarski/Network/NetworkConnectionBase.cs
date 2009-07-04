@@ -47,7 +47,7 @@ namespace Gablarski.Network
 			if (message == null)
 				throw new ArgumentNullException ("message");
 
-			lock (queuel)
+			lock (mqueue)
 			{
 				mqueue.Enqueue (message);
 			}
@@ -63,11 +63,10 @@ namespace Gablarski.Network
 		protected Thread runnerThread;
 		protected volatile bool running = true;
 
-		protected object queuel = new object ();
 		protected readonly Queue<MessageBase> mqueue = new Queue<MessageBase> ();
 
-		protected readonly TcpClient tcp;
-		protected readonly UdpClient udp;
+		protected TcpClient tcp;
+		protected UdpClient udp;
 
 		protected NetworkStream rstream;
 		protected IValueWriter rwriter;
@@ -106,6 +105,14 @@ namespace Gablarski.Network
 			{
 			}
 
+			lock (mqueue)
+			{
+				this.mqueue.Clear();
+			}
+
+			this.tcp = null;
+			this.udp = null;
+
 			if (this.runnerThread != null)
 				this.runnerThread.Join ();
 
@@ -136,7 +143,7 @@ namespace Gablarski.Network
 
 		private void Received (IAsyncResult read)
 		{
-			MessageBase msg = null;
+			MessageBase msg;
 
 			byte[] mbuffer;
 			try
@@ -215,7 +222,7 @@ namespace Gablarski.Network
 				while (mqueue.Count > 0)
 				{
 					MessageBase message;
-					lock (queuel)
+					lock (mqueue)
 					{
 						message = this.mqueue.Dequeue ();
 					}

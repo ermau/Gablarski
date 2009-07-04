@@ -53,6 +53,14 @@ namespace Gablarski.Client
 
 		#region Public Properties
 		/// <summary>
+		/// Gets whether the client is currently connected.
+		/// </summary>
+		public bool IsConnected
+		{
+			get { return this.Connection.IsConnected; }
+		}
+
+		/// <summary>
 		/// Gets the channel manager for this client.
 		/// </summary>
 		public ClientChannelManager Channels

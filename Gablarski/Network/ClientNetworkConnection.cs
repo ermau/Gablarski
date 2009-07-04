@@ -19,6 +19,14 @@ namespace Gablarski.Network
 
 		public void Connect (string host, int port)
 		{
+			if (host == null)
+				throw new ArgumentNullException ("host");
+
+			if (tcp == null)
+				tcp = new TcpClient();
+			if (udp == null)
+				udp = new UdpClient();
+
 			tcp.Connect (host, port);
 			udp.Connect (host, port);
 

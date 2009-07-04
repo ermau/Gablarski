@@ -48,6 +48,7 @@ namespace Gablarski.Clients.Windows
 
 		private void servers_ItemActivate (object sender, EventArgs e)
 		{
+			this.DialogResult = DialogResult.OK;
 			this.Close();
 		}
 
