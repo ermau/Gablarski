@@ -93,7 +93,7 @@ namespace Gablarski.OpenAL
 			uint bufferSize = format.GetBytes (format.GetSamplesPerSecond (frequency)) * 2;
 
 			this.Handle = alcCaptureOpenDevice (this.Name, frequency, format, (int)bufferSize);
-			OpenAL.ErrorCheck ();
+			OpenAL.ErrorCheck (this);
 
 			pcm = new byte[bufferSize];
 			fixed (byte* bppcm = pcm)
@@ -109,7 +109,7 @@ namespace Gablarski.OpenAL
 		{
 			this.capturing = true;
 			alcCaptureStart (this.Handle);
-			OpenAL.ErrorCheck ();
+			OpenAL.ErrorCheck (this);
 		}
 
 		/// <summary>
@@ -119,7 +119,7 @@ namespace Gablarski.OpenAL
 		{
 			this.capturing = false;
 			alcCaptureStop (this.Handle);
-			OpenAL.ErrorCheck ();
+			OpenAL.ErrorCheck (this);
 		}
 
 		/// <summary>
@@ -171,7 +171,6 @@ namespace Gablarski.OpenAL
 			if (this.IsOpen)
 			{
 				alcCaptureCloseDevice (this.Handle);
-				OpenAL.ErrorCheck ();
 				this.Handle = IntPtr.Zero;
 			}
 
@@ -248,7 +247,7 @@ namespace Gablarski.OpenAL
 			}
 
 			alcCaptureSamples (this.Handle, pcmPtr, numSamples);
-			OpenAL.ErrorCheck ();
+			OpenAL.ErrorCheck (this);
 			Array.Copy (pcm, samples, samples.Length);
 
 			return samples;
@@ -258,7 +257,7 @@ namespace Gablarski.OpenAL
 		{
 			int samples;
 			OpenAL.alcGetIntegerv (this.Handle, ALCEnum.ALC_CAPTURE_SAMPLES, 4, out samples);
-			OpenAL.ErrorCheck ();
+			OpenAL.ErrorCheck (this);
 			return samples;
 		}
 

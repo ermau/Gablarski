@@ -217,6 +217,7 @@ namespace Gablarski.OpenAL
 		internal static IntPtr NullDevice = IntPtr.Zero;
 
 		#region Imports
+		// ReSharper disable InconsistentNaming
 		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
 		internal static extern void alDopplerFactor (float value);
 
@@ -232,6 +233,9 @@ namespace Gablarski.OpenAL
 		[DllImport ("OpenAL32.dll", CallingConvention=CallingConvention.Cdecl)]
 		internal static extern int alGetError ();
 
+		[DllImport ("OpenAL32.dll", CallingConvention=CallingConvention.Cdecl)]
+		internal static extern int alcGetError ([In] IntPtr device);
+
 		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
 		internal static extern sbyte alcIsExtensionPresent ([In] IntPtr device, string extensionName);
 
@@ -240,26 +244,38 @@ namespace Gablarski.OpenAL
 
 		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
 		internal static extern void alDistanceModel (DistanceModel model);
+		// ReSharper restore InconsistentNaming
 		#endregion
 
 		internal static bool GetIsExtensionPresent (string extension)
 		{
-			sbyte result = extension.StartsWith ("ALC")
-							? alcIsExtensionPresent (IntPtr.Zero, extension)
-							: alIsExtensionPresent (extension);
-			
-			OpenAL.ErrorCheck ();
-
+			sbyte result;
+			if (extension.StartsWith ("ALC"))
+			{
+				result = alcIsExtensionPresent (IntPtr.Zero, extension);
+			}
+			else
+			{
+				result = alIsExtensionPresent (extension);
+				OpenAL.ErrorCheck ();
+			}
+	
 			return (result == 1);
 		}
 
 		internal static bool GetIsExtensionPresent (Device device, string extension)
 		{
-			sbyte result = extension.StartsWith("ALC")
-							? alcIsExtensionPresent(device.Handle, extension)
-							: alIsExtensionPresent(extension);
-
-			OpenAL.ErrorCheck ();
+			sbyte result;
+			if (extension.StartsWith ("ALC"))
+			{
+				result = alcIsExtensionPresent (device.Handle, extension);
+				OpenAL.ErrorCheck (device);
+			}
+			else
+			{
+				result = alIsExtensionPresent (extension);
+				OpenAL.ErrorCheck ();
+			}
 
 			return (result == 1);
 		}
@@ -314,6 +330,20 @@ namespace Gablarski.OpenAL
 
 				case OpenALError.AL_INVALID_OPERATION:
 					throw new InvalidOperationException ();
+			}
+		}
+
+		[DebuggerStepThrough]
+		internal static void ErrorCheck (Device device)
+		{
+			int error = alcGetError (device.Handle);
+			switch ((OpenALError)error)
+			{
+				case OpenALError.AL_NO_ERROR:
+					return;
+
+				default:
+					throw new Exception();
 			}
 		}
 

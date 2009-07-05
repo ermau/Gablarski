@@ -31,7 +31,7 @@ namespace Gablarski.Clients.Windows
 
 			builder.Append (Environment.NewLine);
 			builder.Append ("[Inner] ");
-			builder.Append (ex.GetType().Namespace);
+			builder.Append (ex.GetType().Name);
 			builder.Append (": ");
 			builder.Append (ex.Message);
 

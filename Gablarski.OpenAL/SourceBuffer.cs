@@ -112,7 +112,5 @@ namespace Gablarski.OpenAL
 				return Buffers[bufferID];
 			}
 		}
-
-		
 	}
 }

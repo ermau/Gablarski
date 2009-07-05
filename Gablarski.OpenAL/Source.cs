@@ -49,6 +49,7 @@ namespace Gablarski.OpenAL
 			{
 				int buffers;
 				alGetSourcei (this.sourceID, IntSourceProperty.AL_BUFFERS_PROCESSED, out buffers);
+				OpenAL.ErrorCheck();
 
 				return buffers;
 			}
