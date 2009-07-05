@@ -59,6 +59,7 @@
     <Compile Include="LocalUserProvider.cs" />
     <Compile Include="Mappings\ChannelMap.cs" />
     <Compile Include="Mappings\UserMap.cs" />
+    <Compile Include="Persistance.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -33,7 +33,7 @@
 			this.btnConnect = new System.Windows.Forms.ToolStripButton ();
 			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator ();
 			this.btnSettings = new System.Windows.Forms.ToolStripButton ();
-			this.players = new Gablarski.Clients.Windows.PlayerTreeView ();
+			this.users = new Gablarski.Clients.Windows.UserTreeView ();
 			this.tools.SuspendLayout ();
 			this.SuspendLayout ();
 			// 
@@ -47,6 +47,7 @@
 			this.tools.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.HorizontalStackWithOverflow;
 			this.tools.Location = new System.Drawing.Point (0, 0);
 			this.tools.Name = "tools";
+			this.tools.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
 			this.tools.Size = new System.Drawing.Size (187, 25);
 			this.tools.TabIndex = 0;
 			// 
@@ -76,25 +77,25 @@
 			this.btnSettings.Text = "Settings";
 			this.btnSettings.Click += new System.EventHandler (this.btnSettings_Click);
 			// 
-			// players
+			// users
 			// 
-			this.players.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+			this.users.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
 						| System.Windows.Forms.AnchorStyles.Left)
 						| System.Windows.Forms.AnchorStyles.Right)));
-			this.players.ImageIndex = 0;
-			this.players.Location = new System.Drawing.Point (0, 25);
-			this.players.Name = "players";
-			this.players.SelectedImageIndex = 0;
-			this.players.Size = new System.Drawing.Size (187, 266);
-			this.players.TabIndex = 1;
+			this.users.ImageIndex = 0;
+			this.users.Location = new System.Drawing.Point (-1, 25);
+			this.users.Name = "users";
+			this.users.SelectedImageIndex = 0;
+			this.users.Size = new System.Drawing.Size (189, 267);
+			this.users.TabIndex = 1;
 			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF (6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size (187, 291);
-			this.Controls.Add (this.players);
 			this.Controls.Add (this.tools);
+			this.Controls.Add (this.users);
 			this.MinimumSize = new System.Drawing.Size (192, 161);
 			this.Name = "MainForm";
 			this.Text = "Gablarski";
@@ -110,7 +111,7 @@
 		#endregion
 
 		private System.Windows.Forms.ToolStrip tools;
-		private PlayerTreeView players;
+		private UserTreeView users;
 		private System.Windows.Forms.ToolStripButton btnConnect;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
 		private System.Windows.Forms.ToolStripButton btnSettings;

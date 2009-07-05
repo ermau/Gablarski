@@ -8,10 +8,10 @@ using Gablarski.Clients.Windows.Properties;
 
 namespace Gablarski.Clients.Windows
 {
-	public class PlayerTreeView
+	public class UserTreeView
 		: TreeView
 	{
-		public PlayerTreeView()
+		public UserTreeView()
 		{
 			this.ImageList = new ImageList
 			{

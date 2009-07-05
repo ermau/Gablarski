@@ -132,24 +132,24 @@ namespace Gablarski.Clients.Windows
 
 			if (kEvent == KeyboardEvents.KeyDown)
 			{
-				this.players.MarkTalking (this.gablarski.CurrentUser);
+				this.users.MarkTalking (this.gablarski.CurrentUser);
 				this.voiceCapture.StartCapture();
 			}
 			else if (kEvent == KeyboardEvents.KeyUp)
 			{
-				this.players.MarkSilent (this.gablarski.CurrentUser);
+				this.users.MarkSilent (this.gablarski.CurrentUser);
 				this.voiceCapture.EndCapture();
 			}
 		}
 
 		private void PlaybackProviderSourceFinished (object sender, SourceFinishedEventArgs e)
 		{
-			this.players.MarkSilent (this.gablarski.Users[e.Source.OwnerId]);
+			this.users.MarkSilent (this.gablarski.Users[e.Source.OwnerId]);
 		}
 
 		private void SourcesReceivedAudio (object sender, ReceivedAudioEventArgs e)
 		{
-			this.players.MarkTalking (this.gablarski.Users[e.Source.OwnerId]);
+			this.users.MarkTalking (this.gablarski.Users[e.Source.OwnerId]);
 			this.playback.QueuePlayback (e.Source, e.AudioData);
 		}
 
@@ -166,22 +166,22 @@ namespace Gablarski.Clients.Windows
 
 		private void UsersUserDisconnected (object sender, UserDisconnectedEventArgs e)
 		{
-			this.players.RemoveUser (e.User);
+			this.users.RemoveUser (e.User);
 		}
 
 		private void UsersUserLoggedIn (object sender, UserLoggedInEventArgs e)
 		{
-			this.players.AddUser (e.UserInfo);
+			this.users.AddUser (e.UserInfo);
 		}
 
 		void UsersReceivedUserList (object sender, ReceivedListEventArgs<UserInfo> e)
 		{
-			this.players.Update (this.gablarski.IdentifyingTypes, this.gablarski.Channels, e.Data);
+			this.users.Update (this.gablarski.IdentifyingTypes, this.gablarski.Channels, e.Data);
 		}
 
 		void ChannelsReceivedChannelList (object sender, ReceivedListEventArgs<Channel> e)
 		{
-			this.players.Update (this.gablarski.IdentifyingTypes, e.Data, this.gablarski.Users.Cast<UserInfo>());
+			this.users.Update (this.gablarski.IdentifyingTypes, e.Data, this.gablarski.Users.Cast<UserInfo>());
 		}
 
 		void CurrentUserReceivedLoginResult (object sender, ReceivedLoginResultEventArgs e)
@@ -194,7 +194,7 @@ namespace Gablarski.Clients.Windows
 
 		void GablarskiDisconnected (object sender, EventArgs e)
 		{
-			this.players.Nodes.Clear();
+			this.users.Nodes.Clear();
 
 			this.btnConnect.Image = Resources.DisconnectImage;
 			this.btnConnect.Text = "Connect";
@@ -207,7 +207,7 @@ namespace Gablarski.Clients.Windows
 			this.btnConnect.Text = "Disconnect";
 			this.btnConnect.ToolTipText = "Disconnect (Connected)";
 
-			this.players.SetServerNode (
+			this.users.SetServerNode (
 				new TreeNode (this.gablarski.ServerInfo.ServerName) {
 					ToolTipText = this.gablarski.ServerInfo.ServerDescription
 				}

@@ -112,7 +112,7 @@
     <Compile Include="Mappings\ServerMap.cs" />
     <Compile Include="Mappings\SettingMap.cs" />
     <Compile Include="Persistance.cs" />
-    <Compile Include="PlayerTreeView.cs">
+    <Compile Include="UserTreeView.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Program.cs" />
@@ -434,6 +434,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\cog.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="XTaskDlg.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
