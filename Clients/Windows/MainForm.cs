@@ -6,12 +6,14 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Windows.Input;
 using Gablarski.Client;
 using Gablarski.Clients.Windows.Entities;
 using Gablarski.Clients.Windows.Properties;
 using Gablarski.Media.Sources;
 using Gablarski.Messages;
 using Gablarski.Network;
+using Kennedy.ManagedHooks;
 using Microsoft.WindowsAPICodePack;
 
 namespace Gablarski.Clients.Windows
@@ -34,28 +36,97 @@ namespace Gablarski.Clients.Windows
 			this.gablarski.Sources.ReceivedSource += this.SourcesReceivedSource;
 			this.gablarski.Sources.ReceivedAudio += SourcesReceivedAudio;
 
+			Settings.SettingChanged += SettingsSettingChanged;
+
 			this.InitializeComponent ();
 		}
 
 		private const string VoiceName = "voice";
 
-		private IPlaybackProvider playbackProvider;
-		private AudioSource voiceSource;
+		private PushToTalk ptt;
+		private IPlaybackProvider playback;
+		private ICaptureProvider voiceCapture;
+		private ClientAudioSource voiceSource;
 
 		private void MainForm_Load (object sender, EventArgs e)
 		{
 			try
 			{
-				this.playbackProvider = new OpenAL.Providers.PlaybackProvider();
-				this.playbackProvider.Device = this.playbackProvider.DefaultDevice;
-				this.playbackProvider.SourceFinished += PlaybackProviderSourceFinished;
+				this.playback = new OpenAL.Providers.PlaybackProvider();
+				this.playback.Device = this.playback.DefaultDevice;
+				this.playback.SourceFinished += PlaybackProviderSourceFinished;
+
+				this.voiceCapture = new OpenAL.Providers.CaptureProvider();
+				this.voiceCapture.Device = this.voiceCapture.DefaultDevice;
+				this.voiceCapture.SamplesAvailable += VoiceCaptureSamplesAvailable;
 			}
 			catch (Exception ex)
 			{
 				TaskDialog.Show (ex.ToDisplayString(), "An error as occured initializing OpenAL.", "OpenAL Initialization", TaskDialogStandardIcon.Error);
 			}
 
+			SetUsePushToTalk (Settings.UsePushToTalk);
+
 			this.gablarski.Connect (this.server.Host, this.server.Port);
+		}
+
+		private void VoiceCaptureSamplesAvailable (object sender, SamplesAvailableEventArgs e)
+		{
+			if (this.voiceSource == null || this.gablarski.CurrentUser == null)
+			{
+				this.voiceCapture.ReadSamples (e.Samples);
+				return;
+			}
+
+			this.voiceSource.SendAudioData (this.voiceCapture.ReadSamples (this.voiceSource.FrameSize), this.gablarski.CurrentUser.CurrentChannelId);
+		}
+
+		private void SettingsSettingChanged (object sender, PropertyChangedEventArgs e)
+		{
+			switch (e.PropertyName)
+			{
+				case "UsePushToTalk":
+					if (Settings.UsePushToTalk != (this.ptt == null))
+						SetUsePushToTalk (Settings.UsePushToTalk);
+
+					break;
+			}
+		}
+
+		private void SetUsePushToTalk (bool use)
+		{
+			if (use)
+			{
+				Program.KHook.KeyboardEvent += KHookKeyboardEvent;
+				//Program.MHook.MouseEvent += MHookMouseEvent;
+				this.ptt = Settings.PushToTalk;
+			}
+			else
+			{
+				Program.KHook.KeyboardEvent -= KHookKeyboardEvent;
+				//Program.MHook.MouseEvent -= MHookMouseEvent;
+				this.ptt = Settings.PushToTalk;
+			}
+		}
+
+		//private void MHookMouseEvent (MouseEvents mEvent, Point point)
+		//{
+		//    if (this.ptt.Supplier != PushToTalkSupplier.Mouse)
+		//        return;
+		//}
+
+		private void KHookKeyboardEvent (KeyboardEvents kEvent, Keys key)
+		{
+			if (this.voiceCapture == null)
+				return;
+
+			if (this.ptt == null || this.ptt.Supplier != PushToTalkSupplier.Keyboard || this.ptt.KeyboardKeys != key)
+				return;
+
+			if (kEvent == KeyboardEvents.KeyDown)
+				this.voiceCapture.StartCapture();
+			else if (kEvent == KeyboardEvents.KeyUp)
+				this.voiceCapture.EndCapture();
 		}
 
 		private void PlaybackProviderSourceFinished (object sender, SourceFinishedEventArgs e)
@@ -66,7 +137,7 @@ namespace Gablarski.Clients.Windows
 		private void SourcesReceivedAudio (object sender, ReceivedAudioEventArgs e)
 		{
 			this.players.MarkTalking (this.gablarski.Users[e.Source.OwnerId]);
-			this.playbackProvider.QueuePlayback (e.Source, e.AudioData);
+			this.playback.QueuePlayback (e.Source, e.AudioData);
 		}
 
 		void SourcesReceivedSource (object sender, ReceivedSourceEventArgs e)
@@ -74,7 +145,7 @@ namespace Gablarski.Clients.Windows
 			if (e.Result == SourceResult.Succeeded)
 			{
 				if (e.Source.OwnerId.Equals (this.gablarski.CurrentUser.UserId) && e.Source.Name == VoiceName)
-					voiceSource = e.Source;
+					voiceSource = (ClientAudioSource)e.Source;
 			}
 			else
 				TaskDialog.Show (e.Result.ToString(), "Source request failed");

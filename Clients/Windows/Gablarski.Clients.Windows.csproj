@@ -133,10 +133,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="PushToTalk.cs" />
     <Compile Include="RequiredTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Servers.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="Windows\Core\AppRestartRecovery\ApplicationRestartRecoveryManager.cs" />
     <Compile Include="Windows\Core\AppRestartRecovery\RecoveryData.cs" />
     <Compile Include="Windows\Core\AppRestartRecovery\RecoverySettings.cs" />
@@ -412,6 +414,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\group.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SystemHookCore.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

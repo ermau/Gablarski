@@ -22,6 +22,8 @@ namespace Gablarski.Clients.CLI
 		private static string nickname;
 		private static bool voiceSource = false;
 
+		private static bool startClient;
+
 		private readonly static List<AudioSource> sources = new List<AudioSource>();
 
 		private readonly static IPlaybackProvider playbackProvider = new PlaybackProvider();
@@ -36,7 +38,6 @@ namespace Gablarski.Clients.CLI
 			bool trace = false;
 			bool startServer = false;
 			bool defaultAudio = false;
-			
 
 			List<string> tracers = new List<string>();
 			string clientConnection = typeof (ClientNetworkConnection).AssemblyQualifiedName;
@@ -63,13 +64,17 @@ namespace Gablarski.Clients.CLI
 			foreach (string unused in options.Parse (args))
 				Console.WriteLine ("Unrecognized option: " + unused);
 
-			if (String.IsNullOrEmpty (nickname) || String.IsNullOrEmpty (host))
+			if (!startServer && (String.IsNullOrEmpty (nickname) || String.IsNullOrEmpty (host)))
 			{
 				options.WriteOptionDescriptions (Console.Out);
 				Environment.Exit (1);
 			}
+			else if (startServer && (String.IsNullOrEmpty (nickname) || String.IsNullOrEmpty (host)))
+			{
+				startClient = false;
+			}
 
-			if (!username.IsEmpty() && password.IsEmpty())
+			if (startClient && !username.IsEmpty() && password.IsEmpty())
 			{
 				Console.WriteLine ("Can not login without a password.");
 				Environment.Exit (1);
@@ -101,15 +106,18 @@ namespace Gablarski.Clients.CLI
 				SelectCapture (captureProvider.DefaultDevice, Console.Out);
 			}
 			
-			client = new GablarskiClient (new ClientNetworkConnection ());
-			client.Connected += ClientConnected;
-			client.ConnectionRejected += ClientConnectionRejected;
-			client.Disconnected += ClientDisconnected;
-			
-			client.Sources.ReceivedSource += SourcesReceivedSource;
-			client.Sources.ReceivedAudio += SourcesReceivedAudio;
+			if (startClient)
+			{
+				client = new GablarskiClient (new ClientNetworkConnection());
+				client.Connected += ClientConnected;
+				client.ConnectionRejected += ClientConnectionRejected;
+				client.Disconnected += ClientDisconnected;
 
-			client.Connect (host, port);
+				client.Sources.ReceivedSource += SourcesReceivedSource;
+				client.Sources.ReceivedAudio += SourcesReceivedAudio;
+
+				client.Connect (host, port);
+			}
 
 			string fullcommand;
 			while ((fullcommand = Console.ReadLine()) != null)
@@ -128,11 +136,19 @@ namespace Gablarski.Clients.CLI
 					case "quit":
 					case "close":
 					case "disconnect":
-						client.Disconnect();
+						if (startClient)
+							client.Disconnect();
+
+						if (startServer)
+							server.Shutdown();
+
 						Environment.Exit (0);
 						break;
 
 					case "source":
+						if (!startClient)
+							break;
+
 						int channels = 1;
 						int bitrate = 0;
 						string request = null;
@@ -159,6 +175,9 @@ namespace Gablarski.Clients.CLI
 						break;
 
 					case "select":
+						if (!startClient)
+							break;
+
 						string input = null;
 						string output = null;
 
@@ -207,6 +226,9 @@ namespace Gablarski.Clients.CLI
 						break;
 
 					case "capture":
+						if (!startClient)
+							break;
+
 						bool stop = false;
 						bool voiceActivation = false;
 						int sourceId = 0;
@@ -309,8 +331,11 @@ namespace Gablarski.Clients.CLI
 		static void WriteCommands (TextWriter writer)
 		{
 			writer.WriteLine ("Commands:");
-			writer.WriteLine ("requestsource: Requests an AudioSource.");
-			writer.WriteLine ("select: Selects an input and/or an output device.");
+			if (startClient)
+			{
+				writer.WriteLine ("requestsource: Requests an AudioSource.");
+				writer.WriteLine ("select: Selects an input and/or an output device.");
+			}
 		}
 
 		static void DisplayDevices()

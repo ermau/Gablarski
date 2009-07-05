@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using FluentNHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
 using Gablarski.Clients.Windows.Entities;
+using Kennedy.ManagedHooks;
 using NHibernate;
 using NHibernate.Cfg;
 using NHibernate.Tool.hbm2ddl;
@@ -15,12 +16,20 @@ namespace Gablarski.Clients.Windows
 {
 	static class Program
 	{
+		public static readonly KeyboardHook KHook = new KeyboardHook();
+		public static readonly MouseHook MHook = new MouseHook();
+
 		/// <summary>
 		/// The main entry point for the application.
 		/// </summary>
 		[STAThread]
 		static void Main ()
 		{
+			AppDomain.CurrentDomain.UnhandledException += (sender, e) => { KHook.UninstallHook(); /*MHook.UninstallHook();*/ };
+
+			KHook.InstallHook();
+			//MHook.InstallHook();
+
 			Application.EnableVisualStyles ();
 			Application.SetCompatibleTextRenderingDefault (false);
 
@@ -32,7 +41,10 @@ namespace Gablarski.Clients.Windows
 			}
 			finally
 			{
+				Settings.SaveSettings();
 				Persistance.CurrentSession.Flush();
+				KHook.UninstallHook();
+				//MHook.UninstallHook();
 			}
 		}
 	}

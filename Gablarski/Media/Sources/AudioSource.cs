@@ -33,6 +33,7 @@ namespace Gablarski.Media.Sources
 			if (bitrate <= 0)
 				throw new ArgumentOutOfRangeException ("bitrate");
 
+			this.Name = name;
 			this.Id = sourceId;
 			this.OwnerId = ownerId;
 			this.Bitrate = bitrate;
