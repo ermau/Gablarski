@@ -62,6 +62,7 @@ namespace Gablarski.Clients.Windows
 				
 			var node = channelPair.Value.Nodes.Add(user.Nickname);
 			node.ImageKey = "silent";
+			node.SelectedImageKey = "silent";
 			this.userNodes[user] = node;
 		}
 
@@ -77,6 +78,7 @@ namespace Gablarski.Clients.Windows
 				return;
 
 			userNodes[user].ImageKey = "talking";
+			userNodes[user].SelectedImageKey = "talking";
 		}
 
 		public void MarkMusic (UserInfo user)
@@ -91,6 +93,7 @@ namespace Gablarski.Clients.Windows
 				return;
 
 			userNodes[user].ImageKey = "music";
+			userNodes[user].SelectedImageKey = "music";
 		}
 
 		public void MarkSilent (UserInfo user)
@@ -105,6 +108,7 @@ namespace Gablarski.Clients.Windows
 				return;
 
 			userNodes[user].ImageKey = "silent";
+			userNodes[user].SelectedImageKey = "silent";
 		}
 
 		public void Update (IdentifyingTypes idTypes, IEnumerable<Channel> channels, IEnumerable<UserInfo> users)

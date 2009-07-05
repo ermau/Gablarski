@@ -124,9 +124,15 @@ namespace Gablarski.Clients.Windows
 				return;
 
 			if (kEvent == KeyboardEvents.KeyDown)
+			{
+				this.players.MarkTalking (this.gablarski.CurrentUser);
 				this.voiceCapture.StartCapture();
+			}
 			else if (kEvent == KeyboardEvents.KeyUp)
+			{
+				this.players.MarkSilent (this.gablarski.CurrentUser);
 				this.voiceCapture.EndCapture();
+			}
 		}
 
 		private void PlaybackProviderSourceFinished (object sender, SourceFinishedEventArgs e)
