@@ -31,6 +31,8 @@ namespace Gablarski.Clients.Windows
 			this.gablarski.Disconnected += this.GablarskiDisconnected;
 			this.gablarski.Channels.ReceivedChannelList += this.ChannelsReceivedChannelList;
 			this.gablarski.Users.ReceivedUserList += this.UsersReceivedUserList;
+			this.gablarski.Users.UserLoggedIn += UsersUserLoggedIn;
+			this.gablarski.Users.UserDisconnected += UsersUserDisconnected;
 			this.gablarski.CurrentUser.ReceivedLoginResult += this.CurrentUserReceivedLoginResult;
 
 			this.gablarski.Sources.ReceivedSource += this.SourcesReceivedSource;
@@ -158,8 +160,18 @@ namespace Gablarski.Clients.Windows
 				if (e.Source.OwnerId.Equals (this.gablarski.CurrentUser.UserId) && e.Source.Name == VoiceName)
 					voiceSource = (ClientAudioSource)e.Source;
 			}
-			else
+			else if (e.Result != SourceResult.NewSource && e.Result != SourceResult.SourceRemoved)
 				TaskDialog.Show (e.Result.ToString(), "Source request failed");
+		}
+
+		private void UsersUserDisconnected (object sender, UserDisconnectedEventArgs e)
+		{
+			this.players.RemoveUser (e.User);
+		}
+
+		private void UsersUserLoggedIn (object sender, UserLoggedInEventArgs e)
+		{
+			this.players.AddUser (e.UserInfo);
 		}
 
 		void UsersReceivedUserList (object sender, ReceivedListEventArgs<UserInfo> e)

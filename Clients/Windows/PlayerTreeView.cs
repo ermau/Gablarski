@@ -88,6 +88,22 @@ namespace Gablarski.Clients.Windows
 			node.Parent.Expand();
 		}
 
+		public void RemoveUser (UserInfo user)
+		{
+			if (this.InvokeRequired)
+			{
+				this.BeginInvoke ((Action<UserInfo>)this.RemoveUser, user);
+				return;
+			}
+
+			if (!this.userNodes.ContainsKey (user))
+				return;
+
+			var node = this.userNodes[user];
+			node.Remove();
+			this.userNodes.Remove (user);
+		}
+
 		public void MarkTalking (UserInfo user)
 		{
 			if (this.InvokeRequired)
