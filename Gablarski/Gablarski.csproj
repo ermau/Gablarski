@@ -80,7 +80,6 @@
     <Compile Include="Client\IDeviceProvider.cs" />
     <Compile Include="Client\IPlaybackProvider.cs" />
     <Compile Include="Client\VoiceActivation.cs" />
-    <Compile Include="DetailedConsoleTraceListener.cs" />
     <Compile Include="en-US.Designer.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="GenericResult.cs" />

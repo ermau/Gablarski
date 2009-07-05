@@ -20,7 +20,7 @@ namespace Gablarski.Client
 				this.StopListening();
 		}
 
-		public event EventHandler<SamplesAvailableEventArgs> SamplesAvailable;
+		public event EventHandler<TalkingEventArgs> Talking;
 
 		public void Listen (int vsensitivity)
 		{
@@ -35,21 +35,47 @@ namespace Gablarski.Client
 			this.capture.EndCapture();
 		}
 
+		private int minSamples = 2;
 		private int sensitivity;
 		private readonly AudioSource source;
 		private readonly ICaptureProvider capture;
 		
 		protected void OnSamplesAvailable (object sender, SamplesAvailableEventArgs e)
 		{
-			byte[] asamples = this.capture.ReadSamples (this.source.FrameSize);
+			int ms = this.minSamples;
 
+			int nsamples = 0;
+			byte[] asamples = this.capture.ReadSamples (this.source.FrameSize);
+			for (int i = 0; i < asamples.Length; i += 2)
+			{
+				short sample = BitConverter.ToInt16 (asamples, i);
+				if (sample <= sensitivity)
+					continue;
+
+				if (++nsamples == ms)
+				{
+					OnTalking (new TalkingEventArgs (asamples));
+					break;
+				}
+			}
 		}
 
-		protected virtual void OnTalking (SamplesAvailableEventArgs e)
+		protected virtual void OnTalking (TalkingEventArgs e)
 		{
-			var talking = this.SamplesAvailable;
+			var talking = this.Talking;
 			if (talking != null)
 				talking (this, e);
 		}
+	}
+
+	public class TalkingEventArgs
+		: EventArgs
+	{
+		public TalkingEventArgs (byte[] asamples)
+		{
+			this.Samples = asamples;
+		}
+
+		public byte[] Samples { get; private set; }
 	}
 }

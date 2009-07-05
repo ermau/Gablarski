@@ -76,6 +76,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DetailedConsoleTraceListener.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="OptionsExtensions.cs" />
     <Compile Include="Program.cs" />
@@ -105,6 +106,8 @@
   -->
   <PropertyGroup>
     <PreBuildEvent>xcopy /Y "$(SolutionDir)Gablarski.CELT\libcelt.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)Gablarski.CELT\libcelt.license.txt" "$(TargetDir)"</PreBuildEvent>
+xcopy /Y "$(SolutionDir)Gablarski.CELT\libcelt.license.txt" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Gablarski.OpenAL\OpenAL32.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Gablarski.OpenAL\OpenALSoft.License.txt" "$(TargetDir)"</PreBuildEvent>
   </PropertyGroup>
 </Project>

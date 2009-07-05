@@ -22,13 +22,14 @@ namespace Gablarski.Clients.CLI
 		private static string nickname;
 		private static bool voiceSource = false;
 
-		private static bool startClient;
+		private static bool startClient = true;
 
 		private readonly static List<AudioSource> sources = new List<AudioSource>();
 
 		private readonly static IPlaybackProvider playbackProvider = new PlaybackProvider();
 		private	readonly static ICaptureProvider captureProvider = new CaptureProvider();
 		private static ClientAudioSource captureSource;
+		private static VoiceActivation voiceActivation;
 
 		[STAThread]
 		public static void Main (string[] args)
@@ -230,20 +231,26 @@ namespace Gablarski.Clients.CLI
 							break;
 
 						bool stop = false;
-						bool voiceActivation = false;
-						int sourceId = 0;
+						bool useVoiceActivation = false;
+						//int sourceId = 0;
 
 						var coptions = new OptionSet
 						{
 							{ "s|stop", v => stop = (v != null)},
-							{ "source:", (int v) => sourceId = v },
-							//{ "v|vactivation", "Uses voice activation.", v => voiceActivation = (v != null) }
+							//{ "source:", (int v) => sourceId = v },
+							{ "v|vactivation", "Uses voice activation.", v => useVoiceActivation = (v != null) }
 						};
 						coptions.Parse (cmdopts);
 
 						if (stop)
 						{
-							if (captureProvider.IsCapturing)
+							if (voiceActivation != null)
+							{
+								voiceActivation.StopListening();
+								voiceActivation.Talking -= va_Talking;
+								voiceActivation = null;
+							}
+							else if (captureProvider.IsCapturing)
 								captureProvider.EndCapture();
 						}
 						else
@@ -258,19 +265,33 @@ namespace Gablarski.Clients.CLI
 									break;
 								}
 
-								source = (sourceId != 0) ? sources.OfType<ClientAudioSource>().FirstOrDefault (s => s.Id == sourceId) : sources.OfType<ClientAudioSource>().First();
+								//source = (sourceId != 0) ? sources.OfType<ClientAudioSource>().FirstOrDefault (s => s.Id == sourceId) : sources.OfType<ClientAudioSource>().First();
+								source = captureSource;
 							}
 
 							if (source == null)
 								Console.WriteLine ("Source not found.");
 							else
 							{
-								if (captureSource == null)
+								if (useVoiceActivation)
+								{
+									voiceActivation = new VoiceActivation (captureProvider, captureSource);
+									voiceActivation.Talking += va_Talking;
+									voiceActivation.Listen ((Int16.MaxValue) / 2);
+								}
+								else
+								{
 									captureProvider.SamplesAvailable += OnSamplesAvailable;
+									if (!captureProvider.IsCapturing)
+										captureProvider.StartCapture();
+								}
 
-								captureSource = source;
-								if (!captureProvider.IsCapturing)
-									captureProvider.StartCapture();
+								//if (captureSource == null)
+								//    captureProvider.SamplesAvailable += OnSamplesAvailable;
+
+								//captureSource = source;
+								//if (!captureProvider.IsCapturing)
+								//    captureProvider.StartCapture();
 							}
 						}
 
@@ -281,6 +302,11 @@ namespace Gablarski.Clients.CLI
 						break;
 				}
 			}
+		}
+
+		static void va_Talking (object sender, TalkingEventArgs e)
+		{
+			captureSource.SendAudioData (e.Samples, client.CurrentUser.CurrentChannelId);
 		}
 
 		static void SourcesReceivedAudio (object sender, ReceivedAudioEventArgs e)
@@ -309,7 +335,9 @@ namespace Gablarski.Clients.CLI
 				return;
 
 			Console.WriteLine ("Received own source. Name: " + e.Source.Name + " Id: " + e.Source.Id + " Owner: " + e.Source.OwnerId + " Bitrate: " + e.Source.Bitrate);
-			
+
+			captureSource = (ClientAudioSource)e.Source;
+
 			lock (sources)
 			{
 				sources.Add (e.Source);
