@@ -27,7 +27,6 @@ namespace Gablarski.Client
 		private GablarskiClient (IClientConnection connection, bool setupDefaults)
 		{
 			this.Connection = connection;
-			this.Connection.Disconnected += this.OnDisconnected;
 
 			if (setupDefaults)
 				this.Setup (new ClientUserManager (this), new ClientChannelManager (this), new ClientSourceManager (this), new CurrentUser (this));
@@ -120,8 +119,9 @@ namespace Gablarski.Client
 			this.messageRunnerThread = new Thread (this.MessageRunner);
 			this.messageRunnerThread.Name = "Gablarski Client Message Runner";
 			this.messageRunnerThread.SetApartmentState (ApartmentState.STA);
-			this.messageRunnerThread.Start ();	
+			this.messageRunnerThread.Start ();
 
+			Connection.Disconnected += this.OnDisconnected;
 			Connection.MessageReceived += OnMessageReceived;
 			Connection.Connect (host, port);
 			Connection.Send (new ConnectMessage (ApiVersion));
