@@ -24,7 +24,7 @@ namespace Gablarski.OpenAL
 		public void Activate ()
 		{
 			alcMakeContextCurrent (this.Handle);
-			OpenAL.ErrorCheck ();
+			OpenAL.ErrorCheck (this.Device);
 			
 			lock (lck)
 			{
@@ -48,10 +48,7 @@ namespace Gablarski.OpenAL
 				return;
 
 			if (this.Handle != IntPtr.Zero)
-			{
 				alcDestroyContext (this.Handle);
-				OpenAL.ErrorCheck ();
-			}
 
 			this.disposed = true;
 		}
@@ -96,10 +93,11 @@ namespace Gablarski.OpenAL
 					contexts = new Dictionary<IntPtr, Context> ();
 
 				c = new Context (alcCreateContext (device.Handle, IntPtr.Zero), device);
+				OpenAL.ErrorCheck(device);
 				contexts.Add (c.Handle, c);
 			}
 
-			OpenAL.ErrorCheck ();
+			OpenAL.ErrorCheck (device);
 			return c;
 		}
 
