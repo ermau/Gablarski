@@ -277,7 +277,7 @@
 			this.Controls.Add (this.servers);
 			this.MinimumSize = new System.Drawing.Size (285, 300);
 			this.Name = "LoginForm";
-			this.Text = "Connect";
+			this.Text = "Gablarski Login";
 			this.Load += new System.EventHandler (this.LoginForm_Load);
 			this.pnlModServer.ResumeLayout (false);
 			this.pnlModServer.PerformLayout ();

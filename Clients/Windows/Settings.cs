@@ -19,7 +19,7 @@ namespace Gablarski.Clients.Windows
 
 		public static PushToTalk PushToTalk
 		{
-			get { return PushToTalk.Parse (GetSetting ("PushToTalk", "k" + 0x56)); }
+			get { return PushToTalk.Parse (GetSetting ("PushToTalk", "k" + 160)); }
 			set
 			{
 				SetSetting ("PushToTalk", value);

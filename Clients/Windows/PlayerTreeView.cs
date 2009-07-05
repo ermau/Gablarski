@@ -20,22 +20,42 @@ namespace Gablarski.Clients.Windows
 				ColorDepth = ColorDepth.Depth24Bit
 			};
 
+			this.ImageList.Images.Add ("server",	Resources.ServerImage);
 			this.ImageList.Images.Add ("channel",	Resources.UsersImage);
 			this.ImageList.Images.Add ("silent",	Resources.SoundNoneImage);
 			this.ImageList.Images.Add ("talking",	Resources.SoundImage);
 			this.ImageList.Images.Add ("music",		Resources.MusicImage);
 		}
 
+		public void SetServerNode (TreeNode node)
+		{
+			if (this.InvokeRequired)
+			{
+				this.BeginInvoke ((Action<TreeNode>)SetServerNode, node);
+				return;
+			}
+
+			this.BeginUpdate();
+
+			this.Nodes.Clear();
+			this.serverNode = node;
+			this.serverNode.ImageKey = "server";
+			this.serverNode.SelectedImageKey = "server";
+			this.Nodes.Add (node);
+
+			this.EndUpdate();
+		}
+
 		public void AddChanel (Channel channel, IdentifyingTypes idTypes)
 		{
 			if (this.InvokeRequired)
 			{
-				this.Invoke ((Action<Channel, IdentifyingTypes>)this.AddChanel, channel, idTypes);
+				this.BeginInvoke ((Action<Channel, IdentifyingTypes>)this.AddChanel, channel, idTypes);
 				return;
 			}
 			
-			var parent = this.Nodes;
-			if (!Channel.IsDefault (channel, idTypes))
+			var parent = this.serverNode.Nodes;
+			if (!Channel.IsDefault (channel.ParentChannelId, idTypes))
 			{
 				var pair = channelNodes.FirstOrDefault (kvp => kvp.Key.ChannelId.Equals (channel.ParentChannelId));
 				if (!pair.Equals (default(KeyValuePair<Channel, TreeNode>)))
@@ -52,7 +72,7 @@ namespace Gablarski.Clients.Windows
 		{
 			if (this.InvokeRequired)
 			{
-				this.Invoke ((Action<UserInfo>)this.AddUser, user);
+				this.BeginInvoke ((Action<UserInfo>)this.AddUser, user);
 				return;
 			}
 
@@ -60,7 +80,7 @@ namespace Gablarski.Clients.Windows
 			if (channelPair.Equals (default(KeyValuePair<Channel,TreeNode>)))
 				return;
 				
-			var node = channelPair.Value.Nodes.Add(user.Nickname);
+			var node = channelPair.Value.Nodes.Add (user.Nickname);
 			node.ImageKey = "silent";
 			node.SelectedImageKey = "silent";
 			this.userNodes[user] = node;
@@ -115,7 +135,7 @@ namespace Gablarski.Clients.Windows
 		{
 			if (this.InvokeRequired)
 			{
-				this.Invoke ((Action<IdentifyingTypes, IEnumerable<Channel>, IEnumerable<UserInfo>>)Update, idTypes, channels, users);
+				this.BeginInvoke ((Action<IdentifyingTypes, IEnumerable<Channel>, IEnumerable<UserInfo>>)Update, idTypes, channels, users);
 				return;
 			}
 
@@ -124,6 +144,8 @@ namespace Gablarski.Clients.Windows
 
 			this.BeginUpdate();
 			this.Nodes.Clear();
+			this.serverNode.Nodes.Clear();
+			this.Nodes.Add (this.serverNode);
 
 			foreach (var channel in channels.Where (c => Channel.IsDefault (c.ParentChannelId, idTypes)))
 			{
@@ -137,6 +159,7 @@ namespace Gablarski.Clients.Windows
 			this.EndUpdate();
 		}
 
+		private TreeNode serverNode;
 		private readonly Dictionary<Channel, TreeNode> channelNodes = new Dictionary<Channel, TreeNode>();
 		private readonly Dictionary<UserInfo, TreeNode> userNodes = new Dictionary<UserInfo, TreeNode>();
 

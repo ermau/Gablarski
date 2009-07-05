@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 
@@ -7,6 +8,11 @@ namespace Gablarski.Clients.Windows
 {
 	public static class Extensions
 	{
+		public static Icon ToIcon (this Bitmap self)
+		{
+			return Icon.FromHandle (self.GetHicon());
+		}
+
 		public static string ToDisplayString (this Exception self)
 		{
 			StringBuilder builder = new StringBuilder(self.GetType().Name);

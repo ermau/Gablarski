@@ -43,7 +43,7 @@ namespace Gablarski.Clients.Windows
 		public override string ToString ()
 		{
 			//return (keyboard) ? "k" + KeyboardKeys : "m" + MouseButtons;
-			return "k" + KeyboardKeys;
+			return "k" + ((int)KeyboardKeys);
 		}
 
 		public static PushToTalk Parse (string value)

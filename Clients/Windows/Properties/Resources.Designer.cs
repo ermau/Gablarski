@@ -123,6 +123,13 @@ namespace Gablarski.Clients.Windows.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap SettingsImage {
+            get {
+                object obj = ResourceManager.GetObject("SettingsImage", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap SoundAddImage {
             get {
                 object obj = ResourceManager.GetObject("SoundAddImage", resourceCulture);

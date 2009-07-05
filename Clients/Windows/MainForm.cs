@@ -47,6 +47,7 @@ namespace Gablarski.Clients.Windows
 		private IPlaybackProvider playback;
 		private ICaptureProvider voiceCapture;
 		private ClientAudioSource voiceSource;
+		private TreeNode serverNode;
 
 		private void MainForm_Load (object sender, EventArgs e)
 		{
@@ -89,6 +90,10 @@ namespace Gablarski.Clients.Windows
 					if (Settings.UsePushToTalk != (this.ptt == null))
 						SetUsePushToTalk (Settings.UsePushToTalk);
 
+					break;
+
+				case "PushToTalk":
+					this.ptt = Settings.PushToTalk;
 					break;
 			}
 		}
@@ -190,6 +195,12 @@ namespace Gablarski.Clients.Windows
 			this.btnConnect.Text = "Disconnect";
 			this.btnConnect.ToolTipText = "Disconnect (Connected)";
 
+			this.players.SetServerNode (
+				new TreeNode (this.gablarski.ServerInfo.ServerName) {
+					ToolTipText = this.gablarski.ServerInfo.ServerDescription
+				}
+			);
+
 			this.gablarski.CurrentUser.Login (this.server.UserNickname, this.server.UserName, this.server.UserPassword);
 		}
 
@@ -212,6 +223,12 @@ namespace Gablarski.Clients.Windows
 				this.gablarski.Disconnect();
 			else
 				this.gablarski.Connect (this.server.Host, this.server.Port);
+		}
+
+		private void btnSettings_Click (object sender, EventArgs e)
+		{
+			SettingsForm settingsForm = new SettingsForm();
+			settingsForm.ShowDialog();
 		}
 	}
 }

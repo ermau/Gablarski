@@ -8,6 +8,7 @@ using FluentNHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
 using Gablarski.Clients.Windows.Entities;
 using Kennedy.ManagedHooks;
+using Microsoft.WindowsAPICodePack;
 using NHibernate;
 using NHibernate.Cfg;
 using NHibernate.Tool.hbm2ddl;
@@ -25,7 +26,13 @@ namespace Gablarski.Clients.Windows
 		[STAThread]
 		static void Main ()
 		{
-			AppDomain.CurrentDomain.UnhandledException += (sender, e) => { KHook.UninstallHook(); /*MHook.UninstallHook();*/ };
+			AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
+			{
+				KHook.UninstallHook();
+				/*MHook.UninstallHook();*/
+				TaskDialog.Show ((e.ExceptionObject as Exception).ToDisplayString(), "Unexpected Error", "Unexpected Error",
+				                 TaskDialogStandardIcon.Error);
+			};
 
 			KHook.InstallHook();
 			//MHook.InstallHook();
