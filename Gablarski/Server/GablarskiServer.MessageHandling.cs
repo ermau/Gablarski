@@ -89,11 +89,9 @@ namespace Gablarski.Server
 				return;
 			}
 
-            e.Connection.Send (new ServerInfoMessage (new ServerInfo (this.settings)
-            {
-            	ChannelIdentifyingType = this.ChannelProvider.IdentifyingType,
-				UserIdentifyingType = this.UserProvider.IdentifyingType
-            }));
+			e.Connection.Send (
+				new ServerInfoMessage (new ServerInfo (this.settings, this.ChannelProvider.IdentifyingType,
+				                                       this.UserProvider.IdentifyingType)));
 		}
 
 		#region Channels

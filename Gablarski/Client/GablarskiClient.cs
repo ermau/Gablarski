@@ -93,6 +93,14 @@ namespace Gablarski.Client
 		}
 
 		/// <summary>
+		/// Gets the <see cref="ServerInfo"/> for the currently connected server. <c>null</c> if not connected.
+		/// </summary>
+		public ServerInfo ServerInfo
+		{
+			get { return this.serverInfo; }
+		}
+
+		/// <summary>
 		/// Gets the <see cref="IdentifyingTypes"/> for this client's connection. <c>null</c> if not connected.
 		/// </summary>
 		public IdentifyingTypes IdentifyingTypes

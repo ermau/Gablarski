@@ -5,45 +5,70 @@ namespace Gablarski
 {
 	public class ServerInfo
 	{
-		internal ServerInfo (ServerSettings settings)
-		{
-			this.ServerName = settings.Name;
-			this.ServerDescription = settings.Description;
-		}
-
 		internal ServerInfo (IValueReader reader)
 		{
 			this.Deserialize (reader);
 		}
 
+		internal ServerInfo (ServerSettings settings, Type channelIdentifingType, Type userIdentifyingType)
+		{
+			if (settings == null)
+				throw new ArgumentNullException("settings");
+			if (channelIdentifingType == null)
+				throw new ArgumentNullException("channelIdentifingType");
+			if (userIdentifyingType == null)
+				throw new ArgumentNullException("userIdentifyingType");
+
+			this.ServerName = settings.Name;
+			this.ServerDescription = settings.Description;
+
+			this.ChannelIdentifyingType = channelIdentifingType;
+			this.UserIdentifyingType = userIdentifyingType;
+		}
+
+		/// <summary>
+		/// Gets the name of the server.
+		/// </summary>
 		public string ServerName
 		{
 			get;
-			set;
+			private set;
 		}
 
+		/// <summary>
+		/// Gets the server description.
+		/// </summary>
 		public string ServerDescription
 		{
 			get;
-			set;
+			private set;
 		}
 
+		/// <summary>
+		/// Gets the type identifying channels.
+		/// </summary>
 		public Type ChannelIdentifyingType
 		{
 			get;
-			set;
+			private set;
 		}
 
+		/// <summary>
+		/// Gets the type identifying users.
+		/// </summary>
 		public Type UserIdentifyingType
 		{
 			get;
-			set;
+			private set;
 		}
 
+		/// <summary>
+		/// Gets the url of the server's logo.
+		/// </summary>
 		public string ServerLogo
 		{
 			get;
-			set;
+			private set;
 		}
 
 		internal void Serialize (IValueWriter writer)
