@@ -33,7 +33,7 @@ namespace Gablarski.Network
 
 		public bool IsConnected
 		{
-			get { return this.tcp.Connected; }
+			get { return (this.tcp != null) ? this.tcp.Connected : false; }
 		}
 
 		public IdentifyingTypes IdentifyingTypes

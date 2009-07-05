@@ -136,6 +136,9 @@ namespace Gablarski.Client
 			Connection.MessageReceived -= this.OnMessageReceived;
 			Connection.Disconnect();
 			this.running = false;
+
+			OnDisconnected (this, EventArgs.Empty);
+
 			this.messageRunnerThread.Join ();
 		}
 		#endregion
