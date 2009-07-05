@@ -46,11 +46,11 @@ namespace Gablarski.Clients.Windows
 			this.EndUpdate();
 		}
 
-		public void AddChanel (Channel channel, IdentifyingTypes idTypes)
+		public void AddChannel (Channel channel, IdentifyingTypes idTypes)
 		{
 			if (this.InvokeRequired)
 			{
-				this.BeginInvoke ((Action<Channel, IdentifyingTypes>)this.AddChanel, channel, idTypes);
+				this.BeginInvoke ((Action<Channel, IdentifyingTypes>)this.AddChannel, channel, idTypes);
 				return;
 			}
 			
@@ -79,11 +79,13 @@ namespace Gablarski.Clients.Windows
 			var channelPair = this.channelNodes.FirstOrDefault (c => c.Key.ChannelId.Equals (user.CurrentChannelId));
 			if (channelPair.Equals (default(KeyValuePair<Channel,TreeNode>)))
 				return;
-				
+			
 			var node = channelPair.Value.Nodes.Add (user.Nickname);
 			node.ImageKey = "silent";
 			node.SelectedImageKey = "silent";
 			this.userNodes[user] = node;
+
+			node.Parent.Expand();
 		}
 
 		public void MarkTalking (UserInfo user)
@@ -149,9 +151,11 @@ namespace Gablarski.Clients.Windows
 
 			foreach (var channel in channels.Where (c => Channel.IsDefault (c.ParentChannelId, idTypes)))
 			{
-				this.AddChanel (channel, idTypes);
+				this.AddChannel (channel, idTypes);
 				this.AddChannels (idTypes, channels, channel);
 			}
+
+			this.serverNode.Expand();
 
 			foreach (var user in users)
 				this.AddUser (user);
@@ -167,11 +171,9 @@ namespace Gablarski.Clients.Windows
 		{
 			foreach (var c in channels.Where (c => c.ParentChannelId.Equals (parent.ChannelId)))
 			{
-				this.AddChanel (c, idTypes);
+				this.AddChannel (c, idTypes);
 				this.AddChannels (idTypes, channels, c);
 			}
-
-			this.ExpandAll();
 		}
 	}
 }

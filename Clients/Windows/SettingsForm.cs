@@ -20,11 +20,16 @@ namespace Gablarski.Clients.Windows
 			InitializeComponent ();
 		}
 
-		private Keys key;
+		private Keys pttKey;
+
+		private void SettingsForm_Load (object sender, EventArgs e)
+		{
+			this.inPTT.SetText (Settings.PushToTalk.KeyboardKeys.ToString());
+		}
 
 		private void btnOk_Click (object sender, EventArgs e)
 		{
-			Settings.PushToTalk = new PushToTalk (key);
+			Settings.PushToTalk = new PushToTalk (pttKey);
 			Settings.SaveSettings();
 			this.Close();
 		}
@@ -44,8 +49,8 @@ namespace Gablarski.Clients.Windows
 			if (kEvent != KeyboardEvents.KeyDown)
 				return;
 
-			this.key = key;
-			this.inPTT.Text = key.ToString();
+			this.pttKey = key;
+			this.inPTT.SetText (key.ToString());
 		}
 	}
 }

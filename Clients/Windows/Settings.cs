@@ -29,6 +29,8 @@ namespace Gablarski.Clients.Windows
 
 		public static void SaveSettings()
 		{
+			LoadSettings();
+
 			lock (SettingLock)
 			{
 				foreach (var entry in settings.Values)

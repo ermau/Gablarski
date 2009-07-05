@@ -137,6 +137,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="PushToTalk.cs" />
+    <Compile Include="PushToTalkTextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="RequiredTextBox.cs">
       <SubType>Component</SubType>
     </Compile>

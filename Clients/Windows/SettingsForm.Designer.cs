@@ -29,7 +29,7 @@
 		private void InitializeComponent ()
 		{
 			this.pushLabel = new System.Windows.Forms.Label ();
-			this.inPTT = new System.Windows.Forms.TextBox ();
+			this.inPTT = new Gablarski.Clients.Windows.PushToTalkTextBox ();
 			this.btnOk = new System.Windows.Forms.Button ();
 			this.btnCancel = new System.Windows.Forms.Button ();
 			this.SuspendLayout ();
@@ -87,6 +87,7 @@
 			this.Name = "SettingsForm";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "Settings";
+			this.Load += new System.EventHandler (this.SettingsForm_Load);
 			this.ResumeLayout (false);
 			this.PerformLayout ();
 
@@ -95,7 +96,7 @@
 		#endregion
 
 		private System.Windows.Forms.Label pushLabel;
-		private System.Windows.Forms.TextBox inPTT;
+		private Gablarski.Clients.Windows.PushToTalkTextBox inPTT;
 		private System.Windows.Forms.Button btnOk;
 		private System.Windows.Forms.Button btnCancel;
 	}
