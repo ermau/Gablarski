@@ -276,6 +276,4 @@ namespace Gablarski.OpenAL
 			}
 		}
 	}
-
-	
 }
