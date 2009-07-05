@@ -151,7 +151,7 @@ namespace Gablarski.Client
 		        	         	? new ClientAudioSource (source, this.context.Connection)
 		        	         	: source;
 					
-					sources.Add (source.Id, source);
+					sources[source.Id] = source;
 		        }
 		    }
 
