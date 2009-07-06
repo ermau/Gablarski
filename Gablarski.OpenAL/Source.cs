@@ -175,7 +175,7 @@ namespace Gablarski.OpenAL
 
 			uint[] id = new [] { this.sourceID };
 			alDeleteSources (1, id);
-			OpenAL.ErrorCheck ();
+			//OpenAL.ErrorCheck ();
 
 			this.disposed = true;
 		}
