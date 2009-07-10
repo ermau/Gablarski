@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -40,7 +41,7 @@ namespace Gablarski.Network
 		public void StartListening()
 		{
 			this.listening = true;
-			new Socket (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+			udp = new Socket (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 			udp.Bind (new IPEndPoint (IPAddress.Any, port));
 
 			tcpListener = new TcpListener (IPAddress.Any, port);
@@ -77,6 +78,7 @@ namespace Gablarski.Network
 		private TcpListener tcpListener;
 		private Socket udp;
 		private int port = 6112;
+		private volatile bool accepting;
 
 		private readonly Dictionary<IPEndPoint, NetworkServerConnection> connections = new Dictionary<IPEndPoint, NetworkServerConnection>();
 
@@ -141,21 +143,32 @@ namespace Gablarski.Network
 
 		private void AcceptConnection (object result)
 		{
-			var listener = (result as TcpListener);
-			#if DEBUG
-			if (listener == null)
-				throw new ArgumentException ("result");
-			#endif
-
-			TcpClient client = listener.AcceptTcpClient();
-			var endpoint = (IPEndPoint)client.Client.RemoteEndPoint;
-			var connection = new NetworkServerConnection (endpoint, client, new SocketValueWriter (this.udp));
-			lock (connections)
+			try
 			{
-				connections.Add (endpoint, connection);
+				var listener = (result as TcpListener);
+				#if DEBUG
+				if (listener == null)
+					throw new ArgumentException ("result");
+				#endif
+
+				TcpClient client = listener.AcceptTcpClient();
+				var endpoint = (IPEndPoint)client.Client.RemoteEndPoint;
+				var connection = new NetworkServerConnection (endpoint, client, new SocketValueWriter (this.udp));
+				lock (connections)
+				{
+					connections.Add (endpoint, connection);
+				}
+
+				OnConnectionMade (new ConnectionEventArgs (connection));
 			}
-			
-			OnConnectionMade (new ConnectionEventArgs (connection));
+			catch (SocketException sex)
+			{
+				Trace.WriteLine ("[Server] Failed to accept connection: " + sex.Message);
+			}
+			finally
+			{
+				this.accepting = false;
+			}
 		}
 
 		protected void OnConnectionMade (ConnectionEventArgs e)
@@ -182,8 +195,11 @@ namespace Gablarski.Network
 					udp.BeginReceiveMessageFrom (buffer, 0, 5120, SocketFlags.None, ref tendpoint, UnreliableReceive, buffer);
 				}
 
-				if (tcpListener.Pending())
+				if (!this.accepting && tcpListener.Pending())
+				{
+					this.accepting = true;
 					ThreadPool.QueueUserWorkItem (AcceptConnection, tcpListener);
+				}
 
 				if (singleCore || (++loops % 100) == 0)
 					Thread.Sleep (1);

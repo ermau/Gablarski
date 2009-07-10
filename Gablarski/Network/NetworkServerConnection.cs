@@ -174,21 +174,22 @@ namespace Gablarski.Network
 				if (mbuffer[0] != 0x2A)
 				{
 					Trace.WriteLine ("[Server] Failed sanity check, disconnecting.");
-
-					ushort type = this.reader.ReadUInt16();
-
-					Func<MessageBase> messageCtor;
-					MessageBase.MessageTypes.TryGetValue (type, out messageCtor);
-					if (messageCtor != null)
-					{
-						var msg = messageCtor();
-						msg.ReadPayload (this.reader, this.IdentifyingTypes);
-
-						OnMessageReceived (new MessageReceivedEventArgs (this, msg));
-					}
-					else
-						this.Disconnect();
+					this.Disconnect();
+					return;
 				}
+
+				ushort type = this.reader.ReadUInt16();
+				Func<MessageBase> messageCtor;
+				MessageBase.MessageTypes.TryGetValue (type, out messageCtor);
+				if (messageCtor != null)
+				{
+					var msg = messageCtor();
+					msg.ReadPayload (this.reader, this.IdentifyingTypes);
+
+					OnMessageReceived (new MessageReceivedEventArgs (this, msg));
+				}
+				else
+					this.Disconnect();
 			}
 			catch (Exception ex)
 			{

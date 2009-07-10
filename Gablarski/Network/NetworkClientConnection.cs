@@ -21,7 +21,7 @@ namespace Gablarski.Network
 		/// </summary>
 		public bool IsConnected
 		{
-			get { throw new NotImplementedException(); }
+			get { return this.tcp.Connected; }
 		}
 
 		/// <summary>
@@ -49,7 +49,10 @@ namespace Gablarski.Network
 		/// <exception cref="System.ArgumentNullException"><paramref name="message"/> is <c>null</c>.</exception>
 		public void Send (MessageBase message)
 		{
-			throw new NotImplementedException();
+			lock (sendQueue)
+			{
+				sendQueue.Enqueue (message);
+			}
 		}
 
 		/// <summary>
@@ -57,11 +60,25 @@ namespace Gablarski.Network
 		/// </summary>
 		public void Disconnect()
 		{
-			this.tcp.Close();
-			this.udp.Close();
+			this.running = false;
+
+			if (this.tcp != null)
+				this.tcp.Close();
+			
+			if (this.udp != null)
+				this.udp.Close();
+
+			if (this.runnerThread != null)
+				this.runnerThread.Join();
 
 			this.tcp = null;
 			this.udp = null;
+			
+			this.rwriter = null;
+			this.rreader = null;
+			this.ureader = null;
+			this.uwriter = null;
+			this.rstream = null;
 		}
 
 		#endregion
@@ -80,6 +97,8 @@ namespace Gablarski.Network
 		/// <exception cref="System.ArgumentNullException"><paramref name="endpoint"/> is <c>null</c>.</exception>
 		public void Connect (IPEndPoint endpoint)
 		{
+			this.running = true;
+
 			this.tcp = new TcpClient (new IPEndPoint (IPAddress.Any, 0));
 			this.tcp.Connect (endpoint);
 			this.rstream = this.tcp.GetStream();
@@ -91,11 +110,15 @@ namespace Gablarski.Network
 			this.udp.Connect (endpoint.Address, endpoint.Port);
 
 			this.uwriter = new SocketValueWriter (this.udp);
+			
+			this.runnerThread = new Thread (this.Runner) { Name = "NetworkClientConnection Runner" };
+			this.runnerThread.Start();
 		}
 
 		#endregion
 
 		private volatile bool running;
+		private Thread runnerThread;
 
 		private TcpClient tcp;
 		private Stream rstream;
@@ -133,7 +156,7 @@ namespace Gablarski.Network
 				if (toSend != null)
 				{
 					IValueWriter iwriter = (!toSend.Reliable) ? writeUnreliable : writeReliable;
-					iwriter.WriteByte (42);
+					iwriter.WriteByte (0x2A);
 					iwriter.WriteUInt16 (toSend.MessageTypeCode);
 
 					toSend.WritePayload (iwriter, this.IdentifyingTypes);
@@ -192,26 +215,28 @@ namespace Gablarski.Network
 
 				if (mbuffer[0] != 0x2A)
 				{
-					Trace.WriteLine ("[Server] Failed sanity check, disconnecting.");
-
-					ushort type = this.rreader.ReadUInt16();
-
-					Func<MessageBase> messageCtor;
-					MessageBase.MessageTypes.TryGetValue (type, out messageCtor);
-					if (messageCtor != null)
-					{
-						var msg = messageCtor();
-						msg.ReadPayload (this.rreader, this.IdentifyingTypes);
-
-						OnMessageReceived (new MessageReceivedEventArgs (this, msg));
-					}
-					else
-						this.Disconnect();
+					Trace.WriteLine ("[Client] Failed sanity check, disconnecting.");
+					this.Disconnect();
+					return;
 				}
+
+				ushort type = this.rreader.ReadUInt16();
+
+				Func<MessageBase> messageCtor;
+				MessageBase.MessageTypes.TryGetValue (type, out messageCtor);
+				if (messageCtor != null)
+				{
+					var msg = messageCtor();
+					msg.ReadPayload (this.rreader, this.IdentifyingTypes);
+
+					OnMessageReceived (new MessageReceivedEventArgs (this, msg));
+				}
+				else
+					this.Disconnect();
 			}
 			catch (Exception ex)
 			{
-				Trace.WriteLine ("[Server] Error reading payload, disconnecting: " + ex.Message);
+				Trace.WriteLine ("[Client] Error reading payload, disconnecting: " + ex.Message);
 				this.Disconnect();
 				return;
 			}
