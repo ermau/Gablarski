@@ -169,7 +169,7 @@ namespace Gablarski.Network
 					var ipEndpoint = new IPEndPoint (IPAddress.Any, 0);
 					var tendpoint = (EndPoint)ipEndpoint;
 					byte[] buffer = new byte[5120];
-					udp.BeginReceiveMessageFrom (buffer, 0, 5120, SocketFlags.None, ref tendpoint, UnreliableReceive, buffer);
+					udp.BeginReceiveFrom (buffer, 0, buffer.Length, SocketFlags.None, ref tendpoint, UnreliableReceive, buffer);
 				}
 
 				if (!this.rwaiting)
@@ -252,9 +252,8 @@ namespace Gablarski.Network
 			{
 				var ipendpoint = new IPEndPoint (IPAddress.Any, 0);
 				var endpoint = (EndPoint)ipendpoint;
-				SocketFlags flags = SocketFlags.None;
-				IPPacketInformation packetInfo;
-				if (udp.EndReceiveMessageFrom (result, ref flags, ref endpoint, out packetInfo) == 0)
+				
+				if (udp.EndReceiveFrom (result, ref endpoint) == 0)
 					return;
 
 				byte[] buffer = (byte[])result.AsyncState;
