@@ -12,16 +12,9 @@ namespace Gablarski
 		public StreamValueWriter (Stream baseStream)
 		{
 			this.baseStream = baseStream;
-			this.AutoFlush = true;
 		}
 
 		#region IValueWriter Members
-		public bool AutoFlush
-		{
-			get;
-			set;
-		}
-
 		public void WriteBytes (byte[] value)
 		{
 			WriteInt32 (value.Length);
@@ -30,7 +23,7 @@ namespace Gablarski
 
 		public void WriteSByte (sbyte value)
 		{
-			Write (new byte[] { (byte)value });
+			baseStream.WriteByte ((byte)value);
 		}
 
 		public void WriteInt16 (short value)
@@ -50,7 +43,7 @@ namespace Gablarski
 
 		public void WriteByte (byte value)
 		{
-			Write (new byte[] { value });
+			baseStream.WriteByte (value);
 		}
 
 		public void WriteUInt16 (ushort value)
@@ -73,6 +66,12 @@ namespace Gablarski
 			value = (value ?? String.Empty) + '\0';
 			Write (Encoding.UTF8.GetBytes (value));
 		}
+
+		public void Flush()
+		{
+			baseStream.Flush();
+		}
+
 		#endregion
 
 		private readonly Stream baseStream;
@@ -80,9 +79,6 @@ namespace Gablarski
 		private void Write (byte[] buffer)
 		{
 			baseStream.Write (buffer, 0, buffer.Length);
-
-			if (this.AutoFlush)
-				baseStream.Flush ();
 		}
 
 		#region IDisposable Members

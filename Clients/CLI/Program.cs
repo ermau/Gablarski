@@ -41,7 +41,7 @@ namespace Gablarski.Clients.CLI
 			bool defaultAudio = false;
 
 			List<string> tracers = new List<string>();
-			string clientConnection = typeof (ClientNetworkConnection).AssemblyQualifiedName;
+			string clientConnection = typeof (NetworkClientConnection).AssemblyQualifiedName;
 			List<string> connectionProviders = new List<string>();
 
 			OptionSet options = new OptionSet
@@ -94,7 +94,7 @@ namespace Gablarski.Clients.CLI
 				server = new GablarskiServer (new ServerSettings(), new GuestUserProvider(), new GuestPermissionProvider(), new LobbyChannelProvider());
 				
 				if (connectionProviders.Count == 0)
-					server.AddConnectionProvider (new ServerNetworkConnectionProvider());
+					server.AddConnectionProvider (new NetworkServerConnectionProvider());
 				else
 					FindTypes<IConnectionProvider> (connectionProviders, server.AddConnectionProvider);
 
@@ -109,7 +109,7 @@ namespace Gablarski.Clients.CLI
 			
 			if (startClient)
 			{
-				client = new GablarskiClient (new ClientNetworkConnection());
+				client = new GablarskiClient (new NetworkClientConnection());
 				client.Connected += ClientConnected;
 				client.ConnectionRejected += ClientConnectionRejected;
 				client.Disconnected += ClientDisconnected;

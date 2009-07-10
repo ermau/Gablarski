@@ -13,6 +13,13 @@ namespace Gablarski.Server
 
 		public event EventHandler<ConnectionEventArgs> ConnectionMade;
 
+		public event EventHandler<MessageReceivedEventArgs> ConnectionlessMessageReceived;
+
+		public IdentifyingTypes IdentifyingTypes
+		{
+			get; set;
+		}
+
 		public void StartListening()
 		{
 			this.listening = true;

@@ -33,6 +33,11 @@ namespace Gablarski.Messages
 			set;
 		}
 
+		public override bool Reliable
+		{
+			get { return false; }
+		}
+
 		public override void WritePayload (IValueWriter writer, IdentifyingTypes idTypes)
 		{
 			writer.WriteInt32 (this.SourceId);

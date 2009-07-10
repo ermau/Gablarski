@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Reflection;
 using System.Threading;
 using Gablarski.Media.Sources;
@@ -115,23 +117,26 @@ namespace Gablarski.Client
 		/// </summary>
 		/// <param name="host">The hostname of the server to connect to.</param>
 		/// <param name="port">The port of the server to connect to.</param>
+		/// <exception cref="ArgumentException"><paramref name="host"/> is invalid.</exception>
 		/// <exception cref="System.ArgumentNullException"><paramref name="host"/> is <c>null</c>.</exception>
 		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="port" /> is outside the acceptable port range.</exception>
+		/// <exception cref="System.Net.Sockets.SocketException">Hostname could not be resolved.</exception>
 		public void Connect (string host, int port)
 		{
 			if (host.IsEmpty ())
 				throw new ArgumentException ("host must not be null or empty", "host");
 
+			IPEndPoint endPoint = new IPEndPoint (Dns.GetHostAddresses (host).Where (ip => ip.AddressFamily != AddressFamily.InterNetworkV6).First(), port);
+
 			this.running = true;
 
-			this.messageRunnerThread = new Thread (this.MessageRunner);
-			this.messageRunnerThread.Name = "Gablarski Client Message Runner";
+			this.messageRunnerThread = new Thread (this.MessageRunner) { Name = "Gablarski Client Message Runner" };
 			this.messageRunnerThread.SetApartmentState (ApartmentState.STA);
 			this.messageRunnerThread.Start ();
 
 			Connection.Disconnected += this.OnDisconnected;
 			Connection.MessageReceived += OnMessageReceived;
-			Connection.Connect (host, port);
+			Connection.Connect (endPoint);
 			Connection.Send (new ConnectMessage (ApiVersion));
 		}
 
@@ -152,6 +157,7 @@ namespace Gablarski.Client
 		#endregion
 
 		#region Event Invokers
+		// ReSharper disable UnusedParameter.Global
 		protected virtual void OnConnected (object sender, EventArgs e)
 		{
 			var connected = this.Connected;
@@ -165,6 +171,7 @@ namespace Gablarski.Client
 			if (disconnected != null)
 				disconnected (this, e);
 		}
+		// ReSharper restore UnusedParameter.Global
 
 		protected virtual void OnConnectionRejected (RejectedConnectionEventArgs e)
 		{

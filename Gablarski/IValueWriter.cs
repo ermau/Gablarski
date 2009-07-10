@@ -21,6 +21,8 @@ namespace Gablarski
 		void WriteUInt64 (UInt64 value);
 
 		void WriteString (string value);
+
+		void Flush();
 	}
 
 	public static class ValueWriterExtensions

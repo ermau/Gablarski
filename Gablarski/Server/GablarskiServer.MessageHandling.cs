@@ -63,10 +63,10 @@ namespace Gablarski.Server
 
 				Trace.WriteLineIf ((msg.MessageType != ClientMessageType.AudioData), "[Server] Message Received: " + msg.MessageType);
 
-				#if !DEBUG
-				if (this.Handlers.ContainsKey (msg.MessageType))
-				#endif
-					this.Handlers[msg.MessageType] (e);
+				Action<MessageReceivedEventArgs> handler;
+				Handlers.TryGetValue (msg.MessageType, out handler);
+				if (handler != null)
+					handler (new MessageReceivedEventArgs (e.Connection, msg));
 			}
 		}
 
@@ -271,7 +271,7 @@ namespace Gablarski.Server
 					sourceId = sources.Sum (kvp => kvp.Value.Count) + 1;
 					index = sources[e.Connection].Count;
 					sources[e.Connection].Add (null);
-					//}
+					//}-
 					//else
 					//    result = SourceResult.FailedPermittedSingleSourceOfType;
 				}
@@ -283,7 +283,7 @@ namespace Gablarski.Server
 						bitrate = request.TargetBitrate.Trim (settings.MinimumAudioBitrate, settings.MaximumAudioBitrate);
 
 					//source = MediaSources.Create (request.MediaSourceType, sourceId, user.UserId);
-					source = new AudioSource (request.Name, sourceId, user.UserId, 1, bitrate, 44100, 128);
+					source = new AudioSource (request.Name, sourceId, user.UserId, 1, bitrate, 44100, 512);
 					//if (source != null)
 					//{
 					lock (sourceLock)

@@ -20,6 +20,11 @@ namespace Gablarski.Messages
 			get { return true; }
 		}
 
+		public virtual int MessageSize
+		{
+			get { return 0; }
+		}
+
 		public abstract void WritePayload (IValueWriter writer, IdentifyingTypes idTypes);
 		public abstract void ReadPayload (IValueReader reader, IdentifyingTypes idTypes);
 

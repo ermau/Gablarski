@@ -53,6 +53,11 @@ namespace Gablarski
 		/// <param name="message">The message to send.</param>
 		public static void Send (this IEnumerable<IConnection> connections, MessageBase message)
 		{
+			#if DEBUG
+			if (message == null)
+				throw new ArgumentNullException ("message");
+			#endif
+
 			foreach (var connection in connections)
 				connection.Send (message);
 		}
@@ -65,6 +70,13 @@ namespace Gablarski
 		/// <param name="predicate">The connection predicate.</param>
 		public static void Send (this IEnumerable<IConnection> connections, MessageBase message, Func<IConnection, bool> predicate)
 		{
+			#if DEBUG
+			if (message == null)
+				throw new ArgumentNullException ("message");
+			if (predicate == null)
+				throw new ArgumentNullException ("predicate");
+			#endif
+
 			foreach (var connection in connections)
 			{
 				if (predicate (connection))
@@ -81,6 +93,11 @@ namespace Gablarski
 		public MessageReceivedEventArgs (IConnection connection, MessageBase message)
 			: base (connection)
 		{
+			#if DEBUG
+			if (message == null)
+				throw new ArgumentNullException ("message");
+			#endif
+
 			this.Message = message;
 		}
 

@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{7347052B-DA5B-4CCA-AB28-3963766E3CDB}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -72,6 +72,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AES.cs" />
+    <Compile Include="ByteArrayValueReader.cs" />
+    <Compile Include="Network\NetworkClientConnection.cs" />
+    <Compile Include="Network\NetworkServerConnection.cs" />
+    <Compile Include="Network\NetworkServerConnectionProvider.cs" />
+    <Compile Include="Network\SocketValueWriter.cs" />
     <Compile Include="Channel.cs" />
     <Compile Include="Client\ClientChannelManager.cs" />
     <Compile Include="Client\GablarskiClient.cs" />
@@ -109,10 +114,7 @@
     <Compile Include="Messages\SourceResultMessage.cs" />
     <Compile Include="ModuleLoader.cs" />
     <Compile Include="MutableLookup.cs" />
-    <Compile Include="Network\ClientNetworkConnection.cs" />
-    <Compile Include="Network\NetworkConnectionBase.cs" />
-    <Compile Include="Network\ServerNetworkConnection.cs" />
-    <Compile Include="Network\ServerNetworkConnectionProvider.cs" />
+    <Compile Include="ByteArrayExtensions.cs" />
     <Compile Include="UserInfo.cs" />
     <Compile Include="ProviderUtils.cs" />
     <Compile Include="ServerInfo.cs" />

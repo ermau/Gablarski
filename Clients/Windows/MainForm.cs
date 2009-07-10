@@ -25,7 +25,7 @@ namespace Gablarski.Clients.Windows
 		{
 			this.server = entry;
 
-			this.gablarski = new GablarskiClient (new ClientNetworkConnection());
+			this.gablarski = new GablarskiClient (new NetworkClientConnection());
 			this.gablarski.ConnectionRejected += this.GablarskiConnectionRejected;
 			this.gablarski.Connected += this.GablarskiConnected;
 			this.gablarski.Disconnected += this.GablarskiDisconnected;
