@@ -172,11 +172,7 @@ namespace Gablarski.Network
 				byte[] mbuffer = (ar.AsyncState as byte[]);
 
 				if (mbuffer[0] != 0x2A)
-				{
-					Trace.WriteLine ("[Server] Failed sanity check, disconnecting.");
-					this.Disconnect();
 					return;
-				}
 
 				ushort type = this.reader.ReadUInt16();
 				Func<MessageBase> messageCtor;
@@ -188,8 +184,6 @@ namespace Gablarski.Network
 
 					OnMessageReceived (new MessageReceivedEventArgs (this, msg));
 				}
-				else
-					this.Disconnect();
 			}
 			catch (Exception ex)
 			{

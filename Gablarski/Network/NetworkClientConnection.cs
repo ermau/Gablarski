@@ -258,7 +258,7 @@ namespace Gablarski.Network
 
 				byte[] buffer = (byte[])result.AsyncState;
 
-				if (buffer[0] == 0x2A)
+				if (buffer[0] != 0x2A)
 					return;
 
 				IValueReader reader = new ByteArrayValueReader (buffer);
@@ -267,7 +267,7 @@ namespace Gablarski.Network
 				Func<MessageBase> messageCtor;
 				MessageBase.MessageTypes.TryGetValue (mtype, out messageCtor);
 				if (messageCtor == null)
-					this.Disconnect();
+					return;
 				else
 				{
 					var msg = messageCtor();

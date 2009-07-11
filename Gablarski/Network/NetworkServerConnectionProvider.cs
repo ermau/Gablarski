@@ -151,7 +151,10 @@ namespace Gablarski.Network
 
 				TcpClient client = listener.AcceptTcpClient();
 				var endpoint = (IPEndPoint)client.Client.RemoteEndPoint;
-				var connection = new NetworkServerConnection (endpoint, client, new SocketValueWriter (this.udp));
+				var socket = new Socket (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+				socket.Connect (endpoint);
+				var connection = new NetworkServerConnection (endpoint, client, new SocketValueWriter (socket));
+
 				lock (connections)
 				{
 					connections.Add (endpoint, connection);
