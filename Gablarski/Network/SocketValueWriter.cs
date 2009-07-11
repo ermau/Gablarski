@@ -114,12 +114,20 @@ namespace Gablarski.Network
 
 		public void Flush()
 		{
-			lock (client)
+			try
 			{
-				client.Send (this.buffer);
+				lock (client)
+				{
+					client.Send (this.buffer);
+				}
 			}
-
-			this.size = 0;
+			catch (SocketException)
+			{
+			}
+			finally
+			{
+				this.size = 0;
+			}
 		}
 
 		#endregion
