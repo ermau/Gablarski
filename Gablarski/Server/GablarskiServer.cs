@@ -102,6 +102,7 @@ namespace Gablarski.Server
 			// MUST provide a gaurantee of persona
 			lock (this.availableConnections)
 			{
+				provider.IdentifyingTypes = this.IdentifyingTypes;
 				provider.ConnectionMade += OnConnectionMade;
 				provider.StartListening ();
 		

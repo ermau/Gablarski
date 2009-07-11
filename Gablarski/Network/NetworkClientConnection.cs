@@ -105,6 +105,7 @@ namespace Gablarski.Network
 
 			this.rwriter = new StreamValueWriter (this.rstream);
 			this.rreader = new StreamValueReader (this.rstream);
+			this.nid = this.rreader.ReadUInt32();
 
 			this.udp = new Socket (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 			this.udp.Connect (endpoint.Address, endpoint.Port);
@@ -126,6 +127,7 @@ namespace Gablarski.Network
 		private IValueReader rreader;
 		private volatile bool rwaiting;
 
+		private uint nid;
 		private Socket udp;
 		private IValueWriter uwriter;
 		private IValueReader ureader;
@@ -157,6 +159,10 @@ namespace Gablarski.Network
 				{
 					IValueWriter iwriter = (!toSend.Reliable) ? writeUnreliable : writeReliable;
 					iwriter.WriteByte (0x2A);
+					
+					if (!toSend.Reliable)
+						iwriter.WriteUInt32 (this.nid);
+
 					iwriter.WriteUInt16 (toSend.MessageTypeCode);
 
 					toSend.WritePayload (iwriter, this.IdentifyingTypes);

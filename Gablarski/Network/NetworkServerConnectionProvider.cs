@@ -80,7 +80,7 @@ namespace Gablarski.Network
 		private int port = 6112;
 		private volatile bool accepting;
 
-		private readonly Dictionary<IPEndPoint, NetworkServerConnection> connections = new Dictionary<IPEndPoint, NetworkServerConnection>();
+		private readonly Dictionary<uint, NetworkServerConnection> connections = new Dictionary<uint, NetworkServerConnection>();
 
 		private void UnreliableReceive (IAsyncResult result)
 		{
@@ -91,18 +91,21 @@ namespace Gablarski.Network
 				if (udp.EndReceiveFrom (result, ref endpoint) == 0)
 					return;
 
-				NetworkServerConnection connection;
-				lock (connections)
-				{
-					connections.TryGetValue (ipendpoint, out connection);
-				}
-
 				byte[] buffer = (byte[])result.AsyncState;
 
 				if (buffer[0] != 0x2A)
 					return;
 
-				IValueReader reader = new ByteArrayValueReader (buffer);
+				IValueReader reader = new ByteArrayValueReader (buffer, 1);
+
+				uint nid = reader.ReadUInt32();
+
+				NetworkServerConnection connection;
+				lock (connections)
+				{
+					connections.TryGetValue (nid, out connection);
+				}
+
 				ushort mtype = reader.ReadUInt16();
 
 				Func<MessageBase> messageCtor;
@@ -153,12 +156,22 @@ namespace Gablarski.Network
 				var endpoint = (IPEndPoint)client.Client.RemoteEndPoint;
 				var socket = new Socket (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 				socket.Connect (endpoint);
-				var connection = new NetworkServerConnection (endpoint, client, new SocketValueWriter (socket));
 
+				uint nid = 1;
+				NetworkServerConnection connection;
 				lock (connections)
 				{
-					connections.Add (endpoint, connection);
+					for (; nid < UInt32.MaxValue; ++nid)
+					{
+						if (!connections.ContainsKey (nid))
+							break;
+					}
+
+					connection = new NetworkServerConnection (nid, endpoint, client, new SocketValueWriter (socket));
+					connections.Add (nid, connection);
 				}
+
+				client.GetStream().Write (BitConverter.GetBytes (nid), 0, sizeof (uint));
 
 				OnConnectionMade (new ConnectionEventArgs (connection));
 			}

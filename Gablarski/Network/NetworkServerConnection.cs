@@ -14,8 +14,9 @@ namespace Gablarski.Network
 	public class NetworkServerConnection
 		: IConnection
 	{
-		public NetworkServerConnection (IPEndPoint endPoint, TcpClient tcp, IValueWriter unreliableWriter)
+		public NetworkServerConnection (uint nid, IPEndPoint endPoint, TcpClient tcp, IValueWriter unreliableWriter)
 		{
+			this.nid = nid;
 			this.endPoint = endPoint;
 
 			this.uwriter = unreliableWriter;
@@ -92,6 +93,8 @@ namespace Gablarski.Network
 		private volatile bool running;
 		private readonly Thread runnerThread;
 		private volatile bool waiting;
+
+		private readonly uint nid;
 
 		internal void Receive (MessageBase message)
 		{
