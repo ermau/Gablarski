@@ -106,7 +106,7 @@ namespace Gablarski.Network
 			this.rwriter = new StreamValueWriter (this.rstream);
 			this.rreader = new StreamValueReader (this.rstream);
 
-			this.udp = new Socket (AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+			this.udp = new Socket (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 			this.udp.Connect (endpoint.Address, endpoint.Port);
 
 			this.uwriter = new SocketValueWriter (this.udp);

@@ -118,7 +118,7 @@ namespace Gablarski.Network
 			{
 				lock (client)
 				{
-					client.Send (this.buffer);
+					client.Send (this.buffer, this.size, SocketFlags.None);
 				}
 			}
 			catch (SocketException)
