@@ -103,14 +103,15 @@ namespace Gablarski.Network
 			this.tcp.Connect (endpoint);
 			this.rstream = this.tcp.GetStream();
 
+			this.udp = new Socket (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+			this.udp.Bind (new IPEndPoint (IPAddress.Any, 0));
+
 			this.rwriter = new StreamValueWriter (this.rstream);
 			this.rreader = new StreamValueReader (this.rstream);
+			this.rwriter.WriteInt32 (((IPEndPoint)this.udp.LocalEndPoint).Port);
 			this.nid = this.rreader.ReadUInt32();
 
-			this.udp = new Socket (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-			this.udp.Connect (endpoint.Address, endpoint.Port);
-
-			this.uwriter = new SocketValueWriter (this.udp);
+			this.uwriter = new SocketValueWriter (this.udp, endpoint);
 			
 			this.runnerThread = new Thread (this.Runner) { Name = "NetworkClientConnection Runner" };
 			this.runnerThread.Start();
@@ -267,7 +268,7 @@ namespace Gablarski.Network
 				if (buffer[0] != 0x2A)
 					return;
 
-				IValueReader reader = new ByteArrayValueReader (buffer);
+				IValueReader reader = new ByteArrayValueReader (buffer, 1);
 				ushort mtype = reader.ReadUInt16();
 
 				Func<MessageBase> messageCtor;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
@@ -18,6 +19,12 @@ namespace Gablarski.Network
 		{
 			this.client = uclient;
 			this.EnsureCapacity (length);
+		}
+
+		public SocketValueWriter (Socket uclient, EndPoint sendTo)
+			: this (uclient)
+		{
+			this.endpoint = sendTo;
 		}
 
 		#region Implementation of IDisposable
@@ -118,7 +125,7 @@ namespace Gablarski.Network
 			{
 				lock (client)
 				{
-					client.Send (this.buffer, this.size, SocketFlags.None);
+					client.SendTo (this.buffer, this.size, SocketFlags.None, this.endpoint);
 				}
 			}
 			catch (SocketException)
@@ -136,6 +143,7 @@ namespace Gablarski.Network
 		private readonly Encoding encoding = Encoding.UTF8;
 		private byte[] buffer;
 		private int size;
+		private EndPoint endpoint;
 
 		private void EnsureCapacity (int min)
 		{

@@ -153,9 +153,14 @@ namespace Gablarski.Network
 				#endif
 
 				TcpClient client = listener.AcceptTcpClient();
-				var endpoint = (IPEndPoint)client.Client.RemoteEndPoint;
+				var stream = client.GetStream();
+				var tendpoint = (IPEndPoint)client.Client.RemoteEndPoint;
 				var socket = new Socket (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-				socket.Connect (endpoint);
+
+				int udpPort = BitConverter.ToInt32 (stream.ReadBytes (4), 0);
+
+				tendpoint = new IPEndPoint (tendpoint.Address, udpPort);
+				socket.Connect (tendpoint);
 
 				uint nid = 1;
 				NetworkServerConnection connection;
@@ -167,11 +172,11 @@ namespace Gablarski.Network
 							break;
 					}
 
-					connection = new NetworkServerConnection (nid, endpoint, client, new SocketValueWriter (socket));
+					connection = new NetworkServerConnection (nid, tendpoint, client, new SocketValueWriter (socket, tendpoint));
 					connections.Add (nid, connection);
 				}
 
-				client.GetStream().Write (BitConverter.GetBytes (nid), 0, sizeof (uint));
+				stream.Write (BitConverter.GetBytes (nid), 0, sizeof (uint));		
 
 				OnConnectionMade (new ConnectionEventArgs (connection));
 			}
