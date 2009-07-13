@@ -14,8 +14,8 @@ namespace Gablarski.Clients.CLI
 {
 	public class Program
 	{
-		public static GablarskiClient client;
-		public static GablarskiServer server;
+		public static GablarskiClient Client;
+		public static GablarskiServer Server;
 
 		private static string username;
 		private static string password;
@@ -24,12 +24,34 @@ namespace Gablarski.Clients.CLI
 
 		private static bool startClient = true;
 
-		private readonly static List<AudioSource> sources = new List<AudioSource>();
+		private readonly static List<AudioSource> Sources = new List<AudioSource>();
 
-		private readonly static IPlaybackProvider playbackProvider = new PlaybackProvider();
-		private	readonly static ICaptureProvider captureProvider = new CaptureProvider();
+		private static IPlaybackProvider playbackProvider;
+		private static ICaptureProvider captureProvider;
 		private static ClientAudioSource captureSource;
 		private static VoiceActivation voiceActivation;
+
+		public static IPlaybackProvider PlaybackProvider
+		{
+			get
+			{
+				if (playbackProvider == null)
+					playbackProvider = new PlaybackProvider();
+
+				return playbackProvider;
+			}
+		}
+
+		public static ICaptureProvider CaptureProvider
+		{
+			get
+			{
+				if (captureProvider == null)
+					captureProvider = new CaptureProvider();
+
+				return captureProvider;
+			}
+		}
 
 		[STAThread]
 		public static void Main (string[] args)
@@ -58,8 +80,8 @@ namespace Gablarski.Clients.CLI
 				{ "v|verbose",		"Turns on tracing, detailed debug invormation",					v => trace = (v != null) },
 				{ "tracer=",		"Adds a tracer to the list (supply assembly qualified name.)",	tracers.Add },
 
-				{ "s|server",		"Starts a local server.",										s => startServer = true },
-				{ "conprovider=",	"Adds a connection provider to the server.",					connectionProviders.Add	},
+				{ "s|Server",		"Starts a local Server.",										s => startServer = true },
+				{ "conprovider=",	"Adds a connection provider to the Server.",					connectionProviders.Add	},
 			};
 
 			foreach (string unused in options.Parse (args))
@@ -91,33 +113,33 @@ namespace Gablarski.Clients.CLI
 
 			if (startServer)
 			{
-				server = new GablarskiServer (new ServerSettings(), new GuestUserProvider(), new GuestPermissionProvider(), new LobbyChannelProvider());
+				Server = new GablarskiServer (new ServerSettings(), new GuestUserProvider(), new GuestPermissionProvider(), new LobbyChannelProvider());
 				
 				if (connectionProviders.Count == 0)
-					server.AddConnectionProvider (new NetworkServerConnectionProvider());
+					Server.AddConnectionProvider (new NetworkServerConnectionProvider());
 				else
-					FindTypes<IConnectionProvider> (connectionProviders, server.AddConnectionProvider);
+					FindTypes<IConnectionProvider> (connectionProviders, Server.AddConnectionProvider);
 
-				server.Start();
+				Server.Start();
 			}
 
 			if (defaultAudio)
 			{
-				SelectPlayback (playbackProvider.DefaultDevice, Console.Out);
-				SelectCapture (captureProvider.DefaultDevice, Console.Out);
+				SelectPlayback (PlaybackProvider.DefaultDevice, Console.Out);
+				SelectCapture (CaptureProvider.DefaultDevice, Console.Out);
 			}
 			
 			if (startClient)
 			{
-				client = new GablarskiClient (new NetworkClientConnection());
-				client.Connected += ClientConnected;
-				client.ConnectionRejected += ClientConnectionRejected;
-				client.Disconnected += ClientDisconnected;
+				Client = new GablarskiClient (new NetworkClientConnection());
+				Client.Connected += ClientConnected;
+				Client.ConnectionRejected += ClientConnectionRejected;
+				Client.Disconnected += ClientDisconnected;
 
-				client.Sources.ReceivedSource += SourcesReceivedSource;
-				client.Sources.ReceivedAudio += SourcesReceivedAudio;
+				Client.Sources.ReceivedSource += SourcesReceivedSource;
+				Client.Sources.ReceivedAudio += SourcesReceivedAudio;
 
-				client.Connect (host, port);
+				Client.Connect (host, port);
 			}
 
 			string fullcommand;
@@ -138,10 +160,10 @@ namespace Gablarski.Clients.CLI
 					case "close":
 					case "disconnect":
 						if (startClient)
-							client.Disconnect();
+							Client.Disconnect();
 
 						if (startServer)
-							server.Shutdown();
+							Server.Shutdown();
 
 						Environment.Exit (0);
 						break;
@@ -155,7 +177,7 @@ namespace Gablarski.Clients.CLI
 						string request = null;
 						var sourceOptions = new OptionSet
 						{
-							{ "l|list",			"Lists current sources.",						v => ListSources (Console.Out)},
+							{ "l|list",			"Lists current Sources.",						v => ListSources (Console.Out)},
 
 							{ "r=|request=",	"Requests a source.",							v => request = v },
 							{ "b=|bitrate=",	"Bitrate of the source to request. (>32000)",	(int b) => bitrate = b },
@@ -170,7 +192,7 @@ namespace Gablarski.Clients.CLI
 							else if (bitrate < 32000 && bitrate != 0)
 								sourceOptions.WriteOptionDescriptions (Console.Out);
 
-							client.Sources.Request (request, channels, bitrate);
+							Client.Sources.Request (request, channels, bitrate);
 						}
 
 						break;
@@ -184,8 +206,8 @@ namespace Gablarski.Clients.CLI
 
 						var soptions = new OptionSet
 						{
-							{ "s|selected", "Displays currently selected devices.", s => { Console.WriteLine ("Output: " + ((playbackProvider.Device != null) ? playbackProvider.Device. ToString() : "None"));
-							                                                             	Console.WriteLine ("Input: " + ((captureProvider.Device !=null) ? captureProvider.Device. ToString() : "None")); } },
+							{ "s|selected", "Displays currently selected devices.", s => { Console.WriteLine ("Output: " + ((PlaybackProvider.Device != null) ? PlaybackProvider.Device. ToString() : "None"));
+							                                                             	Console.WriteLine ("Input: " + ((CaptureProvider.Device !=null) ? CaptureProvider.Device. ToString() : "None")); } },
 							{ "d|devices",	"Displays the output and input devices to choose from.",	s => DisplayDevices() },
 							{ "i:|input:",	"Selects an input device. (Default if not specified.)",		i => input = i ?? String.Empty },
 							{ "o:|output:",	"Selects an output device. (Default if not specified.)",	o => output = o ?? String.Empty }
@@ -206,7 +228,7 @@ namespace Gablarski.Clients.CLI
 									SelectPlayback (device, Console.Out);
 							}
 							else
-								SelectPlayback (playbackProvider.DefaultDevice, Console.Out);
+								SelectPlayback (PlaybackProvider.DefaultDevice, Console.Out);
 						}
 
 						if (input != null)
@@ -221,7 +243,7 @@ namespace Gablarski.Clients.CLI
 									SelectCapture (device, Console.Out);
 							}
 							else
-								SelectCapture (captureProvider.DefaultDevice, Console.Out);
+								SelectCapture (CaptureProvider.DefaultDevice, Console.Out);
 						}
 
 						break;
@@ -250,22 +272,22 @@ namespace Gablarski.Clients.CLI
 								voiceActivation.Talking -= va_Talking;
 								voiceActivation = null;
 							}
-							else if (captureProvider.IsCapturing)
-								captureProvider.EndCapture();
+							else if (CaptureProvider.IsCapturing)
+								CaptureProvider.EndCapture();
 						}
 						else
 						{
 							ClientAudioSource source;
 
-							lock (sources)
+							lock (Sources)
 							{
-								if (sources.Count == 0)
+								if (Sources.Count == 0)
 								{
-									Console.WriteLine ("No sources to capture to.");
+									Console.WriteLine ("No Sources to capture to.");
 									break;
 								}
 
-								//source = (sourceId != 0) ? sources.OfType<ClientAudioSource>().FirstOrDefault (s => s.Id == sourceId) : sources.OfType<ClientAudioSource>().First();
+								//source = (sourceId != 0) ? Sources.OfType<ClientAudioSource>().FirstOrDefault (s => s.Id == sourceId) : Sources.OfType<ClientAudioSource>().First();
 								source = captureSource;
 							}
 
@@ -275,23 +297,23 @@ namespace Gablarski.Clients.CLI
 							{
 								if (useVoiceActivation)
 								{
-									voiceActivation = new VoiceActivation (captureProvider, captureSource);
+									voiceActivation = new VoiceActivation (CaptureProvider, captureSource);
 									voiceActivation.Talking += va_Talking;
 									voiceActivation.Listen ((Int16.MaxValue) / 2);
 								}
 								else
 								{
-									captureProvider.SamplesAvailable += OnSamplesAvailable;
-									if (!captureProvider.IsCapturing)
-										captureProvider.StartCapture();
+									CaptureProvider.SamplesAvailable += OnSamplesAvailable;
+									if (!CaptureProvider.IsCapturing)
+										CaptureProvider.StartCapture();
 								}
 
 								//if (captureSource == null)
-								//    captureProvider.SamplesAvailable += OnSamplesAvailable;
+								//    CaptureProvider.SamplesAvailable += OnSamplesAvailable;
 
 								//captureSource = source;
-								//if (!captureProvider.IsCapturing)
-								//    captureProvider.StartCapture();
+								//if (!CaptureProvider.IsCapturing)
+								//    CaptureProvider.StartCapture();
 							}
 						}
 
@@ -306,53 +328,53 @@ namespace Gablarski.Clients.CLI
 
 		static void va_Talking (object sender, TalkingEventArgs e)
 		{
-			captureSource.SendAudioData (e.Samples, client.CurrentUser.CurrentChannelId);
+			captureSource.SendAudioData (e.Samples, Client.CurrentUser.CurrentChannelId);
 		}
 
 		static void SourcesReceivedAudio (object sender, ReceivedAudioEventArgs e)
 		{
-			playbackProvider.QueuePlayback (e.Source, e.AudioData);
+			PlaybackProvider.QueuePlayback (e.Source, e.AudioData);
 		}
 
 		static void OnSamplesAvailable (object sender, SamplesAvailableEventArgs e)
 		{
 			if (captureSource != null)
-				captureSource.SendAudioData (captureProvider.ReadSamples (captureSource.FrameSize), client.Users.Current.CurrentChannelId);
+				captureSource.SendAudioData (CaptureProvider.ReadSamples (captureSource.FrameSize), Client.Users.Current.CurrentChannelId);
 		}
 
 		static void ListSources (TextWriter writer)
 		{
-			lock (sources)
+			lock (Sources)
 			{
-				foreach (var source in sources)
+				foreach (var source in Sources)
 					writer.WriteLine (source.GetType().Name + ": " + source.Id + " Bitrate: " + source.Bitrate);
 			}
 		}
 		
 		static void SourcesReceivedSource (object sender, ReceivedSourceEventArgs e)
 		{
-			if (!e.Source.OwnerId.Equals (client.CurrentUser.UserId))
+			if (!e.Source.OwnerId.Equals (Client.CurrentUser.UserId))
 				return;
 
 			Console.WriteLine ("Received own source. Name: " + e.Source.Name + " Id: " + e.Source.Id + " Owner: " + e.Source.OwnerId + " Bitrate: " + e.Source.Bitrate);
 
 			captureSource = (ClientAudioSource)e.Source;
 
-			lock (sources)
+			lock (Sources)
 			{
-				sources.Add (e.Source);
+				Sources.Add (e.Source);
 			}
 		}
 
 		static void SelectCapture (IDevice device, TextWriter writer)
 		{
-			captureProvider.Device = device;
-			writer.WriteLine (captureProvider.Device + " selected.");
+			CaptureProvider.Device = device;
+			writer.WriteLine (CaptureProvider.Device + " selected.");
 		}
 
 		static void SelectPlayback (IDevice device, TextWriter writer)
 		{
-			playbackProvider.Device = device;
+			PlaybackProvider.Device = device;
 			writer.WriteLine (device + " selected.");
 		}
 
@@ -424,7 +446,7 @@ namespace Gablarski.Clients.CLI
 				Console.WriteLine ("Login failed: " + e.Result.ResultState);
 
 			if (voiceSource)
-				client.Sources.Request ("voice", 1);
+				Client.Sources.Request ("voice", 1);
 		}
 
 		static void ClientConnectionRejected (object sender, RejectedConnectionEventArgs e)
@@ -435,8 +457,8 @@ namespace Gablarski.Clients.CLI
 		static void ClientConnected (object sender, EventArgs e)
 		{
 			Console.WriteLine ("Connected.");
-			client.CurrentUser.ReceivedLoginResult += CurrentUserReceivedLoginResult;
-			client.CurrentUser.Login (nickname, username, password);
+			Client.CurrentUser.ReceivedLoginResult += CurrentUserReceivedLoginResult;
+			Client.CurrentUser.Login (nickname, username, password);
 		}
 	}
 }
