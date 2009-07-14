@@ -153,6 +153,8 @@ namespace Gablarski.Network
 				#endif
 
 				TcpClient client = listener.AcceptTcpClient();
+				client.NoDelay = true;
+				client.LingerState = new LingerOption (false, 0);
 				var stream = client.GetStream();
 				var tendpoint = (IPEndPoint)client.Client.RemoteEndPoint;
 				var socket = new Socket (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);

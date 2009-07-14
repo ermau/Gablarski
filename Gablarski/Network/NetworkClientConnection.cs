@@ -62,15 +62,30 @@ namespace Gablarski.Network
 		{
 			this.running = false;
 
-			if (this.tcp != null)
-				this.tcp.Close();
-			
-			if (this.udp != null)
-				this.udp.Close();
+			try
+			{
+				if (this.tcp != null)
+				{
+					this.rstream.Close();
+					this.tcp.Close();
+				}
+
+				if (this.udp != null)
+					this.udp.Close();
+			}
+			catch (Exception)
+			{
+			}
+
+			lock (this.sendQueue)
+			{
+				this.sendQueue.Clear();
+			}
 
 			if (this.runnerThread != null)
 				this.runnerThread.Join();
 
+			this.runnerThread = null;
 			this.tcp = null;
 			this.udp = null;
 			
@@ -79,6 +94,8 @@ namespace Gablarski.Network
 			this.ureader = null;
 			this.uwriter = null;
 			this.rstream = null;
+
+			OnDisconnected();
 		}
 
 		#endregion
@@ -123,7 +140,7 @@ namespace Gablarski.Network
 		private Thread runnerThread;
 
 		private TcpClient tcp;
-		private Stream rstream;
+		private NetworkStream rstream;
 		private IValueWriter rwriter;
 		private IValueReader rreader;
 		private volatile bool rwaiting;
@@ -211,6 +228,13 @@ namespace Gablarski.Network
 			var received = this.MessageReceived;
 			if (received != null)
 				received (this, e);
+		}
+
+		private void OnDisconnected()
+		{
+			var dced = this.Disconnected;
+			if (dced != null)
+				dced (this, new ConnectionEventArgs (this));
 		}
 
 		private void ReliableReceived (IAsyncResult ar)

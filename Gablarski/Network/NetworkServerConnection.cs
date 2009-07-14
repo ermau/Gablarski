@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
 using Gablarski.Messages;
 
@@ -75,6 +74,8 @@ namespace Gablarski.Network
 			this.tcp.Close();
 
 			this.runnerThread.Join();
+
+			OnDisconnected();
 		}
 
 		#endregion
@@ -84,7 +85,7 @@ namespace Gablarski.Network
 		private readonly IValueWriter uwriter;
 
 		private readonly TcpClient tcp;
-		private readonly Stream stream;
+		private readonly NetworkStream stream;
 		private readonly IValueReader reader;
 		private readonly IValueWriter writer;
 
@@ -125,22 +126,40 @@ namespace Gablarski.Network
 
 				if (toSend != null)
 				{
-					IValueWriter iwriter = (!toSend.Reliable) ? urWriter : rWriter;
-					iwriter.WriteByte (42);
-					iwriter.WriteUInt16 (toSend.MessageTypeCode);
+					try
+					{
+						IValueWriter iwriter = (!toSend.Reliable) ? urWriter : rWriter;
+						iwriter.WriteByte (42);
+						iwriter.WriteUInt16 (toSend.MessageTypeCode);
 
-					toSend.WritePayload (iwriter, this.IdentifyingTypes);
-					iwriter.Flush();
+						toSend.WritePayload (iwriter, this.IdentifyingTypes);
+						iwriter.Flush();
+					}
+					catch (Exception ex)
+					{
+						Trace.WriteLine ("[Server] Error writing, disconnecting: " + ex.Message);
+						this.Disconnect();
+						return;
+					}
 				}
 
 				if (!this.waiting)
 				{
-					this.waiting = true;
-					byte[] mbuffer = new byte[1];
-
 					try
 					{
-						this.stream.BeginRead (mbuffer, 0, 1, this.Received, mbuffer);
+						if (this.stream.DataAvailable)
+						{
+							this.waiting = true;
+							byte[] mbuffer = new byte[1];
+
+							this.stream.BeginRead (mbuffer, 0, 1, this.Received, mbuffer);
+						}
+						else if (!this.tcp.Connected)
+						{
+							Trace.WriteLine ("[Server] Client disconnected.");
+							this.Disconnect();
+							return;
+						}
 					}
 					catch (SocketException sex)
 					{
@@ -165,6 +184,13 @@ namespace Gablarski.Network
 			var received = this.MessageReceived;
 			if (received != null)
 				received (this, e);
+		}
+
+		private void OnDisconnected()
+		{
+			var dced = this.Disconnected;
+			if (dced != null)
+				dced (this, new ConnectionEventArgs (this));
 		}
 
 		private void Received (IAsyncResult ar)
