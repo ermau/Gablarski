@@ -147,23 +147,24 @@ namespace Gablarski.Network
 				{
 					try
 					{
-						if (this.stream.DataAvailable)
-						{
-							this.waiting = true;
-							byte[] mbuffer = new byte[1];
-
-							this.stream.BeginRead (mbuffer, 0, 1, this.Received, mbuffer);
-						}
-						else if (!this.tcp.Connected)
+						if (!this.tcp.Connected)
 						{
 							Trace.WriteLine ("[Server] Client disconnected.");
 							this.Disconnect();
 							return;
 						}
+						
+						//if (this.stream.DataAvailable)
+						//{
+							this.waiting = true;
+							byte[] mbuffer = new byte[1];
+
+							this.stream.BeginRead (mbuffer, 0, 1, this.Received, mbuffer);
+						//}
 					}
-					catch (SocketException sex)
+					catch (Exception ex)
 					{
-						Trace.WriteLine ("[Server] Error starting read, disconnecting: " + sex.Message);
+						Trace.WriteLine ("[Server] Error starting read, disconnecting: " + ex.Message);
 						this.Disconnect();
 						return;
 					}
@@ -197,7 +198,9 @@ namespace Gablarski.Network
 		{
 			try
 			{
-				this.stream.EndRead (ar);
+				if (this.stream.EndRead (ar) == 0)
+					this.Disconnect();
+
 				byte[] mbuffer = (ar.AsyncState as byte[]);
 
 				if (mbuffer[0] != 0x2A)

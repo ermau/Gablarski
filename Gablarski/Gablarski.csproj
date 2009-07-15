@@ -76,7 +76,6 @@
     <Compile Include="Network\NetworkClientConnection.cs" />
     <Compile Include="Network\NetworkServerConnection.cs" />
     <Compile Include="Network\NetworkServerConnectionProvider.cs" />
-    <Compile Include="Network\SocketValueWriter.cs" />
     <Compile Include="Channel.cs" />
     <Compile Include="Client\ClientChannelManager.cs" />
     <Compile Include="Client\GablarskiClient.cs" />
@@ -115,6 +114,7 @@
     <Compile Include="ModuleLoader.cs" />
     <Compile Include="MutableLookup.cs" />
     <Compile Include="ByteArrayExtensions.cs" />
+    <Compile Include="Network\SocketValueWriter.cs" />
     <Compile Include="UserInfo.cs" />
     <Compile Include="ProviderUtils.cs" />
     <Compile Include="ServerInfo.cs" />
@@ -143,9 +143,6 @@
     <Compile Include="StreamValueWriter.cs" />
     <Compile Include="Client\GablarskiClient.Internal.cs" />
     <Compile Include="Messages\UserDisconnectedMessage.cs" />
-    <Compile Include="Server\ConnectionProviderBase.cs" />
-    <Compile Include="Server\Telnet\TelnetConnection.cs" />
-    <Compile Include="Server\Telnet\TelnetConnectionProvider.cs" />
     <Compile Include="Client\ClientAudioSource.cs" />
     <Compile Include="Client\ClientUser.cs" />
     <Compile Include="Client\ClientUserManager.cs" />
