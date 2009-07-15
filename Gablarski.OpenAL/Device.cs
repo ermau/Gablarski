@@ -32,6 +32,19 @@ namespace Gablarski.OpenAL
 			get { return (this.Handle != IntPtr.Zero); }
 		}
 
+		/// <summary>
+		/// Gets the refresh rate of the device.
+		/// </summary>
+		public int Refresh
+		{
+			get
+			{
+				int refresh;
+				OpenAL.alcGetIntegerv (this.Handle, ALCEnum.ALC_REFRESH, 1, out refresh);
+				return refresh;
+			}
+		}
+
 		public override string ToString ()
 		{
 			return this.Name;

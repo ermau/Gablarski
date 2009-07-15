@@ -322,24 +322,24 @@ namespace Gablarski.OpenAL
 				return;
 
 			int err = alGetError ();
-			switch ((OpenALError)err)
+			switch ((ALError)err)
 			{
-				case OpenALError.AL_NO_ERROR:
+				case ALError.AL_NO_ERROR:
 					return;
 
-				case OpenALError.AL_OUT_OF_MEMORY:
-					throw new OutOfMemoryException ();
+				case ALError.AL_OUT_OF_MEMORY:
+					throw new OutOfMemoryException ("OpenAL (AL) out of memory.");
 
-				case OpenALError.AL_INVALID_ENUM:
-					throw new ArgumentException ("Invalid Enum");
+				case ALError.AL_INVALID_ENUM:
+					throw new ArgumentException ("Invalid enum");
 
-				case OpenALError.AL_INVALID_NAME:
-					throw new ArgumentException ("Invalid Name");
+				case ALError.AL_INVALID_NAME:
+					throw new ArgumentException ("Invalid name");
 
-				case OpenALError.AL_INVALID_VALUE:
-					throw new ArgumentException ("Invalid Value");
+				case ALError.AL_INVALID_VALUE:
+					throw new ArgumentException ("Invalid value");
 
-				case OpenALError.AL_INVALID_OPERATION:
+				case ALError.AL_INVALID_OPERATION:
 					throw new InvalidOperationException ();
 			}
 		}
@@ -348,13 +348,25 @@ namespace Gablarski.OpenAL
 		internal static void ErrorCheck (Device device)
 		{
 			int error = alcGetError (device.Handle);
-			switch ((OpenALError)error)
+			switch ((ALCError)error)
 			{
-				case OpenALError.AL_NO_ERROR:
+				case ALCError.ALC_NO_ERROR:
 					return;
 
-				default:
-					throw new Exception();
+				case ALCError.ALC_INVALID_ENUM:
+					throw new ArgumentException ("Invalid enum");
+
+				case ALCError.ALC_INVALID_VALUE:
+					throw new ArgumentException ("Invalid value");
+
+				case ALCError.ALC_INVALID_CONTEXT:
+					throw new ArgumentException ("Invalid context");
+
+				case ALCError.ALC_INVALID_DEVICE:
+					throw new ArgumentException ("Invalid device");
+
+				case ALCError.ALC_OUT_OF_MEMORY:
+					throw new OutOfMemoryException ("OpenAL (ALC) out of memory.");
 			}
 		}
 
@@ -370,7 +382,7 @@ namespace Gablarski.OpenAL
 	}
 
 	// ReSharper disable InconsistentNaming
-	internal enum OpenALError
+	internal enum ALError
 	{
 		AL_NO_ERROR = 0,
 		AL_INVALID_NAME = 0xA001,
@@ -380,13 +392,28 @@ namespace Gablarski.OpenAL
 		AL_OUT_OF_MEMORY = 0xA005,
 	}
 
+	internal enum ALCError
+	{
+		ALC_NO_ERROR		= 0,
+		ALC_INVALID_DEVICE	= 0xA001,
+		ALC_INVALID_CONTEXT	= 0xA002,
+		ALC_INVALID_ENUM	= 0xA003,
+		ALC_INVALID_VALUE	= 0xA004,
+		ALC_OUT_OF_MEMORY	= 0xA005
+	}
+
 	internal enum ALCEnum
 	{
 		ALC_MAJOR_VERSION	= 0x1000,
 		ALC_MINOR_VERSION	= 0x1001,
 		ALC_ATTRIBUTES_SIZE	= 0x1002,
 		ALC_ALL_ATTRIBUTES	= 0x1003,
-		ALC_CAPTURE_SAMPLES	= 0x312
+		ALC_CAPTURE_SAMPLES	= 0x312,
+		ALC_FREQUENCY		= 0x1007,
+		ALC_REFRESH			= 0x1008,
+		ALC_SYNC			= 0x1009,
+		ALC_MONO_SOURCES	= 0x1010,
+		ALC_STEREO_SOURCES	= 0x1011,
 	}
 	// ReSharper restore InconsistentNaming
 
