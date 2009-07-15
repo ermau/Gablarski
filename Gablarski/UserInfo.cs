@@ -11,7 +11,7 @@ namespace Gablarski
 		{
 		}
 
-		internal UserInfo (string nickname, object userId, object currentChannelId)
+		internal UserInfo (string nickname, string username, object userId, object currentChannelId)
 		{
 			if (nickname.IsEmpty())
 				throw new ArgumentNullException ("nickname");
@@ -21,6 +21,7 @@ namespace Gablarski
 				throw new ArgumentNullException("currentChannelId");
 
 			this.Nickname = nickname;
+			this.Username = (username.IsEmpty()) ? nickname : username;
 			this.UserId = userId;
 			this.CurrentChannelId = currentChannelId;
 		}
@@ -33,6 +34,12 @@ namespace Gablarski
 				throw new ArgumentNullException("idTypes");
 
 			this.Deserialize (reader, idTypes);
+		}
+
+		public virtual string Username
+		{
+			get;
+			protected set;
 		}
 
 		public virtual string Nickname
@@ -56,6 +63,7 @@ namespace Gablarski
 		internal void Serialize (IValueWriter writer, IdentifyingTypes idTypes)
 		{
 			idTypes.WriteUser (writer, this.UserId);
+			writer.WriteString (this.Username);
 			idTypes.WriteChannel (writer, this.CurrentChannelId);
 			writer.WriteString (this.Nickname);
 		}
@@ -63,6 +71,7 @@ namespace Gablarski
 		internal void Deserialize (IValueReader reader, IdentifyingTypes idTypes)
 		{
 			this.UserId = idTypes.ReadUser (reader);
+			this.Username = reader.ReadString();
 			this.CurrentChannelId = idTypes.ReadChannel (reader);
 			this.Nickname = reader.ReadString();			
 		}

@@ -200,7 +200,7 @@ namespace Gablarski.Server
 
 			if (result.Succeeded)
 			{
-				info = new UserInfo (login.Nickname, result.UserId, this.defaultChannel.ChannelId);
+				info = new UserInfo (login.Nickname, (login.Username.IsEmpty()) ? login.Nickname : login.Username, result.UserId, this.defaultChannel.ChannelId);
 
 				if (!this.GetPermission (PermissionName.Login, info))
 					result.ResultState = LoginResultState.FailedPermissions;

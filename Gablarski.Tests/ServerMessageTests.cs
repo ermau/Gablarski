@@ -47,7 +47,7 @@ namespace Gablarski.Tests
 		{
 			LoginResultState state = LoginResultState.Success;
 
-			var msg = new LoginResultMessage (new LoginResult (UserId, state), new UserInfo (Nickname, UserId, ChannelId));
+			var msg = new LoginResultMessage (new LoginResult (UserId, state), new UserInfo (Nickname, null, UserId, ChannelId));
 
 			Assert.AreEqual (UserId, msg.Result.UserId);
 			Assert.AreEqual (state, msg.Result.ResultState);
@@ -128,8 +128,8 @@ namespace Gablarski.Tests
 		{
 			List<UserInfo> users = new List<UserInfo>
 			{
-				new UserInfo (Nickname, UserId, ChannelId),
-				new UserInfo (Nickname2, UserId2, ChannelId2)
+				new UserInfo (Nickname, null, UserId, ChannelId),
+				new UserInfo (Nickname2, null, UserId2, ChannelId2)
 			};
 
 			var msg = new UserListMessage (users);
@@ -203,7 +203,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void UserLoggedIn()
 		{
-			var info = new UserInfo (Nickname, UserId, ChannelId);
+			var info = new UserInfo (Nickname, null, UserId, ChannelId);
 			var msg = new UserLoggedInMessage (info);
 			msg.WritePayload (writer, types);
 			long length = stream.Position;

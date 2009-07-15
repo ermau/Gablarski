@@ -33,6 +33,9 @@ namespace Gablarski.Tests
 			this.settings = null;
 		}
 
+		private const string Username = "Bar";
+		private const string Nickname = "Foo";
+
 		private IUserProvider users;
 		private IChannelProvider channels;
 		private ServerSettings settings;
@@ -40,28 +43,41 @@ namespace Gablarski.Tests
 		private GablarskiServer server;
 		private MockConnectionProvider provider;
 
+		private MockServerConnection Login (string username, string nickname)
+		{
+			UserInfo user;
+			return Login (username, nickname, out user);
+		}
+
 		private MockServerConnection Login (string nickname)
 		{
 			UserInfo user;
-			return Login (nickname, out user);
+			return Login (null, nickname, out user);
 		}
 
 		private MockServerConnection Login (string nickname, out UserInfo user)
+		{
+			return Login (null, nickname, out user);
+		}
+
+		private MockServerConnection Login (string username, string nickname, out UserInfo user)
 		{
 			var connection = provider.EstablishConnection (this.server.IdentifyingTypes);
 			connection.Client.Send (new ConnectMessage (GablarskiServer.MinimumApiVersion));
 			connection.Client.DequeueAndAssertMessage<ServerInfoMessage>();
 
-			connection.Client.Send (new LoginMessage { Nickname = nickname, Username = null, Password = null });
+			connection.Client.Send (new LoginMessage { Nickname = nickname, Username = username, Password = (username.IsEmpty()) ? null : "password" });
 			var message = connection.Client.DequeueAndAssertMessage<LoginResultMessage>();
 
 			Assert.IsTrue (message.Result.Succeeded);
 			Assert.AreEqual (nickname, message.UserInfo.Nickname);
+			Assert.AreEqual ((username.IsEmpty() ? nickname : username), message.UserInfo.Username);
 
 			var login = connection.Client.DequeueAndAssertMessage<UserLoggedInMessage>();
 			user = login.UserInfo;
 			Assert.AreEqual (nickname, login.UserInfo.Nickname);
 			Assert.AreEqual (message.Result.UserId, login.UserInfo.UserId);
+			Assert.AreEqual (message.UserInfo.Username, login.UserInfo.Username);
 			Assert.AreEqual (message.UserInfo.UserId, login.UserInfo.UserId);
 			Assert.AreEqual (message.UserInfo.CurrentChannelId, login.UserInfo.CurrentChannelId);
 
@@ -132,13 +148,13 @@ namespace Gablarski.Tests
 		[Test]
 		public void GuestLogin ()
 		{
-			Login ("Foo");
+			Login (Nickname);
 		}
 
 		[Test]
 		public void NicknameInUse ()
 		{
-			var connection = Login ("Foo");
+			var connection = Login (Username, Nickname);
 
 			connection.Client.Send (new LoginMessage { Nickname = "Foo", Username = null, Password = null });
 			MessageBase message = connection.Client.DequeueMessage ();
@@ -153,8 +169,8 @@ namespace Gablarski.Tests
 		public void UserDisconnected()
 		{
 			UserInfo foo;
-			var fooc = Login ("Foo", out foo);
-			var barc = Login ("Bar");
+			var fooc = Login (Nickname, out foo);
+			var barc = Login (Username);
 
 			fooc.Disconnect();
 

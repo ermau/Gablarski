@@ -10,9 +10,10 @@ namespace Gablarski.Tests
 	[TestFixture]
 	public class UserInfoTests
 	{
-		private const string nickname = "Foo";
-		private const int userid = 1;
-		private const int chanid = 2;
+		private const string Username = "Bar";
+		private const string Nickname = "Foo";
+		private const int UserId = 1;
+		private const int ChanId = 2;
 
 		[Test]
 		public void InvalidCtor()
@@ -20,19 +21,27 @@ namespace Gablarski.Tests
 			Assert.Throws<ArgumentNullException> (() => new UserInfo (null, new IdentifyingTypes (typeof (Int32), typeof (Int32))));
 			Assert.Throws<ArgumentNullException> (() => new UserInfo (new StreamValueReader (new MemoryStream()), null));
 
-			Assert.Throws<ArgumentNullException> (() => new UserInfo (null, userid, chanid));
-			Assert.Throws<ArgumentNullException> (() => new UserInfo (nickname, null, chanid));
-			Assert.Throws<ArgumentNullException> (() => new UserInfo (nickname, userid, null));
+			Assert.Throws<ArgumentNullException> (() => new UserInfo (null, null, UserId, ChanId));
+			Assert.Throws<ArgumentNullException> (() => new UserInfo (Nickname, null, null, ChanId));
+			Assert.Throws<ArgumentNullException> (() => new UserInfo (Nickname, null, UserId, null));
 		}
 
 		[Test]
 		public void Ctor()
 		{
-			var info = new UserInfo (nickname, userid, chanid);
+			var info = new UserInfo (Nickname, null, UserId, ChanId);
 
-			Assert.AreEqual (userid, info.UserId);
-			Assert.AreEqual (chanid, info.CurrentChannelId);
-			Assert.AreEqual (nickname, info.Nickname);
+			Assert.AreEqual (UserId, info.UserId);
+			Assert.AreEqual (ChanId, info.CurrentChannelId);
+			Assert.AreEqual (Nickname, info.Nickname);
+			Assert.AreEqual (Nickname, info.Username);
+
+			info = new UserInfo (Nickname, Username, UserId, ChanId);
+
+			Assert.AreEqual (UserId, info.UserId);
+			Assert.AreEqual (ChanId, info.CurrentChannelId);
+			Assert.AreEqual (Nickname, info.Nickname);
+			Assert.AreEqual (Username, info.Username);
 		}
 
 		[Test]
@@ -43,16 +52,16 @@ namespace Gablarski.Tests
 			var reader = new StreamValueReader (stream);
 			var types = new IdentifyingTypes (typeof (Int32), typeof (Int32));
 
-			var info = new UserInfo (nickname, userid, chanid);
+			var info = new UserInfo (Nickname, null, UserId, ChanId);
 			info.Serialize (writer, types);
 			long length = stream.Position;
 			stream.Position = 0;
 
 			info = new UserInfo (reader, types);
 			Assert.AreEqual (length, stream.Position);
-			Assert.AreEqual (userid, info.UserId);
-			Assert.AreEqual (chanid, info.CurrentChannelId);
-			Assert.AreEqual (nickname, info.Nickname);
+			Assert.AreEqual (UserId, info.UserId);
+			Assert.AreEqual (ChanId, info.CurrentChannelId);
+			Assert.AreEqual (Nickname, info.Nickname);
 		}
 
 		[Test]
@@ -66,8 +75,8 @@ namespace Gablarski.Tests
 		[Test]
 		public void Equals()
 		{
-			UserInfo foo = new UserInfo ("foo", 1, 2);
-			UserInfo bar = new UserInfo ("foo", 1, 2);
+			UserInfo foo = new UserInfo ("foo", null, 1, 2);
+			UserInfo bar = new UserInfo ("foo", null, 1, 2);
 
 			Assert.AreEqual (foo, bar);
 		}
@@ -75,8 +84,8 @@ namespace Gablarski.Tests
 		[Test]
 		public void HashCode()
 		{
-			UserInfo foo = new UserInfo ("foo", 1, 2);
-			UserInfo bar = new UserInfo ("foo", 1, 2);
+			UserInfo foo = new UserInfo ("foo", null, 1, 2);
+			UserInfo bar = new UserInfo ("foo", null, 1, 2);
 
 			Assert.AreEqual (foo.GetHashCode(), bar.GetHashCode());
 		}
