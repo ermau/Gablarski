@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Gablarski.Client;
 using Gablarski.Clients.Windows.Properties;
 
 namespace Gablarski.Clients.Windows
@@ -21,10 +23,17 @@ namespace Gablarski.Clients.Windows
 			};
 
 			this.ImageList.Images.Add ("server",	Resources.ServerImage);
-			this.ImageList.Images.Add ("channel",	Resources.UsersImage);
+			this.ImageList.Images.Add ("channel",	Resources.ChannelImage);
 			this.ImageList.Images.Add ("silent",	Resources.SoundNoneImage);
 			this.ImageList.Images.Add ("talking",	Resources.SoundImage);
 			this.ImageList.Images.Add ("music",		Resources.MusicImage);
+
+			InitMenus();
+		}
+
+		public GablarskiClient Client
+		{
+			get; set;
 		}
 
 		public void SetServerNode (TreeNode node)
@@ -53,7 +62,7 @@ namespace Gablarski.Clients.Windows
 				this.BeginInvoke ((Action<Channel, IdentifyingTypes>)this.AddChannel, channel, idTypes);
 				return;
 			}
-			
+
 			var parent = this.serverNode.Nodes;
 			if (!Channel.IsDefault (channel.ParentChannelId, idTypes))
 			{
@@ -63,8 +72,10 @@ namespace Gablarski.Clients.Windows
 			}
 
 			var node = parent.Add (channel.ChannelId.ToString(), channel.Name);
+			node.Tag = channel;
 			node.ImageKey = "channel";
 			node.SelectedImageKey = "channel";
+			node.ContextMenuStrip = channelMenu;
 			this.channelNodes.Add (channel, node);
 		}
 
@@ -83,6 +94,7 @@ namespace Gablarski.Clients.Windows
 			var node = channelPair.Value.Nodes.Add (user.Nickname);
 			node.ImageKey = "silent";
 			node.SelectedImageKey = "silent";
+			node.ContextMenuStrip = userMenu;
 			this.userNodes[user] = node;
 
 			node.Parent.Expand();
@@ -183,6 +195,13 @@ namespace Gablarski.Clients.Windows
 		private readonly Dictionary<Channel, TreeNode> channelNodes = new Dictionary<Channel, TreeNode>();
 		private readonly Dictionary<UserInfo, TreeNode> userNodes = new Dictionary<UserInfo, TreeNode>();
 
+		protected override void OnNodeMouseClick (TreeNodeMouseClickEventArgs e)
+		{
+			this.SelectedNode = e.Node;
+
+			base.OnNodeMouseClick (e);
+		}
+
 		private void AddChannels (IdentifyingTypes idTypes, IEnumerable<Channel> channels, Channel parent)
 		{
 			foreach (var c in channels.Where (c => c.ParentChannelId.Equals (parent.ChannelId)))
@@ -190,6 +209,53 @@ namespace Gablarski.Clients.Windows
 				this.AddChannel (c, idTypes);
 				this.AddChannels (idTypes, channels, c);
 			}
+		}
+
+		private void ContextDeleteChannelClick (object sender, EventArgs e)
+		{
+			Client.Channels.Delete (this.SelectedNode.Tag as Channel);
+		}
+
+		private void ContextEditChannelClick (object sender, EventArgs e)
+		{
+			ChannelForm editChannel = new ChannelForm (this.SelectedNode.Tag as Channel);
+			if (editChannel.ShowDialog() == DialogResult.OK)
+				Client.Channels.Update (editChannel.Channel);
+		}
+
+		private void ContextAddChannelClick (object sender, EventArgs e)
+		{
+			ChannelForm addChannel = new ChannelForm ();
+			if (addChannel.ShowDialog() == DialogResult.OK)
+				Client.Channels.Create (addChannel.Channel);
+		}
+
+		private ContextMenuStrip channelMenu;
+		private ContextMenuStrip userMenu;
+		
+		private readonly ToolStripMenuItem contextAddChannel = new ToolStripMenuItem ("Add Channel", Resources.ChannelAddImage);
+		private readonly ToolStripMenuItem contextEditChannel = new ToolStripMenuItem ("Edit Channel", Resources.ChannelEditImage);
+		private readonly ToolStripMenuItem contextDeleteChannel = new ToolStripMenuItem ("Delete Channel", Resources.ChannelDeleteImage);
+
+		private void InitMenus()
+		{
+			if (channelMenu != null)
+				return;
+
+			this.ContextMenuStrip = new ContextMenuStrip();
+			this.ContextMenuStrip.Items.Add (contextAddChannel);
+
+			contextAddChannel.Click += ContextAddChannelClick;
+			contextEditChannel.Click += ContextEditChannelClick;
+			contextDeleteChannel.Click += ContextDeleteChannelClick;
+
+			channelMenu = new ContextMenuStrip();
+
+			channelMenu.Items.Add (contextAddChannel);
+			channelMenu.Items.Add (contextEditChannel);
+			channelMenu.Items.Add (contextDeleteChannel);
+
+			userMenu = new ContextMenuStrip();
 		}
 	}
 }

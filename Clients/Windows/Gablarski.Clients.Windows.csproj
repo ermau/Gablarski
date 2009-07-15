@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{043E20A2-310D-41C0-94BC-766E3BAACAFB}</ProjectGuid>
     <OutputType>WinExe</OutputType>
@@ -94,6 +94,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AvatarCache.cs" />
+    <Compile Include="ChannelForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ChannelForm.Designer.cs">
+      <DependentUpon>ChannelForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Entities\ServerEntry.cs" />
     <Compile Include="Entities\SettingEntry.cs" />
     <Compile Include="Extensions.cs" />
@@ -117,6 +123,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="ChannelForm.resx">
+      <DependentUpon>ChannelForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="LoginForm.resx">
       <DependentUpon>LoginForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -394,8 +403,12 @@
     <Page Include="Windows\Shell\Controls\CommandLinkWPF.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Windows\Shell\ExplorerBrowser\ExplorerBrowser.WPF.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -439,6 +452,15 @@
     <None Include="XTaskDlg.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\group_add.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\group_delete.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\group_edit.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

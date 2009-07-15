@@ -269,7 +269,7 @@ namespace Gablarski.Clients.CLI
 							if (voiceActivation != null)
 							{
 								voiceActivation.StopListening();
-								voiceActivation.Talking -= va_Talking;
+								voiceActivation.Talking -= VaTalking;
 								voiceActivation = null;
 							}
 							else if (CaptureProvider.IsCapturing)
@@ -298,7 +298,7 @@ namespace Gablarski.Clients.CLI
 								if (useVoiceActivation)
 								{
 									voiceActivation = new VoiceActivation (CaptureProvider, captureSource);
-									voiceActivation.Talking += va_Talking;
+									voiceActivation.Talking += VaTalking;
 									voiceActivation.Listen ((Int16.MaxValue) / 2);
 								}
 								else
@@ -326,7 +326,7 @@ namespace Gablarski.Clients.CLI
 			}
 		}
 
-		static void va_Talking (object sender, TalkingEventArgs e)
+		static void VaTalking (object sender, TalkingEventArgs e)
 		{
 			captureSource.SendAudioData (e.Samples, Client.CurrentUser.CurrentChannelId);
 		}
@@ -385,6 +385,7 @@ namespace Gablarski.Clients.CLI
 			{
 				writer.WriteLine ("requestsource: Requests an AudioSource.");
 				writer.WriteLine ("select: Selects an input and/or an output device.");
+				writer.WriteLine ("capture: Starts or stops capturing audio.");
 			}
 		}
 

@@ -1,17 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Windows.Forms;
-using FluentNHibernate.Cfg;
-using FluentNHibernate.Cfg.Db;
-using Gablarski.Clients.Windows.Entities;
 using Kennedy.ManagedHooks;
 using Microsoft.WindowsAPICodePack;
-using NHibernate;
-using NHibernate.Cfg;
-using NHibernate.Tool.hbm2ddl;
 
 namespace Gablarski.Clients.Windows
 {

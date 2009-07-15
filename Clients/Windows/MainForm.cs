@@ -1,16 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using System.Windows.Input;
 using Gablarski.Client;
 using Gablarski.Clients.Windows.Entities;
 using Gablarski.Clients.Windows.Properties;
-using Gablarski.Media.Sources;
 using Gablarski.Messages;
 using Gablarski.Network;
 using Kennedy.ManagedHooks;
@@ -41,6 +35,8 @@ namespace Gablarski.Clients.Windows
 			Settings.SettingChanged += SettingsSettingChanged;
 
 			this.InitializeComponent ();
+
+			this.users.Client = this.gablarski;
 		}
 
 		private const string VoiceName = "voice";
@@ -49,7 +45,6 @@ namespace Gablarski.Clients.Windows
 		private IPlaybackProvider playback;
 		private ICaptureProvider voiceCapture;
 		private ClientAudioSource voiceSource;
-		private TreeNode serverNode;
 
 		private void MainForm_Load (object sender, EventArgs e)
 		{
