@@ -202,6 +202,15 @@ namespace Gablarski.Clients.Windows
 			base.OnNodeMouseClick (e);
 		}
 
+		protected override void OnNodeMouseDoubleClick (TreeNodeMouseClickEventArgs e)
+		{
+			Channel channel = this.SelectedNode.Tag as Channel;
+			if (e.Button != MouseButtons.Left || channel == null)
+				base.OnNodeMouseDoubleClick (e);
+
+			Client.CurrentUser.Move (channel);
+		}
+
 		private void AddChannels (IdentifyingTypes idTypes, IEnumerable<Channel> channels, Channel parent)
 		{
 			foreach (var c in channels.Where (c => c.ParentChannelId.Equals (parent.ChannelId)))

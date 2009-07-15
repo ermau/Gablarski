@@ -10,6 +10,7 @@ namespace Gablarski.Client
 		: ClientUser
 	{
 		internal CurrentUser (IClientContext context)
+			: base (context.Connection)
 		{
 			if (context == null)
 				throw new ArgumentNullException ("context");

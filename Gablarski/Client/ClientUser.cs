@@ -9,12 +9,16 @@ namespace Gablarski.Client
 	public class ClientUser
 		: UserInfo
 	{
-		internal ClientUser ()
+		internal ClientUser (IClientConnection client)
 		{
+			if (client == null)
+				throw new ArgumentNullException ("client");
+
+			this.client = client;
 		}
 
 		public ClientUser (UserInfo user, IClientConnection client)
-			: base (user.Nickname, null, user.UserId, user.CurrentChannelId)
+			: base (user.Nickname, user.Username, user.UserId, user.CurrentChannelId)
 		{
 			if (client == null)
 				throw new ArgumentNullException ("client");
