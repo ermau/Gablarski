@@ -95,6 +95,31 @@ namespace Gablarski.Server
 			}
 		}
 
+		public bool UpdateIfExists (IConnection connection, UserInfo user)
+		{
+			lock (lck)
+			{
+				if (!this.connections.Contains (connection))
+					return false;
+
+				this.users[connection] = user;
+				return true;
+			}
+		}
+
+		public bool UpdateIfExists (UserInfo user)
+		{
+			lock (lck)
+			{
+				var old = this.users.FirstOrDefault (kvp => kvp.Value.UserId.Equals (user.UserId));
+				if (old.Equals (default(KeyValuePair<IConnection, UserInfo>)))
+					return false;
+
+				this.users[old.Key] = user;
+				return true;
+			}
+		}
+
 		public bool Remove (IConnection connection)
 		{
 			lock (lck)

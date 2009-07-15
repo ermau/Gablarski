@@ -227,11 +227,37 @@ namespace Gablarski.Server
 
 		private void UpdateChannels (bool sendUpdate)
 		{
-			this.channels = this.ChannelProvider.GetChannels ().ToDictionary (c => c.ChannelId);
-			this.defaultChannel = this.ChannelProvider.DefaultChannel;
+			lock (channelLock)
+			{
+				this.channels = this.ChannelProvider.GetChannels().ToDictionary (c => c.ChannelId);
+				this.defaultChannel = this.ChannelProvider.DefaultChannel;
+			}
 
 			if (sendUpdate)
+			{
+				object defaultChannelId;
+				List<object> movedUsers = new List<object>();
+				lock (channelLock)
+				{
+					defaultChannelId = ChannelProvider.DefaultChannel.ChannelId;
+					foreach (var u in this.connections.Users)
+					{
+						if (!this.channels.ContainsKey (u.CurrentChannelId))
+						{
+							movedUsers.Add (u.UserId);
+							this.connections.UpdateIfExists (new UserInfo (u) { CurrentChannelId = defaultChannelId  });
+						}
+					}
+				}
+
+				foreach (var userId in movedUsers)
+				{
+					this.connections.Send (new UserChangedChannelMessage 
+						{ ChangeInfo = new ChannelChangeInfo (userId, defaultChannelId) });
+				}
+
 				this.connections.Send (new ChannelListMessage (this.channels.Values));
+			}
 		}
 
 		private void OnChannelsUpdatedExternally (object sender, EventArgs e)

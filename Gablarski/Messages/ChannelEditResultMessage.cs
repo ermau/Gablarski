@@ -36,7 +36,12 @@ namespace Gablarski.Messages
 		/// <summary>
 		/// Failed because channel doesn't exist on the server.
 		/// </summary>
-		FailedChannelDoesntExist = 5
+		FailedChannelDoesntExist = 5,
+
+		/// <summary>
+		/// Failed because you can not delete the last remaining channel.
+		/// </summary>
+		FailedLastChannel = 6,
 	}
 
 	public class ChannelEditResultMessage

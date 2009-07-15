@@ -101,10 +101,13 @@ namespace Gablarski.Server
 				e.Connection.Send (new ChannelListMessage (GenericResult.FailedPermissions));
 			else
 			{
+				IEnumerable<Channel> currentChannels;
 				lock (this.channelLock)
 				{
-					e.Connection.Send (new ChannelListMessage (this.channels.Values));
+					currentChannels = this.channels.Values.ToList();
 				}
+
+				e.Connection.Send (new ChannelListMessage (currentChannels));
 			}
 		}
 
@@ -124,7 +127,7 @@ namespace Gablarski.Server
 			{
 				requestingPlayer = this.connections[e.Connection];
 
-				if (requestingPlayer.UserId == change.MoveInfo.TargetUserId)
+				if (requestingPlayer.UserId.Equals (change.MoveInfo.TargetUserId))
 				{
 					if (!GetPermission (PermissionName.ChangeChannel, requestingPlayer))
 						resultState = ChannelChangeResult.FailedPermissions;
@@ -134,8 +137,9 @@ namespace Gablarski.Server
 				
 				if (resultState == ChannelChangeResult.FailedUnknown)
 				{
-					requestingPlayer.CurrentChannelId = change.MoveInfo.TargetChannelId;
-					this.connections.Send (new ChannelChangeMessage (change.MoveInfo.TargetUserId, change.MoveInfo.TargetChannelId, requestingPlayer));
+					if (this.connections.UpdateIfExists (e.Connection, new UserInfo (requestingPlayer) { CurrentChannelId = change.MoveInfo.TargetChannelId }))
+						this.connections.Send (new ChannelChangeMessage (change.MoveInfo.TargetUserId, change.MoveInfo.TargetChannelId, requestingPlayer));
+					
 					return;
 				}
 			}
@@ -154,6 +158,8 @@ namespace Gablarski.Server
 			{
 				if (!this.channels.TryGetValue (msg.Channel.ChannelId, out realChannel))
 					result = ChannelEditResult.FailedChannelDoesntExist;
+				else if (this.channels.Count == 1)
+					result = ChannelEditResult.FailedLastChannel;
 				else if (!this.channelProvider.UpdateSupported)
 					result = ChannelEditResult.FailedChannelsReadOnly;
 				else if (realChannel.ReadOnly)

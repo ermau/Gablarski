@@ -11,6 +11,11 @@ namespace Gablarski
 		{
 		}
 
+		internal UserInfo (UserInfo info)
+			: this (info.Nickname, info.Username, info.UserId, info.CurrentChannelId)
+		{
+		}
+
 		internal UserInfo (string nickname, string username, object userId, object currentChannelId)
 		{
 			if (nickname.IsEmpty())
