@@ -175,6 +175,14 @@ namespace Gablarski.OpenAL
 			private set;
 		}
 
+		/// <summary>
+		/// Gets the underlying OpenAL provider version.
+		/// </summary>
+		public static string Version
+		{
+			get { return Marshal.PtrToStringAnsi (alGetString (AL_VERSION)); }
+		}
+
 		#region AudioFormat Extensions
 		public static uint GetBytesPerSample (this AudioFormat self)
 		{
@@ -226,6 +234,9 @@ namespace Gablarski.OpenAL
 
 		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
 		internal static extern void alcGetIntegerv (IntPtr device, ALCEnum param, int size, out int data);
+
+		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
+		internal static extern IntPtr alGetString (int name);
 
 		[DllImport ("OpenAL32.dll", CallingConvention=CallingConvention.Cdecl)]
 		internal static extern IntPtr alcGetString ([In] IntPtr device, int name);
@@ -347,14 +358,18 @@ namespace Gablarski.OpenAL
 			}
 		}
 
+		// ReSharper disable InconsistentNaming
+		internal const int AL_VERSION = 0xB002;
 		internal const int ALC_DEFAULT_DEVICE_SPECIFIER = 0x1004;
 		internal const int ALC_DEVICE_SPECIFIER = 0x1005;
 		internal const int ALC_CAPTURE_DEVICE_SPECIFIER = 0x310;
 		internal const int ALC_CAPTURE_DEFAULT_DEVICE_SPECIFIER = 0x311;
 		internal const int ALC_ALL_DEVICES_SPECIFIER = 0x1013;
 		internal const int ALC_DEFAULT_ALL_DEVICES_SPECIFIER = 0x1012;
+		// ReSharper restore InconsistentNaming
 	}
 
+	// ReSharper disable InconsistentNaming
 	internal enum OpenALError
 	{
 		AL_NO_ERROR = 0,
@@ -373,6 +388,7 @@ namespace Gablarski.OpenAL
 		ALC_ALL_ATTRIBUTES	= 0x1003,
 		ALC_CAPTURE_SAMPLES	= 0x312
 	}
+	// ReSharper restore InconsistentNaming
 
 	public enum DistanceModel
 	{
