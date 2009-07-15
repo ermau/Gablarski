@@ -194,24 +194,31 @@ namespace Gablarski.Clients.Windows
 
 		void GablarskiDisconnected (object sender, EventArgs e)
 		{
-			this.users.Nodes.Clear();
+			this.Invoke ((Action)delegate
+			{
+				this.users.Nodes.Clear();
 
-			this.btnConnect.Image = Resources.DisconnectImage;
-			this.btnConnect.Text = "Connect";
-			this.btnConnect.ToolTipText = "Connect (Disconnected)";
+				this.btnConnect.Image = Resources.DisconnectImage;
+				this.btnConnect.Text = "Connect";
+				this.btnConnect.ToolTipText = "Connect (Disconnected)";
+			});
 		}
 
 		void GablarskiConnected (object sender, EventArgs e)
 		{
-			this.btnConnect.Image = Resources.ConnectImage;
-			this.btnConnect.Text = "Disconnect";
-			this.btnConnect.ToolTipText = "Disconnect (Connected)";
+			this.Invoke ((Action)delegate
+			{
+				this.btnConnect.Image = Resources.ConnectImage;
+				this.btnConnect.Text = "Disconnect";
+				this.btnConnect.ToolTipText = "Disconnect (Connected)";
 
-			this.users.SetServerNode (
-				new TreeNode (this.gablarski.ServerInfo.ServerName) {
-					ToolTipText = this.gablarski.ServerInfo.ServerDescription
-				}
-			);
+				this.users.SetServerNode (
+					new TreeNode (this.gablarski.ServerInfo.ServerName)
+					{
+						ToolTipText = this.gablarski.ServerInfo.ServerDescription
+					}
+				);
+			});
 
 			this.gablarski.CurrentUser.Login (this.server.UserNickname, this.server.UserName, this.server.UserPassword);
 		}

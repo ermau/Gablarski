@@ -54,7 +54,6 @@
 			// btnConnect
 			// 
 			this.btnConnect.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.btnConnect.Enabled = false;
 			this.btnConnect.Image = global::Gablarski.Clients.Windows.Properties.Resources.DisconnectImage;
 			this.btnConnect.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.btnConnect.Name = "btnConnect";
@@ -99,8 +98,8 @@
 			this.MinimumSize = new System.Drawing.Size (192, 161);
 			this.Name = "MainForm";
 			this.Text = "Gablarski";
-			this.Load += new System.EventHandler (this.MainForm_Load);
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler (this.MainForm_FormClosing);
+			this.Load += new System.EventHandler (this.MainForm_Load);
 			this.tools.ResumeLayout (false);
 			this.tools.PerformLayout ();
 			this.ResumeLayout (false);

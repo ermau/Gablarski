@@ -21,7 +21,7 @@ namespace Gablarski.Network
 		/// </summary>
 		public bool IsConnected
 		{
-			get { return this.tcp.Connected; }
+			get { return (this.tcp == null) ? false : this.tcp.Connected; }
 		}
 
 		/// <summary>
