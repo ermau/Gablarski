@@ -17,14 +17,17 @@ namespace Gablarski
 				throw new ArgumentNullException ("channelIdType");
 
 			this.UserIdType = userIdType;
+			this.UserDefaultValue = userIdType.GetDefaultValue();
 			this.WriteUser = GetSerializationMethod (this.UserIdType);
 			this.ReadUser = GetDeserializationMethod (this.UserIdType);
 
 			this.ChannelIdType = channelIdType;
+			this.ChannelDefaultValue = channelIdType.GetDefaultValue();
 			this.WriteChannel = GetSerializationMethod (this.ChannelIdType);
 			this.ReadChannel = GetDeserializationMethod (this.ChannelIdType);
 		}
 
+		public readonly object UserDefaultValue;
 		public readonly Action<IValueWriter, object> WriteUser;
 		public readonly Func<IValueReader, object> ReadUser;
 
@@ -37,6 +40,7 @@ namespace Gablarski
 			private set;
 		}
 
+		public readonly object ChannelDefaultValue;
 		public readonly Action<IValueWriter, object> WriteChannel;
 		public readonly Func<IValueReader, object> ReadChannel;
 

@@ -156,22 +156,20 @@ namespace Gablarski.Server
 			Channel realChannel;
 			lock (channelLock)
 			{
-				if (!this.channels.TryGetValue (msg.Channel.ChannelId, out realChannel))
-					result = ChannelEditResult.FailedChannelDoesntExist;
-				else if (this.channels.Count == 1)
+				if (msg.Delete && this.channels.Count == 1)
 					result = ChannelEditResult.FailedLastChannel;
 				else if (!this.channelProvider.UpdateSupported)
 					result = ChannelEditResult.FailedChannelsReadOnly;
-				else if (realChannel.ReadOnly)
+				else if (this.channels.TryGetValue (msg.Channel.ChannelId, out realChannel) && realChannel.ReadOnly)
 					result = ChannelEditResult.FailedChannelReadOnly;
-				else if (msg.Channel.ChannelId != null)
+				else if (!IdentifyingTypes.ChannelDefaultValue.Equals (msg.Channel.ChannelId))
 				{
 					if (msg.Delete && !GetPermission (PermissionName.DeleteChannel, msg.Channel.ChannelId, e.Connection))
 						result = ChannelEditResult.FailedPermissions;
 					else if (!msg.Delete && !GetPermission (PermissionName.EditChannel, msg.Channel.ChannelId, e.Connection))
 						result = ChannelEditResult.FailedPermissions;
 				}
-				else if (msg.Channel.ChannelId == null && !GetPermission (PermissionName.AddChannel, e.Connection))
+				else if (!GetPermission (PermissionName.AddChannel, e.Connection))
 					result = ChannelEditResult.FailedPermissions;
 
 				if (result == ChannelEditResult.FailedUnknown)

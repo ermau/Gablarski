@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Gablarski.Server
 {
@@ -45,9 +46,9 @@ namespace Gablarski.Server
 		{
 			lock (this.channels)
 			{
-				if (channel.ChannelId == null)
+				if (channel.ChannelId.Equals (0))
 				{
-					long id = ++this.lastId;
+					int id = Interlocked.Increment (ref this.lastId);
 					channels.Add (id, new Channel (id, channel));
 				}
 				else if (channels.ContainsKey (channel.ChannelId))
@@ -63,7 +64,7 @@ namespace Gablarski.Server
 			}
 		}
 
-		private long lastId = 1;
+		private int lastId = 1;
 		private readonly Channel lobby;
 		private readonly Dictionary<object, Channel> channels = new Dictionary<object, Channel> ();
 	}
