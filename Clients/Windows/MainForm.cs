@@ -27,6 +27,7 @@ namespace Gablarski.Clients.Windows
 			this.gablarski.Users.ReceivedUserList += this.UsersReceivedUserList;
 			this.gablarski.Users.UserLoggedIn += UsersUserLoggedIn;
 			this.gablarski.Users.UserDisconnected += UsersUserDisconnected;
+			this.gablarski.Users.UserChangedChannel += UsersUserChangedChannel;
 			this.gablarski.CurrentUser.ReceivedLoginResult += this.CurrentUserReceivedLoginResult;
 
 			this.gablarski.Sources.ReceivedSource += this.SourcesReceivedSource;
@@ -157,6 +158,12 @@ namespace Gablarski.Clients.Windows
 			}
 			else if (e.Result != SourceResult.NewSource && e.Result != SourceResult.SourceRemoved)
 				TaskDialog.Show (e.Result.ToString(), "Source request failed");
+		}
+
+		private void UsersUserChangedChannel (object sender, ChannelChangedEventArgs e)
+		{
+			this.users.RemoveUser (e.TargetUser);
+			this.users.AddUser (e.TargetUser);
 		}
 
 		private void UsersUserDisconnected (object sender, UserDisconnectedEventArgs e)

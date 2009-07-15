@@ -138,7 +138,7 @@ namespace Gablarski.Server
 				if (resultState == ChannelChangeResult.FailedUnknown)
 				{
 					if (this.connections.UpdateIfExists (e.Connection, new UserInfo (requestingPlayer) { CurrentChannelId = change.MoveInfo.TargetChannelId }))
-						this.connections.Send (new ChannelChangeMessage (change.MoveInfo.TargetUserId, change.MoveInfo.TargetChannelId, requestingPlayer));
+						this.connections.Send (new UserChangedChannelMessage { ChangeInfo = new ChannelChangeInfo (change.MoveInfo.TargetUserId, change.MoveInfo.TargetChannelId, requestingPlayer.UserId)});
 					
 					return;
 				}

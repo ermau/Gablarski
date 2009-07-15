@@ -43,6 +43,7 @@ namespace Gablarski.Client
 				
 				{ ServerMessageType.ChannelListReceived, this.Channels.OnChannelListReceivedMessage },
 				//{ ServerMessageType.ChangeChannelResult, OnChangeChannelResultMessage },
+				{ ServerMessageType.UserChangedChannel, this.Users.OnUserChangedChannelMessage },
 				{ ServerMessageType.ChannelEditResult, this.Channels.OnChannelEditResultMessage },
 
 				{ ServerMessageType.ConnectionRejected, OnConnectionRejectedMessage },
