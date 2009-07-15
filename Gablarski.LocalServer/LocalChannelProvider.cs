@@ -48,12 +48,14 @@ namespace Gablarski.LocalServer
 			return this.session.CreateCriteria (typeof (Channel)).List<Channel>();
 		}
 
-		public void SaveChannel (Channel channel)
+		public ChannelEditResult SaveChannel (Channel channel)
 		{
 			using (var trans = this.session.BeginTransaction())
 			{
 				this.session.SaveOrUpdate (channel);
 			}
+
+			return ChannelEditResult.Success;
 		}
 
 		public void DeleteChannel (Channel channel)

@@ -43,7 +43,7 @@ namespace Gablarski.Server
 		/// Creates or updates the <paramref name="channel"/>.
 		/// </summary>
 		/// <param name="channel">The channel to create or update.</param>
-		void SaveChannel (Channel channel);
+		ChannelEditResult SaveChannel (Channel channel);
 
 		/// <summary>
 		/// Deletes the <paramref name="channel"/>.
@@ -63,5 +63,49 @@ namespace Gablarski.Server
 		{
 			return (self.DefaultChannel ?? self.GetChannels ().FirstOrDefault ());
 		}
+	}
+
+	public enum ChannelEditResult
+		: byte
+	{
+		/// <summary>
+		/// Failed for an unknown reason.
+		/// </summary>
+		FailedUnknown = 0,
+
+		/// <summary>
+		/// Great Success!
+		/// </summary>
+		Success = 1,
+
+		/// <summary>
+		/// Failed because the player does not have sufficient permissions.
+		/// </summary>
+		FailedPermissions = 2,
+
+		/// <summary>
+		/// Failed because no channels are updateable.
+		/// </summary>
+		FailedChannelsReadOnly = 3,
+
+		/// <summary>
+		/// Failed because the channel is marked as readonly.
+		/// </summary>
+		FailedChannelReadOnly = 4,
+
+		/// <summary>
+		/// Failed because channel doesn't exist on the server.
+		/// </summary>
+		FailedChannelDoesntExist = 5,
+
+		/// <summary>
+		/// Failed because you can not delete the last remaining channel.
+		/// </summary>
+		FailedLastChannel = 6,
+
+		/// <summary>
+		/// Failed because a channel with this name already exists.
+		/// </summary>
+		FailedChannelExists = 7,
 	}
 }

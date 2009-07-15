@@ -42,10 +42,13 @@ namespace Gablarski.Server
 				yield return c;
 		}
 
-		public void SaveChannel (Channel channel)
+		public ChannelEditResult SaveChannel (Channel channel)
 		{
 			lock (this.channels)
 			{
+				if (GetChannels().Any (c => c.Name.ToLower().Trim() == channel.Name.ToLower().Trim()))
+					return ChannelEditResult.FailedChannelExists;
+
 				if (channel.ChannelId.Equals (0))
 				{
 					int id = Interlocked.Increment (ref this.lastId);
@@ -54,6 +57,8 @@ namespace Gablarski.Server
 				else if (channels.ContainsKey (channel.ChannelId))
 					channels[channel.ChannelId] = channel;
 			}
+
+			return ChannelEditResult.Success;
 		}
 
 		public void DeleteChannel (Channel channel)

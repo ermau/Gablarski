@@ -16,6 +16,7 @@ namespace Gablarski.Server
 			if (playerId != null) // User
 			{
 				return GetNamesAsPermissions (PermissionName.Login, PermissionName.ChangeChannel, PermissionName.AddChannel,
+				                              PermissionName.EditChannel, PermissionName.DeleteChannel,
 				                              PermissionName.RequestChannelList, PermissionName.RequestSource);
 			}
 			else // Non-user client.

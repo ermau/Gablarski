@@ -175,12 +175,12 @@ namespace Gablarski.Server
 				if (result == ChannelEditResult.FailedUnknown)
 				{
 					if (!msg.Delete)
-						this.channelProvider.SaveChannel (msg.Channel);
+						result = this.channelProvider.SaveChannel (msg.Channel);
 					else
 						this.channelProvider.DeleteChannel (msg.Channel);
 
-					this.UpdateChannels (true);
-					result = ChannelEditResult.Success;
+					if (result == ChannelEditResult.Success)
+						this.UpdateChannels (true);
 				}
 			}
 
