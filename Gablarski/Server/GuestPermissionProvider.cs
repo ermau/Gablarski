@@ -13,9 +13,12 @@ namespace Gablarski.Server
 			if (this.admins.Contains (playerId))
 				return GetNamesAsPermissions (Permission.GetAllNames());
 
-			if (playerId != null)
-				return GetNamesAsPermissions (PermissionName.Login, PermissionName.RequestSource, PermissionName.ChangeChannel, PermissionName.RequestChannelList);
-			else
+			if (playerId != null) // User
+			{
+				return GetNamesAsPermissions (PermissionName.Login, PermissionName.ChangeChannel, PermissionName.AddChannel,
+				                              PermissionName.RequestChannelList, PermissionName.RequestSource);
+			}
+			else // Non-user client.
 				return GetNamesAsPermissions (PermissionName.Login, PermissionName.RequestChannelList);
 		}
 

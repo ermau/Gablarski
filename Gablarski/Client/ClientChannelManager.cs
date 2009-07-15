@@ -77,6 +77,18 @@ namespace Gablarski.Client
 			this.context.Connection.Send (new ChannelEditMessage (channel) { Delete = true });
 		}
 
+		/// <summary>
+		/// Clears the channel manager of all channels.
+		/// </summary>
+		public void Clear()
+		{
+			lock (channelLock)
+			{
+				this.channels = null;
+				OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Reset));
+			}
+		}
+
 		#region IEnumerable<Channel> members
 		public IEnumerator<Channel> GetEnumerator ()
 		{

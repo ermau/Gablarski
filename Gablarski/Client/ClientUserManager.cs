@@ -73,6 +73,18 @@ namespace Gablarski.Client
 			}
 		}
 
+		/// <summary>
+		/// Clears the user manager of all users.
+		/// </summary>
+		public void Clear()
+		{
+			lock (userLock)
+			{
+				this.users = null;
+				OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Reset));
+			}
+		}
+
 		#region Implementation of IEnumerable
 
 		/// <summary>
@@ -152,7 +164,7 @@ namespace Gablarski.Client
 					this.users = new Dictionary<object, ClientUser>();
 
 				user = new ClientUser (msg.UserInfo, this.context.Connection);
-				this.users.Add (msg.UserInfo.UserId,user);
+				this.users.Add (msg.UserInfo.UserId, user);
 			}
 
 			OnUserLoggedIn (new UserLoggedInEventArgs (user));

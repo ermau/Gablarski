@@ -58,7 +58,7 @@ namespace Gablarski
 		}
 
 		/// <summary>
-		/// Gets the name of the channel.
+		/// Gets or sets the name of the channel.
 		/// </summary>
 		public virtual string Name
 		{
@@ -73,7 +73,7 @@ namespace Gablarski
 		}
 
 		/// <summary>
-		/// Gets the description of the channel.
+		/// Gets or sets the description of the channel.
 		/// </summary>
 		public virtual string Description
 		{
@@ -88,7 +88,7 @@ namespace Gablarski
 		}
 		
 		/// <summary>
-		/// Gets the player limit. 0 for no limit.
+		/// Gets or sets the player limit. 0 for no limit.
 		/// </summary>
 		public virtual int PlayerLimit
 		{

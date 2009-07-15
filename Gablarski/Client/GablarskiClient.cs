@@ -145,14 +145,23 @@ namespace Gablarski.Client
 		/// </summary>
 		public void Disconnect()
 		{
+			this.running = false;
+			lock (this.mqueue)
+			{
+				this.mqueue.Clear();
+			}
+
 			Connection.Disconnected -= this.OnDisconnected;
 			Connection.MessageReceived -= this.OnMessageReceived;
 			Connection.Disconnect();
-			this.running = false;
 
 			OnDisconnected (this, EventArgs.Empty);
 
 			this.messageRunnerThread.Join ();
+
+			this.Users.Clear();
+			this.Channels.Clear();
+			this.Sources.Clear();
 		}
 		#endregion
 

@@ -119,6 +119,18 @@ namespace Gablarski.Client
 			this.context.Connection.Send (new RequestSourceMessage (name, channels, targetBitrate));
 		}
 
+		/// <summary>
+		/// Clears the source manager of all sources.
+		/// </summary>
+		public void Clear()
+		{
+			lock (this.sourceLock)
+			{
+				this.sources = null;
+				OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Reset));
+			}
+		}
+
 		private readonly IClientContext context;
 		private readonly object sourceLock = new object();
 		private Dictionary<int, AudioSource> sources;
