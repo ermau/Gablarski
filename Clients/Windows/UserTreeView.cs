@@ -15,6 +15,8 @@ namespace Gablarski.Clients.Windows
 	{
 		public UserTreeView()
 		{
+			this.AllowDrop = true;
+
 			this.ImageList = new ImageList
 			{
 				TransparentColor = Color.Transparent,
@@ -92,6 +94,7 @@ namespace Gablarski.Clients.Windows
 				return;
 			
 			var node = channelPair.Value.Nodes.Add (user.Nickname);
+			node.Tag = user;
 			node.ImageKey = "silent";
 			node.SelectedImageKey = "silent";
 			node.ContextMenuStrip = userMenu;
@@ -200,6 +203,45 @@ namespace Gablarski.Clients.Windows
 			this.SelectedNode = e.Node;
 
 			base.OnNodeMouseClick (e);
+		}
+
+		protected override void OnItemDrag (ItemDragEventArgs e)
+		{
+			var node = ((TreeNode)e.Item);
+			if (node.Tag is UserInfo)
+				DoDragDrop (node, DragDropEffects.Move);
+
+			base.OnItemDrag (e);
+		}
+
+		protected override void OnDragOver (DragEventArgs e)
+		{
+			e.Effect = DragDropEffects.Move;
+			base.OnDragOver (e);
+		}
+
+		protected override void OnDragDrop (DragEventArgs e)
+		{
+			if (e.Data.GetDataPresent ("System.Windows.Forms.TreeNode", false))
+			{
+				TreeNode destinationNode = this.GetNodeAt (this.PointToClient (new Point (e.X, e.Y)));
+				TreeNode movedNode = (TreeNode)e.Data.GetData ("System.Windows.Forms.TreeNode");
+
+				if (destinationNode != null)
+				{
+					var channel = destinationNode.Tag as Channel;
+					var user = movedNode.Tag as ClientUser;
+					if (channel != null && user != null)
+					{
+						if (user.CurrentChannelId.Equals (channel.ChannelId))
+							return;
+
+						user.Move (channel);
+					}
+				}
+			}
+
+			base.OnDragDrop (e);
 		}
 
 		protected override void OnNodeMouseDoubleClick (TreeNodeMouseClickEventArgs e)
