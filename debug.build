@@ -12,22 +12,12 @@
 			<test assemblyname="Gablarski.Tests\bin\Debug\Gablarski.Tests.dll" />
 		</nunit2>
 
-		<zip zipfile="Gablarski-Debug.zip">
+		<zip zipfile="Gablarski-CLI-Debug.zip">
 			<fileset basedir="Clients\CLI\bin\x86\Debug">
-				<include name="**/*"/>
-			</fileset>
-		</zip>
-	</target>
-
-	<target name="build64">
-		<exec program="${DotNetFramework3.5_x64_Path}\msbuild.exe">
-			<arg value="/property:Configuration=Debug;Platform=x64" />
-			<arg value="Gablarski.sln" />
-		</exec>
-
-		<zip zipfile="Gablarski-Debug64.zip">
-			<fileset basedir="Clients\CLI\bin\x64\Debug">
-				<include name="**/*"/>
+				<include name="gablarskicli.exe" />
+				<include name="*.dll" />
+				<include name="*.pdb" />
+				<include name="*.txt" />
 			</fileset>
 		</zip>
 	</target>
