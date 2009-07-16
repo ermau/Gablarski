@@ -122,6 +122,7 @@ namespace Gablarski.Network
 
 			this.udp = new Socket (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 			this.udp.Bind (new IPEndPoint (IPAddress.Any, 0));
+			this.udp.SendTo (new byte[] { 24, 24 }, endpoint);
 
 			this.rwriter = new StreamValueWriter (this.rstream);
 			this.rreader = new StreamValueReader (this.rstream);
