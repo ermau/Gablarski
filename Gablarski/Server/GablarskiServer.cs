@@ -325,7 +325,7 @@ namespace Gablarski.Server
 
 			lock (sourceLock)
 			{
-				if (!this.sourceLookup.Contains (e.Connection))
+				if (this.sourceLookup == null || !this.sourceLookup.Contains (e.Connection))
 					return;
 
 				this.connections.Send (new SourcesRemovedMessage (this.sourceLookup[e.Connection]));
