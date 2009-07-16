@@ -263,10 +263,11 @@ namespace Gablarski.Server
 			AudioSource source = null;
 			try
 			{
-				int sourceId;
+				int sourceId = 1;
 				lock (sourceLock)
 				{
-					sourceId = this.sources.Max (s => s.Id) + 1;
+					if (this.sources.Count > 0)
+						sourceId = this.sources.Max (s => s.Id) + 1;
 				}
 
 				if (result == SourceResult.FailedUnknown)
