@@ -140,7 +140,9 @@ namespace Gablarski.Clients.Windows
 
 		private void PlaybackProviderSourceFinished (object sender, SourceFinishedEventArgs e)
 		{
-			this.users.MarkSilent (this.gablarski.Users[e.Source.OwnerId]);
+			var user = this.gablarski.Users[e.Source.OwnerId];
+			if (user != null)
+				this.users.MarkSilent (user);
 		}
 
 		private void SourcesReceivedAudio (object sender, ReceivedAudioEventArgs e)

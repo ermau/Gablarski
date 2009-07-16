@@ -56,14 +56,16 @@ namespace Gablarski.Clients.CLI
 		[STAThread]
 		public static void Main (string[] args)
 		{
+			bool trace = false;
+			List<string> tracers = new List<string>();
+
+			string clientConnection = typeof (NetworkClientConnection).AssemblyQualifiedName;
 			string host = String.Empty;
 			int port = 6112;
-			bool trace = false;
-			bool startServer = false;
 			bool defaultAudio = false;
 
-			List<string> tracers = new List<string>();
-			string clientConnection = typeof (NetworkClientConnection).AssemblyQualifiedName;
+			bool startServer = false;
+			string serverLogo = String.Empty;
 			List<string> connectionProviders = new List<string>();
 
 			OptionSet options = new OptionSet
@@ -80,7 +82,8 @@ namespace Gablarski.Clients.CLI
 				{ "v|verbose",		"Turns on tracing, detailed debug invormation",					v => trace = (v != null) },
 				{ "tracer=",		"Adds a tracer to the list (supply assembly qualified name.)",	tracers.Add },
 
-				{ "s|Server",		"Starts a local Server.",										s => startServer = true },
+				{ "s|server",		"Starts a local Server.",										s => startServer = true },
+				{ "serverlogo=",	"Specifies a server logo URL.",									v => serverLogo = v },
 				{ "conprovider=",	"Adds a connection provider to the Server.",					connectionProviders.Add	},
 			};
 
@@ -113,10 +116,10 @@ namespace Gablarski.Clients.CLI
 
 			if (startServer)
 			{
-				Server = new GablarskiServer (new ServerSettings(), new GuestUserProvider(), new GuestPermissionProvider(), new LobbyChannelProvider());
+				Server = new GablarskiServer (new ServerSettings { ServerLogo = serverLogo }, new GuestUserProvider(), new GuestPermissionProvider(), new LobbyChannelProvider());
 				
 				if (connectionProviders.Count == 0)
-					Server.AddConnectionProvider (new NetworkServerConnectionProvider());
+					Server.AddConnectionProvider (new NetworkServerConnectionProvider { Port = port });
 				else
 					FindTypes<IConnectionProvider> (connectionProviders, Server.AddConnectionProvider);
 

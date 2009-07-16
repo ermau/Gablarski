@@ -263,21 +263,10 @@ namespace Gablarski.Server
 			AudioSource source = null;
 			try
 			{
-				int index;
 				int sourceId;
 				lock (sourceLock)
 				{
-					if (!sources.ContainsKey (e.Connection))
-						sources.Add (e.Connection, new List<AudioSource> ());
-
-					//if (!sources[e.Connection].Any (s => s != null && s.GetType () == request.MediaSourceType))
-					//{
-					sourceId = sources.Sum (kvp => kvp.Value.Count) + 1;
-					index = sources[e.Connection].Count;
-					sources[e.Connection].Add (null);
-					//}-
-					//else
-					//    result = SourceResult.FailedPermittedSingleSourceOfType;
+					sourceId = this.sources.Max (s => s.Id) + 1;
 				}
 
 				if (result == SourceResult.FailedUnknown)
@@ -286,19 +275,15 @@ namespace Gablarski.Server
 					if (request.TargetBitrate != 0)
 						bitrate = request.TargetBitrate.Trim (settings.MinimumAudioBitrate, settings.MaximumAudioBitrate);
 
-					//source = MediaSources.Create (request.MediaSourceType, sourceId, user.UserId);
 					source = new AudioSource (request.Name, sourceId, user.UserId, 1, bitrate, 44100, 512);
-					//if (source != null)
-					//{
+
 					lock (sourceLock)
 					{
-						sources[e.Connection][index] = source;
+						this.sources.Add (source);
+						this.sourceLookup = this.sources.ToLookup (s => this.connections.GetConnection (s.OwnerId));
 					}
 
 					result = SourceResult.Succeeded;
-					//}
-					//else
-					//    result = SourceResult.FailedNotSupportedType;
 				}
 			}
 			catch (OverflowException)
@@ -307,14 +292,6 @@ namespace Gablarski.Server
 			}
 			finally
 			{
-				//MediaSourceInfo sourceInfo = new MediaSourceInfo
-				//{
-				//    SourceId = sourceId,
-				//    UserId = user.UserId,
-				//    MediaType = (source != null) ? source.Type : MediaType.None,
-				//    SourceTypeName = request.MediaSourceType.AssemblyQualifiedName
-				//};
-
 				e.Connection.Send (new SourceResultMessage (result, source));
 				if (result == SourceResult.Succeeded)
 				{

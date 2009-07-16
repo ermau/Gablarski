@@ -190,7 +190,8 @@ namespace Gablarski.Server
 		}
 
 		private readonly object sourceLock = new object ();
-		private readonly Dictionary<IConnection, List<AudioSource>> sources = new Dictionary<IConnection, List<AudioSource>> ();
+		private ILookup<IConnection, AudioSource> sourceLookup;
+		private readonly List<AudioSource> sources = new List<AudioSource>();
 
 		private readonly ConnectionCollection connections = new ConnectionCollection();
 
@@ -270,18 +271,14 @@ namespace Gablarski.Server
 
 		private IEnumerable<AudioSource> GetSourceInfoList ()
 		{
-			IEnumerable<AudioSource> agrSources = Enumerable.Empty<AudioSource> ();
+			AudioSource[] currentSources;
 			lock (this.sourceLock)
 			{
-				foreach (var kvp in this.sources)
-				{
-					agrSources = agrSources.Concat (kvp.Value);
-				}
-
-				agrSources = agrSources.ToList ();
+				currentSources = new AudioSource[this.sources.Count];
+				this.sources.CopyTo (currentSources, 0);
 			}
 
-			return agrSources;
+			return currentSources;
 		}
 
 		protected bool GetPermission (PermissionName name, object channelId, object playerId)
@@ -328,11 +325,14 @@ namespace Gablarski.Server
 
 			lock (sourceLock)
 			{
-				if (this.sources.ContainsKey (e.Connection))
-				{
-					this.connections.Send (new SourcesRemovedMessage (this.sources[e.Connection]));
-					this.sources.Remove (e.Connection);
-				}
+				if (!this.sourceLookup.Contains (e.Connection))
+					return;
+
+				this.connections.Send (new SourcesRemovedMessage (this.sourceLookup[e.Connection]));
+				foreach (var source in this.sourceLookup[e.Connection])
+					this.sources.Remove (source);
+
+				this.sourceLookup = this.sources.ToLookup (k => this.connections.GetConnection (k.OwnerId));
 			}
 		}
 		

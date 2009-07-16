@@ -95,6 +95,14 @@ namespace Gablarski.Server
 			}
 		}
 
+		public IConnection GetConnection (object userId)
+		{
+			lock (lck)
+			{
+				return (from kvp in this.users where kvp.Value.UserId.Equals (userId) select kvp.Key).FirstOrDefault();
+			}
+		}
+
 		public bool UpdateIfExists (IConnection connection, UserInfo user)
 		{
 			lock (lck)

@@ -59,6 +59,11 @@ namespace Gablarski.Clients.Windows
 
 		public void AddChannel (Channel channel, IdentifyingTypes idTypes)
 		{
+			#if DEBUG
+			if (channel == null)
+				throw new ArgumentNullException ("channel");
+			#endif
+
 			if (this.InvokeRequired)
 			{
 				this.BeginInvoke ((Action<Channel, IdentifyingTypes>)this.AddChannel, channel, idTypes);
@@ -83,6 +88,11 @@ namespace Gablarski.Clients.Windows
 
 		public void AddUser (UserInfo user)
 		{
+			#if DEBUG
+			if (user == null)
+				throw new ArgumentNullException ("user");
+			#endif
+
 			if (this.InvokeRequired)
 			{
 				this.BeginInvoke ((Action<UserInfo>)this.AddUser, user);
@@ -105,6 +115,11 @@ namespace Gablarski.Clients.Windows
 
 		public void RemoveUser (UserInfo user)
 		{
+			#if DEBUG
+			if (user == null)
+				throw new ArgumentNullException ("user");
+			#endif
+
 			if (this.InvokeRequired)
 			{
 				this.BeginInvoke ((Action<UserInfo>)this.RemoveUser, user);
@@ -121,6 +136,11 @@ namespace Gablarski.Clients.Windows
 
 		public void MarkTalking (UserInfo user)
 		{
+			#if DEBUG
+			if (user == null)
+				throw new ArgumentNullException ("user");
+			#endif
+
 			if (this.InvokeRequired)
 			{
 				this.BeginInvoke ((Action<UserInfo>)this.MarkTalking, user);
@@ -136,6 +156,11 @@ namespace Gablarski.Clients.Windows
 
 		public void MarkMusic (UserInfo user)
 		{
+			#if DEBUG
+			if (user == null)
+				throw new ArgumentNullException ("user");
+			#endif
+
 			if (this.InvokeRequired)
 			{
 				this.BeginInvoke ((Action<UserInfo>)this.MarkTalking, user);
@@ -151,6 +176,11 @@ namespace Gablarski.Clients.Windows
 
 		public void MarkSilent (UserInfo user)
 		{
+			#if DEBUG
+			if (user == null)
+				throw new ArgumentNullException ("user");
+			#endif
+
 			if (this.InvokeRequired)
 			{
 				this.BeginInvoke ((Action<UserInfo>)this.MarkSilent, user);
