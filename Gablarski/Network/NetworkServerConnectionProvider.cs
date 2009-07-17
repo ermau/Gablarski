@@ -41,6 +41,9 @@ namespace Gablarski.Network
 		public void StartListening()
 		{
 			this.listening = true;
+			
+			Trace.WriteLineIf (VerboseTracing, "[Network] Listening on port " + port);
+
 			udp = new Socket (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 			udp.Bind (new IPEndPoint (IPAddress.Any, port));
 
@@ -57,6 +60,9 @@ namespace Gablarski.Network
 		public void StopListening()
 		{
 			this.listening = false;
+
+			Trace.WriteLineIf (VerboseTracing, "[Network] Stopped listening to port " + port);
+
 			udp.Close();
 			tcpListener.Stop();
 
