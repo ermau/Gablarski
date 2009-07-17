@@ -113,7 +113,10 @@ namespace Gablarski.Network
 
 				if (buffer[0] != 0x2A)
 				{
-					Trace.WriteLineIf (VerboseTracing, "[Network] Message failed sanity check.");
+					if (buffer[0] == 24)
+						udp.SendTo (new byte[] { 24, 24 }, endpoint);
+
+					Trace.WriteLineIf (VerboseTracing, "[Network] Unreliable message failed sanity check.");
 					return;
 				}
 

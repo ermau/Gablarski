@@ -35,7 +35,7 @@ namespace Gablarski.Messages
 
 		public override bool Reliable
 		{
-			get { return false; }
+			get { return true; }
 		}
 
 		public override void WritePayload (IValueWriter writer, IdentifyingTypes idTypes)

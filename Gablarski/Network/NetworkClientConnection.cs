@@ -100,6 +100,14 @@ namespace Gablarski.Network
 
 		#endregion
 
+		/// <summary>
+		/// Whether to output detailed tracing.
+		/// </summary>
+		public bool VerboseTracing
+		{
+			get; set;
+		}
+
 		#region Implementation of IClientConnection
 
 		/// <summary>
@@ -254,7 +262,7 @@ namespace Gablarski.Network
 
 				if (mbuffer[0] != 0x2A)
 				{
-					Trace.WriteLine ("[Client] Failed sanity check, disconnecting.");
+					Trace.WriteLine ("[Network] Failed reliable sanity check, disconnecting.");
 					this.Disconnect();
 					return;
 				}
@@ -275,7 +283,7 @@ namespace Gablarski.Network
 			}
 			catch (Exception ex)
 			{
-				Trace.WriteLine ("[Client] Error reading payload, disconnecting: " + ex.Message);
+				Trace.WriteLine ("[Network] Error reading payload, disconnecting: " + ex.Message);
 				this.Disconnect();
 				return;
 			}
@@ -293,12 +301,18 @@ namespace Gablarski.Network
 				var endpoint = (EndPoint)ipendpoint;
 				
 				if (udp.EndReceiveFrom (result, ref endpoint) == 0)
+				{
+					Trace.WriteLineIf (VerboseTracing, "[Network] UDP EndReceiveFrom returned nothing.");
 					return;
+				}
 
 				byte[] buffer = (byte[])result.AsyncState;
 
 				if (buffer[0] != 0x2A)
+				{
+					Trace.WriteLineIf (VerboseTracing, "[Network] Unreliable message failed sanity check.");
 					return;
+				}
 
 				IValueReader reader = new ByteArrayValueReader (buffer, 1);
 				ushort mtype = reader.ReadUInt16();
@@ -306,7 +320,10 @@ namespace Gablarski.Network
 				Func<MessageBase> messageCtor;
 				MessageBase.MessageTypes.TryGetValue (mtype, out messageCtor);
 				if (messageCtor == null)
+				{
+					Trace.WriteLineIf (VerboseTracing, "[Network] Message type " + mtype + " not found from " + endpoint);
 					return;
+				}
 				else
 				{
 					var msg = messageCtor();
