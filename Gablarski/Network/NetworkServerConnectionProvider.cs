@@ -151,7 +151,7 @@ namespace Gablarski.Network
 					}
 					else
 					{
-						Trace.WriteLine (VerboseTracing, "[Network] Unreliable message received: " + msg.MessageTypeCode);
+						Trace.WriteLineIf (VerboseTracing, "[Network] Unreliable message received: " + msg.MessageTypeCode);
 						connection.Receive (msg);
 					}
 				}
