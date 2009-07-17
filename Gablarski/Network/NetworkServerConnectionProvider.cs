@@ -160,10 +160,10 @@ namespace Gablarski.Network
 				Trace.WriteLine ("[Server] Accepted TCP Connection from " + tendpoint);
 				var udpSocket = new Socket (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 
-				int udpPort = BitConverter.ToInt32 (stream.ReadBytes (4), 0);
-				Trace.WriteLine ("[Server] Connection reports UDP port " + udpPort);
+				//int udpPort = BitConverter.ToInt32 (stream.ReadBytes (4), 0);
+				//Trace.WriteLine ("[Server] Connection reports UDP port " + udpPort);
 
-				tendpoint = new IPEndPoint (tendpoint.Address, udpPort);
+				//tendpoint = new IPEndPoint (tendpoint.Address, udpPort);
 				udpSocket.Connect (tendpoint);
 
 				uint nid = 1;
