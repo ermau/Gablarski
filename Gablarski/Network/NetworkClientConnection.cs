@@ -116,16 +116,23 @@ namespace Gablarski.Network
 		{
 			this.running = true;
 
+			Trace.WriteLine ("[Client] Connecting to " + endpoint.Address + ":" + endpoint.Port);
+
 			this.tcp = new TcpClient (new IPEndPoint (IPAddress.Any, 0));
 			this.tcp.Connect (endpoint);
 			this.rstream = this.tcp.GetStream();
+
+			Trace.WriteLine ("[Client] TCP Local Endpoint: " + this.tcp.Client.LocalEndPoint);
 
 			this.udp = new Socket (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 			this.udp.Bind (new IPEndPoint (IPAddress.Any, 0));
 			this.udp.SendTo (new byte[] { 24, 24 }, endpoint);
 
+			Trace.WriteLine ("[Client] UDP Local Endpoint: " + this.udp.LocalEndPoint);
+
 			this.rwriter = new StreamValueWriter (this.rstream);
 			this.rreader = new StreamValueReader (this.rstream);
+
 			this.rwriter.WriteInt32 (((IPEndPoint)this.udp.LocalEndPoint).Port);
 			this.nid = this.rreader.ReadUInt32();
 
