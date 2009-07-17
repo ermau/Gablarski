@@ -57,6 +57,7 @@ namespace Gablarski.Clients.CLI
 		public static void Main (string[] args)
 		{
 			bool trace = false;
+			bool veryverbose = false;
 			List<string> tracers = new List<string>();
 
 			string clientConnection = typeof (NetworkClientConnection).AssemblyQualifiedName;
@@ -80,6 +81,7 @@ namespace Gablarski.Clients.CLI
 				{ "defaultaudio",	"Selects the default input and output audio.",					v => defaultAudio = (v != null) },
 
 				{ "v|verbose",		"Turns on tracing, detailed debug invormation",					v => trace = (v != null) },
+				{ "V|veryverbose",	"Turns on very detailed debug information",						v => veryverbose = (v != null) },
 				{ "tracer=",		"Adds a tracer to the list (supply assembly qualified name.)",	tracers.Add },
 
 				{ "s|server",		"Starts a local Server.",										s => startServer = true },
@@ -89,6 +91,8 @@ namespace Gablarski.Clients.CLI
 
 			foreach (string unused in options.Parse (args))
 				Console.WriteLine ("Unrecognized option: " + unused);
+
+			trace = (trace || veryverbose);
 
 			if (!startServer && (String.IsNullOrEmpty (nickname) || String.IsNullOrEmpty (host)))
 			{
@@ -117,6 +121,7 @@ namespace Gablarski.Clients.CLI
 			if (startServer)
 			{
 				Server = new GablarskiServer (new ServerSettings { ServerLogo = serverLogo }, new GuestUserProvider(), new GuestPermissionProvider(), new LobbyChannelProvider());
+				Server.VerboseTracing = veryverbose;
 				
 				if (connectionProviders.Count == 0)
 					Server.AddConnectionProvider (new NetworkServerConnectionProvider { Port = port });
@@ -135,6 +140,7 @@ namespace Gablarski.Clients.CLI
 			if (startClient)
 			{
 				Client = new GablarskiClient (new NetworkClientConnection());
+				Client.VerboseTracing = veryverbose;
 				Client.Connected += ClientConnected;
 				Client.ConnectionRejected += ClientConnectionRejected;
 				Client.Disconnected += ClientDisconnected;

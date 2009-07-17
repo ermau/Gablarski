@@ -88,6 +88,9 @@ namespace Gablarski.Client
 			private set;
 		}
 
+		/// <summary>
+		/// Gets the current user.
+		/// </summary>
 		public CurrentUser CurrentUser
 		{
 			get;
@@ -108,6 +111,14 @@ namespace Gablarski.Client
 		public IdentifyingTypes IdentifyingTypes
 		{
 			get { return this.Connection.IdentifyingTypes; }
+		}
+
+		/// <summary>
+		/// Gets or sets whether to trace verbosely (trace audio data mostly).
+		/// </summary>
+		public bool VerboseTracing
+		{
+			get; set;
 		}
 		#endregion
 

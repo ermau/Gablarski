@@ -61,7 +61,7 @@ namespace Gablarski.Server
 					return;
 				}
 
-				Trace.WriteLineIf ((msg.MessageType != ClientMessageType.AudioData), "[Server] Message Received: " + msg.MessageType);
+				Trace.WriteLineIf ((VerboseTracing || msg.MessageType != ClientMessageType.AudioData), "[Server] Message Received: " + msg.MessageType);
 
 				Action<MessageReceivedEventArgs> handler;
 				Handlers.TryGetValue (msg.MessageType, out handler);

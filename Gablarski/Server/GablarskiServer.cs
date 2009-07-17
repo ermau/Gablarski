@@ -53,6 +53,14 @@ namespace Gablarski.Server
 
 		public IdentifyingTypes IdentifyingTypes { get; private set; }
 
+		/// <summary>
+		/// Gets or sets whether to trace verbosely (trace audio data mostly).
+		/// </summary>
+		public bool VerboseTracing
+		{
+			get; set;
+		}
+
 		#region Public Methods
 		/// <summary>
 		/// Gets or sets the list of <c>IConnectionProvider</c>'s for the server to use.
