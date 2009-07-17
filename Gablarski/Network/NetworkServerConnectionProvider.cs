@@ -44,11 +44,13 @@ namespace Gablarski.Network
 			
 			Trace.WriteLineIf (VerboseTracing, "[Network] Listening on port " + port);
 
-			udp = new Socket (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-			udp.Bind (new IPEndPoint (IPAddress.Any, port));
+			var localEP = new IPEndPoint (IPAddress.Any, port);
 
-			tcpListener = new TcpListener (IPAddress.Any, port);
-			tcpListener.Start();
+			udp = new Socket (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+			udp.Bind (localEP);
+
+			tcpListener = new TcpListener (localEP);
+			tcpListener.Start ();
 
 			this.listenerThread = new Thread (this.Listener) { Name = "Network Provider Listener" };
 			this.listenerThread.Start();

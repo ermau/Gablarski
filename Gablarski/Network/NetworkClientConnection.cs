@@ -125,7 +125,7 @@ namespace Gablarski.Network
 			Trace.WriteLine ("[Client] TCP Local Endpoint: " + this.tcp.Client.LocalEndPoint);
 
 			this.udp = new Socket (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-			this.udp.Bind (new IPEndPoint (IPAddress.Any, ((IPEndPoint)this.tcp.Client.LocalEndPoint).Port));
+			this.udp.Bind ((IPEndPoint)this.tcp.Client.LocalEndPoint);
 			this.udp.SendTo (new byte[] { 24, 24 }, endpoint);
 
 			Trace.WriteLine ("[Client] UDP Local Endpoint: " + this.udp.LocalEndPoint);
