@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using Gablarski.Client;
 using Gablarski.Media.Sources;
 using Gablarski.Network;
@@ -56,6 +57,8 @@ namespace Gablarski.Clients.CLI
 		[STAThread]
 		public static void Main (string[] args)
 		{
+			Console.WriteLine ("Gablarski CLI Client version: " + Assembly.GetExecutingAssembly().GetName().Version);
+
 			bool trace = false;
 			bool veryverbose = false;
 			List<string> tracers = new List<string>();
@@ -124,7 +127,7 @@ namespace Gablarski.Clients.CLI
 				Server.VerboseTracing = veryverbose;
 				
 				if (connectionProviders.Count == 0)
-					Server.AddConnectionProvider (new NetworkServerConnectionProvider { Port = port });
+					Server.AddConnectionProvider (new NetworkServerConnectionProvider { Port = port, VerboseTracing = veryverbose });
 				else
 					FindTypes<IConnectionProvider> (connectionProviders, Server.AddConnectionProvider);
 

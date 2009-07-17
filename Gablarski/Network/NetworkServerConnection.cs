@@ -78,6 +78,11 @@ namespace Gablarski.Network
 			OnDisconnected();
 		}
 
+		public override string ToString ()
+		{
+			return "NetworkServerConnection " + this.endPoint;
+		}
+
 		#endregion
 
 		private readonly IPEndPoint endPoint;

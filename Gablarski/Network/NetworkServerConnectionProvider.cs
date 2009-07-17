@@ -70,6 +70,13 @@ namespace Gablarski.Network
 			tcpListener = null;
 		}
 
+		/// <summary>
+		/// Whether to output detailed tracing.
+		/// </summary>
+		public bool VerboseTracing
+		{
+			get; set;
+		}
 		#endregion
 
 		private Thread listenerThread;
@@ -89,12 +96,18 @@ namespace Gablarski.Network
 				var ipendpoint = new IPEndPoint (IPAddress.Any, 0);
 				var endpoint = (EndPoint)ipendpoint;
 				if (udp.EndReceiveFrom (result, ref endpoint) == 0)
+				{
+					Trace.WriteLineIf (VerboseTracing, "[Network] UDP EndReceiveFrom returned nothing.");
 					return;
+				}
 
 				byte[] buffer = (byte[])result.AsyncState;
 
 				if (buffer[0] != 0x2A)
+				{
+					Trace.WriteLineIf (VerboseTracing, "[Network] Message failed sanity check.");
 					return;
+				}
 
 				IValueReader reader = new ByteArrayValueReader (buffer, 1);
 
@@ -110,21 +123,24 @@ namespace Gablarski.Network
 
 				Func<MessageBase> messageCtor;
 				MessageBase.MessageTypes.TryGetValue (mtype, out messageCtor);
-				if (messageCtor == null && connection != null)
+				if (messageCtor == null)
+				{
+					Trace.WriteLineIf (VerboseTracing, "[Network] Message type " + mtype + " not found from " + connection);
 					return;
-				else if (messageCtor != null)
+				}
+				else
 				{
 					var msg = messageCtor();
 					msg.ReadPayload (reader, this.IdentifyingTypes);
 
 					if (connection == null)
 					{
-						Trace.WriteLine ("[Network] Connectionless message received: " + msg.MessageTypeCode);
+						Trace.WriteLineIf (VerboseTracing, "[Network] Connectionless message received: " + msg.MessageTypeCode);
 						OnConnectionlessMessageReceived (new MessageReceivedEventArgs (null, msg));
 					}
 					else
 					{
-						Trace.WriteLine ("[Network] Unreliable message received: " + msg.MessageTypeCode);
+						Trace.WriteLine (VerboseTracing, "[Network] Unreliable message received: " + msg.MessageTypeCode);
 						connection.Receive (msg);
 					}
 				}
