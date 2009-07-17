@@ -118,15 +118,21 @@ namespace Gablarski.Network
 					msg.ReadPayload (reader, this.IdentifyingTypes);
 
 					if (connection == null)
+					{
+						Trace.WriteLine ("[Network] Connectionless message received: " + msg.MessageTypeCode);
 						OnConnectionlessMessageReceived (new MessageReceivedEventArgs (null, msg));
+					}
 					else
+					{
+						Trace.WriteLine ("[Network] Unreliable message received: " + msg.MessageTypeCode);
 						connection.Receive (msg);
+					}
 				}
 			}
-			catch (SocketException sex)
+			catch (SocketException)
 			{
 			}
-			catch (ObjectDisposedException odex)
+			catch (ObjectDisposedException)
 			{
 			}
 			finally
