@@ -114,7 +114,13 @@ namespace Gablarski.Client
 			this.OnConnected (this, EventArgs.Empty);
 		}
 
-		private void OnDisconnectedInternal (object sender, ConnectionEventArgs e)
+		private enum DisconnectHandling
+		{
+			None,
+			Reconnect
+		}
+
+		private void DisconnectCore (DisconnectHandling handling, IConnection connection)
 		{
 			if (!this.running)
 				return;
@@ -125,9 +131,9 @@ namespace Gablarski.Client
 				this.mqueue.Clear();
 			}
 
-			e.Connection.Disconnected -= this.OnDisconnectedInternal;
-			e.Connection.MessageReceived -= this.OnMessageReceived;
-			e.Connection.Disconnect();
+			connection.Disconnected -= this.OnDisconnectedInternal;
+			connection.MessageReceived -= this.OnMessageReceived;
+			connection.Disconnect();
 
 			if (this.messageRunnerThread != null)
 				this.messageRunnerThread.Join ();
@@ -136,7 +142,12 @@ namespace Gablarski.Client
 			this.Channels.Clear();
 			this.Sources.Clear();
 
-			OnDisconnected (sender, EventArgs.Empty);
+			OnDisconnected (this, EventArgs.Empty);
+		}
+
+		private void OnDisconnectedInternal (object sender, ConnectionEventArgs e)
+		{
+			DisconnectCore ((ReconnectAutomatically) ? DisconnectHandling.Reconnect : DisconnectHandling.None, e.Connection);
 		}
 	}
 }

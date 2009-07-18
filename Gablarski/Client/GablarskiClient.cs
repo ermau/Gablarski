@@ -113,6 +113,27 @@ namespace Gablarski.Client
 			get { return this.Connection.IdentifyingTypes; }
 		}
 
+		private bool reconnectAutomatically = true;
+		/// <summary>
+		/// Gets or sets whether to reconnect automatically on disconnection. <c>true</c> by default.
+		/// </summary>
+		/// <seealso cref="ReconnectAttemptFrequency"/>
+		public bool ReconnectAutomatically
+		{
+			get { return reconnectAutomatically; }
+			set { reconnectAutomatically = value; }
+		}
+
+		private int reconnectAttemptFrequency = 5000;
+		/// <summary>
+		/// Gets or sets the frequency (ms) at which to attempt reconnection. (5s default).
+		/// </summary>
+		public int ReconnectAttemptFrequency
+		{
+			get { return reconnectAttemptFrequency; }
+			set { reconnectAttemptFrequency = value; }
+		}
+
 		/// <summary>
 		/// Gets or sets whether to trace verbosely (trace audio data mostly).
 		/// </summary>
@@ -163,7 +184,7 @@ namespace Gablarski.Client
 		/// </summary>
 		public void Disconnect()
 		{
-			OnDisconnectedInternal (this, new ConnectionEventArgs (this.Connection));
+			DisconnectCore (DisconnectHandling.None, this.Connection);
 		}
 		#endregion
 
