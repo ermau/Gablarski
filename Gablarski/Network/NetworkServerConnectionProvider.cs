@@ -248,7 +248,14 @@ namespace Gablarski.Network
 					var ipEndpoint = new IPEndPoint (IPAddress.Any, 0);
 					var tendpoint = (EndPoint)ipEndpoint;
 					byte[] buffer = new byte[5120];
-					udp.BeginReceiveFrom (buffer, 0, 5120, SocketFlags.None, ref tendpoint, UnreliableReceive, buffer);
+
+					try
+					{
+						udp.BeginReceiveFrom (buffer, 0, 5120, SocketFlags.None, ref tendpoint, UnreliableReceive, buffer);
+					}
+					catch (SocketException)
+					{
+					}
 				}
 
 				if (!this.accepting && tcpListener.Pending())

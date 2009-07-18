@@ -15,10 +15,8 @@ namespace Gablarski.Clients.Windows
 	public partial class MainForm
 		: Form
 	{
-		public MainForm (ServerEntry entry)
+		public MainForm ()
 		{
-			this.server = entry;
-
 			this.gablarski = new GablarskiClient (new NetworkClientConnection());
 			this.gablarski.ConnectionRejected += this.GablarskiConnectionRejected;
 			this.gablarski.Connected += this.GablarskiConnected;
@@ -38,6 +36,23 @@ namespace Gablarski.Clients.Windows
 			this.InitializeComponent ();
 
 			this.users.Client = this.gablarski;
+		}
+
+		public bool ShowConnect (bool cancelExits)
+		{
+			var login = new LoginForm();
+			if (login.ShowDialog(this) == DialogResult.OK)
+			{
+				this.server = login.Entry;
+				Connect();
+			}
+			else if (cancelExits)
+			{
+				this.Close();
+				return false;
+			}
+
+			return true;
 		}
 
 		private const string VoiceName = "voice";
@@ -61,11 +76,16 @@ namespace Gablarski.Clients.Windows
 			}
 			catch (Exception ex)
 			{
-				TaskDialog.Show (ex.ToDisplayString(), "An error as occured initializing OpenAL.", "OpenAL Initialization", TaskDialogStandardIcon.Error);
+				//TaskDialog.Show (ex.ToDisplayString(), "An error as occured initializing OpenAL.", "OpenAL Initialization", TaskDialogStandardIcon.Error);
+				MessageBox.Show ("An error occured initializing OpenAL" + Environment.NewLine + ex.ToDisplayString(),
+				                 "OpenAL Initialization", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
 
 			SetUsePushToTalk (Settings.UsePushToTalk);
+		}
 
+		private void Connect()
+		{
 			this.gablarski.Connect (this.server.Host, this.server.Port);
 		}
 
@@ -159,7 +179,8 @@ namespace Gablarski.Clients.Windows
 					voiceSource = (ClientAudioSource)e.Source;
 			}
 			else if (e.Result != SourceResult.NewSource && e.Result != SourceResult.SourceRemoved)
-				TaskDialog.Show (e.Result.ToString(), "Source request failed");
+				MessageBox.Show (e.Result.ToString());
+				//TaskDialog.Show (e.Result.ToString(), "Source request failed");
 		}
 
 		private void UsersUserChangedChannel (object sender, ChannelChangedEventArgs e)
@@ -191,7 +212,8 @@ namespace Gablarski.Clients.Windows
 		void CurrentUserReceivedLoginResult (object sender, ReceivedLoginResultEventArgs e)
 		{
 			if (!e.Result.Succeeded)
-				TaskDialog.Show (e.Result.ResultState.ToString(), "Login Failed");
+				//TaskDialog.Show (e.Result.ResultState.ToString(), "Login Failed");
+				MessageBox.Show ("Login Failed" + Environment.NewLine + e.Result.ResultState.ToString());
 			else
 				this.gablarski.Sources.Request ("voice", 1, 64000);
 		}
@@ -208,7 +230,7 @@ namespace Gablarski.Clients.Windows
 			});
 		}
 
-		void GablarskiConnected (object sender, EventArgs e)
+		private void GablarskiConnected (object sender, EventArgs e)
 		{
 			this.Invoke ((Action)delegate
 			{
@@ -227,13 +249,29 @@ namespace Gablarski.Clients.Windows
 			this.gablarski.CurrentUser.Login (this.server.UserNickname, this.server.UserName, this.server.UserPassword);
 		}
 
-		void GablarskiConnectionRejected (object sender, RejectedConnectionEventArgs e)
+		private void GablarskiConnectionRejected (object sender, RejectedConnectionEventArgs e)
 		{
-			TaskDialog.Show (e.Reason.ToString(), "Connection rejected");
+			//TaskDialog.Show (e.Reason.ToString(), "Connection rejected");
+			switch (e.Reason)
+			{
+				case ConnectionRejectedReason.CouldNotConnect:
+					MessageBox.Show ("Could not connect to the server", "Connecting", MessageBoxButtons.RetryCancel,
+					                 MessageBoxIcon.Warning);
+					break;
+
+				case ConnectionRejectedReason.IncompatibleVersion:
+					MessageBox.Show ("Connecting to the server failed because it is running a newer version of Gablarski than you are.", "Connecting",
+					                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
+					break;
+
+				default:
+					MessageBox.Show (e.Reason.ToString());
+					break;
+			}
 		}
 
 		private readonly GablarskiClient gablarski;
-		private readonly ServerEntry server;
+		private ServerEntry server;
 
 		private void MainForm_FormClosing (object sender, FormClosingEventArgs e)
 		{
@@ -245,7 +283,7 @@ namespace Gablarski.Clients.Windows
 			if (this.gablarski.IsConnected)
 				this.gablarski.Disconnect();
 			else
-				this.gablarski.Connect (this.server.Host, this.server.Port);
+				this.ShowConnect (false);
 		}
 
 		private void btnSettings_Click (object sender, EventArgs e)

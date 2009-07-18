@@ -8,7 +8,16 @@ namespace Gablarski.Messages
 	public enum ConnectionRejectedReason
 	{
 		Unknown = 0,
-		IncompatibleVersion = 1
+		
+		/// <summary>
+		/// Server rejected the client as incompatible.
+		/// </summary>
+		IncompatibleVersion = 1,
+
+		/// <summary>
+		/// The client could not connect to the server.
+		/// </summary>
+		CouldNotConnect = 2,
 	}
 
 	public class ConnectionRejectedMessage

@@ -20,8 +20,10 @@ namespace Gablarski.Clients.Windows
 			{
 				KHook.UninstallHook();
 				/*MHook.UninstallHook();*/
-				TaskDialog.Show ((e.ExceptionObject as Exception).ToDisplayString(), "Unexpected Error", "Unexpected Error",
-				                 TaskDialogStandardIcon.Error);
+				/*TaskDialog.Show ((e.ExceptionObject as Exception).ToDisplayString(), "Unexpected Error", "Unexpected Error",
+				                 TaskDialogStandardIcon.Error);*/
+				MessageBox.Show ("Unexpected error" + Environment.NewLine + (e.ExceptionObject as Exception).ToDisplayString(),
+				                 "Unexpected error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			};
 
 			KHook.InstallHook();
@@ -32,9 +34,10 @@ namespace Gablarski.Clients.Windows
 
 			try
 			{
-				var login = new LoginForm();
-				if (login.ShowDialog() == DialogResult.OK)
-					Application.Run (new MainForm (login.Entry));
+				var m = new MainForm();
+				m.Show();
+				if (m.ShowConnect (true))
+					Application.Run (m);
 			}
 			finally
 			{

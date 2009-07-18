@@ -137,18 +137,25 @@ namespace Gablarski.Client
 			if (host.IsEmpty ())
 				throw new ArgumentException ("host must not be null or empty", "host");
 
-			IPEndPoint endPoint = new IPEndPoint (Dns.GetHostAddresses (host).Where (ip => ip.AddressFamily != AddressFamily.InterNetworkV6).First(), port);
+			try
+			{
+				IPEndPoint endPoint = new IPEndPoint (Dns.GetHostAddresses (host).Where (ip => ip.AddressFamily != AddressFamily.InterNetworkV6).First(), port);
 
-			this.running = true;
+				this.running = true;
 
-			this.messageRunnerThread = new Thread (this.MessageRunner) { Name = "Gablarski Client Message Runner" };
-			this.messageRunnerThread.SetApartmentState (ApartmentState.STA);
-			this.messageRunnerThread.Start ();
+				this.messageRunnerThread = new Thread (this.MessageRunner) { Name = "Gablarski Client Message Runner" };
+				this.messageRunnerThread.SetApartmentState (ApartmentState.STA);
+				this.messageRunnerThread.Start();
 
-			Connection.Disconnected += this.OnDisconnected;
-			Connection.MessageReceived += OnMessageReceived;
-			Connection.Connect (endPoint);
-			Connection.Send (new ConnectMessage (ApiVersion));
+				Connection.Disconnected += this.OnDisconnected;
+				Connection.MessageReceived += OnMessageReceived;
+				Connection.Connect (endPoint);
+				Connection.Send (new ConnectMessage (ApiVersion));
+			}
+			catch (SocketException)
+			{
+				OnConnectionRejected (new RejectedConnectionEventArgs (ConnectionRejectedReason.CouldNotConnect));
+			}
 		}
 
 		/// <summary>
@@ -156,6 +163,9 @@ namespace Gablarski.Client
 		/// </summary>
 		public void Disconnect()
 		{
+			if (!this.running)
+				return;
+
 			this.running = false;
 			lock (this.mqueue)
 			{
@@ -168,7 +178,8 @@ namespace Gablarski.Client
 
 			OnDisconnected (this, EventArgs.Empty);
 
-			this.messageRunnerThread.Join ();
+			if (this.messageRunnerThread != null)
+				this.messageRunnerThread.Join ();
 
 			this.Users.Clear();
 			this.Channels.Clear();

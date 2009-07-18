@@ -9,15 +9,10 @@ namespace Microsoft.WindowsAPICodePack
     /// </summary>
     public class CommonDllNames
     {
-		static CommonDllNames ()
-		{
-			ComCtl32 = (Environment.OSVersion.Version.Major > 5) ? "comctl32.dll" : "XTaskDlg.dll";
-		}
-
         /// <summary>
         /// 
         /// </summary>
-        public static readonly string ComCtl32;
+        public const string ComCtl32 = "comctl32.dll";
         /// <summary>
         /// 
         /// </summary>
