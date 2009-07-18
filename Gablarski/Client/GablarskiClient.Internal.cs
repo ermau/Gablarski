@@ -113,5 +113,30 @@ namespace Gablarski.Client
 
 			this.OnConnected (this, EventArgs.Empty);
 		}
+
+		private void OnDisconnectedInternal (object sender, ConnectionEventArgs e)
+		{
+			if (!this.running)
+				return;
+
+			this.running = false;
+			lock (this.mqueue)
+			{
+				this.mqueue.Clear();
+			}
+
+			e.Connection.Disconnected -= this.OnDisconnectedInternal;
+			e.Connection.MessageReceived -= this.OnMessageReceived;
+			e.Connection.Disconnect();
+
+			if (this.messageRunnerThread != null)
+				this.messageRunnerThread.Join ();
+
+			this.Users.Clear();
+			this.Channels.Clear();
+			this.Sources.Clear();
+
+			OnDisconnected (sender, EventArgs.Empty);
+		}
 	}
 }

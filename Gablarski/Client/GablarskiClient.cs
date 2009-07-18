@@ -147,7 +147,7 @@ namespace Gablarski.Client
 				this.messageRunnerThread.SetApartmentState (ApartmentState.STA);
 				this.messageRunnerThread.Start();
 
-				Connection.Disconnected += this.OnDisconnected;
+				Connection.Disconnected += this.OnDisconnectedInternal;
 				Connection.MessageReceived += OnMessageReceived;
 				Connection.Connect (endPoint);
 				Connection.Send (new ConnectMessage (ApiVersion));
@@ -163,27 +163,7 @@ namespace Gablarski.Client
 		/// </summary>
 		public void Disconnect()
 		{
-			if (!this.running)
-				return;
-
-			this.running = false;
-			lock (this.mqueue)
-			{
-				this.mqueue.Clear();
-			}
-
-			Connection.Disconnected -= this.OnDisconnected;
-			Connection.MessageReceived -= this.OnMessageReceived;
-			Connection.Disconnect();
-
-			OnDisconnected (this, EventArgs.Empty);
-
-			if (this.messageRunnerThread != null)
-				this.messageRunnerThread.Join ();
-
-			this.Users.Clear();
-			this.Channels.Clear();
-			this.Sources.Clear();
+			OnDisconnectedInternal (this, new ConnectionEventArgs (this.Connection));
 		}
 		#endregion
 
