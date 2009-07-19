@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using Gablarski.Media.Sources;
 using Gablarski.Messages;
 using System.Threading;
 

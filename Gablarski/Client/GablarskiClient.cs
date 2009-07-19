@@ -160,7 +160,7 @@ namespace Gablarski.Client
 
 			try
 			{
-				IPEndPoint endPoint = new IPEndPoint (Dns.GetHostAddresses (host).Where (ip => ip.AddressFamily != AddressFamily.InterNetworkV6).First(), port);
+				IPEndPoint endPoint = new IPEndPoint (Dns.GetHostAddresses (host).Where (ip => ip.AddressFamily == AddressFamily.InterNetwork).First(), port);
 
 				this.running = true;
 

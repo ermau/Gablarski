@@ -77,7 +77,7 @@ namespace Gablarski.Clients.Windows
 			catch (Exception ex)
 			{
 				//TaskDialog.Show (ex.ToDisplayString(), "An error as occured initializing OpenAL.", "OpenAL Initialization", TaskDialogStandardIcon.Error);
-				MessageBox.Show ("An error occured initializing OpenAL" + Environment.NewLine + ex.ToDisplayString(),
+				MessageBox.Show (this, "An error occured initializing OpenAL" + Environment.NewLine + ex.ToDisplayString(),
 				                 "OpenAL Initialization", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
 
@@ -179,7 +179,7 @@ namespace Gablarski.Clients.Windows
 					voiceSource = (ClientAudioSource)e.Source;
 			}
 			else if (e.Result != SourceResult.NewSource && e.Result != SourceResult.SourceRemoved)
-				MessageBox.Show (e.Result.ToString());
+				MessageBox.Show (this, e.Result.ToString());
 				//TaskDialog.Show (e.Result.ToString(), "Source request failed");
 		}
 
@@ -196,7 +196,7 @@ namespace Gablarski.Clients.Windows
 
 		private void UsersUserLoggedIn (object sender, UserLoggedInEventArgs e)
 		{
-			this.users.AddUser (e.UserInfo);
+			this.users.AddUser (e.User);
 		}
 
 		void UsersReceivedUserList (object sender, ReceivedListEventArgs<UserInfo> e)
@@ -213,7 +213,7 @@ namespace Gablarski.Clients.Windows
 		{
 			if (!e.Result.Succeeded)
 				//TaskDialog.Show (e.Result.ResultState.ToString(), "Login Failed");
-				MessageBox.Show ("Login Failed" + Environment.NewLine + e.Result.ResultState.ToString());
+				MessageBox.Show (this, "Login Failed" + Environment.NewLine + e.Result.ResultState);
 			else
 				this.gablarski.Sources.Request ("voice", 1, 64000);
 		}
@@ -255,12 +255,15 @@ namespace Gablarski.Clients.Windows
 			switch (e.Reason)
 			{
 				case ConnectionRejectedReason.CouldNotConnect:
-					MessageBox.Show ("Could not connect to the server", "Connecting", MessageBoxButtons.RetryCancel,
-					                 MessageBoxIcon.Warning);
+					if (MessageBox.Show (this, "Could not connect to the server", "Connecting", MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning) == DialogResult.Retry)
+						Connect();
+					else
+						ShowConnect (true);
+
 					break;
 
 				case ConnectionRejectedReason.IncompatibleVersion:
-					MessageBox.Show ("Connecting to the server failed because it is running a newer version of Gablarski than you are.", "Connecting",
+					MessageBox.Show (this, "Connecting to the server failed because it is running a newer version of Gablarski than you are.", "Connecting",
 					                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
 					break;
 

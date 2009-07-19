@@ -272,13 +272,13 @@ namespace Gablarski.Client
 			if (userInfo == null)
 				throw new ArgumentNullException ("userInfo");
 
-			this.UserInfo = userInfo;
+			this.User = userInfo;
 		}
 
 		/// <summary>
 		/// Gets the new user's information.
 		/// </summary>
-		public ClientUser UserInfo
+		public ClientUser User
 		{
 			get;
 			private set;

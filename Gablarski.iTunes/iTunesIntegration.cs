@@ -17,10 +17,7 @@ namespace Gablarski.iTunes
 			get
 			{
 				var track = itunes.CurrentTrack;
-				if (track != null)
-					return track.Name;
-
-				return String.Empty;
+				return track != null ? track.Name : String.Empty;
 			}
 		}
 
@@ -29,10 +26,7 @@ namespace Gablarski.iTunes
 			get
 			{
 				var track = itunes.CurrentTrack;
-				if (track != null)
-					return track.Artist;
-
-				return String.Empty;
+				return track != null ? track.Artist : String.Empty;
 			}
 		}
 
@@ -41,10 +35,7 @@ namespace Gablarski.iTunes
 			get
 			{
 				var track = itunes.CurrentTrack;
-				if (track != null)
-					return track.Album;
-
-				return String.Empty;
+				return track != null ? track.Album : String.Empty;
 			}
 		}
 
