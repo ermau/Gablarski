@@ -191,13 +191,6 @@ namespace Gablarski.Network
 				var stream = client.GetStream();
 				var tendpoint = (IPEndPoint)client.Client.RemoteEndPoint;
 				Trace.WriteLine ("[Server] Accepted TCP Connection from " + tendpoint);
-				var udpSocket = new Socket (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-
-				//int udpPort = BitConverter.ToInt32 (stream.ReadBytes (4), 0);
-				//Trace.WriteLine ("[Server] Connection reports UDP port " + udpPort);
-
-				//tendpoint = new IPEndPoint (tendpoint.Address, udpPort);
-				udpSocket.Connect (tendpoint);
 
 				uint nid = 1;
 				NetworkServerConnection connection;
@@ -209,7 +202,7 @@ namespace Gablarski.Network
 							break;
 					}
 
-					connection = new NetworkServerConnection (nid, tendpoint, client, new SocketValueWriter (udpSocket, tendpoint));
+					connection = new NetworkServerConnection (nid, tendpoint, client, new SocketValueWriter (this.udp, tendpoint));
 					connections.Add (nid, connection);
 				}
 
