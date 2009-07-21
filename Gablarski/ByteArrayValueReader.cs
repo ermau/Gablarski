@@ -97,7 +97,7 @@ namespace Gablarski
 			string str = String.Empty;
 			while (true)
 			{
-				string tstr = Encoding.UTF8.GetString (buffer, pos, 1);
+				string tstr = Encoding.UTF8.GetString (buffer, pos++, 1);
 				if (tstr == "\0")
 					break;
 
