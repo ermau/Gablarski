@@ -41,7 +41,7 @@ namespace Gablarski.CELT
 			return pcm;
 		}
 
-		private IntPtr decoderState;
+		private readonly IntPtr decoderState;
 
 		#region IDisposable Members
 		public void Dispose ()
@@ -56,13 +56,14 @@ namespace Gablarski.CELT
 			if (this.disposed)
 				return;
 
-
+			celt_decoder_destroy (this.decoderState);
 
 			this.disposed = true;
 		}
 		#endregion
 
 		#region Imports
+		// ReSharper disable InconsistentNaming
 		[DllImport ("libcelt.dll", CallingConvention = CallingConvention.Cdecl)]
 		private static extern IntPtr celt_decoder_create (IntPtr mode);
 
@@ -71,6 +72,7 @@ namespace Gablarski.CELT
 
 		[DllImport ("libcelt.dll", CallingConvention = CallingConvention.Cdecl)]
 		private static extern ErrorCode celt_decode (IntPtr decoderState, byte[] data, int length, IntPtr pcm);
+		// ReSharper restore InconsistentNaming
 		#endregion
 
 		/// <summary>
