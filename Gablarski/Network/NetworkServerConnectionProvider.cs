@@ -192,15 +192,11 @@ namespace Gablarski.Network
 				var tendpoint = (IPEndPoint)client.Client.RemoteEndPoint;
 				Trace.WriteLine ("[Server] Accepted TCP Connection from " + tendpoint);
 
-				uint nid = 1;
+				uint nid = 0;
 				NetworkServerConnection connection;
 				lock (connections)
 				{
-					for (; nid < UInt32.MaxValue; ++nid)
-					{
-						if (!connections.ContainsKey (nid))
-							break;
-					}
+					while (connections.ContainsKey (++nid)) ;
 
 					connection = new NetworkServerConnection (nid, tendpoint, client, new SocketValueWriter (this.udp, tendpoint));
 					connections.Add (nid, connection);
