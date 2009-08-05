@@ -132,16 +132,14 @@ namespace Gablarski.Network
 
 				ushort mtype = reader.ReadUInt16();
 
-				Func<MessageBase> messageCtor;
-				MessageBase.MessageTypes.TryGetValue (mtype, out messageCtor);
-				if (messageCtor == null)
+				MessageBase msg;
+				if (!MessageBase.GetMessage (mtype, out msg))
 				{
 					Trace.WriteLineIf (VerboseTracing, "[Network] Message type " + mtype + " not found from " + connection);
 					return;
 				}
 				else
 				{
-					var msg = messageCtor();
 					msg.ReadPayload (reader, this.IdentifyingTypes);
 
 					if (connection == null)

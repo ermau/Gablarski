@@ -269,11 +269,9 @@ namespace Gablarski.Network
 
 				ushort type = this.rreader.ReadUInt16();
 
-				Func<MessageBase> messageCtor;
-				MessageBase.MessageTypes.TryGetValue (type, out messageCtor);
-				if (messageCtor != null)
+				MessageBase msg;
+				if (MessageBase.GetMessage (type, out msg))
 				{
-					var msg = messageCtor();
 					msg.ReadPayload (this.rreader, this.IdentifyingTypes);
 
 					OnMessageReceived (new MessageReceivedEventArgs (this, msg));
@@ -317,16 +315,14 @@ namespace Gablarski.Network
 				IValueReader reader = new ByteArrayValueReader (buffer, 1);
 				ushort mtype = reader.ReadUInt16();
 
-				Func<MessageBase> messageCtor;
-				MessageBase.MessageTypes.TryGetValue (mtype, out messageCtor);
-				if (messageCtor == null)
+				MessageBase msg;
+				if (!MessageBase.GetMessage (mtype, out msg))
 				{
 					Trace.WriteLineIf (VerboseTracing, "[Network] Message type " + mtype + " not found from " + endpoint);
 					return;
 				}
 				else
 				{
-					var msg = messageCtor();
 					msg.ReadPayload (reader, this.IdentifyingTypes);
 
 					OnMessageReceived (new MessageReceivedEventArgs (this, msg));

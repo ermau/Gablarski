@@ -28,6 +28,19 @@ namespace Gablarski.Messages
 		public abstract void WritePayload (IValueWriter writer, IdentifyingTypes idTypes);
 		public abstract void ReadPayload (IValueReader reader, IdentifyingTypes idTypes);
 
+		public static bool GetMessage (ushort messageType, out MessageBase msg)
+		{
+			msg = null;
+			Func<MessageBase> msgctor;
+			if (MessageTypes.TryGetValue (messageType, out msgctor))
+			{
+				msg = msgctor();
+				return true;
+			}
+
+			return false;
+		}
+
 		public static ReadOnlyDictionary<ushort, Func<MessageBase>> MessageTypes
 		{
 			get;
@@ -40,8 +53,7 @@ namespace Gablarski.Messages
 
 			Type msgb = typeof(MessageBase);
 
-			Type[] types = Assembly.GetExecutingAssembly ().GetTypes ();
-			foreach (Type t in types.Where (t => msgb.IsAssignableFrom (t) && !t.IsAbstract))
+			foreach (Type t in Assembly.GetExecutingAssembly ().GetTypes ().Where (t => msgb.IsAssignableFrom (t) && !t.IsAbstract))
 			{
 				var ctor = t.GetConstructor (Type.EmptyTypes);
 

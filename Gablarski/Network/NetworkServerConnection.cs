@@ -212,11 +212,9 @@ namespace Gablarski.Network
 					return;
 
 				ushort type = this.reader.ReadUInt16();
-				Func<MessageBase> messageCtor;
-				MessageBase.MessageTypes.TryGetValue (type, out messageCtor);
-				if (messageCtor != null)
+				MessageBase msg;
+				if (MessageBase.GetMessage (type, out msg))
 				{
-					var msg = messageCtor();
 					msg.ReadPayload (this.reader, this.IdentifyingTypes);
 
 					OnMessageReceived (new MessageReceivedEventArgs (this, msg));
