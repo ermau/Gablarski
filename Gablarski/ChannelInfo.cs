@@ -6,31 +6,30 @@ using Gablarski.Client;
 
 namespace Gablarski
 {
-	public class Channel
+	public class ChannelInfo
 	{
-		public Channel ()
-			: this (null)
+		public ChannelInfo ()
+			: this (0)
 		{
 		}
 
-		public Channel (IValueReader reader, IdentifyingTypes idTypes)
+		public ChannelInfo (IValueReader reader)
 		{
-			Deserialize (reader, idTypes);
+			Deserialize (reader);
 		}
 
-		public Channel (object channelId)
+		public ChannelInfo (int channelId)
 			: this (channelId, false)
 		{
 			this.ChannelId = channelId;
 		}
 
-		public Channel (object channelId, bool readOnly)
+		public ChannelInfo (int channelId, bool readOnly)
 		{
-			this.ReadOnly = readOnly;
 			this.ChannelId = channelId;
 		}
 
-		public Channel (object channelId, Channel channel)
+		public ChannelInfo (int channelId, ChannelInfo channel)
 			: this (channelId, channel.ReadOnly)
 		{
 			this.ParentChannelId = channel.ParentChannelId;
@@ -42,7 +41,7 @@ namespace Gablarski
 		/// <summary>
 		/// Gets the ID of this channel.
 		/// </summary>
-		public virtual object ChannelId
+		public virtual int ChannelId
 		{
 			get;
 			private set;
@@ -51,11 +50,15 @@ namespace Gablarski
 		/// <summary>
 		/// Gets or sets the channel ID this is a subchannel of. default if a main channel.
 		/// </summary>
-		public virtual object ParentChannelId
+		public virtual int ParentChannelId
 		{
 			get;
 			set;
 		}
+
+		protected string name;
+		protected string description;
+		protected int playerLimit;
 
 		/// <summary>
 		/// Gets or sets the name of the channel.
@@ -86,7 +89,7 @@ namespace Gablarski
 				this.description = value;
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets or sets the player limit. 0 for no limit.
 		/// </summary>
@@ -108,42 +111,27 @@ namespace Gablarski
 		public virtual bool ReadOnly
 		{
 			get;
-			private set;
+			protected set;
 		}
 
-		private string name;
-		private string description;
-		private int playerLimit;
-
-		internal void Serialize (IValueWriter writer, IdentifyingTypes idTypes)
+		internal void Serialize (IValueWriter writer)
 		{
-			idTypes.WriteChannel (writer, this.ChannelId);
-			idTypes.WriteChannel (writer, this.ParentChannelId);
+			writer.WriteInt32 (this.ChannelId);
+			writer.WriteInt32 (this.ParentChannelId);
 			writer.WriteBool (this.ReadOnly);
 			writer.WriteInt32 (this.PlayerLimit);
 			writer.WriteString (this.Name);
 			writer.WriteString (this.Description);
 		}
 
-		internal void Deserialize (IValueReader reader, IdentifyingTypes idTypes)
+		internal void Deserialize (IValueReader reader)
 		{
-			this.ChannelId = idTypes.ReadChannel (reader);
-			this.ParentChannelId = idTypes.ReadChannel (reader);
+			this.ChannelId = reader.ReadInt32();
+			this.ParentChannelId = reader.ReadInt32();
 			this.ReadOnly = reader.ReadBool();
 			this.playerLimit = reader.ReadInt32 ();
 			this.name = reader.ReadString ();
 			this.description = reader.ReadString ();
-		}
-
-		/// <summary>
-		/// Gets whether the channelId is the default value (basically null) or not.
-		/// </summary>
-		/// <param name="channelId">The channel identifier to check.</param>
-		/// <param name="types">The <see cref="IdentifyingTypes"/> instance to check against.</param>
-		/// <returns><c>true</c> if <paramref name="channelId"/> is default, <c>false</c> otherwise.</returns>
-		public static bool IsDefault (object channelId, IdentifyingTypes types)
-		{
-			return channelId.Equals (types.ChannelIdType.GetDefaultValue());
 		}
 	}
 }

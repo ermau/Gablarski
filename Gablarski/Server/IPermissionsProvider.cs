@@ -7,6 +7,6 @@ namespace Gablarski.Server
 {
 	public interface IPermissionsProvider
 	{
-		IEnumerable<Permission> GetPermissions (object playerId, IdentifyingTypes idTypes);
+		IEnumerable<Permission> GetPermissions (int playerId);
 	}
 }

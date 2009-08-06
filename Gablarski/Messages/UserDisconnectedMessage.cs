@@ -14,26 +14,26 @@ namespace Gablarski.Messages
 			
 		}
 
-		public UserDisconnectedMessage (object userId)
+		public UserDisconnectedMessage (int userId)
 			: this()
 		{
 			this.UserId = userId;
 		}
 
-		public object UserId
+		public int UserId
 		{
 			get;
 			private set;
 		}
 
-		public override void WritePayload (IValueWriter writer, IdentifyingTypes idTypes)
+		public override void WritePayload (IValueWriter writer)
 		{
-			idTypes.WriteUser (writer, this.UserId);
+			writer.WriteInt32 (this.UserId);
 		}
 
-		public override void ReadPayload (IValueReader reader, IdentifyingTypes idTypes)
+		public override void ReadPayload (IValueReader reader)
 		{
-			this.UserId = idTypes.ReadUser (reader);
+			this.UserId = reader.ReadInt32();
 		}
 	}
 }

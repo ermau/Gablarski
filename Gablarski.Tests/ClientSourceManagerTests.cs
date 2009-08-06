@@ -16,7 +16,7 @@ namespace Gablarski.Tests
 		public void ManagerSetup()
 		{
 			this.provider = new MockConnectionProvider();
-			this.server = this.provider.EstablishConnection(new IdentifyingTypes (typeof(Int32), typeof(Int32)));
+			this.server = this.provider.EstablishConnection();
 			this.client = this.server.Client;
 
 			var context = new MockClientContext { Connection = this.server.Client };
@@ -25,7 +25,7 @@ namespace Gablarski.Tests
 
 			context.Users = new ClientUserManager (context);
 			context.Channels = channels;
-			context.CurrentUser = new CurrentUser (context, 1, "Foo", channels.First());
+			context.CurrentUser = new CurrentUser (context, 1, "Foo", channels.First().ChannelId);
 
 			this.manager = new ClientSourceManager (context);
 		}

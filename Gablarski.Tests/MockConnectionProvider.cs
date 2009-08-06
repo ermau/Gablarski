@@ -10,10 +10,9 @@ namespace Gablarski.Tests
 	public class MockConnectionProvider
 		: IConnectionProvider
 	{
-		public MockServerConnection EstablishConnection (IdentifyingTypes types)
+		public MockServerConnection EstablishConnection ()
 		{
 			var connection = new MockServerConnection ();
-			connection.IdentifyingTypes = types;
 
 			var connectionMade = this.ConnectionMade;
 			if (connectionMade != null)
@@ -33,11 +32,6 @@ namespace Gablarski.Tests
 		public event EventHandler<ConnectionEventArgs> ConnectionMade;
 
 		public event EventHandler<MessageReceivedEventArgs> ConnectionlessMessageReceived;
-
-		public IdentifyingTypes IdentifyingTypes
-		{
-			get; set;
-		}
 
 		public void StartListening ()
 		{

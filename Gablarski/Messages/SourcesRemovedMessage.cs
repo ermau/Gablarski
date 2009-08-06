@@ -26,7 +26,7 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public override void WritePayload (IValueWriter writer, IdentifyingTypes idTypes)
+		public override void WritePayload (IValueWriter writer)
 		{
 			int count = this.SourceIds.Count();
 			writer.WriteInt32 (count);
@@ -37,7 +37,7 @@ namespace Gablarski.Messages
 			}
 		}
 
-		public override void ReadPayload (IValueReader reader, IdentifyingTypes idTypes)
+		public override void ReadPayload (IValueReader reader)
 		{
 			int[] sourceIds = new int[reader.ReadInt32()];
 			for (int i = 0; i < sourceIds.Length; ++i)

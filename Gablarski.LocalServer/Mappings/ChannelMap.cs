@@ -7,7 +7,7 @@ using FluentNHibernate.Mapping;
 namespace Gablarski.LocalServer.Mappings
 {
 	public class ChannelMap
-		: ClassMap<Channel>
+		: ClassMap<ChannelInfo>
 	{
 		public ChannelMap()
 		{

@@ -199,7 +199,7 @@ namespace Gablarski.Network
 
 					iwriter.WriteUInt16 (toSend.MessageTypeCode);
 
-					toSend.WritePayload (iwriter, this.IdentifyingTypes);
+					toSend.WritePayload (iwriter);
 					iwriter.Flush();
 				}
 
@@ -272,7 +272,7 @@ namespace Gablarski.Network
 				MessageBase msg;
 				if (MessageBase.GetMessage (type, out msg))
 				{
-					msg.ReadPayload (this.rreader, this.IdentifyingTypes);
+					msg.ReadPayload (this.rreader);
 
 					OnMessageReceived (new MessageReceivedEventArgs (this, msg));
 				}
@@ -323,7 +323,7 @@ namespace Gablarski.Network
 				}
 				else
 				{
-					msg.ReadPayload (reader, this.IdentifyingTypes);
+					msg.ReadPayload (reader);
 
 					OnMessageReceived (new MessageReceivedEventArgs (this, msg));
 				}

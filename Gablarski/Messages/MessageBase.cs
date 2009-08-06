@@ -25,8 +25,8 @@ namespace Gablarski.Messages
 			get { return 0; }
 		}
 
-		public abstract void WritePayload (IValueWriter writer, IdentifyingTypes idTypes);
-		public abstract void ReadPayload (IValueReader reader, IdentifyingTypes idTypes);
+		public abstract void WritePayload (IValueWriter writerm);
+		public abstract void ReadPayload (IValueReader reader);
 
 		public static bool GetMessage (ushort messageType, out MessageBase msg)
 		{

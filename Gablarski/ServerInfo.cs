@@ -10,20 +10,13 @@ namespace Gablarski
 			this.Deserialize (reader);
 		}
 
-		internal ServerInfo (ServerSettings settings, Type channelIdentifingType, Type userIdentifyingType)
+		internal ServerInfo (ServerSettings settings)
 		{
 			if (settings == null)
 				throw new ArgumentNullException("settings");
-			if (channelIdentifingType == null)
-				throw new ArgumentNullException("channelIdentifingType");
-			if (userIdentifyingType == null)
-				throw new ArgumentNullException("userIdentifyingType");
 
 			this.ServerName = settings.Name;
 			this.ServerDescription = settings.Description;
-
-			this.ChannelIdentifyingType = channelIdentifingType;
-			this.UserIdentifyingType = userIdentifyingType;
 		}
 
 		/// <summary>
@@ -45,24 +38,6 @@ namespace Gablarski
 		}
 
 		/// <summary>
-		/// Gets the type identifying channels.
-		/// </summary>
-		public Type ChannelIdentifyingType
-		{
-			get;
-			private set;
-		}
-
-		/// <summary>
-		/// Gets the type identifying users.
-		/// </summary>
-		public Type UserIdentifyingType
-		{
-			get;
-			private set;
-		}
-
-		/// <summary>
 		/// Gets the url of the server's logo.
 		/// </summary>
 		public string ServerLogo
@@ -73,8 +48,6 @@ namespace Gablarski
 
 		internal void Serialize (IValueWriter writer)
 		{
-			writer.WriteString (this.ChannelIdentifyingType.AssemblyQualifiedName);
-			writer.WriteString (this.UserIdentifyingType.AssemblyQualifiedName);
 			writer.WriteString (this.ServerName);
 			writer.WriteString (this.ServerDescription);
 			writer.WriteString (this.ServerLogo);
@@ -82,8 +55,6 @@ namespace Gablarski
 
 		internal void Deserialize (IValueReader reader)
 		{
-			this.ChannelIdentifyingType = Type.GetType (reader.ReadString());
-			this.UserIdentifyingType = Type.GetType (reader.ReadString());
 			this.ServerName = reader.ReadString();
 			this.ServerDescription = reader.ReadString();
 			this.ServerLogo = reader.ReadString();

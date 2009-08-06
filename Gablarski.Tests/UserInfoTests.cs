@@ -18,12 +18,12 @@ namespace Gablarski.Tests
 		[Test]
 		public void InvalidCtor()
 		{
-			Assert.Throws<ArgumentNullException> (() => new UserInfo (null, new IdentifyingTypes (typeof (Int32), typeof (Int32))));
-			Assert.Throws<ArgumentNullException> (() => new UserInfo (new StreamValueReader (new MemoryStream()), null));
+			Assert.Throws<ArgumentNullException> (() => new UserInfo ((UserInfo)null));
+			Assert.Throws<ArgumentNullException> (() => new UserInfo ((StreamValueReader)null));
 
 			Assert.Throws<ArgumentNullException> (() => new UserInfo (null, null, UserId, ChanId));
-			Assert.Throws<ArgumentNullException> (() => new UserInfo (Nickname, null, null, ChanId));
-			Assert.Throws<ArgumentNullException> (() => new UserInfo (Nickname, null, UserId, null));
+			Assert.Throws<ArgumentOutOfRangeException> (() => new UserInfo (Nickname, null, -1, ChanId));
+			Assert.Throws<ArgumentOutOfRangeException> (() => new UserInfo (Nickname, null, UserId, -1));
 		}
 
 		[Test]
@@ -50,26 +50,17 @@ namespace Gablarski.Tests
 			var stream = new MemoryStream(new byte[20480], true);
 			var writer = new StreamValueWriter (stream);
 			var reader = new StreamValueReader (stream);
-			var types = new IdentifyingTypes (typeof (Int32), typeof (Int32));
 
 			var info = new UserInfo (Nickname, null, UserId, ChanId);
-			info.Serialize (writer, types);
+			info.Serialize (writer);
 			long length = stream.Position;
 			stream.Position = 0;
 
-			info = new UserInfo (reader, types);
+			info = new UserInfo (reader);
 			Assert.AreEqual (length, stream.Position);
 			Assert.AreEqual (UserId, info.UserId);
 			Assert.AreEqual (ChanId, info.CurrentChannelId);
 			Assert.AreEqual (Nickname, info.Nickname);
-		}
-
-		[Test]
-		public void IsDefault()
-		{
-			var idtypes = new IdentifyingTypes (typeof (Int32), typeof (Int32));
-			Assert.IsTrue (UserInfo.IsDefault (default (Int32), idtypes));
-			Assert.IsFalse (UserInfo.IsDefault (1, idtypes));
 		}
 
 		[Test]

@@ -18,15 +18,15 @@ namespace Gablarski.Client
 			this.context = context;
 		}
 
-		internal CurrentUser (IClientContext context, object userId, string nickname, object currentChannelId)
+		internal CurrentUser (IClientContext context, int userId, string nickname, int currentChannelId)
 			: this (context)
 		{
-			if (userId == null)
-				throw new ArgumentNullException("userId");
+			if (userId < 0)
+				throw new ArgumentOutOfRangeException("userId");
 			if (nickname.IsEmpty())
 				throw new ArgumentNullException("nickname", "nickname is null or empty.");
-			if (currentChannelId == null)
-				throw new ArgumentNullException("currentChannelId");
+			if (currentChannelId < 0)
+				throw new ArgumentOutOfRangeException("currentChannelId");
 
 			this.UserId = userId;
 			this.Nickname = nickname;

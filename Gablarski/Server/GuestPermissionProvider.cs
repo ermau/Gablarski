@@ -8,12 +8,12 @@ namespace Gablarski.Server
 	public class GuestPermissionProvider
 		: IPermissionsProvider
 	{
-		public IEnumerable<Permission> GetPermissions (object playerId, IdentifyingTypes idTypes)
+		public IEnumerable<Permission> GetPermissions (int playerId)
 		{
 			if (this.admins.Contains (playerId))
 				return GetNamesAsPermissions (Permission.GetAllNames());
 
-			if (playerId != null) // User
+			if (playerId != 0) // User
 			{
 				return GetNamesAsPermissions (PermissionName.Login, PermissionName.ChangeChannel, PermissionName.AddChannel,
 				                              PermissionName.EditChannel, PermissionName.DeleteChannel,
@@ -23,7 +23,7 @@ namespace Gablarski.Server
 				return GetNamesAsPermissions (PermissionName.Login, PermissionName.RequestChannelList);
 		}
 
-		public void SetAdmin (long playerId)
+		public void SetAdmin (int playerId)
 		{
 			if (playerId == 0)
 				throw new ArgumentException ("Guests can not be admins.");
@@ -32,7 +32,7 @@ namespace Gablarski.Server
 				this.admins.Add (playerId);
 		}
 
-		private readonly HashSet<object> admins = new HashSet<object> ();
+		private readonly HashSet<int> admins = new HashSet<int> ();
 
 		private IEnumerable<Permission> GetNamesAsPermissions (IEnumerable<PermissionName> names)
 		{

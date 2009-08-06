@@ -25,12 +25,12 @@ namespace Gablarski.Messages
 			private set;
 		}
 
-		public override void WritePayload (IValueWriter writer, IdentifyingTypes idTypes)
+		public override void WritePayload (IValueWriter writer)
 		{
 			writer.WriteVersion (this.ApiVersion);
 		}
 
-		public override void ReadPayload (IValueReader reader, IdentifyingTypes idTypes)
+		public override void ReadPayload (IValueReader reader)
 		{
 			this.ApiVersion = reader.ReadVersion ();
 		}

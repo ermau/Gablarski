@@ -20,7 +20,7 @@ namespace Gablarski.Tests
 		/// <summary>
 		/// Gets the channels in this context
 		/// </summary>
-		public IEnumerable<Channel> Channels { get; set; }
+		public IEnumerable<ChannelInfo> Channels { get; set; }
 
 		/// <summary>
 		/// Gets teh source manager in this context

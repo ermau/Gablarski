@@ -201,12 +201,12 @@ namespace Gablarski.Clients.Windows
 
 		void UsersReceivedUserList (object sender, ReceivedListEventArgs<UserInfo> e)
 		{
-			this.users.Update (this.gablarski.IdentifyingTypes, this.gablarski.Channels, e.Data);
+			this.users.Update (this.gablarski.Channels, e.Data);
 		}
 
-		void ChannelsReceivedChannelList (object sender, ReceivedListEventArgs<Channel> e)
+		void ChannelsReceivedChannelList (object sender, ReceivedListEventArgs<ChannelInfo> e)
 		{
-			this.users.Update (this.gablarski.IdentifyingTypes, e.Data, this.gablarski.Users.Cast<UserInfo>());
+			this.users.Update (e.Data, this.gablarski.Users.Cast<UserInfo>());
 		}
 
 		void CurrentUserReceivedLoginResult (object sender, ReceivedLoginResultEventArgs e)

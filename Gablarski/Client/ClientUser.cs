@@ -26,7 +26,7 @@ namespace Gablarski.Client
 			this.client = client;
 		}
 
-		public ClientUser (string nickname, object userId, object currentChannelId, IClientConnection client)
+		public ClientUser (string nickname, int userId, int currentChannelId, IClientConnection client)
 			: base (nickname, null, userId, currentChannelId)
 		{
 			if (client == null)
@@ -39,7 +39,7 @@ namespace Gablarski.Client
 		/// Moves this user to <paramref name="targetChannel"/>.
 		/// </summary>
 		/// <param name="targetChannel">The channel to move this user to.</param>
-		public void Move (Channel targetChannel)
+		public void Move (ChannelInfo targetChannel)
 		{
 			if (targetChannel == null)
 				throw new ArgumentNullException ("targetChannel");

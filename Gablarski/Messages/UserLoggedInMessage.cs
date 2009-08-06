@@ -25,14 +25,14 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public override void WritePayload (IValueWriter writer, IdentifyingTypes idTypes)
+		public override void WritePayload (IValueWriter writer)
 		{
-			this.UserInfo.Serialize (writer, idTypes);
+			this.UserInfo.Serialize (writer);
 		}
 
-		public override void ReadPayload (IValueReader reader, IdentifyingTypes idTypes)
+		public override void ReadPayload (IValueReader reader)
 		{
-			this.UserInfo = new UserInfo (reader, idTypes);
+			this.UserInfo = new UserInfo (reader);
 		}
 	}
 }

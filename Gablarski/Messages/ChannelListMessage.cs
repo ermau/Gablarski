@@ -14,7 +14,7 @@ namespace Gablarski.Messages
 
 		}
 
-		public ChannelListMessage (IEnumerable<Channel> channels)
+		public ChannelListMessage (IEnumerable<ChannelInfo> channels)
 			: this()
 		{
 			this.Channels = channels;
@@ -39,13 +39,13 @@ namespace Gablarski.Messages
 		/// <summary>
 		/// Gets or sets the channels in the message, <c>null</c> if request failed.
 		/// </summary>
-		public IEnumerable<Channel> Channels
+		public IEnumerable<ChannelInfo> Channels
 		{
 			get;
 			set;
 		}
 
-		public override void WritePayload (IValueWriter writer, IdentifyingTypes idTypes)
+		public override void WritePayload (IValueWriter writer)
 		{
 			writer.WriteGenericResult (this.Result);
 			if (this.Result != GenericResult.Success)
@@ -53,18 +53,18 @@ namespace Gablarski.Messages
 
 			writer.WriteInt32 (this.Channels.Count ());
 			foreach (var c in this.Channels)
-				c.Serialize (writer, idTypes);
+				c.Serialize (writer);
 		}
 
-		public override void ReadPayload (IValueReader reader, IdentifyingTypes idTypes)
+		public override void ReadPayload (IValueReader reader)
 		{
 			this.Result = reader.ReadGenericResult ();
 			if (this.Result != GenericResult.Success)
 				return;
 
-			Channel[] channels = new Channel[reader.ReadInt32 ()];
+			ChannelInfo[] channels = new ChannelInfo[reader.ReadInt32 ()];
 			for (int i = 0; i < channels.Length; ++i)
-				channels[i] = new Channel (reader, idTypes);
+				channels[i] = new ChannelInfo (reader);
 
 			this.Channels = channels;
 		}

@@ -110,14 +110,6 @@ namespace Gablarski.Client
 			get { return this.serverInfo; }
 		}
 
-		/// <summary>
-		/// Gets the <see cref="IdentifyingTypes"/> for this client's connection. <c>null</c> if not connected.
-		/// </summary>
-		public IdentifyingTypes IdentifyingTypes
-		{
-			get { return this.Connection.IdentifyingTypes; }
-		}
-
 		private bool reconnectAutomatically = true;
 		/// <summary>
 		/// Gets or sets whether to reconnect automatically on disconnection. <c>true</c> by default.
@@ -225,7 +217,7 @@ namespace Gablarski.Client
 			get { return this.Connection; }
 		}
 
-		IEnumerable<Channel> IClientContext.Channels
+		IEnumerable<ChannelInfo> IClientContext.Channels
 		{
 			get { return this.Channels; }
 		}

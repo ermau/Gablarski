@@ -8,28 +8,24 @@ namespace Gablarski.Media.Sources
 {
 	public class AudioSource
 	{
-		public AudioSource (IValueReader reader, IdentifyingTypes idTypes)
+		public AudioSource (IValueReader reader)
 		{
 			if (reader == null)
 				throw new ArgumentNullException ("reader");
-			if (idTypes == null)
-				throw new ArgumentNullException ("idTypes");
 
-			this.Deserialize (reader, idTypes);
+			this.Deserialize (reader);
 		}
 
-		public AudioSource (string name, int sourceId, object ownerId, byte channels, int bitrate, int frequency, short frameSize)
+		public AudioSource (string name, int sourceId, int ownerId, byte channels, int bitrate, int frequency, short frameSize)
 		{
 			if (name == null)
 				throw new ArgumentNullException ("name");
 			if (sourceId <= 0)
 				throw new ArgumentOutOfRangeException ("sourceId");
-			if (ownerId == null)
-				throw new ArgumentNullException ("ownerId");
 			if (sourceId < 0)
 				throw new ArgumentOutOfRangeException ("sourceId");
-			if (ownerId == null)
-				throw new ArgumentNullException ("ownerId");
+			if (ownerId < 0)
+				throw new ArgumentOutOfRangeException ("ownerId");
 			if (bitrate <= 0)
 				throw new ArgumentOutOfRangeException ("bitrate");
 
@@ -45,7 +41,7 @@ namespace Gablarski.Media.Sources
 			this.FrameSize = frameSize;
 		}
 
-		public AudioSource (string name, int id, object ownerId, byte channels, int bitrate, int frequency, short frameSize, byte complexity)
+		public AudioSource (string name, int id, int ownerId, byte channels, int bitrate, int frequency, short frameSize, byte complexity)
 			: this (name, id, ownerId, channels, bitrate, frequency, frameSize)
 		{
 			if (complexity < 1 || complexity > 10)
@@ -75,7 +71,7 @@ namespace Gablarski.Media.Sources
 		/// <summary>
 		/// Gets the owner's identifier.
 		/// </summary>
-		public object OwnerId
+		public int OwnerId
 		{
 			get;
 			private set;
@@ -171,11 +167,11 @@ namespace Gablarski.Media.Sources
 		private CeltDecoder decoder;
 		private CeltMode mode;
 
-		internal void Serialize (IValueWriter writer, IdentifyingTypes idTypes)
+		internal void Serialize (IValueWriter writer)
 		{
 			writer.WriteString (this.Name);
 			writer.WriteInt32 (this.Id);
-			idTypes.WriteUser (writer, this.OwnerId);
+			writer.WriteInt32 (this.OwnerId);
 			writer.WriteInt32 (this.Bitrate);
 
 			CheckRanges (this.Channels, this.Frequency, this.FrameSize);
@@ -184,11 +180,11 @@ namespace Gablarski.Media.Sources
 			writer.WriteInt16 (this.FrameSize);
 		}
 
-		internal void Deserialize (IValueReader reader, IdentifyingTypes idTypes)
+		internal void Deserialize (IValueReader reader)
 		{
 			this.Name = reader.ReadString();
 			this.Id = reader.ReadInt32 ();
-			this.OwnerId = idTypes.ReadUser (reader);
+			this.OwnerId = reader.ReadInt32();
 			this.Bitrate = reader.ReadInt32();
 
 			this.Channels = reader.ReadByte();

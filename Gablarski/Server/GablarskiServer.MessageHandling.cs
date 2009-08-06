@@ -64,8 +64,7 @@ namespace Gablarski.Server
 				Trace.WriteLineIf ((VerboseTracing || msg.MessageType != ClientMessageType.AudioData), "[Server] Message Received: " + msg.MessageType);
 
 				Action<MessageReceivedEventArgs> handler;
-				Handlers.TryGetValue (msg.MessageType, out handler);
-				if (handler != null)
+				if (Handlers.TryGetValue (msg.MessageType, out handler))
 					handler (new MessageReceivedEventArgs (e.Connection, msg));
 			}
 		}
@@ -89,9 +88,7 @@ namespace Gablarski.Server
 				return;
 			}
 
-			e.Connection.Send (
-				new ServerInfoMessage (new ServerInfo (this.settings, this.ChannelProvider.IdentifyingType,
-				                                       this.UserProvider.IdentifyingType)));
+			e.Connection.Send (new ServerInfoMessage (new ServerInfo (this.settings)));
 		}
 
 		#region Channels
@@ -101,7 +98,7 @@ namespace Gablarski.Server
 				e.Connection.Send (new ChannelListMessage (GenericResult.FailedPermissions));
 			else
 			{
-				IEnumerable<Channel> currentChannels;
+				IEnumerable<ChannelInfo> currentChannels;
 				lock (this.channelLock)
 				{
 					currentChannels = this.channels.Values.ToList();
@@ -153,7 +150,7 @@ namespace Gablarski.Server
 
 			ChannelEditResult result = ChannelEditResult.FailedUnknown;
 
-			Channel realChannel;
+			ChannelInfo realChannel;
 			lock (channelLock)
 			{
 				if (msg.Delete && this.channels.Count == 1)
@@ -162,7 +159,7 @@ namespace Gablarski.Server
 					result = ChannelEditResult.FailedChannelsReadOnly;
 				else if (this.channels.TryGetValue (msg.Channel.ChannelId, out realChannel) && realChannel.ReadOnly)
 					result = ChannelEditResult.FailedChannelReadOnly;
-				else if (!IdentifyingTypes.ChannelDefaultValue.Equals (msg.Channel.ChannelId))
+				else if (msg.Channel.ChannelId != 0)
 				{
 					if (msg.Delete && !GetPermission (PermissionName.DeleteChannel, msg.Channel.ChannelId, e.Connection))
 						result = ChannelEditResult.FailedPermissions;

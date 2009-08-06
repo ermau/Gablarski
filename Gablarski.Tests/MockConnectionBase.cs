@@ -27,7 +27,7 @@ namespace Gablarski.Tests
 			{
 				writer.WriteByte (42);
 				writer.WriteUInt16 (message.MessageTypeCode);
-				message.WritePayload (this.writer, this.IdentifyingTypes);
+				message.WritePayload (this.writer);
 				Interlocked.Increment (ref this.waiting);
 			}
 
@@ -56,7 +56,7 @@ namespace Gablarski.Tests
 				if (!MessageBase.GetMessage (type, out msg))
 					Assert.Fail ("[" + Name + "] Type " + type + " does not exist.");
 
-				msg.ReadPayload (this.reader, this.IdentifyingTypes);
+				msg.ReadPayload (this.reader);
 
 				Interlocked.Decrement (ref this.waiting);
 			}

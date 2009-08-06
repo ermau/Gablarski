@@ -10,7 +10,7 @@ namespace Gablarski.Server
 	{
 		public LobbyChannelProvider ()
 		{
-			this.lobby = new Channel (1)
+			this.lobby = new ChannelInfo (1)
 			{
 				Name = "Lobby",
 				Description = String.Empty
@@ -29,12 +29,12 @@ namespace Gablarski.Server
 			get { return true; }
 		}
 
-		public Channel DefaultChannel
+		public ChannelInfo DefaultChannel
 		{
 			get { return this.lobby; }
 		}
 
-		public IEnumerable<Channel> GetChannels ()
+		public IEnumerable<ChannelInfo> GetChannels ()
 		{
 			yield return this.lobby;
 
@@ -42,7 +42,7 @@ namespace Gablarski.Server
 				yield return c;
 		}
 
-		public ChannelEditResult SaveChannel (Channel channel)
+		public ChannelEditResult SaveChannel (ChannelInfo channel)
 		{
 			lock (this.channels)
 			{
@@ -52,7 +52,7 @@ namespace Gablarski.Server
 				if (channel.ChannelId.Equals (0))
 				{
 					int id = Interlocked.Increment (ref this.lastId);
-					channels.Add (id, new Channel (id, channel));
+					channels.Add (id, new ChannelInfo (id, channel));
 				}
 				else if (channels.ContainsKey (channel.ChannelId))
 					channels[channel.ChannelId] = channel;
@@ -61,7 +61,7 @@ namespace Gablarski.Server
 			return ChannelEditResult.Success;
 		}
 
-		public void DeleteChannel (Channel channel)
+		public void DeleteChannel (ChannelInfo channel)
 		{
 			lock (this.channels)
 			{
@@ -70,7 +70,7 @@ namespace Gablarski.Server
 		}
 
 		private int lastId = 1;
-		private readonly Channel lobby;
-		private readonly Dictionary<object, Channel> channels = new Dictionary<object, Channel> ();
+		private readonly ChannelInfo lobby;
+		private readonly Dictionary<object, ChannelInfo> channels = new Dictionary<object, ChannelInfo> ();
 	}
 }

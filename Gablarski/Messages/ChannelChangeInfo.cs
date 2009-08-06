@@ -11,40 +11,38 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public ChannelChangeInfo (object targetUserId, object targetChannelId)
+		public ChannelChangeInfo (int targetUserId, int targetChannelId)
 		{
-			if (targetUserId == null)
-				throw new ArgumentNullException ("targetUserId");
-			if (targetChannelId == null)
-				throw new ArgumentNullException ("targetChannelId");
+			if (targetUserId < 0)
+				throw new ArgumentOutOfRangeException ("targetUserId");
+			if (targetChannelId < 0)
+				throw new ArgumentOutOfRangeException ("targetChannelId");
 
 			this.TargetUserId = targetUserId;
 			this.TargetChannelId = targetChannelId;
 		}
 
-		public ChannelChangeInfo (object targetUserId, object targetChannelId, object requestingUserId)
+		public ChannelChangeInfo (int targetUserId, int targetChannelId, int requestingUserId)
 			: this (targetUserId, targetChannelId)
 		{
-			if (requestingUserId == null)
-				throw new ArgumentNullException ("requestingUserId");
+			if (requestingUserId < 0)
+				throw new ArgumentOutOfRangeException ("requestingUserId");
 
 			this.RequestingUserId = requestingUserId;
 		}
 
-		public ChannelChangeInfo (IValueReader reader, IdentifyingTypes idTypes)
+		public ChannelChangeInfo (IValueReader reader)
 		{
 			if (reader == null)
 				throw new ArgumentNullException("reader");
-			if (idTypes == null)
-				throw new ArgumentNullException("idTypes");
 
-			this.Deserialize (reader, idTypes);
+			this.Deserialize (reader);
 		}
 
 		/// <summary>
 		/// Gets the ID of the player who moved the target player.
 		/// </summary>
-		public object RequestingUserId
+		public int RequestingUserId
 		{
 			get;
 			set;
@@ -53,7 +51,7 @@ namespace Gablarski.Messages
 		/// <summary>
 		/// Gets the ID of the player being moved.
 		/// </summary>
-		public object TargetUserId
+		public int TargetUserId
 		{
 			get;
 			private set;
@@ -62,24 +60,24 @@ namespace Gablarski.Messages
 		/// <summary>
 		/// Gets the ID of the channel the player is being moved to.
 		/// </summary>
-		public object TargetChannelId
+		public int TargetChannelId
 		{
 			get;
 			private set;
 		}
 
-		internal void Serialize (IValueWriter writer, IdentifyingTypes idTypes)
+		internal void Serialize (IValueWriter writer)
 		{
-			idTypes.WriteUser (writer, this.RequestingUserId);
-			idTypes.WriteUser (writer, this.TargetUserId);
-			idTypes.WriteChannel (writer, this.TargetChannelId);
+			writer.WriteInt32 (this.RequestingUserId);
+			writer.WriteInt32 (this.TargetUserId);
+			writer.WriteInt32 (this.TargetChannelId);
 		}
 
-		internal void Deserialize (IValueReader reader, IdentifyingTypes idTypes)
+		internal void Deserialize (IValueReader reader)
 		{
-			this.RequestingUserId = idTypes.ReadUser (reader);
-			this.TargetUserId = idTypes.ReadUser (reader);
-			this.TargetChannelId = idTypes.ReadChannel (reader);
+			this.RequestingUserId = reader.ReadInt32();
+			this.TargetUserId = reader.ReadInt32();
+			this.TargetChannelId = reader.ReadInt32();
 		}
 	}
 }

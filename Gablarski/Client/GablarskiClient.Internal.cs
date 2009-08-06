@@ -108,13 +108,10 @@ namespace Gablarski.Client
 		private void OnServerInfoReceivedMessage (MessageReceivedEventArgs e)
 		{
 			this.serverInfo = ((ServerInfoMessage)e.Message).ServerInfo;
-			this.Connection.IdentifyingTypes = new IdentifyingTypes (this.serverInfo.UserIdentifyingType, this.serverInfo.ChannelIdentifyingType);
 
 			Trace.WriteLine ("[Client] Received server information: ");
 			Trace.WriteLine ("Server name: " + this.serverInfo.ServerName);
 			Trace.WriteLine ("Server description: " + this.serverInfo.ServerDescription);
-			Trace.WriteLine ("User identifying type: " + this.serverInfo.UserIdentifyingType);
-			Trace.WriteLine ("Channel identifying type: " + this.serverInfo.ChannelIdentifyingType);
 
 			this.OnConnected (this, EventArgs.Empty);
 		}

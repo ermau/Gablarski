@@ -14,14 +14,14 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public ChannelEditResultMessage (Channel channel, ChannelEditResult result)
+		public ChannelEditResultMessage (ChannelInfo channel, ChannelEditResult result)
 			: this ()
 		{
 			this.ChannelId = channel.ChannelId;
 			this.Result = result;
 		}
 
-		public object ChannelId
+		public int ChannelId
 		{
 			get;
 			set;
@@ -33,15 +33,15 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public override void WritePayload (IValueWriter writer, IdentifyingTypes idTypes)
+		public override void WritePayload (IValueWriter writer)
 		{
-			idTypes.WriteChannel (writer, this.ChannelId);
+			writer.WriteInt32 (this.ChannelId);
 			writer.WriteByte ((byte)this.Result);
 		}
 
-		public override void ReadPayload (IValueReader reader, IdentifyingTypes idTypes)
+		public override void ReadPayload (IValueReader reader)
 		{
-			this.ChannelId = idTypes.ReadChannel (reader);
+			this.ChannelId = reader.ReadInt32();
 			this.Result = (ChannelEditResult)reader.ReadByte();
 		}
 	}

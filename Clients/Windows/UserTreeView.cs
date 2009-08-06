@@ -57,7 +57,7 @@ namespace Gablarski.Clients.Windows
 			this.EndUpdate();
 		}
 
-		public void AddChannel (Channel channel, IdentifyingTypes idTypes)
+		public void AddChannel (ChannelInfo channel)
 		{
 			#if DEBUG
 			if (channel == null)
@@ -66,15 +66,15 @@ namespace Gablarski.Clients.Windows
 
 			if (this.InvokeRequired)
 			{
-				this.BeginInvoke ((Action<Channel, IdentifyingTypes>)this.AddChannel, channel, idTypes);
+				this.BeginInvoke ((Action<ChannelInfo>)this.AddChannel, channel);
 				return;
 			}
 
 			var parent = this.serverNode.Nodes;
-			if (!Channel.IsDefault (channel.ParentChannelId, idTypes))
+			if (channel.ParentChannelId != 0)
 			{
-				var pair = channelNodes.FirstOrDefault (kvp => kvp.Key.ChannelId.Equals (channel.ParentChannelId));
-				if (!pair.Equals (default(KeyValuePair<Channel, TreeNode>)))
+				var pair = channelNodes.FirstOrDefault (kvp => kvp.Key.ChannelId == channel.ParentChannelId);
+				if (!pair.Equals (default(KeyValuePair<ChannelInfo, TreeNode>)))
 					parent = pair.Value.Nodes;
 			}
 
@@ -99,8 +99,8 @@ namespace Gablarski.Clients.Windows
 				return;
 			}
 
-			var channelPair = this.channelNodes.FirstOrDefault (c => c.Key.ChannelId.Equals (user.CurrentChannelId));
-			if (channelPair.Equals (default(KeyValuePair<Channel,TreeNode>)))
+			var channelPair = this.channelNodes.FirstOrDefault (c => c.Key.ChannelId == user.CurrentChannelId);
+			if (channelPair.Equals (default(KeyValuePair<ChannelInfo,TreeNode>)))
 				return;
 			
 			var node = channelPair.Value.Nodes.Add (user.Nickname);
@@ -194,11 +194,11 @@ namespace Gablarski.Clients.Windows
 			userNodes[user].SelectedImageKey = "silent";
 		}
 
-		public void Update (IdentifyingTypes idTypes, IEnumerable<Channel> channels, IEnumerable<UserInfo> users)
+		public void Update (IEnumerable<ChannelInfo> channels, IEnumerable<UserInfo> users)
 		{
 			if (this.InvokeRequired)
 			{
-				this.BeginInvoke ((Action<IdentifyingTypes, IEnumerable<Channel>, IEnumerable<UserInfo>>)Update, idTypes, channels, users);
+				this.BeginInvoke ((Action<IEnumerable<ChannelInfo>, IEnumerable<UserInfo>>)Update, channels, users);
 				return;
 			}
 
@@ -210,10 +210,10 @@ namespace Gablarski.Clients.Windows
 			this.serverNode.Nodes.Clear();
 			this.Nodes.Add (this.serverNode);
 
-			foreach (var channel in channels.Where (c => Channel.IsDefault (c.ParentChannelId, idTypes)))
+			foreach (var channel in channels.Where (c => c.ParentChannelId == 0))
 			{
-				this.AddChannel (channel, idTypes);
-				this.AddChannels (idTypes, channels, channel);
+				this.AddChannel (channel);
+				this.AddChannels (channels, channel);
 			}
 
 			this.serverNode.Expand();
@@ -225,7 +225,7 @@ namespace Gablarski.Clients.Windows
 		}
 
 		private TreeNode serverNode;
-		private readonly Dictionary<Channel, TreeNode> channelNodes = new Dictionary<Channel, TreeNode>();
+		private readonly Dictionary<ChannelInfo, TreeNode> channelNodes = new Dictionary<ChannelInfo, TreeNode>();
 		private readonly Dictionary<UserInfo, TreeNode> userNodes = new Dictionary<UserInfo, TreeNode>();
 
 		protected override void OnNodeMouseClick (TreeNodeMouseClickEventArgs e)
@@ -259,7 +259,7 @@ namespace Gablarski.Clients.Windows
 
 				if (destinationNode != null)
 				{
-					var channel = destinationNode.Tag as Channel;
+					var channel = destinationNode.Tag as ChannelInfo;
 					var user = movedNode.Tag as ClientUser;
 					if (channel != null && user != null)
 					{
@@ -276,30 +276,30 @@ namespace Gablarski.Clients.Windows
 
 		protected override void OnNodeMouseDoubleClick (TreeNodeMouseClickEventArgs e)
 		{
-			Channel channel = this.SelectedNode.Tag as Channel;
+			ChannelInfo channel = this.SelectedNode.Tag as ChannelInfo;
 			if (e.Button != MouseButtons.Left || channel == null)
 				base.OnNodeMouseDoubleClick (e);
 
 			Client.CurrentUser.Move (channel);
 		}
 
-		private void AddChannels (IdentifyingTypes idTypes, IEnumerable<Channel> channels, Channel parent)
+		private void AddChannels (IEnumerable<ChannelInfo> channels, ChannelInfo parent)
 		{
-			foreach (var c in channels.Where (c => c.ParentChannelId.Equals (parent.ChannelId)))
+			foreach (var c in channels.Where (c => c.ParentChannelId == parent.ChannelId))
 			{
-				this.AddChannel (c, idTypes);
-				this.AddChannels (idTypes, channels, c);
+				this.AddChannel (c);
+				this.AddChannels (channels, c);
 			}
 		}
 
 		private void ContextDeleteChannelClick (object sender, EventArgs e)
 		{
-			Client.Channels.Delete (this.SelectedNode.Tag as Channel);
+			Client.Channels.Delete (this.SelectedNode.Tag as ChannelInfo);
 		}
 
 		private void ContextEditChannelClick (object sender, EventArgs e)
 		{
-			ChannelForm editChannel = new ChannelForm (this.SelectedNode.Tag as Channel);
+			ChannelForm editChannel = new ChannelForm (this.SelectedNode.Tag as ChannelInfo);
 			if (editChannel.ShowDialog() == DialogResult.OK)
 				Client.Channels.Update (editChannel.Channel);
 		}

@@ -12,18 +12,24 @@ namespace Gablarski
 		}
 
 		internal UserInfo (UserInfo info)
-			: this (info.Nickname, info.Username, info.UserId, info.CurrentChannelId)
 		{
+			if (info == null)
+				throw new ArgumentNullException ("info");
+
+			this.Nickname = info.Nickname;
+			this.Username = info.Username;
+			this.UserId = info.UserId;
+			this.CurrentChannelId = info.CurrentChannelId;
 		}
 
-		internal UserInfo (string nickname, string username, object userId, object currentChannelId)
+		internal UserInfo (string nickname, string username, int userId, int currentChannelId)
 		{
 			if (nickname.IsEmpty())
 				throw new ArgumentNullException ("nickname");
-			if (userId == null)
-				throw new ArgumentNullException("userId");
-			if (currentChannelId == null)
-				throw new ArgumentNullException("currentChannelId");
+			if (userId < 0)
+				throw new ArgumentOutOfRangeException ("userId");
+			if (currentChannelId < 0)
+				throw new ArgumentOutOfRangeException ("currentChannelId");
 
 			this.Nickname = nickname;
 			this.Username = (username.IsEmpty()) ? nickname : username;
@@ -31,14 +37,12 @@ namespace Gablarski
 			this.CurrentChannelId = currentChannelId;
 		}
 
-		internal UserInfo (IValueReader reader, IdentifyingTypes idTypes)
+		internal UserInfo (IValueReader reader)
 		{
 			if (reader == null)
 				throw new ArgumentNullException("reader");
-			if (idTypes == null)
-				throw new ArgumentNullException("idTypes");
 
-			this.Deserialize (reader, idTypes);
+			this.Deserialize (reader);
 		}
 
 		public virtual string Username
@@ -53,43 +57,32 @@ namespace Gablarski
 			protected set;
 		}
 
-		public virtual object UserId
+		public virtual int UserId
 		{
 			get;
 			protected set;
 		}
 
-		public object CurrentChannelId
+		public int CurrentChannelId
 		{
 			get;
 			set;
 		}
 
-		internal void Serialize (IValueWriter writer, IdentifyingTypes idTypes)
+		internal void Serialize (IValueWriter writer)
 		{
-			idTypes.WriteUser (writer, this.UserId);
+			writer.WriteInt32 (this.UserId);
 			writer.WriteString (this.Username);
-			idTypes.WriteChannel (writer, this.CurrentChannelId);
+			writer.WriteInt32 (this.CurrentChannelId);
 			writer.WriteString (this.Nickname);
 		}
 
-		internal void Deserialize (IValueReader reader, IdentifyingTypes idTypes)
+		internal void Deserialize (IValueReader reader)
 		{
-			this.UserId = idTypes.ReadUser (reader);
+			this.UserId = reader.ReadInt32();
 			this.Username = reader.ReadString();
-			this.CurrentChannelId = idTypes.ReadChannel (reader);
+			this.CurrentChannelId = reader.ReadInt32();
 			this.Nickname = reader.ReadString();			
-		}
-
-		/// <summary>
-		/// Gets whether <paramref name="userId"/> is the default value (basically null) or not.
-		/// </summary>
-		/// <param name="userId">The user identifier to check.</param>
-		/// <param name="types">The <see cref="IdentifyingTypes"/> instance to check against.</param>
-		/// <returns><c>true</c> if <paramref name="userId"/> is default, <c>false</c> otherwise.</returns>
-		public static bool IsDefault (object userId, IdentifyingTypes types)
-		{
-			return userId.Equals (types.UserIdType.GetDefaultValue());
 		}
 
 		public override bool Equals (object obj)

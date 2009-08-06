@@ -11,7 +11,7 @@ using NHibernate;
 namespace Gablarski.LocalServer
 {
 	public class LocalChannelProvider
-		: IChannelProvider, IDisposable
+		//: IChannelProvider, IDisposable
 	{
 		public event EventHandler ChannelsUpdatedExternally;
 
@@ -38,17 +38,17 @@ namespace Gablarski.LocalServer
 			get { return true; }
 		}
 
-		public Channel DefaultChannel
+		public NativeChannel DefaultChannel
 		{
 			get { throw new NotImplementedException (); }
 		}
 
-		public IEnumerable<Channel> GetChannels ()
+		public IEnumerable<NativeChannel> GetChannels ()
 		{
-			return this.session.CreateCriteria (typeof (Channel)).List<Channel>();
+			return this.session.CreateCriteria (typeof (NativeChannel)).List<NativeChannel>();
 		}
 
-		public ChannelEditResult SaveChannel (Channel channel)
+		public ChannelEditResult SaveChannel (ChannelInfo channel)
 		{
 			using (var trans = this.session.BeginTransaction())
 			{
@@ -58,7 +58,7 @@ namespace Gablarski.LocalServer
 			return ChannelEditResult.Success;
 		}
 
-		public void DeleteChannel (Channel channel)
+		public void DeleteChannel (ChannelInfo channel)
 		{
 			using (var trans = this.session.BeginTransaction())
 			{

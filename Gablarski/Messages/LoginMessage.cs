@@ -31,7 +31,7 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public override void WritePayload (IValueWriter writer, IdentifyingTypes idTypes)
+		public override void WritePayload (IValueWriter writer)
 		{
 			bool guest = String.IsNullOrEmpty (Username);
 			
@@ -48,7 +48,7 @@ namespace Gablarski.Messages
 			}
 		}
 
-		public override void ReadPayload (IValueReader reader, IdentifyingTypes idTypes)
+		public override void ReadPayload (IValueReader reader)
 		{
 			bool guest = reader.ReadBool ();
 

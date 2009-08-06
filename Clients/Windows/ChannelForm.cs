@@ -16,16 +16,16 @@ namespace Gablarski.Clients.Windows
 		{
 			InitializeComponent();
 
-			this.Channel = new Channel ();
+			this.Channel = new ChannelInfo ();
 			this.Text = "Add Channel";
 			this.Icon = Resources.ChannelAddImage.ToIcon();
 		}
 
-		public ChannelForm (Channel channel)
+		public ChannelForm (ChannelInfo channel)
 		{
 			InitializeComponent ();
 
-			this.Channel = new Channel (channel.ChannelId, channel);
+			this.Channel = new ChannelInfo (channel.ChannelId, channel);
 			this.Text = "Edit Channel";
 			this.Icon = Resources.ChannelEditImage.ToIcon();
 
@@ -34,7 +34,7 @@ namespace Gablarski.Clients.Windows
 			this.inPlayerLimit.Value = channel.PlayerLimit;
 		}
 
-		public Channel Channel
+		public ChannelInfo Channel
 		{
 			get; private set;
 		}

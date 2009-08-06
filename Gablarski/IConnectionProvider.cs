@@ -14,11 +14,6 @@ namespace Gablarski
 		/// </summary>
 		event EventHandler<ConnectionEventArgs> ConnectionMade;
 
-		IdentifyingTypes IdentifyingTypes
-		{
-			get; set;
-		}
-
 		/// <summary>
 		/// Starts listening for connections and connectionless messages.
 		/// </summary>

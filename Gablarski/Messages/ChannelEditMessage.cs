@@ -13,13 +13,13 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public ChannelEditMessage (Channel channel)
+		public ChannelEditMessage (ChannelInfo channel)
 			: this()
 		{
 			this.Channel = channel;
 		}
 
-		public Channel Channel
+		public ChannelInfo Channel
 		{
 			get;
 			set;
@@ -31,15 +31,15 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public override void WritePayload (IValueWriter writer, IdentifyingTypes idTypes)
+		public override void WritePayload (IValueWriter writer)
 		{
-			this.Channel.Serialize (writer, idTypes);
+			this.Channel.Serialize (writer);
 			writer.WriteBool (this.Delete);
 		}
 
-		public override void ReadPayload (IValueReader reader, IdentifyingTypes idTypes)
+		public override void ReadPayload (IValueReader reader)
 		{
-			this.Channel = new Channel (reader, idTypes);
+			this.Channel = new ChannelInfo (reader);
 			this.Delete = reader.ReadBool ();
 		}
 	}

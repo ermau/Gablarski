@@ -140,7 +140,7 @@ namespace Gablarski.Network
 				}
 				else
 				{
-					msg.ReadPayload (reader, this.IdentifyingTypes);
+					msg.ReadPayload (reader);
 
 					if (connection == null)
 					{

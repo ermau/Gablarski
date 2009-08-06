@@ -9,7 +9,7 @@ using Gablarski.Server;
 namespace Gablarski.Client
 {
 	public class ClientChannelManager
-		: IEnumerable<Channel>, INotifyCollectionChanged
+		: IEnumerable<ChannelInfo>, INotifyCollectionChanged
 	{
 		protected internal ClientChannelManager (IClientContext context)
 		{
@@ -28,7 +28,7 @@ namespace Gablarski.Client
 		/// <summary>
 		/// A new or updated player list has been received.
 		/// </summary>
-		public event EventHandler<ReceivedListEventArgs<Channel>> ReceivedChannelList;
+		public event EventHandler<ReceivedListEventArgs<ChannelInfo>> ReceivedChannelList;
 
 		public event NotifyCollectionChangedEventHandler CollectionChanged;
 		#endregion
@@ -37,12 +37,12 @@ namespace Gablarski.Client
 		/// Send a create channel request to the server.
 		/// </summary>
 		/// <param name="channel">The channel to create.</param>
-		public void Create (Channel channel)
+		public void Create (ChannelInfo channel)
 		{
 			if (channel == null)
 				throw new ArgumentNullException ("channel");
 
-			if (channel.ChannelId != null)
+			if (channel.ChannelId != 0)
 				throw new ArgumentException ("Can not create an existing channel", "channel");
 
 			this.context.Connection.Send (new ChannelEditMessage (channel));
@@ -52,12 +52,12 @@ namespace Gablarski.Client
 		/// Sends an update request to the server for <paramref name="channel"/>.
 		/// </summary>
 		/// <param name="channel">The updated information for the channel.</param>
-		public void Update (Channel channel)
+		public void Update (ChannelInfo channel)
 		{
 			if (channel == null)
 				throw new ArgumentNullException ("channel");
 
-			if (channel.ChannelId == null)
+			if (channel.ChannelId == 0)
 				throw new ArgumentException ("channel must be an existing channel", "channel");
 
 			this.context.Connection.Send (new ChannelEditMessage (channel));
@@ -67,12 +67,12 @@ namespace Gablarski.Client
 		/// Sends a delete channel request to the server.
 		/// </summary>
 		/// <param name="channel">The channel to delete.</param>
-		public void Delete (Channel channel)
+		public void Delete (ChannelInfo channel)
 		{
 			if (channel == null)
 				throw new ArgumentNullException ("channel");
 
-			if (channel.ChannelId == null)
+			if (channel.ChannelId == 0)
 				throw new ArgumentException ("channel must be an existing channel", "channel");
 
 			this.context.Connection.Send (new ChannelEditMessage (channel) { Delete = true });
@@ -91,10 +91,10 @@ namespace Gablarski.Client
 		}
 
 		#region IEnumerable<Channel> members
-		public IEnumerator<Channel> GetEnumerator ()
+		public IEnumerator<ChannelInfo> GetEnumerator ()
 		{
 			if (this.channels == null || this.channels.Count == 0)
-				return Enumerable.Empty<Channel> ().GetEnumerator();
+				return Enumerable.Empty<ChannelInfo> ().GetEnumerator();
 
 			lock (channelLock)
 			{
@@ -111,10 +111,10 @@ namespace Gablarski.Client
 		private readonly IClientContext context;
 
 		private readonly object channelLock = new object ();
-		private Dictionary<object, Channel> channels;
+		private Dictionary<int, ChannelInfo> channels;
 
 		/// <returns><c>null</c> if no channel exists by the identifier.</returns>
-		protected internal Channel this[object identifier]
+		protected internal ChannelInfo this[int channelId]
 		{
 			get
 			{
@@ -123,10 +123,9 @@ namespace Gablarski.Client
 
 				lock (channelLock)
 				{
-					if (!this.channels.ContainsKey (identifier))
-						return null;
-
-					return this.channels[identifier];
+					ChannelInfo channel;
+					this.channels.TryGetValue (channelId, out channel);
+					return channel;
 				}
 			}
 		}
@@ -140,7 +139,7 @@ namespace Gablarski.Client
 				this.channels = msg.Channels.ToDictionary (c => c.ChannelId);
 			}
 
-			OnReceivedChannelList (new ReceivedListEventArgs<Channel> (msg.Channels));
+			OnReceivedChannelList (new ReceivedListEventArgs<ChannelInfo> (msg.Channels));
 			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Reset));
 		}
 
@@ -148,7 +147,7 @@ namespace Gablarski.Client
 		{
 			var msg = (ChannelEditResultMessage)e.Message;
 
-			Channel channel;
+			ChannelInfo channel;
 			lock (this.channelLock)
 			{
 				this.channels.TryGetValue (msg.ChannelId, out channel);
@@ -157,7 +156,7 @@ namespace Gablarski.Client
 			OnReceivedChannelEditResult (new ChannelEditResultEventArgs (channel, msg.Result));
 		}
 
-		protected internal virtual void OnReceivedChannelList (ReceivedListEventArgs<Channel> e)
+		protected internal virtual void OnReceivedChannelList (ReceivedListEventArgs<ChannelInfo> e)
 		{
 			var received = this.ReceivedChannelList;
 			if (received != null)
@@ -183,7 +182,7 @@ namespace Gablarski.Client
 	public class ChannelEditResultEventArgs
 		: EventArgs
 	{
-		public ChannelEditResultEventArgs (Channel channel, ChannelEditResult result)
+		public ChannelEditResultEventArgs (ChannelInfo channel, ChannelEditResult result)
 		{
 			this.Channel = channel;
 			this.Result = result;
@@ -192,7 +191,7 @@ namespace Gablarski.Client
 		/// <summary>
 		/// Gets the channel the edit request was for.
 		/// </summary>
-		public Channel Channel
+		public ChannelInfo Channel
 		{
 			get;
 			private set;

@@ -39,12 +39,12 @@ namespace Gablarski.Tests
 			var msg = new ConnectMessage (ver);
 			Assert.AreEqual (ver, msg.ApiVersion);
 
-			msg.WritePayload (writer, types);
+			msg.WritePayload (writer);
 			long length = stream.Position;
 			stream.Position = 0;
 
 			msg = new ConnectMessage();
-			msg.ReadPayload (reader, types);
+			msg.ReadPayload (reader);
 
 			Assert.AreEqual (length, stream.Position);
 			Assert.AreEqual (ver, msg.ApiVersion);
@@ -55,12 +55,12 @@ namespace Gablarski.Tests
 		{
 			string nickname = "Foo";
 			var msg = new LoginMessage { Nickname = nickname };
-			msg.WritePayload (writer, types);
+			msg.WritePayload (writer);
 			long length = stream.Position;
 			stream.Position = 0;
 
 			msg = new LoginMessage();
-			msg.ReadPayload (reader, types);
+			msg.ReadPayload (reader);
 
 			Assert.AreEqual (length, stream.Position);
 			Assert.AreEqual (nickname, msg.Nickname);
@@ -74,12 +74,12 @@ namespace Gablarski.Tests
 			string password = "monkeys";
 
 			var msg = new LoginMessage { Nickname = nickname, Username = username, Password = password };
-			msg.WritePayload (writer, types);
+			msg.WritePayload (writer);
 			long length = stream.Position;
 			stream.Position = 0;
 
 			msg = new LoginMessage();
-			msg.ReadPayload (reader, types);
+			msg.ReadPayload (reader);
 
 			Assert.AreEqual (length, stream.Position);
 			Assert.AreEqual (nickname, msg.Nickname);

@@ -38,13 +38,13 @@ namespace Gablarski.Messages
 			get { return false; }
 		}
 
-		public override void WritePayload (IValueWriter writer, IdentifyingTypes idTypes)
+		public override void WritePayload (IValueWriter writer)
 		{
 			writer.WriteInt32 (this.SourceId);
 			writer.WriteBytes (this.Data);
 		}
 
-		public override void ReadPayload (IValueReader reader, IdentifyingTypes idTypes)
+		public override void ReadPayload (IValueReader reader)
 		{
 			this.SourceId = reader.ReadInt32 ();
 			this.Data = reader.ReadBytes ();

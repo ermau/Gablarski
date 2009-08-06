@@ -40,12 +40,12 @@ namespace Gablarski.Messages
 			private set;
 		}
 
-		public override void WritePayload (IValueWriter writer, IdentifyingTypes idTypes)
+		public override void WritePayload (IValueWriter writer)
 		{
 			writer.WriteByte ((byte)this.Reason);
 		}
 
-		public override void ReadPayload (IValueReader reader, IdentifyingTypes idTypes)
+		public override void ReadPayload (IValueReader reader)
 		{
 			this.Reason = (ConnectionRejectedReason)reader.ReadByte ();
 		}

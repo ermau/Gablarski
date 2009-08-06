@@ -137,7 +137,7 @@ namespace Gablarski.Network
 						iwriter.WriteByte (42);
 						iwriter.WriteUInt16 (toSend.MessageTypeCode);
 
-						toSend.WritePayload (iwriter, this.IdentifyingTypes);
+						toSend.WritePayload (iwriter);
 						iwriter.Flush();
 					}
 					catch (Exception ex)
@@ -215,7 +215,7 @@ namespace Gablarski.Network
 				MessageBase msg;
 				if (MessageBase.GetMessage (type, out msg))
 				{
-					msg.ReadPayload (this.reader, this.IdentifyingTypes);
+					msg.ReadPayload (this.reader);
 
 					OnMessageReceived (new MessageReceivedEventArgs (this, msg));
 				}

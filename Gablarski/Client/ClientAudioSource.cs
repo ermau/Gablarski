@@ -16,12 +16,12 @@ namespace Gablarski.Client
 			this.client = client;
 		}
 
-		public void SendAudioData (byte[] data, Channel targetChannel)
+		public void SendAudioData (byte[] data, ChannelInfo targetChannel)
 		{
 			SendAudioData (data, targetChannel.ChannelId);
 		}
 
-		public void SendAudioData (byte[] data, object targetChannelId)
+		public void SendAudioData (byte[] data, int targetChannelId)
 		{
 			this.client.Send (new SendAudioDataMessage (targetChannelId, this.Id, Encode (data)));
 		}

@@ -17,7 +17,7 @@ namespace Gablarski.Tests
 
 			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource ("voice", 0, 1, 1, 64000, 44100, 512, 10));
 
-			Assert.Throws<ArgumentNullException> (() => new AudioSource ("voice", 1, null, 1, 64000, 44100, 512, 10));
+			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource ("voice", 1, -1, 1, 64000, 44100, 512, 10));
 
 			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource ("voice", 1, 1, 0, 0, 41000, 512, 10));
 			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource ("voice", 1, 1, 3, 0, 41000, 512, 10));
@@ -37,7 +37,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void Values()
 		{
-			object user = 1;
+			int user = 1;
 			var source = new AudioSource ("voice", 1, user, 1, 64000, 44100, 512, 10);
 			Assert.AreEqual ("voice",	source.Name);
 			Assert.AreEqual (1,			source.Id);

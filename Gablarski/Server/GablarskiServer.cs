@@ -26,9 +26,7 @@ namespace Gablarski.Server
 			this.settings = settings;
 			this.userProvider = userProvider;
 			this.permissionProvider = permissionProvider;
-
-			this.IdentifyingTypes = new IdentifyingTypes (userProvider.IdentifyingType, channelProvider.IdentifyingType);
-			
+		
 			this.channelProvider = channelProvider;
 			this.channelProvider.ChannelsUpdatedExternally += OnChannelsUpdatedExternally;
 			this.UpdateChannels (false);
@@ -44,14 +42,10 @@ namespace Gablarski.Server
 		{
 			this.settings = settings;
 
-			this.IdentifyingTypes = new IdentifyingTypes (((IUserProvider)provider).IdentifyingType, ((IChannelProvider)provider).IdentifyingType);
-
 			this.backendProvider = provider;
 			this.backendProvider.ChannelsUpdatedExternally += OnChannelsUpdatedExternally;
 			this.UpdateChannels (false);
 		}
-
-		public IdentifyingTypes IdentifyingTypes { get; private set; }
 
 		/// <summary>
 		/// Gets or sets whether to trace verbosely (trace audio data mostly).
@@ -110,7 +104,6 @@ namespace Gablarski.Server
 			// MUST provide a gaurantee of persona
 			lock (this.availableConnections)
 			{
-				provider.IdentifyingTypes = this.IdentifyingTypes;
 				provider.ConnectionMade += OnConnectionMade;
 				provider.StartListening ();
 		
@@ -202,10 +195,12 @@ namespace Gablarski.Server
 		private readonly List<AudioSource> sources = new List<AudioSource>();
 
 		private readonly ConnectionCollection connections = new ConnectionCollection();
+		private Dictionary<int, object> nativeusers = new Dictionary<int, object>();
 
 		private readonly object channelLock = new object ();
-		private Channel defaultChannel;
-		private Dictionary<object, Channel> channels;
+		private ChannelInfo defaultChannel;
+		private Dictionary<int, ChannelInfo> channels;
+		private Dictionary<int, object> nativeChannels = new Dictionary<int, object>();
 
 		private void Disconnect (IConnection connection)
 		{
@@ -244,8 +239,8 @@ namespace Gablarski.Server
 
 			if (sendUpdate)
 			{
-				object defaultChannelId;
-				List<object> movedUsers = new List<object>();
+				int defaultChannelId;
+				List<int> movedUsers = new List<int>();
 				lock (channelLock)
 				{
 					defaultChannelId = ChannelProvider.DefaultChannel.ChannelId;
@@ -289,15 +284,15 @@ namespace Gablarski.Server
 			return currentSources;
 		}
 
-		protected bool GetPermission (PermissionName name, object channelId, object playerId)
+		protected bool GetPermission (PermissionName name, int channelId, int playerId)
 		{
 			if (this.BackendProvider != null)
 				return this.BackendProvider.GetPermissions (channelId, playerId).GetPermission (name);
 			else
-				return this.PermissionProvider.GetPermissions (playerId, this.IdentifyingTypes).GetPermission (name);
+				return this.PermissionProvider.GetPermissions (playerId).GetPermission (name);
 		}
 
-		protected bool GetPermission (PermissionName name, object channelId, IConnection connection)
+		protected bool GetPermission (PermissionName name, int channelId, IConnection connection)
 		{
 			return GetPermission (name, channelId, this.connections[connection].UserId);
 		}
@@ -327,7 +322,7 @@ namespace Gablarski.Server
 			e.Connection.Disconnected -= this.OnClientDisconnected;
 			e.Connection.Disconnect();
 
-			object playerId;
+			int playerId;
 			if (this.connections.Remove (e.Connection, out playerId))
 				this.connections.Send (new UserDisconnectedMessage (playerId));
 
@@ -350,7 +345,6 @@ namespace Gablarski.Server
 
 			this.connections.Add (e.Connection);
 
-			e.Connection.IdentifyingTypes = this.IdentifyingTypes;
 			e.Connection.MessageReceived += this.OnMessageReceived;
 			e.Connection.Disconnected += this.OnClientDisconnected;
 		}

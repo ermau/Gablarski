@@ -16,7 +16,7 @@ namespace Gablarski.Tests
 		public void ManagerSetup ()
 		{
 			this.provider = new MockConnectionProvider ();
-			this.server = this.provider.EstablishConnection (new IdentifyingTypes (typeof(Int32), typeof(Int32)));
+			this.server = this.provider.EstablishConnection ();
 			this.manager = new ClientChannelManager (new MockClientContext { Connection = this.server.Client });
 		}
 
@@ -41,13 +41,13 @@ namespace Gablarski.Tests
 		public void CreateInvalidChannel ()
 		{
 			Assert.Throws<ArgumentNullException> (() => manager.Create (null));
-			Assert.Throws<ArgumentException>(() => manager.Create (new Channel (1)));
+			Assert.Throws<ArgumentException>(() => manager.Create (new ChannelInfo (1)));
 		}
 
 		[Test]
 		public void CreateChannel ()
 		{
-			Channel c = new Channel
+			ChannelInfo c = new ChannelInfo
 			{
 				Name = "Name",
 				Description = "Description",
@@ -66,13 +66,13 @@ namespace Gablarski.Tests
 		public void UpdateInvalidChannel ()
 		{
 			Assert.Throws<ArgumentNullException> (() => manager.Update (null));
-			Assert.Throws<ArgumentException>(() => manager.Update (new Channel ()));
+			Assert.Throws<ArgumentException>(() => manager.Update (new ChannelInfo ()));
 		}
 
 		[Test]
 		public void UpdateChannel ()
 		{
-			Channel c = new Channel (2)
+			ChannelInfo c = new ChannelInfo (2)
 			{
 				Name = "Name",
 				Description = "Description",
@@ -93,13 +93,13 @@ namespace Gablarski.Tests
 		public void DeleteInvalidChannel ()
 		{
 			Assert.Throws<ArgumentNullException> (() => manager.Delete (null));
-			Assert.Throws<ArgumentException> (() => manager.Delete (new Channel (null)));
+			Assert.Throws<ArgumentException> (() => manager.Delete (new ChannelInfo ()));
 		}
 
 		[Test]
 		public void DeleteChannel ()
 		{
-			Channel c = new Channel (2)
+			ChannelInfo c = new ChannelInfo (2)
 			{
 				Name = "Name",
 				Description = "Description",
@@ -124,20 +124,20 @@ namespace Gablarski.Tests
 
 		public static void PopulateChannels (ClientChannelManager manager, IConnection server)
 		{
-			Channel c1 = new Channel (1)
+			ChannelInfo c1 = new ChannelInfo (1)
 			{
 				Name = "Channel 1",
 				Description = "Description 1"
 			};
 
-			Channel sc1 = new Channel (2)
+			ChannelInfo sc1 = new ChannelInfo (2)
 			{
 				Name = "SubChannel 1",
 				Description = "Description 2",
 				ParentChannelId = c1.ChannelId
 			};
 
-			Channel c2 = new Channel (3)
+			ChannelInfo c2 = new ChannelInfo (3)
 			{
 				Name = "Channel 2",
 				Description = "Description 3"
@@ -166,20 +166,20 @@ namespace Gablarski.Tests
 		[Test]
 		public void UpdateChannelFailed ()
 		{
-			Channel c1 = new Channel (1)
+			ChannelInfo c1 = new ChannelInfo (1)
 			{
 				Name = "Channel 1",
 				Description = "Description 1"
 			};
 
-			Channel sc1 = new Channel (2)
+			ChannelInfo sc1 = new ChannelInfo (2)
 			{
 				Name = "SubChannel 1",
 				Description = "Description 2",
 				ParentChannelId = c1.ChannelId
 			};
 
-			Channel c2 = new Channel (3)
+			ChannelInfo c2 = new ChannelInfo (3)
 			{
 				Name = "Channel 2",
 				Description = "Description 3"
@@ -188,7 +188,7 @@ namespace Gablarski.Tests
 			manager.OnChannelListReceivedMessage (new MessageReceivedEventArgs (this.server,
 				new ChannelListMessage (new[] { c1, sc1, c2 })));
 
-			Channel updated = new Channel (1, c1) { Name = "Updated 1", Description = "U Description 1" };
+			ChannelInfo updated = new ChannelInfo (1, c1) { Name = "Updated 1", Description = "U Description 1" };
 			manager.OnChannelEditResultMessage (new MessageReceivedEventArgs (this.server,
 				new ChannelEditResultMessage (updated, ChannelEditResult.FailedUnknown)));
 

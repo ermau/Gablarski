@@ -20,7 +20,7 @@ namespace Gablarski
 		/// <summary>
 		/// Gets the channels in this context
 		/// </summary>
-		IEnumerable<Channel> Channels { get; }
+		IEnumerable<ChannelInfo> Channels { get; }
 
 		/// <summary>
 		/// Gets the sources in this context.

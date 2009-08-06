@@ -62,7 +62,7 @@ namespace Gablarski.Tests
 
 		private MockServerConnection Login (string username, string nickname, out UserInfo user)
 		{
-			var connection = provider.EstablishConnection (this.server.IdentifyingTypes);
+			var connection = provider.EstablishConnection ();
 			connection.Client.Send (new ConnectMessage (GablarskiServer.MinimumApiVersion));
 			connection.Client.DequeueAndAssertMessage<ServerInfoMessage>();
 
@@ -92,7 +92,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void OldVersionReject ()
 		{
-			var connection = provider.EstablishConnection (this.server.IdentifyingTypes);
+			var connection = provider.EstablishConnection ();
 			connection.Client.Send (new ConnectMessage (new Version (0,0,0,1)));
 
 			MessageBase message = connection.Client.DequeueMessage ();
@@ -105,21 +105,19 @@ namespace Gablarski.Tests
 		[Test]
 		public void ServerInfo()
 		{
-			var connection = provider.EstablishConnection (this.server.IdentifyingTypes);
+			var connection = provider.EstablishConnection ();
 			connection.Client.Send (new ConnectMessage (GablarskiServer.MinimumApiVersion));
 
 			var msg = connection.Client.DequeueAndAssertMessage<ServerInfoMessage>();
 			Assert.AreEqual (this.settings.Name, msg.ServerInfo.ServerName);
 			Assert.AreEqual (this.settings.Description, msg.ServerInfo.ServerDescription);
-			Assert.AreEqual (this.channels.IdentifyingType, msg.ServerInfo.ChannelIdentifyingType);
-			Assert.AreEqual (this.users.IdentifyingType, msg.ServerInfo.UserIdentifyingType);
 			Assert.AreEqual (String.Empty, msg.ServerInfo.ServerLogo);
 		}
 
 		[Test]
 		public void RequestChannelList ()
 		{
-			var connection = provider.EstablishConnection (this.server.IdentifyingTypes);
+			var connection = provider.EstablishConnection ();
 			connection.Client.Send (new RequestChannelListMessage ());
 
 			MessageBase message = connection.Client.DequeueMessage ();
@@ -134,7 +132,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void BadNickname ()
 		{
-			var connection = provider.EstablishConnection (this.server.IdentifyingTypes);
+			var connection = provider.EstablishConnection ();
 			connection.Client.Send (new LoginMessage { Nickname = null, Username = null, Password = null });
 
 			MessageBase message = connection.Client.DequeueMessage ();

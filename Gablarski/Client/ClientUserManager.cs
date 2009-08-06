@@ -56,7 +56,7 @@ namespace Gablarski.Client
 			get { return this.context.CurrentUser; }
 		}
 
-		public ClientUser this[object identifier]
+		public ClientUser this[int identifier]
 		{
 			get
 			{
@@ -121,7 +121,7 @@ namespace Gablarski.Client
 		#endregion
 
 		private readonly object userLock = new object();
-		private Dictionary<object, ClientUser> users;
+		private Dictionary<int, ClientUser> users;
 		private readonly IClientContext context;
 
 		#region Message handlers
@@ -161,7 +161,7 @@ namespace Gablarski.Client
 			lock (userLock)
 			{
 				if (this.users == null)
-					this.users = new Dictionary<object, ClientUser>();
+					this.users = new Dictionary<int, ClientUser>();
 
 				user = new ClientUser (msg.UserInfo, this.context.Connection);
 				this.users.Add (msg.UserInfo.UserId, user);
@@ -193,7 +193,7 @@ namespace Gablarski.Client
 		{
 			var msg = (UserChangedChannelMessage)e.Message;
 
-			Channel channel = this.context.Channels.FirstOrDefault (c => c.ChannelId.Equals (msg.ChangeInfo.TargetChannelId));
+			ChannelInfo channel = this.context.Channels.FirstOrDefault (c => c.ChannelId.Equals (msg.ChangeInfo.TargetChannelId));
 			if (channel == null)
 				return;
 
@@ -309,7 +309,7 @@ namespace Gablarski.Client
 	public class ChannelChangedEventArgs
 		: EventArgs
 	{
-		public ChannelChangedEventArgs (ClientUser target, Channel targetChannel, ClientUser movedBy)
+		public ChannelChangedEventArgs (ClientUser target, ChannelInfo targetChannel, ClientUser movedBy)
 		{
 			if (target == null)
 				throw new ArgumentNullException ("target");
@@ -332,7 +332,7 @@ namespace Gablarski.Client
 		/// <summary>
 		/// Gets the channel the user is being moved to.
 		/// </summary>
-		public Channel TargetChannel
+		public ChannelInfo TargetChannel
 		{
 			get; private set;
 		}
