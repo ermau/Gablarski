@@ -106,10 +106,13 @@
   </Target>
   -->
   <PropertyGroup>
-    <PreBuildEvent>xcopy /Y "$(SolutionDir)Gablarski.CELT\libcelt.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)Gablarski.CELT\libcelt.license.txt" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)Gablarski.Speex\libspeexdsp.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)Gablarski.OpenAL\OpenAL32.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)Gablarski.OpenAL\OpenALSoft.License.txt" "$(TargetDir)"</PreBuildEvent>
+    <PreBuildEvent>
+    </PreBuildEvent>
+    <PostBuildEvent>xcopy /Y "$(SolutionDir)Gablarski\Audio\CELT\libcelt.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Gablarski\Audio\CELT\libcelt.license.txt" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Gablarski\Audio\Speex\libspeexdsp.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Gablarski\Audio\Speex\libspeexdsp.license.txt" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Gablarski\Audio\OpenAL\OpenAL32.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Gablarski\Audio\OpenAL\OpenALSoft.License.txt" "$(TargetDir)"</PostBuildEvent>
   </PropertyGroup>
 </Project>
