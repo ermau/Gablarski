@@ -25,6 +25,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>3</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -72,7 +73,26 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AES.cs" />
+    <Compile Include="Audio\CELT\Celt.cs" />
+    <Compile Include="Audio\CELT\CeltDecoder.cs" />
+    <Compile Include="Audio\CELT\CeltEncoder.cs" />
+    <Compile Include="Audio\CELT\CeltMode.cs" />
+    <Compile Include="Audio\OpenAL\CaptureDevice.cs" />
+    <Compile Include="Audio\OpenAL\Context.cs" />
+    <Compile Include="Audio\OpenAL\Device.cs" />
+    <Compile Include="Audio\OpenAL\Extension.cs" />
+    <Compile Include="Audio\OpenAL\OpenAL.cs" />
+    <Compile Include="Audio\OpenAL\PlaybackDevice.cs" />
+    <Compile Include="Audio\OpenAL\Providers\CaptureProvider.cs" />
+    <Compile Include="Audio\OpenAL\Providers\PlaybackProvider.cs" />
+    <Compile Include="Audio\OpenAL\Source.cs" />
+    <Compile Include="Audio\OpenAL\SourceBuffer.cs" />
+    <Compile Include="Audio\OpenAL\SourcePool.cs" />
+    <Compile Include="Audio\Speex\SpeexJitterBuffer.cs" />
+    <Compile Include="Audio\Speex\SpeexJitterBufferPacket.cs" />
+    <Compile Include="Audio\Speex\SpeexPreprocessor.cs" />
     <Compile Include="ByteArrayValueReader.cs" />
+    <Compile Include="Client\AudioEngine.cs" />
     <Compile Include="Network\NetworkClientConnection.cs" />
     <Compile Include="Network\NetworkServerConnection.cs" />
     <Compile Include="Network\NetworkServerConnectionProvider.cs" />
@@ -84,7 +104,6 @@
     <Compile Include="Client\IDeviceProvider.cs" />
     <Compile Include="Client\IPlaybackProvider.cs" />
     <Compile Include="Client\VoiceActivation.cs" />
-    <Compile Include="en-US.Designer.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="GenericResult.cs" />
     <Compile Include="IClientConnection.cs" />
@@ -157,21 +176,33 @@
     <Compile Include="Server\LobbyChannelProvider.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="en-US.resx" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Gablarski.CELT\Gablarski.CELT.csproj">
-      <Project>{A55BF3FF-7D5F-4BA6-8C2E-2A6F59FD032B}</Project>
-      <Name>Gablarski.CELT</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Gablarski.Speex\Gablarski.Speex.csproj">
-      <Project>{EA65B7E2-026A-4CC0-9E63-EA4BCCFCD906}</Project>
-      <Name>Gablarski.Speex</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Mono.Rocks\Mono.Rocks.csproj">
       <Project>{F656F792-2CDE-4E17-BB5F-6A6F1C266CB8}</Project>
       <Name>Mono.Rocks</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Audio\CELT\libcelt.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Audio\CELT\libcelt.license.txt" />
+    <None Include="Audio\OpenAL\OpenAL32.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Audio\OpenAL\OpenALSoft.License.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Audio\Speex\libspeexdsp.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Audio\Speex\libspeexdsp.license.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Audio\OpenAL\Gablarski.OpenAL.dll.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

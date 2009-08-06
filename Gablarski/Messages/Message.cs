@@ -31,7 +31,7 @@ namespace Gablarski.Messages
 		ConnectionRejected = 2,
 		ServerInfoReceived = 12,
 		LoginResult = 4,
-		Disconnect = 6,
+		//Disconnect = 6,
 
 		SourceListReceived = 16,
 		SourceResult = 8,

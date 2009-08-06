@@ -8,6 +8,7 @@ using Gablarski.Media.Sources;
 using Gablarski.Network;
 using Gablarski.OpenAL.Providers;
 using Gablarski.Server;
+using Gablarski.Speex;
 using Mono.Options;
 using System.Linq;
 

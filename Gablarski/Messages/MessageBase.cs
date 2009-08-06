@@ -49,9 +49,36 @@ namespace Gablarski.Messages
 
 		static MessageBase ()
 		{
-			Dictionary<ushort, Func<MessageBase>> messageTypes = new Dictionary<ushort, Func<MessageBase>> ();
+			MessageTypes = new ReadOnlyDictionary<ushort,Func<MessageBase>> (new Dictionary<ushort, Func<MessageBase>>
+			{
+				{ (ushort)ServerMessageType.AudioDataReceived, () => new AudioDataReceivedMessage() },
+				{ (ushort)ServerMessageType.ChangeChannelResult, () => new ChannelChangeResultMessage() },
+				{ (ushort)ServerMessageType.ChannelEditResult, () => new ChannelEditResultMessage() },
+				{ (ushort)ServerMessageType.ChannelListReceived, () => new ChannelListMessage() },
+				{ (ushort)ServerMessageType.ConnectionRejected, () => new ConnectionRejectedMessage() },
+				{ (ushort)ServerMessageType.LoginResult, () => new LoginResultMessage() },
+				{ (ushort)ServerMessageType.ServerInfoReceived, () => new ServerInfoMessage() },
+				{ (ushort)ServerMessageType.SourceListReceived, () => new SourceListMessage() },
+				{ (ushort)ServerMessageType.SourceResult, () => new SourceResultMessage() },
+				{ (ushort)ServerMessageType.SourcesRemoved, () => new SourcesRemovedMessage() },
+				{ (ushort)ServerMessageType.UserChangedChannel, () => new UserChangedChannelMessage() },
+				{ (ushort)ServerMessageType.UserDisconnected, () => new UserDisconnectedMessage() },
+				{ (ushort)ServerMessageType.UserListReceived, () => new UserListMessage() },
+				{ (ushort)ServerMessageType.UserLoggedIn, () => new UserLoggedInMessage() },
 
-			Type msgb = typeof(MessageBase);
+				{ (ushort)ClientMessageType.AudioData, () => new SendAudioDataMessage() },
+				{ (ushort)ClientMessageType.ChangeChannel, () => new ChannelChangeMessage() },
+				{ (ushort)ClientMessageType.Connect, () => new ConnectMessage() },
+				{ (ushort)ClientMessageType.Disconnect, () => new DisconnectMessage() },
+				{ (ushort)ClientMessageType.EditChannel, () => new ChannelEditMessage() },
+				{ (ushort)ClientMessageType.Login, () => new LoginMessage() },
+				{ (ushort)ClientMessageType.RequestChannelList, () => new RequestChannelListMessage() },
+				{ (ushort)ClientMessageType.RequestSource, () => new RequestSourceMessage() },
+				{ (ushort)ClientMessageType.RequestSourceList, () => new RequestSourceListMessage() },
+				{ (ushort)ClientMessageType.RequestUserList, () => new RequestUserListMessage() }
+			});
+
+			/*Type msgb = typeof(MessageBase);
 
 			foreach (Type t in Assembly.GetExecutingAssembly ().GetTypes ().Where (t => msgb.IsAssignableFrom (t) && !t.IsAbstract))
 			{
@@ -68,7 +95,7 @@ namespace Gablarski.Messages
 				messageTypes.Add (dud.MessageTypeCode, dctord);
 			}
 
-			MessageTypes = new ReadOnlyDictionary<ushort, Func<MessageBase>> (messageTypes);
+			MessageTypes = new ReadOnlyDictionary<ushort, Func<MessageBase>> (messageTypes);*/
 		}
 	}
 }

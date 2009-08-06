@@ -85,9 +85,16 @@ namespace Gablarski.Client
 
 		private void OnMessageReceived (object sender, MessageReceivedEventArgs e)
 		{
-			lock (mqueue)
+			if (e.Message.MessageTypeCode != (ushort)ServerMessageType.AudioDataReceived)
 			{
-				mqueue.Enqueue (e);
+				lock (mqueue)
+				{
+					mqueue.Enqueue (e);
+				}
+			}
+			else
+			{
+				this.handlers[(e.Message as ServerMessage).MessageType] (e);
 			}
 		}
 

@@ -53,10 +53,9 @@ namespace Gablarski.Tests
 					Assert.Fail ("[" + Name + "] Header does not begin with 42.");
 
 				ushort type = this.reader.ReadUInt16();
-				if (!MessageBase.MessageTypes.ContainsKey (type))
+				if (!MessageBase.GetMessage (type, out msg))
 					Assert.Fail ("[" + Name + "] Type " + type + " does not exist.");
 
-				msg = MessageBase.MessageTypes[type]();
 				msg.ReadPayload (this.reader, this.IdentifyingTypes);
 
 				Interlocked.Decrement (ref this.waiting);

@@ -366,10 +366,6 @@
       <Project>{529145D5-6CC3-4016-89B5-826563024AF1}</Project>
       <Name>FluentNHibernate</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Gablarski.OpenAL\Gablarski.OpenAL.csproj">
-      <Project>{1EFCB570-3B06-47AF-9130-531C5625AE79}</Project>
-      <Name>Gablarski.OpenAL</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Gablarski\Gablarski.csproj">
       <Project>{7347052B-DA5B-4CCA-AB28-3963766E3CDB}</Project>
       <Name>Gablarski</Name>

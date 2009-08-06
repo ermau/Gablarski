@@ -88,6 +88,11 @@ namespace Gablarski.Client
 			private set;
 		}
 
+		public AudioEngine Audio
+		{
+			get; private set;
+		}
+
 		/// <summary>
 		/// Gets the current user.
 		/// </summary>
