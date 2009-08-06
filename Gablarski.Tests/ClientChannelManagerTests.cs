@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Gablarski.Server;
 using NUnit.Framework;
 using Gablarski.Client;
 using Gablarski.Messages;

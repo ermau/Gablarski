@@ -5,7 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Threading;
-using Gablarski.Media.Sources;
+using Gablarski.Audio;
 using Gablarski.Messages;
 
 namespace Gablarski.Client

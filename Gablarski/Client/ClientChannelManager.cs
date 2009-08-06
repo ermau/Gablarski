@@ -4,7 +4,6 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using Gablarski.Messages;
-using Gablarski.Server;
 
 namespace Gablarski.Client
 {

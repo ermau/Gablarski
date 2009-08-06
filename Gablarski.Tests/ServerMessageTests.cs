@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Gablarski.Media.Sources;
+using Gablarski.Audio;
 using Gablarski.Messages;
 using NUnit.Framework;
 

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Gablarski.Media.Sources;
+using Gablarski.Audio;
 using NUnit.Framework;
 
 namespace Gablarski.Tests

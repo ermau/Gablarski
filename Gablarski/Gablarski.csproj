@@ -169,7 +169,7 @@
     <Compile Include="Client\CurrentUser.cs" />
     <Compile Include="IdentifyingTypes.cs" />
     <Compile Include="IClientContext.cs" />
-    <Compile Include="Media\Sources\AudioSource.cs" />
+    <Compile Include="Audio\AudioSource.cs" />
     <Compile Include="Messages\SourcesRemovedMessage.cs" />
     <Compile Include="Messages\UserChangedChannelMessage.cs" />
     <Compile Include="Messages\UserLoggedInMessage.cs" />
