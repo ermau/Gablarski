@@ -82,12 +82,6 @@ namespace Gablarski.Tests
 			get { return this.connected; }
 		}
 
-		public IdentifyingTypes IdentifyingTypes
-		{
-			get;
-			set;
-		}
-
 		public abstract void Send (MessageBase message);
 
 		public void Disconnect ()

@@ -19,7 +19,6 @@ namespace Gablarski.Tests
 			stream = new MemoryStream(new byte[20480], true);
 			writer = new StreamValueWriter (stream);
 			reader = new StreamValueReader (stream);
-			types = new IdentifyingTypes (typeof (Int32), typeof (Int32));
 		}
 
 		[TearDown]
@@ -29,7 +28,6 @@ namespace Gablarski.Tests
 			reader.Dispose();
 		}
 
-		private IdentifyingTypes types;
 		private MemoryStream stream;
 		private IValueWriter writer;
 		private IValueReader reader;

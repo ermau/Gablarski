@@ -167,7 +167,6 @@
     <Compile Include="Client\ClientUserManager.cs" />
     <Compile Include="Client\ClientSourceManager.cs" />
     <Compile Include="Client\CurrentUser.cs" />
-    <Compile Include="IdentifyingTypes.cs" />
     <Compile Include="IClientContext.cs" />
     <Compile Include="Audio\AudioSource.cs" />
     <Compile Include="Messages\SourcesRemovedMessage.cs" />

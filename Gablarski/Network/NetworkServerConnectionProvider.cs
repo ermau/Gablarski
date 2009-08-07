@@ -30,11 +30,6 @@ namespace Gablarski.Network
 		/// </summary>
 		public event EventHandler<ConnectionEventArgs> ConnectionMade;
 
-		public IdentifyingTypes IdentifyingTypes
-		{
-			get; set;
-		}
-
 		/// <summary>
 		/// Starts listening for connections and connectionless messages.
 		/// </summary>

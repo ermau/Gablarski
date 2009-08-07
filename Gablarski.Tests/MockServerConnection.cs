@@ -18,7 +18,6 @@ namespace Gablarski.Tests
 				if (this.client == null)
 				{
 					this.client = new MockClientConnection (this);
-					this.client.IdentifyingTypes = this.IdentifyingTypes;
 				}
 
 				return this.client;
@@ -30,7 +29,6 @@ namespace Gablarski.Tests
 			if (this.client == null)
 			{
 				this.client = new MockClientConnection (this);
-				this.client.IdentifyingTypes = this.IdentifyingTypes;
 			}
 
 			this.client.Receive (message);

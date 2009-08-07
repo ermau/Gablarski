@@ -25,14 +25,6 @@ namespace Gablarski.Network
 		}
 
 		/// <summary>
-		/// Gets the identifying types for various data structures.
-		/// </summary>
-		public IdentifyingTypes IdentifyingTypes
-		{
-			get; set;
-		}
-
-		/// <summary>
 		/// A message was received from the underlying transport.
 		/// </summary>
 		public event EventHandler<MessageReceivedEventArgs> MessageReceived;

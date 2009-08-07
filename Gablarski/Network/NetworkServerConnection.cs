@@ -41,14 +41,6 @@ namespace Gablarski.Network
 			get { return this.tcp.Connected; }
 		}
 
-		/// <summary>
-		/// Gets the identifying types for various data structures.
-		/// </summary>
-		public IdentifyingTypes IdentifyingTypes
-		{
-			get; set;
-		}
-
 		public event EventHandler<MessageReceivedEventArgs> MessageReceived;
 		public event EventHandler<ConnectionEventArgs> Disconnected;
 
