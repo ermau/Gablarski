@@ -202,10 +202,9 @@ namespace Gablarski.Client
 			ClientUser movedBy = null;
 			lock (userLock)
 			{
-				if (!this.users.ContainsKey (msg.ChangeInfo.TargetUserId))
+				if (!this.users.TryGetValue (msg.ChangeInfo.TargetUserId, out old))
 					return;
 
-				old = this.users[msg.ChangeInfo.TargetUserId];
 				this.users[msg.ChangeInfo.TargetUserId] = new ClientUser (old.Nickname, old.UserId, msg.ChangeInfo.TargetChannelId, this.context.Connection);
 				user = this.users[msg.ChangeInfo.TargetUserId];
 
