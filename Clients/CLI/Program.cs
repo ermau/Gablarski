@@ -4,11 +4,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using Gablarski.Audio;
+using Gablarski.Audio.OpenAL.Providers;
 using Gablarski.Client;
 using Gablarski.Network;
-using Gablarski.OpenAL.Providers;
 using Gablarski.Server;
-using Gablarski.Speex;
 using Mono.Options;
 using System.Linq;
 
@@ -31,14 +30,13 @@ namespace Gablarski.Clients.CLI
 		private static IPlaybackProvider playbackProvider;
 		private static ICaptureProvider captureProvider;
 		private static ClientAudioSource captureSource;
-		private static VoiceActivation voiceActivation;
 
 		public static IPlaybackProvider PlaybackProvider
 		{
 			get
 			{
 				if (playbackProvider == null)
-					playbackProvider = new PlaybackProvider();
+					playbackProvider = new OpenALPlaybackProvider();
 
 				return playbackProvider;
 			}
@@ -49,7 +47,7 @@ namespace Gablarski.Clients.CLI
 			get
 			{
 				if (captureProvider == null)
-					captureProvider = new CaptureProvider();
+					captureProvider = new OpenALCaptureProvider();
 
 				return captureProvider;
 			}
@@ -234,7 +232,7 @@ namespace Gablarski.Clients.CLI
 							output = output.Trim();
 							if (output != String.Empty)
 							{
-								var device = OpenAL.OpenAL.PlaybackDevices.FirstOrDefault (d => d.Name == output);
+								var device = Audio.OpenAL.OpenAL.PlaybackDevices.FirstOrDefault (d => d.Name == output);
 								if (device == null)
 									Console.WriteLine (output + " not found.");
 								else
@@ -249,7 +247,7 @@ namespace Gablarski.Clients.CLI
 							input = input.Trim();
 							if (input != String.Empty)
 							{
-								var device = OpenAL.OpenAL.CaptureDevices.FirstOrDefault (d => d.Name == input);
+								var device = Audio.OpenAL.OpenAL.CaptureDevices.FirstOrDefault (d => d.Name == input);
 								if (device == null)
 									Console.WriteLine (input + " not found.");
 								else
@@ -273,19 +271,13 @@ namespace Gablarski.Clients.CLI
 						{
 							{ "s|stop", v => stop = (v != null)},
 							//{ "source:", (int v) => sourceId = v },
-							{ "v|vactivation", "Uses voice activation.", v => useVoiceActivation = (v != null) }
+							//{ "v|vactivation", "Uses voice activation.", v => useVoiceActivation = (v != null) }
 						};
 						coptions.Parse (cmdopts);
 
 						if (stop)
 						{
-							if (voiceActivation != null)
-							{
-								voiceActivation.StopListening();
-								voiceActivation.Talking -= VaTalking;
-								voiceActivation = null;
-							}
-							else if (CaptureProvider.IsCapturing)
+							if (CaptureProvider.IsCapturing)
 								CaptureProvider.EndCapture();
 						}
 						else
@@ -308,18 +300,9 @@ namespace Gablarski.Clients.CLI
 								Console.WriteLine ("Source not found.");
 							else
 							{
-								if (useVoiceActivation)
-								{
-									voiceActivation = new VoiceActivation (CaptureProvider, captureSource);
-									voiceActivation.Talking += VaTalking;
-									voiceActivation.Listen ((Int16.MaxValue) / 2);
-								}
-								else
-								{
-									CaptureProvider.SamplesAvailable += OnSamplesAvailable;
-									if (!CaptureProvider.IsCapturing)
-										CaptureProvider.StartCapture();
-								}
+								CaptureProvider.SamplesAvailable += OnSamplesAvailable;
+								if (!CaptureProvider.IsCapturing)
+									CaptureProvider.StartCapture();
 
 								//if (captureSource == null)
 								//    CaptureProvider.SamplesAvailable += OnSamplesAvailable;
@@ -337,11 +320,6 @@ namespace Gablarski.Clients.CLI
 						break;
 				}
 			}
-		}
-
-		static void VaTalking (object sender, TalkingEventArgs e)
-		{
-			captureSource.SendAudioData (e.Samples, Client.CurrentUser.CurrentChannelId);
 		}
 
 		static void SourcesReceivedAudio (object sender, ReceivedAudioEventArgs e)
@@ -379,13 +357,13 @@ namespace Gablarski.Clients.CLI
 			}
 		}
 
-		static void SelectCapture (IDevice device, TextWriter writer)
+		static void SelectCapture (IAudioDevice device, TextWriter writer)
 		{
 			CaptureProvider.Device = device;
 			writer.WriteLine (CaptureProvider.Device + " selected.");
 		}
 
-		static void SelectPlayback (IDevice device, TextWriter writer)
+		static void SelectPlayback (IAudioDevice device, TextWriter writer)
 		{
 			PlaybackProvider.Device = device;
 			writer.WriteLine (device + " selected.");
@@ -405,9 +383,9 @@ namespace Gablarski.Clients.CLI
 		static void DisplayDevices()
 		{
 			Console.WriteLine ("Playback devices:");
-			foreach (var device in OpenAL.OpenAL.PlaybackDevices)
+			foreach (var device in Audio.OpenAL.OpenAL.PlaybackDevices)
 			{
-				if (device == OpenAL.OpenAL.DefaultPlaybackDevice)
+				if (device == Audio.OpenAL.OpenAL.DefaultPlaybackDevice)
 					Console.Write ("[Default] ");
 
 				Console.WriteLine ("\"" + device.Name + "\" ");
@@ -415,9 +393,9 @@ namespace Gablarski.Clients.CLI
 
 			Console.WriteLine();
 			Console.WriteLine ("Capture devices:");
-			foreach (var device in OpenAL.OpenAL.CaptureDevices)
+			foreach (var device in Audio.OpenAL.OpenAL.CaptureDevices)
 			{
-				if (device == OpenAL.OpenAL.DefaultCaptureDevice)
+				if (device == Audio.OpenAL.OpenAL.DefaultCaptureDevice)
 					Console.Write ("[Default] ");
 
 				Console.WriteLine ("\"" + device.Name + "\"");

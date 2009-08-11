@@ -6,16 +6,16 @@ using System.Text;
 using System.Runtime.InteropServices;
 using System.Security;
 
-namespace Gablarski.OpenAL
+namespace Gablarski.Audio.OpenAL
 {
 	[SuppressUnmanagedCodeSecurity]
 	public static class OpenAL
 	{
 		static OpenAL ()
 		{
-			#if DEBUG
+#if DEBUG
 			OpenAL.ErrorChecking = true;
-			#endif
+#endif
 
 			if (GetIsExtensionPresent ("ALC_EXT_CAPTURE"))
 			{
@@ -381,7 +381,6 @@ namespace Gablarski.OpenAL
 		// ReSharper restore InconsistentNaming
 	}
 
-	// ReSharper disable InconsistentNaming
 	internal enum ALError
 	{
 		AL_NO_ERROR = 0,
@@ -415,7 +414,6 @@ namespace Gablarski.OpenAL
 		ALC_MONO_SOURCES	= 0x1010,
 		ALC_STEREO_SOURCES	= 0x1011,
 	}
-	// ReSharper restore InconsistentNaming
 
 	public enum DistanceModel
 	{

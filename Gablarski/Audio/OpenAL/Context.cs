@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 
-namespace Gablarski.OpenAL
+namespace Gablarski.Audio.OpenAL
 {
 	public class Context
 		: IDisposable
@@ -24,7 +24,7 @@ namespace Gablarski.OpenAL
 		public void Activate ()
 		{
 			alcMakeContextCurrent (this.Handle);
-			OpenAL.ErrorCheck (this.Device);
+			Audio.OpenAL.OpenAL.ErrorCheck (this.Device);
 			
 			lock (lck)
 			{
@@ -93,11 +93,11 @@ namespace Gablarski.OpenAL
 					contexts = new Dictionary<IntPtr, Context> ();
 
 				c = new Context (alcCreateContext (device.Handle, IntPtr.Zero), device);
-				OpenAL.ErrorCheck(device);
+				Audio.OpenAL.OpenAL.ErrorCheck(device);
 				contexts.Add (c.Handle, c);
 			}
 
-			OpenAL.ErrorCheck (device);
+			Audio.OpenAL.OpenAL.ErrorCheck (device);
 			return c;
 		}
 

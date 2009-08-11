@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Gablarski.Speex
+namespace Gablarski.Audio.Speex
 {
 	public class SpeexJitterBufferPacket
 	{
@@ -38,7 +38,7 @@ namespace Gablarski.Speex
 		internal SpeexJitterBuffer.JitterBufferPacket ToNativePacket()
 		{
 			return new SpeexJitterBuffer.JitterBufferPacket
-	    	{
+			{
 				data = Data,
 				len = (uint)Data.Length,
 				sequence = Sequence,

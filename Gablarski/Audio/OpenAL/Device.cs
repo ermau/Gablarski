@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
-using Gablarski.Client;
 
-namespace Gablarski.OpenAL
+namespace Gablarski.Audio.OpenAL
 {
 	public abstract class Device
-		: IDevice
+		: IAudioDevice
 	{
 		protected Device (string deviceName)
 		{
@@ -40,7 +39,7 @@ namespace Gablarski.OpenAL
 			get
 			{
 				int refresh;
-				OpenAL.alcGetIntegerv (this.Handle, ALCEnum.ALC_REFRESH, 1, out refresh);
+				Audio.OpenAL.OpenAL.alcGetIntegerv (this.Handle, ALCEnum.ALC_REFRESH, 1, out refresh);
 				return refresh;
 			}
 		}

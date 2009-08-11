@@ -22,15 +22,6 @@ namespace Gablarski
 			this.keys = new ReadOnlyCollection<TKey> (this.orderedKeys);
 		}
 
-		public OrderedDictionary (IDictionary<TKey, TValue> oldDict)
-		{
-			this.orderedKeys = new List<TKey> (oldDict.Count);
-			this.dict = new Dictionary<TKey, TValue> (oldDict.Count);
-			this.keys = new ReadOnlyCollection<TKey> (this.orderedKeys);
-			foreach (var kvp in oldDict)
-				this.Add (kvp);
-		}
-
 		/// <summary>
 		/// Gets or sets the value for the specified <paramref name="index"/>.
 		/// </summary>

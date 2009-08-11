@@ -5,7 +5,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 using System.Security;
 
-namespace Gablarski.OpenAL
+namespace Gablarski.Audio.OpenAL
 {
 	[SuppressUnmanagedCodeSecurity]
 	public class Source
@@ -22,7 +22,7 @@ namespace Gablarski.OpenAL
 			{
 				int state;
 				alGetSourcei (this.sourceID, IntSourceProperty.AL_SOURCE_STATE, out state);
-				OpenAL.ErrorCheck ();
+				Audio.OpenAL.OpenAL.ErrorCheck ();
 
 				return (SourceState)state;
 			}
@@ -49,7 +49,7 @@ namespace Gablarski.OpenAL
 			{
 				int buffers;
 				alGetSourcei (this.sourceID, IntSourceProperty.AL_BUFFERS_PROCESSED, out buffers);
-				OpenAL.ErrorCheck();
+				Audio.OpenAL.OpenAL.ErrorCheck();
 
 				return buffers;
 			}
@@ -91,7 +91,7 @@ namespace Gablarski.OpenAL
 		public void Queue (SourceBuffer buffer)
 		{
 			alSourceQueueBuffers (this.sourceID, 1, new [] { buffer.bufferID });
-			OpenAL.ErrorCheck ();
+			Audio.OpenAL.OpenAL.ErrorCheck ();
 		}
 
 		public void QueueAndPlay (SourceBuffer buffer)
@@ -104,7 +104,7 @@ namespace Gablarski.OpenAL
 		{
 			uint[] bufferIDs = buffers.Select (b => b.bufferID).ToArray ();
 			alSourceQueueBuffers (this.sourceID, bufferIDs.Length, bufferIDs);
-			OpenAL.ErrorCheck ();
+			Audio.OpenAL.OpenAL.ErrorCheck ();
 		}
 
 		public SourceBuffer[] Dequeue ()
@@ -116,7 +116,7 @@ namespace Gablarski.OpenAL
 		{
 			uint[] bufferIDs = new uint[buffers];
 			alSourceUnqueueBuffers (this.sourceID, buffers, bufferIDs);
-			OpenAL.ErrorCheck ();
+			Audio.OpenAL.OpenAL.ErrorCheck ();
 
 			SourceBuffer[] dequeued = new SourceBuffer[bufferIDs.Length];
 			for (int i = 0; i < bufferIDs.Length; ++i)
@@ -138,13 +138,13 @@ namespace Gablarski.OpenAL
 		public void Pause ()
 		{
 			alSourcePause (this.sourceID);
-			OpenAL.ErrorCheck ();
+			Audio.OpenAL.OpenAL.ErrorCheck ();
 		}
 
 		public void Stop ()
 		{
 			alSourceStop (this.sourceID);
-			OpenAL.ErrorCheck ();
+			Audio.OpenAL.OpenAL.ErrorCheck ();
 		}
 
 		private readonly uint sourceID;
@@ -155,7 +155,7 @@ namespace Gablarski.OpenAL
 				return;
 
 			alSourcePlay (this.sourceID);
-			OpenAL.ErrorCheck ();
+			Audio.OpenAL.OpenAL.ErrorCheck ();
 		}
 
 		#region IDisposable Members
@@ -201,7 +201,7 @@ namespace Gablarski.OpenAL
 
 			uint[] sourceIDs = new uint[count];
 			alGenSources (count, sourceIDs);
-			OpenAL.ErrorCheck ();
+			Audio.OpenAL.OpenAL.ErrorCheck ();
 
 			for (int i = 0; i < count; ++i)
 				sources[i] = new Source (sourceIDs[i]);
@@ -244,7 +244,7 @@ namespace Gablarski.OpenAL
 		{
 			float value;
 			alGetSourcef (sourceID, property, out value);
-			OpenAL.ErrorCheck ();
+			Audio.OpenAL.OpenAL.ErrorCheck ();
 
 			return value;
 		}
@@ -252,7 +252,7 @@ namespace Gablarski.OpenAL
 		internal static void SetPropertyF (uint sourceID, FloatSourceProperty property, float value)
 		{
 			alSourcef (sourceID, property, value);
-			OpenAL.ErrorCheck ();
+			Audio.OpenAL.OpenAL.ErrorCheck ();
 		}
 
 		internal static int AvailableSources
@@ -269,7 +269,6 @@ namespace Gablarski.OpenAL
 		Stopped = 0x1014
 	}
 
-	// ReSharper disable InconsistentNaming
 	internal enum IntSourceProperty
 	{
 		AL_SOURCE_STATE = 0x1010,
@@ -290,5 +289,4 @@ namespace Gablarski.OpenAL
 		AL_CONE_OUTER_ANGLE		= 0x1002,
 		AL_REFERENCE_DISTANCE	= 0x1020
 	}
-	// ReSharper restore InconsistentNaming
 }

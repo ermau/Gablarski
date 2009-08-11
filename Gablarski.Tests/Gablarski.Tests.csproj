@@ -50,6 +50,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AudioEngineTests.cs" />
     <Compile Include="AudioSourceTests.cs" />
     <Compile Include="ChannelTests.cs" />
     <Compile Include="ClientChannelManagerTests.cs" />
@@ -58,11 +59,13 @@
     <Compile Include="ExtensionTests.cs" />
     <Compile Include="IdentifyingTypesTests.cs" />
     <Compile Include="ClientMessageTests.cs" />
-    <Compile Include="MockClientConnection.cs" />
-    <Compile Include="MockClientContext.cs" />
-    <Compile Include="MockConnectionBase.cs" />
-    <Compile Include="MockConnectionProvider.cs" />
-    <Compile Include="MockServerConnection.cs" />
+    <Compile Include="Mocks\Audio\MockAudioDevice.cs" />
+    <Compile Include="Mocks\Audio\MockCaptureProvider.cs" />
+    <Compile Include="Mocks\Network\MockClientConnection.cs" />
+    <Compile Include="Mocks\MockClientContext.cs" />
+    <Compile Include="Mocks\Network\MockConnectionBase.cs" />
+    <Compile Include="Mocks\Network\MockConnectionProvider.cs" />
+    <Compile Include="Mocks\Network\MockServerConnection.cs" />
     <Compile Include="ModuleLoaderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServerMessageTests.cs" />

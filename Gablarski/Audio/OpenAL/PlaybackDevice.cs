@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 
-namespace Gablarski.OpenAL
+namespace Gablarski.Audio.OpenAL
 {
 	public class PlaybackDevice
 		: Device
@@ -21,7 +21,7 @@ namespace Gablarski.OpenAL
 		public PlaybackDevice Open ()
 		{
 			this.Handle = alcOpenDevice (this.Name);
-			OpenAL.ErrorCheck (this);
+			Audio.OpenAL.OpenAL.ErrorCheck (this);
 
 			if (this.Handle == IntPtr.Zero)
 				throw new Exception ("Device failed to open for an unknown reason.");

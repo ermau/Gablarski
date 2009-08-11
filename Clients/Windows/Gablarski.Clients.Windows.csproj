@@ -203,7 +203,6 @@
     <Compile Include="Windows\Core\Dialogs\TaskDialogs\TaskDialogRadioButton.cs" />
     <Compile Include="Windows\Core\Dialogs\TaskDialogs\TaskDialogResult.cs" />
     <Compile Include="Windows\Core\Dialogs\TaskDialogs\TaskDialogStandardButton.cs" />
-    <Compile Include="Windows\Core\Dialogs\TaskDialogs\TaskDialogStandardButtons.cs" />
     <Compile Include="Windows\Core\Dialogs\TaskDialogs\TaskDialogStandardIcon.cs" />
     <Compile Include="Windows\Core\Dialogs\TaskDialogs\TaskDialogStartupLocation.cs" />
     <Compile Include="Windows\Core\Dialogs\TaskDialogs\TaskDialogTickEventArgs.cs" />
@@ -355,7 +354,6 @@
     <Compile Include="Windows\Shell\Taskbar\TabbedThumbnailBitmapRequestedEventArgs.cs" />
     <Compile Include="Windows\Shell\Taskbar\TabbedThumbnailEventArgs.cs" />
     <Compile Include="Windows\Shell\Taskbar\TabbedThumbnailManager.cs" />
-    <Compile Include="Windows\Shell\Taskbar\TabbedThumbnailPreview.cs" />
     <Compile Include="Windows\Shell\Taskbar\TabbedThumbnailProxyWindow.cs">
       <SubType>Form</SubType>
     </Compile>

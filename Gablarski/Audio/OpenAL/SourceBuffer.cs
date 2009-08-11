@@ -5,7 +5,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 using System.Security;
 
-namespace Gablarski.OpenAL
+namespace Gablarski.Audio.OpenAL
 {
 	[SuppressUnmanagedCodeSecurity]
 	public class SourceBuffer
@@ -19,7 +19,7 @@ namespace Gablarski.OpenAL
 		public void Buffer (byte[] data, AudioFormat format, uint frequency)
 		{
 			alBufferData (this.bufferID, format, data, data.Length, frequency);
-			OpenAL.ErrorCheck ();
+			Audio.OpenAL.OpenAL.ErrorCheck ();
 		}
 
 		#region IDisposable Members
@@ -37,7 +37,7 @@ namespace Gablarski.OpenAL
 				return;
 
 			alDeleteBuffers (1, new[] { this.bufferID });
-			OpenAL.ErrorCheck ();
+			Audio.OpenAL.OpenAL.ErrorCheck ();
 
 			lock (lck)
 			{
@@ -67,7 +67,7 @@ namespace Gablarski.OpenAL
 
 				uint[] bufferIDs = new uint[count];
 				alGenBuffers (count, bufferIDs);
-				OpenAL.ErrorCheck ();
+				Audio.OpenAL.OpenAL.ErrorCheck ();
 
 				for (int i = 0; i < count; ++i)
 				{

@@ -2,15 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Gablarski.Audio;
-using Gablarski.Client;
 
-namespace Gablarski.OpenAL.Providers
+namespace Gablarski.Audio.OpenAL.Providers
 {
-	public class PlaybackProvider
+	public class OpenALPlaybackProvider
 		: IPlaybackProvider
 	{
-		public PlaybackProvider()
+		public OpenALPlaybackProvider()
 		{
 			this.pool.SourceFinished += PoolSourceFinished;
 		}
@@ -18,7 +16,7 @@ namespace Gablarski.OpenAL.Providers
 		#region IPlaybackProvider Members
 		public event EventHandler<SourceFinishedEventArgs> SourceFinished;
 
-		public IDevice Device
+		public IAudioDevice Device
 		{
 			get { return this.device; }
 			set
@@ -77,14 +75,14 @@ namespace Gablarski.OpenAL.Providers
 			pool.PlayingSource (source);
 		}
 
-		public IEnumerable<IDevice> GetDevices ()
+		public IEnumerable<IAudioDevice> GetDevices ()
 		{
-			return OpenAL.PlaybackDevices.Cast<IDevice>();
+			return Audio.OpenAL.OpenAL.PlaybackDevices.Cast<IAudioDevice>();
 		}
 
-		public IDevice DefaultDevice
+		public IAudioDevice DefaultDevice
 		{
-			get { return OpenAL.DefaultPlaybackDevice; }
+			get { return Audio.OpenAL.OpenAL.DefaultPlaybackDevice; }
 		}
 
 		#endregion

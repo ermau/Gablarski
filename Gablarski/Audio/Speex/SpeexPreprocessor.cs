@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Gablarski.Speex
+namespace Gablarski.Audio.Speex
 {
 	public class SpeexPreprocessor
 		: IDisposable
@@ -30,10 +30,10 @@ namespace Gablarski.Speex
 			get { return GetValue (SpeexPreprocessorRequest.SPEEX_PREPROCESS_GET_PROB_START); }
 			set
 			{
-				#if DEBUG
+#if DEBUG
 				if (value < 0 || value > 100)
 					throw new ArgumentOutOfRangeException ("value", "value must be 0-100");
-				#endif
+#endif
 
 				SetValue (SpeexPreprocessorRequest.SPEEX_PREPROCESS_SET_PROB_START, value);
 			}

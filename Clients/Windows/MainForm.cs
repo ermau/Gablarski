@@ -2,6 +2,8 @@
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
+using Gablarski.Audio;
+using Gablarski.Audio.OpenAL.Providers;
 using Gablarski.Client;
 using Gablarski.Clients.Windows.Entities;
 using Gablarski.Clients.Windows.Properties;
@@ -66,11 +68,11 @@ namespace Gablarski.Clients.Windows
 		{
 			try
 			{
-				this.playback = new OpenAL.Providers.PlaybackProvider();
+				this.playback = new OpenALPlaybackProvider();
 				this.playback.Device = this.playback.DefaultDevice;
 				this.playback.SourceFinished += PlaybackProviderSourceFinished;
 
-				this.voiceCapture = new OpenAL.Providers.CaptureProvider();
+				this.voiceCapture = new OpenALCaptureProvider();
 				this.voiceCapture.Device = this.voiceCapture.DefaultDevice;
 				this.voiceCapture.SamplesAvailable += VoiceCaptureSamplesAvailable;
 			}

@@ -5,9 +5,8 @@ using System.Text;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Security;
-using Gablarski.Client;
 
-namespace Gablarski.OpenAL
+namespace Gablarski.Audio.OpenAL
 {
 	[SuppressUnmanagedCodeSecurity]
 	public class CaptureDevice

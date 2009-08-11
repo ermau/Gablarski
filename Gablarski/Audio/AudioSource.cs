@@ -22,7 +22,7 @@ namespace Gablarski.Audio
 				throw new ArgumentNullException ("name");
 			if (sourceId <= 0)
 				throw new ArgumentOutOfRangeException ("sourceId");
-			if (sourceId < 0)
+			if (sourceId <= 0)
 				throw new ArgumentOutOfRangeException ("sourceId");
 			if (ownerId < 0)
 				throw new ArgumentOutOfRangeException ("ownerId");

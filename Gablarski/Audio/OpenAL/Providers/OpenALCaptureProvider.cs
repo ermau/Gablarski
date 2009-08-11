@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Gablarski.Client;
 
-namespace Gablarski.OpenAL.Providers
+namespace Gablarski.Audio.OpenAL.Providers
 {
-	public class CaptureProvider
+	public class OpenALCaptureProvider
 		: ICaptureProvider
 	{
 		#region ICaptureProvider Members
@@ -25,7 +24,7 @@ namespace Gablarski.OpenAL.Providers
 			}
 		}
 
-		public IDevice Device
+		public IAudioDevice Device
 		{
 			get { return this.device; }
 			set
@@ -80,14 +79,14 @@ namespace Gablarski.OpenAL.Providers
 
 		#endregion
 
-		#region IDeviceProvider Members
+		#region IAudioDeviceProvider Members
 		
-		public IEnumerable<IDevice> GetDevices ()
+		public IEnumerable<IAudioDevice> GetDevices ()
 		{
-			return OpenAL.CaptureDevices.Cast<IDevice>();
+			return OpenAL.CaptureDevices.Cast<IAudioDevice>();
 		}
 
-		public IDevice DefaultDevice
+		public IAudioDevice DefaultDevice
 		{
 			get { return OpenAL.DefaultCaptureDevice; }
 		}
