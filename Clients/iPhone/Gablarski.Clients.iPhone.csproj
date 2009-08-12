@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-16"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">iPhoneSimulator</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{0E30E1E3-CC04-4273-83FA-D006C31D1F9A}</ProjectGuid>
+    <ProjectTypeGuids>{E613F3A2-FE9C-494F-B74E-F63BCB86FEA6};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Exe</OutputType>
+    <MainNibFile>MainWindow.xib</MainNibFile>
+    <AssemblyName>iPhone</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <RootNamespace>Gablarski.Clients.iPhone</RootNamespace>
+    <BundleDisplayName>Gablarski</BundleDisplayName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\iPhoneSimulator\Debug</OutputPath>
+    <DefineConstants>DEBUG IPHONE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\iPhoneSimulator\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\iPhone\Debug</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\iPhone\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="monotouch" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MainWindow.xib.designer.cs">
+      <DependentUpon>MainWindow.xib</DependentUpon>
+    </Compile>
+    <Compile Include="Main.cs" />
+    <Compile Include="..\..\Gablarski\ByteArrayExtensions.cs" />
+    <Compile Include="..\..\Gablarski\ByteArrayValueReader.cs" />
+    <Compile Include="..\..\Gablarski\Audio\CELT\Celt.cs" />
+    <Compile Include="..\..\Gablarski\Audio\CELT\CeltDecoder.cs" />
+    <Compile Include="..\..\Gablarski\Audio\CELT\CeltEncoder.cs" />
+    <Compile Include="..\..\Gablarski\Audio\CELT\CeltMode.cs" />
+    <Compile Include="..\..\Gablarski\Audio\Speex\SpeexJitterBuffer.cs" />
+    <Compile Include="..\..\Gablarski\Audio\Speex\SpeexJitterBufferPacket.cs" />
+    <Compile Include="..\..\Gablarski\Audio\Speex\SpeexPreprocessor.cs" />
+    <Compile Include="..\..\Gablarski\Audio\AudioSource.cs" />
+    <Compile Include="..\..\Gablarski\Client\ClientAudioSource.cs" />
+    <Compile Include="..\..\Gablarski\Client\ClientChannelManager.cs" />
+    <Compile Include="..\..\Gablarski\Client\ClientSourceManager.cs" />
+    <Compile Include="..\..\Gablarski\Client\ClientUser.cs" />
+    <Compile Include="..\..\Gablarski\Client\ClientUserManager.cs" />
+    <Compile Include="..\..\Gablarski\Client\CurrentUser.cs" />
+    <Compile Include="..\..\Gablarski\Client\GablarskiClient.cs" />
+    <Compile Include="..\..\Gablarski\Client\GablarskiClient.Internal.cs" />
+    <Compile Include="..\..\Gablarski\Messages\AudioDataReceivedMessage.cs" />
+    <Compile Include="..\..\Gablarski\Messages\ChannelChangeInfo.cs" />
+    <Compile Include="..\..\Gablarski\Messages\ChannelChangeMessage.cs" />
+    <Compile Include="..\..\Gablarski\Messages\ChannelChangeResultMessage.cs" />
+    <Compile Include="..\..\Gablarski\Messages\ChannelEditMessage.cs" />
+    <Compile Include="..\..\Gablarski\Messages\ChannelEditResultMessage.cs" />
+    <Compile Include="..\..\Gablarski\Messages\ChannelListMessage.cs" />
+    <Compile Include="..\..\Gablarski\Messages\ClientMessage.cs" />
+    <Compile Include="..\..\Gablarski\Messages\ConnectionRejectedMessage.cs" />
+    <Compile Include="..\..\Gablarski\Messages\ConnectMessage.cs" />
+    <Compile Include="..\..\Gablarski\Messages\DisconnectMessage.cs" />
+    <Compile Include="..\..\Gablarski\Messages\LoginMessage.cs" />
+    <Compile Include="..\..\Gablarski\Messages\LoginResultMessage.cs" />
+    <Compile Include="..\..\Gablarski\Messages\Message.cs" />
+    <Compile Include="..\..\Gablarski\Messages\MessageBase.cs" />
+    <Compile Include="..\..\Gablarski\Messages\RequestChannelListMessage.cs" />
+    <Compile Include="..\..\Gablarski\Messages\RequestSourceListMessage.cs" />
+    <Compile Include="..\..\Gablarski\Messages\RequestSourceMessage.cs" />
+    <Compile Include="..\..\Gablarski\Messages\RequestUserListMessage.cs" />
+    <Compile Include="..\..\Gablarski\Messages\SendAudioDataMessage.cs" />
+    <Compile Include="..\..\Gablarski\Messages\ServerInfoMessage.cs" />
+    <Compile Include="..\..\Gablarski\Messages\ServerMessage.cs" />
+    <Compile Include="..\..\Gablarski\Messages\SourceListMessage.cs" />
+    <Compile Include="..\..\Gablarski\Messages\SourceResultMessage.cs" />
+    <Compile Include="..\..\Gablarski\Messages\SourcesRemovedMessage.cs" />
+    <Compile Include="..\..\Gablarski\Messages\UserChangedChannelMessage.cs" />
+    <Compile Include="..\..\Gablarski\Messages\UserDisconnectedMessage.cs" />
+    <Compile Include="..\..\Gablarski\Messages\UserListMessage.cs" />
+    <Compile Include="..\..\Gablarski\Messages\UserLoggedInMessage.cs" />
+    <Compile Include="..\..\Gablarski\IClientConnection.cs" />
+    <Compile Include="..\..\Gablarski\IClientContext.cs" />
+    <Compile Include="..\..\Gablarski\IConnection.cs" />
+    <Compile Include="..\..\Gablarski\IConnectionProvider.cs" />
+    <Compile Include="..\..\Gablarski\INotifyCollectionChanged.cs" />
+    <Compile Include="..\..\Gablarski\IValueReader.cs" />
+    <Compile Include="..\..\Gablarski\IValueWriter.cs" />
+    <Compile Include="..\..\Gablarski\LoginResult.cs" />
+    <Compile Include="..\..\Gablarski\MediaType.cs" />
+    <Compile Include="..\..\Gablarski\ModuleLoader.cs" />
+    <Compile Include="..\..\Gablarski\MutableLookup.cs" />
+    <Compile Include="..\..\Gablarski\OrderedDictionary.cs" />
+    <Compile Include="..\..\Gablarski\Permission.cs" />
+    <Compile Include="..\..\Gablarski\ProviderUtils.cs" />
+    <Compile Include="..\..\Gablarski\ServerInfo.cs" />
+    <Compile Include="..\..\Gablarski\StreamValueReader.cs" />
+    <Compile Include="..\..\Gablarski\StreamValueWriter.cs" />
+    <Compile Include="..\..\Gablarski\UserInfo.cs" />
+    <Compile Include="..\..\Gablarski\Network\NetworkClientConnection.cs" />
+    <Compile Include="..\..\Gablarski\Network\NetworkServerConnection.cs" />
+    <Compile Include="..\..\Gablarski\Network\NetworkServerConnectionProvider.cs" />
+    <Compile Include="..\..\Gablarski\Network\SocketValueWriter.cs" />
+    <Compile Include="..\..\Gablarski\Server\ConnectionCollection.cs" />
+    <Compile Include="..\..\Gablarski\Server\GablarskiServer.cs" />
+    <Compile Include="..\..\Gablarski\Server\GablarskiServer.MessageHandling.cs" />
+    <Compile Include="..\..\Gablarski\Server\GuestPermissionProvider.cs" />
+    <Compile Include="..\..\Gablarski\Server\GuestUserProvider.cs" />
+    <Compile Include="..\..\Gablarski\Server\IBackendProvider.cs" />
+    <Compile Include="..\..\Gablarski\Server\IChannelProvider.cs" />
+    <Compile Include="..\..\Gablarski\Server\IPermissionsProvider.cs" />
+    <Compile Include="..\..\Gablarski\Server\IUserProvider.cs" />
+    <Compile Include="..\..\Gablarski\Server\LobbyChannelProvider.cs" />
+    <Compile Include="..\..\Gablarski\Server\ServerSettings.cs" />
+    <Compile Include="..\..\Gablarski\ChannelInfo.cs" />
+    <Compile Include="..\..\Gablarski\GenericResult.cs" />
+    <Compile Include="..\..\Mono.Rocks\Mono.Rocks\ReadOnlyDictionary.cs" />
+    <Compile Include="..\..\Gablarski\Extensions.cs" />
+    <Compile Include="..\..\Mono.Rocks\Mono.Rocks\Check.cs" />
+    <Compile Include="..\..\Mono.Rocks\Mono.Rocks\NaturalStringComparer.cs" />
+    <Compile Include="..\..\Mono.Rocks\Mono.Rocks\Lambda.cs" />
+    <Compile Include="..\..\Mono.Rocks\Mono.Rocks\Lambdas.cs" />
+    <Compile Include="..\..\Mono.Rocks\Mono.Rocks\Eithers.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="MainWindow.xib" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties InternalTargetFrameworkVersion="IPhone">
+        <Policies>
+          <DotNetNamingPolicy DirectoryNamespaceAssociation="PrefixedHierarchical" ResourceNamePolicy="FileFormatDefault" />
+        </Policies>
+      </Properties>
+    </MonoDevelop>
+  </ProjectExtensions>
+</Project>
