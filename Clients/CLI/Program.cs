@@ -302,14 +302,14 @@ namespace Gablarski.Clients.CLI
 							{
 								CaptureProvider.SamplesAvailable += OnSamplesAvailable;
 								if (!CaptureProvider.IsCapturing)
-									CaptureProvider.StartCapture();
+									CaptureProvider.BeginCapture();
 
 								//if (captureSource == null)
 								//    CaptureProvider.SamplesAvailable += OnSamplesAvailable;
 
 								//captureSource = source;
 								//if (!CaptureProvider.IsCapturing)
-								//    CaptureProvider.StartCapture();
+								//    CaptureProvider.BeginCapture();
 							}
 						}
 

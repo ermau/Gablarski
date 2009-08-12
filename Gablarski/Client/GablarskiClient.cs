@@ -19,11 +19,16 @@ namespace Gablarski.Client
 			: this (connection, true)
 		{
 		}
-		
+
 		public GablarskiClient (IClientConnection connection, ClientUserManager userMananger, ClientChannelManager channelManager, ClientSourceManager sourceManager, CurrentUser currentUser)
+			: this(connection, userMananger, channelManager, sourceManager, currentUser, new AudioEngine())
+		{
+		}
+
+		public GablarskiClient (IClientConnection connection, ClientUserManager userMananger, ClientChannelManager channelManager, ClientSourceManager sourceManager, CurrentUser currentUser, IAudioEngine audioEngine)
 			: this (connection, false)
 		{
-			this.Setup (userMananger, channelManager, sourceManager, currentUser);
+			this.Setup (userMananger, channelManager, sourceManager, currentUser, audioEngine);
 		}
 
 		private GablarskiClient (IClientConnection connection, bool setupDefaults)
@@ -31,7 +36,7 @@ namespace Gablarski.Client
 			this.Connection = connection;
 
 			if (setupDefaults)
-				this.Setup (new ClientUserManager (this), new ClientChannelManager (this), new ClientSourceManager (this), new CurrentUser (this));
+				this.Setup (new ClientUserManager (this), new ClientChannelManager (this), new ClientSourceManager (this), new CurrentUser (this), new AudioEngine());
 		}
 
 		#region Events
@@ -88,7 +93,7 @@ namespace Gablarski.Client
 			private set;
 		}
 
-		public AudioEngine Audio
+		public IAudioEngine Audio
 		{
 			get; private set;
 		}

@@ -151,7 +151,7 @@ namespace Gablarski.Clients.Windows
 			if (kEvent == KeyboardEvents.KeyDown)
 			{
 				this.users.MarkTalking (this.gablarski.CurrentUser);
-				this.voiceCapture.StartCapture();
+				this.voiceCapture.BeginCapture();
 			}
 			else if (kEvent == KeyboardEvents.KeyUp)
 			{

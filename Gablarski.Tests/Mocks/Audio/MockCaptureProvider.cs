@@ -59,7 +59,7 @@ namespace Gablarski.Tests.Mocks.Audio
 		public bool IsCapturing { get; private set; }
 
 		public event EventHandler<SamplesAvailableEventArgs> SamplesAvailable;
-		public void StartCapture()
+		public void BeginCapture()
 		{
 			this.IsCapturing = true;
 		}

@@ -8,63 +8,70 @@ using Gablarski.Client;
 
 namespace Gablarski.Audio
 {
-	public enum AudioEngineThreadingMode
-	{
-		ThreadPerCore = 0,
-		//ThreadPerProvider
-		SingleThread,
-	}
-
-	public enum AudioEngineCaptureMode
-	{
-		Signal = 0,
-		Activated
-	}
-
-	public class AudioEngineCaptureOptions
-	{
-		public AudioEngineCaptureMode Mode
-		{
-			get; set;
-		}
-
-		public int VoiceActivityStartProbability
-		{
-			get; set;
-		}
-	}
-
 	public class AudioEngine
+		: IAudioEngine
 	{
-		public void Capture (ICaptureProvider capturor, AudioSource source, AudioEngineCaptureOptions options)
+		public void Attach (ICaptureProvider provider, AudioSource source, AudioEngineCaptureOptions options)
 		{
-			if (capturor == null)
-				throw new ArgumentNullException ("capturor");
+			if (provider == null)
+				throw new ArgumentNullException ("provider");
 			if (source == null)
 				throw new ArgumentNullException ("source");
 			if (options == null)
 				throw new ArgumentNullException ("options");
 
+			if (provider.Device == null)
+				provider.Device = provider.DefaultDevice;
+
 			lock (entities)
 			{
-				entities.Add (source, new AudioEntity (capturor, source, options));
+				entities.Add (source, new AudioEntity (provider, source, options));
 			}
 		}
 
-		public void Stop (ICaptureProvider provider)
+		public bool Detach (ICaptureProvider provider)
 		{
+			if (provider == null)
+				throw new ArgumentNullException ("provider");
+
+			bool removed = false;
+
 			lock (entities)
 			{
 				foreach (var entity in entities.Values.Where (e => e.Capture == provider).ToList())
+				{
 					entities.Remove (entity.Source);
+					removed = true;
+				}
+			}
+
+			return removed;
+		}
+
+		public bool Detach (AudioSource source)
+		{
+			if (source == null)
+				throw new ArgumentNullException ("source");
+				
+			lock (entities)
+			{
+				return entities.Remove (source);
 			}
 		}
 
-		public void Stop (AudioSource source)
+		public void BeginCapture (AudioSource source)
 		{
 			lock (entities)
 			{
-				entities.Remove (source);
+				entities[source].Capture.BeginCapture();
+			}
+		}
+
+		public void EndCapture (AudioSource source)
+		{
+			lock (entities)
+			{
+				entities[source].Capture.EndCapture();
 			}
 		}
 

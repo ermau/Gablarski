@@ -44,7 +44,7 @@ namespace Gablarski.Audio.OpenAL.Providers
 			private set;
 		}
 
-		public void StartCapture ()
+		public void BeginCapture ()
 		{
 			CheckDevice();
 

@@ -13,7 +13,7 @@ namespace Gablarski.Audio
 
 		event EventHandler<SamplesAvailableEventArgs> SamplesAvailable;
 
-		void StartCapture ();
+		void BeginCapture ();
 		void EndCapture ();
 
 		byte[] ReadSamples ();

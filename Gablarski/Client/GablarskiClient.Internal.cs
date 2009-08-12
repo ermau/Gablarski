@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Gablarski.Audio;
 using Gablarski.Messages;
 using System.Threading;
 
@@ -22,11 +23,12 @@ namespace Gablarski.Client
 		private readonly Queue<MessageReceivedEventArgs> mqueue = new Queue<MessageReceivedEventArgs> (100);
 		private Thread messageRunnerThread;
 
-		protected void Setup (ClientUserManager userMananger, ClientChannelManager channelManager, ClientSourceManager sourceManager, CurrentUser currentUser)
+		protected void Setup (ClientUserManager userMananger, ClientChannelManager channelManager, ClientSourceManager sourceManager, CurrentUser currentUser, IAudioEngine audioEngine)
 		{
 			if (this.handlers != null)
 				return;
 
+			this.Audio = audioEngine;
 			this.CurrentUser = currentUser;
 			this.Users = userMananger;
 			this.Channels = channelManager;
