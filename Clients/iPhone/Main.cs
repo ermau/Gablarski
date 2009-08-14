@@ -11,6 +11,7 @@ using Gablarski.Network;
 using Mono.Rocks;
 using System.Net;
 using MonoTouch.ObjCRuntime;
+using System.Reflection;
 
 namespace Gablarski.Clients.iPhone
 {
@@ -50,18 +51,16 @@ namespace Gablarski.Clients.iPhone
 			
 			private IntPtr handle;
 		}
-				
+		
 		private GablarskiClient client;
 		partial void Connect (MonoTouch.UIKit.UIButton sender)
-		{			
-			var connecting = Alert ("Connecting", "Connecting to " + this.serverIn.Text + ":" + this.portIn.Text);
+		{
 			client = new GablarskiClient (new NetworkClientConnection { VerboseTracing = true }) { VerboseTracing = true };
 			client.Connected += (s, e) =>
 			{
 				var pool = new AutoReleasePool();
 				
-				connecting.DismissWithClickedButtonIndex (1, true);
-				this.client.CurrentUser.Login ("iPhone");
+				this.client.CurrentUser.Login (this.nicknameIn.Text);
 				
 				pool.Release();
 			};
@@ -70,7 +69,6 @@ namespace Gablarski.Clients.iPhone
 			{
 				var pool = new AutoReleasePool();
 				
-				connecting.DismissWithClickedButtonIndex (1, true);
 				Alert ("Connect failed", e.Reason.ToString() + ((e.Error != null) ? e.Error.ToString() : String.Empty)).Dispose();
 				
 				pool.Release();
@@ -80,13 +78,16 @@ namespace Gablarski.Clients.iPhone
 			{
 				var pool = new AutoReleasePool();
 				
-				connecting.DismissWithClickedButtonIndex (1, true);
 				Alert ("Disconnected", "Disconnected").Dispose();
 				
 				pool.Release();
 			};			
 			
-			client.CurrentUser.ReceivedLoginResult += (object s, ReceivedLoginResultEventArgs e) => Alert ("Login", e.Result.ToString());
+			client.CurrentUser.ReceivedLoginResult += (object s, ReceivedLoginResultEventArgs e) => 
+			{
+				Console.WriteLine ("Login Result: " + e.Result.ResultState);
+			};
+			
 			client.Connect (this.serverIn.Text, 6112);
 		}
 

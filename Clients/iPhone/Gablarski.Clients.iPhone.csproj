@@ -23,6 +23,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ExtraMtouchArgs>-nolink</ExtraMtouchArgs>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>none</DebugType>
@@ -150,6 +151,13 @@
     <Compile Include="..\..\Mono.Rocks\Mono.Rocks\Lambda.cs" />
     <Compile Include="..\..\Mono.Rocks\Mono.Rocks\Lambdas.cs" />
     <Compile Include="..\..\Mono.Rocks\Mono.Rocks\Eithers.cs" />
+    <Compile Include="..\..\Gablarski\Audio\IAudioEngine.cs" />
+    <Compile Include="..\..\Gablarski\Audio\ICaptureProvider.cs" />
+    <Compile Include="..\..\Gablarski\Audio\IAudioDevice.cs" />
+    <Compile Include="..\..\Gablarski\Audio\IAudioDeviceProvider.cs" />
+    <Compile Include="..\..\Gablarski\Audio\AudioEngine.cs" />
+    <Compile Include="ServerTableDataSource.cs" />
+    <Compile Include="IEnumerable.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="MainWindow.xib" />

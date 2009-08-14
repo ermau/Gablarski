@@ -76,5 +76,35 @@ namespace Gablarski.Clients.iPhone {
 				this.SetNativeField("connectButton", value);
 			}
 		}
+		
+		[MonoTouch.Foundation.Connect("busy")]
+		protected MonoTouch.UIKit.UIActivityIndicatorView busy {
+			get {
+				return ((MonoTouch.UIKit.UIActivityIndicatorView)(this.GetNativeField("busy")));
+			}
+			set {
+				this.SetNativeField("busy", value);
+			}
+		}
+		
+		[MonoTouch.Foundation.Connect("busyText")]
+		protected MonoTouch.UIKit.UILabel busyText {
+			get {
+				return ((MonoTouch.UIKit.UILabel)(this.GetNativeField("busyText")));
+			}
+			set {
+				this.SetNativeField("busyText", value);
+			}
+		}
+		
+		[MonoTouch.Foundation.Connect("players")]
+		protected MonoTouch.UIKit.UITableView players {
+			get {
+				return ((MonoTouch.UIKit.UITableView)(this.GetNativeField("players")));
+			}
+			set {
+				this.SetNativeField("players", value);
+			}
+		}
 	}
 }
