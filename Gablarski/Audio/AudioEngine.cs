@@ -89,7 +89,7 @@ namespace Gablarski.Audio
 		private volatile bool running;
 		private Thread runnerThread;
 
-		private Dictionary<AudioSource, AudioEntity> entities = new Dictionary<AudioSource, AudioEntity>();
+		private readonly Dictionary<AudioSource, AudioEntity> entities = new Dictionary<AudioSource, AudioEntity>();
 
 		private class AudioEntity
 		{

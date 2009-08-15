@@ -1,8 +1,8 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{043E20A2-310D-41C0-94BC-766E3BAACAFB}</ProjectGuid>
@@ -25,6 +25,8 @@
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Optimize>false</Optimize>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
     <OutputPath>bin\x64\Release\</OutputPath>
@@ -33,6 +35,7 @@
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -41,6 +44,8 @@
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Optimize>false</Optimize>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <OutputPath>bin\x86\Release\</OutputPath>
@@ -49,14 +54,14 @@
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CustomMarshalers" />
-    <Reference Include="Kennedy.ManagedHooks, Version=1.2.0.10, Culture=neutral">
+    <Reference Include="Kennedy.ManagedHooks, Version=1.2.0.10, Culture=neutral, PublicKeyToken=null">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>.\Kennedy.ManagedHooks.dll</HintPath>
+      <HintPath>Kennedy.ManagedHooks.dll</HintPath>
     </Reference>
-    <Reference Include="NHibernate, Version=2.0.1.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+    <Reference Include="NHibernate, Version=2.0.1.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\fluent-nhibernate\tools\NHibernate\NHibernate.dll</HintPath>
     </Reference>
@@ -70,7 +75,7 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
-    <Reference Include="System.Data.SQLite, Version=1.0.60.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=x86">
+    <Reference Include="System.Data.SQLite, Version=1.0.60.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\fluent-nhibernate\tools\sqlite\System.Data.SQLite.dll</HintPath>
     </Reference>
@@ -91,6 +96,7 @@
     <Reference Include="WindowsFormsIntegration">
       <RequiredTargetFramework>3.0</RequiredTargetFramework>
     </Reference>
+    <Reference Include="CustomMarshalers" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AvatarCache.cs" />
@@ -154,14 +160,11 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <SubType>Designer</SubType>
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="SettingsForm.resx">
       <DependentUpon>SettingsForm.cs</DependentUpon>
     </EmbeddedResource>
     <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="PushToTalk.cs" />
@@ -378,90 +381,44 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\connect.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\server_add.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\server_connect.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\server.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\server_delete.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\server_edit.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\disk.png" />
     <None Include="Windows\Shell\Design\ShellObjects.cd" />
     <None Include="Windows\Shell\Design\ShellThumbnailClassDiagram.cd" />
     <None Include="Windows\Shell\ExplorerBrowser\ExplorerBrowserDiagram.cd" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="Windows\Shell\Controls\CommandLinkWPF.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Windows\Shell\ExplorerBrowser\ExplorerBrowser.WPF.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\disconnect.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\sound.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\sound_add.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\sound_delete.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\sound_low.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\sound_mute.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\sound_none.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\music.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\group.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="SystemHookCore.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\cog.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="XTaskDlg.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\group_add.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\group_delete.png" />
+    <None Include="Resources\group_edit.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\group_edit.png" />
+    <Page Include="Windows\Shell\Controls\CommandLinkWPF.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\Shell\ExplorerBrowser\ExplorerBrowser.WPF.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

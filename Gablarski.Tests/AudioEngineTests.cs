@@ -47,12 +47,18 @@ namespace Gablarski.Tests
 		}
 
 		[Test]
-		public void AttachDetatch()
+		public void AttachDetatchSource()
 		{
 			var engine = new AudioEngine();
 
 			engine.Attach (this.provider, this.source, new AudioEngineCaptureOptions());
 			Assert.IsTrue (engine.Detach (this.source));
+		}
+
+		[Test]
+		public void AttachDetatchProvider()
+		{
+			var engine = new AudioEngine();
 
 			engine.Attach (this.provider, this.source, new AudioEngineCaptureOptions());
 			Assert.IsTrue (engine.Detach (this.provider));
