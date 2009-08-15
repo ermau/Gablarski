@@ -46,22 +46,38 @@ namespace Gablarski.Tests
 			Assert.Throws<ArgumentNullException> (() => engine.Detach ((AudioSource)null));
 		}
 
-		[Test]
-		public void AttachDetatchSource()
-		{
-			var engine = new AudioEngine();
+		//[Test]
+		//public void AttachDetatchSource()
+		//{
+		//    var engine = new AudioEngine();
 
-			engine.Attach (this.provider, this.source, new AudioEngineCaptureOptions());
-			Assert.IsTrue (engine.Detach (this.source));
-		}
+		//    engine.Attach (this.provider, this.source, new AudioEngineCaptureOptions());
+		//    Assert.IsTrue (engine.Detach (this.source));
+		//}
 
-		[Test]
-		public void AttachDetatchProvider()
-		{
-			var engine = new AudioEngine();
+		//[Test]
+		//public void AttachDetatchProvider()
+		//{
+		//    var engine = new AudioEngine();
 
-			engine.Attach (this.provider, this.source, new AudioEngineCaptureOptions());
-			Assert.IsTrue (engine.Detach (this.provider));
-		}
+		//    engine.Attach (this.provider, this.source, new AudioEngineCaptureOptions());
+		//    Assert.IsTrue (engine.Detach (this.provider));
+		//}
+
+		//[Test]
+		//public void InvalidBeginCapture()
+		//{
+		//    var engine = new AudioEngine();
+		//    engine.Attach (this.provider, this.source, new AudioEngineCaptureOptions());
+		//    Assert.Throws<ArgumentNullException> (() => engine.BeginCapture (null));
+		//}
+
+		//[Test]
+		//public void InvalidEndCapture()
+		//{
+		//    var engine = new AudioEngine();
+		//    engine.Attach (this.provider, this.source, new AudioEngineCaptureOptions());
+		//    Assert.Throws<ArgumentNullException> (() => engine.EndCapture (null));
+		//}
 	}
 }
