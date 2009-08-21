@@ -302,7 +302,7 @@ namespace Gablarski.Clients.CLI
 							{
 								CaptureProvider.SamplesAvailable += OnSamplesAvailable;
 								if (!CaptureProvider.IsCapturing)
-									CaptureProvider.BeginCapture();
+									CaptureProvider.BeginCapture(AudioFormat.Mono16Bit);
 
 								//if (captureSource == null)
 								//    CaptureProvider.SamplesAvailable += OnSamplesAvailable;

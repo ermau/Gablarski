@@ -50,14 +50,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AudioEngineTests.cs" />
+    <Compile Include="ThreadedAudioEngineTests.cs" />
     <Compile Include="AudioSourceTests.cs" />
     <Compile Include="ChannelTests.cs" />
     <Compile Include="ClientChannelManagerTests.cs" />
     <Compile Include="ClientSourceManagerTests.cs" />
     <Compile Include="ClientUserManagerTests.cs" />
     <Compile Include="ExtensionTests.cs" />
-    <Compile Include="IdentifyingTypesTests.cs" />
     <Compile Include="ClientMessageTests.cs" />
     <Compile Include="Mocks\Audio\MockAudioDevice.cs" />
     <Compile Include="Mocks\Audio\MockCaptureProvider.cs" />

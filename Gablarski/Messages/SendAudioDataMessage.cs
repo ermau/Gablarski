@@ -13,19 +13,29 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public SendAudioDataMessage (int targetChannelId, int sourceId, byte[] data)
+		public SendAudioDataMessage (int targetChannelId, int sourceId, int sequence, byte[] data)
 			: base (ClientMessageType.AudioData)
 		{
+			#if DEBUG
+			if (sequence < 0)
+				throw new ArgumentOutOfRangeException("sequence");
 			if (targetChannelId <= 0)
 				throw new ArgumentOutOfRangeException("targetChannelId");
 			if (sourceId <= 0)
 				throw new ArgumentOutOfRangeException("sourceId");
 			if (data == null)
 				throw new ArgumentNullException("data");
+			#endif
 
 			this.TargetChannelId = targetChannelId;
 			this.SourceId = sourceId;
 			this.Data = data;
+		}
+
+		public int Sequence
+		{
+			get;
+			set;
 		}
 
 		public int TargetChannelId
@@ -55,6 +65,7 @@ namespace Gablarski.Messages
 		{
 			writer.WriteInt32 (this.TargetChannelId);
 			writer.WriteInt32 (this.SourceId);
+			writer.WriteInt32 (this.Sequence);
 			writer.WriteBytes (this.Data);
 		}
 
@@ -62,6 +73,7 @@ namespace Gablarski.Messages
 		{
 			this.TargetChannelId = reader.ReadInt32();
 			this.SourceId = reader.ReadInt32();
+			this.Sequence = reader.ReadInt32();
 			this.Data = reader.ReadBytes();
 		}
 	}

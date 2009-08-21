@@ -11,7 +11,7 @@ using Gablarski.Messages;
 namespace Gablarski.Client
 {
 	public class ClientSourceManager
-		: IEnumerable<AudioSource>, INotifyCollectionChanged
+		: IAudioReceiver, IEnumerable<AudioSource>, INotifyCollectionChanged
 	{
 		protected internal ClientSourceManager (IClientContext context)
 		{
@@ -36,6 +36,16 @@ namespace Gablarski.Client
 		/// A media source was removed.
 		/// </summary>
 		public event EventHandler<ReceivedListEventArgs<AudioSource>> SourcesRemoved;
+
+		/// <summary>
+		/// A media source started playing.
+		/// </summary>
+		public event EventHandler<AudioSourceEventArgs> AudioSourceStarted;
+
+		/// <summary>
+		/// A media source stopped playing.
+		/// </summary>
+		public event EventHandler<AudioSourceEventArgs> AudioSourceStopped;
 
 		/// <summary>
 		/// Audio has been received.
@@ -192,6 +202,26 @@ namespace Gablarski.Client
 			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Remove, removed));
 		}
 
+		internal void OnAudioSourceStateChangedMessage (MessageReceivedEventArgs e)
+		{
+			var msg = (AudioSourceStateChangeMessage)e.Message;
+
+			AudioSource source = null;
+			lock (this.sourceLock)
+			{
+				if (this.sources != null && this.sources.ContainsKey (msg.SourceId))
+					source = this.sources[msg.SourceId];
+			}
+
+			if (source != null)
+			{
+				if (msg.Starting)
+					OnAudioSourceStarted (new AudioSourceEventArgs (source));
+				else
+					OnAudioSourceStopped (new AudioSourceEventArgs (source));
+			}
+		}
+
 		internal void OnAudioDataReceivedMessage (MessageReceivedEventArgs e)
 		{
 			var msg = (AudioDataReceivedMessage)e.Message;
@@ -204,10 +234,24 @@ namespace Gablarski.Client
 			}
 
 			if (source != null)
-				OnReceivedAudio (new ReceivedAudioEventArgs (source, source.Decode (msg.Data)));
+				OnReceivedAudio (new ReceivedAudioEventArgs (source, msg.Sequence, msg.Data));
 		}
 
 		#region Event Invokers
+		protected virtual void OnAudioSourceStarted (AudioSourceEventArgs e)
+		{
+			var started = this.AudioSourceStarted;
+			if (started != null)
+				started (this, e);
+		}
+
+		protected virtual void OnAudioSourceStopped (AudioSourceEventArgs e)
+		{
+			var stopped = this.AudioSourceStopped;
+			if (stopped != null)
+				stopped (this, e);
+		}
+
 		protected virtual void OnReceivedAudio (ReceivedAudioEventArgs e)
 		{
 			var received = this.ReceivedAudio;
@@ -246,34 +290,6 @@ namespace Gablarski.Client
 	}
 
 	#region Event Args
-	public class ReceivedAudioEventArgs
-		: EventArgs
-	{
-		public ReceivedAudioEventArgs (AudioSource source, byte[] data)
-		{
-			this.Source = source;
-			this.AudioData = data;
-		}
-
-		/// <summary>
-		/// Gets the media source audio was received for.
-		/// </summary>
-		public AudioSource Source
-		{
-			get;
-			private set;
-		}
-
-		/// <summary>
-		/// Gets the audio data.
-		/// </summary>
-		public byte[] AudioData
-		{
-			get;
-			private set;
-		}
-	}
-
 	public class ReceivedSourceEventArgs
 		: EventArgs
 	{

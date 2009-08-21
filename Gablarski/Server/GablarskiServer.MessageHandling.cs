@@ -20,6 +20,7 @@ namespace Gablarski.Server
 				{ ClientMessageType.Login, UserLoginAttempt },
 				{ ClientMessageType.RequestSource, ClientRequestsSource },
 				{ ClientMessageType.AudioData, AudioDataReceived },
+				{ ClientMessageType.ClientAudioSourceStateChange, AudioSourceStateChanged },
 
 				{ ClientMessageType.RequestChannelList, ClientRequestsChannelList },
 				{ ClientMessageType.RequestUserList, ClientRequestsUserList },
@@ -299,11 +300,18 @@ namespace Gablarski.Server
 		}
 		#endregion
 
+		protected void AudioSourceStateChanged (MessageReceivedEventArgs e)
+		{
+			var msg = (ClientAudioSourceStateChangeMessage)e.Message;
+
+			this.connections.Send (new AudioSourceStateChangeMessage (msg.Starting, msg.SourceId, msg.ChannelId), (c, p) => c != e.Connection && p.CurrentChannelId.Equals (msg.ChannelId));
+		}
+
 		protected void AudioDataReceived (MessageReceivedEventArgs e)
 		{
 			var msg = (SendAudioDataMessage)e.Message;
 
-			this.connections.Send (new AudioDataReceivedMessage (msg.SourceId, msg.Data), (c, p) => c != e.Connection && p.CurrentChannelId.Equals (msg.TargetChannelId));
+			this.connections.Send (new AudioDataReceivedMessage (msg.SourceId, msg.Sequence, msg.Data), (c, p) => c != e.Connection && p.CurrentChannelId.Equals (msg.TargetChannelId));
 		}
 		#endregion
 	}

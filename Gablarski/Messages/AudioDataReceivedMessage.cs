@@ -11,14 +11,29 @@ namespace Gablarski.Messages
 		public AudioDataReceivedMessage ()
 			: base (ServerMessageType.AudioDataReceived)
 		{
-			
 		}
 
-		public AudioDataReceivedMessage (int sourceId, byte[] data)
+		public AudioDataReceivedMessage (int sourceId, int sequence, byte[] data)
 			: this()
 		{
+			#if DEBUG
+			if (sourceId <= 0)
+				throw new ArgumentOutOfRangeException("sourceId");
+			if (sequence < 0)
+				throw new ArgumentOutOfRangeException("sequence");
+			if (data == null)
+				throw new ArgumentNullException("data");
+			#endif
+
 			this.SourceId = sourceId;
+			this.Sequence = sequence;
 			this.Data = data;
+		}
+
+		public int Sequence
+		{
+			get;
+			set;
 		}
 
 		public int SourceId
@@ -41,12 +56,14 @@ namespace Gablarski.Messages
 		public override void WritePayload (IValueWriter writer)
 		{
 			writer.WriteInt32 (this.SourceId);
+			writer.WriteInt32 (this.Sequence);
 			writer.WriteBytes (this.Data);
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
 			this.SourceId = reader.ReadInt32 ();
+			this.Sequence = reader.ReadInt32();
 			this.Data = reader.ReadBytes ();
 		}
 	}

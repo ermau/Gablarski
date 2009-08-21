@@ -7,12 +7,24 @@ namespace Gablarski.Audio.Speex
 {
 	public class SpeexJitterBufferPacket
 	{
-		internal SpeexJitterBufferPacket (SpeexJitterBuffer.JitterBufferPacket nativePacket)
+		public SpeexJitterBufferPacket (byte[] data, uint sequence, AudioSource source)
+		{
+			this.Data = data;
+			this.TimeStamp = sequence*(uint)source.FrameSize;
+			this.Sequence = sequence;
+		}
+
+		internal SpeexJitterBufferPacket (SpeexJitterBuffer.JitterBufferPacket nativePacket, bool encoded)
 		{
 			this.Data = Data;
 			this.TimeStamp = nativePacket.timestamp;
 			this.Span = nativePacket.span;
 			this.Sequence = nativePacket.sequence;
+		}
+
+		public bool Encoded
+		{
+			get; set;
 		}
 
 		public byte[] Data

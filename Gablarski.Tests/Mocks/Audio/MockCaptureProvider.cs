@@ -35,6 +35,16 @@ namespace Gablarski.Tests.Mocks.Audio
 			get { return captureDevice; }
 		}
 
+		public bool CanCaptureStereo
+		{
+			get { return true; }
+		}
+
+		public int AvailableSampleCount
+		{
+			 get { return this.frameSize; }
+		}
+
 		#endregion
 
 		#region Implementation of IDisposable
@@ -59,7 +69,7 @@ namespace Gablarski.Tests.Mocks.Audio
 		public bool IsCapturing { get; private set; }
 
 		public event EventHandler<SamplesAvailableEventArgs> SamplesAvailable;
-		public void BeginCapture()
+		public void BeginCapture (AudioFormat format)
 		{
 			this.IsCapturing = true;
 		}

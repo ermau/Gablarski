@@ -15,6 +15,7 @@ namespace Gablarski.Messages
 		RequestSourceList = 15,
 		RequestSource = 7,
 		AudioData = 9,
+		ClientAudioSourceStateChange = 27,
 		RemoveSource = 26,
 
 		RequestServerInfo = 11,
@@ -22,7 +23,8 @@ namespace Gablarski.Messages
 		
 		RequestChannelList = 18,
 		ChangeChannel = 20,
-		EditChannel = 22
+		EditChannel = 22,
+		
 	}
 
 	public enum ServerMessageType
@@ -36,6 +38,7 @@ namespace Gablarski.Messages
 		SourceListReceived = 16,
 		SourceResult = 8,
 		AudioDataReceived = 10,
+		AudioSourceStateChange = 28,
 		SourcesRemoved = 25,
 	
 		UserLoggedIn = 24,

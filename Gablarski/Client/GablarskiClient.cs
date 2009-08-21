@@ -21,7 +21,7 @@ namespace Gablarski.Client
 		}
 
 		public GablarskiClient (IClientConnection connection, ClientUserManager userMananger, ClientChannelManager channelManager, ClientSourceManager sourceManager, CurrentUser currentUser)
-			: this(connection, userMananger, channelManager, sourceManager, currentUser, new AudioEngine())
+			: this(connection, userMananger, channelManager, sourceManager, currentUser, new ThreadedAudioEngine())
 		{
 		}
 
@@ -36,7 +36,7 @@ namespace Gablarski.Client
 			this.Connection = connection;
 
 			if (setupDefaults)
-				this.Setup (new ClientUserManager (this), new ClientChannelManager (this), new ClientSourceManager (this), new CurrentUser (this), new AudioEngine());
+				this.Setup (new ClientUserManager (this), new ClientChannelManager (this), new ClientSourceManager (this), new CurrentUser (this), new ThreadedAudioEngine());
 		}
 
 		#region Events

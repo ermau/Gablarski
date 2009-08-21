@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Gablarski.Client;
 
 namespace Gablarski.Audio
 {
 	public enum AudioEngineCaptureMode
 	{
-		Signal = 0,
+		Explicit = 0,
 		Activated
 	}
 
@@ -24,15 +25,30 @@ namespace Gablarski.Audio
 		}
 	}
 
+	public class AudioEnginePlaybackOptions
+	{
+		
+	}
+
 	public interface IAudioEngine
 	{
 		/// <summary>
-		/// Starts a capture with the given <paramref name="provider"/> pumped to the <paramref name="source"/> with the given <paramref name="options"/>.
+		/// Gets or sets the audio receiver.
 		/// </summary>
-		/// <param name="provider">The provider to pump the audio from. (If the device is not preselected, the default device will be used.)</param>
+		IAudioReceiver AudioReceiver { get; set; }
+
+		/// <summary>
+		/// Attaches a non-default playback provider to be used for the given source.
+		/// </summary>
+		void Attach (IPlaybackProvider playback, AudioSource source, AudioEnginePlaybackOptions options);
+
+		/// <summary>
+		/// Starts a capture with the given <paramref name="capture"/> pumped to the <paramref name="source"/> with the given <paramref name="options"/>.
+		/// </summary>
+		/// <param name="capture">The provider to pump the audio from. (If the device is not preselected, the default device will be used.)</param>
 		/// <param name="source">The audio source to pump the audio to.</param>
 		/// <param name="options">Capturing options.</param>
-		void Attach (ICaptureProvider provider, AudioSource source, AudioEngineCaptureOptions options);
+		void Attach (ICaptureProvider capture, AudioFormat format, ClientAudioSource source, AudioEngineCaptureOptions options);
 
 		/// <summary>
 		/// Stops any captures on the given provider.
@@ -48,7 +64,17 @@ namespace Gablarski.Audio
 		/// <returns><c>true</c> if any capturing was occuring for <paramref name="source"/>, <c>false</c> otherwise.</returns>
 		bool Detach (AudioSource source);
 
-		void BeginCapture (AudioSource source);
+		/// <summary>
+		/// Starts the audio engine.
+		/// </summary>
+		void Start();
+
+		/// <summary>
+		/// Stops the audio engine.
+		/// </summary>
+		void Stop();
+
+		void BeginCapture (AudioSource source, ChannelInfo channel);
 		void EndCapture (AudioSource source);
 	}
 }

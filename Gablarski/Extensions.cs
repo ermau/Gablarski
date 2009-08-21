@@ -46,7 +46,6 @@ namespace Gablarski
 				return self;
 		}
 
-
 		private static readonly Dictionary<Type, object> CachedValues = new Dictionary<Type, object>();
 		public static object GetDefaultValue (this Type self)
         {

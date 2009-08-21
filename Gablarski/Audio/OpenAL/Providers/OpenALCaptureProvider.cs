@@ -24,6 +24,16 @@ namespace Gablarski.Audio.OpenAL.Providers
 			}
 		}
 
+		public int AvailableSampleCount
+		{
+			get { return this.device.AvailableSamples; }
+		}
+
+		public bool CanCaptureStereo
+		{
+			get { return true; }
+		}
+
 		public IAudioDevice Device
 		{
 			get { return this.device; }
@@ -44,12 +54,12 @@ namespace Gablarski.Audio.OpenAL.Providers
 			private set;
 		}
 
-		public void BeginCapture ()
+		public void BeginCapture (Audio.AudioFormat format)
 		{
 			CheckDevice();
 
 			if (!this.device.IsOpen)
-				this.device.Open (44100, AudioFormat.Mono16Bit);
+				this.device.Open (44100, GetOpenALFormat (format));
 
 			this.IsCapturing = true;
 			this.device.StartCapture();
@@ -108,6 +118,31 @@ namespace Gablarski.Audio.OpenAL.Providers
 		{
 			if (this.device == null)
 				throw new InvalidOperationException ("No device set.");
+		}
+
+		internal static AudioFormat GetOpenALFormat (Audio.AudioFormat format)
+		{
+			AudioFormat oalFormat = AudioFormat.Mono16Bit;
+			switch (format)
+			{
+				case Audio.AudioFormat.Mono16Bit:
+					oalFormat = AudioFormat.Mono16Bit;
+					break;
+
+				case Audio.AudioFormat.Mono8Bit:
+					oalFormat = AudioFormat.Mono8Bit;
+					break;
+
+				case Audio.AudioFormat.Stereo16Bit:
+					oalFormat = AudioFormat.Stereo16Bit;
+					break;
+
+				case Audio.AudioFormat.Stereo8Bit:
+					oalFormat = AudioFormat.Stereo8Bit;
+					break;
+			}
+
+			return oalFormat;
 		}
 	}
 }

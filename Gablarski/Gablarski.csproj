@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>10.0.20506</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{7347052B-DA5B-4CCA-AB28-3963766E3CDB}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -73,11 +73,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AES.cs" />
+    <Compile Include="Audio\AudioCaptureEntity.cs" />
+    <Compile Include="Audio\AudioPlaybackEntity.cs" />
     <Compile Include="Audio\CELT\Celt.cs" />
     <Compile Include="Audio\CELT\CeltDecoder.cs" />
     <Compile Include="Audio\CELT\CeltEncoder.cs" />
     <Compile Include="Audio\CELT\CeltMode.cs" />
     <Compile Include="Audio\IAudioEngine.cs" />
+    <Compile Include="Audio\IAudioReceiver.cs" />
     <Compile Include="Audio\OpenAL\CaptureDevice.cs" />
     <Compile Include="Audio\OpenAL\Context.cs" />
     <Compile Include="Audio\OpenAL\Device.cs" />
@@ -93,7 +96,9 @@
     <Compile Include="Audio\Speex\SpeexJitterBufferPacket.cs" />
     <Compile Include="Audio\Speex\SpeexPreprocessor.cs" />
     <Compile Include="ByteArrayValueReader.cs" />
-    <Compile Include="Audio\AudioEngine.cs" />
+    <Compile Include="Audio\ThreadedAudioEngine.cs" />
+    <Compile Include="Messages\AudioSourceStateChangeMessage.cs" />
+    <Compile Include="Messages\ClientAudioSourceStateChangeMessage.cs" />
     <Compile Include="Network\NetworkClientConnection.cs" />
     <Compile Include="Network\NetworkServerConnection.cs" />
     <Compile Include="Network\NetworkServerConnectionProvider.cs" />

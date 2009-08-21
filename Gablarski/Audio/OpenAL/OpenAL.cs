@@ -381,6 +381,7 @@ namespace Gablarski.Audio.OpenAL
 		// ReSharper restore InconsistentNaming
 	}
 
+	// ReSharper disable InconsistentNaming
 	internal enum ALError
 	{
 		AL_NO_ERROR = 0,
@@ -427,4 +428,5 @@ namespace Gablarski.Audio.OpenAL
 		Stereo8Bit = 0x1102,
 		Stereo16Bit = 0x1103
 	}
+	// ReSharper restore InconsistentNaming
 }

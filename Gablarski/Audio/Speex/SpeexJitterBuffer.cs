@@ -9,9 +9,9 @@ namespace Gablarski.Audio.Speex
 	public class SpeexJitterBuffer
 		: IDisposable
 	{
-		private SpeexJitterBuffer (IntPtr state)
+		public SpeexJitterBuffer (int span)
 		{
-			this.state = state;
+			this.state = jitter_buffer_init (span);
 		}
 
 		public void Push (SpeexJitterBufferPacket packet)
@@ -38,7 +38,7 @@ namespace Gablarski.Audio.Speex
 					break;
 			}
 
-			return new SpeexJitterBufferPacket (npacket);
+			return new SpeexJitterBufferPacket (npacket, (result != JitterBufferStatus.Missing));
 		}
 
 		#region IDisposable Members
@@ -72,7 +72,7 @@ namespace Gablarski.Audio.Speex
 
 		public static SpeexJitterBuffer Create (int step)
 		{
-			return new SpeexJitterBuffer (jitter_buffer_init (step));
+			return new SpeexJitterBuffer (step);
 		}
 
 		// ReSharper disable InconsistentNaming
