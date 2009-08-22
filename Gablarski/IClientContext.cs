@@ -12,6 +12,8 @@ namespace Gablarski
 	/// </summary>
 	public interface IClientContext
 	{
+		IAudioEngine Audio { get; }
+
 		/// <summary>
 		/// Gets the connection associated with this client.
 		/// </summary>

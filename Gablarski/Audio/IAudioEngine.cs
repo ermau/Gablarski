@@ -38,7 +38,12 @@ namespace Gablarski.Audio
 		IAudioReceiver AudioReceiver { get; set; }
 
 		/// <summary>
-		/// Attaches a non-default playback provider to be used for the given source.
+		/// Attaches a playback provider to all <paramref name="sources"/> not already attached, skipping any ClientAudioSources.
+		/// </summary>
+		void Attach (IPlaybackProvider playback, IEnumerable<AudioSource> sources, AudioEnginePlaybackOptions options);
+
+		/// <summary>
+		/// Attaches a playback provider to be used for the given source.
 		/// </summary>
 		void Attach (IPlaybackProvider playback, AudioSource source, AudioEnginePlaybackOptions options);
 
@@ -70,7 +75,7 @@ namespace Gablarski.Audio
 		void Start();
 
 		/// <summary>
-		/// Stops the audio engine.
+		/// Stops the audio engine and clears all attachments.
 		/// </summary>
 		void Stop();
 

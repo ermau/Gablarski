@@ -12,6 +12,8 @@ namespace Gablarski.Tests
 	{
 		#region Implementation of IClientContext
 
+		public IAudioEngine Audio { get; set; }
+
 		/// <summary>
 		/// Gets the connection associated with this client.
 		/// </summary>

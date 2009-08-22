@@ -26,6 +26,27 @@ namespace Gablarski.Audio
 			}
 		}
 
+		public void Attach (IPlaybackProvider playback, IEnumerable<AudioSource> sources, AudioEnginePlaybackOptions options)
+		{
+			if (playback == null)
+				throw new ArgumentNullException ("playback");
+			if (sources == null)
+				throw new ArgumentNullException ("sources");
+			if (options == null)
+				throw new ArgumentNullException ("options");
+
+			lock (playbacks)
+			{
+				foreach (var s in sources)
+				{
+					if (playbacks.ContainsKey (s) && !(s is ClientAudioSource))
+						continue;
+
+					playbacks.Add (s, new AudioPlaybackEntity (playback, s, options));
+				}
+			}
+		}
+
 		public void Attach (IPlaybackProvider playback, AudioSource source, AudioEnginePlaybackOptions options)
 		{
 			if (playback == null)
@@ -152,8 +173,8 @@ namespace Gablarski.Audio
 			this.running = true;
 
 			this.AudioReceiver.ReceivedAudio += OnReceivedAudio;
-			this.AudioReceiver.ReceivedAudio += OnAudioSourceStarted;
-			this.AudioReceiver.ReceivedAudio += OnAudioSourceStopped;
+			this.AudioReceiver.AudioSourceStarted += OnAudioSourceStarted;
+			this.AudioReceiver.AudioSourceStopped += OnAudioSourceStopped;
 
 			this.playbackRunnerThread = new Thread (this.PlaybackRunner) { Name = "ThreadedAudioEngine Playback Runner" };
 			this.playbackRunnerThread.Start();
@@ -171,6 +192,16 @@ namespace Gablarski.Audio
 			{
 				this.playbackRunnerThread.Join();
 				this.playbackRunnerThread = null;
+			}
+
+			lock (captures)
+			{
+				captures.Clear();
+			}
+
+			lock (playbacks)
+			{
+				playbacks.Clear();
 			}
 		}
 
@@ -220,6 +251,9 @@ namespace Gablarski.Audio
 				{
 					foreach (var e in playbacks.Values)
 					{
+						if (!this.running)
+							return;
+
 						var s = e.Source;
 
 						DateTime last;
