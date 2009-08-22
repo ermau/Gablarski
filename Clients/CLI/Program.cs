@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
@@ -148,7 +149,7 @@ namespace Gablarski.Clients.CLI
 				Client.Disconnected += ClientDisconnected;
 
 				Client.Sources.ReceivedSource += SourcesReceivedSource;
-				Client.Sources.ReceivedAudio += SourcesReceivedAudio;
+				Client.Sources.ReceivedSourceList += SourcesReceivedSourceList;
 
 				Client.Connect (host, port);
 			}
@@ -278,7 +279,11 @@ namespace Gablarski.Clients.CLI
 						if (stop)
 						{
 							if (CaptureProvider.IsCapturing)
+							{
+								captureSource.EndSending ();
 								CaptureProvider.EndCapture();
+								//Client.Audio.EndCapture (captureSource);
+							}
 						}
 						else
 						{
@@ -302,7 +307,11 @@ namespace Gablarski.Clients.CLI
 							{
 								CaptureProvider.SamplesAvailable += OnSamplesAvailable;
 								if (!CaptureProvider.IsCapturing)
-									CaptureProvider.BeginCapture(AudioFormat.Mono16Bit);
+								{
+									captureSource.BeginSending (Client.Channels[Client.Users.Current.CurrentChannelId]);
+									CaptureProvider.BeginCapture (AudioFormat.Mono16Bit);
+									//Client.Audio.BeginCapture (captureSource, Client.Channels[Client.Users.Current.CurrentChannelId]);
+								}
 
 								//if (captureSource == null)
 								//    CaptureProvider.SamplesAvailable += OnSamplesAvailable;
@@ -322,15 +331,15 @@ namespace Gablarski.Clients.CLI
 			}
 		}
 
-		static void SourcesReceivedAudio (object sender, ReceivedAudioEventArgs e)
+		private static void SourcesReceivedSourceList (object sender, ReceivedListEventArgs<AudioSource> e)
 		{
-			PlaybackProvider.QueuePlayback (e.Source, e.AudioData);
+			Client.Audio.Attach (playbackProvider, e.Data, new AudioEnginePlaybackOptions());
 		}
 
 		static void OnSamplesAvailable (object sender, SamplesAvailableEventArgs e)
 		{
 			if (captureSource != null)
-				captureSource.SendAudioData (CaptureProvider.ReadSamples (captureSource.FrameSize), Client.Users.Current.CurrentChannelId);
+				captureSource.SendAudioData (CaptureProvider.ReadSamples (captureSource.FrameSize));
 		}
 
 		static void ListSources (TextWriter writer)
@@ -345,11 +354,14 @@ namespace Gablarski.Clients.CLI
 		static void SourcesReceivedSource (object sender, ReceivedSourceEventArgs e)
 		{
 			if (!e.Source.OwnerId.Equals (Client.CurrentUser.UserId))
+			{
+				Client.Audio.Attach (playbackProvider, e.Source, new AudioEnginePlaybackOptions());
 				return;
-
-			Console.WriteLine ("Received own source. Name: " + e.Source.Name + " Id: " + e.Source.Id + " Owner: " + e.Source.OwnerId + " Bitrate: " + e.Source.Bitrate);
+			}
 
 			captureSource = (ClientAudioSource)e.Source;
+			Client.Audio.Attach (captureProvider, AudioFormat.Mono16Bit, captureSource, new AudioEngineCaptureOptions());
+			Console.WriteLine ("Received own source. Name: " + e.Source.Name + " Id: " + e.Source.Id + " Owner: " + e.Source.OwnerId + " Bitrate: " + e.Source.Bitrate);
 
 			lock (Sources)
 			{

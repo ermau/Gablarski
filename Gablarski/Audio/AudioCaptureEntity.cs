@@ -70,7 +70,7 @@ namespace Gablarski.Audio
 		public void EndCapture()
 		{
 			this.capture.EndCapture();
-			this.Source.EndSending (this.channel);
+			this.Source.EndSending ();
 		}
 
 		private readonly AudioFormat format;

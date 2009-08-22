@@ -53,6 +53,7 @@ namespace Gablarski.Client
 				
 				{ ServerMessageType.SourceResult, this.Sources.OnSourceResultMessage },
 				{ ServerMessageType.AudioDataReceived, this.Sources.OnAudioDataReceivedMessage },
+				{ ServerMessageType.AudioSourceStateChange, this.Sources.OnAudioSourceStateChangedMessage },
 			};
 		}
 
@@ -145,6 +146,7 @@ namespace Gablarski.Client
 			this.Users.Clear();
 			this.Channels.Clear();
 			this.Sources.Clear();
+			this.Audio.Stop();
 
 			OnDisconnected (this, EventArgs.Empty);
 		}

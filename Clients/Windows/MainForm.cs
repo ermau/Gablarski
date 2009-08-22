@@ -99,7 +99,7 @@ namespace Gablarski.Clients.Windows
 				return;
 			}
 
-			this.voiceSource.SendAudioData (this.voiceCapture.ReadSamples (this.voiceSource.FrameSize), this.gablarski.CurrentUser.CurrentChannelId);
+			this.voiceSource.SendAudioData (this.voiceCapture.ReadSamples (this.voiceSource.FrameSize));
 		}
 
 		private void SettingsSettingChanged (object sender, PropertyChangedEventArgs e)

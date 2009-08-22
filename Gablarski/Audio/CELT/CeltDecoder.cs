@@ -31,6 +31,11 @@ namespace Gablarski.CELT
 		/// <returns>The CELT decoded PCM.</returns>
 		public unsafe byte[] Decode (byte[] encoded)
 		{
+			#if DEBUG
+			if (encoded == null)
+				throw new ArgumentNullException ("encoded");
+			#endif
+
 			IntPtr pcmptr;
 			byte[] pcm = new byte[this.Mode.FrameSize*2];
 			fixed (byte* bpcm = pcm)

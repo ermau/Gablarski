@@ -32,6 +32,25 @@ namespace Gablarski.Client
 		public event NotifyCollectionChangedEventHandler CollectionChanged;
 		#endregion
 
+		/// <summary>Gets the channel with id <paramref name="channelId"/></summary>
+		/// <param name="channelId">The id of the channel.</param>
+		/// <returns><c>null</c> if no channel exists by the identifier.</returns>
+		public ChannelInfo this[int channelId]
+		{
+			get
+			{
+				if (this.channels == null || this.channels.Count == 0)
+					return null;
+
+				lock (channelLock)
+				{
+					ChannelInfo channel;
+					this.channels.TryGetValue (channelId, out channel);
+					return channel;
+				}
+			}
+		}
+
 		/// <summary>
 		/// Send a create channel request to the server.
 		/// </summary>
@@ -111,23 +130,6 @@ namespace Gablarski.Client
 
 		private readonly object channelLock = new object ();
 		private Dictionary<int, ChannelInfo> channels;
-
-		/// <returns><c>null</c> if no channel exists by the identifier.</returns>
-		protected internal ChannelInfo this[int channelId]
-		{
-			get
-			{
-				if (this.channels == null || this.channels.Count == 0)
-					return null;
-
-				lock (channelLock)
-				{
-					ChannelInfo channel;
-					this.channels.TryGetValue (channelId, out channel);
-					return channel;
-				}
-			}
-		}
 
 		internal void OnChannelListReceivedMessage (MessageReceivedEventArgs e)
 		{
