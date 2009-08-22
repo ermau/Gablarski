@@ -322,6 +322,7 @@ namespace Gablarski.Network
 			}
 			catch (SocketException sex)
 			{
+				Trace.WriteLine ("[Network] SocketException during unreliable receive: " + sex);
 			}
 			catch (ObjectDisposedException odex)
 			{

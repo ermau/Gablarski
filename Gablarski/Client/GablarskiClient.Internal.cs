@@ -76,6 +76,7 @@ namespace Gablarski.Client
 				var msg = (e.Message as ServerMessage);
 				if (msg == null)
 				{
+					Trace.WriteLine ("[Client] Non ServerMessage received (" + e.Message.MessageTypeCode + "), disconnecting.");
 					Connection.Disconnect ();
 					return;
 				}

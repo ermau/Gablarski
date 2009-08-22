@@ -20,7 +20,7 @@ namespace Gablarski.Server
 				{ ClientMessageType.Login, UserLoginAttempt },
 				{ ClientMessageType.RequestSource, ClientRequestsSource },
 				{ ClientMessageType.AudioData, AudioDataReceived },
-				{ ClientMessageType.ClientAudioSourceStateChange, AudioSourceStateChanged },
+				{ ClientMessageType.ClientAudioSourceStateChange, ClientAudioSourceStateChanged },
 
 				{ ClientMessageType.RequestChannelList, ClientRequestsChannelList },
 				{ ClientMessageType.RequestUserList, ClientRequestsUserList },
@@ -300,7 +300,7 @@ namespace Gablarski.Server
 		}
 		#endregion
 
-		protected void AudioSourceStateChanged (MessageReceivedEventArgs e)
+		protected void ClientAudioSourceStateChanged (MessageReceivedEventArgs e)
 		{
 			var msg = (ClientAudioSourceStateChangeMessage)e.Message;
 

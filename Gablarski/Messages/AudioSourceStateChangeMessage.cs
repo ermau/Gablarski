@@ -1,15 +1,15 @@
 namespace Gablarski.Messages
 {
 	public class AudioSourceStateChangeMessage
-		: ClientMessage
+		: ServerMessage
 	{
 		public AudioSourceStateChangeMessage ()
-			: base (ClientMessageType.ClientAudioSourceStateChange)
+			: base (ServerMessageType.AudioSourceStateChange)
 		{
 		}
 
 		public AudioSourceStateChangeMessage (bool starting, int sourceId, int channelID)
-			: base (ClientMessageType.ClientAudioSourceStateChange)
+			: base (ServerMessageType.AudioSourceStateChange)
 		{
 			this.Starting = starting;
 			this.SourceId = sourceId;

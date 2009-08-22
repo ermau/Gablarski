@@ -125,6 +125,11 @@ namespace Gablarski.Audio
 
 		public byte[] Encode (byte[] data)
 		{
+			#if DEBUG
+			if (data == null)
+				throw new ArgumentNullException("data");
+			#endif
+
 			if (this.encoder == null)
 			{
 				lock (this.codecLock)
@@ -147,6 +152,11 @@ namespace Gablarski.Audio
 
 		public byte[] Decode (byte[] data)
 		{
+			#if DEBUG
+			if (data == null)
+				throw new ArgumentNullException("data");
+			#endif
+			
 			if (this.decoder == null)
 			{
 				lock (this.codecLock)

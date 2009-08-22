@@ -15,7 +15,7 @@ namespace Gablarski.Messages
 		RequestSourceList = 15,
 		RequestSource = 7,
 		AudioData = 9,
-		ClientAudioSourceStateChange = 27,
+		ClientAudioSourceStateChange = 28,
 		RemoveSource = 26,
 
 		RequestServerInfo = 11,
@@ -38,7 +38,7 @@ namespace Gablarski.Messages
 		SourceListReceived = 16,
 		SourceResult = 8,
 		AudioDataReceived = 10,
-		AudioSourceStateChange = 28,
+		AudioSourceStateChange = 29,
 		SourcesRemoved = 25,
 	
 		UserLoggedIn = 24,
