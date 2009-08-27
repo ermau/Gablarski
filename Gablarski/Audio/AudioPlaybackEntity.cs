@@ -18,6 +18,11 @@ namespace Gablarski.Audio
 			this.frameTimeSpan = TimeSpan.FromSeconds ((double)source.FrameSize/source.Frequency);
 		}
 
+		public DateTime Last
+		{
+			get; set;
+		}
+
 		public IPlaybackProvider Playback
 		{
 			get { return this.playback; }

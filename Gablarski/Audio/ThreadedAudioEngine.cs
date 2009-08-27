@@ -243,8 +243,6 @@ namespace Gablarski.Audio
 
 		private void PlaybackRunner() 
 		{
-			Dictionary<AudioSource, DateTime> sources = new Dictionary<AudioSource, DateTime>();
-
 			while (this.running)
 			{
 				lock (playbacks)
@@ -256,8 +254,7 @@ namespace Gablarski.Audio
 
 						var s = e.Source;
 
-						DateTime last;
-						sources.TryGetValue (s, out last);
+						DateTime last = e.Last;
 
 						DateTime n = DateTime.Now;
 						if (e.Playing && n.Subtract (last) >= e.FrameTimeSpan)
@@ -265,12 +262,12 @@ namespace Gablarski.Audio
 							var packet = e.Buffer.Pull (s.FrameSize);
 
 							e.Playback.QueuePlayback (s, (packet.Encoded) ? s.Decode (packet.Data) : packet.Data);
-							sources[s] = n;
+							e.Last = n;
 						}
 					}
 				}
 
-				Thread.Sleep (1);
+				Thread.Sleep (0);
 			}
 		}
 	}
