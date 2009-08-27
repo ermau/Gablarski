@@ -35,18 +35,22 @@ namespace Gablarski.Audio.OpenAL.Providers
 			if (this.context == null)
 				this.context = this.device.CreateAndActivateContext();
 
+			Stack<SourceBuffer> bufferStack;
+			lock (bufferLock)
+			{
+				if (!this.buffers.TryGetValue (audioSource, out bufferStack))
+					this.buffers[audioSource] = bufferStack = new Stack<SourceBuffer>();
+			}
+
 			Source source = this.pool.RequestSource (audioSource);
 			if (source.ProcessedBuffers > 0)
 			{
 				SourceBuffer[] freeBuffers = source.Dequeue ();
 				for (int i = 0; i < freeBuffers.Length; ++i)
 				{
-					lock (bufferLock)
+					lock (bufferStack)
 					{
-						if (!this.buffers.ContainsKey (audioSource))
-							this.buffers[audioSource] = new Stack<SourceBuffer> ();
-
-						this.buffers[audioSource].Push (freeBuffers[i]);
+						bufferStack.Push (freeBuffers[i]);
 					}
 				}
 			}
@@ -54,14 +58,7 @@ namespace Gablarski.Audio.OpenAL.Providers
 			if (data.Length == 0)
 				return;
 
-			Stack<SourceBuffer> bufferStack;
 			SourceBuffer buffer;
-			lock (bufferLock)
-			{
-				if (!this.buffers.TryGetValue (audioSource, out bufferStack))
-					this.buffers[audioSource] = bufferStack = new Stack<SourceBuffer>();
-			}
-
 			lock (bufferStack)
 			{
 				if (bufferStack.Count == 0)
