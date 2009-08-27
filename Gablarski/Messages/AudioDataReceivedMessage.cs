@@ -19,8 +19,6 @@ namespace Gablarski.Messages
 			#if DEBUG
 			if (sourceId <= 0)
 				throw new ArgumentOutOfRangeException("sourceId");
-			if (sequence < 0)
-				throw new ArgumentOutOfRangeException("sequence");
 			if (data == null)
 				throw new ArgumentNullException("data");
 			#endif

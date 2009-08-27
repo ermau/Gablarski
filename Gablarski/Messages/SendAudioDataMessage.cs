@@ -17,8 +17,6 @@ namespace Gablarski.Messages
 			: base (ClientMessageType.AudioData)
 		{
 			#if DEBUG
-			if (sequence < 0)
-				throw new ArgumentOutOfRangeException("sequence");
 			if (targetChannelId <= 0)
 				throw new ArgumentOutOfRangeException("targetChannelId");
 			if (sourceId <= 0)
@@ -30,6 +28,7 @@ namespace Gablarski.Messages
 			this.TargetChannelId = targetChannelId;
 			this.SourceId = sourceId;
 			this.Data = data;
+			this.Sequence = sequence;
 		}
 
 		public int Sequence

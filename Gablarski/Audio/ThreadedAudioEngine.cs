@@ -264,7 +264,7 @@ namespace Gablarski.Audio
 						{
 							var packet = e.Buffer.Pull (s.FrameSize);
 
-							e.Playback.QueuePlayback (s, (packet.Encoded) ? packet.Data : s.Decode (packet.Data));
+							e.Playback.QueuePlayback (s, (packet.Encoded) ? s.Decode (packet.Data) : packet.Data);
 							sources[s] = n;
 						}
 					}

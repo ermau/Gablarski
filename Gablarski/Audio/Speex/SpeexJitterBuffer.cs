@@ -14,18 +14,36 @@ namespace Gablarski.Audio.Speex
 			this.state = jitter_buffer_init (span);
 		}
 
-		public void Push (SpeexJitterBufferPacket packet)
+		public unsafe void Push (SpeexJitterBufferPacket packet)
 		{
-			var npacket = packet.ToNativePacket();
-			jitter_buffer_put (this.state, ref npacket);
+			fixed (byte* pBuffer = packet.Data)
+			{
+				JitterBufferPacket p = new JitterBufferPacket();
+				p.data = pBuffer;
+				p.len = (uint)packet.Data.Length;
+				p.sequence = (ushort)packet.Sequence;
+				p.span = packet.Span;
+				p.timestamp = packet.TimeStamp;
+
+				jitter_buffer_put (this.state, &p);
+			}
 		}
 
-		public SpeexJitterBufferPacket Pull (int span)
+		public unsafe SpeexJitterBufferPacket Pull (int span)
 		{
 			int offset;
-			JitterBufferPacket npacket;
-			
-			var result = jitter_buffer_get (this.state, out npacket, span, out offset);
+
+			byte[] buffer = new byte[4096];
+
+			var p = new JitterBufferPacket();
+			JitterBufferStatus result;
+			fixed (byte* pbuffer = buffer)
+			{
+				p.data = pbuffer;
+				p.len = (uint)buffer.Length;
+				result = jitter_buffer_get (this.state, &p, span, out offset);
+			}
+
 			switch (result)
 			{
 				case JitterBufferStatus.BadArgument:
@@ -38,7 +56,18 @@ namespace Gablarski.Audio.Speex
 					break;
 			}
 
-			return new SpeexJitterBufferPacket (npacket, (result != JitterBufferStatus.Missing));
+			var sp = new SpeexJitterBufferPacket();
+			sp.Encoded = (result != JitterBufferStatus.Missing);
+			sp.Sequence = p.sequence;
+			sp.Span = p.span;
+			sp.TimeStamp = p.timestamp;
+			sp.Data = new byte[p.len];
+			if (sp.Encoded)		
+				Array.Copy (buffer, sp.Data, p.len);
+
+			jitter_buffer_tick (this.state);
+
+			return sp;
 		}
 
 		#region IDisposable Members
@@ -76,13 +105,14 @@ namespace Gablarski.Audio.Speex
 		}
 
 		// ReSharper disable InconsistentNaming
-		internal struct JitterBufferPacket
+		[StructLayout (LayoutKind.Sequential)]
+		internal unsafe struct JitterBufferPacket
 		{
-			public byte[] data;
+			public byte* data;
 			public uint len;
 			public uint timestamp;
 			public uint span;
-			public uint sequence;
+			public ushort sequence;
 			public uint user_data;
 		}
 
@@ -122,10 +152,13 @@ namespace Gablarski.Audio.Speex
 		private static extern int jitter_buffer_ctl (IntPtr state, int request, IntPtr data);
 
 		[DllImport ("libspeexdsp.dll")]
-		private static extern void jitter_buffer_put (IntPtr state, ref JitterBufferPacket packet);
+		private static extern void jitter_buffer_tick (IntPtr state);
 
 		[DllImport ("libspeexdsp.dll")]
-		private static extern JitterBufferStatus jitter_buffer_get (IntPtr state, out JitterBufferPacket packet, int desired_span, out int offset);
+		private unsafe static extern void jitter_buffer_put (IntPtr state, JitterBufferPacket* packet);
+
+		[DllImport ("libspeexdsp.dll")]
+		private unsafe static extern JitterBufferStatus jitter_buffer_get (IntPtr state, JitterBufferPacket* packet, int desired_span, out int offset);
 		// ReSharper restore InconsistentNaming
 	}
 }

@@ -305,7 +305,6 @@ namespace Gablarski.Clients.CLI
 								Console.WriteLine ("Source not found.");
 							else
 							{
-								CaptureProvider.SamplesAvailable += OnSamplesAvailable;
 								if (!CaptureProvider.IsCapturing)
 								{
 									captureSource.BeginSending (Client.Channels[Client.Users.Current.CurrentChannelId]);
@@ -372,6 +371,7 @@ namespace Gablarski.Clients.CLI
 		static void SelectCapture (IAudioDevice device, TextWriter writer)
 		{
 			CaptureProvider.Device = device;
+			CaptureProvider.SamplesAvailable += OnSamplesAvailable;
 			writer.WriteLine (CaptureProvider.Device + " selected.");
 		}
 
