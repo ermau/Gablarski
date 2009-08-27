@@ -35,7 +35,7 @@ namespace Gablarski.Audio
 			if (options == null)
 				throw new ArgumentNullException ("options");
 
-			lock (playbacks)
+			playbackLock.EnterWriteLock();
 			{
 				foreach (var s in sources)
 				{
@@ -45,6 +45,7 @@ namespace Gablarski.Audio
 					playbacks.Add (s, new AudioPlaybackEntity (playback, s, options));
 				}
 			}
+			playbackLock.ExitWriteLock();
 		}
 
 		public void Attach (IPlaybackProvider playback, AudioSource source, AudioEnginePlaybackOptions options)
@@ -56,10 +57,11 @@ namespace Gablarski.Audio
 			if (options == null)
 				throw new ArgumentNullException ("options");
 
-			lock (playbacks)
+			playbackLock.EnterWriteLock();
 			{
 				playbacks.Add (source, new AudioPlaybackEntity (playback, source, options));
 			}
+			playbackLock.ExitWriteLock();
 		}
 
 		public void Attach (ICaptureProvider capture, AudioFormat format, ClientAudioSource source, AudioEngineCaptureOptions options)
@@ -86,8 +88,8 @@ namespace Gablarski.Audio
 				throw new ArgumentNullException("provider");
 
 			bool removed = false;
-			
-			lock (playbacks)
+
+			playbackLock.EnterWriteLock();
 			{
 				foreach (var entity in playbacks.Values.Where (e => e.Playback == provider).ToList())
 				{
@@ -95,6 +97,7 @@ namespace Gablarski.Audio
 					removed = true;
 				}
 			}
+			playbackLock.ExitWriteLock();
 
 			return removed;
 		}
@@ -123,7 +126,7 @@ namespace Gablarski.Audio
 			if (source == null)
 				throw new ArgumentNullException ("source");
 
-			bool removed = false;
+			bool removed;
 			lock (captures)
 			{
 				removed = captures.Remove (source);
@@ -131,10 +134,11 @@ namespace Gablarski.Audio
 
 			if (!removed)
 			{
-				lock (playbacks)
+				playbackLock.EnterWriteLock();
 				{
 					removed = playbacks.Remove (source);
 				}
+				playbackLock.ExitWriteLock();
 			}
 
 			return removed;
@@ -176,8 +180,8 @@ namespace Gablarski.Audio
 			this.AudioReceiver.AudioSourceStarted += OnAudioSourceStarted;
 			this.AudioReceiver.AudioSourceStopped += OnAudioSourceStopped;
 
-			this.playbackRunnerThread = new Thread (this.PlaybackRunner) { Name = "ThreadedAudioEngine Playback Runner" };
-			this.playbackRunnerThread.Start();
+		/*	this.playbackRunnerThread = new Thread (this.PlaybackRunner) { Name = "ThreadedAudioEngine Playback Runner" };
+			this.playbackRunnerThread.Start();*/
 		}
 
 		public void Stop ()
@@ -199,10 +203,11 @@ namespace Gablarski.Audio
 				captures.Clear();
 			}
 
-			lock (playbacks)
+			playbackLock.EnterWriteLock();
 			{
 				playbacks.Clear();
 			}
+			playbackLock.ExitWriteLock();
 		}
 
 		private volatile bool running;
@@ -210,55 +215,61 @@ namespace Gablarski.Audio
 
 		private readonly Dictionary<AudioSource, AudioCaptureEntity> captures = new Dictionary<AudioSource, AudioCaptureEntity>();
 		private readonly Dictionary<AudioSource, AudioPlaybackEntity> playbacks = new Dictionary<AudioSource, AudioPlaybackEntity>();
+		private readonly ReaderWriterLockSlim playbackLock = new ReaderWriterLockSlim();
 
 		private IAudioReceiver audioReceiver;
 
 		private void OnAudioSourceStopped (object sender, AudioSourceEventArgs e)
 		{
-			lock (playbacks)
+			playbackLock.EnterReadLock();
 			{
 				playbacks[e.Source].Playing = false;
 			}
+			playbackLock.ExitReadLock();
 		}
 
 		private void OnAudioSourceStarted (object sender, AudioSourceEventArgs e)
 		{
-			lock (playbacks)
+			playbackLock.EnterReadLock();
 			{
 				playbacks[e.Source].Playing = true;
 			}
+			playbackLock.ExitReadLock();
 		}
 
 		private void OnReceivedAudio (object sender, ReceivedAudioEventArgs e)
 		{
 			var packet = new SpeexJitterBufferPacket (e.AudioData, (uint)e.Sequence, e.Source);
 
-			lock (playbacks)
+			byte[] decoded = e.Source.Decode (e.AudioData);
+
+			playbackLock.EnterReadLock();
 			{
 				var p = playbacks[e.Source];
 				if (p.Playing)
-					p.Buffer.Push (packet);
+					p.Playback.QueuePlayback (e.Source, decoded);
+					//p.Buffer.Push (packet);
 			}
+			playbackLock.ExitReadLock();
 		}
 
-		private void PlaybackRunner() 
+		private void PlaybackRunner()
 		{
 			while (this.running)
 			{
-				lock (playbacks)
+				playbackLock.EnterReadLock();
 				{
 					foreach (var e in playbacks.Values)
 					{
 						if (!this.running)
 							return;
-
-						var s = e.Source;
-
-						DateTime last = e.Last;
+						if (!e.Playing)
+							continue;
 
 						DateTime n = DateTime.Now;
-						if (e.Playing && n.Subtract (last) >= e.FrameTimeSpan)
+						if (n.Subtract (e.Last) >= e.FrameTimeSpan)
 						{
+							var s = e.Source;
 							var packet = e.Buffer.Pull (s.FrameSize);
 
 							e.Playback.QueuePlayback (s, (packet.Encoded) ? s.Decode (packet.Data) : packet.Data);
@@ -266,8 +277,9 @@ namespace Gablarski.Audio
 						}
 					}
 				}
+				playbackLock.ExitReadLock();
 
-				Thread.Sleep (0);
+				Thread.Sleep (1);
 			}
 		}
 	}

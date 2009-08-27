@@ -14,7 +14,7 @@ namespace Gablarski.Audio
 			this.source = source;
 			this.options = options;
 
-			buffer = new SpeexJitterBuffer(source.FrameSize);
+			buffer = new SpeexJitterBuffer (source.FrameSize);
 			this.frameTimeSpan = TimeSpan.FromSeconds ((double)source.FrameSize/source.Frequency);
 		}
 

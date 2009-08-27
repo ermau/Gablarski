@@ -25,7 +25,10 @@ namespace Gablarski.Audio.Speex
 				p.span = packet.Span;
 				p.timestamp = packet.TimeStamp;
 
-				jitter_buffer_put (this.state, &p);
+				lock (sync)
+				{
+					jitter_buffer_put (this.state, &p);
+				}
 			}
 		}
 
@@ -41,7 +44,10 @@ namespace Gablarski.Audio.Speex
 			{
 				p.data = pbuffer;
 				p.len = (uint)buffer.Length;
-				result = jitter_buffer_get (this.state, &p, span, out offset);
+				lock (sync)
+				{
+					result = jitter_buffer_get (this.state, &p, span, out offset);
+				}
 			}
 
 			switch (result)
@@ -65,7 +71,10 @@ namespace Gablarski.Audio.Speex
 			if (sp.Encoded)		
 				Array.Copy (buffer, sp.Data, p.len);
 
-			jitter_buffer_tick (this.state);
+			lock (sync)
+			{
+				jitter_buffer_tick (this.state);
+			}
 
 			return sp;
 		}
@@ -84,10 +93,15 @@ namespace Gablarski.Audio.Speex
 				return;
 
 			if (this.state != IntPtr.Zero)
-				jitter_buffer_destroy (this.state);
-
-			this.state = IntPtr.Zero;
-
+			{
+				lock (sync)
+				{
+					jitter_buffer_destroy (this.state);
+				}
+	
+				this.state = IntPtr.Zero;
+			}
+			
 			this.disposed = true;
 		}
 
@@ -98,11 +112,7 @@ namespace Gablarski.Audio.Speex
 		#endregion
 
 		private IntPtr state;
-
-		public static SpeexJitterBuffer Create (int step)
-		{
-			return new SpeexJitterBuffer (step);
-		}
+		private readonly object sync = new object();
 
 		// ReSharper disable InconsistentNaming
 		[StructLayout (LayoutKind.Sequential)]
