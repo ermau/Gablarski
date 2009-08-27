@@ -54,19 +54,20 @@ namespace Gablarski.Audio.OpenAL.Providers
 			if (data.Length == 0)
 				return;
 
+			Stack<SourceBuffer> bufferStack;
 			SourceBuffer buffer;
 			lock (bufferLock)
 			{
-				if (!this.buffers.ContainsKey (audioSource))
-				{
-					this.buffers[audioSource] = new Stack<SourceBuffer> ();
-					this.PushBuffers (audioSource, 10);
-				}
+				if (!this.buffers.TryGetValue (audioSource, out bufferStack))
+					this.buffers[audioSource] = bufferStack = new Stack<SourceBuffer>();
+			}
 
-				if (this.buffers[audioSource].Count == 0)
-					this.PushBuffers (audioSource, 10);
+			lock (bufferStack)
+			{
+				if (bufferStack.Count == 0)
+					PushBuffers (bufferStack, 10);
 
-				buffer = this.buffers[audioSource].Pop ();
+				buffer = bufferStack.Pop ();
 			}
 
 			//var buffer = SourceBuffer.Generate ();
@@ -102,11 +103,11 @@ namespace Gablarski.Audio.OpenAL.Providers
 		private readonly object bufferLock = new object ();
 		private readonly Dictionary<AudioSource, Stack<SourceBuffer>> buffers = new Dictionary<AudioSource, Stack<SourceBuffer>> ();
 
-		private void PushBuffers (AudioSource audioSource, int number)
+		private static void PushBuffers (Stack<SourceBuffer> bufferStack, int number)
 		{
 			SourceBuffer[] sbuffers = SourceBuffer.Generate (number);
 			for (int i = 0; i < sbuffers.Length; ++i)
-				this.buffers[audioSource].Push (sbuffers[i]);
+				bufferStack.Push (sbuffers[i]);
 		}
 
 		private void OnSourceFinished (SourceFinishedEventArgs e)
