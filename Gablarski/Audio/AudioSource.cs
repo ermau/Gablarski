@@ -144,10 +144,14 @@ namespace Gablarski.Audio
 
 			int len;
 			byte[] encoded = this.encoder.Encode (data, this.Bitrate, out len);
-			byte[] final = new byte[len];
-			Array.Copy (encoded, final, len);
+			if (encoded.Length != len)
+			{
+				byte[] final = new byte[len];
+				Array.Copy (encoded, final, len);
+				encoded = final;
+			}
 
-			return final;
+			return encoded;
 		}
 
 		public byte[] Decode (byte[] data)
