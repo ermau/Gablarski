@@ -18,9 +18,11 @@ namespace Gablarski.Server
 				{ ClientMessageType.Connect, ClientConnected },
 				{ ClientMessageType.Disconnect, ClientDisconnected },
 				{ ClientMessageType.Login, UserLoginAttempt },
+
 				{ ClientMessageType.RequestSource, ClientRequestsSource },
 				{ ClientMessageType.AudioData, AudioDataReceived },
 				{ ClientMessageType.ClientAudioSourceStateChange, ClientAudioSourceStateChanged },
+				{ ClientMessageType.RequestMute, ClientRequestsMute },
 
 				{ ClientMessageType.RequestChannelList, ClientRequestsChannelList },
 				{ ClientMessageType.RequestUserList, ClientRequestsUserList },
@@ -186,7 +188,42 @@ namespace Gablarski.Server
 		}
 		#endregion
 
+		private void ClientRequestsMute (MessageReceivedEventArgs e)
+		{
+			var msg = (RequestMuteMessage)e.Message;
+
+			if ((msg.Type & MuteType.User) == MuteType.User)
+				ClientRequestsPlayerMute (this.connections[e.Connection], this.connections.GetUser ((int)msg.Target), msg.ForEveryone);
+			else if ((msg.Type & MuteType.AudioSource) == MuteType.AudioSource)
+			{
+				AudioSource source;
+				lock (this.sourceLock)
+				{
+					source = this.sources.FirstOrDefault (a => a.Id == (int)msg.Target);
+				}
+
+				ClientRequestsSourceMute (this.connections[e.Connection], source, msg.ForEveryone);
+			}
+		}
+
 		#region Users
+		protected void ClientRequestsPlayerMute (UserInfo requesting, UserInfo target, bool forEveryone)
+		{
+			bool allowed = (!forEveryone || GetPermission (PermissionName.MuteUser, requesting));
+
+			if (allowed)
+			{
+				if (this.connections.UpdateIfExists (new UserInfo (target) { Muted = true }))
+				{
+					this.connections.Send (new MutedMessage
+					{
+						Target = target.Username,
+						Type = (forEveryone) ? MuteType.User | MuteType.ForEveryone : MuteType.User
+					}, (UserInfo u) => (forEveryone || u == requesting));
+				}
+			}
+		}
+
 		protected void UserLoginAttempt (MessageReceivedEventArgs e)
 		{
 			var login = (LoginMessage)e.Message;
@@ -243,6 +280,30 @@ namespace Gablarski.Server
 		#region Media
 
 		#region Sources
+		protected void ClientRequestsSourceMute (UserInfo requesting, AudioSource target, bool forEveryone)
+		{
+			if (requesting == null)
+				return;
+			if (target == null)
+				return;
+
+			bool allowed = (!forEveryone || GetPermission (PermissionName.MuteAudioSource, requesting));
+			if (!allowed)
+			{
+				this.connections[requesting].Send (new PermissionDeniedMessage (ClientMessageType.RequestMute));
+				return;
+			}
+
+			lock (this.sourceLock)
+			{
+				this.sources.Remove (target);
+				this.sources.Add (new AudioSource (target.Name, target.Id, target.OwnerId, target.Channels, target.Bitrate, target.Frequency, target.FrameSize, target.Complexity, true));
+			}
+
+			this.connections.Send (new MutedMessage { Target = target.Id, Type = (forEveryone) ? MuteType.AudioSource | MuteType.ForEveryone : MuteType.AudioSource },
+				(UserInfo u) => forEveryone || u == requesting);
+		}
+
 		private void ClientRequestsSourceList (MessageReceivedEventArgs e)
 		{
 			e.Connection.Send (new SourceListMessage (this.GetSourceInfoList ()));

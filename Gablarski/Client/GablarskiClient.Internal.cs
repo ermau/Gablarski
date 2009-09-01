@@ -36,6 +36,8 @@ namespace Gablarski.Client
 
 			this.handlers = new Dictionary<ServerMessageType, Action<MessageReceivedEventArgs>>
 			{
+				{ ServerMessageType.PermissionDenied, OnPermissionDeniedMessage },
+
 				{ ServerMessageType.ServerInfoReceived, OnServerInfoReceivedMessage },
 				{ ServerMessageType.UserListReceived, this.Users.OnUserListReceivedMessage },
 				{ ServerMessageType.SourceListReceived, this.Sources.OnSourceListReceivedMessage },
@@ -55,6 +57,11 @@ namespace Gablarski.Client
 				{ ServerMessageType.AudioDataReceived, this.Sources.OnAudioDataReceivedMessage },
 				{ ServerMessageType.AudioSourceStateChange, this.Sources.OnAudioSourceStateChangedMessage },
 			};
+		}
+
+		private void OnPermissionDeniedMessage (MessageReceivedEventArgs obj)
+		{
+			
 		}
 
 		private void MessageRunner ()

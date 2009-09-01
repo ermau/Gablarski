@@ -13,41 +13,58 @@ namespace Gablarski.Audio
 			if (reader == null)
 				throw new ArgumentNullException ("reader");
 
-			this.Deserialize (reader);
+			Deserialize (reader);
+		}
+
+		public AudioSource (AudioSource source)
+			: this (source.Name, source.Id, source.OwnerId, source.Channels, source.Bitrate, source.Frequency, source.FrameSize, source.Complexity, source.Muted)
+		{
 		}
 
 		public AudioSource (string name, int sourceId, int ownerId, byte channels, int bitrate, int frequency, short frameSize)
+			: this (name, sourceId, ownerId, channels, bitrate, frequency, frameSize, 10)
+		{
+		}
+
+		public AudioSource (string name, int id, int ownerId, byte channels, int bitrate, int frequency, short frameSize, byte complexity)
+			: this (name, id, ownerId, channels, bitrate, frequency, frameSize, complexity, false)
+		{
+		}
+
+		public AudioSource (string name, int sourceId, int ownerId, byte channels, int bitrate, int frequency, short frameSize, byte complexity, bool muted)
 		{
 			if (name == null)
 				throw new ArgumentNullException ("name");
-			if (sourceId <= 0)
-				throw new ArgumentOutOfRangeException ("sourceId");
 			if (sourceId <= 0)
 				throw new ArgumentOutOfRangeException ("sourceId");
 			if (ownerId < 0)
 				throw new ArgumentOutOfRangeException ("ownerId");
 			if (bitrate <= 0)
 				throw new ArgumentOutOfRangeException ("bitrate");
+			if (complexity < 1 || complexity > 10)
+				throw new ArgumentOutOfRangeException ("complexity");
+
+			CheckRanges (channels, frequency, frameSize);
 
 			this.Name = name;
 			this.Id = sourceId;
 			this.OwnerId = ownerId;
 			this.Bitrate = bitrate;
+			this.complexity = complexity;
+			this.Muted = muted;
 
-			CheckRanges (channels, frequency, frameSize);
-			
 			this.Channels = channels;
 			this.Frequency = frequency;
 			this.FrameSize = frameSize;
 		}
 
-		public AudioSource (string name, int id, int ownerId, byte channels, int bitrate, int frequency, short frameSize, byte complexity)
-			: this (name, id, ownerId, channels, bitrate, frequency, frameSize)
+		/// <summary>
+		/// Gets if the source is muted by you or the server.
+		/// </summary>
+		public bool Muted
 		{
-			if (complexity < 1 || complexity > 10)
-				throw new ArgumentOutOfRangeException ("complexity");
-
-			this.complexity = complexity;
+			get;
+			private set;
 		}
 
 		/// <summary>
@@ -187,11 +204,10 @@ namespace Gablarski.Audio
 			writer.WriteInt32 (this.Id);
 			writer.WriteInt32 (this.OwnerId);
 			writer.WriteInt32 (this.Bitrate);
-
-			CheckRanges (this.Channels, this.Frequency, this.FrameSize);
 			writer.WriteByte (this.Channels);
 			writer.WriteInt32 (this.Frequency);
 			writer.WriteInt16 (this.FrameSize);
+			writer.WriteBool (this.Muted);
 		}
 
 		internal void Deserialize (IValueReader reader)
@@ -200,11 +216,10 @@ namespace Gablarski.Audio
 			this.Id = reader.ReadInt32 ();
 			this.OwnerId = reader.ReadInt32();
 			this.Bitrate = reader.ReadInt32();
-
 			this.Channels = reader.ReadByte();
 			this.Frequency = reader.ReadInt32();
 			this.FrameSize = reader.ReadInt16();
-			CheckRanges (this.Channels, this.Frequency, this.FrameSize);
+			this.Muted = reader.ReadBool();
 		}
 
 		protected static void CheckRanges (byte channels, int frequency, short frameSize)

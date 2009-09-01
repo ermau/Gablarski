@@ -51,6 +51,11 @@ namespace Gablarski.Client
 		public event EventHandler<RejectedConnectionEventArgs> ConnectionRejected;
 
 		/// <summary>
+		/// Permission was denied to requested action.
+		/// </summary>
+		public event EventHandler<PermissionDeniedEventArgs> PermissionDenied;
+
+		/// <summary>
 		/// The connection to the server has been lost (or forcibly closed.)
 		/// </summary>
 		public event EventHandler Disconnected;
@@ -243,6 +248,23 @@ namespace Gablarski.Client
 	}
 
 	#region Event Args
+	public class PermissionDeniedEventArgs
+		: EventArgs
+	{
+		public PermissionDeniedEventArgs (ClientMessageType messageType)
+		{
+			this.DeniedMessage = messageType;
+		}
+
+		/// <summary>
+		/// Gets the message type that was denied.
+		/// </summary>
+		public ClientMessageType DeniedMessage
+		{
+			get; private set;
+		}
+	}
+	
 	public class RejectedConnectionEventArgs
 		: EventArgs
 	{

@@ -73,6 +73,12 @@ namespace Gablarski
 		/// Request a channel list.
 		/// </summary>
 		RequestChannelList = 10,
+
+		MuteAudioSource = 14,
+
+		MuteUser = 15,
+
+		// Next: 16
 	}
 
 	public class Permission

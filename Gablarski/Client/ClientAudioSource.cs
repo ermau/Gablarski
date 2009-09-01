@@ -35,6 +35,11 @@ namespace Gablarski.Client
 			this.client.Send (new ClientAudioSourceStateChangeMessage (false, this.Id, this.targetChannelId));
 		}
 
+		public void Mute (bool forEveryone)
+		{
+			this.client.Send (new RequestMuteMessage { Target = this.Id, Type = (forEveryone) ? MuteType.AudioSource | MuteType.ForEveryone : MuteType.AudioSource});
+		}
+
 		public void SendAudioData (byte[] data)
 		{
 			#if DEBUG

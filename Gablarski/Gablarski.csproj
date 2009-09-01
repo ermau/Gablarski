@@ -99,8 +99,8 @@
     <Compile Include="Audio\ThreadedAudioEngine.cs" />
     <Compile Include="Messages\AudioSourceStateChangeMessage.cs" />
     <Compile Include="Messages\ClientAudioSourceStateChangeMessage.cs" />
-    <Compile Include="Messages\RequestMuteUserMessage.cs" />
-    <Compile Include="Messages\UserMutedMessage.cs" />
+    <Compile Include="Messages\RequestMuteMessage.cs" />
+    <Compile Include="Messages\MutedMessage.cs" />
     <Compile Include="Network\NetworkClientConnection.cs" />
     <Compile Include="Network\NetworkServerConnection.cs" />
     <Compile Include="Network\NetworkServerConnectionProvider.cs" />

@@ -38,15 +38,16 @@ namespace Gablarski.Tests
 		public void Values()
 		{
 			int user = 1;
-			var source = new AudioSource ("voice", 1, user, 1, 64000, 44100, 512, 10);
+			var source = new AudioSource ("voice", 1, user, 1, 64000, 44100, 512, 10, true);
 			Assert.AreEqual ("voice",	source.Name);
 			Assert.AreEqual (1,			source.Id);
 			Assert.AreEqual (user,		source.OwnerId);
 			Assert.AreEqual (1,			source.Channels);
-			Assert.AreEqual (64000,	 source.Bitrate);
-			Assert.AreEqual (44100,	 source.Frequency);
+			Assert.AreEqual (64000,		source.Bitrate);
+			Assert.AreEqual (44100,		source.Frequency);
 			Assert.AreEqual (512,		source.FrameSize);
 			Assert.AreEqual (10,		source.Complexity);
+			Assert.AreEqual (true,		source.Muted);
 		}
 	}
 }
