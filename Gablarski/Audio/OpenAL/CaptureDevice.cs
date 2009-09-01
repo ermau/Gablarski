@@ -101,6 +101,12 @@ namespace Gablarski.Audio.OpenAL
 			return this;
 		}
 
+		public void Close ()
+		{
+			alcCaptureCloseDevice (this.Handle);
+			this.Handle = IntPtr.Zero;
+		}
+
 		/// <summary>
 		/// Starts capturing.
 		/// </summary>

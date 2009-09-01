@@ -9,9 +9,9 @@ namespace Gablarski.Audio.Speex
 	public class SpeexPreprocessor
 		: IDisposable
 	{
-		public static SpeexPreprocessor Create (int frameSize, int samplingRate)
+		public SpeexPreprocessor (int frameSize, int samplingRate)
 		{
-			return new SpeexPreprocessor (speex_preprocess_state_init (frameSize, samplingRate));
+			this.state = speex_preprocess_state_init (frameSize, samplingRate);
 		}
 
 		internal SpeexPreprocessor (IntPtr state)
@@ -19,24 +19,137 @@ namespace Gablarski.Audio.Speex
 			this.state = state;
 		}
 
-		public bool VoiceActivityDetection
+		#region Noise
+		public bool Denoise
 		{
-			get { return (GetValue(SpeexPreprocessorRequest.SPEEX_PREPROCESS_GET_VAD) == 1); }
-			set { SetValue (SpeexPreprocessorRequest.SPEEX_PREPROCESS_SET_VAD, (value) ? 1 : 0); }
+			get { return GetValue (SPEEX_PREPROCESS.GET_DENOISE) == 1; }
+			set { SetValue (SPEEX_PREPROCESS.SET_DENOISE, value); }
 		}
 
+		/// <summary>
+		/// Gets or sets maximum attenuation of the noise in dB
+		/// </summary>
+		public int NoiseSupress
+		{
+			get { return GetValue (SPEEX_PREPROCESS.GET_NOISE_SUPPRESS); }
+			set { SetValue (SPEEX_PREPROCESS.SET_NOISE_SUPPRESS, value); }
+		}
+		#endregion
+
+		#region AGC
+		public bool AutomaticGainControl
+		{
+			get { return GetValue (SPEEX_PREPROCESS.GET_AGC) == 1; }
+			set { SetValue (SPEEX_PREPROCESS.SET_AGC, value); }
+		}
+
+		/// <summary>
+		/// Gets or sets the maximal gain increase in dB/second
+		/// </summary>
+		public int AutomaticGainControlIncrement
+		{
+			get { return GetValue (SPEEX_PREPROCESS.GET_AGC_INCREMENT); }
+			set { SetValue (SPEEX_PREPROCESS.SET_AGC_INCREMENT, value); }
+		}
+
+		/// <summary>
+		/// Gets or sets the maximal gain decrease in dB/second
+		/// </summary>
+		public int AutomaticGainControlDecrement
+		{
+			get { return GetValue (SPEEX_PREPROCESS.GET_AGC_DECREMENT); }
+			set { SetValue (SPEEX_PREPROCESS.SET_AGC_DECREMENT, value); }
+		}
+
+		/// <summary>
+		/// Gets or sets the maximal gain in dB
+		/// </summary>
+		public int AutomaticGainControlMaximum
+		{
+			get { return GetValue (SPEEX_PREPROCESS.GET_AGC_MAX_GAIN); }
+			set { SetValue (SPEEX_PREPROCESS.SET_AGC_MAX_GAIN, value); }
+		}
+
+		/// <summary>
+		/// Gets loudness
+		/// </summary>
+		public int AutomaticGainControlLoudness
+		{
+			get { return GetValue (SPEEX_PREPROCESS.GET_AGC_LOUDNESS); }
+		}
+		#endregion
+
+		#region Dereverb
+		public bool Dereverb
+		{
+			get { return GetValue (SPEEX_PREPROCESS.GET_DEREVERB) == 1; }
+			set { SetValue (SPEEX_PREPROCESS.GET_DEREVERB, value); }
+		}
+
+		public int DereverbLevel
+		{
+			get { return GetValue (SPEEX_PREPROCESS.GET_DEREVERB_LEVEL); }
+			set { SetValue (SPEEX_PREPROCESS.SET_DEREVERB_LEVEL, value); }
+		}
+
+		public int DereverbDecay
+		{
+			get { return GetValue (SPEEX_PREPROCESS.GET_DEREVERB_DECAY); }
+			set { SetValue (SPEEX_PREPROCESS.SET_DEREVERB_DECAY, value); }
+		}
+		#endregion
+
+		#region VAD
+		public bool VoiceActivityDetection
+		{
+			get { return (GetValue(SPEEX_PREPROCESS.GET_VAD) == 1); }
+			set { SetValue (SPEEX_PREPROCESS.SET_VAD, value); }
+		}
+
+		public int VoiceActivityProbability
+		{
+			get { return GetValue (SPEEX_PREPROCESS.GET_PROB); }
+		}
+
+		/// <summary>
+		/// Gets or sets the probability required for the VAD to go from silence to voice (0-100)
+		/// </summary>
 		public int VoiceActivityStartProbability
 		{
-			get { return GetValue (SpeexPreprocessorRequest.SPEEX_PREPROCESS_GET_PROB_START); }
+			get { return GetValue (SPEEX_PREPROCESS.GET_PROB_START); }
 			set
 			{
-#if DEBUG
+				#if DEBUG
 				if (value < 0 || value > 100)
-					throw new ArgumentOutOfRangeException ("value", "value must be 0-100");
-#endif
+				    throw new ArgumentOutOfRangeException ("value", "value must be 0-100");
+				#endif
 
-				SetValue (SpeexPreprocessorRequest.SPEEX_PREPROCESS_SET_PROB_START, value);
+				SetValue (SPEEX_PREPROCESS.SET_PROB_START, value);
 			}
+		}
+
+		/// <summary>
+		/// Gets or sets the probability required for the VAD to stay in the voice state (0-100)
+		/// </summary>
+		public int VoiceActivityContinueProbability
+		{
+			get { return GetValue (SPEEX_PREPROCESS.GET_PROB_CONTINUE); }
+
+			set
+			{
+				#if DEBUG
+				if (value < 0 || value > 100)
+				    throw new ArgumentOutOfRangeException ("value", "value must be 0-100");
+				#endif
+
+				SetValue (SPEEX_PREPROCESS.SET_PROB_CONTINUE, value);
+			}
+		}
+		#endregion
+
+		public bool Preprocess (ref byte[] pcm)
+		{
+			return speex_preprocess_run (this.state, ref pcm) == 1;
 		}
 
 		#region IDisposable Members
@@ -68,7 +181,7 @@ namespace Gablarski.Audio.Speex
 
 		private IntPtr state;
 
-		private int GetValue (SpeexPreprocessorRequest request)
+		private int GetValue (SPEEX_PREPROCESS request)
 		{
 			int value = 0;
 			if (speex_preprocess_ctl (this.state, request, ref value) == CtlResult.Error)
@@ -77,7 +190,12 @@ namespace Gablarski.Audio.Speex
 			return value;
 		}
 
-		private void SetValue (SpeexPreprocessorRequest request, int value)
+		private void SetValue (SPEEX_PREPROCESS request, bool value)
+		{
+			SetValue (request, (value) ? 1 : 0);
+		}
+
+		private void SetValue (SPEEX_PREPROCESS request, int value)
 		{
 			if (speex_preprocess_ctl (this.state, request, ref value) == CtlResult.Error)
 				throw new Exception ("SetValue " + request);
@@ -91,10 +209,10 @@ namespace Gablarski.Audio.Speex
 		private static extern void speex_preprocess_state_destroy (IntPtr state);
 
 		[DllImport ("libspeexdsp.dll")]
-		private static extern int speex_preprocess_run (IntPtr state, ref short[] frames);
+		private static extern int speex_preprocess_run (IntPtr state, ref byte[] frames);
 
 		[DllImport ("libspeexdsp.dll")]
-		private static extern CtlResult speex_preprocess_ctl (IntPtr state, SpeexPreprocessorRequest request, ref int data);
+		private static extern CtlResult speex_preprocess_ctl (IntPtr state, SPEEX_PREPROCESS request, ref int data);
 		
 		private enum CtlResult
 		{
@@ -102,19 +220,47 @@ namespace Gablarski.Audio.Speex
 			Error = -1
 		}
 
-		private enum SpeexPreprocessorRequest
+		private enum SPEEX_PREPROCESS
 		{
-			SPEEX_PREPROCESS_SET_DENOISE = 0,
-			SPEEX_PREPROCESS_GET_DENOISE = 1,
-			SPEEX_PREPROCESS_SET_AGC = 2,
-			SPEEX_PREPROCESS_GET_AGC = 3,
-			SPEEX_PREPROCESS_SET_VAD = 4,
-			SPEEX_PREPROCESS_GET_VAD = 5,
+			SET_DENOISE = 0,
+			GET_DENOISE = 1,
+			
+			SET_AGC = 2,
+			GET_AGC = 3,
+			SET_AGC_LEVEL = 6,
+			GET_AGC_LEVEL = 7,
+			SET_AGC_INCREMENT = 26,
+			GET_AGC_INCREMENT = 27,
+			SET_AGC_DECREMENT = 28,
+			GET_AGC_DECREMENT = 29,
+			SET_AGC_MAX_GAIN = 30,
+			GET_AGC_MAX_GAIN = 31,
+			GET_AGC_LOUDNESS = 33,
+			
+			SET_DEREVERB = 8,
+			GET_DEREVERB = 9,
+			SET_DEREVERB_LEVEL = 10,
+			GET_DEREVERB_LEVEL = 11,
+			SET_DEREVERB_DECAY = 12,
+			GET_DEREVERB_DECAY = 13,
+			
+			SET_VAD = 4,
+			GET_VAD = 5,
+			GET_PROB = 45,
+			SET_PROB_START = 14,
+			GET_PROB_START = 15,
+			SET_PROB_CONTINUE = 16,
+			GET_PROB_CONTINUE = 17,
 
-			SPEEX_PREPROCESS_SET_PROB_START = 14,
-			SPEEX_PREPROCESS_GET_PROB_START = 15,
-			SPEEX_PREPROCESS_SET_PROB_CONTINUE = 16,
-			SPEEX_PREPROCESS_GET_PROB_CONTINUE = 17,
+			SET_NOISE_SUPPRESS = 18,
+			GET_NOISE_SUPPRESS = 19,
+			
+			SET_ECHO_SUPPRESS = 20,
+			GET_ECHO_SUPPRESS = 21,
+			SET_ECHO_SUPPRESS_ACTIVE = 22,
+			GET_ECHO_SUPPRESS_ACTIVE = 23,
+			SET_ECHO_STATE = 24,
+			GET_ECHO_STATE = 25,
 		}
 		// ReSharper restore InconsistentNaming
 	}

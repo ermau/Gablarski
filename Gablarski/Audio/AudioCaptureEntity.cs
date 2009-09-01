@@ -19,7 +19,7 @@ namespace Gablarski.Audio
 			this.frameLength = (this.source.FrameSize/source.Frequency)*1000;
 
 			if (options.Mode == AudioEngineCaptureMode.Activated)
-				preprocessor = SpeexPreprocessor.Create (this.source.FrameSize, this.source.Frequency);
+				preprocessor = new SpeexPreprocessor (this.source.FrameSize, this.source.Frequency);
 		}
 
 		public AudioFormat Format
