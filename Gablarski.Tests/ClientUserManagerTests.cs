@@ -40,9 +40,9 @@ namespace Gablarski.Tests
 			manager.OnUserListReceivedMessage (new MessageReceivedEventArgs (client,
 			                                                                 new UserListMessage (new[]
 			                                                                 {
-			                                                                 	new UserInfo ("Foo", null, 1, 1),
-			                                                                 	new UserInfo ("Bar", null, 2, 1),
-			                                                                 	new UserInfo ("Wee", null, 3, 2),
+			                                                                 	new UserInfo ("Foo", null, 1, 1, false),
+			                                                                 	new UserInfo ("Bar", null, 2, 1, false),
+			                                                                 	new UserInfo ("Wee", null, 3, 2, true),
 			                                                                 })));
 			Assert.AreEqual (3, manager.Count());
 			VerifyDefaultUsers (manager);
@@ -50,9 +50,9 @@ namespace Gablarski.Tests
 
 		private static void VerifyDefaultUsers (IEnumerable<ClientUser> manager)
 		{
-			Assert.AreEqual (1, manager.Count (u => (int)u.UserId == 1 && u.Nickname == "Foo" && (int)u.CurrentChannelId == 1));
-			Assert.AreEqual (1, manager.Count (u => (int)u.UserId == 2 && u.Nickname == "Bar" && (int)u.CurrentChannelId == 1));
-			Assert.AreEqual (1, manager.Count (u => (int)u.UserId == 3 && u.Nickname == "Wee" && (int)u.CurrentChannelId == 2));
+			Assert.AreEqual (1, manager.Count (u => u.UserId == 1 && u.Nickname == "Foo" && !u.Muted && u.CurrentChannelId == 1));
+			Assert.AreEqual (1, manager.Count (u => u.UserId == 2 && u.Nickname == "Bar" && !u.Muted && u.CurrentChannelId == 1));
+			Assert.AreEqual (1, manager.Count (u => u.UserId == 3 && u.Nickname == "Wee" && u.Muted && u.CurrentChannelId == 2));
 		}
 
 		private MockServerConnection server;
@@ -76,7 +76,7 @@ namespace Gablarski.Tests
 		{
 			CreateUsers (this.server.Client, this.manager);
 
-			var newGuy = new UserInfo ("New", null, 4, 3);
+			var newGuy = new UserInfo ("New", null, 4, 3, false);
 			manager.OnUserLoggedInMessage (new MessageReceivedEventArgs (this.server.Client,
 				new UserLoggedInMessage(newGuy)));
 

@@ -197,12 +197,12 @@ namespace Gablarski.Server
 				return;
 			}
 
-			LoginResult result = this.UserProvider.Login (login.Username, login.Password);
+			LoginResult result = this.AuthenticationProvider.Login (login.Username, login.Password);
 			UserInfo info = null;
 
 			if (result.Succeeded)
 			{
-				info = new UserInfo (login.Nickname, (login.Username.IsEmpty()) ? login.Nickname : login.Username, result.UserId, this.defaultChannel.ChannelId);
+				info = new UserInfo (login.Nickname, (login.Username.IsEmpty()) ? login.Nickname : login.Username, result.UserId, this.defaultChannel.ChannelId, false);
 
 				if (!this.GetPermission (PermissionName.Login, info))
 					result.ResultState = LoginResultState.FailedPermissions;

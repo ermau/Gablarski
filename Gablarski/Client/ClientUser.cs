@@ -18,7 +18,7 @@ namespace Gablarski.Client
 		}
 
 		public ClientUser (UserInfo user, IClientConnection client)
-			: base (user.Nickname, user.Username, user.UserId, user.CurrentChannelId)
+			: base (user.Nickname, user.Username, user.UserId, user.CurrentChannelId, user.Muted)
 		{
 			if (client == null)
 				throw new ArgumentNullException ("client");
@@ -26,8 +26,8 @@ namespace Gablarski.Client
 			this.client = client;
 		}
 
-		public ClientUser (string nickname, int userId, int currentChannelId, IClientConnection client)
-			: base (nickname, null, userId, currentChannelId)
+		public ClientUser (string nickname, int userId, int currentChannelId, IClientConnection client, bool muted)
+			: base (nickname, null, userId, currentChannelId, muted)
 		{
 			if (client == null)
 				throw new ArgumentNullException ("client");

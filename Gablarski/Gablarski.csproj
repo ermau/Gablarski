@@ -99,6 +99,8 @@
     <Compile Include="Audio\ThreadedAudioEngine.cs" />
     <Compile Include="Messages\AudioSourceStateChangeMessage.cs" />
     <Compile Include="Messages\ClientAudioSourceStateChangeMessage.cs" />
+    <Compile Include="Messages\RequestMuteUserMessage.cs" />
+    <Compile Include="Messages\UserMutedMessage.cs" />
     <Compile Include="Network\NetworkClientConnection.cs" />
     <Compile Include="Network\NetworkServerConnection.cs" />
     <Compile Include="Network\NetworkServerConnectionProvider.cs" />
@@ -139,13 +141,14 @@
     <Compile Include="MutableLookup.cs" />
     <Compile Include="ByteArrayExtensions.cs" />
     <Compile Include="Network\SocketValueWriter.cs" />
+    <Compile Include="Server\IServerPersistance.cs" />
     <Compile Include="UserInfo.cs" />
     <Compile Include="ProviderUtils.cs" />
     <Compile Include="ServerInfo.cs" />
     <Compile Include="Server\ConnectionCollection.cs" />
     <Compile Include="Server\GablarskiServer.MessageHandling.cs" />
     <Compile Include="Server\GuestPermissionProvider.cs" />
-    <Compile Include="Server\GuestUserProvider.cs" />
+    <Compile Include="Server\GuestAuthProvider.cs" />
     <Compile Include="Server\IBackendProvider.cs" />
     <Compile Include="Server\IChannelProvider.cs" />
     <Compile Include="Server\IPermissionsProvider.cs" />
@@ -158,7 +161,7 @@
     <Compile Include="Messages\MessageBase.cs" />
     <Compile Include="Messages\ServerMessage.cs" />
     <Compile Include="Server\GablarskiServer.cs" />
-    <Compile Include="Server\IUserProvider.cs" />
+    <Compile Include="Server\IAuthenticationProvider.cs" />
     <Compile Include="Permission.cs" />
     <Compile Include="OrderedDictionary.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

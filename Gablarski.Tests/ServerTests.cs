@@ -15,8 +15,8 @@ namespace Gablarski.Tests
 			this.settings = new ServerSettings {Name = "Test Server", Description = "Test Server"};
 			this.permissions = new GuestPermissionProvider ();
 			this.channels = new LobbyChannelProvider();
-			this.users = new GuestUserProvider();
-			this.server = new GablarskiServer (this.settings, this.users, this.permissions, this.channels);
+			this.authentications = new GuestAuthProvider();
+			this.server = new GablarskiServer (this.settings, this.authentications, this.permissions, this.channels);
 			this.server.AddConnectionProvider (this.provider = new MockConnectionProvider ());
 			this.server.Start ();
 		}
@@ -27,7 +27,7 @@ namespace Gablarski.Tests
 			this.server.Shutdown ();
 			this.server = null;
 			this.provider = null;
-			this.users = null;
+			this.authentications = null;
 			this.channels = null;
 			this.permissions = null;
 			this.settings = null;
@@ -36,7 +36,7 @@ namespace Gablarski.Tests
 		private const string Username = "Bar";
 		private const string Nickname = "Foo";
 
-		private IUserProvider users;
+		private IAuthenticationProvider authentications;
 		private IChannelProvider channels;
 		private ServerSettings settings;
 		private GuestPermissionProvider permissions;

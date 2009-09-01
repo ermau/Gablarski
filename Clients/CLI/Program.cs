@@ -123,7 +123,7 @@ namespace Gablarski.Clients.CLI
 
 			if (startServer)
 			{
-				Server = new GablarskiServer (new ServerSettings { ServerLogo = serverLogo }, new GuestUserProvider(), new GuestPermissionProvider(), new LobbyChannelProvider());
+				Server = new GablarskiServer (new ServerSettings { ServerLogo = serverLogo }, new GuestAuthProvider(), new GuestPermissionProvider(), new LobbyChannelProvider());
 				Server.VerboseTracing = veryverbose;
 				
 				if (connectionProviders.Count == 0)

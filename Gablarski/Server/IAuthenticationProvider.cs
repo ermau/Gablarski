@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Gablarski.Server
 {
-	public interface IUserProvider
+	public interface IAuthenticationProvider
 	{
 		/// <summary>
 		/// Gets whether a user exists or not.

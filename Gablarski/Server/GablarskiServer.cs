@@ -17,14 +17,14 @@ namespace Gablarski.Server
 		/// Initializes a new <c>GablarskiServer</c> instance.
 		/// </summary>
 		/// <param name="settings">The settings for the server, providing name, description, etc.</param>
-		/// <param name="userProvider">The user authentication provider for the server to use.</param>
+		/// <param name="authProvider">The user authentication provider for the server to use.</param>
 		/// <param name="permissionProvider">The user permissions provider for the server to use.</param>
 		/// <param name="channelProvider">The channel provider for the server to use.</param>
-		public GablarskiServer (ServerSettings settings, IUserProvider userProvider, IPermissionsProvider permissionProvider, IChannelProvider channelProvider)
+		public GablarskiServer (ServerSettings settings, IAuthenticationProvider authProvider, IPermissionsProvider permissionProvider, IChannelProvider channelProvider)
 			: this()
 		{
 			this.settings = settings;
-			this.userProvider = userProvider;
+			this.authProvider = authProvider;
 			this.permissionProvider = permissionProvider;
 		
 			this.channelProvider = channelProvider;
@@ -167,7 +167,7 @@ namespace Gablarski.Server
 
 		private readonly IChannelProvider channelProvider;
 		private readonly IPermissionsProvider permissionProvider;
-		private readonly IUserProvider userProvider;
+		private readonly IAuthenticationProvider authProvider;
 		private volatile bool running = true;
 
 		protected IBackendProvider BackendProvider
@@ -185,9 +185,9 @@ namespace Gablarski.Server
 			get { return (backendProvider ?? permissionProvider); }
 		}
 
-		protected IUserProvider UserProvider
+		protected IAuthenticationProvider AuthenticationProvider
 		{
-			get { return (backendProvider ?? userProvider); }
+			get { return (backendProvider ?? authProvider); }
 		}
 
 		private readonly object sourceLock = new object ();

@@ -205,10 +205,10 @@ namespace Gablarski.Client
 				if (!this.users.TryGetValue (msg.ChangeInfo.TargetUserId, out old))
 					return;
 
-				this.users[msg.ChangeInfo.TargetUserId] = new ClientUser (old.Nickname, old.UserId, msg.ChangeInfo.TargetChannelId, this.context.Connection);
+				this.users[msg.ChangeInfo.TargetUserId] = new ClientUser (old.Nickname, old.UserId, msg.ChangeInfo.TargetChannelId, this.context.Connection, old.Muted);
 				user = this.users[msg.ChangeInfo.TargetUserId];
 
-				if (msg.ChangeInfo.RequestingUserId != null)
+				if (msg.ChangeInfo.RequestingUserId != 0)
 					this.users.TryGetValue (msg.ChangeInfo.RequestingUserId, out movedBy);
 			}
 

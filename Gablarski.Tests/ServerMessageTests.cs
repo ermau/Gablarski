@@ -40,18 +40,21 @@ namespace Gablarski.Tests
 		private const int UserId2 = 2;
 		private const int ChannelId2 = 3;
 
+		private const bool Muted = true;
+
 		[Test]
 		public void LoginResult()
 		{
 			LoginResultState state = LoginResultState.Success;
 
-			var msg = new LoginResultMessage (new LoginResult (UserId, state), new UserInfo (Nickname, null, UserId, ChannelId));
+			var msg = new LoginResultMessage (new LoginResult (UserId, state), new UserInfo (Nickname, null, UserId, ChannelId, true));
 
 			Assert.AreEqual (UserId, msg.Result.UserId);
 			Assert.AreEqual (state, msg.Result.ResultState);
 			Assert.AreEqual (UserId, msg.UserInfo.UserId);
 			Assert.AreEqual (Nickname, msg.UserInfo.Nickname);
 			Assert.AreEqual (ChannelId, msg.UserInfo.CurrentChannelId);
+			Assert.AreEqual (Muted, msg.UserInfo.Muted);
 			msg.WritePayload (writer);
 			long length = stream.Position;
 			stream.Position = 0;
@@ -65,6 +68,7 @@ namespace Gablarski.Tests
 			Assert.AreEqual (UserId, msg.UserInfo.UserId);
 			Assert.AreEqual (Nickname, msg.UserInfo.Nickname);
 			Assert.AreEqual (ChannelId, msg.UserInfo.CurrentChannelId);
+			Assert.AreEqual (Muted, msg.UserInfo.Muted);
 		}
 
 		[Test]
@@ -126,13 +130,13 @@ namespace Gablarski.Tests
 		{
 			List<UserInfo> users = new List<UserInfo>
 			{
-				new UserInfo (Nickname, null, UserId, ChannelId),
-				new UserInfo (Nickname2, null, UserId2, ChannelId2)
+				new UserInfo (Nickname, null, UserId, ChannelId, false),
+				new UserInfo (Nickname2, null, UserId2, ChannelId2, true)
 			};
 
 			var msg = new UserListMessage (users);
-			Assert.AreEqual (1, msg.Users.Count (ui => ui.UserId.Equals (users[0].UserId) && ui.CurrentChannelId.Equals (users[0].CurrentChannelId) && ui.Nickname == users[0].Nickname));
-			Assert.AreEqual (1, msg.Users.Count (ui => ui.UserId.Equals (users[1].UserId) && ui.CurrentChannelId.Equals (users[1].CurrentChannelId) && ui.Nickname == users[1].Nickname));
+			Assert.AreEqual (1, msg.Users.Count (ui => ui.UserId.Equals (users[0].UserId) && ui.CurrentChannelId.Equals (users[0].CurrentChannelId) && ui.Nickname == users[0].Nickname && ui.Muted == users[0].Muted));
+			Assert.AreEqual (1, msg.Users.Count (ui => ui.UserId.Equals (users[1].UserId) && ui.CurrentChannelId.Equals (users[1].CurrentChannelId) && ui.Nickname == users[1].Nickname && ui.Muted == users[1].Muted));
 			msg.WritePayload (writer);
 			long length = stream.Position;
 			stream.Position = 0;
@@ -140,8 +144,8 @@ namespace Gablarski.Tests
 			msg = new UserListMessage();
 			msg.ReadPayload (reader);
 			Assert.AreEqual (length, stream.Position);
-			Assert.AreEqual (1, msg.Users.Count (ui => ui.UserId.Equals (users[0].UserId) && ui.CurrentChannelId.Equals (users[0].CurrentChannelId) && ui.Nickname == users[0].Nickname));
-			Assert.AreEqual (1, msg.Users.Count (ui => ui.UserId.Equals (users[1].UserId) && ui.CurrentChannelId.Equals (users[1].CurrentChannelId) && ui.Nickname == users[1].Nickname));
+			Assert.AreEqual (1, msg.Users.Count (ui => ui.UserId.Equals (users[0].UserId) && ui.CurrentChannelId.Equals (users[0].CurrentChannelId) && ui.Nickname == users[0].Nickname && ui.Muted == users[0].Muted));
+			Assert.AreEqual (1, msg.Users.Count (ui => ui.UserId.Equals (users[1].UserId) && ui.CurrentChannelId.Equals (users[1].CurrentChannelId) && ui.Nickname == users[1].Nickname && ui.Muted == users[1].Muted));
 		}
 
 		[Test]
@@ -201,7 +205,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void UserLoggedIn()
 		{
-			var info = new UserInfo (Nickname, null, UserId, ChannelId);
+			var info = new UserInfo (Nickname, null, UserId, ChannelId, false);
 			var msg = new UserLoggedInMessage (info);
 			msg.WritePayload (writer);
 			long length = stream.Position;

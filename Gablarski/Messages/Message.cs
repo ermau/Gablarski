@@ -5,6 +5,8 @@ using System.Text;
 
 namespace Gablarski.Messages
 {
+	// Next: 32
+
 	public enum ClientMessageType
 		: ushort
 	{
@@ -25,6 +27,7 @@ namespace Gablarski.Messages
 		ChangeChannel = 20,
 		EditChannel = 22,
 		
+		RequestMuteUser = 30,
 	}
 
 	public enum ServerMessageType
@@ -49,6 +52,8 @@ namespace Gablarski.Messages
 		ChannelListReceived = 19,
 		ChangeChannelResult = 21,
 		ChannelEditResult = 23,
+
+		UserMuted = 31,
 	}
 
 	public abstract class Message<TMessage>

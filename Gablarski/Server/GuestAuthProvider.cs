@@ -3,10 +3,10 @@ using System.Threading;
 
 namespace Gablarski.Server
 {
-	public class GuestUserProvider
-		: IUserProvider
+	public class GuestAuthProvider
+		: IAuthenticationProvider
 	{
-		#region IUserProvider Members
+		#region IAuthenticationProvider Members
 		public Type IdentifyingType
 		{
 			get { return typeof (Int32);}
