@@ -14,6 +14,11 @@ namespace Gablarski.Audio.Speex
 			this.state = jitter_buffer_init (span);
 		}
 
+		public int AvailableCount
+		{
+			get { return GetValue (JITTER_BUFFER.GET_AVAILABLE_COUNT); }
+		}
+
 		public unsafe void Push (SpeexJitterBufferPacket packet)
 		{
 			fixed (byte* pBuffer = packet.Data)
@@ -71,12 +76,36 @@ namespace Gablarski.Audio.Speex
 			if (sp.Encoded)		
 				Array.Copy (buffer, sp.Data, p.len);
 
+			return sp;
+		}
+
+		public void Tick()
+		{
 			lock (sync)
 			{
 				jitter_buffer_tick (this.state);
 			}
+		}
 
-			return sp;
+		public unsafe void UpdateDelay (SpeexJitterBufferPacket packet)
+		{
+			lock (sync)
+			{
+				fixed (byte* pBuffer = packet.Data)
+				{
+					JitterBufferPacket p = new JitterBufferPacket();
+					p.data = pBuffer;
+					p.len = (uint)packet.Data.Length;
+					p.sequence = (ushort)packet.Sequence;
+					p.span = packet.Span;
+					p.timestamp = packet.TimeStamp;
+
+					lock (sync)
+					{
+						jitter_buffer_update_delay (this.state, &p, IntPtr.Zero);
+					}
+				}
+			}
 		}
 
 		#region IDisposable Members
@@ -114,6 +143,21 @@ namespace Gablarski.Audio.Speex
 		private IntPtr state;
 		private readonly object sync = new object();
 
+		private int GetValue (JITTER_BUFFER param)
+		{
+			int requestState;
+			int value = 0;
+			lock (sync)
+			{
+				 requestState = jitter_buffer_ctl (this.state, (int)param, ref value);
+			}
+
+			if (requestState == -1)
+				throw new ArgumentException ("Unknown request " + param);
+
+			return value;
+		}
+
 		// ReSharper disable InconsistentNaming
 		[StructLayout (LayoutKind.Sequential)]
 		internal unsafe struct JitterBufferPacket
@@ -135,19 +179,22 @@ namespace Gablarski.Audio.Speex
 			BadArgument = -2
 		}
 
-		private const int JITTER_BUFFER_SET_MARGIN = 0;
-		private const int JITTER_BUFFER_GET_MARGIN = 1;
-		private const int JITTER_BUFFER_GET_AVAILABLE_COUNT = 3;
-		private const int JITTER_BUFFER_SET_DESTROY_CALLBACK = 4;
-		private const int JITTER_BUFFER_GET_DESTROY_CALLBACK = 5;
-		private const int JITTER_BUFFER_SET_DELAY_STEP = 6;
-		private const int JITTER_BUFFER_GET_DELAY_STEP = 7;
-		private const int JITTER_BUFFER_SET_CONCEALMENT_SIZE = 8;
-		private const int JITTER_BUFFER_GET_CONCEALMENT_SIZE = 9;
-		private const int JITTER_BUFFER_SET_MAX_LATE_RATE = 10;
-		private const int JITTER_BUFFER_GET_MAX_LATE_RATE = 11;
-		private const int JITTER_BUFFER_SET_LATE_COST = 12;
-		private const int JITTER_BUFFER_GET_LATE_COST = 13;
+		private enum JITTER_BUFFER
+		{
+			SET_MARGIN = 0,
+			GET_MARGIN = 1,
+			GET_AVAILABLE_COUNT = 3,
+			SET_DESTROY_CALLBACK = 4,
+			GET_DESTROY_CALLBACK = 5,
+			SET_DELAY_STEP = 6,
+			GET_DELAY_STEP = 7,
+			SET_CONCEALMENT_SIZE = 8,
+			GET_CONCEALMENT_SIZE = 9,
+			SET_MAX_LATE_RATE = 10,
+			GET_MAX_LATE_RATE = 11,
+			SET_LATE_COST = 12,
+			GET_LATE_COST = 13,
+		}
 
 		[DllImport ("libspeexdsp.dll")]
 		private static extern IntPtr jitter_buffer_init (int step_size);
@@ -159,7 +206,7 @@ namespace Gablarski.Audio.Speex
 		private static extern void jitter_buffer_destroy (IntPtr state);
 
 		[DllImport ("libspeexdsp.dll")]
-		private static extern int jitter_buffer_ctl (IntPtr state, int request, IntPtr data);
+		private static extern int jitter_buffer_ctl (IntPtr state, int request, ref int data);
 
 		[DllImport ("libspeexdsp.dll")]
 		private static extern void jitter_buffer_tick (IntPtr state);
@@ -169,6 +216,9 @@ namespace Gablarski.Audio.Speex
 
 		[DllImport ("libspeexdsp.dll")]
 		private unsafe static extern JitterBufferStatus jitter_buffer_get (IntPtr state, JitterBufferPacket* packet, int desired_span, out int offset);
+
+		[DllImport ("libspeexdsp.dll")]
+		private static extern unsafe JitterBufferStatus jitter_buffer_update_delay (IntPtr state, JitterBufferPacket* packet, IntPtr offset);
 		// ReSharper restore InconsistentNaming
 	}
 }

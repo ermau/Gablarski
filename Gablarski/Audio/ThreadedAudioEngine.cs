@@ -180,8 +180,8 @@ namespace Gablarski.Audio
 			this.AudioReceiver.AudioSourceStarted += OnAudioSourceStarted;
 			this.AudioReceiver.AudioSourceStopped += OnAudioSourceStopped;
 
-		/*	this.playbackRunnerThread = new Thread (this.PlaybackRunner) { Name = "ThreadedAudioEngine Playback Runner" };
-			this.playbackRunnerThread.Start();*/
+			this.playbackRunnerThread = new Thread (this.PlaybackRunner) { Name = "ThreadedAudioEngine Playback Runner" };
+			this.playbackRunnerThread.Start();
 		}
 
 		public void Stop ()
@@ -247,8 +247,8 @@ namespace Gablarski.Audio
 			{
 				var p = playbacks[e.Source];
 				if (p.Playing)
-					p.Playback.QueuePlayback (e.Source, decoded);
-					//p.Buffer.Push (packet);
+					p.Buffer.Push (packet);
+				//p.Playback.QueuePlayback (e.Source, decoded);
 			}
 			playbackLock.ExitReadLock();
 		}
@@ -266,15 +266,25 @@ namespace Gablarski.Audio
 						if (!e.Playing)
 							continue;
 
+						var j = e.Buffer;
+						var s = e.Source;
+
 						DateTime n = DateTime.Now;
 						if (n.Subtract (e.Last) >= e.FrameTimeSpan)
 						{
-							var s = e.Source;
-							var packet = e.Buffer.Pull (s.FrameSize);
+							var packet = j.Pull (s.FrameSize);
 
 							e.Playback.QueuePlayback (s, (packet.Encoded) ? s.Decode (packet.Data) : packet.Data);
 							e.Last = n;
 						}
+
+						while (e.Buffer.AvailableCount > 0)
+						{
+							var packet = j.Pull (s.FrameSize);
+							e.Playback.QueuePlayback (s, packet.Data);
+						}
+
+						j.Tick();
 					}
 				}
 				playbackLock.ExitReadLock();
