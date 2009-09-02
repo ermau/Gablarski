@@ -29,6 +29,7 @@ namespace Gablarski.Clients.Windows
 			this.ImageList.Images.Add ("silent",	Resources.SoundNoneImage);
 			this.ImageList.Images.Add ("talking",	Resources.SoundImage);
 			this.ImageList.Images.Add ("music",		Resources.MusicImage);
+			this.ImageList.Images.Add ("muted",		Resources.SoundMuteImage);
 
 			InitMenus();
 		}
@@ -102,11 +103,13 @@ namespace Gablarski.Clients.Windows
 			var channelPair = this.channelNodes.FirstOrDefault (c => c.Key.ChannelId == user.CurrentChannelId);
 			if (channelPair.Equals (default(KeyValuePair<ChannelInfo,TreeNode>)))
 				return;
-			
+
+			string imageKey = (!user.Muted) ? "silent" : "muted";
+
 			var node = channelPair.Value.Nodes.Add (user.Nickname);
 			node.Tag = user;
-			node.ImageKey = "silent";
-			node.SelectedImageKey = "silent";
+			node.ImageKey = imageKey;
+			node.SelectedImageKey = imageKey;
 			node.ContextMenuStrip = userMenu;
 			this.userNodes[user] = node;
 
@@ -172,6 +175,23 @@ namespace Gablarski.Clients.Windows
 
 			userNodes[user].ImageKey = "music";
 			userNodes[user].SelectedImageKey = "music";
+		}
+
+		public void MarkMuted (UserInfo user)
+		{
+			if (user == null)
+				throw new ArgumentNullException("user");
+
+			if (this.InvokeRequired)
+			{
+				this.BeginInvoke ((Action<UserInfo>)this.MarkMuted, user);
+				return;
+			}
+
+			if (!userNodes.ContainsKey (user))
+				return;
+
+			userNodes[user].SelectedImageKey = userNodes[user].ImageKey = "muted";
 		}
 
 		public void MarkSilent (UserInfo user)
@@ -311,12 +331,20 @@ namespace Gablarski.Clients.Windows
 				Client.Channels.Create (addChannel.Channel);
 		}
 
+		private void ContextIgnoreUserClick (object sender, EventArgs e)
+		{
+			((ClientUser)this.SelectedNode.Tag).Ignore ();
+		}
+
 		private ContextMenuStrip channelMenu;
 		private ContextMenuStrip userMenu;
 		
 		private readonly ToolStripMenuItem contextAddChannel = new ToolStripMenuItem ("Add Channel", Resources.ChannelAddImage);
 		private readonly ToolStripMenuItem contextEditChannel = new ToolStripMenuItem ("Edit Channel", Resources.ChannelEditImage);
 		private readonly ToolStripMenuItem contextDeleteChannel = new ToolStripMenuItem ("Delete Channel", Resources.ChannelDeleteImage);
+
+		private readonly ToolStripMenuItem contextIgnoreUser = new ToolStripMenuItem ("Ignore User", Resources.SoundMuteImage);
+		private readonly ToolStripMenuItem contextMuteUser = new ToolStripMenuItem ("Mute User", Resources.SoundMuteImage);
 
 		private void InitMenus()
 		{
@@ -336,7 +364,12 @@ namespace Gablarski.Clients.Windows
 			channelMenu.Items.Add (contextEditChannel);
 			channelMenu.Items.Add (contextDeleteChannel);
 
+
+			contextIgnoreUser.Click += ContextIgnoreUserClick;
+			
 			userMenu = new ContextMenuStrip();
+
+			userMenu.Items.Add (contextIgnoreUser);
 		}
 	}
 }

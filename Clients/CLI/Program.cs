@@ -148,7 +148,7 @@ namespace Gablarski.Clients.CLI
 				Client.ConnectionRejected += ClientConnectionRejected;
 				Client.Disconnected += ClientDisconnected;
 
-				Client.Sources.ReceivedSource += SourcesReceivedSource;
+				Client.Sources.ReceivedAudioSource += SourcesReceivedSource;
 				Client.Sources.ReceivedSourceList += SourcesReceivedSourceList;
 
 				Client.Connect (host, port);
@@ -350,7 +350,7 @@ namespace Gablarski.Clients.CLI
 			}
 		}
 		
-		static void SourcesReceivedSource (object sender, ReceivedSourceEventArgs e)
+		static void SourcesReceivedSource (object sender, ReceivedAudioSourceEventArgs e)
 		{
 			if (!e.Source.OwnerId.Equals (Client.CurrentUser.UserId))
 			{

@@ -44,7 +44,6 @@ namespace Gablarski.Client
 				{ ServerMessageType.SourcesRemoved, this.Sources.OnSourcesRemovedMessage },
 				
 				{ ServerMessageType.ChannelListReceived, this.Channels.OnChannelListReceivedMessage },
-				//{ ServerMessageType.ChangeChannelResult, OnChangeChannelResultMessage },
 				{ ServerMessageType.UserChangedChannel, this.Users.OnUserChangedChannelMessage },
 				{ ServerMessageType.ChannelEditResult, this.Channels.OnChannelEditResultMessage },
 
@@ -52,6 +51,7 @@ namespace Gablarski.Client
 				{ ServerMessageType.LoginResult, this.CurrentUser.OnLoginResultMessage },
 				{ ServerMessageType.UserLoggedIn, this.Users.OnUserLoggedInMessage },
 				{ ServerMessageType.UserDisconnected, this.Users.OnUserDisconnectedMessage },
+				{ ServerMessageType.Muted, OnMuted },
 				
 				{ ServerMessageType.SourceResult, this.Sources.OnSourceResultMessage },
 				{ ServerMessageType.AudioDataReceived, this.Sources.OnAudioDataReceivedMessage },
@@ -111,6 +111,14 @@ namespace Gablarski.Client
 			{
 				this.handlers[(e.Message as ServerMessage).MessageType] (e);
 			}
+		}
+
+		private void OnMuted (MessageReceivedEventArgs obj)
+		{
+			var msg = (MutedMessage)obj.Message;
+
+			if ((msg.Type & MuteType.User) == MuteType.User)
+				this.Users.OnUserMutedMessage ((string)msg.Target);
 		}
 
 		private void OnConnectionRejectedMessage (MessageReceivedEventArgs e)

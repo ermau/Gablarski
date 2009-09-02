@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
-    <ProductVersion>10.0.20506</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{043E20A2-310D-41C0-94BC-766E3BAACAFB}</ProjectGuid>
     <OutputType>WinExe</OutputType>
@@ -459,6 +459,7 @@ xcopy /Y "$(SolutionDir)Gablarski\Audio\CELT\libcelt.license.txt" "$(SolutionDir
 xcopy /Y "$(SolutionDir)Gablarski\Audio\Speex\libspeexdsp.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Gablarski\Audio\Speex\libspeexdsp.license.txt" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Gablarski\Audio\OpenAL\OpenAL32.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)Gablarski\Audio\OpenAL\OpenALSoft.License.txt" "$(TargetDir)"</PostBuildEvent>
+xcopy /Y "$(SolutionDir)Gablarski\Audio\OpenAL\OpenALSoft.License.txt" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)fluent-nhibernate\tools\NHibernate\*.dll" "$(TargetDir)"</PostBuildEvent>
   </PropertyGroup>
 </Project>

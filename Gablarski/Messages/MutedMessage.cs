@@ -23,11 +23,6 @@ namespace Gablarski.Messages
 			get; set;
 		}
 
-		public bool ForEveryone
-		{
-			get { return (Type & MuteType.ForEveryone) == MuteType.ForEveryone; }
-		}
-
 		public override void WritePayload (IValueWriter writer)
 		{
 			writer.WriteByte ((byte)this.Type);

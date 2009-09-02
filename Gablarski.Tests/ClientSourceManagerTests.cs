@@ -67,28 +67,32 @@ namespace Gablarski.Tests
 			manager.OnSourceListReceivedMessage (new MessageReceivedEventArgs (this.client, 
 				new SourceListMessage (new []
 				{
-					new AudioSource ("voice", 1, 1, 1, 64000, 44100, 256, 10),
-					new AudioSource ("voice", 2, 2, 1, 96000, 44100, 512, 10),
+					new AudioSource ("ownvoice", 1, 1, 1, 64000, 44100, 256, 10, false),
+					new AudioSource ("voice", 2, 2, 1, 96000, 44100, 512, 10, true),
 				})
 			));
 
-			var source = manager.OfType<AudioSource>().FirstOrDefault (s => s.Id == 1);
-			Assert.IsNotNull (source);
-			Assert.AreEqual (1, source.OwnerId, "OwnerId not matching");
-			Assert.AreEqual (1, source.Channels, "Channels not matching");
-			Assert.AreEqual (64000, source.Bitrate, "Bitrate not matching");
-			Assert.AreEqual (44100, source.Frequency, "Frequency not matching");
-			Assert.AreEqual (256, source.FrameSize, "FrameSize not matching");
-			Assert.AreEqual (10, source.Complexity, "Complexity not matching.");
+			var csource = manager.OfType<ClientAudioSource>().FirstOrDefault (s => s.Id == 1);
+			Assert.IsNotNull (csource, "Source not found");
+			Assert.AreEqual ("ownvoice", csource.Name, "Name not matching");
+			Assert.AreEqual (1, csource.OwnerId, "OwnerId not matching");
+			Assert.AreEqual (1, csource.Channels, "Channels not matching");
+			Assert.AreEqual (64000, csource.Bitrate, "Bitrate not matching");
+			Assert.AreEqual (44100, csource.Frequency, "Frequency not matching");
+			Assert.AreEqual (256, csource.FrameSize, "FrameSize not matching");
+			Assert.AreEqual (10, csource.Complexity, "Complexity not matching.");
+			Assert.AreEqual (false, csource.Muted, "Muted not matching");
 
-			source = manager.OfType<AudioSource>().FirstOrDefault (s => s.Id == 2);
-			Assert.IsNotNull (source);
+			var source = manager.OfType<AudioSource>().FirstOrDefault (s => s.Id == 2);
+			Assert.IsNotNull (source, "Source not found");
+			Assert.AreEqual ("voice", source.Name, "Name not matching");
 			Assert.AreEqual (2, source.OwnerId, "OwnerId not matching");
 			Assert.AreEqual (1, source.Channels, "Channels not matching");
 			Assert.AreEqual (96000, source.Bitrate, "Bitrate not matching");
 			Assert.AreEqual (44100, source.Frequency, "Frequency not matching");
 			Assert.AreEqual (512, source.FrameSize, "FrameSize not matching");
 			Assert.AreEqual (10, source.Complexity, "Complexity not matching");
+			Assert.AreEqual (true, source.Muted, "Muted not matching");
 		}
 
 		//manager.OnSourceResultMessage (new SourceResultMessage (SourceResult.));

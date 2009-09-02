@@ -21,16 +21,6 @@ namespace Gablarski.Audio
 		{
 		}
 
-		public AudioSource (string name, int sourceId, int ownerId, byte channels, int bitrate, int frequency, short frameSize)
-			: this (name, sourceId, ownerId, channels, bitrate, frequency, frameSize, 10)
-		{
-		}
-
-		public AudioSource (string name, int id, int ownerId, byte channels, int bitrate, int frequency, short frameSize, byte complexity)
-			: this (name, id, ownerId, channels, bitrate, frequency, frameSize, complexity, false)
-		{
-		}
-
 		public AudioSource (string name, int sourceId, int ownerId, byte channels, int bitrate, int frequency, short frameSize, byte complexity, bool muted)
 		{
 			if (name == null)
@@ -64,7 +54,7 @@ namespace Gablarski.Audio
 		public bool Muted
 		{
 			get;
-			private set;
+			protected internal set;
 		}
 
 		/// <summary>
@@ -73,7 +63,7 @@ namespace Gablarski.Audio
 		public string Name
 		{
 			get;
-			private set;
+			protected internal set;
 		}
 
 		/// <summary>
@@ -82,7 +72,7 @@ namespace Gablarski.Audio
 		public int Id
 		{
 			get;
-			private set;
+			protected internal set;
 		}
 
 		/// <summary>
@@ -91,7 +81,7 @@ namespace Gablarski.Audio
 		public int OwnerId
 		{
 			get;
-			private set;
+			protected internal set;
 		}
 
 		/// <summary>
@@ -100,7 +90,7 @@ namespace Gablarski.Audio
 		public int Bitrate
 		{
 			get;
-			private set;
+			protected internal set;
 		}
 
 		private readonly byte complexity = 10;
@@ -119,7 +109,7 @@ namespace Gablarski.Audio
 		public byte Channels
 		{
 			get;
-			private set;
+			protected internal set;
 		}
 
 		/// <summary>
@@ -128,7 +118,7 @@ namespace Gablarski.Audio
 		public int Frequency
 		{
 			get;
-			private set;
+			protected internal set;
 		}
 
 		/// <summary>
@@ -137,7 +127,7 @@ namespace Gablarski.Audio
 		public short FrameSize
 		{
 			get;
-			private set;
+			protected internal set;
 		}
 
 		public byte[] Encode (byte[] data)
@@ -198,7 +188,7 @@ namespace Gablarski.Audio
 		private CeltDecoder decoder;
 		private CeltMode mode;
 
-		internal void Serialize (IValueWriter writer)
+		protected internal void Serialize (IValueWriter writer)
 		{
 			writer.WriteString (this.Name);
 			writer.WriteInt32 (this.Id);
@@ -210,7 +200,7 @@ namespace Gablarski.Audio
 			writer.WriteBool (this.Muted);
 		}
 
-		internal void Deserialize (IValueReader reader)
+		protected internal void Deserialize (IValueReader reader)
 		{
 			this.Name = reader.ReadString();
 			this.Id = reader.ReadInt32 ();

@@ -21,22 +21,27 @@ namespace Gablarski.Client
 
 		#region Events
 		/// <summary>
-		/// An new or updated player list has been received.
+		/// An new or updated user list has been received.
 		/// </summary>
 		public event EventHandler<ReceivedListEventArgs<UserInfo>> ReceivedUserList;
 
 		/// <summary>
-		/// A new player has logged in.
+		/// A new user has logged in.
 		/// </summary>
-		public event EventHandler<UserLoggedInEventArgs> UserLoggedIn;
+		public event EventHandler<UserEventArgs> UserLoggedIn;
 
 		/// <summary>
-		/// A player has disconnected.
+		/// A user has disconnected.
 		/// </summary>
-		public event EventHandler<UserDisconnectedEventArgs> UserDisconnected;
+		public event EventHandler<UserEventArgs> UserDisconnected;
 
 		/// <summary>
-		/// A player has changed channels.
+		/// A user was muted or ignored.
+		/// </summary>
+		public event EventHandler<UserEventArgs> UserMuted;
+
+		/// <summary>
+		/// A user has changed channels.
 		/// </summary>
 		public event EventHandler<ChannelChangedEventArgs> UserChangedChannel;
 
@@ -138,6 +143,21 @@ namespace Gablarski.Client
 			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Reset));
 		}
 
+		internal void OnUserMutedMessage (string username)
+		{
+			lock (userLock)
+			{
+		        var user = this.users.Values.FirstOrDefault (u => u.Username == username);
+		        if (user == null)
+		            return;
+
+		        user.Muted = true;
+
+		        OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Replace, user, user));
+			    OnUserMuted (new UserEventArgs (user));
+			}
+		}
+
 		internal void OnUserDisconnectedMessage (MessageReceivedEventArgs e)
 		{
 			var msg = (UserDisconnectedMessage) e.Message;
@@ -149,7 +169,7 @@ namespace Gablarski.Client
 				this.users.Remove (msg.UserId);
 			}
 
-			OnUserDisconnected (new UserDisconnectedEventArgs (user));
+			OnUserDisconnected (new UserEventArgs (user));
 			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Remove, user));
 		}
 
@@ -167,7 +187,7 @@ namespace Gablarski.Client
 				this.users.Add (msg.UserInfo.UserId, user);
 			}
 
-			OnUserLoggedIn (new UserLoggedInEventArgs (user));
+			OnUserLoggedIn (new UserEventArgs (user));
 			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Add, user));
 		}
 
@@ -218,7 +238,14 @@ namespace Gablarski.Client
 		#endregion
 
 		#region Event Invokers
-		protected virtual void OnUserDisconnected (UserDisconnectedEventArgs e)
+		protected virtual void OnUserMuted (UserEventArgs e)
+		{
+			var muted = this.UserMuted;
+			if (muted != null)
+				muted (this, e);
+		}
+
+		protected virtual void OnUserDisconnected (UserEventArgs e)
 		{
 			var disconnected = this.UserDisconnected;
 			if (disconnected != null)
@@ -232,7 +259,7 @@ namespace Gablarski.Client
 				received (this, e);
 		}
 
-		protected virtual void OnUserLoggedIn (UserLoggedInEventArgs e)
+		protected virtual void OnUserLoggedIn (UserEventArgs e)
 		{
 			var result = this.UserLoggedIn;
 			if (result != null)
@@ -263,10 +290,10 @@ namespace Gablarski.Client
 	}
 
 	#region Event Args
-	public class UserLoggedInEventArgs
+	public class UserEventArgs
 		: EventArgs
 	{
-		public UserLoggedInEventArgs (ClientUser userInfo)
+		public UserEventArgs (ClientUser userInfo)
 		{
 			if (userInfo == null)
 				throw new ArgumentNullException ("userInfo");
@@ -275,28 +302,7 @@ namespace Gablarski.Client
 		}
 
 		/// <summary>
-		/// Gets the new user's information.
-		/// </summary>
-		public ClientUser User
-		{
-			get;
-			private set;
-		}
-	}
-
-	public class UserDisconnectedEventArgs
-		: EventArgs
-	{
-		public UserDisconnectedEventArgs (ClientUser user)
-		{
-			if (user == null)
-				throw new ArgumentNullException ("user");
-
-			this.User = user;
-		}
-
-		/// <summary>
-		/// Gets the user that disconnected.
+		/// Gets the user target of the event.
 		/// </summary>
 		public ClientUser User
 		{
@@ -306,26 +312,16 @@ namespace Gablarski.Client
 	}
 
 	public class ChannelChangedEventArgs
-		: EventArgs
+		: UserEventArgs
 	{
 		public ChannelChangedEventArgs (ClientUser target, ChannelInfo targetChannel, ClientUser movedBy)
+			: base (target)
 		{
-			if (target == null)
-				throw new ArgumentNullException ("target");
 			if (targetChannel == null)
 				throw new ArgumentNullException ("targetChannel");
 
-			this.TargetUser = target;
 			this.TargetChannel = targetChannel;
 			this.MovedBy = movedBy;
-		}
-
-		/// <summary>
-		/// Gets the target user of the move.
-		/// </summary>
-		public ClientUser TargetUser
-		{
-			get; private set;
 		}
 
 		/// <summary>

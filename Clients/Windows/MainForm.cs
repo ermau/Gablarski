@@ -30,7 +30,7 @@ namespace Gablarski.Clients.Windows
 			this.gablarski.Users.UserChangedChannel += UsersUserChangedChannel;
 			this.gablarski.CurrentUser.ReceivedLoginResult += this.CurrentUserReceivedLoginResult;
 
-			this.gablarski.Sources.ReceivedSource += this.SourcesReceivedSource;
+			this.gablarski.Sources.ReceivedAudioSource += this.SourcesReceivedSource;
 			this.gablarski.Sources.ReceivedAudio += SourcesReceivedAudio;
 
 			Settings.SettingChanged += SettingsSettingChanged;
@@ -148,15 +148,17 @@ namespace Gablarski.Clients.Windows
 			if (this.ptt == null || this.ptt.Supplier != PushToTalkSupplier.Keyboard || this.ptt.KeyboardKeys != key)
 				return;
 
-			if (kEvent == KeyboardEvents.KeyDown)
+			if (kEvent == KeyboardEvents.KeyDown && !this.voiceCapture.IsCapturing)
 			{
 				this.users.MarkTalking (this.gablarski.CurrentUser);
-				this.voiceCapture.BeginCapture(AudioFormat.Mono16Bit);
+				this.voiceSource.BeginSending (this.gablarski.CurrentChannel);
+				this.voiceCapture.BeginCapture (AudioFormat.Mono16Bit);
 			}
 			else if (kEvent == KeyboardEvents.KeyUp)
 			{
 				this.users.MarkSilent (this.gablarski.CurrentUser);
 				this.voiceCapture.EndCapture();
+				this.voiceSource.EndSending();
 			}
 		}
 
@@ -173,7 +175,7 @@ namespace Gablarski.Clients.Windows
 			this.playback.QueuePlayback (e.Source, e.AudioData);
 		}
 
-		void SourcesReceivedSource (object sender, ReceivedSourceEventArgs e)
+		void SourcesReceivedSource (object sender, ReceivedAudioSourceEventArgs e)
 		{
 			if (e.Result == SourceResult.Succeeded)
 			{
@@ -187,16 +189,16 @@ namespace Gablarski.Clients.Windows
 
 		private void UsersUserChangedChannel (object sender, ChannelChangedEventArgs e)
 		{
-			this.users.RemoveUser (e.TargetUser);
-			this.users.AddUser (e.TargetUser);
+			this.users.RemoveUser (e.User);
+			this.users.AddUser (e.User);
 		}
 
-		private void UsersUserDisconnected (object sender, UserDisconnectedEventArgs e)
+		private void UsersUserDisconnected (object sender, UserEventArgs e)
 		{
 			this.users.RemoveUser (e.User);
 		}
 
-		private void UsersUserLoggedIn (object sender, UserLoggedInEventArgs e)
+		private void UsersUserLoggedIn (object sender, UserEventArgs e)
 		{
 			this.users.AddUser (e.User);
 		}

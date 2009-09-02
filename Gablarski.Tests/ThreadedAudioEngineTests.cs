@@ -19,7 +19,7 @@ namespace Gablarski.Tests
 		public void Setup()
 		{
 			this.provider = new MockCaptureProvider();
-			this.source = new ClientAudioSource (new AudioSource ("mockSource", 1, 1, 1, 64000, 44100, 256), new MockClientConnection (new MockServerConnection()));
+			this.source = new ClientAudioSource (new AudioSource ("mockSource", 1, 1, 1, 64000, 44100, 256, 10, false), new MockClientConnection (new MockServerConnection()));
 		}
 
 		[TearDown]

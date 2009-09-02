@@ -191,17 +191,13 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Audio\CELT\libcelt.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Audio\CELT\libcelt.license.txt" />
     <None Include="Audio\OpenAL\OpenAL32.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Audio\OpenAL\OpenALSoft.License.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Audio\Speex\libspeexdsp.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Audio\Speex\libspeexdsp.license.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

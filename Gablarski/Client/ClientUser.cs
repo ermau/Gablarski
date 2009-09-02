@@ -47,9 +47,14 @@ namespace Gablarski.Client
 			this.client.Send (new ChannelChangeMessage (this.UserId, targetChannel.ChannelId));
 		}
 
-		public void Mute (bool forEveryone)
+		public void Ignore()
 		{
-			this.client.Send (new RequestMuteMessage { Target = this.Username, Type = (forEveryone) ? MuteType.User | MuteType.ForEveryone : MuteType.User});
+			throw new NotImplementedException();
+		}
+
+		public void Mute ()
+		{
+			this.client.Send (new RequestMuteMessage { Target = this.Username, Type = MuteType.User});
 		}
 
 		private readonly IClientConnection client;

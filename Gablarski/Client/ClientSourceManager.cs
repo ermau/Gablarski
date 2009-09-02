@@ -28,24 +28,29 @@ namespace Gablarski.Client
 		public event EventHandler<ReceivedListEventArgs<AudioSource>> ReceivedSourceList;
 
 		/// <summary>
-		/// A new media source has been received.
+		/// A new audio source has been received.
 		/// </summary>
-		public event EventHandler<ReceivedSourceEventArgs> ReceivedSource;
+		public event EventHandler<ReceivedAudioSourceEventArgs> ReceivedAudioSource;
 
 		/// <summary>
-		/// A media source was removed.
+		/// An audio source was removed.
 		/// </summary>
-		public event EventHandler<ReceivedListEventArgs<AudioSource>> SourcesRemoved;
+		public event EventHandler<ReceivedListEventArgs<AudioSource>> AudioSourcesRemoved;
 
 		/// <summary>
-		/// A media source started playing.
+		/// An audio source started playing.
 		/// </summary>
 		public event EventHandler<AudioSourceEventArgs> AudioSourceStarted;
 
 		/// <summary>
-		/// A media source stopped playing.
+		/// An audio source stopped playing.
 		/// </summary>
 		public event EventHandler<AudioSourceEventArgs> AudioSourceStopped;
+
+		/// <summary>
+		/// An audio source has been muted.
+		/// </summary>
+		public event EventHandler<AudioSourceEventArgs> AudioSourceMuted;
 
 		/// <summary>
 		/// Audio has been received.
@@ -80,7 +85,7 @@ namespace Gablarski.Client
 			if (this.sources == null)
 				yield break;
 
-			lock (this.sourceLock)
+			lock (this.sources)
 			{
 				if (this.sources == null)
 					yield break;
@@ -134,28 +139,89 @@ namespace Gablarski.Client
 		/// </summary>
 		public void Clear()
 		{
-			lock (this.sourceLock)
+			lock (this.sources)
 			{
-				this.sources = null;
+				this.sources.Clear();
 				OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Reset));
 			}
 		}
 
 		private readonly IClientContext context;
-		private readonly object sourceLock = new object();
-		private Dictionary<int, AudioSource> sources;
+		private Dictionary<int, AudioSource> sources = new Dictionary<int, AudioSource>();
+
+		// We'll end up with new instances from the outside world, we can update our
+		// own instances no problem.
+		internal void UpdateSourceFromExternal (AudioSource updatedSource)
+		{
+			NotifyCollectionChangedEventArgs collectionChanged;
+
+			lock (sources)
+			{
+				AudioSource source;
+				if (!sources.TryGetValue (updatedSource.Id, out source))
+				{
+					sources[updatedSource.Id] = source = updatedSource;
+					collectionChanged = new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Add, source);
+				}
+				else
+				{
+					CopySource (source, updatedSource);
+					collectionChanged = new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Replace, updatedSource, source);
+				}
+			}
+
+			OnCollectionChanged (collectionChanged);
+		}
+
+		internal void UpdateSourcesFromExternal (IEnumerable<AudioSource> updatedSources)
+		{
+			IEnumerable<AudioSource> updatedAndNew;
+			IEnumerable<AudioSource> deleted;
+
+			lock (sources)
+			{
+				updatedAndNew = updatedSources.Where (s => !this.sources.ContainsValue (s));
+				updatedAndNew = updatedAndNew.Concat (this.sources.Values.Intersect (updatedSources)).ToList();
+				deleted = this.sources.Values.Where (s => !updatedSources.Contains (s)).ToList();
+			}
+
+			foreach (var s in updatedAndNew)
+				UpdateSourceFromExternal (s);
+
+			foreach (var d in deleted)
+			{
+				lock (sources)
+				{
+					sources.Remove (d.Id);
+				}
+
+				OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Remove, d));
+			}
+		}
+
+		private void CopySource (AudioSource target, AudioSource updatedSource)
+		{
+			target.Name = updatedSource.Name;
+			target.Id = updatedSource.Id;
+			target.OwnerId = updatedSource.OwnerId;
+			target.Bitrate = updatedSource.Bitrate;
+			target.Muted = updatedSource.Muted;
+
+			target.Channels = updatedSource.Channels;
+			target.Frequency = updatedSource.Frequency;
+			target.FrameSize = updatedSource.FrameSize;
+		}
 
 		internal void OnSourceListReceivedMessage (MessageReceivedEventArgs e)
 		{
 		    var msg = (SourceListMessage)e.Message;
 
-			lock (sourceLock)
+			lock (sources)
 			{
-				this.sources = msg.Sources.ToDictionary (s => s.Id, s => (s.OwnerId == context.CurrentUser.UserId) ? new ClientAudioSource (s, this.context.Connection) : s);
+				UpdateSourcesFromExternal (msg.Sources.Select (s => (s.OwnerId == context.CurrentUser.UserId) ? new ClientAudioSource (s, this.context.Connection) : s));
 			}
 
 			OnReceivedSourceList (new ReceivedListEventArgs<AudioSource> (msg.Sources));
-			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Reset));
 		}
 
 		internal void OnSourceResultMessage (MessageReceivedEventArgs e)
@@ -164,21 +230,14 @@ namespace Gablarski.Client
 			var source = sourceMessage.Source;
 			if (sourceMessage.SourceResult == SourceResult.Succeeded || sourceMessage.SourceResult == SourceResult.NewSource)
 		    {
-		        lock (sourceLock)
-		        {
-		        	if (sources == null)
-						sources = new Dictionary<int, AudioSource>();
-
-		        	source = (source.OwnerId.Equals (context.CurrentUser.UserId))
+	        	source = (source.OwnerId.Equals (context.CurrentUser.UserId))
 		        	         	? new ClientAudioSource (source, this.context.Connection)
 		        	         	: source;
 					
-					sources[source.Id] = source;
-		        }
+				UpdateSourceFromExternal (source);
 		    }
 
-		    OnReceivedSource (new ReceivedSourceEventArgs (source, sourceMessage.SourceResult));
-			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Add, source));
+		    OnReceivedSource (new ReceivedAudioSourceEventArgs (source, sourceMessage.SourceResult));
 		}
 
 		internal void OnSourcesRemovedMessage (MessageReceivedEventArgs e)
@@ -186,7 +245,7 @@ namespace Gablarski.Client
 			var sourceMessage = (SourcesRemovedMessage)e.Message;
 
 			List<AudioSource> removed = new List<AudioSource>();
-			lock (sourceLock)
+			lock (sources)
 			{
 				foreach (int id in sourceMessage.SourceIds)
 				{
@@ -202,16 +261,23 @@ namespace Gablarski.Client
 			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Remove, removed));
 		}
 
+		internal AudioSource GetSource (int sourceId)
+		{
+			AudioSource source = null;
+			lock (this.sources)
+			{
+				if (this.sources != null && this.sources.ContainsKey (sourceId))
+					source = this.sources[sourceId];
+			}
+
+			return source;
+		}
+
 		internal void OnAudioSourceStateChangedMessage (MessageReceivedEventArgs e)
 		{
 			var msg = (AudioSourceStateChangeMessage)e.Message;
 
-			AudioSource source = null;
-			lock (this.sourceLock)
-			{
-				if (this.sources != null && this.sources.ContainsKey (msg.SourceId))
-					source = this.sources[msg.SourceId];
-			}
+			var source = GetSource (msg.SourceId);
 
 			if (source != null)
 			{
@@ -226,13 +292,7 @@ namespace Gablarski.Client
 		{
 			var msg = (AudioDataReceivedMessage)e.Message;
 
-			AudioSource source = null;
-			lock (this.sourceLock)
-			{
-				if (this.sources != null && this.sources.ContainsKey (msg.SourceId))
-					source = this.sources[msg.SourceId];
-			}
-
+			var source = GetSource (msg.SourceId);
 			if (source != null)
 				OnReceivedAudio (new ReceivedAudioEventArgs (source, msg.Sequence, msg.Data));
 		}
@@ -259,9 +319,9 @@ namespace Gablarski.Client
 				received (this, e);
 		}
 
-		protected virtual void OnReceivedSource (ReceivedSourceEventArgs e)
+		protected virtual void OnReceivedSource (ReceivedAudioSourceEventArgs e)
 		{
-			var received = this.ReceivedSource;
+			var received = this.ReceivedAudioSource;
 			if (received != null)
 				received (this, e);
 		}
@@ -275,7 +335,7 @@ namespace Gablarski.Client
 
 		protected virtual void OnSourcesRemoved (ReceivedListEventArgs<AudioSource> e)
 		{
-			var removed = this.SourcesRemoved;
+			var removed = this.AudioSourcesRemoved;
 			if (removed != null)
 				removed (this, e);
 		}
@@ -290,10 +350,10 @@ namespace Gablarski.Client
 	}
 
 	#region Event Args
-	public class ReceivedSourceEventArgs
+	public class ReceivedAudioSourceEventArgs
 		: EventArgs
 	{
-		public ReceivedSourceEventArgs (AudioSource source, SourceResult result)
+		public ReceivedAudioSourceEventArgs (AudioSource source, SourceResult result)
 		{
 			this.Result = result;
 			this.Source = source;

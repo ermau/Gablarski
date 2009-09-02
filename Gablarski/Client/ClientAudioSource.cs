@@ -12,7 +12,7 @@ namespace Gablarski.Client
 		: AudioSource
 	{
 		internal ClientAudioSource (AudioSource source, IClientConnection client)
-			: base (source.Name, source.Id, source.OwnerId, source.Channels, source.Bitrate, source.Frequency, source.FrameSize, source.Complexity)
+			: base (source.Name, source.Id, source.OwnerId, source.Channels, source.Bitrate, source.Frequency, source.FrameSize, source.Complexity, source.Muted)
 		{
 			this.client = client;
 		}
@@ -35,9 +35,14 @@ namespace Gablarski.Client
 			this.client.Send (new ClientAudioSourceStateChangeMessage (false, this.Id, this.targetChannelId));
 		}
 
-		public void Mute (bool forEveryone)
+		public void Ignore ()
 		{
-			this.client.Send (new RequestMuteMessage { Target = this.Id, Type = (forEveryone) ? MuteType.AudioSource | MuteType.ForEveryone : MuteType.AudioSource});
+			throw new NotImplementedException();
+		}
+
+		public void Mute ()
+		{
+			this.client.Send (new RequestMuteMessage { Target = this.Id, Type = MuteType.AudioSource });
 		}
 
 		public void SendAudioData (byte[] data)

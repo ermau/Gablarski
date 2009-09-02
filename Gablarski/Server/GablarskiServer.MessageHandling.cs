@@ -197,7 +197,7 @@ namespace Gablarski.Server
 			var msg = (RequestMuteMessage)e.Message;
 
 			if ((msg.Type & MuteType.User) == MuteType.User)
-				ClientRequestsPlayerMute (this.connections[e.Connection], this.connections.GetUser ((int)msg.Target), msg.ForEveryone);
+				ClientRequestsPlayerMute (this.connections[e.Connection], this.connections.GetUser ((int)msg.Target));
 			else if ((msg.Type & MuteType.AudioSource) == MuteType.AudioSource)
 			{
 				AudioSource source;
@@ -206,25 +206,23 @@ namespace Gablarski.Server
 					source = this.sources.FirstOrDefault (a => a.Id == (int)msg.Target);
 				}
 
-				ClientRequestsSourceMute (this.connections[e.Connection], source, msg.ForEveryone);
+				ClientRequestsSourceMute (this.connections[e.Connection], source);
 			}
 		}
 
 		#region Users
-		protected void ClientRequestsPlayerMute (UserInfo requesting, UserInfo target, bool forEveryone)
+		protected void ClientRequestsPlayerMute (UserInfo requesting, UserInfo target)
 		{
-			bool allowed = (!forEveryone || GetPermission (PermissionName.MuteUser, requesting));
-
-			if (allowed)
+			if (!GetPermission (PermissionName.MuteUser, requesting))
+				return;
+			
+			if (this.connections.UpdateIfExists (new UserInfo (target) { Muted = true }))
 			{
-				if (this.connections.UpdateIfExists (new UserInfo (target) { Muted = true }))
+				this.connections.Send (new MutedMessage
 				{
-					this.connections.Send (new MutedMessage
-					{
-						Target = target.Username,
-						Type = (forEveryone) ? MuteType.User | MuteType.ForEveryone : MuteType.User
-					}, (UserInfo u) => (forEveryone || u == requesting));
-				}
+					Target = target.Username,
+					Type =  MuteType.User
+				}, (UserInfo u) => u == requesting);
 			}
 		}
 
@@ -284,15 +282,14 @@ namespace Gablarski.Server
 		#region Media
 
 		#region Sources
-		protected void ClientRequestsSourceMute (UserInfo requesting, AudioSource target, bool forEveryone)
+		protected void ClientRequestsSourceMute (UserInfo requesting, AudioSource target)
 		{
 			if (requesting == null)
 				return;
 			if (target == null)
 				return;
 
-			bool allowed = (!forEveryone || GetPermission (PermissionName.MuteAudioSource, requesting));
-			if (!allowed)
+			if (!GetPermission (PermissionName.MuteAudioSource, requesting))
 			{
 				this.connections[requesting].Send (new PermissionDeniedMessage (ClientMessageType.RequestMute));
 				return;
@@ -304,8 +301,8 @@ namespace Gablarski.Server
 				this.sources.Add (new AudioSource (target.Name, target.Id, target.OwnerId, target.Channels, target.Bitrate, target.Frequency, target.FrameSize, target.Complexity, true));
 			}
 
-			this.connections.Send (new MutedMessage { Target = target.Id, Type = (forEveryone) ? MuteType.AudioSource | MuteType.ForEveryone : MuteType.AudioSource },
-				(UserInfo u) => forEveryone || u == requesting);
+			this.connections.Send (new MutedMessage { Target = target.Id, Type = MuteType.AudioSource },
+				(UserInfo u) => u == requesting);
 		}
 
 		private void ClientRequestsSourceList (MessageReceivedEventArgs e)
@@ -339,7 +336,7 @@ namespace Gablarski.Server
 					if (request.TargetBitrate != 0)
 						bitrate = request.TargetBitrate.Trim (settings.MinimumAudioBitrate, settings.MaximumAudioBitrate);
 
-					source = new AudioSource (request.Name, sourceId, user.UserId, 1, bitrate, 44100, 256);
+					source = new AudioSource (request.Name, sourceId, user.UserId, 1, bitrate, 44100, 256, 10, false);
 
 					lock (sourceLock)
 					{

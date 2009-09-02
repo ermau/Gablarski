@@ -113,6 +113,14 @@ namespace Gablarski.Client
 		}
 
 		/// <summary>
+		/// Gets the current channel the user is in.
+		/// </summary>
+		public ChannelInfo CurrentChannel
+		{
+			get { return this.Channels[this.CurrentUser.CurrentChannelId]; }
+		}
+
+		/// <summary>
 		/// Gets the <see cref="ServerInfo"/> for the currently connected server. <c>null</c> if not connected.
 		/// </summary>
 		public ServerInfo ServerInfo

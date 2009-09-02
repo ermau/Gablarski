@@ -9,10 +9,8 @@ namespace Gablarski.Messages
 	public enum MuteType
 		: byte
 	{
-		ForEveryone = 1,
-
-		User = 2,
-		AudioSource = 4,
+		User = 1,
+		AudioSource = 2,
 	}
 
 	public class RequestMuteMessage
@@ -33,16 +31,11 @@ namespace Gablarski.Messages
 			get; set;
 		}
 
-		public bool ForEveryone
-		{
-			get { return (Type & MuteType.ForEveryone) == MuteType.ForEveryone; }
-		}
-
 		public override void WritePayload (IValueWriter writer)
 		{
 			writer.WriteByte ((byte)this.Type);
 			
-			if ((this.Type & MuteType.User) == MuteType.User)
+			if (this.Type == MuteType.User)
 				writer.WriteString ((string)this.Target);
 			else
 				writer.WriteInt32 ((int)this.Target);
@@ -52,7 +45,7 @@ namespace Gablarski.Messages
 		{
 			this.Type = (MuteType)reader.ReadByte();
 
-			if ((this.Type & MuteType.User) == MuteType.User)
+			if (this.Type == MuteType.User)
 				this.Target = reader.ReadString();
 			else
 				this.Target = reader.ReadInt32();
