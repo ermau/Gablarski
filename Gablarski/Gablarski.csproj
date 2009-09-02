@@ -97,6 +97,7 @@
     <Compile Include="Audio\Speex\SpeexPreprocessor.cs" />
     <Compile Include="ByteArrayValueReader.cs" />
     <Compile Include="Audio\ThreadedAudioEngine.cs" />
+    <Compile Include="IIndexedEnumerable.cs" />
     <Compile Include="Messages\AudioSourceStateChangeMessage.cs" />
     <Compile Include="Messages\ClientAudioSourceStateChangeMessage.cs" />
     <Compile Include="Messages\PermissionDeniedMessage.cs" />

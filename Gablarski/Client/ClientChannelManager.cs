@@ -8,7 +8,7 @@ using Gablarski.Messages;
 namespace Gablarski.Client
 {
 	public class ClientChannelManager
-		: IEnumerable<ChannelInfo>, INotifyCollectionChanged
+		: IIndexedEnumerable<int, ChannelInfo>, INotifyCollectionChanged
 	{
 		protected internal ClientChannelManager (IClientContext context)
 		{

@@ -333,7 +333,7 @@ namespace Gablarski.Clients.Windows
 
 		private void ContextIgnoreUserClick (object sender, EventArgs e)
 		{
-			((ClientUser)this.SelectedNode.Tag).Ignore ();
+			((ClientUser)this.SelectedNode.Tag).ToggleIgnore ();
 		}
 
 		private ContextMenuStrip channelMenu;

@@ -243,17 +243,17 @@ namespace Gablarski.Client
 			get { return this.Connection; }
 		}
 
-		IEnumerable<ChannelInfo> IClientContext.Channels
+		IIndexedEnumerable<int, ChannelInfo> IClientContext.Channels
 		{
 			get { return this.Channels; }
 		}
 
-		IEnumerable<AudioSource> IClientContext.Sources
+		IIndexedEnumerable<int, AudioSource> IClientContext.Sources
 		{
 			get { return this.Sources; }
 		}
 
-		IEnumerable<ClientUser> IClientContext.Users
+		IIndexedEnumerable<int, ClientUser> IClientContext.Users
 		{
 			get { return this.Users; }
 		}

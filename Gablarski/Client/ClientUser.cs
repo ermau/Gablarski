@@ -35,6 +35,11 @@ namespace Gablarski.Client
 			this.client = client;
 		}
 
+		public bool IsIgnored
+		{
+			get; private set;
+		}
+
 		/// <summary>
 		/// Moves this user to <paramref name="targetChannel"/>.
 		/// </summary>
@@ -47,14 +52,14 @@ namespace Gablarski.Client
 			this.client.Send (new ChannelChangeMessage (this.UserId, targetChannel.ChannelId));
 		}
 
-		public void Ignore()
+		public void ToggleIgnore()
 		{
-			throw new NotImplementedException();
+			this.IsIgnored = !this.IsIgnored;
 		}
 
-		public void Mute ()
+		public void ToggleMute ()
 		{
-			this.client.Send (new RequestMuteMessage { Target = this.Username, Type = MuteType.User});
+			this.client.Send (new RequestMuteMessage { Target = this.Username, Type = MuteType.User, Unmute = !this.Muted });
 		}
 
 		private readonly IClientConnection client;

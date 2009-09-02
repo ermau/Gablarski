@@ -11,7 +11,7 @@ using Gablarski.Messages;
 namespace Gablarski.Client
 {
 	public class ClientSourceManager
-		: IAudioReceiver, IEnumerable<AudioSource>, INotifyCollectionChanged
+		: IAudioReceiver, IIndexedEnumerable<int, AudioSource>, INotifyCollectionChanged
 	{
 		protected internal ClientSourceManager (IClientContext context)
 		{
@@ -69,6 +69,20 @@ namespace Gablarski.Client
 		public IEnumerable<ClientAudioSource> Mine
 		{
 			get { return this.OfType<ClientAudioSource>(); }
+		}
+
+		public AudioSource this[int sourceID]
+		{
+			get
+			{
+				AudioSource source;
+				lock (this.sources)
+				{
+					this.sources.TryGetValue (sourceID, out source);
+				}
+
+				return source;
+			}
 		}
 
 		#region Implementation of IEnumerable
@@ -147,7 +161,7 @@ namespace Gablarski.Client
 		}
 
 		private readonly IClientContext context;
-		private Dictionary<int, AudioSource> sources = new Dictionary<int, AudioSource>();
+		private readonly Dictionary<int, AudioSource> sources = new Dictionary<int, AudioSource>();
 
 		// We'll end up with new instances from the outside world, we can update our
 		// own instances no problem.
@@ -261,23 +275,11 @@ namespace Gablarski.Client
 			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Remove, removed));
 		}
 
-		internal AudioSource GetSource (int sourceId)
-		{
-			AudioSource source = null;
-			lock (this.sources)
-			{
-				if (this.sources != null && this.sources.ContainsKey (sourceId))
-					source = this.sources[sourceId];
-			}
-
-			return source;
-		}
-
 		internal void OnAudioSourceStateChangedMessage (MessageReceivedEventArgs e)
 		{
 			var msg = (AudioSourceStateChangeMessage)e.Message;
 
-			var source = GetSource (msg.SourceId);
+			var source = this[msg.SourceId];
 
 			if (source != null)
 			{
@@ -292,9 +294,17 @@ namespace Gablarski.Client
 		{
 			var msg = (AudioDataReceivedMessage)e.Message;
 
-			var source = GetSource (msg.SourceId);
+			var source = this[msg.SourceId];
 			if (source != null)
-				OnReceivedAudio (new ReceivedAudioEventArgs (source, msg.Sequence, msg.Data));
+			{
+				var csource = (source as ClientAudioSource);
+				if (csource != null && csource.IsIgnored)
+					return;
+
+				var user = this.context.Users[msg.SourceId];
+				if (user != null && !user.IsIgnored)
+					OnReceivedAudio (new ReceivedAudioEventArgs (source, msg.Sequence, msg.Data));
+			}
 		}
 
 		#region Event Invokers

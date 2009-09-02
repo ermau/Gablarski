@@ -22,17 +22,17 @@ namespace Gablarski
 		/// <summary>
 		/// Gets the channels in this context
 		/// </summary>
-		IEnumerable<ChannelInfo> Channels { get; }
+		IIndexedEnumerable<int, ChannelInfo> Channels { get; }
 
 		/// <summary>
 		/// Gets the sources in this context.
 		/// </summary>
-		IEnumerable<AudioSource> Sources { get; }
+		IIndexedEnumerable<int, AudioSource> Sources { get; }
 
 		/// <summary>
 		/// Gets the user associated with this context
 		/// </summary>
-		IEnumerable<ClientUser> Users { get; }
+		IIndexedEnumerable<int, ClientUser> Users { get; }
 
 		/// <summary>
 		/// Gets the current logged in user.

@@ -30,19 +30,24 @@ namespace Gablarski.Client
 			this.client.Send (new ClientAudioSourceStateChangeMessage (true, this.Id, this.targetChannelId));
 		}
 
+		public bool IsIgnored
+		{
+			get; private set;
+		}
+
 		public void EndSending ()
 		{
 			this.client.Send (new ClientAudioSourceStateChangeMessage (false, this.Id, this.targetChannelId));
 		}
 
-		public void Ignore ()
+		public void ToggleIgnore ()
 		{
-			throw new NotImplementedException();
+			this.IsIgnored = !this.IsIgnored;
 		}
 
-		public void Mute ()
+		public void ToggleMute ()
 		{
-			this.client.Send (new RequestMuteMessage { Target = this.Id, Type = MuteType.AudioSource });
+			this.client.Send (new RequestMuteMessage { Target = this.Id, Type = MuteType.AudioSource, Unmute = !this.Muted });
 		}
 
 		public void SendAudioData (byte[] data)

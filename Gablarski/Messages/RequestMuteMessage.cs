@@ -21,6 +21,11 @@ namespace Gablarski.Messages
 		{
 		}
 
+		public bool Unmute
+		{
+			get; set;
+		}
+
 		public object Target
 		{
 			get; set;
@@ -34,6 +39,7 @@ namespace Gablarski.Messages
 		public override void WritePayload (IValueWriter writer)
 		{
 			writer.WriteByte ((byte)this.Type);
+			writer.WriteBool (this.Unmute);
 			
 			if (this.Type == MuteType.User)
 				writer.WriteString ((string)this.Target);
@@ -44,6 +50,7 @@ namespace Gablarski.Messages
 		public override void ReadPayload (IValueReader reader)
 		{
 			this.Type = (MuteType)reader.ReadByte();
+			this.Unmute = reader.ReadBool();
 
 			if (this.Type == MuteType.User)
 				this.Target = reader.ReadString();

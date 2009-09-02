@@ -9,7 +9,7 @@ using Gablarski.Messages;
 namespace Gablarski.Client
 {
 	public class ClientUserManager
-		: IEnumerable<ClientUser>, INotifyCollectionChanged
+		: IIndexedEnumerable<int, ClientUser>, INotifyCollectionChanged
 	{
 		protected internal ClientUserManager (IClientContext context)
 		{
@@ -134,12 +134,14 @@ namespace Gablarski.Client
 		{
 			var msg = (UserListMessage)e.Message;
 
+			IEnumerable<UserInfo> userlist;
 			lock (userLock)
 			{
 				this.users = msg.Users.ToDictionary (p => p.UserId, p => new ClientUser (p, this.context.Connection));
+				userlist = this.users.Values.Cast<UserInfo>().ToList();
 			}
 
-			OnReceivedUserList (new ReceivedListEventArgs<UserInfo> (msg.Users));
+			OnReceivedUserList (new ReceivedListEventArgs<UserInfo> (userlist));
 			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Reset));
 		}
 

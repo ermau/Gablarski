@@ -197,7 +197,7 @@ namespace Gablarski.Server
 			var msg = (RequestMuteMessage)e.Message;
 
 			if ((msg.Type & MuteType.User) == MuteType.User)
-				ClientRequestsPlayerMute (this.connections[e.Connection], this.connections.GetUser ((int)msg.Target));
+				ClientRequestsPlayerMute (this.connections[e.Connection], this.connections.GetUser ((int)msg.Target), msg.Unmute);
 			else if ((msg.Type & MuteType.AudioSource) == MuteType.AudioSource)
 			{
 				AudioSource source;
@@ -206,17 +206,17 @@ namespace Gablarski.Server
 					source = this.sources.FirstOrDefault (a => a.Id == (int)msg.Target);
 				}
 
-				ClientRequestsSourceMute (this.connections[e.Connection], source);
+				ClientRequestsSourceMute (this.connections[e.Connection], source, msg.Unmute);
 			}
 		}
 
 		#region Users
-		protected void ClientRequestsPlayerMute (UserInfo requesting, UserInfo target)
+		protected void ClientRequestsPlayerMute (UserInfo requesting, UserInfo target, bool unmute)
 		{
 			if (!GetPermission (PermissionName.MuteUser, requesting))
 				return;
 			
-			if (this.connections.UpdateIfExists (new UserInfo (target) { Muted = true }))
+			if (this.connections.UpdateIfExists (new UserInfo (target) { Muted = !unmute }))
 			{
 				this.connections.Send (new MutedMessage
 				{
@@ -282,7 +282,7 @@ namespace Gablarski.Server
 		#region Media
 
 		#region Sources
-		protected void ClientRequestsSourceMute (UserInfo requesting, AudioSource target)
+		protected void ClientRequestsSourceMute (UserInfo requesting, AudioSource target, bool unmute)
 		{
 			if (requesting == null)
 				return;
@@ -297,8 +297,7 @@ namespace Gablarski.Server
 
 			lock (this.sourceLock)
 			{
-				this.sources.Remove (target);
-				this.sources.Add (new AudioSource (target.Name, target.Id, target.OwnerId, target.Channels, target.Bitrate, target.Frequency, target.FrameSize, target.Complexity, true));
+				target.Muted = !unmute;
 			}
 
 			this.connections.Send (new MutedMessage { Target = target.Id, Type = MuteType.AudioSource },

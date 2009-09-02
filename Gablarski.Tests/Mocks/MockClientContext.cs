@@ -22,17 +22,17 @@ namespace Gablarski.Tests
 		/// <summary>
 		/// Gets the channels in this context
 		/// </summary>
-		public IEnumerable<ChannelInfo> Channels { get; set; }
+		public IIndexedEnumerable<int, ChannelInfo> Channels { get; set; }
 
 		/// <summary>
 		/// Gets teh source manager in this context
 		/// </summary>
-		public IEnumerable<AudioSource> Sources { get; set; }
+		public IIndexedEnumerable<int, AudioSource> Sources { get; set; }
 
 		/// <summary>
 		/// Gets the user associated with this context
 		/// </summary>
-		public IEnumerable<ClientUser> Users { get; set; }
+		public IIndexedEnumerable<int, ClientUser> Users { get; set; }
 
 		/// <summary>
 		/// Gets the current logged in user.
