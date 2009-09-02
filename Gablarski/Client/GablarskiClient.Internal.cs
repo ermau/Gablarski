@@ -61,7 +61,7 @@ namespace Gablarski.Client
 
 		private void OnPermissionDeniedMessage (MessageReceivedEventArgs obj)
 		{
-			
+			OnPermissionDenied (new PermissionDeniedEventArgs (((PermissionDeniedMessage)obj.Message).DeniedMessage));
 		}
 
 		private void MessageRunner ()
@@ -74,23 +74,27 @@ namespace Gablarski.Client
 					continue;
 				}
 
-				MessageReceivedEventArgs e;
-				lock (mqueue)
+				while (mqueue.Count > 0)
 				{
-					e = mqueue.Dequeue ();
+					MessageReceivedEventArgs e;
+					lock (mqueue)
+					{
+						e = mqueue.Dequeue();
+					}
+
+					var msg = (e.Message as ServerMessage);
+					if (msg == null)
+					{
+						Trace.WriteLine ("[Client] Non ServerMessage received (" + e.Message.MessageTypeCode + "), disconnecting.");
+						Connection.Disconnect();
+						return;
+					}
+
+					Trace.WriteLineIf ((VerboseTracing || msg.MessageType != ServerMessageType.AudioDataReceived),
+										"[Client] Message Received: " + msg.MessageType);
+
+					this.handlers[msg.MessageType] (e);
 				}
-
-				var msg = (e.Message as ServerMessage);
-				if (msg == null)
-				{
-					Trace.WriteLine ("[Client] Non ServerMessage received (" + e.Message.MessageTypeCode + "), disconnecting.");
-					Connection.Disconnect ();
-					return;
-				}
-
-				Trace.WriteLineIf ((VerboseTracing || msg.MessageType != ServerMessageType.AudioDataReceived), "[Client] Message Received: " + msg.MessageType);
-
-				this.handlers[msg.MessageType] (e);
 			}
 		}
 

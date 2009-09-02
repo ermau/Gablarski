@@ -51,24 +51,28 @@ namespace Gablarski.Server
 					continue;
 				}
 
-				MessageReceivedEventArgs e;
-				lock (mqueue)
+				while (mqueue.Count > 0)
 				{
-					e = mqueue.Dequeue ();
+					MessageReceivedEventArgs e;
+					lock (mqueue)
+					{
+						e = mqueue.Dequeue();
+					}
+
+					var msg = (e.Message as ClientMessage);
+					if (msg == null)
+					{
+						Disconnect (e.Connection);
+						return;
+					}
+
+					Trace.WriteLineIf ((VerboseTracing || msg.MessageType != ClientMessageType.AudioData),
+										"[Server] Message Received: " + msg.MessageType);
+
+					Action<MessageReceivedEventArgs> handler;
+					if (Handlers.TryGetValue (msg.MessageType, out handler))
+						handler (new MessageReceivedEventArgs (e.Connection, msg));
 				}
-
-				var msg = (e.Message as ClientMessage);
-				if (msg == null)
-				{
-					Disconnect (e.Connection);
-					return;
-				}
-
-				Trace.WriteLineIf ((VerboseTracing || msg.MessageType != ClientMessageType.AudioData), "[Server] Message Received: " + msg.MessageType);
-
-				Action<MessageReceivedEventArgs> handler;
-				if (Handlers.TryGetValue (msg.MessageType, out handler))
-					handler (new MessageReceivedEventArgs (e.Connection, msg));
 			}
 		}
 
@@ -365,14 +369,14 @@ namespace Gablarski.Server
 		{
 			var msg = (ClientAudioSourceStateChangeMessage)e.Message;
 
-			this.connections.Send (new AudioSourceStateChangeMessage (msg.Starting, msg.SourceId, msg.ChannelId), (c, p) => c != e.Connection && p.CurrentChannelId.Equals (msg.ChannelId));
+			this.connections.Send (new AudioSourceStateChangeMessage (msg.Starting, msg.SourceId, msg.ChannelId), (con, user) => con != e.Connection && user.CurrentChannelId.Equals (msg.ChannelId));
 		}
 
 		protected void AudioDataReceived (MessageReceivedEventArgs e)
 		{
 			var msg = (SendAudioDataMessage)e.Message;
 
-			this.connections.Send (new AudioDataReceivedMessage (msg.SourceId, msg.Sequence, msg.Data), (c, p) => c != e.Connection && p.CurrentChannelId.Equals (msg.TargetChannelId));
+			this.connections.Send (new AudioDataReceivedMessage (msg.SourceId, msg.Sequence, msg.Data), (con, user) => con != e.Connection && !user.Muted && user.CurrentChannelId.Equals (msg.TargetChannelId));
 		}
 		#endregion
 	}

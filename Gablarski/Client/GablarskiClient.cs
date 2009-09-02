@@ -199,7 +199,6 @@ namespace Gablarski.Client
 		#endregion
 
 		#region Event Invokers
-		// ReSharper disable UnusedParameter.Global
 		protected virtual void OnConnected (object sender, EventArgs e)
 		{
 			var connected = this.Connected;
@@ -213,13 +212,19 @@ namespace Gablarski.Client
 			if (disconnected != null)
 				disconnected (this, e);
 		}
-		// ReSharper restore UnusedParameter.Global
 
 		protected virtual void OnConnectionRejected (RejectedConnectionEventArgs e)
 		{
 			var rejected = this.ConnectionRejected;
 			if (rejected != null)
 				rejected (this, e);
+		}
+
+		protected virtual void OnPermissionDenied (PermissionDeniedEventArgs e)
+		{
+			var denied = this.PermissionDenied;
+			if (denied != null)
+				denied (this, e);
 		}
 		#endregion
 
