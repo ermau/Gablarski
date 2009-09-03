@@ -35,7 +35,7 @@ namespace Gablarski
 			this.Username = (username.IsEmpty()) ? nickname : username;
 			this.UserId = userId;
 			this.CurrentChannelId = currentChannelId;
-			this.Muted = muted;
+			this.IsMuted = muted;
 		}
 
 		internal UserInfo (IValueReader reader)
@@ -70,7 +70,7 @@ namespace Gablarski
 			set;
 		}
 
-		public bool Muted
+		public bool IsMuted
 		{
 			get; set;
 		}
@@ -81,7 +81,7 @@ namespace Gablarski
 			writer.WriteString (this.Username);
 			writer.WriteInt32 (this.CurrentChannelId);
 			writer.WriteString (this.Nickname);
-			writer.WriteBool (this.Muted);
+			writer.WriteBool (this.IsMuted);
 		}
 
 		internal void Deserialize (IValueReader reader)
@@ -90,7 +90,7 @@ namespace Gablarski
 			this.Username = reader.ReadString();
 			this.CurrentChannelId = reader.ReadInt32();
 			this.Nickname = reader.ReadString();
-			this.Muted = reader.ReadBool();
+			this.IsMuted = reader.ReadBool();
 		}
 
 		public override bool Equals (object obj)

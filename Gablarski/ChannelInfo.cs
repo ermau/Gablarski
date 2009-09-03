@@ -19,23 +19,19 @@ namespace Gablarski
 		}
 
 		public ChannelInfo (int channelId)
-			: this (channelId, false)
-		{
-			this.ChannelId = channelId;
-		}
-
-		public ChannelInfo (int channelId, bool readOnly)
 		{
 			this.ChannelId = channelId;
 		}
 
 		public ChannelInfo (int channelId, ChannelInfo channel)
-			: this (channelId, channel.ReadOnly)
+			: this (channelId)
 		{
 			this.ParentChannelId = channel.ParentChannelId;
 			this.Name = channel.Name;
 			this.Description = channel.Description;
 			this.PlayerLimit = channel.PlayerLimit;
+
+			this.ReadOnly = channel.ReadOnly;
 		}
 
 		/// <summary>
@@ -111,7 +107,7 @@ namespace Gablarski
 		public virtual bool ReadOnly
 		{
 			get;
-			protected set;
+			set;
 		}
 
 		internal void Serialize (IValueWriter writer)

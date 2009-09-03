@@ -36,7 +36,7 @@ namespace Gablarski.Tests
 			Assert.AreEqual (ChanId, info.CurrentChannelId);
 			Assert.AreEqual (Nickname, info.Nickname);
 			Assert.AreEqual (Nickname, info.Username);
-			Assert.AreEqual (Muted, info.Muted);
+			Assert.AreEqual (Muted, info.IsMuted);
 
 			info = new UserInfo (Nickname, Username, UserId, ChanId, Muted);
 
@@ -44,7 +44,7 @@ namespace Gablarski.Tests
 			Assert.AreEqual (ChanId, info.CurrentChannelId);
 			Assert.AreEqual (Nickname, info.Nickname);
 			Assert.AreEqual (Username, info.Username);
-			Assert.AreEqual (Muted, info.Muted);
+			Assert.AreEqual (Muted, info.IsMuted);
 		}
 
 		[Test]
@@ -64,7 +64,7 @@ namespace Gablarski.Tests
 			Assert.AreEqual (UserId, info.UserId);
 			Assert.AreEqual (ChanId, info.CurrentChannelId);
 			Assert.AreEqual (Nickname, info.Nickname);
-			Assert.AreEqual (Muted, info.Muted);
+			Assert.AreEqual (Muted, info.IsMuted);
 		}
 
 		[Test]
