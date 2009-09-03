@@ -276,19 +276,20 @@ namespace Gablarski.Audio
 						DateTime n = DateTime.Now;
 						if (n.Subtract (e.Last) >= e.FrameTimeSpan)
 						{
-							var packet = j.Pull (s.FrameSize);
+						    var packet = j.Pull (s.FrameSize);
 
-							e.Playback.QueuePlayback (s, (packet.Encoded) ? s.Decode (packet.Data) : packet.Data);
-							e.Last = n;
+						    e.Playback.QueuePlayback (s, (packet.Encoded) ? s.Decode (packet.Data) : packet.Data);
+						    e.Last = n;
+						    j.Tick();
 						}
 
-						while (e.Buffer.AvailableCount > 0)
+						if (e.Buffer.AvailableCount > 0)
 						{
 							var packet = j.Pull (s.FrameSize);
-							e.Playback.QueuePlayback (s, packet.Data);
-						}
 
-						j.Tick();
+						    e.Playback.QueuePlayback (s, (packet.Encoded) ? s.Decode (packet.Data) : packet.Data);
+							e.Last = e.Last.Add (e.FrameTimeSpan);
+						}
 					}
 				}
 				playbackLock.ExitReadLock();
