@@ -49,7 +49,7 @@ namespace Gablarski.Server
 		/// Deletes the <paramref name="channel"/>.
 		/// </summary>
 		/// <param name="channel">The channel to delete.</param>
-		void DeleteChannel (ChannelInfo channel);
+		ChannelEditResult DeleteChannel (ChannelInfo channel);
 	}
 
 	public static class ChannelProviderExtensions

@@ -13,7 +13,8 @@ namespace Gablarski.Server
 			this.lobby = new ChannelInfo (1)
 			{
 				Name = "Lobby",
-				Description = String.Empty
+				Description = String.Empty,
+				ReadOnly = true
 			};
 		}
 
@@ -56,16 +57,21 @@ namespace Gablarski.Server
 				}
 				else if (channels.ContainsKey (channel.ChannelId))
 					channels[channel.ChannelId] = channel;
+				else
+					return ChannelEditResult.FailedChannelDoesntExist;
 			}
 
 			return ChannelEditResult.Success;
 		}
 
-		public void DeleteChannel (ChannelInfo channel)
+		public ChannelEditResult DeleteChannel (ChannelInfo channel)
 		{
 			lock (this.channels)
 			{
-				this.channels.Remove (channel.ChannelId);
+				if (this.channels.Remove (channel.ChannelId))
+					return ChannelEditResult.Success;
+				else
+                    return ChannelEditResult.FailedChannelDoesntExist;
 			}
 		}
 
