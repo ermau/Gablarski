@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -223,7 +224,9 @@ namespace Gablarski.Audio
 		{
 			playbackLock.EnterReadLock();
 			{
-				playbacks[e.Source].Playing = false;
+				AudioPlaybackEntity playbackEntity;
+				if (playbacks.TryGetValue (e.Source, out playbackEntity))
+					playbackEntity.Playing = false;
 			}
 			playbackLock.ExitReadLock();
 		}
@@ -232,7 +235,11 @@ namespace Gablarski.Audio
 		{
 			playbackLock.EnterReadLock();
 			{
-				playbacks[e.Source].Playing = true;
+				AudioPlaybackEntity playbackEntity;
+				if (playbacks.TryGetValue (e.Source, out playbackEntity))
+					playbackEntity.Playing = true;
+				else
+					Trace.WriteLine ("[Audio] Attempting to playback an unknown source");
 			}
 			playbackLock.ExitReadLock();
 		}
@@ -241,14 +248,11 @@ namespace Gablarski.Audio
 		{
 			var packet = new SpeexJitterBufferPacket (e.AudioData, (uint)e.Sequence, e.Source);
 
-			byte[] decoded = e.Source.Decode (e.AudioData);
-
 			playbackLock.EnterReadLock();
 			{
-				var p = playbacks[e.Source];
-				if (p.Playing)
+				AudioPlaybackEntity p;
+				if (playbacks.TryGetValue (e.Source, out p) && p.Playing)
 					p.Buffer.Push (packet);
-				//p.Playback.QueuePlayback (e.Source, decoded);
 			}
 			playbackLock.ExitReadLock();
 		}
