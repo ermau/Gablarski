@@ -30,6 +30,7 @@ namespace Gablarski.Clients.Windows
 			this.gablarski.Users.UserChangedChannel += UsersUserChangedChannel;
 			this.gablarski.CurrentUser.ReceivedLoginResult += this.CurrentUserReceivedLoginResult;
 
+			this.gablarski.Sources.ReceivedSourceList += SourcesOnReceivedSourceList;
 			this.gablarski.Sources.ReceivedAudioSource += this.SourcesReceivedSource;
 			this.gablarski.Sources.ReceivedAudio += SourcesReceivedAudio;
 
@@ -38,6 +39,14 @@ namespace Gablarski.Clients.Windows
 			this.InitializeComponent ();
 
 			this.users.Client = this.gablarski;
+		}
+
+		private void SourcesOnReceivedSourceList(object sender, ReceivedListEventArgs<AudioSource> args)
+		{
+			foreach (var s in args.Data.Where (s => s.OwnerId != this.gablarski.CurrentUser.UserId))
+			{
+				gablarski.Audio.Attach (playback, s, new AudioEnginePlaybackOptions());
+			}
 		}
 
 		public bool ShowConnect (bool cancelExits)
@@ -172,15 +181,16 @@ namespace Gablarski.Clients.Windows
 		private void SourcesReceivedAudio (object sender, ReceivedAudioEventArgs e)
 		{
 			this.users.MarkTalking (this.gablarski.Users[e.Source.OwnerId]);
-			this.playback.QueuePlayback (e.Source, e.AudioData);
 		}
 
 		void SourcesReceivedSource (object sender, ReceivedAudioSourceEventArgs e)
 		{
 			if (e.Result == SourceResult.Succeeded)
 			{
-				if (e.Source.OwnerId.Equals (this.gablarski.CurrentUser.UserId) && e.Source.Name == VoiceName)
+				if (e.Source.OwnerId == this.gablarski.CurrentUser.UserId && e.Source.Name == VoiceName)
 					voiceSource = (ClientAudioSource)e.Source;
+				else
+					this.gablarski.Audio.Attach (playback, e.Source, new AudioEnginePlaybackOptions());
 			}
 			else if (e.Result != SourceResult.NewSource && e.Result != SourceResult.SourceRemoved)
 				MessageBox.Show (this, e.Result.ToString());

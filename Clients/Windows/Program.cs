@@ -19,9 +19,10 @@ namespace Gablarski.Clients.Windows
 			AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
 			{
 				KHook.UninstallHook();
-				/*MHook.UninstallHook();*/
-				/*TaskDialog.Show ((e.ExceptionObject as Exception).ToDisplayString(), "Unexpected Error", "Unexpected Error",
-				                 TaskDialogStandardIcon.Error);*/
+				//MHook.UninstallHook();
+				//TaskDialog.Show ((e.ExceptionObject as Exception).ToDisplayString(), "Unexpected Error", "Unexpected Error",
+				//                 TaskDialogStandardIcon.Error);
+
 				MessageBox.Show ("Unexpected error" + Environment.NewLine + (e.ExceptionObject as Exception).ToDisplayString(),
 				                 "Unexpected error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			};

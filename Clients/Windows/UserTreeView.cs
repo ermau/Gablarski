@@ -30,13 +30,28 @@ namespace Gablarski.Clients.Windows
 			this.ImageList.Images.Add ("talking",	Resources.SoundImage);
 			this.ImageList.Images.Add ("music",		Resources.MusicImage);
 			this.ImageList.Images.Add ("muted",		Resources.SoundMuteImage);
-
-			InitMenus();
 		}
 
 		public GablarskiClient Client
 		{
-			get; set;
+			get { return this.client; }
+			set
+			{
+				if (this.client != null)
+				{
+					this.client.CurrentUser.PermissionsChanged -= OnPermissionsChanged;
+					this.client.Users.UserMuted -= OnUserMuted;
+				}
+
+				this.client = value;
+				this.client.CurrentUser.PermissionsChanged += OnPermissionsChanged;
+				this.client.Users.UserMuted += OnUserMuted;
+			}
+		}
+
+		private void OnUserMuted (object sender, UserEventArgs e)
+		{
+			
 		}
 
 		public void SetServerNode (TreeNode node)
@@ -83,7 +98,9 @@ namespace Gablarski.Clients.Windows
 			node.Tag = channel;
 			node.ImageKey = "channel";
 			node.SelectedImageKey = "channel";
-			node.ContextMenuStrip = channelMenu;
+
+			SetupChannelContext (node);
+
 			this.channelNodes.Add (channel, node);
 		}
 
@@ -104,13 +121,15 @@ namespace Gablarski.Clients.Windows
 			if (channelPair.Equals (default(KeyValuePair<ChannelInfo,TreeNode>)))
 				return;
 
-			string imageKey = (!user.Muted) ? "silent" : "muted";
+			string imageKey = (!user.IsMuted) ? "silent" : "muted";
 
 			var node = channelPair.Value.Nodes.Add (user.Nickname);
 			node.Tag = user;
 			node.ImageKey = imageKey;
 			node.SelectedImageKey = imageKey;
-			node.ContextMenuStrip = userMenu;
+
+			SetupUserContext (node);
+
 			this.userNodes[user] = node;
 
 			node.Parent.Expand();
@@ -173,8 +192,7 @@ namespace Gablarski.Clients.Windows
 			if (!userNodes.ContainsKey (user))
 				return;
 
-			userNodes[user].ImageKey = "music";
-			userNodes[user].SelectedImageKey = "music";
+			userNodes[user].ImageKey = userNodes[user].SelectedImageKey = "music";
 		}
 
 		public void MarkMuted (UserInfo user)
@@ -207,11 +225,10 @@ namespace Gablarski.Clients.Windows
 				return;
 			}
 
-			if (!userNodes.ContainsKey (user) || userNodes[user].ImageKey == "silent")
+			if (!userNodes.ContainsKey (user) || userNodes[user].ImageKey == "silent" || userNodes[user].ImageKey == "muted")
 				return;
 
-			userNodes[user].ImageKey = "silent";
-			userNodes[user].SelectedImageKey = "silent";
+			userNodes[user].ImageKey = userNodes[user].SelectedImageKey = "silent";
 		}
 
 		public void Update (IEnumerable<ChannelInfo> channels, IEnumerable<UserInfo> users)
@@ -240,6 +257,8 @@ namespace Gablarski.Clients.Windows
 
 			foreach (var user in users)
 				this.AddUser (user);
+
+			UpdateContextMenus (false);
 
 			this.EndUpdate();
 		}
@@ -333,43 +352,94 @@ namespace Gablarski.Clients.Windows
 
 		private void ContextIgnoreUserClick (object sender, EventArgs e)
 		{
-			((ClientUser)this.SelectedNode.Tag).ToggleIgnore ();
+			var u = (ClientUser)this.SelectedNode.Tag;
+			if (u.ToggleIgnore ())
+				MarkMuted (u);
+			else if (!u.IsMuted)
+				MarkSilent (u);
 		}
 
-		private ContextMenuStrip channelMenu;
-		private ContextMenuStrip userMenu;
-		
-		private readonly ToolStripMenuItem contextAddChannel = new ToolStripMenuItem ("Add Channel", Resources.ChannelAddImage);
-		private readonly ToolStripMenuItem contextEditChannel = new ToolStripMenuItem ("Edit Channel", Resources.ChannelEditImage);
-		private readonly ToolStripMenuItem contextDeleteChannel = new ToolStripMenuItem ("Delete Channel", Resources.ChannelDeleteImage);
-
-		private readonly ToolStripMenuItem contextIgnoreUser = new ToolStripMenuItem ("Ignore User", Resources.SoundMuteImage);
-		private readonly ToolStripMenuItem contextMuteUser = new ToolStripMenuItem ("Mute User", Resources.SoundMuteImage);
-
-		private void InitMenus()
+		private void ContextMuteUserClick (object sender, EventArgs e)
 		{
-			if (channelMenu != null)
-				return;
-
-			this.ContextMenuStrip = new ContextMenuStrip();
-			this.ContextMenuStrip.Items.Add (contextAddChannel);
-
-			contextAddChannel.Click += ContextAddChannelClick;
-			contextEditChannel.Click += ContextEditChannelClick;
-			contextDeleteChannel.Click += ContextDeleteChannelClick;
-
-			channelMenu = new ContextMenuStrip();
-
-			channelMenu.Items.Add (contextAddChannel);
-			channelMenu.Items.Add (contextEditChannel);
-			channelMenu.Items.Add (contextDeleteChannel);
-
-
-			contextIgnoreUser.Click += ContextIgnoreUserClick;
-			
-			userMenu = new ContextMenuStrip();
-
-			userMenu.Items.Add (contextIgnoreUser);
+			((ClientUser)this.SelectedNode.Tag).ToggleMute();
 		}
+
+		private GablarskiClient client;
+		private void OnPermissionsChanged (object sender, EventArgs e)
+		{
+			UpdateContextMenus (true);
+		}
+
+		private void SetupUserContext (TreeNode un)
+		{
+			un.ContextMenuStrip = new ContextMenuStrip();
+			
+			var ignore = new ToolStripMenuItem ("Ignore user", Resources.SoundMuteImage);
+			ignore.ToolTipText = "Ignores the user";
+			ignore.Click += ContextIgnoreUserClick;
+			
+			un.ContextMenuStrip.Items.Add (ignore);
+
+			if (this.Client.CurrentUser.Permissions.CheckPermission (PermissionName.MuteUser))
+			{
+				var mute = new ToolStripMenuItem ("Mute user", Resources.SoundMuteImage);
+				mute.ToolTipText = "Mutes the user for everyone";
+				mute.Click += ContextMuteUserClick;
+
+				un.ContextMenuStrip.Items.Add (mute);
+			}
+		}
+		
+		private void SetupChannelContext (TreeNode cn)
+		{
+			var channel = (ChannelInfo)cn.Tag;
+			cn.ContextMenuStrip = new ContextMenuStrip();
+
+			if (this.client.CurrentUser.Permissions.CheckPermission (PermissionName.AddChannel))
+			{
+				var add = new ToolStripMenuItem ("Add Channel", Resources.ChannelAddImage);
+				add.Click += ContextAddChannelClick;
+
+				cn.ContextMenuStrip.Items.Add (add);
+			}
+
+			if (!channel.ReadOnly && this.Client.CurrentUser.Permissions.CheckPermission (PermissionName.EditChannel))
+			{
+				var edit = new ToolStripMenuItem ("Edit Channel", Resources.ChannelEditImage);
+				edit.Click += ContextEditChannelClick;
+
+				cn.ContextMenuStrip.Items.Add (edit);
+			}
+
+			if (!channel.ReadOnly && this.Client.CurrentUser.Permissions.CheckPermission (PermissionName.DeleteChannel))
+			{
+				var delete = new ToolStripMenuItem ("Delete Channel", Resources.ChannelDeleteImage);
+				delete.Click += ContextDeleteChannelClick;
+
+				cn.ContextMenuStrip.Items.Add (delete);
+			}
+		}
+
+		private void UpdateContextMenus(bool full)
+		{
+			this.ContextMenuStrip = new ContextMenuStrip();
+			
+			if (this.client.CurrentUser.Permissions.CheckPermission (PermissionName.AddChannel))
+			{
+				var add = new ToolStripMenuItem ("Add Channel", Resources.ChannelAddImage);
+				add.Click += ContextAddChannelClick;
+
+				this.ContextMenuStrip.Items.Add (add);
+			}
+
+			if (full)
+			{
+				foreach (var cn in this.channelNodes.Values)
+					SetupChannelContext (cn);
+
+				foreach (var un in this.userNodes.Values)
+					SetupUserContext (un);
+			}
+		}		
 	}
 }

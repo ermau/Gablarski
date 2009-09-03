@@ -18,7 +18,7 @@ namespace Gablarski.Client
 		}
 
 		public ClientUser (UserInfo user, IClientConnection client)
-			: base (user.Nickname, user.Username, user.UserId, user.CurrentChannelId, user.Muted)
+			: base (user.Nickname, user.Username, user.UserId, user.CurrentChannelId, user.IsMuted)
 		{
 			if (client == null)
 				throw new ArgumentNullException ("client");
@@ -52,14 +52,18 @@ namespace Gablarski.Client
 			this.client.Send (new ChannelChangeMessage (this.UserId, targetChannel.ChannelId));
 		}
 
-		public void ToggleIgnore()
+		/// <summary>
+		/// Toggles this user's ignored status.
+		/// </summary>
+		/// <returns><c>true</c> if the user is now ignored, <c>false</c> otherwise.</returns>
+		public bool ToggleIgnore()
 		{
-			this.IsIgnored = !this.IsIgnored;
+			return this.IsIgnored = !this.IsIgnored;
 		}
 
 		public void ToggleMute ()
 		{
-			this.client.Send (new RequestMuteMessage { Target = this.Username, Type = MuteType.User, Unmute = !this.Muted });
+			this.client.Send (new RequestMuteMessage { Target = this.Username, Type = MuteType.User, Unmute = !this.IsMuted });
 		}
 
 		private readonly IClientConnection client;

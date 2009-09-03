@@ -83,6 +83,11 @@ namespace Gablarski
 
 	public class Permission
 	{
+		internal Permission (IValueReader reader)
+		{
+			Deserialize (reader);
+		}
+
 		public Permission (PermissionName name)
 		{
 			this.Name = name;
@@ -110,14 +115,25 @@ namespace Gablarski
 		{
 			return Enum.GetValues (typeof (PermissionName)).Cast<PermissionName> ();
 		}
+
+		internal void Serialize (IValueWriter writer)
+		{
+			writer.WriteInt32 ((int)this.Name);
+			writer.WriteBool (this.IsAllowed);
+		}
+
+		internal void Deserialize (IValueReader reader)
+		{
+			this.Name = (PermissionName)reader.ReadInt32();
+			this.IsAllowed = reader.ReadBool();
+		}
 	}
 
 	public static class PermissionExtensions
 	{
-		public static bool GetPermission (this IEnumerable<Permission> self, PermissionName name)
+		public static bool CheckPermission (this IEnumerable<Permission> self, PermissionName name)
 		{
-			var perm = self.Where (p => p.Name == name).FirstOrDefault ();
-			return (perm != null && perm.IsAllowed);
+			return self.Any (p => p.Name == name && p.IsAllowed);
 		}
 	}
 }

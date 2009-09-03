@@ -44,6 +44,7 @@ namespace Gablarski.Server
 
 			this.backendProvider = provider;
 			this.backendProvider.ChannelsUpdatedExternally += OnChannelsUpdatedExternally;
+			this.backendProvider.PermissionsChanged += OnPermissionsChanged;
 			this.UpdateChannels (false);
 		}
 
@@ -264,6 +265,11 @@ namespace Gablarski.Server
 			}
 		}
 
+		private void OnPermissionsChanged (object sender, PermissionsChangedEventArgs e)
+		{
+			this.connections.GetConnection (e.UserId).Send (new PermissionsMessage (e.UserId, permissionProvider.GetPermissions (e.UserId)));
+		}
+
 		private void OnChannelsUpdatedExternally (object sender, EventArgs e)
 		{
 			lock (channelLock)
@@ -287,9 +293,9 @@ namespace Gablarski.Server
 		protected bool GetPermission (PermissionName name, int channelId, int playerId)
 		{
 			if (this.BackendProvider != null)
-				return this.BackendProvider.GetPermissions (channelId, playerId).GetPermission (name);
+				return this.BackendProvider.GetPermissions (channelId, playerId).CheckPermission (name);
 			else
-				return this.PermissionProvider.GetPermissions (playerId).GetPermission (name);
+				return this.PermissionProvider.GetPermissions (playerId).CheckPermission (name);
 		}
 
 		protected bool GetPermission (PermissionName name, int channelId, IConnection connection)

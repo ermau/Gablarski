@@ -181,7 +181,7 @@ namespace Gablarski.Server
 					if (!msg.Delete)
 						result = this.channelProvider.SaveChannel (msg.Channel);
 					else
-						this.channelProvider.DeleteChannel (msg.Channel);
+						result = this.channelProvider.DeleteChannel (msg.Channel);
 
 					if (result == ChannelEditResult.Success)
 						this.UpdateChannels (true);
@@ -216,7 +216,7 @@ namespace Gablarski.Server
 			if (!GetPermission (PermissionName.MuteUser, requesting))
 				return;
 			
-			if (this.connections.UpdateIfExists (new UserInfo (target) { Muted = !unmute }))
+			if (this.connections.UpdateIfExists (new UserInfo (target) { IsMuted = !unmute }))
 			{
 				this.connections.Send (new MutedMessage
 				{
@@ -256,6 +256,7 @@ namespace Gablarski.Server
 			if (result.Succeeded)
 			{
 				e.Connection.Send (msg);
+				e.Connection.Send (new PermissionsMessage (info.UserId, this.PermissionProvider.GetPermissions (msg.UserInfo.UserId)));
 
 				this.connections.Send (new UserLoggedInMessage (info));
 
@@ -372,7 +373,7 @@ namespace Gablarski.Server
 		{
 			var msg = (SendAudioDataMessage)e.Message;
 
-			this.connections.Send (new AudioDataReceivedMessage (msg.SourceId, msg.Sequence, msg.Data), (con, user) => con != e.Connection && !user.Muted && user.CurrentChannelId.Equals (msg.TargetChannelId));
+			this.connections.Send (new AudioDataReceivedMessage (msg.SourceId, msg.Sequence, msg.Data), (con, user) => con != e.Connection && !user.IsMuted && user.CurrentChannelId.Equals (msg.TargetChannelId));
 		}
 		#endregion
 	}

@@ -8,12 +8,14 @@ namespace Gablarski.Server
 	public class GuestPermissionProvider
 		: IPermissionsProvider
 	{
-		public IEnumerable<Permission> GetPermissions (int playerId)
+		public event EventHandler<PermissionsChangedEventArgs> PermissionsChanged;
+
+		public IEnumerable<Permission> GetPermissions (int userID)
 		{
-			if (this.admins.Contains (playerId))
+			if (this.admins.Contains (userID))
 				return GetNamesAsPermissions (Permission.GetAllNames());
 
-			if (playerId != 0) // User
+			if (userID != 0) // User
 			{
 				return GetNamesAsPermissions (PermissionName.Login, PermissionName.ChangeChannel, PermissionName.AddChannel,
 				                              PermissionName.EditChannel, PermissionName.DeleteChannel,
@@ -23,13 +25,15 @@ namespace Gablarski.Server
 				return GetNamesAsPermissions (PermissionName.Login, PermissionName.RequestChannelList);
 		}
 
-		public void SetAdmin (int playerId)
+		public void SetAdmin (int userId)
 		{
-			if (playerId == 0)
+			if (userId == 0)
 				throw new ArgumentException ("Guests can not be admins.");
 
-			if (!this.admins.Contains (playerId))
-				this.admins.Add (playerId);
+			if (!this.admins.Contains (userId))
+				this.admins.Add (userId);
+
+			OnPermissionsChanged (new PermissionsChangedEventArgs (userId));
 		}
 
 		private readonly HashSet<int> admins = new HashSet<int> ();
@@ -43,6 +47,13 @@ namespace Gablarski.Server
 		{
 			for (int i = 0; i < names.Length; ++i)
 				yield return new Permission (names[i], true);
+		}
+
+		protected void OnPermissionsChanged (PermissionsChangedEventArgs e)
+		{
+			var changed = this.PermissionsChanged;
+			if (changed != null)
+				changed (this, e);
 		}
 	}
 }

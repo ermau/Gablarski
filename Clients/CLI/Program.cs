@@ -352,7 +352,7 @@ namespace Gablarski.Clients.CLI
 		
 		static void SourcesReceivedSource (object sender, ReceivedAudioSourceEventArgs e)
 		{
-			if (!e.Source.OwnerId.Equals (Client.CurrentUser.UserId))
+			if (e.Source.OwnerId != Client.CurrentUser.UserId)
 			{
 				Client.Audio.Attach (playbackProvider, e.Source, new AudioEnginePlaybackOptions());
 				return;

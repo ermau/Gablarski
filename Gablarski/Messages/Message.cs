@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Gablarski.Messages
 {
-	// Next: 33
+	// Next: 34
 
 	public enum ClientMessageType
 		: ushort
@@ -46,6 +46,7 @@ namespace Gablarski.Messages
 		SourcesRemoved = 25,
 	
 		UserLoggedIn = 24,
+		Permissions = 33,
 		UserListReceived = 14,
 		UserDisconnected = 17,
 		UserChangedChannel = 27,

@@ -7,6 +7,22 @@ namespace Gablarski.Server
 {
 	public interface IPermissionsProvider
 	{
-		IEnumerable<Permission> GetPermissions (int playerId);
+		event EventHandler<PermissionsChangedEventArgs> PermissionsChanged;
+
+		IEnumerable<Permission> GetPermissions (int userId);
+	}
+
+	public class PermissionsChangedEventArgs
+		: EventArgs
+	{
+		public PermissionsChangedEventArgs (int userId)
+		{
+			this.UserId = userId;
+		}
+
+		public int UserId
+		{
+			get; private set;
+		}
 	}
 }

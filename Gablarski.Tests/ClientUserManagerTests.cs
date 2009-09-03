@@ -50,9 +50,9 @@ namespace Gablarski.Tests
 
 		private static void VerifyDefaultUsers (IEnumerable<ClientUser> manager)
 		{
-			Assert.AreEqual (1, manager.Count (u => u.UserId == 1 && u.Nickname == "Foo" && !u.Muted && u.CurrentChannelId == 1));
-			Assert.AreEqual (1, manager.Count (u => u.UserId == 2 && u.Nickname == "Bar" && !u.Muted && u.CurrentChannelId == 1));
-			Assert.AreEqual (1, manager.Count (u => u.UserId == 3 && u.Nickname == "Wee" && u.Muted && u.CurrentChannelId == 2));
+			Assert.AreEqual (1, manager.Count (u => u.UserId == 1 && u.Nickname == "Foo" && !u.IsMuted && u.CurrentChannelId == 1));
+			Assert.AreEqual (1, manager.Count (u => u.UserId == 2 && u.Nickname == "Bar" && !u.IsMuted && u.CurrentChannelId == 1));
+			Assert.AreEqual (1, manager.Count (u => u.UserId == 3 && u.Nickname == "Wee" && u.IsMuted && u.CurrentChannelId == 2));
 		}
 
 		private MockServerConnection server;

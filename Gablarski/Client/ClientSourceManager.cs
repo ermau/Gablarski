@@ -50,7 +50,7 @@ namespace Gablarski.Client
 		/// <summary>
 		/// An audio source has been muted.
 		/// </summary>
-		public event EventHandler<AudioSourceEventArgs> AudioSourceMuted;
+		public event EventHandler<AudioSourceMutedEventArgs> AudioSourceMuted;
 
 		/// <summary>
 		/// Audio has been received.
@@ -295,16 +295,25 @@ namespace Gablarski.Client
 			var msg = (AudioDataReceivedMessage)e.Message;
 
 			var source = this[msg.SourceId];
-			if (source != null)
-			{
-				var csource = (source as ClientAudioSource);
-				if (csource != null && csource.IsIgnored)
-					return;
+			if (source == null)
+				return;
 
-				var user = this.context.Users[msg.SourceId];
-				if (user != null && !user.IsIgnored)
-					OnReceivedAudio (new ReceivedAudioEventArgs (source, msg.Sequence, msg.Data));
-			}
+			var csource = (source as ClientAudioSource);
+			if (csource != null && csource.IsIgnored)
+				return;
+
+			var user = this.context.Users[msg.SourceId];
+			if (user != null && !user.IsIgnored)
+				OnReceivedAudio (new ReceivedAudioEventArgs (source, msg.Sequence, msg.Data));
+		}
+
+		internal void OnMutedMessage (int sourceId, bool unmuted)
+		{
+			var source = this[sourceId];
+			if (source == null)
+				return;
+
+			OnAudioSourceMuted (new AudioSourceMutedEventArgs (source, unmuted));
 		}
 
 		#region Event Invokers
@@ -356,10 +365,29 @@ namespace Gablarski.Client
 			if (changed != null)
 				changed (this, e);
 		}
+
+		protected virtual void OnAudioSourceMuted (AudioSourceMutedEventArgs e)
+		{
+			var muted = this.AudioSourceMuted;
+			if (muted != null)
+				muted (this, e);
+		}
 		#endregion
 	}
 
 	#region Event Args
+	public class AudioSourceMutedEventArgs
+		: AudioSourceEventArgs
+	{
+		public AudioSourceMutedEventArgs (AudioSource source, bool unmuted)
+			: base (source)
+		{
+			this.Unmuted = unmuted;
+		}
+
+		public bool Unmuted { get; set; }
+	}
+
 	public class ReceivedAudioSourceEventArgs
 		: EventArgs
 	{

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Gablarski.Messages;
+using Gablarski.Server;
 
 namespace Gablarski.Client
 {
@@ -33,11 +34,24 @@ namespace Gablarski.Client
 			this.CurrentChannelId = currentChannelId;
 		}
 
+		public IEnumerable<Permission> Permissions
+		{
+			get
+			{
+				lock (permissionLock)
+				{
+					return this.permissions.ToList();
+				}
+			}
+		}
+
 		#region Events
 		/// <summary>
 		/// A login result has been received.
 		/// </summary>
 		public event EventHandler<ReceivedLoginResultEventArgs> ReceivedLoginResult;
+
+		public event EventHandler PermissionsChanged;
 		#endregion
 
 		/// <summary>
@@ -71,12 +85,21 @@ namespace Gablarski.Client
 		}
 
 		private readonly IClientContext context;
+		private readonly object permissionLock = new object();
+		private IEnumerable<Permission> permissions;
 
 		protected virtual void OnLoginResult (ReceivedLoginResultEventArgs e)
 		{
 			var result = this.ReceivedLoginResult;
 			if (result != null)
 				result (this, e);
+		}
+
+		protected virtual void OnPermissionsChanged (EventArgs e)
+		{
+			var changed = this.PermissionsChanged;
+			if (changed != null)
+				changed (this, e);
 		}
 
 		internal void OnLoginResultMessage (MessageReceivedEventArgs e)
@@ -91,6 +114,16 @@ namespace Gablarski.Client
 
 			var args = new ReceivedLoginResultEventArgs (msg.Result);
 			this.OnLoginResult (args);
+		}
+
+		internal void OnPermissionsMessage (MessageReceivedEventArgs e)
+		{
+			var msg = (PermissionsMessage)e.Message;
+			if (msg.OwnerId != this.UserId)
+				return;
+
+			this.permissions = msg.Permissions;
+			OnPermissionsChanged (EventArgs.Empty);
 		}
 	}
 

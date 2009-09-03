@@ -38,7 +38,7 @@ namespace Gablarski.Client
 		/// <summary>
 		/// A user was muted or ignored.
 		/// </summary>
-		public event EventHandler<UserEventArgs> UserMuted;
+		public event EventHandler<UserMutedEventArgs> UserMuted;
 
 		/// <summary>
 		/// A user has changed channels.
@@ -145,7 +145,7 @@ namespace Gablarski.Client
 			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Reset));
 		}
 
-		internal void OnUserMutedMessage (string username)
+		internal void OnMutedMessage (string username, bool unmuted)
 		{
 			lock (userLock)
 			{
@@ -153,10 +153,10 @@ namespace Gablarski.Client
 		        if (user == null)
 		            return;
 
-		        user.Muted = true;
+		        user.IsMuted = true;
 
 		        OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Replace, user, user));
-			    OnUserMuted (new UserEventArgs (user));
+			    OnUserMuted (new UserMutedEventArgs (user, unmuted));
 			}
 		}
 
@@ -227,7 +227,7 @@ namespace Gablarski.Client
 				if (!this.users.TryGetValue (msg.ChangeInfo.TargetUserId, out old))
 					return;
 
-				this.users[msg.ChangeInfo.TargetUserId] = new ClientUser (old.Nickname, old.UserId, msg.ChangeInfo.TargetChannelId, this.context.Connection, old.Muted);
+				this.users[msg.ChangeInfo.TargetUserId] = new ClientUser (old.Nickname, old.UserId, msg.ChangeInfo.TargetChannelId, this.context.Connection, old.IsMuted);
 				user = this.users[msg.ChangeInfo.TargetUserId];
 
 				if (msg.ChangeInfo.RequestingUserId != 0)
@@ -240,7 +240,7 @@ namespace Gablarski.Client
 		#endregion
 
 		#region Event Invokers
-		protected virtual void OnUserMuted (UserEventArgs e)
+		protected virtual void OnUserMuted (UserMutedEventArgs e)
 		{
 			var muted = this.UserMuted;
 			if (muted != null)
@@ -292,6 +292,18 @@ namespace Gablarski.Client
 	}
 
 	#region Event Args
+	public class UserMutedEventArgs
+		: UserEventArgs
+	{
+		public UserMutedEventArgs (ClientUser userInfo, bool unmuted)
+			: base (userInfo)
+		{
+			this.Unmuted = unmuted;
+		}
+
+		public bool Unmuted { get; set; }
+	}
+
 	public class UserEventArgs
 		: EventArgs
 	{

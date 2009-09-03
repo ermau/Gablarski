@@ -25,7 +25,7 @@ namespace Gablarski.Messages
 			get { return 0; }
 		}
 
-		public abstract void WritePayload (IValueWriter writerm);
+		public abstract void WritePayload (IValueWriter writer);
 		public abstract void ReadPayload (IValueReader reader);
 
 		public static bool GetMessage (ushort messageType, out MessageBase msg)
@@ -49,10 +49,12 @@ namespace Gablarski.Messages
 
 		static MessageBase ()
 		{
+			#if NOEMIT
+
 			MessageTypes = new ReadOnlyDictionary<ushort,Func<MessageBase>> (new Dictionary<ushort, Func<MessageBase>>
 			{
 			    { (ushort)ServerMessageType.AudioDataReceived, () => new AudioDataReceivedMessage() },
-				{ (ushort)ServerMessageType.AudioSourceStateChange, () => new AudioSourceStateChangeMessage() },
+			    { (ushort)ServerMessageType.AudioSourceStateChange, () => new AudioSourceStateChangeMessage() },
 			    { (ushort)ServerMessageType.ChangeChannelResult, () => new ChannelChangeResultMessage() },
 			    { (ushort)ServerMessageType.ChannelEditResult, () => new ChannelEditResultMessage() },
 			    { (ushort)ServerMessageType.ChannelListReceived, () => new ChannelListMessage() },
@@ -66,9 +68,11 @@ namespace Gablarski.Messages
 			    { (ushort)ServerMessageType.UserDisconnected, () => new UserDisconnectedMessage() },
 			    { (ushort)ServerMessageType.UserListReceived, () => new UserListMessage() },
 			    { (ushort)ServerMessageType.UserLoggedIn, () => new UserLoggedInMessage() },
+			    { (ushort)ServerMessageType.Muted, () => new MutedMessage() },
+			    { (ushort)ServerMessageType.Permissions, () => new PermissionsMessage() },
 
 			    { (ushort)ClientMessageType.AudioData, () => new SendAudioDataMessage() },
-				{ (ushort)ClientMessageType.ClientAudioSourceStateChange, () => new ClientAudioSourceStateChangeMessage() },
+			    { (ushort)ClientMessageType.ClientAudioSourceStateChange, () => new ClientAudioSourceStateChangeMessage() },
 			    { (ushort)ClientMessageType.ChangeChannel, () => new ChannelChangeMessage() },
 			    { (ushort)ClientMessageType.Connect, () => new ConnectMessage() },
 			    { (ushort)ClientMessageType.Disconnect, () => new DisconnectMessage() },
@@ -77,27 +81,32 @@ namespace Gablarski.Messages
 			    { (ushort)ClientMessageType.RequestChannelList, () => new RequestChannelListMessage() },
 			    { (ushort)ClientMessageType.RequestSource, () => new RequestSourceMessage() },
 			    { (ushort)ClientMessageType.RequestSourceList, () => new RequestSourceListMessage() },
-			    { (ushort)ClientMessageType.RequestUserList, () => new RequestUserListMessage() }
+			    { (ushort)ClientMessageType.RequestUserList, () => new RequestUserListMessage() },
+			    { (ushort)ClientMessageType.RequestMute, () => new RequestMuteMessage() }
 			});
 
-			//Type msgb = typeof(MessageBase);
+			#else
 
-			//foreach (Type t in Assembly.GetExecutingAssembly ().GetTypes ().Where (t => msgb.IsAssignableFrom (t) && !t.IsAbstract))
-			//{
-			//    var ctor = t.GetConstructor (Type.EmptyTypes);
+			Type msgb = typeof(MessageBase);
+			Dictionary<ushort, Func<MessageBase>> messageTypes = new Dictionary<ushort, Func<MessageBase>>();
+			foreach (Type t in Assembly.GetExecutingAssembly ().GetTypes ().Where (t => msgb.IsAssignableFrom (t) && !t.IsAbstract))
+			{
+			    var ctor = t.GetConstructor (Type.EmptyTypes);
 
-			//    var dctor = new DynamicMethod (t.Name, msgb, null);
-			//    var il = dctor.GetILGenerator ();
+			    var dctor = new DynamicMethod (t.Name, msgb, null);
+			    var il = dctor.GetILGenerator ();
 
-			//    il.Emit (OpCodes.Newobj, ctor);
-			//    il.Emit (OpCodes.Ret);
+			    il.Emit (OpCodes.Newobj, ctor);
+			    il.Emit (OpCodes.Ret);
 
-			//    Func<MessageBase> dctord = (Func<MessageBase>)dctor.CreateDelegate (typeof (Func<MessageBase>));
-			//    MessageBase dud = dctord();
-			//    messageTypes.Add (dud.MessageTypeCode, dctord);
-			//}
+			    Func<MessageBase> dctord = (Func<MessageBase>)dctor.CreateDelegate (typeof (Func<MessageBase>));
+			    MessageBase dud = dctord();
+			    messageTypes.Add (dud.MessageTypeCode, dctord);
+			}
 
-			//MessageTypes = new ReadOnlyDictionary<ushort, Func<MessageBase>> (messageTypes);
+			MessageTypes = new ReadOnlyDictionary<ushort, Func<MessageBase>> (messageTypes);
+
+			#endif
 		}
 	}
 }

@@ -73,6 +73,8 @@ namespace Gablarski.Tests
 			Assert.AreEqual (nickname, message.UserInfo.Nickname);
 			Assert.AreEqual ((username.IsEmpty() ? nickname : username), message.UserInfo.Username);
 
+			connection.Client.DequeueAndAssertMessage<PermissionsMessage>();
+
 			var login = connection.Client.DequeueAndAssertMessage<UserLoggedInMessage>();
 			user = login.UserInfo;
 			Assert.AreEqual (nickname, login.UserInfo.Nickname);

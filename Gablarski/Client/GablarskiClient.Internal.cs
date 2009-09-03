@@ -49,6 +49,7 @@ namespace Gablarski.Client
 
 				{ ServerMessageType.ConnectionRejected, OnConnectionRejectedMessage },
 				{ ServerMessageType.LoginResult, this.CurrentUser.OnLoginResultMessage },
+				{ ServerMessageType.Permissions, this.CurrentUser.OnPermissionsMessage },
 				{ ServerMessageType.UserLoggedIn, this.Users.OnUserLoggedInMessage },
 				{ ServerMessageType.UserDisconnected, this.Users.OnUserDisconnectedMessage },
 				{ ServerMessageType.Muted, OnMuted },
@@ -117,8 +118,10 @@ namespace Gablarski.Client
 		{
 			var msg = (MutedMessage)obj.Message;
 
-			if ((msg.Type & MuteType.User) == MuteType.User)
-				this.Users.OnUserMutedMessage ((string)msg.Target);
+			if (msg.Type == MuteType.User)
+				this.Users.OnMutedMessage ((string)msg.Target, msg.Unmuted);
+			else if (msg.Type == MuteType.AudioSource)
+				this.Sources.OnMutedMessage ((int)msg.Target, msg.Unmuted);
 		}
 
 		private void OnConnectionRejectedMessage (MessageReceivedEventArgs e)
