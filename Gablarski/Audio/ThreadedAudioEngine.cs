@@ -226,7 +226,10 @@ namespace Gablarski.Audio
 			{
 				AudioPlaybackEntity playbackEntity;
 				if (playbacks.TryGetValue (e.Source, out playbackEntity))
+				{
 					playbackEntity.Playing = false;
+					playbackEntity.Buffer.Reset();
+				}
 			}
 			playbackLock.ExitReadLock();
 		}

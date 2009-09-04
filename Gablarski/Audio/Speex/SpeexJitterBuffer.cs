@@ -114,6 +114,14 @@ namespace Gablarski.Audio.Speex
 			return packet;
 		}
 
+		public void Reset()
+		{
+			lock (sync)
+			{
+				jitter_buffer_reset (this.state);
+			}
+		}
+
 		#region IDisposable Members
 		public void Dispose ()
 		{
