@@ -15,7 +15,6 @@ namespace Gablarski.Audio
 			this.options = options;
 
 			buffer = new SpeexJitterBuffer (source.FrameSize);
-			this.frameTimeSpan = TimeSpan.FromSeconds ((double)source.FrameSize/source.Frequency);
 		}
 
 		public DateTime Last
@@ -36,11 +35,6 @@ namespace Gablarski.Audio
 		public AudioEnginePlaybackOptions Options
 		{
 			get { return this.options; }
-		}
-
-		public TimeSpan FrameTimeSpan
-		{
-			get { return frameTimeSpan; }
 		}
 
 		public SpeexJitterBuffer Buffer

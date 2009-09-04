@@ -19,10 +19,15 @@ namespace Gablarski.Audio
 		IAudioDevice Device { get; set; }
 
 		/// <summary>
-		/// Queues fixed-point PCM <paramref name="data"/> to be played back, owned by <paramref name="source"/>.
+		/// Gets the number of buffers free for this source
+		/// </summary>
+		int GetBuffersFree (AudioSource source);
+
+		/// <summary>
+		/// Queues PCM <paramref name="data"/> to be played back, owned by <paramref name="source"/>.
 		/// </summary>
 		/// <param name="source">The <see cref="AudioSource"/> the audio came from.</param>
-		/// <param name="data">Fixed-point PCM data.</param>
+		/// <param name="data">PCM data.</param>
 		void QueuePlayback (AudioSource source, byte[] data);
 	}
 

@@ -270,25 +270,14 @@ namespace Gablarski.Audio
 						if (!e.Playing)
 							continue;
 
-						var j = e.Buffer;
 						var s = e.Source;
 
-						DateTime n = DateTime.Now;
-						if (n.Subtract (e.Last) >= e.FrameTimeSpan)
+						int free = e.Playback.GetBuffersFree (s);
+						while (free-- > 0)
 						{
-						    var packet = j.Pull (s.FrameSize);
+							var packet = e.Buffer.Pull (s.FrameSize);
 
-						    e.Playback.QueuePlayback (s, (packet.Encoded) ? s.Decode (packet.Data) : packet.Data);
-						    e.Last = n;
-						    j.Tick();
-						}
-
-						if (e.Buffer.AvailableCount > 0)
-						{
-							var packet = j.Pull (s.FrameSize);
-
-						    e.Playback.QueuePlayback (s, (packet.Encoded) ? s.Decode (packet.Data) : packet.Data);
-							e.Last = e.Last.Add (e.FrameTimeSpan);
+							e.Playback.QueuePlayback (s, (packet.Encoded) ? s.Decode (packet.Data) : packet.Data);
 						}
 					}
 				}

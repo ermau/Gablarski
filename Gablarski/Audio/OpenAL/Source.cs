@@ -104,7 +104,7 @@ namespace Gablarski.Audio.OpenAL
 		{
 			uint[] bufferIDs = buffers.Select (b => b.bufferID).ToArray ();
 			alSourceQueueBuffers (this.sourceID, bufferIDs.Length, bufferIDs);
-			Audio.OpenAL.OpenAL.ErrorCheck ();
+			OpenAL.ErrorCheck ();
 		}
 
 		public SourceBuffer[] Dequeue ()
@@ -116,11 +116,11 @@ namespace Gablarski.Audio.OpenAL
 		{
 			uint[] bufferIDs = new uint[buffers];
 			alSourceUnqueueBuffers (this.sourceID, buffers, bufferIDs);
-			Audio.OpenAL.OpenAL.ErrorCheck ();
+			OpenAL.ErrorCheck ();
 
 			SourceBuffer[] dequeued = new SourceBuffer[bufferIDs.Length];
 			for (int i = 0; i < bufferIDs.Length; ++i)
-				dequeued[i] = SourceBuffer.GetBuffer (bufferIDs[i]);
+				dequeued[i] = SourceBuffer.Buffers[bufferIDs[i]];
 
 			return dequeued;
 		}
@@ -155,7 +155,7 @@ namespace Gablarski.Audio.OpenAL
 				return;
 
 			alSourcePlay (this.sourceID);
-			Audio.OpenAL.OpenAL.ErrorCheck ();
+			OpenAL.ErrorCheck ();
 		}
 
 		#region IDisposable Members
@@ -194,14 +194,14 @@ namespace Gablarski.Audio.OpenAL
 
 		public static Source[] Generate (int count)
 		{
-			if (count > AvailableSources)
-				return null;
+			if (count > MaxSources)
+				throw new InvalidOperationException();
 
 			Source[] sources = new Source[count];
 
 			uint[] sourceIDs = new uint[count];
 			alGenSources (count, sourceIDs);
-			Audio.OpenAL.OpenAL.ErrorCheck ();
+			OpenAL.ErrorCheck ();
 
 			for (int i = 0; i < count; ++i)
 				sources[i] = new Source (sourceIDs[i]);
@@ -255,9 +255,9 @@ namespace Gablarski.Audio.OpenAL
 			Audio.OpenAL.OpenAL.ErrorCheck ();
 		}
 
-		internal static int AvailableSources
+		internal static int MaxSources
 		{
-			get { return 16; }
+			get { return 32; }
 		}
 	}
 
@@ -269,6 +269,7 @@ namespace Gablarski.Audio.OpenAL
 		Stopped = 0x1014
 	}
 
+	// ReSharper disable InconsistentNaming
 	internal enum IntSourceProperty
 	{
 		AL_SOURCE_STATE = 0x1010,
@@ -289,4 +290,5 @@ namespace Gablarski.Audio.OpenAL
 		AL_CONE_OUTER_ANGLE		= 0x1002,
 		AL_REFERENCE_DISTANCE	= 0x1020
 	}
+	// ReSharper restore InconsistentNaming
 }

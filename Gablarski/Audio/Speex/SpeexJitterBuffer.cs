@@ -63,20 +63,27 @@ namespace Gablarski.Audio.Speex
 				case JitterBufferStatus.InternalError:
 					throw new Exception();
 
+				case JitterBufferStatus.Ok:
+					var sp = new SpeexJitterBufferPacket
+					{
+						Encoded = true,
+						Sequence = p.sequence,
+						Span = p.span,
+						TimeStamp = p.timestamp,
+						Data = new byte[p.len]
+					};
+
+					Array.Copy (buffer, sp.Data, p.len);
+
+					Tick();
+
+					return sp;
+
 				default:
-					break;
-			}
-
-			var sp = new SpeexJitterBufferPacket();
-			sp.Encoded = (result != JitterBufferStatus.Missing);
-			sp.Sequence = p.sequence;
-			sp.Span = p.span;
-			sp.TimeStamp = p.timestamp;
-			sp.Data = new byte[p.len];
-			if (sp.Encoded)		
-				Array.Copy (buffer, sp.Data, p.len);
-
-			return sp;
+					var d = UpdateDelay();
+					Tick();
+					return d;
+			}		
 		}
 
 		public void Tick()
@@ -87,25 +94,23 @@ namespace Gablarski.Audio.Speex
 			}
 		}
 
-		public unsafe void UpdateDelay (SpeexJitterBufferPacket packet)
+		public unsafe SpeexJitterBufferPacket UpdateDelay ()
 		{
+			SpeexJitterBufferPacket packet = new SpeexJitterBufferPacket();
+
+			JitterBufferPacket p = new JitterBufferPacket();
 			lock (sync)
 			{
-				fixed (byte* pBuffer = packet.Data)
-				{
-					JitterBufferPacket p = new JitterBufferPacket();
-					p.data = pBuffer;
-					p.len = (uint)packet.Data.Length;
-					p.sequence = (ushort)packet.Sequence;
-					p.span = packet.Span;
-					p.timestamp = packet.TimeStamp;
-
-					lock (sync)
-					{
-						jitter_buffer_update_delay (this.state, &p, IntPtr.Zero);
-					}
-				}
+			    jitter_buffer_update_delay (this.state, &p, IntPtr.Zero);
 			}
+
+			packet.Data = new byte[0];
+			packet.Encoded = false;
+			packet.Sequence = p.sequence;
+			packet.Span = p.span;
+			packet.TimeStamp = p.timestamp;
+
+			return packet;
 		}
 
 		#region IDisposable Members

@@ -8,10 +8,10 @@ namespace Gablarski.Audio.OpenAL.Providers
 	public class OpenALPlaybackProvider
 		: IPlaybackProvider
 	{
-		public OpenALPlaybackProvider()
-		{
-			this.pool.SourceFinished += PoolSourceFinished;
-		}
+		//public OpenALPlaybackProvider()
+		//{
+		//	this.pool.SourceFinished += PoolSourceFinished;
+		//}
 
 		#region IPlaybackProvider Members
 		public event EventHandler<SourceFinishedEventArgs> SourceFinished;
@@ -24,53 +24,46 @@ namespace Gablarski.Audio.OpenAL.Providers
 				this.device = (value as PlaybackDevice);
 				if (this.device == null)
 					throw new ArgumentException ("Can only accept OpenAL PlaybackDevice devices");
+
+				if (!this.device.IsOpen)
+					this.device.Open();
+
+				this.context = this.device.CreateAndActivateContext();
 			}
+		}
+
+		public int GetBuffersFree (AudioSource source)
+		{
+			var s = pool.RequestSource (source);
+			
+			if (s.ProcessedBuffers > 0)
+				return s.ProcessedBuffers;
+			else if (s.State == SourceState.Initial || s.State == SourceState.Stopped)
+				return 5;
+			else
+				return 0;
 		}
 
 		public void QueuePlayback (AudioSource audioSource, byte[] data)
 		{
-			if (!this.device.IsOpen)
-				this.device.Open();
-
-			if (this.context == null)
-				this.context = this.device.CreateAndActivateContext();
-
 			Stack<SourceBuffer> bufferStack;
-			lock (bufferLock)
-			{
-				if (!this.buffers.TryGetValue (audioSource, out bufferStack))
-					this.buffers[audioSource] = bufferStack = new Stack<SourceBuffer>();
-			}
+
+			if (!this.buffers.TryGetValue (audioSource, out bufferStack))
+				this.buffers[audioSource] = bufferStack = new Stack<SourceBuffer> (SourceBuffer.Generate (100));
 
 			Source source = this.pool.RequestSource (audioSource);
-			if (source.ProcessedBuffers > 0)
-			{
-				SourceBuffer[] freeBuffers = source.Dequeue ();
-				for (int i = 0; i < freeBuffers.Length; ++i)
-				{
-					lock (bufferStack)
-					{
-						bufferStack.Push (freeBuffers[i]);
-					}
-				}
-			}
+
+			SourceBuffer[] dbuffers = source.Dequeue();
+			for (int i = 0; i < dbuffers.Length; ++i)
+				bufferStack.Push (dbuffers[i]);
 
 			if (data.Length == 0)
 				return;
 
-			SourceBuffer buffer;
-			lock (bufferStack)
-			{
-				if (bufferStack.Count == 0)
-					PushBuffers (bufferStack, 10);
+			SourceBuffer buffer = bufferStack.Pop();
 
-				buffer = bufferStack.Pop ();
-			}
-
-			//var buffer = SourceBuffer.Generate ();
 			buffer.Buffer (data, (audioSource.Channels == 1) ? AudioFormat.Mono16Bit : AudioFormat.Stereo16Bit, (uint)audioSource.Frequency);
 			source.QueueAndPlay (buffer);
-			pool.PlayingSource (source);
 		}
 
 		public IEnumerable<IAudioDevice> GetDevices ()
@@ -97,15 +90,8 @@ namespace Gablarski.Audio.OpenAL.Providers
 		private Context context;
 		private PlaybackDevice device;
 		private readonly SourcePool<AudioSource> pool = new SourcePool<AudioSource>();
-		private readonly object bufferLock = new object ();
+		//private readonly object bufferLock = new object ();
 		private readonly Dictionary<AudioSource, Stack<SourceBuffer>> buffers = new Dictionary<AudioSource, Stack<SourceBuffer>> ();
-
-		private static void PushBuffers (Stack<SourceBuffer> bufferStack, int number)
-		{
-			SourceBuffer[] sbuffers = SourceBuffer.Generate (number);
-			for (int i = 0; i < sbuffers.Length; ++i)
-				bufferStack.Push (sbuffers[i]);
-		}
 
 		private void OnSourceFinished (SourceFinishedEventArgs e)
 		{

@@ -21,7 +21,7 @@ namespace Gablarski.Audio.OpenAL
 		public PlaybackDevice Open ()
 		{
 			this.Handle = alcOpenDevice (this.Name);
-			Audio.OpenAL.OpenAL.ErrorCheck (this);
+			OpenAL.ErrorCheck (this);
 
 			if (this.Handle == IntPtr.Zero)
 				throw new Exception ("Device failed to open for an unknown reason.");

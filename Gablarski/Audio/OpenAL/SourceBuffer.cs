@@ -58,33 +58,23 @@ namespace Gablarski.Audio.OpenAL
 
 		public static SourceBuffer[] Generate (int count)
 		{
-			lock (lck)
+			if (Buffers == null)
+				Buffers = new Dictionary<uint, SourceBuffer> (count);
+
+			SourceBuffer[] buffers = new SourceBuffer[count];
+
+			uint[] bufferIDs = new uint[count];
+			alGenBuffers (count, bufferIDs);
+			Audio.OpenAL.OpenAL.ErrorCheck ();
+
+			for (int i = 0; i < count; ++i)
 			{
-				if (Buffers == null)
-					Buffers = new Dictionary<uint, SourceBuffer> (count);
-
-				SourceBuffer[] buffers = new SourceBuffer[count];
-
-				uint[] bufferIDs = new uint[count];
-				alGenBuffers (count, bufferIDs);
-				Audio.OpenAL.OpenAL.ErrorCheck ();
-
-				for (int i = 0; i < count; ++i)
-				{
-					buffers[i] = new SourceBuffer (bufferIDs[i]);
-					Buffers.Add (buffers[i].bufferID, buffers[i]);
-				}
-
-				return buffers;
+				buffers[i] = new SourceBuffer (bufferIDs[i]);
+				Buffers.Add (buffers[i].bufferID, buffers[i]);
 			}
-		}
 
-		//public static void Delete (this IEnumerable<SourceBuffer> self)
-		//{
-		//    uint[] bufferIDs = self.Select (b => b.bufferID).ToArray ();
-		//    alDeleteBuffers (bufferIDs.Length, bufferIDs);
-		//    OpenAL.ErrorCheck ();
-		//}
+			return buffers;
+		}
 
 		#region Imports
 		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
@@ -99,18 +89,10 @@ namespace Gablarski.Audio.OpenAL
 
 		private static object lck = new object ();
 
-		private static Dictionary<uint, SourceBuffer> Buffers
+		internal static Dictionary<uint, SourceBuffer> Buffers
 		{
 			get;
 			set;
-		}
-
-		internal static SourceBuffer GetBuffer (uint bufferID)
-		{
-			lock (lck)
-			{
-				return Buffers[bufferID];
-			}
 		}
 	}
 }

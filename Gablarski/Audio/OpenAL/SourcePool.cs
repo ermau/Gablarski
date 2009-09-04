@@ -11,101 +11,53 @@ namespace Gablarski.Audio.OpenAL
 	{
 		public SourcePool()
 		{
-			this.sourcePollerThread = new Thread (this.SourcePoller);
-			this.sourcePollerThread.IsBackground = true;
-			this.sourcePollerThread.Start();
+			this.sources = new Source[Source.MaxSources];
+			this.owners = new T[Source.MaxSources];
 		}
-
-		public event EventHandler<SourceFinishedEventArgs<T>> SourceFinished;
 
 		public Source RequestSource (T owner)
 		{
-			Source free = null;
-			lock (this.sourceLock)
-			{
-				foreach (var kvp in owners)
-				{
-					if (kvp.Value == null)
-					{
-						free = kvp.Key;
-						break;
-					}
-					
-					if (kvp.Value == owner)
-						return kvp.Key;
-				}
-			}
-				
-			if (free == null)
-				free = Source.Generate ();
+			var s = this.sources;
+			var o = this.owners;
 
-			lock (this.sourceLock)
+			int lastFree = 0;
+			for (int i = 0; i < this.sources.Length; ++i)
 			{
-				owners[free] = owner;
-			}
-			
-			return free;
-		}
+				if (o[i] == owner)
+					return sources[i];
 
-		public void PlayingSource (Source source)
-		{
-			lock (this.sourceLock)
-			{
-				if (!this.playing.Contains (source))
-					this.playing.Add (source);
+				if (o[i] == default(T))
+					lastFree = i;
 			}
+
+			if (s[lastFree] == null)
+				s[lastFree] = Source.Generate ();
+
+			return s[lastFree];
 		}
 
 		public void FreeSource (Source source)
 		{
-			lock (this.sourceLock)
+			for (int i = 0; i < owners.Length; ++i)
 			{
-				owners[source] = default(T);
+				if (sources[i] != source)
+					continue;
+
+				owners[i] = default(T);
 			}
 		}
 
-		public void FreeSources (IEnumerable<Source> sources)
+		public void FreeSources (IEnumerable<Source> freeSources)
 		{
-			lock (this.sourceLock)
+			for (int i = 0; i < sources.Length; ++i)
 			{
-				foreach (Source csource in sources)
-					owners[csource] = default (T);
+				if (!freeSources.Contains (sources[i]))
+					owners[i] = default(T);
 			}
 		}
 
-		private readonly HashSet<Source> playing = new HashSet<Source>();
-		private readonly Dictionary<Source, T> owners = new Dictionary<Source, T> ();
-		
-		private readonly object sourceLock = new object();
-		private readonly Thread sourcePollerThread;
-		private volatile bool listening = true;
-
-		private void OnSourceFinished (SourceFinishedEventArgs<T> e)
-		{
-			var finished = this.SourceFinished;
-			if (finished != null)
-				finished (this, e);
-		}
-
-		private void SourcePoller()
-		{
-			while (this.listening)
-			{
-				lock (sourceLock)
-				{
-					foreach (Source s in owners.Keys)
-					{
-						if (!playing.Contains (s) || !s.IsStopped)
-							continue;
-
-						OnSourceFinished (new SourceFinishedEventArgs<T> (owners[s], s));
-						playing.Remove (s);
-					}
-				}
-
-				Thread.Sleep (1);
-			}
-		}
+		private readonly T[] owners;
+		private readonly Source[] sources;
 	}
 
 	public class SourceFinishedEventArgs<T>
