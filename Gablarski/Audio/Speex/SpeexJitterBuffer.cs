@@ -80,7 +80,7 @@ namespace Gablarski.Audio.Speex
 					return sp;
 
 				default:
-					var d = UpdateDelay();
+					var d = UpdateDelay (span * 2);
 					Tick();
 					return d;
 			}		
@@ -94,17 +94,18 @@ namespace Gablarski.Audio.Speex
 			}
 		}
 
-		public unsafe SpeexJitterBufferPacket UpdateDelay ()
+		public unsafe SpeexJitterBufferPacket UpdateDelay (int span)
 		{
 			SpeexJitterBufferPacket packet = new SpeexJitterBufferPacket();
 
 			JitterBufferPacket p = new JitterBufferPacket();
+			p.span = (uint)span;
 			lock (sync)
 			{
 			    jitter_buffer_update_delay (this.state, &p, IntPtr.Zero);
 			}
 
-			packet.Data = new byte[0];
+			packet.Data = new byte[span];
 			packet.Encoded = false;
 			packet.Sequence = p.sequence;
 			packet.Span = p.span;
