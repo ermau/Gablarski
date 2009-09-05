@@ -81,7 +81,6 @@ namespace Gablarski.Clients.Windows
 			{
 				this.playback = new OpenALPlaybackProvider();
 				this.playback.Device = this.playback.DefaultDevice;
-				this.playback.SourceFinished += PlaybackProviderSourceFinished;
 
 				this.voiceCapture = new OpenALCaptureProvider();
 				this.voiceCapture.Device = this.voiceCapture.DefaultDevice;
@@ -173,21 +172,14 @@ namespace Gablarski.Clients.Windows
 			}
 		}
 
-		private void PlaybackProviderSourceFinished (object sender, SourceFinishedEventArgs e)
-		{
-			var user = this.gablarski.Users[e.Source.OwnerId];
-			if (user != null)
-				this.users.MarkSilent (user);
-		}
-
 		void SourceStarted (object sender, AudioSourceEventArgs e)
 		{
-			this.users.MarkTalking (this.gablarski.Users[e.Source.Id]);
+			this.users.MarkTalking (this.gablarski.Users[e.Source.OwnerId]);
 		}
 
 		void SourceStoped (object sender, AudioSourceEventArgs e)
 		{
-			this.users.MarkSilent (this.gablarski.Users[e.Source.Id]);
+			this.users.MarkSilent (this.gablarski.Users[e.Source.OwnerId]);
 		}
 
 		void SourcesRemoved (object sender, ReceivedListEventArgs<AudioSource> e)

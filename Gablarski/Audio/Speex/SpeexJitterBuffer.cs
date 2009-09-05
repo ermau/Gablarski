@@ -83,7 +83,7 @@ namespace Gablarski.Audio.Speex
 					var d = UpdateDelay (span * 2);
 					Tick();
 					return d;
-			}		
+			}
 		}
 
 		public void Tick()
@@ -105,7 +105,7 @@ namespace Gablarski.Audio.Speex
 			    jitter_buffer_update_delay (this.state, &p, IntPtr.Zero);
 			}
 
-			packet.Data = new byte[span*2];
+			packet.Data = new byte[span];
 			packet.Encoded = false;
 			packet.Sequence = p.sequence;
 			packet.Span = p.span;

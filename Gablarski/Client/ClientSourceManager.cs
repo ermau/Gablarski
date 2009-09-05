@@ -302,7 +302,7 @@ namespace Gablarski.Client
 			if (csource != null && csource.IsIgnored)
 				return;
 
-			var user = this.context.Users[msg.SourceId];
+			var user = this.context.Users[source.OwnerId];
 			if (user != null && !user.IsIgnored)
 				OnReceivedAudio (new ReceivedAudioEventArgs (source, msg.Sequence, msg.Data));
 		}
