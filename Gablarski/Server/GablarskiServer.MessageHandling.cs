@@ -182,9 +182,6 @@ namespace Gablarski.Server
 						result = this.channelProvider.SaveChannel (msg.Channel);
 					else
 						result = this.channelProvider.DeleteChannel (msg.Channel);
-
-					if (result == ChannelEditResult.Success)
-						this.UpdateChannels (true);
 				}
 			}
 
@@ -366,12 +363,29 @@ namespace Gablarski.Server
 		{
 			var msg = (ClientAudioSourceStateChangeMessage)e.Message;
 
+			var speaker = this.connections[e.Connection];
+
+			PermissionName n = PermissionName.SendAudioToCurrentChannel;
+			if (speaker.CurrentChannelId == msg.ChannelId)
+				n = PermissionName.SendAudioToDifferentChannel;
+
+			if (!GetPermission (n, msg.ChannelId, speaker.UserId))
+				return;
+
 			this.connections.Send (new AudioSourceStateChangeMessage (msg.Starting, msg.SourceId, msg.ChannelId), (con, user) => con != e.Connection && user.CurrentChannelId.Equals (msg.ChannelId));
 		}
 
 		protected void AudioDataReceived (MessageReceivedEventArgs e)
 		{
 			var msg = (SendAudioDataMessage)e.Message;
+			var speaker = this.connections[e.Connection];
+
+			PermissionName n = PermissionName.SendAudioToCurrentChannel;
+			if (speaker.CurrentChannelId == msg.TargetChannelId)
+				n = PermissionName.SendAudioToDifferentChannel;
+
+			if (!GetPermission (n, msg.TargetChannelId, speaker.UserId))
+				return;
 
 			this.connections.Send (new AudioDataReceivedMessage (msg.SourceId, msg.Sequence, msg.Data), (con, user) => con != e.Connection && !user.IsMuted && user.CurrentChannelId.Equals (msg.TargetChannelId));
 		}

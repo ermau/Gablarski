@@ -25,10 +25,12 @@ namespace Gablarski.Server
 		{
 			this.settings = settings;
 			this.authProvider = authProvider;
+			
 			this.permissionProvider = permissionProvider;
+			this.permissionProvider.PermissionsChanged += OnPermissionsChanged;
 		
 			this.channelProvider = channelProvider;
-			this.channelProvider.ChannelsUpdatedExternally += OnChannelsUpdatedExternally;
+			this.channelProvider.ChannelsUpdated += OnChannelsUpdatedExternally;
 			this.UpdateChannels (false);
 		}
 
@@ -43,7 +45,7 @@ namespace Gablarski.Server
 			this.settings = settings;
 
 			this.backendProvider = provider;
-			this.backendProvider.ChannelsUpdatedExternally += OnChannelsUpdatedExternally;
+			this.backendProvider.ChannelsUpdated += OnChannelsUpdatedExternally;
 			this.backendProvider.PermissionsChanged += OnPermissionsChanged;
 			this.UpdateChannels (false);
 		}
@@ -80,7 +82,7 @@ namespace Gablarski.Server
 					this.availableConnections.Clear ();
 
 					foreach (var provider in value)
-						this.AddConnectionProvider (provider);
+						AddConnectionProvider (provider);
 				}
 			}
 		}
@@ -124,15 +126,15 @@ namespace Gablarski.Server
 		/// <summary>
 		/// Disconnections an <c>IConnection</c>.
 		/// </summary>
-		/// <param name="player">The player to disconnect.</param>
-		public void Disconnect (UserInfo player)
+		/// <param name="user">The user to disconnect.</param>
+		public void Disconnect (UserInfo user)
 		{
-			if (player == null)
-				throw new ArgumentNullException ("player");
+			if (user == null)
+				throw new ArgumentNullException ("user");
 
-			var playerConnection = this.connections[player];
-			if (playerConnection != null)
-				this.Disconnect (playerConnection);
+			var userConnection = this.connections[user];
+			if (userConnection != null)
+				this.Disconnect (userConnection);
 		}
 
 		/// <summary>
@@ -272,10 +274,7 @@ namespace Gablarski.Server
 
 		private void OnChannelsUpdatedExternally (object sender, EventArgs e)
 		{
-			lock (channelLock)
-			{
-				this.UpdateChannels (true);
-			}
+			UpdateChannels (true);
 		}
 
 		private IEnumerable<AudioSource> GetSourceInfoList ()
@@ -290,12 +289,12 @@ namespace Gablarski.Server
 			return currentSources;
 		}
 
-		protected bool GetPermission (PermissionName name, int channelId, int playerId)
+		protected bool GetPermission (PermissionName name, int channelId, int userId)
 		{
 			if (this.BackendProvider != null)
-				return this.BackendProvider.GetPermissions (channelId, playerId).CheckPermission (name);
+				return this.BackendProvider.GetPermissions (channelId, userId).CheckPermission (name);
 			else
-				return this.PermissionProvider.GetPermissions (playerId).CheckPermission (name);
+				return this.PermissionProvider.GetPermissions (userId).CheckPermission (name);
 		}
 
 		protected bool GetPermission (PermissionName name, int channelId, IConnection connection)
@@ -305,14 +304,14 @@ namespace Gablarski.Server
 
 		protected bool GetPermission (PermissionName name, IConnection connection)
 		{
-			var player = this.connections[connection];
+			var user = this.connections[connection];
 
-			return GetPermission (name, (player != null) ? player.CurrentChannelId : 0, (player != null) ? player.UserId : 0);
+			return GetPermission (name, (user != null) ? user.CurrentChannelId : 0, (user != null) ? user.UserId : 0);
 		}
 
-		protected bool GetPermission (PermissionName name, UserInfo player)
+		protected bool GetPermission (PermissionName name, UserInfo user)
 		{
-			return GetPermission (name, player.CurrentChannelId, player.UserId);
+			return GetPermission (name, user.CurrentChannelId, user.UserId);
 		}
 
 		protected void ClientDisconnected (MessageReceivedEventArgs e)
@@ -328,9 +327,9 @@ namespace Gablarski.Server
 			e.Connection.Disconnected -= this.OnClientDisconnected;
 			e.Connection.Disconnect();
 
-			int playerId;
-			if (this.connections.Remove (e.Connection, out playerId))
-				this.connections.Send (new UserDisconnectedMessage (playerId));
+			int userId;
+			if (this.connections.Remove (e.Connection, out userId))
+				this.connections.Send (new UserDisconnectedMessage (userId));
 
 			lock (sourceLock)
 			{

@@ -11,9 +11,9 @@ namespace Gablarski.Server
 	public interface IChannelProvider
 	{
 		/// <summary>
-		/// Fired when the channel list or default channel is updated from outside of Gablarski.
+		/// Fired when the channel list or default channel is updated.
 		/// </summary>
-		event EventHandler ChannelsUpdatedExternally;
+		event EventHandler ChannelsUpdated;
 
 		/// <summary>
 		/// Gets the type used to uniquely identify a channel.

@@ -18,7 +18,7 @@ namespace Gablarski.Server
 			};
 		}
 
-		public event EventHandler ChannelsUpdatedExternally;
+		public event EventHandler ChannelsUpdated;
 
 		public Type IdentifyingType
 		{
@@ -61,22 +61,33 @@ namespace Gablarski.Server
 					return ChannelEditResult.FailedChannelDoesntExist;
 			}
 
+			OnChannelsUpdated (EventArgs.Empty);
 			return ChannelEditResult.Success;
 		}
 
 		public ChannelEditResult DeleteChannel (ChannelInfo channel)
 		{
+			ChannelEditResult result;
+
 			lock (this.channels)
 			{
-				if (this.channels.Remove (channel.ChannelId))
-					return ChannelEditResult.Success;
-				else
-                    return ChannelEditResult.FailedChannelDoesntExist;
+				if (!this.channels.Remove (channel.ChannelId))
+					return ChannelEditResult.FailedChannelDoesntExist;
 			}
+
+			OnChannelsUpdated (EventArgs.Empty);
+			return ChannelEditResult.Success;
 		}
 
 		private int lastId = 1;
 		private readonly ChannelInfo lobby;
 		private readonly Dictionary<object, ChannelInfo> channels = new Dictionary<object, ChannelInfo> ();
+
+		private void OnChannelsUpdated (EventArgs e)
+		{
+			var changed = this.ChannelsUpdated;
+			if (changed != null)
+				changed (this, e);
+		}
 	}
 }

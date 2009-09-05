@@ -78,7 +78,8 @@ namespace Gablarski
 
 		MuteUser = 15,
 
-		// Next: 16
+		ModifyPermissions = 16,
+		// Next: 17
 	}
 
 	public class Permission

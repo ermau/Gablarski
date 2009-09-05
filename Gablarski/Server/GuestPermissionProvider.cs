@@ -10,6 +10,11 @@ namespace Gablarski.Server
 	{
 		public event EventHandler<PermissionsChangedEventArgs> PermissionsChanged;
 
+		public bool UpdatedSupported
+		{
+			get { return false; }
+		}
+
 		public IEnumerable<Permission> GetPermissions (int userID)
 		{
 			if (this.admins.Contains (userID))
@@ -24,6 +29,7 @@ namespace Gablarski.Server
 			else // Non-user client.
 				return GetNamesAsPermissions (PermissionName.Login, PermissionName.RequestChannelList);
 		}
+
 
 		public void SetAdmin (int userId)
 		{
