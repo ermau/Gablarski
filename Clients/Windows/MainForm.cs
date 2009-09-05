@@ -33,6 +33,7 @@ namespace Gablarski.Clients.Windows
 			this.gablarski.Sources.ReceivedSourceList += SourcesOnReceivedSourceList;
 			this.gablarski.Sources.ReceivedAudioSource += this.SourcesReceivedSource;
 			this.gablarski.Sources.ReceivedAudio += SourcesReceivedAudio;
+			this.gablarski.Sources.AudioSourcesRemoved += SourcesRemoved;
 
 			Settings.SettingChanged += SettingsSettingChanged;
 
@@ -183,18 +184,23 @@ namespace Gablarski.Clients.Windows
 			this.users.MarkTalking (this.gablarski.Users[e.Source.OwnerId]);
 		}
 
+		void SourcesRemoved (object sender, ReceivedListEventArgs<AudioSource> e)
+		{
+			foreach (var s in e.Data)
+				this.gablarski.Audio.Detach (s);
+		}
+
 		void SourcesReceivedSource (object sender, ReceivedAudioSourceEventArgs e)
 		{
 			if (e.Result == SourceResult.Succeeded)
 			{
-				if (e.Source.OwnerId == this.gablarski.CurrentUser.UserId && e.Source.Name == VoiceName)
+				if (e.Source.Name == VoiceName)
 					voiceSource = (ClientAudioSource)e.Source;
-				else
-					this.gablarski.Audio.Attach (playback, e.Source, new AudioEnginePlaybackOptions());
 			}
-			else if (e.Result != SourceResult.NewSource && e.Result != SourceResult.SourceRemoved)
+			else if (e.Result == SourceResult.NewSource)
+				this.gablarski.Audio.Attach (playback, e.Source, new AudioEnginePlaybackOptions());
+			else
 				MessageBox.Show (this, e.Result.ToString());
-				//TaskDialog.Show (e.Result.ToString(), "Source request failed");
 		}
 
 		private void UsersUserChangedChannel (object sender, ChannelChangedEventArgs e)

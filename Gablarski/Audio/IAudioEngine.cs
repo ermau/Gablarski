@@ -63,10 +63,10 @@ namespace Gablarski.Audio
 		bool Detach (ICaptureProvider provider);
 
 		/// <summary>
-		/// Stops any capturing to <paramref name="source"/>.
+		/// Stops any playback or capturing to <paramref name="source"/>.
 		/// </summary>
-		/// <param name="source">The source to stop any capturing for.</param>
-		/// <returns><c>true</c> if any capturing was occuring for <paramref name="source"/>, <c>false</c> otherwise.</returns>
+		/// <param name="source">The source to stop any playback or capturing for.</param>
+		/// <returns><c>true</c> if any playback or capturing was occuring for <paramref name="source"/>, <c>false</c> otherwise.</returns>
 		bool Detach (AudioSource source);
 
 		/// <summary>

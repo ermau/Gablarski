@@ -19,7 +19,7 @@ namespace Gablarski.Audio.OpenAL
 		public void Buffer (byte[] data, AudioFormat format, uint frequency)
 		{
 			alBufferData (this.bufferID, format, data, data.Length, frequency);
-			Audio.OpenAL.OpenAL.ErrorCheck ();
+			OpenAL.ErrorCheck ();
 		}
 
 		#region IDisposable Members
@@ -36,15 +36,12 @@ namespace Gablarski.Audio.OpenAL
 			if (this.disposed)
 				return;
 
-			alDeleteBuffers (1, new[] { this.bufferID });
-			Audio.OpenAL.OpenAL.ErrorCheck ();
-
-			lock (lck)
-			{
-				Buffers.Remove (this.bufferID);
-			}
-
 			this.disposed = true;
+
+			alDeleteBuffers (1, new[] { this.bufferID });
+			OpenAL.ErrorCheck ();
+
+			Buffers.Remove (this.bufferID);
 		}
 
 		#endregion
@@ -86,8 +83,6 @@ namespace Gablarski.Audio.OpenAL
 		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
 		private static extern void alDeleteBuffers (int numBuffers, uint[] bufferIDs);
 		#endregion
-
-		private static object lck = new object ();
 
 		internal static Dictionary<uint, SourceBuffer> Buffers
 		{
