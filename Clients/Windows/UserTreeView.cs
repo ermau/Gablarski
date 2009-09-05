@@ -225,7 +225,7 @@ namespace Gablarski.Clients.Windows
 				return;
 			}
 
-			if (!userNodes.ContainsKey (user) || userNodes[user].ImageKey == "silent" || userNodes[user].ImageKey == "muted")
+			if (!userNodes.ContainsKey (user) || user.IsMuted || userNodes[user].ImageKey == "silent" || userNodes[user].ImageKey == "muted")
 				return;
 
 			userNodes[user].ImageKey = userNodes[user].SelectedImageKey = "silent";

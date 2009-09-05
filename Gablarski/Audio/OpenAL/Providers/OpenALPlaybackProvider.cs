@@ -49,7 +49,7 @@ namespace Gablarski.Audio.OpenAL.Providers
 			Stack<SourceBuffer> bufferStack;
 
 			if (!this.buffers.TryGetValue (audioSource, out bufferStack))
-				this.buffers[audioSource] = bufferStack = new Stack<SourceBuffer> (SourceBuffer.Generate (100));
+				this.buffers[audioSource] = bufferStack = new Stack<SourceBuffer> (SourceBuffer.Generate (10));
 
 			Source source = this.pool.RequestSource (audioSource);
 

@@ -32,8 +32,9 @@ namespace Gablarski.Clients.Windows
 
 			this.gablarski.Sources.ReceivedSourceList += SourcesOnReceivedSourceList;
 			this.gablarski.Sources.ReceivedAudioSource += this.SourcesReceivedSource;
-			this.gablarski.Sources.ReceivedAudio += SourcesReceivedAudio;
 			this.gablarski.Sources.AudioSourcesRemoved += SourcesRemoved;
+			this.gablarski.Sources.AudioSourceStopped += SourceStoped;
+			this.gablarski.Sources.AudioSourceStarted += SourceStarted;
 
 			Settings.SettingChanged += SettingsSettingChanged;
 
@@ -179,9 +180,14 @@ namespace Gablarski.Clients.Windows
 				this.users.MarkSilent (user);
 		}
 
-		private void SourcesReceivedAudio (object sender, ReceivedAudioEventArgs e)
+		void SourceStarted (object sender, AudioSourceEventArgs e)
 		{
-			this.users.MarkTalking (this.gablarski.Users[e.Source.OwnerId]);
+			this.users.MarkTalking (this.gablarski.Users[e.Source.Id]);
+		}
+
+		void SourceStoped (object sender, AudioSourceEventArgs e)
+		{
+			this.users.MarkSilent (this.gablarski.Users[e.Source.Id]);
 		}
 
 		void SourcesRemoved (object sender, ReceivedListEventArgs<AudioSource> e)
