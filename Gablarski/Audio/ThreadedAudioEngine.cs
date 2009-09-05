@@ -240,7 +240,12 @@ namespace Gablarski.Audio
 			{
 				AudioPlaybackEntity playbackEntity;
 				if (playbacks.TryGetValue (e.Source, out playbackEntity))
+				{
+					for (int i = 0; i < 5; ++i)
+						playbackEntity.Playback.QueuePlayback (e.Source, new byte[e.Source.FrameSize * 2]);
+
 					playbackEntity.Playing = true;
+				}
 				else
 					Trace.WriteLine ("[Audio] Attempting to playback an unknown source");
 			}

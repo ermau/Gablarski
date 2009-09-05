@@ -34,14 +34,16 @@ namespace Gablarski.Audio.OpenAL.Providers
 
 		public int GetBuffersFree (AudioSource source)
 		{
-			var s = pool.RequestSource (source);
+			//var s = pool.RequestSource (source);
 			
-			if (s.ProcessedBuffers > 0)
-				return s.ProcessedBuffers;
-			else if (s.State == SourceState.Initial || s.State == SourceState.Stopped)
-				return 5;
-			else
-				return 0;
+			//if (s.ProcessedBuffers > 0)
+			//    return s.ProcessedBuffers;
+			//else if (s.State == SourceState.Initial || s.State == SourceState.Stopped)
+			//    return 5;
+			//else
+			//    return 0;
+
+			return pool.RequestSource (source).ProcessedBuffers;
 		}
 
 		public void QueuePlayback (AudioSource audioSource, byte[] data)
