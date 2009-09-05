@@ -51,7 +51,7 @@ namespace Gablarski.Clients.Windows
 
 		private void OnUserMuted (object sender, UserEventArgs e)
 		{
-			
+			MarkMuted (e.User);
 		}
 
 		public void SetServerNode (TreeNode node)
@@ -75,10 +75,8 @@ namespace Gablarski.Clients.Windows
 
 		public void AddChannel (ChannelInfo channel)
 		{
-			#if DEBUG
 			if (channel == null)
-				throw new ArgumentNullException ("channel");
-			#endif
+				return;
 
 			if (this.InvokeRequired)
 			{
@@ -106,10 +104,8 @@ namespace Gablarski.Clients.Windows
 
 		public void AddUser (UserInfo user)
 		{
-			#if DEBUG
 			if (user == null)
-				throw new ArgumentNullException ("user");
-			#endif
+				return;
 
 			if (this.InvokeRequired)
 			{
@@ -137,10 +133,8 @@ namespace Gablarski.Clients.Windows
 
 		public void RemoveUser (UserInfo user)
 		{
-			#if DEBUG
 			if (user == null)
-				throw new ArgumentNullException ("user");
-			#endif
+				return;
 
 			if (this.InvokeRequired)
 			{
@@ -158,10 +152,8 @@ namespace Gablarski.Clients.Windows
 
 		public void MarkTalking (UserInfo user)
 		{
-			#if DEBUG
 			if (user == null)
-				throw new ArgumentNullException ("user");
-			#endif
+				return;
 
 			if (this.InvokeRequired)
 			{
@@ -198,7 +190,7 @@ namespace Gablarski.Clients.Windows
 		public void MarkMuted (UserInfo user)
 		{
 			if (user == null)
-				throw new ArgumentNullException("user");
+				return;
 
 			if (this.InvokeRequired)
 			{
@@ -214,10 +206,8 @@ namespace Gablarski.Clients.Windows
 
 		public void MarkSilent (UserInfo user)
 		{
-			#if DEBUG
 			if (user == null)
-				throw new ArgumentNullException ("user");
-			#endif
+				return;
 
 			if (this.InvokeRequired)
 			{
@@ -317,7 +307,10 @@ namespace Gablarski.Clients.Windows
 		{
 			ChannelInfo channel = this.SelectedNode.Tag as ChannelInfo;
 			if (e.Button != MouseButtons.Left || channel == null)
+			{
 				base.OnNodeMouseDoubleClick (e);
+				return;
+			}
 
 			Client.CurrentUser.Move (channel);
 		}
