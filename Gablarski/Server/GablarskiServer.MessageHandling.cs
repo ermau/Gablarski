@@ -24,6 +24,7 @@ namespace Gablarski.Server
 				{ ClientMessageType.ClientAudioSourceStateChange, ClientAudioSourceStateChanged },
 				{ ClientMessageType.RequestMute, ClientRequestsMute },
 
+				{ ClientMessageType.QueryServer, ClientQueryServer },
 				{ ClientMessageType.RequestChannelList, ClientRequestsChannelList },
 				{ ClientMessageType.RequestUserList, ClientRequestsUserList },
 				{ ClientMessageType.RequestSourceList, ClientRequestsSourceList },
@@ -84,6 +85,11 @@ namespace Gablarski.Server
 			}
 		}
 
+		protected ServerInfo GetServerInfo()
+		{
+			return new ServerInfo (this.settings);
+		}
+
 		private void ClientConnected (MessageReceivedEventArgs e)
 		{
 			var msg = (ConnectMessage)e.Message;
@@ -95,7 +101,23 @@ namespace Gablarski.Server
 				return;
 			}
 
-			e.Connection.Send (new ServerInfoMessage (new ServerInfo (this.settings)));
+			e.Connection.Send (new ServerInfoMessage (GetServerInfo()));
+		}
+
+		private void ClientQueryServer (MessageReceivedEventArgs e)
+		{
+			if (!GetPermission (PermissionName.RequestChannelList, e.Connection))
+				e.Connection.Send (new PermissionDeniedMessage (ClientMessageType.QueryServer));
+			else
+			{
+				IEnumerable<ChannelInfo> currentChannels;
+				lock (this.channelLock)
+				{
+					currentChannels = this.channels.Values.ToList();
+				}
+
+				e.Connection.Send (new QueryServerResultMessage { Channels = currentChannels, Users = this.connections.Users, ServerInfo = GetServerInfo() });
+			}
 		}
 
 		#region Channels

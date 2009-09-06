@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProductVersion>10.0.20506</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{DABD979A-6930-4250-A770-E746736F4AAF}</ProjectGuid>
     <OutputType>Exe</OutputType>
@@ -140,6 +140,9 @@ xcopy /Y "$(SolutionDir)Gablarski\Audio\CELT\libcelt.license.txt" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Gablarski\Audio\Speex\libspeexdsp.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Gablarski\Audio\Speex\libspeexdsp.license.txt" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Gablarski\Audio\OpenAL\OpenAL32.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)Gablarski\Audio\OpenAL\OpenALSoft.License.txt" "$(TargetDir)"</PostBuildEvent>
+xcopy /Y "$(SolutionDir)Gablarski\Audio\OpenAL\OpenALSoft.License.txt" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Gablarski.WebServer\bin\Debug\*.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Gablarski.WebServer\bin\Debug\*.pdb" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Gablarski.WebServer\bin\Debug\HttpServer.License.txt" "$(TargetDir)"</PostBuildEvent>
   </PropertyGroup>
 </Project>

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Gablarski.Messages
 {
-	// Next: 34
+	// Next: 36
 
 	public enum ClientMessageType
 		: ushort
@@ -13,6 +13,7 @@ namespace Gablarski.Messages
 		Connect = 1,
 		Login = 3,
 		Disconnect = 5,
+		QueryServer = 34,
 
 		RequestSourceList = 15,
 		RequestSource = 7,
@@ -34,6 +35,7 @@ namespace Gablarski.Messages
 		: ushort
 	{
 		ConnectionRejected = 2,
+		QueryServerResult = 36,
 		ServerInfoReceived = 12,
 		LoginResult = 4,
 		//Disconnect = 6,
