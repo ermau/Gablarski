@@ -123,11 +123,9 @@ namespace Gablarski
 
 		internal static IEnumerable<Type> SearchAssembly (Assembly asm, Type contract)
 		{
-			foreach (var type in asm.GetTypes ().Where (t => t.IsPublic))
+			foreach (var type in asm.GetTypes ()
+				.Where (t => t.IsPublic && contract.IsAssignableFrom (t) && !t.IsInterface && !t.IsAbstract))
 			{
-				if (!contract.IsAssignableFrom (type) && !contract.IsAbstract && !contract.IsInterface)
-					continue;
-
 				yield return type;
 			}
 		}

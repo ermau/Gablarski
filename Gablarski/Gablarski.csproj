@@ -122,7 +122,6 @@
     <Compile Include="IConnection.cs" />
     <Compile Include="IConnectionProvider.cs" />
     <Compile Include="LoginResult.cs" />
-    <Compile Include="MediaType.cs" />
     <Compile Include="Messages\AudioDataReceivedMessage.cs" />
     <Compile Include="Messages\ChannelChangeMessage.cs" />
     <Compile Include="Messages\ChannelEditMessage.cs" />
@@ -148,7 +147,6 @@
     <Compile Include="Network\SocketValueWriter.cs" />
     <Compile Include="Server\IServerPersistance.cs" />
     <Compile Include="UserInfo.cs" />
-    <Compile Include="ProviderUtils.cs" />
     <Compile Include="ServerInfo.cs" />
     <Compile Include="Server\ConnectionCollection.cs" />
     <Compile Include="Server\GablarskiServer.MessageHandling.cs" />
