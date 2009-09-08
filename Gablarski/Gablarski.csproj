@@ -100,6 +100,8 @@
     <Compile Include="IIndexedEnumerable.cs" />
     <Compile Include="Messages\AudioSourceStateChangeMessage.cs" />
     <Compile Include="Messages\ClientAudioSourceStateChangeMessage.cs" />
+    <Compile Include="Messages\JoinMessage.cs" />
+    <Compile Include="Messages\JoinResultMessage.cs" />
     <Compile Include="Messages\PermissionDeniedMessage.cs" />
     <Compile Include="Messages\PermissionsMessage.cs" />
     <Compile Include="Messages\QueryServerMessage.cs" />
@@ -146,6 +148,7 @@
     <Compile Include="ByteArrayExtensions.cs" />
     <Compile Include="Network\SocketValueWriter.cs" />
     <Compile Include="Server\IServerPersistance.cs" />
+    <Compile Include="Server\ServerUserInfo.cs" />
     <Compile Include="UserInfo.cs" />
     <Compile Include="ServerInfo.cs" />
     <Compile Include="Server\ConnectionCollection.cs" />
@@ -182,7 +185,7 @@
     <Compile Include="Audio\AudioSource.cs" />
     <Compile Include="Messages\SourcesRemovedMessage.cs" />
     <Compile Include="Messages\UserChangedChannelMessage.cs" />
-    <Compile Include="Messages\UserLoggedInMessage.cs" />
+    <Compile Include="Messages\UserJoinedMessage.cs" />
     <Compile Include="Server\LobbyChannelProvider.cs" />
   </ItemGroup>
   <ItemGroup>

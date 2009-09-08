@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using HttpServer;
+using HttpServer.Sessions;
 
 namespace Gablarski.WebServer
 {
@@ -20,13 +21,18 @@ namespace Gablarski.WebServer
 		/// </summary>
 		public void StartListening()
 		{
-			server = new HttpServer.HttpServer();
+			var sstore = new MemorySessionStore();
+			server = new HttpServer.HttpServer (sstore);
 
+			ConnectionManager.SessionStore = sstore;
 			ConnectionManager.ConnectionProvider = this;
 			ConnectionManager.Server = server;
 
+			server.Add (new FileResourceModule());
+			server.Add (new LoginModule());
 			server.Add (new AdminModule());
 			server.Add (new QueryModule());
+			
 			server.Start (IPAddress.Any, 80);
 		}
 

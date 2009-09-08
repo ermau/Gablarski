@@ -40,9 +40,9 @@ namespace Gablarski.Tests
 			manager.OnUserListReceivedMessage (new MessageReceivedEventArgs (client,
 			                                                                 new UserListMessage (new[]
 			                                                                 {
-			                                                                 	new UserInfo ("Foo", null, 1, 1, false),
-			                                                                 	new UserInfo ("Bar", null, 2, 1, false),
-			                                                                 	new UserInfo ("Wee", null, 3, 2, true),
+			                                                                 	new UserInfo ("Foo", "Foo", 1, 1, false),
+			                                                                 	new UserInfo ("Bar", "Bar", 2, 1, false),
+			                                                                 	new UserInfo ("Wee", "Wee", 3, 2, true),
 			                                                                 })));
 			Assert.AreEqual (3, manager.Count());
 			VerifyDefaultUsers (manager);
@@ -76,9 +76,9 @@ namespace Gablarski.Tests
 		{
 			CreateUsers (this.server.Client, this.manager);
 
-			var newGuy = new UserInfo ("New", null, 4, 3, false);
+			var newGuy = new UserInfo ("New", "new", 4, 3, false);
 			manager.OnUserLoggedInMessage (new MessageReceivedEventArgs (this.server.Client,
-				new UserLoggedInMessage(newGuy)));
+				new UserJoinedMessage(newGuy)));
 
 			VerifyDefaultUsers (this.manager);
 			Assert.AreEqual (1, this.manager.Count ( u => u.UserId == newGuy.UserId && u.Nickname == newGuy.Nickname && u.CurrentChannelId == newGuy.CurrentChannelId));

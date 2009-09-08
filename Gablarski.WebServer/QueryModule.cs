@@ -22,35 +22,29 @@ namespace Gablarski.WebServer
 
 		#region Overrides of HttpModule
 
-		/// <summary>
-		/// Method that process the url
-		/// </summary>
-		/// <param name="request">Information sent by the browser about the request</param><param name="response">Information that is being sent back to the client.</param><param name="session">Session used to </param>
-		/// <returns>
-		/// true if this module handled the request.
-		/// </returns>
 		public override bool Process (IHttpRequest request, IHttpResponse response, IHttpSession session)
 		{
 			if (request.UriParts.Length > 0 && request.UriParts[0] == "query")
 			{
 				ConnectionManager.ProcessSession (session, response);
 
-				var connection = (WebServerConnection)session["connection"];
-				var mqueue = (List<MessageBase>)session["mqueue"];
-				
-				var result = ConnectionManager.SendAndReceive<QueryServerMessage, QueryServerResultMessage> (new QueryServerMessage(), session);
-
 				var bodyWriter = new StreamWriter (response.Body);
-
+				
 				try
 				{
+					var result = ConnectionManager.SendAndReceive<QueryServerMessage, QueryServerResultMessage> (new QueryServerMessage(), session);
+				
 					JsonTextWriter writer = new JsonTextWriter (bodyWriter);
 					Serializer.Serialize (writer, result);
-					writer.Flush();
+
+					response.ContentType = "application/json";
+					response.AddHeader ("X-JSON", "true");
 				}
 				catch (Exception ex)
 				{
+					bodyWriter.Write ("<pre>");
 					bodyWriter.Write (ex);
+					bodyWriter.Write ("</pre>");
 				}
 
 				bodyWriter.Flush();

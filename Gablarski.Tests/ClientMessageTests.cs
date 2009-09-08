@@ -49,15 +49,15 @@ namespace Gablarski.Tests
 		}
 
 		[Test]
-		public void LoginNoUserNoPass()
+		public void JoinWithoutLogin()
 		{
 			string nickname = "Foo";
-			var msg = new LoginMessage { Nickname = nickname };
+			var msg = new JoinMessage { Nickname = nickname };
 			msg.WritePayload (writer);
 			long length = stream.Position;
 			stream.Position = 0;
 
-			msg = new LoginMessage();
+			msg = new JoinMessage();
 			msg.ReadPayload (reader);
 
 			Assert.AreEqual (length, stream.Position);
@@ -71,7 +71,7 @@ namespace Gablarski.Tests
 			string username = "foo_";
 			string password = "monkeys";
 
-			var msg = new LoginMessage { Nickname = nickname, Username = username, Password = password };
+			var msg = new LoginMessage { Username = username, Password = password };
 			msg.WritePayload (writer);
 			long length = stream.Position;
 			stream.Position = 0;
@@ -80,7 +80,6 @@ namespace Gablarski.Tests
 			msg.ReadPayload (reader);
 
 			Assert.AreEqual (length, stream.Position);
-			Assert.AreEqual (nickname, msg.Nickname);
 			Assert.AreEqual (username, msg.Username);
 			Assert.AreEqual (password, msg.Password);
 		}

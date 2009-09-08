@@ -34,7 +34,9 @@ namespace Gablarski.Tests
 		}
 
 		private const string Username = "Bar";
+		private const string Username2 = "Bar2";
 		private const string Nickname = "Foo";
+		private const string Nickname2 = "Foo2";
 
 		private IAuthenticationProvider authentications;
 		private IChannelProvider channels;
@@ -49,16 +51,6 @@ namespace Gablarski.Tests
 			return Login (username, nickname, out user);
 		}
 
-		private MockServerConnection Login (string nickname)
-		{
-			UserInfo user;
-			return Login (null, nickname, out user);
-		}
-
-		private MockServerConnection Login (string nickname, out UserInfo user)
-		{
-			return Login (null, nickname, out user);
-		}
 
 		private MockServerConnection Login (string username, string nickname, out UserInfo user)
 		{
@@ -66,26 +58,28 @@ namespace Gablarski.Tests
 			connection.Client.Send (new ConnectMessage (GablarskiServer.MinimumApiVersion));
 			connection.Client.DequeueAndAssertMessage<ServerInfoMessage>();
 
-			connection.Client.Send (new LoginMessage { Nickname = nickname, Username = username, Password = (username.IsEmpty()) ? null : "password" });
-			var message = connection.Client.DequeueAndAssertMessage<LoginResultMessage>();
-
-			Assert.IsTrue (message.Result.Succeeded);
-			Assert.AreEqual (nickname, message.UserInfo.Nickname);
-			Assert.AreEqual ((username.IsEmpty() ? nickname : username), message.UserInfo.Username);
+			connection.Client.Send (new LoginMessage { Username = username, Password = "password" });
+			var loginResultMessage = connection.Client.DequeueAndAssertMessage<LoginResultMessage>();
+			Assert.IsTrue (loginResultMessage.Result.Succeeded);
 
 			connection.Client.DequeueAndAssertMessage<PermissionsMessage>();
 
-			var login = connection.Client.DequeueAndAssertMessage<UserLoggedInMessage>();
-			user = login.UserInfo;
-			Assert.AreEqual (nickname, login.UserInfo.Nickname);
-			Assert.AreEqual (message.Result.UserId, login.UserInfo.UserId);
-			Assert.AreEqual (message.UserInfo.Username, login.UserInfo.Username);
-			Assert.AreEqual (message.UserInfo.UserId, login.UserInfo.UserId);
-			Assert.AreEqual (message.UserInfo.CurrentChannelId, login.UserInfo.CurrentChannelId);
+			connection.Client.Send (new JoinMessage { Nickname = nickname });
+
+			var joinResultMessage = connection.Client.DequeueAndAssertMessage<JoinResultMessage>();
+			Assert.AreEqual (LoginResultState.Success, joinResultMessage.Result);
+
+			var userJoinedMessage = connection.Client.DequeueAndAssertMessage<UserJoinedMessage>();
+			user = userJoinedMessage.UserInfo;
+			Assert.AreEqual (nickname, userJoinedMessage.UserInfo.Nickname);
+			
+			Assert.AreEqual (joinResultMessage.UserInfo.Username, userJoinedMessage.UserInfo.Username);
+			Assert.AreEqual (joinResultMessage.UserInfo.UserId, userJoinedMessage.UserInfo.UserId);
+			Assert.AreEqual (joinResultMessage.UserInfo.CurrentChannelId, userJoinedMessage.UserInfo.CurrentChannelId);
 
 			connection.Client.DequeueAndAssertMessage<ChannelListMessage>();
 			var usermsg = connection.Client.DequeueAndAssertMessage<UserListMessage>();
-			Assert.IsNotNull (usermsg.Users.FirstOrDefault (u => u.UserId.Equals (login.UserInfo.UserId)));
+			Assert.IsNotNull (usermsg.Users.FirstOrDefault (u => u.UserId == userJoinedMessage.UserInfo.UserId));
 			connection.Client.DequeueAndAssertMessage<SourceListMessage>();
 
 			return connection;
@@ -135,42 +129,31 @@ namespace Gablarski.Tests
 		public void BadNickname ()
 		{
 			var connection = provider.EstablishConnection ();
-			connection.Client.Send (new LoginMessage { Nickname = null, Username = null, Password = null });
+			connection.Client.Send (new JoinMessage { Nickname = String.Empty });
 
-			MessageBase message = connection.Client.DequeueMessage ();
-			Assert.IsInstanceOf<LoginResultMessage> (message);
-			var login = (LoginResultMessage)message;
+			var join = connection.Client.DequeueAndAssertMessage<JoinResultMessage>();
 
-			Assert.IsFalse (login.Result.Succeeded);
-			Assert.AreEqual (LoginResultState.FailedInvalidNickname, login.Result.ResultState);
-		}
-
-		[Test]
-		public void GuestLogin ()
-		{
-			Login (Nickname);
+			Assert.AreEqual (LoginResultState.FailedInvalidNickname, join.Result);
 		}
 
 		[Test]
 		public void NicknameInUse ()
 		{
-			var connection = Login (Username, Nickname);
+			 Login (Username, Nickname);
 
-			connection.Client.Send (new LoginMessage { Nickname = "Foo", Username = null, Password = null });
-			MessageBase message = connection.Client.DequeueMessage ();
-			Assert.IsInstanceOf<LoginResultMessage> (message);
+			var connection = provider.EstablishConnection();
+			connection.Client.Send (new JoinMessage (Nickname));
 
-			var login = (LoginResultMessage)message;
-			Assert.IsFalse (login.Result.Succeeded);
-			Assert.AreEqual (LoginResultState.FailedNicknameInUse, login.Result.ResultState);
+			var join = connection.Client.DequeueAndAssertMessage<JoinResultMessage>();
+			Assert.AreEqual (LoginResultState.FailedNicknameInUse, join.Result);
 		}
 
 		[Test]
 		public void UserDisconnected()
 		{
 			UserInfo foo;
-			var fooc = Login (Nickname, out foo);
-			var barc = Login (Username);
+			var fooc = Login (Username, Nickname, out foo);
+			var barc = Login (Username2, Nickname2);
 
 			fooc.Disconnect();
 

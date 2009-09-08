@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
 using Kennedy.ManagedHooks;
-using Microsoft.WindowsAPICodePack;
 
 namespace Gablarski.Clients.Windows
 {

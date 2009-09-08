@@ -144,25 +144,6 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Windows\Shell\Common\EnumUnknown.cs" />
-    <Compile Include="Windows\Shell\Common\SearchCondition.cs" />
-    <Compile Include="Windows\Shell\Common\SearchConditionFactory.cs" />
-    <Compile Include="Windows\Shell\Common\ShellFileSystemFolder.cs" />
-    <Compile Include="Windows\Shell\Common\ShellItemArray.cs" />
-    <Compile Include="Windows\Shell\Common\ShellNonFileSystemFolder.cs" />
-    <Compile Include="Windows\Shell\Common\ShellNonFileSystemItem.cs" />
-    <Compile Include="Windows\Shell\Common\ShellObjectContainer.cs" />
-    <Compile Include="Windows\Shell\Common\ShellObjectNode.cs" />
-    <Compile Include="Windows\Shell\Common\ShellSavedSearchCollection.cs" />
-    <Compile Include="Windows\Shell\Common\ShellSearchCollection.cs" />
-    <Compile Include="Windows\Shell\Common\ShellSearchConnector.cs" />
-    <Compile Include="Windows\Shell\Common\ShellSearchFolder.cs" />
-    <Compile Include="Windows\Shell\Common\SortColumn.cs" />
-    <Compile Include="Windows\Shell\Interop\Common\WindowUtilities.cs" />
-    <Compile Include="Windows\Shell\PropertySystem\SystemProperties.cs" />
-    <Compile Include="Windows\Shell\Taskbar\TaskbarManager.cs" />
-    <Compile Include="Windows\Shell\Taskbar\ThumbnailButtonClickedEventArgs.cs" />
-    <Compile Include="Windows\Shell\Taskbar\UserRemovedJumpListItemsEventArg.cs" />
     <EmbeddedResource Include="ChannelForm.resx">
       <DependentUpon>ChannelForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -198,192 +179,6 @@
     <Compile Include="SettingsForm.Designer.cs">
       <DependentUpon>SettingsForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Windows\Core\AppRestartRecovery\ApplicationRestartRecoveryManager.cs" />
-    <Compile Include="Windows\Core\AppRestartRecovery\RecoveryData.cs" />
-    <Compile Include="Windows\Core\AppRestartRecovery\RecoverySettings.cs" />
-    <Compile Include="Windows\Core\AppRestartRecovery\RestartRestrictions.cs" />
-    <Compile Include="Windows\Core\AppRestartRecovery\RestartSettings.cs" />
-    <Compile Include="Windows\Core\Dialogs\Common\DialogControl.cs" />
-    <Compile Include="Windows\Core\Dialogs\Common\DialogControlCollection.cs" />
-    <Compile Include="Windows\Core\Dialogs\Common\DialogsDefaults.cs" />
-    <Compile Include="Windows\Core\Dialogs\Common\IDialogControlHost.cs" />
-    <Compile Include="Windows\Core\Dialogs\TaskDialogs\TaskDialog.cs" />
-    <Compile Include="Windows\Core\Dialogs\TaskDialogs\TaskDialogBar.cs" />
-    <Compile Include="Windows\Core\Dialogs\TaskDialogs\TaskDialogButton.cs" />
-    <Compile Include="Windows\Core\Dialogs\TaskDialogs\TaskDialogButtonBase.cs" />
-    <Compile Include="Windows\Core\Dialogs\TaskDialogs\TaskDialogClosingEventArgs.cs" />
-    <Compile Include="Windows\Core\Dialogs\TaskDialogs\TaskDialogCommandLink.cs" />
-    <Compile Include="Windows\Core\Dialogs\TaskDialogs\TaskDialogControl.cs" />
-    <Compile Include="Windows\Core\Dialogs\TaskDialogs\TaskDialogDefaults.cs" />
-    <Compile Include="Windows\Core\Dialogs\TaskDialogs\TaskDialogExpandedInfoMode.cs" />
-    <Compile Include="Windows\Core\Dialogs\TaskDialogs\TaskDialogHyperlinkClickedEventArgs.cs" />
-    <Compile Include="Windows\Core\Dialogs\TaskDialogs\TaskDialogProgressBar.cs" />
-    <Compile Include="Windows\Core\Dialogs\TaskDialogs\TaskDialogProgressBarState.cs" />
-    <Compile Include="Windows\Core\Dialogs\TaskDialogs\TaskDialogRadioButton.cs" />
-    <Compile Include="Windows\Core\Dialogs\TaskDialogs\TaskDialogResult.cs" />
-    <Compile Include="Windows\Core\Dialogs\TaskDialogs\TaskDialogStandardButton.cs" />
-    <Compile Include="Windows\Core\Dialogs\TaskDialogs\TaskDialogStandardIcon.cs" />
-    <Compile Include="Windows\Core\Dialogs\TaskDialogs\TaskDialogStartupLocation.cs" />
-    <Compile Include="Windows\Core\Dialogs\TaskDialogs\TaskDialogTickEventArgs.cs" />
-    <Compile Include="Windows\Core\Interop\AppRestartRecovery\AppRestartRecoveryNativeMethods.cs" />
-    <Compile Include="Windows\Core\Interop\CommonDllNames.cs" />
-    <Compile Include="Windows\Core\Interop\CoreErrorHelper.cs" />
-    <Compile Include="Windows\Core\Interop\CoreHelpers.cs" />
-    <Compile Include="Windows\Core\Interop\CoreNativeMethods.cs" />
-    <Compile Include="Windows\Core\Interop\Dialogs\DialogShowState.cs" />
-    <Compile Include="Windows\Core\Interop\NetworkList\INetwork.cs" />
-    <Compile Include="Windows\Core\Interop\NetworkList\INetworkConnection.cs" />
-    <Compile Include="Windows\Core\Interop\NetworkList\INetworkListManager.cs" />
-    <Compile Include="Windows\Core\Interop\NetworkList\NetworkListManagerClass.cs" />
-    <Compile Include="Windows\Core\Interop\PowerManagement\PowerManagementNativeMethods.cs" />
-    <Compile Include="Windows\Core\Interop\TaskDialogs\NativeTaskDialog.cs" />
-    <Compile Include="Windows\Core\Interop\TaskDialogs\NativeTaskDialogSettings.cs" />
-    <Compile Include="Windows\Core\Interop\TaskDialogs\TaskDialogNativeMethods.cs" />
-    <Compile Include="Windows\Core\NetworkList\Network.cs" />
-    <Compile Include="Windows\Core\NetworkList\NetworkCollection.cs" />
-    <Compile Include="Windows\Core\NetworkList\NetworkConnection.cs" />
-    <Compile Include="Windows\Core\NetworkList\NetworkConnectionCollection.cs" />
-    <Compile Include="Windows\Core\NetworkList\NetworkListEnums.cs" />
-    <Compile Include="Windows\Core\NetworkList\NetworkListManager.cs" />
-    <Compile Include="Windows\Core\PowerManagement\BatteryState.cs" />
-    <Compile Include="Windows\Core\PowerManagement\EventManager.cs" />
-    <Compile Include="Windows\Core\PowerManagement\ExecutionState.cs" />
-    <Compile Include="Windows\Core\PowerManagement\MessageManager.cs" />
-    <Compile Include="Windows\Core\PowerManagement\PersonalityGuids.cs" />
-    <Compile Include="Windows\Core\PowerManagement\Power.cs" />
-    <Compile Include="Windows\Core\PowerManagement\PowerManager.cs" />
-    <Compile Include="Windows\Core\PowerManagement\PowerPersonality.cs" />
-    <Compile Include="Windows\Core\PowerManagement\PowerSource.cs" />
-    <Compile Include="Windows\Core\PropertySystem\PropertyKey.cs" />
-    <Compile Include="Windows\Core\PropertySystem\PropVariant.cs" />
-    <Compile Include="Windows\Core\PropertySystem\PropVariantNativeMethods.cs" />
-    <Compile Include="Windows\Core\SafeHandles\SafeIconHandle.cs" />
-    <Compile Include="Windows\Core\SafeHandles\SafeRegionHandle.cs" />
-    <Compile Include="Windows\Core\SafeHandles\SafeWindowHandle.cs" />
-    <Compile Include="Windows\Core\SafeHandles\ZeroInvalidHandle.cs" />
-    <Compile Include="Windows\Shell\CommonFileDialogs\CommonFileDialog.cs" />
-    <Compile Include="Windows\Shell\CommonFileDialogs\CommonFileDialogButton.cs" />
-    <Compile Include="Windows\Shell\CommonFileDialogs\CommonFileDialogCheckBox.cs" />
-    <Compile Include="Windows\Shell\CommonFileDialogs\CommonFileDialogComboBox.cs" />
-    <Compile Include="Windows\Shell\CommonFileDialogs\CommonFileDialogControl.cs" />
-    <Compile Include="Windows\Shell\CommonFileDialogs\CommonFileDialogControlCollection.cs" />
-    <Compile Include="Windows\Shell\CommonFileDialogs\CommonFileDialogFilter.cs" />
-    <Compile Include="Windows\Shell\CommonFileDialogs\CommonFileDialogFilterCollection.cs" />
-    <Compile Include="Windows\Shell\CommonFileDialogs\CommonFileDialogFolderChangeEventArgs.cs" />
-    <Compile Include="Windows\Shell\CommonFileDialogs\CommonFileDialogGroupBox.cs" />
-    <Compile Include="Windows\Shell\CommonFileDialogs\CommonFileDialogLabel.cs" />
-    <Compile Include="Windows\Shell\CommonFileDialogs\CommonFileDialogMenu.cs" />
-    <Compile Include="Windows\Shell\CommonFileDialogs\CommonFileDialogProminentControl.cs" />
-    <Compile Include="Windows\Shell\CommonFileDialogs\CommonFileDialogRadioButtonList.cs" />
-    <Compile Include="Windows\Shell\CommonFileDialogs\CommonFileDialogResult.cs" />
-    <Compile Include="Windows\Shell\CommonFileDialogs\CommonFileDialogSeperator.cs" />
-    <Compile Include="Windows\Shell\CommonFileDialogs\CommonFileDialogStandardFilters.cs" />
-    <Compile Include="Windows\Shell\CommonFileDialogs\CommonFileDialogTextBox.cs" />
-    <Compile Include="Windows\Shell\CommonFileDialogs\CommonOpenFileDialog.cs" />
-    <Compile Include="Windows\Shell\CommonFileDialogs\CommonSaveFileDialog.cs" />
-    <Compile Include="Windows\Shell\CommonFileDialogs\ICommonFileDialogIndexedControls.cs" />
-    <Compile Include="Windows\Shell\Common\DefaultShellImageSizes.cs" />
-    <Compile Include="Windows\Shell\Common\IconReference.cs" />
-    <Compile Include="Windows\Shell\Common\ShellEnums.cs" />
-    <Compile Include="Windows\Shell\Common\ShellFile.cs" />
-    <Compile Include="Windows\Shell\Common\ShellFolder.cs" />
-    <Compile Include="Windows\Shell\Common\ShellFolderItems.cs" />
-    <Compile Include="Windows\Shell\Common\ShellHelper.cs" />
-    <Compile Include="Windows\Shell\Common\ShellLibrary.cs" />
-    <Compile Include="Windows\Shell\Common\ShellLink.cs" />
-    <Compile Include="Windows\Shell\Common\ShellObject.cs" />
-    <Compile Include="Windows\Shell\Common\ShellObjectCollection.cs" />
-    <Compile Include="Windows\Shell\Common\ShellObjectFactory.cs" />
-    <Compile Include="Windows\Shell\Common\ShellThumbnail.cs" />
-    <Compile Include="Windows\Shell\Common\ShellThumbnailEnums.cs" />
-    <Compile Include="Windows\Shell\Controls\CommandLinkWinforms.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Windows\Shell\Controls\CommandLinkWPF.xaml.cs">
-      <DependentUpon>CommandLinkWPF.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Windows\Shell\ExplorerBrowser\ExplorerBrowser.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Windows\Shell\ExplorerBrowser\ExplorerBrowser.WPF.xaml.cs">
-      <DependentUpon>ExplorerBrowser.WPF.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Windows\Shell\ExplorerBrowser\ExplorerBrowserContentOptions.cs" />
-    <Compile Include="Windows\Shell\ExplorerBrowser\ExplorerBrowserEnums.cs" />
-    <Compile Include="Windows\Shell\ExplorerBrowser\ExplorerBrowserEvents.cs" />
-    <Compile Include="Windows\Shell\ExplorerBrowser\ExplorerBrowserPaneVisibility.cs" />
-    <Compile Include="Windows\Shell\ExplorerBrowser\NavigationLog.cs" />
-    <Compile Include="Windows\Shell\ExplorerBrowser\NavigationLogEnums.cs" />
-    <Compile Include="Windows\Shell\ExplorerBrowser\NavigationLogEvents.cs" />
-    <Compile Include="Windows\Shell\ExplorerBrowser\NavigationOptions.cs" />
-    <Compile Include="Windows\Shell\Interop\Common\ShellCOMClasses.cs" />
-    <Compile Include="Windows\Shell\Interop\Common\ShellCOMGuids.cs" />
-    <Compile Include="Windows\Shell\Interop\Common\ShellCOMInterfaces.cs" />
-    <Compile Include="Windows\Shell\Interop\Common\ShellNativeMethods.cs" />
-    <Compile Include="Windows\Shell\Interop\Dialogs\DialogsCOMClasses.cs" />
-    <Compile Include="Windows\Shell\Interop\Dialogs\DialogsCOMInterfaces.cs" />
-    <Compile Include="Windows\Shell\Interop\Dialogs\DialogShowState.cs" />
-    <Compile Include="Windows\Shell\Interop\ExplorerBrowser\ExplorerBrowserCOMGuids.cs" />
-    <Compile Include="Windows\Shell\Interop\ExplorerBrowser\ExplorerBrowserCOMInterfaces.cs" />
-    <Compile Include="Windows\Shell\Interop\ExplorerBrowser\ExplorerBrowserNativeMethods.cs" />
-    <Compile Include="Windows\Shell\Interop\KnownFolders\KnownFoldersCOMGuids.cs" />
-    <Compile Include="Windows\Shell\Interop\KnownFolders\KnownFoldersCOMInterfaces.cs" />
-    <Compile Include="Windows\Shell\Interop\KnownFolders\KnownFoldersNativeMethods.cs" />
-    <Compile Include="Windows\Shell\Interop\PropertySystem\PropertySystemCOMInterfaces.cs" />
-    <Compile Include="Windows\Shell\Interop\PropertySystem\PropertySystemNativeMethods.cs" />
-    <Compile Include="Windows\Shell\Interop\StockIcons\StockIconsNativeMethods.cs" />
-    <Compile Include="Windows\Shell\Interop\Taskbar\TabbedThumbnailNativeMethods.cs" />
-    <Compile Include="Windows\Shell\Interop\Taskbar\TaskbarCOMInterfaces.cs" />
-    <Compile Include="Windows\Shell\Interop\Taskbar\TaskbarNativeMethods.cs" />
-    <Compile Include="Windows\Shell\KnownFolders\DefinitionOptions.cs" />
-    <Compile Include="Windows\Shell\KnownFolders\FileSystemKnownFolder.cs" />
-    <Compile Include="Windows\Shell\KnownFolders\FolderCategory.cs" />
-    <Compile Include="Windows\Shell\KnownFolders\FolderProperties.cs" />
-    <Compile Include="Windows\Shell\KnownFolders\FoldersIdentifiers.cs" />
-    <Compile Include="Windows\Shell\KnownFolders\FolderTypes.cs" />
-    <Compile Include="Windows\Shell\KnownFolders\IKnownFolder.cs" />
-    <Compile Include="Windows\Shell\KnownFolders\KnownFolderHelper.cs" />
-    <Compile Include="Windows\Shell\KnownFolders\KnownFolders.cs" />
-    <Compile Include="Windows\Shell\KnownFolders\KnownFolderSettings.cs" />
-    <Compile Include="Windows\Shell\KnownFolders\NonFileSystemKnownFolder.cs" />
-    <Compile Include="Windows\Shell\KnownFolders\RedirectionCapabilities.cs" />
-    <Compile Include="Windows\Shell\KnownFolders\RetrievalOptions.cs" />
-    <Compile Include="Windows\Shell\PropertySystem\IShellProperty.cs" />
-    <Compile Include="Windows\Shell\PropertySystem\ShellProperties.cs" />
-    <Compile Include="Windows\Shell\PropertySystem\ShellProperty.cs" />
-    <Compile Include="Windows\Shell\PropertySystem\ShellPropertyCollection.cs" />
-    <Compile Include="Windows\Shell\PropertySystem\ShellPropertyDescription.cs" />
-    <Compile Include="Windows\Shell\PropertySystem\ShellPropertyDescriptionsCache.cs" />
-    <Compile Include="Windows\Shell\PropertySystem\ShellPropertyEnums.cs" />
-    <Compile Include="Windows\Shell\PropertySystem\ShellPropertyEnumType.cs" />
-    <Compile Include="Windows\Shell\PropertySystem\ShellPropertyWriter.cs" />
-    <Compile Include="Windows\Shell\PropertySystem\StronglyTypedProperties.cs" />
-    <Compile Include="Windows\Shell\StockIcons\StockIcon.cs" />
-    <Compile Include="Windows\Shell\StockIcons\StockIconEnums.cs" />
-    <Compile Include="Windows\Shell\StockIcons\StockIcons.cs" />
-    <Compile Include="Windows\Shell\Taskbar\JumpList.cs" />
-    <Compile Include="Windows\Shell\Taskbar\JumpListCustomCategory.cs" />
-    <Compile Include="Windows\Shell\Taskbar\JumpListCustomCategoryCollection.cs" />
-    <Compile Include="Windows\Shell\Taskbar\JumpListItem.cs" />
-    <Compile Include="Windows\Shell\Taskbar\JumpListItemCollection.cs" />
-    <Compile Include="Windows\Shell\Taskbar\JumpListLink.cs" />
-    <Compile Include="Windows\Shell\Taskbar\JumpListSeparator.cs" />
-    <Compile Include="Windows\Shell\Taskbar\ProgressBarStateSettings.cs" />
-    <Compile Include="Windows\Shell\Taskbar\TabbedThumbnail.cs" />
-    <Compile Include="Windows\Shell\Taskbar\TabbedThumbnailBitmapRequestedEventArgs.cs" />
-    <Compile Include="Windows\Shell\Taskbar\TabbedThumbnailEventArgs.cs" />
-    <Compile Include="Windows\Shell\Taskbar\TabbedThumbnailManager.cs" />
-    <Compile Include="Windows\Shell\Taskbar\TabbedThumbnailProxyWindow.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Windows\Shell\Taskbar\TabbedThumbnailScreenCapture.cs" />
-    <Compile Include="Windows\Shell\Taskbar\TaskbarEnums.cs" />
-    <Compile Include="Windows\Shell\Taskbar\TaskbarInterfaces.cs" />
-    <Compile Include="Windows\Shell\Taskbar\TaskbarWindow.cs" />
-    <Compile Include="Windows\Shell\Taskbar\TaskbarWindowManager.cs" />
-    <Compile Include="Windows\Shell\Taskbar\ThumbnailButton.cs" />
-    <Compile Include="Windows\Shell\Taskbar\ThumbnailToolbarManager.cs" />
-    <Compile Include="Windows\Shell\Taskbar\ThumbnailToolbarProxyWindow.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\fluent-nhibernate\src\FluentNHibernate\FluentNHibernate.csproj">
@@ -403,9 +198,6 @@
     <None Include="Resources\server_delete.png" />
     <None Include="Resources\server_edit.png" />
     <None Include="Resources\disk.png" />
-    <None Include="Windows\Shell\Design\ShellObjects.cd" />
-    <None Include="Windows\Shell\Design\ShellThumbnailClassDiagram.cd" />
-    <None Include="Windows\Shell\ExplorerBrowser\ExplorerBrowserDiagram.cd" />
     <None Include="Resources\disconnect.png" />
     <None Include="Resources\sound.png" />
     <None Include="Resources\sound_add.png" />
@@ -425,20 +217,6 @@
     <None Include="Resources\group_add.png" />
     <None Include="Resources\group_delete.png" />
     <None Include="Resources\group_edit.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="Windows\Shell\Controls\CommandLinkWPF.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Windows\Shell\ExplorerBrowser\ExplorerBrowser.WPF.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">

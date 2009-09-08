@@ -66,7 +66,7 @@ namespace Gablarski.Server
 						return;
 
 					this.name = value;
-					this.OnPropertyChanged ("Name");
+					OnPropertyChanged ("Name");
 				}
 			}
 		}
@@ -90,7 +90,7 @@ namespace Gablarski.Server
 						return;
 
 					this.description = value;
-					this.OnPropertyChanged ("Description");
+					OnPropertyChanged ("Description");
 				}
 			}
 		}
@@ -114,7 +114,7 @@ namespace Gablarski.Server
 						return;
 
 					this.minbitrate = value;
-					this.OnPropertyChanged ("MinimumAudioBitrate");
+					OnPropertyChanged ("MinimumAudioBitrate");
 				}
 			}
 		}
@@ -138,7 +138,7 @@ namespace Gablarski.Server
 						return;
 
 					this.maxbitrate = value;
-					this.OnPropertyChanged ("MaximumAudioBitrate");
+					OnPropertyChanged ("MaximumAudioBitrate");
 				}
 			}
 		}
@@ -162,7 +162,7 @@ namespace Gablarski.Server
 						return;
 
 					this.defaultbitrate = value;
-					this.OnPropertyChanged ("DefaultAudioBitrate");
+					OnPropertyChanged ("DefaultAudioBitrate");
 				}
 			}
 		}
@@ -186,7 +186,31 @@ namespace Gablarski.Server
 						return;
 
 					this.serverLogo = value;
-					this.OnPropertyChanged ("ServerLogo");
+					OnPropertyChanged ("ServerLogo");
+				}
+			}
+		}
+
+		public bool allowGuestLogins = true;
+		public virtual bool AllowGuestLogins
+		{
+			get
+			{
+				lock (settingsLock)
+				{
+					return this.allowGuestLogins;
+				}
+			}
+
+			set
+			{
+				lock (settingsLock)
+				{
+					if (value == this.allowGuestLogins)
+						return;
+
+					this.allowGuestLogins = value;
+					OnPropertyChanged ("AllowguestLogins");
 				}
 			}
 		}

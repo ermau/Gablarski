@@ -49,7 +49,7 @@ namespace Gablarski.Server
 			get { return this.connections.Count; }
 		}
 
-		public UserInfo this[IConnection key]
+		public ServerUserInfo this[IConnection key]
 		{
 			get
 			{
@@ -63,28 +63,39 @@ namespace Gablarski.Server
 			}
 		}
 
-		public IConnection this[UserInfo key]
+		public IConnection this[ServerUserInfo key]
 		{
 			get
 			{
 				lock (lck)
 				{
-					return (from kvp in this.users where kvp.Value == key select kvp.Key).FirstOrDefault();
+					return this.users.FirstOrDefault (kvp => kvp.Value == key).Key;
 				}
 			}
 		}
 
-		public KeyValuePair<IConnection, UserInfo> this[int index]
+		public IConnection this[UserInfo key]
+		{
+			get
+			{
+				lock(lck)
+				{
+					return this.users.FirstOrDefault (kvp => kvp.Value == key).Key;
+				}
+			}
+		}
+
+		public KeyValuePair<IConnection, ServerUserInfo> this[int index]
 		{
 			get
 			{
 				lock (lck)
 				{
 					IConnection c = this.connections[index];
-					UserInfo p;
+					ServerUserInfo p;
 					this.users.TryGetValue (c, out p);
 
-					return new KeyValuePair<IConnection, UserInfo> (c, p);
+					return new KeyValuePair<IConnection, ServerUserInfo> (c, p);
 				}
 			}
 		}
@@ -95,7 +106,7 @@ namespace Gablarski.Server
 			{
 				lock (lck)
 				{
-					UserInfo[] copiedPlayers = new UserInfo[this.users.Count];
+					ServerUserInfo[] copiedPlayers = new ServerUserInfo[this.users.Count];
 					this.users.Values.CopyTo (copiedPlayers, 0);
 
 					return copiedPlayers;
@@ -103,11 +114,11 @@ namespace Gablarski.Server
 			}
 		}
 
-		public bool UserLoggedIn (string nickname)
+		public bool NicknameInUse (string nickname, IConnection connection)
 		{
 			lock (lck)
 			{
-				return this.users.Values.Any (p => p.Nickname == nickname);
+				return this.users.Any (kvp => kvp.Value.Nickname == nickname && kvp.Key != connection);
 			}
 		}
 
@@ -120,7 +131,7 @@ namespace Gablarski.Server
 		}
 
 
-		public void Add (IConnection connection, UserInfo user)
+		public void Add (IConnection connection, ServerUserInfo user)
 		{
 			lock (lck)
 			{
@@ -139,7 +150,7 @@ namespace Gablarski.Server
 			}
 		}
 
-		public UserInfo GetUser (int userId)
+		public ServerUserInfo GetUser (int userId)
 		{
 			lock (lck)
 			{
@@ -147,7 +158,7 @@ namespace Gablarski.Server
 			}
 		}
 
-		public bool UpdateIfExists (IConnection connection, UserInfo user)
+		public bool UpdateIfExists (IConnection connection, ServerUserInfo user)
 		{
 			lock (lck)
 			{
@@ -159,12 +170,12 @@ namespace Gablarski.Server
 			}
 		}
 
-		public bool UpdateIfExists (UserInfo user)
+		public bool UpdateIfExists (ServerUserInfo user)
 		{
 			lock (lck)
 			{
 				var old = this.users.FirstOrDefault (kvp => kvp.Value.UserId.Equals (user.UserId));
-				if (old.Equals (default(KeyValuePair<IConnection, UserInfo>)))
+				if (old.Equals (default(KeyValuePair<IConnection, ServerUserInfo>)))
 					return false;
 
 				this.users[old.Key] = user;
@@ -217,7 +228,7 @@ namespace Gablarski.Server
 			}
 		}
 
-		public void Send (MessageBase message, Func<UserInfo, bool> selector)
+		public void Send (MessageBase message, Func<ServerUserInfo, bool> selector)
 		{
 			lock (lck)
 			{
@@ -231,7 +242,7 @@ namespace Gablarski.Server
 			}
 		}
 
-		public void Send (MessageBase message, Func<IConnection, UserInfo, bool> selector)
+		public void Send (MessageBase message, Func<IConnection, ServerUserInfo, bool> selector)
 		{
 			lock (lck)
 			{
@@ -247,6 +258,6 @@ namespace Gablarski.Server
 
 		private object lck = new object();
 		private readonly List<IConnection> connections = new List<IConnection>();
-		private readonly Dictionary<IConnection, UserInfo> users = new Dictionary<IConnection, UserInfo>();
+		private readonly Dictionary<IConnection, ServerUserInfo> users = new Dictionary<IConnection, ServerUserInfo>();
 	}
 }

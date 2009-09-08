@@ -22,20 +22,24 @@ namespace Gablarski.Tests
 			Assert.Throws<ArgumentNullException> (() => new UserInfo ((UserInfo)null));
 			Assert.Throws<ArgumentNullException> (() => new UserInfo ((StreamValueReader)null));
 
-			Assert.Throws<ArgumentNullException> (() => new UserInfo (null, null, UserId, ChanId, Muted));
-			Assert.Throws<ArgumentOutOfRangeException> (() => new UserInfo (Nickname, null, -1, ChanId, Muted));
-			Assert.Throws<ArgumentOutOfRangeException> (() => new UserInfo (Nickname, null, UserId, -1, Muted));
+			Assert.Throws<ArgumentNullException> (() => new UserInfo (null, UserId, ChanId, Muted));
+			Assert.Throws<ArgumentException> (() => new UserInfo (Username, 0, ChanId, Muted));
+			Assert.Throws<ArgumentOutOfRangeException> (() => new UserInfo (Username, UserId, -1, Muted));
+
+			Assert.Throws<ArgumentNullException> (() => new UserInfo (null, Username, UserId, ChanId, Muted));
+			Assert.Throws<ArgumentNullException> (() => new UserInfo (Nickname, null, UserId, ChanId, Muted));
+			Assert.Throws<ArgumentException> (() => new UserInfo (Nickname, Username, 0, ChanId, Muted));
+			Assert.Throws<ArgumentOutOfRangeException> (() => new UserInfo (Nickname, Username, UserId, -1, Muted));
 		}
 
 		[Test]
 		public void Ctor()
 		{
-			var info = new UserInfo (Nickname, null, UserId, ChanId, Muted);
+			var info = new UserInfo (Username, UserId, ChanId, Muted);
 
 			Assert.AreEqual (UserId, info.UserId);
 			Assert.AreEqual (ChanId, info.CurrentChannelId);
-			Assert.AreEqual (Nickname, info.Nickname);
-			Assert.AreEqual (Nickname, info.Username);
+			Assert.AreEqual (Username, info.Username);
 			Assert.AreEqual (Muted, info.IsMuted);
 
 			info = new UserInfo (Nickname, Username, UserId, ChanId, Muted);
@@ -54,7 +58,7 @@ namespace Gablarski.Tests
 			var writer = new StreamValueWriter (stream);
 			var reader = new StreamValueReader (stream);
 
-			var info = new UserInfo (Nickname, null, UserId, ChanId, Muted);
+			var info = new UserInfo (Nickname, Username, UserId, ChanId, Muted);
 			info.Serialize (writer);
 			long length = stream.Position;
 			stream.Position = 0;
@@ -70,8 +74,8 @@ namespace Gablarski.Tests
 		[Test]
 		public void Equals()
 		{
-			UserInfo foo = new UserInfo ("foo", null, 1, 2, Muted);
-			UserInfo bar = new UserInfo ("foo", null, 1, 2, Muted);
+			UserInfo foo = new UserInfo (Nickname, Username, 1, 2, Muted);
+			UserInfo bar = new UserInfo (Nickname, Username, 1, 2, Muted);
 
 			Assert.AreEqual (foo, bar);
 		}
@@ -79,8 +83,8 @@ namespace Gablarski.Tests
 		[Test]
 		public void HashCode()
 		{
-			UserInfo foo = new UserInfo ("foo", null, 1, 2, Muted);
-			UserInfo bar = new UserInfo ("foo", null, 1, 2, Muted);
+			UserInfo foo = new UserInfo (Nickname, Username, 1, 2, Muted);
+			UserInfo bar = new UserInfo (Nickname, Username, 1, 2, Muted);
 
 			Assert.AreEqual (foo.GetHashCode(), bar.GetHashCode());
 		}

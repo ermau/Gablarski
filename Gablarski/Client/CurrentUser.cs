@@ -87,37 +87,42 @@ namespace Gablarski.Client
 		/// </summary>
 		public event EventHandler<ReceivedLoginResultEventArgs> ReceivedLoginResult;
 
+		public event EventHandler<ReceivedJoinResultEventArgs> ReceivedJoinResult;
+
 		public event EventHandler PermissionsChanged;
 		#endregion
 
 		/// <summary>
-		/// Logs into the connected server with <paramref name="nick"/>.
+		/// Logs into the connected server
 		/// </summary>
-		/// <param name="nick">The nickname to log in with.</param>
-		/// <exception cref="System.ArgumentNullException"><paramref name="nick"/> is null or empty.</exception>
-		public void Login (string nick)
-		{
-			Login (nick, null, null);
-		}
-
-		/// <summary>
-		/// Logs into the connected server with <paramref name="nick"/>.
-		/// </summary>
-		/// <param name="nick">The nickname to log in with.</param>
 		/// <param name="username">The username to log in with.</param>
 		/// <param name="password">The password to log in with.</param>
-		/// <exception cref="System.ArgumentNullException"><paramref name="nick"/> is null or empty.</exception>
-		public void Login (string nick, string username, string password)
+		/// <exception cref="System.ArgumentNullException"><paramref name="username"/> is null or empty.</exception>
+		/// <exception cref="System.ArgumentNullException"><paramref name="password"/> is null.</exception>
+		public void Login (string username, string password)
 		{
-			if (nick.IsEmpty())
-				throw new ArgumentNullException ("nick", "nick must not be null or empty");
+			if (username.IsEmpty())
+				throw new ArgumentNullException("username");
+			if (password == null)
+				throw new ArgumentNullException("password");
 
 			this.context.Connection.Send (new LoginMessage
 			{
-				Nickname = nick,
 				Username = username,
 				Password = password
 			});
+		}
+
+		/// <summary>
+		/// Join
+		/// </summary>
+		/// <param name="nickname"></param>
+		public void Join (string nickname)
+		{
+			if (nickname.IsEmpty())
+				throw new ArgumentNullException ("nickname");
+
+			this.context.Connection.Send (new JoinMessage (nickname));
 		}
 
 		private readonly IClientContext context;
@@ -138,18 +143,34 @@ namespace Gablarski.Client
 				changed (this, e);
 		}
 
+		protected virtual void OnJoinResult (ReceivedJoinResultEventArgs e)
+		{
+			var join = this.ReceivedJoinResult;
+			if (join != null)
+				join (this, e);
+		}
+
 		internal void OnLoginResultMessage (MessageReceivedEventArgs e)
 		{
 		    var msg = (LoginResultMessage)e.Message;
 			if (msg.Result.ResultState == LoginResultState.Success)
+				this.UserId = msg.Result.UserId;
+
+			var args = new ReceivedLoginResultEventArgs (msg.Result);
+			OnLoginResult (args);
+		}
+
+		internal void OnJoinResultMessage (MessageReceivedEventArgs e)
+		{
+			var msg = (JoinResultMessage)e.Message;
+			if (msg.Result == LoginResultState.Success)
 			{
-				this.UserId = msg.UserInfo.UserId;
 				this.Nickname = msg.UserInfo.Nickname;
 				this.CurrentChannelId = msg.UserInfo.CurrentChannelId;
 			}
 
-			var args = new ReceivedLoginResultEventArgs (msg.Result);
-			this.OnLoginResult (args);
+			var args = new ReceivedJoinResultEventArgs(msg.Result);
+			OnJoinResult (args);
 		}
 
 		internal void OnPermissionsMessage (MessageReceivedEventArgs e)
@@ -160,6 +181,20 @@ namespace Gablarski.Client
 
 			this.permissions = msg.Permissions;
 			OnPermissionsChanged (EventArgs.Empty);
+		}
+	}
+
+	public class ReceivedJoinResultEventArgs
+		: EventArgs
+	{
+		public ReceivedJoinResultEventArgs (LoginResultState result)
+		{
+			this.Result = result;
+		}
+
+		public LoginResultState Result
+		{
+			get; set;
 		}
 	}
 

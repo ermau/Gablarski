@@ -85,6 +85,7 @@ namespace Gablarski.Client
 
 				{ ServerMessageType.ConnectionRejected, OnConnectionRejectedMessage },
 				{ ServerMessageType.LoginResult, this.CurrentUser.OnLoginResultMessage },
+				{ ServerMessageType.JoinResult, this.CurrentUser.OnJoinResultMessage },
 				{ ServerMessageType.Permissions, this.CurrentUser.OnPermissionsMessage },
 				{ ServerMessageType.UserLoggedIn, this.Users.OnUserLoggedInMessage },
 				{ ServerMessageType.UserDisconnected, this.Users.OnUserDisconnectedMessage },

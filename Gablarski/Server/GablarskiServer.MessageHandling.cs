@@ -54,6 +54,7 @@ namespace Gablarski.Server
 				{ ClientMessageType.Connect, ClientConnected },
 				{ ClientMessageType.Disconnect, ClientDisconnected },
 				{ ClientMessageType.Login, UserLoginAttempt },
+				{ ClientMessageType.Join, UserJoinAttempt },
 
 				{ ClientMessageType.RequestSource, ClientRequestsSource },
 				{ ClientMessageType.AudioData, AudioDataReceived },
@@ -199,7 +200,7 @@ namespace Gablarski.Server
 				
 				if (resultState == ChannelChangeResult.FailedUnknown)
 				{
-					if (this.connections.UpdateIfExists (e.Connection, new UserInfo (requestingPlayer) { CurrentChannelId = change.MoveInfo.TargetChannelId }))
+					if (this.connections.UpdateIfExists (e.Connection, new ServerUserInfo (requestingPlayer) { CurrentChannelId = change.MoveInfo.TargetChannelId }))
 						this.connections.Send (new UserChangedChannelMessage { ChangeInfo = new ChannelChangeInfo (change.MoveInfo.TargetUserId, change.MoveInfo.TargetChannelId, requestingPlayer.UserId)});
 					
 					return;
@@ -271,49 +272,70 @@ namespace Gablarski.Server
 			if (!GetPermission (PermissionName.MuteUser, requesting))
 				return;
 			
-			if (this.connections.UpdateIfExists (new UserInfo (target) { IsMuted = !unmute }))
+			if (this.connections.UpdateIfExists (new ServerUserInfo (target) { IsMuted = !unmute }))
 			{
 				this.connections.Send (new MutedMessage
 				{
 					Target = target.Username,
 					Type =  MuteType.User
-				}, (UserInfo u) => u == requesting);
+				}, (ServerUserInfo u) => u == requesting);
 			}
 		}
 
-		protected void UserLoginAttempt (MessageReceivedEventArgs e)
+		private void UserJoinAttempt (MessageReceivedEventArgs e)
 		{
-			var login = (LoginMessage)e.Message;
+			var join = (JoinMessage)e.Message;
 
-			if (login.Nickname.IsEmpty ())
+			if (join.Nickname.IsEmpty ())
 			{
-				e.Connection.Send (new LoginResultMessage (new LoginResult (0, LoginResultState.FailedInvalidNickname), null));
+				e.Connection.Send (new JoinResultMessage (LoginResultState.FailedInvalidNickname, null));
 				return;
 			}
 
-			LoginResult result = this.AuthenticationProvider.Login (login.Username, login.Password);
-			UserInfo info = null;
-
-			if (result.Succeeded)
+			ServerUserInfo info = this.connections[e.Connection];
+			if (info == null)
 			{
-				info = new UserInfo (login.Nickname, (login.Username.IsEmpty()) ? login.Nickname : login.Username, result.UserId, this.defaultChannel.ChannelId, false);
+				if (!settings.AllowGuestLogins)
+				{
+					e.Connection.Send (new JoinResultMessage (LoginResultState.FailedUsername, null));
+					return;
+				}
 
-				if (!this.GetPermission (PermissionName.Login, info))
-					result.ResultState = LoginResultState.FailedPermissions;
-				else if (!this.connections.UserLoggedIn (login.Nickname))
-					this.connections.Add (e.Connection, info);
-				else
-					result.ResultState = LoginResultState.FailedNicknameInUse;
+				LoginResult r = AuthenticationProvider.Login (join.Nickname, null);
+				if (!r.Succeeded)
+				{
+					e.Connection.Send (new JoinResultMessage (r.ResultState, null));
+					return;
+				}
+
+				info = new ServerUserInfo (new UserInfo (join.Nickname, join.Nickname, r.UserId, defaultChannel.ChannelId, false));
+				this.connections.Add (e.Connection, info);
+			}
+			else
+			{
+				info = new ServerUserInfo (info) { Nickname = join.Nickname };
+				this.connections.UpdateIfExists (e.Connection, info);
 			}
 
-			var msg = new LoginResultMessage (result, info);
+			LoginResultState result = LoginResultState.Success;
 
-			if (result.Succeeded)
+			if (!GetPermission (PermissionName.Login, info))
+				result = LoginResultState.FailedPermissions;
+			else if (this.connections.NicknameInUse (join.Nickname, e.Connection))
+				result = LoginResultState.FailedNicknameInUse;
+			else
+				this.connections.Add (e.Connection, info);
+
+			var msg = new JoinResultMessage (result, info);
+
+			if (result == LoginResultState.Success)
 			{
 				e.Connection.Send (msg);
-				e.Connection.Send (new PermissionsMessage (info.UserId, this.PermissionProvider.GetPermissions (msg.UserInfo.UserId)));
 
-				this.connections.Send (new UserLoggedInMessage (info));
+				if (!info.IsLoggedIn)
+					e.Connection.Send (new PermissionsMessage (info.UserId, this.PermissionProvider.GetPermissions (msg.UserInfo.UserId)));
+
+				this.connections.Send (new UserJoinedMessage (info));
 
 				lock (this.channelLock)
 				{
@@ -324,9 +346,33 @@ namespace Gablarski.Server
 				e.Connection.Send (new SourceListMessage (this.GetSourceInfoList ()));
 			}
 			else
+			{
 				e.Connection.Send (msg);
+				this.connections.Remove (e.Connection);
+			}
+		}
 
-			Trace.WriteLine ("[Server]" + login.Username + " Login: " + result.ResultState);
+		protected void UserLoginAttempt (MessageReceivedEventArgs e)
+		{
+			var login = (LoginMessage)e.Message;
+
+			if (login.Username.IsEmpty())
+			{
+				e.Connection.Send (new LoginResultMessage (new LoginResult (0, LoginResultState.FailedUsername)));
+				return;
+			}
+
+			LoginResult result = this.AuthenticationProvider.Login (login.Username, login.Password);
+
+			e.Connection.Send (new LoginResultMessage (result));
+
+			if (result.Succeeded)
+			{
+				this.connections.Add (e.Connection, new ServerUserInfo (new UserInfo (login.Username, result.UserId, this.defaultChannel.ChannelId, false), true));
+				e.Connection.Send (new PermissionsMessage (result.UserId, this.PermissionProvider.GetPermissions (result.UserId)));
+			}
+
+			Trace.WriteLine ("[Server] " + login.Username + " Login: " + result.ResultState);
 		}
 
 		private void ClientRequestsUserList (MessageReceivedEventArgs e)
@@ -357,7 +403,7 @@ namespace Gablarski.Server
 			}
 
 			this.connections.Send (new MutedMessage { Target = target.Id, Type = MuteType.AudioSource },
-				(UserInfo u) => u == requesting);
+				(ServerUserInfo u) => u == requesting);
 		}
 
 		private void ClientRequestsSourceList (MessageReceivedEventArgs e)

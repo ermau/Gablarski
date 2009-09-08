@@ -41,34 +41,34 @@ using System.Text;
 
 namespace Gablarski.Messages
 {
-	public class LoginResultMessage
+	public class UserJoinedMessage
 		: ServerMessage
 	{
-		public LoginResultMessage ()
-			: base (ServerMessageType.LoginResult)
+		public UserJoinedMessage()
+			: base (ServerMessageType.UserLoggedIn)
 		{
 		}
 
-		public LoginResultMessage (LoginResult result)
-			: this()
+		public UserJoinedMessage (UserInfo userInfo)
+			: base (ServerMessageType.UserLoggedIn)
 		{
-			this.Result = result;
+			this.UserInfo = userInfo;
 		}
 
-		public LoginResult Result
+		public UserInfo UserInfo
 		{
 			get;
 			set;
 		}
 
-		public override void ReadPayload (IValueReader reader)
-		{
-			this.Result = new LoginResult (reader);
-		}
-
 		public override void WritePayload (IValueWriter writer)
 		{
-			this.Result.Serialize (writer);
+			this.UserInfo.Serialize (writer);
+		}
+
+		public override void ReadPayload (IValueReader reader)
+		{
+			this.UserInfo = new UserInfo (reader);
 		}
 	}
 }

@@ -163,7 +163,7 @@ namespace Gablarski.Server
 		/// Disconnections an <c>IConnection</c>.
 		/// </summary>
 		/// <param name="user">The user to disconnect.</param>
-		public void Disconnect (UserInfo user)
+		public void Disconnect (ServerUserInfo user)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
@@ -288,7 +288,7 @@ namespace Gablarski.Server
 						if (!this.channels.ContainsKey (u.CurrentChannelId))
 						{
 							movedUsers.Add (u.UserId);
-							this.connections.UpdateIfExists (new UserInfo (u) { CurrentChannelId = defaultChannelId  });
+							this.connections.UpdateIfExists (new ServerUserInfo (u) { CurrentChannelId = defaultChannelId  });
 						}
 					}
 				}

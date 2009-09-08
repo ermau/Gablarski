@@ -34,6 +34,11 @@ namespace Gablarski.WebServer
 			set { timeBetweenScans = value; }
 		}
 
+		public static IHttpSessionStore SessionStore
+		{
+			get; set;
+		}
+
 		public static void ProcessSession (IHttpSession session, IHttpResponse response)
 		{
 			bool newSession = false;
@@ -53,6 +58,8 @@ namespace Gablarski.WebServer
 
 					session["mqueue"] = new List<MessageBase>();
 					session["connection"] = connection;
+					session["loggedIn"] = false;
+					SessionStore.Save (session);
 
 					response.Cookies.Add (new ResponseCookie (Server.SessionCookieName, session.Id, DateTime.Now.Add (SessionTtl)));
 
@@ -120,6 +127,7 @@ namespace Gablarski.WebServer
 
 		private static readonly Dictionary<string, IHttpSession> sessions = new Dictionary<string, IHttpSession>();
 		private static readonly Dictionary<string, WebServerConnection> connections = new Dictionary<string, WebServerConnection>();
+		private static readonly MemorySessionStore store = new MemorySessionStore();
 
 		private static void KillOldSessions ()
 		{
@@ -127,12 +135,12 @@ namespace Gablarski.WebServer
 			{
 				foreach (var session in sessions.Values.ToList())
 				{
-					if (DateTime.Now.Subtract (session.Accessed) > TimeBetweenScans)
-					{
-						sessions.Remove (session.Id);
-						connections[session.Id].Disconnect();
-						connections.Remove (session.Id);
-					}
+					if (DateTime.Now.Subtract (session.Accessed) <= TimeBetweenScans)
+						continue;
+
+					sessions.Remove (session.Id);
+					connections[session.Id].Disconnect();
+					connections.Remove (session.Id);
 				}
 			}
 		}

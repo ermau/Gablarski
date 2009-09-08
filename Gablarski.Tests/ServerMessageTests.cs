@@ -46,11 +46,21 @@ namespace Gablarski.Tests
 		public void LoginResult()
 		{
 			LoginResultState state = LoginResultState.Success;
+			var msg = new LoginResultMessage (new LoginResult (UserId, state));
 
-			var msg = new LoginResultMessage (new LoginResult (UserId, state), new UserInfo (Nickname, null, UserId, ChannelId, true));
-
-			Assert.AreEqual (UserId, msg.Result.UserId);
+			Assert.IsTrue (msg.Result.Succeeded);
 			Assert.AreEqual (state, msg.Result.ResultState);
+			Assert.AreEqual (UserId, msg.Result.UserId);
+		}
+
+		[Test]
+		public void JoinResult()
+		{
+			LoginResultState state = LoginResultState.Success;
+
+			var msg = new JoinResultMessage (state, new UserInfo (Nickname, Nickname, UserId, ChannelId, true));
+
+			Assert.AreEqual (state, msg.Result);
 			Assert.AreEqual (UserId, msg.UserInfo.UserId);
 			Assert.AreEqual (Nickname, msg.UserInfo.Nickname);
 			Assert.AreEqual (ChannelId, msg.UserInfo.CurrentChannelId);
@@ -59,12 +69,11 @@ namespace Gablarski.Tests
 			long length = stream.Position;
 			stream.Position = 0;
 
-			msg = new LoginResultMessage();
+			msg = new JoinResultMessage();
 			msg.ReadPayload (reader);
 
 			Assert.AreEqual (length, stream.Position);
-			Assert.AreEqual (UserId, msg.Result.UserId);
-			Assert.AreEqual (state, msg.Result.ResultState);
+			Assert.AreEqual (state, msg.Result);
 			Assert.AreEqual (UserId, msg.UserInfo.UserId);
 			Assert.AreEqual (Nickname, msg.UserInfo.Nickname);
 			Assert.AreEqual (ChannelId, msg.UserInfo.CurrentChannelId);
@@ -130,8 +139,8 @@ namespace Gablarski.Tests
 		{
 			List<UserInfo> users = new List<UserInfo>
 			{
-				new UserInfo (Nickname, null, UserId, ChannelId, false),
-				new UserInfo (Nickname2, null, UserId2, ChannelId2, true)
+				new UserInfo (Nickname, Nickname, UserId, ChannelId, false),
+				new UserInfo (Nickname2, Nickname2, UserId2, ChannelId2, true)
 			};
 
 			var msg = new UserListMessage (users);
@@ -205,13 +214,13 @@ namespace Gablarski.Tests
 		[Test]
 		public void UserLoggedIn()
 		{
-			var info = new UserInfo (Nickname, null, UserId, ChannelId, false);
-			var msg = new UserLoggedInMessage (info);
+			var info = new UserInfo (Nickname, Nickname, UserId, ChannelId, false);
+			var msg = new UserJoinedMessage (info);
 			msg.WritePayload (writer);
 			long length = stream.Position;
 			stream.Position = 0;
 
-			msg = new UserLoggedInMessage();
+			msg = new UserJoinedMessage();
 			msg.ReadPayload (reader);
 			Assert.AreEqual (length, stream.Position);
 			Assert.AreEqual (info.UserId, msg.UserInfo.UserId);

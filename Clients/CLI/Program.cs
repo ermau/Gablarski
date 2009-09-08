@@ -449,6 +449,8 @@ namespace Gablarski.Clients.CLI
 			else
 				Console.WriteLine ("Login failed: " + e.Result.ResultState);
 
+			Client.CurrentUser.Join (nickname);
+
 			if (voiceSource)
 				Client.Sources.Request ("voice", 1);
 		}
@@ -462,7 +464,11 @@ namespace Gablarski.Clients.CLI
 		{
 			Console.WriteLine ("Connected.");
 			Client.CurrentUser.ReceivedLoginResult += CurrentUserReceivedLoginResult;
-			Client.CurrentUser.Login (nickname, username, password);
+
+			if (username.IsEmpty() || password.IsEmpty())
+				Client.CurrentUser.Join (nickname);
+			else
+				Client.CurrentUser.Login (username, password);
 		}
 	}
 }

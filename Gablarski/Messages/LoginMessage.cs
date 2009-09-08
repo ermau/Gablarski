@@ -49,12 +49,6 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public string Nickname
-		{
-			get;
-			set;
-		}
-
 		public string Username
 		{
 			get;
@@ -69,32 +63,17 @@ namespace Gablarski.Messages
 
 		public override void WritePayload (IValueWriter writer)
 		{
-			bool guest = String.IsNullOrEmpty (Username);
-			
-			if (String.IsNullOrEmpty (this.Password) && !guest)
+			if (String.IsNullOrEmpty (this.Password))
 				throw new InvalidOperationException ("Can not login without a password.");
 
-			writer.WriteBool (guest);
-			writer.WriteString (Nickname);
-
-			if (!guest)
-			{
-				writer.WriteString (Username);
-				writer.WriteString (Password);
-			}
+			writer.WriteString (Username);
+			writer.WriteString (Password);
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
-			bool guest = reader.ReadBool ();
-
-			this.Nickname = reader.ReadString ();
-			
-			if (!guest)
-			{
-				this.Username = reader.ReadString ();
-				this.Password = reader.ReadString ();
-			}
+			this.Username = reader.ReadString ();
+			this.Password = reader.ReadString ();
 		}
 	}
 }

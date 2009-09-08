@@ -62,13 +62,30 @@ namespace Gablarski
 		{
 			if (nickname.IsEmpty())
 				throw new ArgumentNullException ("nickname");
-			if (userId < 0)
-				throw new ArgumentOutOfRangeException ("userId");
+			if (username.IsEmpty())
+				throw new ArgumentNullException ("username");
+			if (userId == 0)
+				throw new ArgumentException ("userId");
 			if (currentChannelId < 0)
 				throw new ArgumentOutOfRangeException ("currentChannelId");
 
 			this.Nickname = nickname;
-			this.Username = (username.IsEmpty()) ? nickname : username;
+			this.Username = username;
+			this.UserId = userId;
+			this.CurrentChannelId = currentChannelId;
+			this.IsMuted = muted;
+		}
+
+		internal UserInfo (string username, int userId, int currentChannelId, bool muted)
+		{
+			if (username.IsEmpty())
+				throw new ArgumentNullException ("username");
+			if (userId == 0)
+				throw new ArgumentException ("userId");
+			if (currentChannelId < 0)
+				throw new ArgumentOutOfRangeException ("currentChannelId");
+
+			this.Username = username;
 			this.UserId = userId;
 			this.CurrentChannelId = currentChannelId;
 			this.IsMuted = muted;
@@ -79,22 +96,22 @@ namespace Gablarski
 			if (reader == null)
 				throw new ArgumentNullException("reader");
 
-			this.Deserialize (reader);
+			Deserialize (reader);
 		}
 
-		public virtual string Username
+		public string Username
 		{
 			get;
 			protected set;
 		}
 
-		public virtual string Nickname
+		public string Nickname
 		{
 			get;
-			protected set;
+			set;
 		}
 
-		public virtual int UserId
+		public int UserId
 		{
 			get;
 			protected set;
@@ -133,12 +150,12 @@ namespace Gablarski
 		{
 			var info = (obj as UserInfo);
 
-			return (info != null) ? this.UserId.Equals (info.UserId) : this.UserId.Equals (obj);
+			return (info != null) ? Username == info.Username : false;
 		}
 
 		public override int GetHashCode ()
 		{
-			return this.UserId.GetHashCode();
+			return this.Username.GetHashCode();
 		}
 	}
 }

@@ -10,7 +10,6 @@ using Gablarski.Clients.Windows.Properties;
 using Gablarski.Messages;
 using Gablarski.Network;
 using Kennedy.ManagedHooks;
-using Microsoft.WindowsAPICodePack;
 
 namespace Gablarski.Clients.Windows
 {
@@ -155,7 +154,7 @@ namespace Gablarski.Clients.Windows
 			if (this.voiceCapture == null)
 				return;
 
-			if (this.ptt == null || this.ptt.Supplier != PushToTalkSupplier.Keyboard || this.ptt.KeyboardKeys != key)
+			if (!this.gablarski.IsConnected || this.ptt == null || this.ptt.Supplier != PushToTalkSupplier.Keyboard || this.ptt.KeyboardKeys != key)
 				return;
 
 			if (kEvent == KeyboardEvents.KeyDown && !this.voiceCapture.IsCapturing)
@@ -233,7 +232,10 @@ namespace Gablarski.Clients.Windows
 				//TaskDialog.Show (e.Result.ResultState.ToString(), "Login Failed");
 				MessageBox.Show (this, "Login Failed" + Environment.NewLine + e.Result.ResultState);
 			else
+			{
+				this.gablarski.CurrentUser.Join (this.server.UserNickname);
 				this.gablarski.Sources.Request ("voice", 1, 64000);
+			}
 		}
 
 		void GablarskiDisconnected (object sender, EventArgs e)
@@ -264,7 +266,10 @@ namespace Gablarski.Clients.Windows
 				);
 			});
 
-			this.gablarski.CurrentUser.Login (this.server.UserNickname, this.server.UserName, this.server.UserPassword);
+			if (this.server.UserName.IsEmpty() || this.server.UserPassword == null)
+				this.gablarski.CurrentUser.Join (this.server.UserNickname);
+			else
+				this.gablarski.CurrentUser.Login (this.server.UserName, this.server.UserPassword);
 		}
 
 		private void GablarskiConnectionRejected (object sender, RejectedConnectionEventArgs e)

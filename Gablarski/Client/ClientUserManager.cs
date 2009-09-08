@@ -213,7 +213,7 @@ namespace Gablarski.Client
 
 		internal void OnUserLoggedInMessage (MessageReceivedEventArgs e)
 		{
-			var msg = (UserLoggedInMessage)e.Message;
+			var msg = (UserJoinedMessage)e.Message;
 
 			ClientUser user;
 			lock (userLock)

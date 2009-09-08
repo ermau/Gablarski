@@ -63,7 +63,7 @@ namespace Gablarski.Client
 		}
 
 		public ClientUser (string nickname, int userId, int currentChannelId, IClientConnection client, bool muted)
-			: base (nickname, null, userId, currentChannelId, muted)
+			: base (nickname, nickname, userId, currentChannelId, muted)
 		{
 			if (client == null)
 				throw new ArgumentNullException ("client");

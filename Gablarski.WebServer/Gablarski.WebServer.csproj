@@ -32,6 +32,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Fadd, Version=1.0.0.0, Culture=neutral, PublicKeyToken=41411ef5f05a116f, processorArchitecture=MSIL" />
     <Reference Include="HttpServer, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0505b774db687742, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>.\HttpServer.dll</HintPath>
@@ -56,6 +57,8 @@
   <ItemGroup>
     <Compile Include="AdminModule.cs" />
     <Compile Include="ConnectionManager.cs" />
+    <Compile Include="FileResourceModule.cs" />
+    <Compile Include="LoginModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueryModule.cs" />
     <Compile Include="WebServerConnection.cs" />
@@ -83,6 +86,18 @@
     <None Include="HttpServer.License.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Html\login.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Html\styles.css" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Html\prototype.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Html\admin.html" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
