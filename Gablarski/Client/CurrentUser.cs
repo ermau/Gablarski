@@ -165,6 +165,7 @@ namespace Gablarski.Client
 			var msg = (JoinResultMessage)e.Message;
 			if (msg.Result == LoginResultState.Success)
 			{
+				this.Username = msg.UserInfo.Username;
 				this.Nickname = msg.UserInfo.Nickname;
 				this.CurrentChannelId = msg.UserInfo.CurrentChannelId;
 			}
