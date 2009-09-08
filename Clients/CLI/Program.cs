@@ -150,6 +150,7 @@ namespace Gablarski.Clients.CLI
 
 				Client.Sources.ReceivedAudioSource += SourcesReceivedSource;
 				Client.Sources.ReceivedSourceList += SourcesReceivedSourceList;
+				Client.CurrentUser.ReceivedJoinResult += new EventHandler<ReceivedJoinResultEventArgs> (CurrentUserReceivedJoinResult);
 
 				Client.Connect (host, port);
 			}
@@ -287,19 +288,18 @@ namespace Gablarski.Clients.CLI
 						}
 						else
 						{
-							ClientAudioSource source;
+							ClientAudioSource source = captureSource;
 
-							lock (Sources)
-							{
-								if (Sources.Count == 0)
-								{
-									Console.WriteLine ("No Sources to capture to.");
-									break;
-								}
+							//lock (Sources)
+							//{
+							//    if (Sources.Count == 0)
+							//    {
+							//        Console.WriteLine ("No Sources to capture to.");
+							//        break;
+							//    }
 
-								//source = (sourceId != 0) ? Sources.OfType<ClientAudioSource>().FirstOrDefault (s => s.Id == sourceId) : Sources.OfType<ClientAudioSource>().First();
-								source = captureSource;
-							}
+							//    source = (sourceId != 0) ? Sources.OfType<ClientAudioSource>().FirstOrDefault (s => s.Id == sourceId) : Sources.OfType<ClientAudioSource>().First();
+							//}
 
 							if (source == null)
 								Console.WriteLine ("Source not found.");
@@ -330,8 +330,28 @@ namespace Gablarski.Clients.CLI
 			}
 		}
 
+		static void CurrentUserReceivedJoinResult (object sender, ReceivedJoinResultEventArgs e)
+		{
+			if (e.Result != LoginResultState.Success)
+			{
+				Console.WriteLine (e.Result);
+				return;
+			}
+
+			if (voiceSource)
+				Client.Sources.Request ("voice", 1);
+		}
+
 		private static void SourcesReceivedSourceList (object sender, ReceivedListEventArgs<AudioSource> e)
 		{
+			foreach (var s in e.Data)
+			{
+				lock (Sources)
+				{
+					Sources.Add (s);
+				}
+			}
+
 			Client.Audio.Attach (playbackProvider, e.Data, new AudioEnginePlaybackOptions());
 		}
 
@@ -352,6 +372,11 @@ namespace Gablarski.Clients.CLI
 		
 		static void SourcesReceivedSource (object sender, ReceivedAudioSourceEventArgs e)
 		{
+			lock (Sources)
+			{
+				Sources.Add (e.Source);
+			}
+
 			if (e.Source.OwnerId != Client.CurrentUser.UserId)
 			{
 				Client.Audio.Attach (playbackProvider, e.Source, new AudioEnginePlaybackOptions());
@@ -361,11 +386,6 @@ namespace Gablarski.Clients.CLI
 			captureSource = (ClientAudioSource)e.Source;
 			Client.Audio.Attach (captureProvider, AudioFormat.Mono16Bit, captureSource, new AudioEngineCaptureOptions());
 			Console.WriteLine ("Received own source. Name: " + e.Source.Name + " Id: " + e.Source.Id + " Owner: " + e.Source.OwnerId + " Bitrate: " + e.Source.Bitrate);
-
-			lock (Sources)
-			{
-				Sources.Add (e.Source);
-			}
 		}
 
 		static void SelectCapture (IAudioDevice device, TextWriter writer)
@@ -450,9 +470,6 @@ namespace Gablarski.Clients.CLI
 				Console.WriteLine ("Login failed: " + e.Result.ResultState);
 
 			Client.CurrentUser.Join (nickname);
-
-			if (voiceSource)
-				Client.Sources.Request ("voice", 1);
 		}
 
 		static void ClientConnectionRejected (object sender, RejectedConnectionEventArgs e)

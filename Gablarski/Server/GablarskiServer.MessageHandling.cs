@@ -470,7 +470,7 @@ namespace Gablarski.Server
 			var speaker = this.connections[e.Connection];
 
 			PermissionName n = PermissionName.SendAudioToCurrentChannel;
-			if (speaker.CurrentChannelId == msg.ChannelId)
+			if (speaker.CurrentChannelId != msg.ChannelId)
 				n = PermissionName.SendAudioToDifferentChannel;
 
 			if (!GetPermission (n, msg.ChannelId, speaker.UserId))
