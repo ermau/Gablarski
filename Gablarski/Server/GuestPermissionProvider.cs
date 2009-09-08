@@ -60,7 +60,7 @@ namespace Gablarski.Server
 			{
 				return GetNamesAsPermissions (PermissionName.Login, PermissionName.ChangeChannel, PermissionName.AddChannel,
 				                              PermissionName.EditChannel, PermissionName.DeleteChannel,
-				                              PermissionName.RequestChannelList, PermissionName.RequestSource);
+				                              PermissionName.RequestChannelList, PermissionName.RequestSource, PermissionName.SendAudioToCurrentChannel);
 			}
 			else // Non-user client.
 				return GetNamesAsPermissions (PermissionName.Login, PermissionName.RequestChannelList);
