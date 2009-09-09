@@ -142,6 +142,14 @@ namespace Gablarski.Server
 			}
 		}
 
+		public UserInfo GetUser (string target)
+		{
+			lock (lck)
+			{
+				return this.users.FirstOrDefault (u => u.Value.Username == target).Value;
+			}
+		}
+
 		public IConnection GetConnection (int userId)
 		{
 			lock (lck)

@@ -252,9 +252,9 @@ namespace Gablarski.Server
 		{
 			var msg = (RequestMuteMessage)e.Message;
 
-			if ((msg.Type & MuteType.User) == MuteType.User)
-				ClientRequestsPlayerMute (this.connections[e.Connection], this.connections.GetUser ((int)msg.Target), msg.Unmute);
-			else if ((msg.Type & MuteType.AudioSource) == MuteType.AudioSource)
+			if (msg.Type == MuteType.User)
+				ClientRequestsUserMute (this.connections[e.Connection], this.connections.GetUser ((string)msg.Target), msg.Unmute);
+			else if (msg.Type  == MuteType.AudioSource)
 			{
 				AudioSource source;
 				lock (this.sourceLock)
@@ -267,7 +267,7 @@ namespace Gablarski.Server
 		}
 
 		#region Users
-		protected void ClientRequestsPlayerMute (UserInfo requesting, UserInfo target, bool unmute)
+		protected void ClientRequestsUserMute (UserInfo requesting, UserInfo target, bool unmute)
 		{
 			if (!GetPermission (PermissionName.MuteUser, requesting))
 				return;
@@ -469,6 +469,9 @@ namespace Gablarski.Server
 
 			var speaker = this.connections[e.Connection];
 
+			if (speaker.IsMuted)
+				return;
+
 			PermissionName n = PermissionName.SendAudioToCurrentChannel;
 			if (speaker.CurrentChannelId != msg.ChannelId)
 				n = PermissionName.SendAudioToDifferentChannel;
@@ -476,13 +479,16 @@ namespace Gablarski.Server
 			if (!GetPermission (n, msg.ChannelId, speaker.UserId))
 				return;
 
-			this.connections.Send (new AudioSourceStateChangeMessage (msg.Starting, msg.SourceId, msg.ChannelId), (con, user) => con != e.Connection && user.CurrentChannelId.Equals (msg.ChannelId));
+			this.connections.Send (new AudioSourceStateChangeMessage (msg.Starting, msg.SourceId, msg.ChannelId), (con, user) => con != e.Connection && user.CurrentChannelId == msg.ChannelId);
 		}
 
 		protected void AudioDataReceived (MessageReceivedEventArgs e)
 		{
 			var msg = (SendAudioDataMessage)e.Message;
 			var speaker = this.connections[e.Connection];
+
+			if (speaker.IsMuted)
+				return;
 
 			PermissionName n = PermissionName.SendAudioToCurrentChannel;
 			if (speaker.CurrentChannelId != msg.TargetChannelId)
@@ -491,7 +497,7 @@ namespace Gablarski.Server
 			if (!GetPermission (n, msg.TargetChannelId, speaker.UserId))
 				return;
 
-			this.connections.Send (new AudioDataReceivedMessage (msg.SourceId, msg.Sequence, msg.Data), (con, user) => con != e.Connection && !user.IsMuted && user.CurrentChannelId.Equals (msg.TargetChannelId));
+			this.connections.Send (new AudioDataReceivedMessage (msg.SourceId, msg.Sequence, msg.Data), (con, user) => con != e.Connection && user.CurrentChannelId.Equals (msg.TargetChannelId));
 		}
 		#endregion
 	}

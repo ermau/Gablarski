@@ -99,7 +99,7 @@ namespace Gablarski.Client
 
 		public void ToggleMute ()
 		{
-			this.client.Send (new RequestMuteMessage { Target = this.Username, Type = MuteType.User, Unmute = !this.IsMuted });
+			this.client.Send (new RequestMuteMessage { Target = this.Username, Type = MuteType.User, Unmute = this.IsMuted });
 		}
 
 		private readonly IClientConnection client;

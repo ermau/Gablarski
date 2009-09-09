@@ -164,8 +164,10 @@ namespace Gablarski.Clients.Windows
 			if (!userNodes.ContainsKey (user) || userNodes[user].ImageKey == "talking")
 				return;
 
-			userNodes[user].ImageKey = "talking";
-			userNodes[user].SelectedImageKey = "talking";
+			var node = userNodes[user];
+			node.ImageKey = "talking";
+			node.SelectedImageKey = "talking";
+			SetupUserContext (node);
 		}
 
 		public void MarkMusic (UserInfo user)
@@ -184,7 +186,9 @@ namespace Gablarski.Clients.Windows
 			if (!userNodes.ContainsKey (user))
 				return;
 
-			userNodes[user].ImageKey = userNodes[user].SelectedImageKey = "music";
+			var node = userNodes[user];
+			userNodes[user].ImageKey = node.SelectedImageKey = "music";
+			SetupUserContext (node);
 		}
 
 		public void MarkMuted (UserInfo user)
@@ -201,7 +205,9 @@ namespace Gablarski.Clients.Windows
 			if (!userNodes.ContainsKey (user))
 				return;
 
-			userNodes[user].SelectedImageKey = userNodes[user].ImageKey = "muted";
+			var node = userNodes[user];
+			userNodes[user].SelectedImageKey = node.ImageKey = "muted";
+			SetupUserContext (node);
 		}
 
 		public void MarkSilent (UserInfo user)
@@ -215,10 +221,12 @@ namespace Gablarski.Clients.Windows
 				return;
 			}
 
-			if (!userNodes.ContainsKey (user) || user.IsMuted || userNodes[user].ImageKey == "silent" || userNodes[user].ImageKey == "muted")
+			if (!userNodes.ContainsKey (user) || user.IsMuted || userNodes[user].ImageKey == "silent")
 				return;
 
-			userNodes[user].ImageKey = userNodes[user].SelectedImageKey = "silent";
+			var node = userNodes[user];
+			userNodes[user].ImageKey = node.SelectedImageKey = "silent";
+			SetupUserContext (node);
 		}
 
 		public void Update (IEnumerable<ChannelInfo> channels, IEnumerable<UserInfo> users)
@@ -367,19 +375,46 @@ namespace Gablarski.Clients.Windows
 		{
 			un.ContextMenuStrip = new ContextMenuStrip();
 			
-			var ignore = new ToolStripMenuItem ("Ignore user", Resources.SoundMuteImage);
-			ignore.ToolTipText = "Ignores the user";
-			ignore.Click += ContextIgnoreUserClick;
-			
-			un.ContextMenuStrip.Items.Add (ignore);
+			var target = (ClientUser)un.Tag;
 
-			if (this.Client.CurrentUser.Permissions.CheckPermission (PermissionName.MuteUser))
+			if (target.Username != Client.CurrentUser.Username)
 			{
-				var mute = new ToolStripMenuItem ("Mute user", Resources.SoundMuteImage);
-				mute.ToolTipText = "Mutes the user for everyone";
-				mute.Click += ContextMuteUserClick;
+				if (!target.IsIgnored)
+				{
+					var ignore = new ToolStripMenuItem ("Ignore user", Resources.SoundMuteImage);
+					ignore.ToolTipText = "Ignores the user";
+					ignore.Click += ContextIgnoreUserClick;
 
-				un.ContextMenuStrip.Items.Add (mute);
+					un.ContextMenuStrip.Items.Add (ignore);
+				}
+				else
+				{
+					var ignore = new ToolStripMenuItem ("Unignore user", Resources.SoundImage);
+					ignore.ToolTipText = "Unignores the user";
+					ignore.Click += ContextIgnoreUserClick;
+
+					un.ContextMenuStrip.Items.Add (ignore);
+				}
+
+				if (this.Client.CurrentUser.Permissions.CheckPermission (PermissionName.MuteUser))
+				{
+					if (!target.IsMuted)
+					{
+						var mute = new ToolStripMenuItem ("Mute user", Resources.SoundMuteImage);
+						mute.ToolTipText = "Mutes the user for everyone";
+						mute.Click += ContextMuteUserClick;
+
+						un.ContextMenuStrip.Items.Add (mute);
+					}
+					else
+					{
+						var mute = new ToolStripMenuItem ("Unmute user", Resources.SoundImage);
+						mute.ToolTipText = "Unmutes the user for everyone";
+						mute.Click += ContextMuteUserClick;
+
+						un.ContextMenuStrip.Items.Add (mute);
+					}
+				}
 			}
 		}
 		
