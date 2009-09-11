@@ -79,29 +79,56 @@ namespace Gablarski.Audio.OpenAL.Providers
 			//else
 			//    return 0;
 
-			return pool.RequestSource (source).ProcessedBuffers;
+			lock (this.pool)
+			{
+				return pool.RequestSource (source).ProcessedBuffers;
+			}
 		}
 
 		public void QueuePlayback (AudioSource audioSource, byte[] data)
 		{
 			Stack<SourceBuffer> bufferStack;
+            
+			lock (this.buffers)
+			{
+				if (!this.buffers.TryGetValue (audioSource, out bufferStack))
+					this.buffers[audioSource] = bufferStack = new Stack<SourceBuffer> (SourceBuffer.Generate (10));
+			}
 
-			if (!this.buffers.TryGetValue (audioSource, out bufferStack))
-				this.buffers[audioSource] = bufferStack = new Stack<SourceBuffer> (SourceBuffer.Generate (10));
+			Source source;
+			lock (this.pool)
+			{
+				source = this.pool.RequestSource (audioSource);
+			}
+			
+			SourceBuffer buffer;
+			lock (bufferStack)
+			{
+				SourceBuffer[] dbuffers = source.Dequeue();
+				for (int i = 0; i < dbuffers.Length; ++i)
+					bufferStack.Push (dbuffers[i]);
 
-			Source source = this.pool.RequestSource (audioSource);
+				if (data.Length == 0)
+					return;
 
-			SourceBuffer[] dbuffers = source.Dequeue();
-			for (int i = 0; i < dbuffers.Length; ++i)
-				bufferStack.Push (dbuffers[i]);
-
-			if (data.Length == 0)
-				return;
-
-			SourceBuffer buffer = bufferStack.Pop();
+				buffer = bufferStack.Pop();
+			}
 
 			buffer.Buffer (data, (audioSource.Channels == 1) ? AudioFormat.Mono16Bit : AudioFormat.Stereo16Bit, (uint)audioSource.Frequency);
 			source.QueueAndPlay (buffer);
+		}
+
+		public void FreeSource (AudioSource audioSource)
+		{
+			lock (this.buffers)
+			{
+				this.buffers.Remove (audioSource);
+			}
+
+			lock (this.pool)
+			{
+				this.pool.FreeSource (audioSource);
+			}
 		}
 
 		public IEnumerable<IAudioDevice> GetDevices ()

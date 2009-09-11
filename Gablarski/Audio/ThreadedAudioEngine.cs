@@ -216,6 +216,7 @@ namespace Gablarski.Audio
 			this.AudioReceiver.ReceivedAudio += OnReceivedAudio;
 			this.AudioReceiver.AudioSourceStarted += OnAudioSourceStarted;
 			this.AudioReceiver.AudioSourceStopped += OnAudioSourceStopped;
+			this.AudioReceiver.AudioSourcesRemoved += OnAudioSourceRemoved;
 
 			this.playbackRunnerThread = new Thread (this.PlaybackRunner) { Name = "ThreadedAudioEngine Playback Runner" };
 			this.playbackRunnerThread.Start();
@@ -228,6 +229,7 @@ namespace Gablarski.Audio
 			this.AudioReceiver.ReceivedAudio -= OnReceivedAudio;
 			this.AudioReceiver.AudioSourceStarted -= OnAudioSourceStarted;
 			this.AudioReceiver.AudioSourceStopped -= OnAudioSourceStopped;
+			this.AudioReceiver.AudioSourcesRemoved -= OnAudioSourceRemoved;
 			
 			if (this.playbackRunnerThread != null)
 			{
@@ -246,15 +248,41 @@ namespace Gablarski.Audio
 			}
 			playbackLock.ExitWriteLock();
 		}
-
+		
 		private volatile bool running;
 		private Thread playbackRunnerThread;
 
 		private readonly Dictionary<AudioSource, AudioCaptureEntity> captures = new Dictionary<AudioSource, AudioCaptureEntity>();
 		private readonly Dictionary<AudioSource, AudioPlaybackEntity> playbacks = new Dictionary<AudioSource, AudioPlaybackEntity>();
 		private readonly ReaderWriterLockSlim playbackLock = new ReaderWriterLockSlim();
+		private readonly ReaderWriterLockSlim captureLock = new ReaderWriterLockSlim();
 
 		private IAudioReceiver audioReceiver;
+
+		private void OnAudioSourceRemoved (object sender, ReceivedListEventArgs<ClientAudioSource> e)
+		{
+			foreach (var s in e.Data)
+			{
+				playbackLock.EnterUpgradeableReadLock();
+				if (playbacks.ContainsKey (s))
+				{
+					playbackLock.EnterWriteLock();
+					playbacks[s].Playback.FreeSource (s);
+					playbacks.Remove (s);
+					playbackLock.ExitWriteLock();
+				}
+				playbackLock.ExitUpgradeableReadLock();
+
+				captureLock.EnterUpgradeableReadLock();
+				if (captures.ContainsKey (s))
+				{
+					captureLock.EnterWriteLock();
+					captures.Remove (s);
+					captureLock.ExitWriteLock();
+				}
+				captureLock.ExitUpgradeableReadLock();
+			}
+		}
 
 		private void OnAudioSourceStopped (object sender, AudioSourceEventArgs e)
 		{

@@ -72,6 +72,17 @@ namespace Gablarski.Audio.OpenAL
 			return s[lastFree];
 		}
 
+		public void FreeSource (T owner)
+		{
+			for (int i = 0; i < owners.Length; ++i)
+			{
+				if (!owners[i].Equals (owner))
+					continue;
+
+				owners[i] = default(T);
+			}
+		}
+
 		public void FreeSource (Source source)
 		{
 			for (int i = 0; i < owners.Length; ++i)

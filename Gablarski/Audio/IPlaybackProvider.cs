@@ -65,6 +65,12 @@ namespace Gablarski.Audio
 		/// <param name="source">The <see cref="AudioSource"/> the audio came from.</param>
 		/// <param name="data">PCM data.</param>
 		void QueuePlayback (AudioSource source, byte[] data);
+
+		/// <summary>
+		/// Frees any internal resources associated with the <paramref name="source"/>.
+		/// </summary>
+		/// <param name="source">The source to free any resources for.</param>
+		void FreeSource (AudioSource source);
 	}
 
 	public class SourceFinishedEventArgs

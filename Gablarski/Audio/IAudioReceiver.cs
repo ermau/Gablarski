@@ -47,6 +47,7 @@ namespace Gablarski.Audio
 		event EventHandler<AudioSourceEventArgs> AudioSourceStarted;
 		event EventHandler<AudioSourceEventArgs> AudioSourceStopped;
 		event EventHandler<ReceivedAudioEventArgs> ReceivedAudio;
+		event EventHandler<ReceivedListEventArgs<ClientAudioSource>> AudioSourcesRemoved;
 	}
 
 	public class AudioSourceEventArgs
