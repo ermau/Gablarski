@@ -28,6 +28,7 @@ namespace Gablarski.Clients.Windows
 			this.gablarski.Users.UserDisconnected += UsersUserDisconnected;
 			this.gablarski.Users.UserChangedChannel += UsersUserChangedChannel;
 			this.gablarski.CurrentUser.ReceivedLoginResult += this.CurrentUserReceivedLoginResult;
+			this.gablarski.CurrentUser.ReceivedJoinResult += this.CurrentUserReceivedJoinResult;
 
 			this.gablarski.Sources.ReceivedSourceList += SourcesOnReceivedSourceList;
 			this.gablarski.Sources.ReceivedAudioSource += this.SourcesReceivedSource;
@@ -155,7 +156,7 @@ namespace Gablarski.Clients.Windows
 
 		private void KHookKeyboardEvent (KeyboardEvents kEvent, Keys key)
 		{
-			if (this.voiceCapture == null)
+			if (this.voiceCapture == null || this.voiceSource == null)
 				return;
 
 			if (!this.gablarski.IsConnected || this.ptt == null || this.ptt.Supplier != PushToTalkSupplier.Keyboard || this.ptt.KeyboardKeys != key)
@@ -236,10 +237,15 @@ namespace Gablarski.Clients.Windows
 				//TaskDialog.Show (e.Result.ResultState.ToString(), "Login Failed");
 				MessageBox.Show (this, "Login Failed" + Environment.NewLine + e.Result.ResultState);
 			else
-			{
 				this.gablarski.CurrentUser.Join (this.server.UserNickname);
+		}
+
+		void CurrentUserReceivedJoinResult (object sender, ReceivedJoinResultEventArgs e)
+		{
+			if (e.Result != LoginResultState.Success)
+				MessageBox.Show (this, "Join failed: " + e.Result);
+			else
 				this.gablarski.Sources.Request ("voice", 1, 64000);
-			}
 		}
 
 		void GablarskiDisconnected (object sender, EventArgs e)
