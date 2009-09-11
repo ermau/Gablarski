@@ -72,8 +72,9 @@ namespace Gablarski.Tests
 				})
 			));
 
-			var csource = manager.OfType<ClientAudioSource>().FirstOrDefault (s => s.Id == 1);
+			var csource = manager.FirstOrDefault (s => s.Id == 1);
 			Assert.IsNotNull (csource, "Source not found");
+			Assert.IsInstanceOf (typeof (OwnedAudioSource), csource);
 			Assert.AreEqual ("ownvoice", csource.Name, "Name not matching");
 			Assert.AreEqual (1, csource.OwnerId, "OwnerId not matching");
 			Assert.AreEqual (1, csource.Channels, "Channels not matching");
@@ -81,10 +82,11 @@ namespace Gablarski.Tests
 			Assert.AreEqual (44100, csource.Frequency, "Frequency not matching");
 			Assert.AreEqual (256, csource.FrameSize, "FrameSize not matching");
 			Assert.AreEqual (10, csource.Complexity, "Complexity not matching.");
-			Assert.AreEqual (false, csource.Muted, "Muted not matching");
+			Assert.AreEqual (false, csource.IsMuted, "IsMuted not matching");
 
-			var source = manager.OfType<AudioSource>().FirstOrDefault (s => s.Id == 2);
+			var source = manager.FirstOrDefault (s => s.Id == 2);
 			Assert.IsNotNull (source, "Source not found");
+			Assert.IsInstanceOf (typeof (ClientAudioSource), csource);
 			Assert.AreEqual ("voice", source.Name, "Name not matching");
 			Assert.AreEqual (2, source.OwnerId, "OwnerId not matching");
 			Assert.AreEqual (1, source.Channels, "Channels not matching");
@@ -92,7 +94,7 @@ namespace Gablarski.Tests
 			Assert.AreEqual (44100, source.Frequency, "Frequency not matching");
 			Assert.AreEqual (512, source.FrameSize, "FrameSize not matching");
 			Assert.AreEqual (10, source.Complexity, "Complexity not matching");
-			Assert.AreEqual (true, source.Muted, "Muted not matching");
+			Assert.AreEqual (true, source.IsMuted, "IsMuted not matching");
 		}
 
 		//manager.OnSourceResultMessage (new SourceResultMessage (SourceResult.));

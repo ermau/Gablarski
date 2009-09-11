@@ -76,7 +76,7 @@ namespace Gablarski.Audio
 			{
 				foreach (var s in sources)
 				{
-					if (playbacks.ContainsKey (s) && !(s is ClientAudioSource))
+					if (playbacks.ContainsKey (s) && !(s is OwnedAudioSource))
 						continue;
 
 					playbacks.Add (s, new AudioPlaybackEntity (playback, s, options));
@@ -101,7 +101,7 @@ namespace Gablarski.Audio
 			playbackLock.ExitWriteLock();
 		}
 
-		public void Attach (ICaptureProvider capture, AudioFormat format, ClientAudioSource source, AudioEngineCaptureOptions options)
+		public void Attach (ICaptureProvider capture, AudioFormat format, OwnedAudioSource source, AudioEngineCaptureOptions options)
 		{
 			if (capture == null)
 				throw new ArgumentNullException ("capture");

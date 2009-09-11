@@ -72,7 +72,7 @@ namespace Gablarski.Clients.Windows
 		private PushToTalk ptt;
 		private IPlaybackProvider playback;
 		private ICaptureProvider voiceCapture;
-		private ClientAudioSource voiceSource;
+		private OwnedAudioSource voiceSource;
 
 		private void MainForm_Load (object sender, EventArgs e)
 		{
@@ -123,6 +123,10 @@ namespace Gablarski.Clients.Windows
 
 				case "PushToTalk":
 					this.ptt = Settings.PushToTalk;
+					break;
+
+				case "DisplaySources":
+					this.users.Update (this.gablarski.Channels, this.gablarski.Users.Cast<UserInfo>(), this.gablarski.Sources);
 					break;
 			}
 		}
@@ -181,7 +185,7 @@ namespace Gablarski.Clients.Windows
 			this.users.MarkSilent (this.gablarski.Users[e.Source.OwnerId]);
 		}
 
-		void SourcesRemoved (object sender, ReceivedListEventArgs<AudioSource> e)
+		void SourcesRemoved (object sender, ReceivedListEventArgs<ClientAudioSource> e)
 		{
 			foreach (var s in e.Data)
 				this.gablarski.Audio.Detach (s);
@@ -192,7 +196,7 @@ namespace Gablarski.Clients.Windows
 			if (e.Result == SourceResult.Succeeded)
 			{
 				if (e.Source.Name == VoiceName)
-					voiceSource = (ClientAudioSource)e.Source;
+					voiceSource = (OwnedAudioSource)e.Source;
 			}
 			else if (e.Result == SourceResult.NewSource)
 				this.gablarski.Audio.Attach (playback, e.Source, new AudioEnginePlaybackOptions());
@@ -218,12 +222,12 @@ namespace Gablarski.Clients.Windows
 
 		void UsersReceivedUserList (object sender, ReceivedListEventArgs<UserInfo> e)
 		{
-			this.users.Update (this.gablarski.Channels, e.Data);
+			this.users.Update (this.gablarski.Channels, e.Data, this.gablarski.Sources);
 		}
 
 		void ChannelsReceivedChannelList (object sender, ReceivedListEventArgs<ChannelInfo> e)
 		{
-			this.users.Update (e.Data, this.gablarski.Users.Cast<UserInfo>());
+			this.users.Update (e.Data, this.gablarski.Users.Cast<UserInfo>(), this.gablarski.Sources);
 		}
 
 		void CurrentUserReceivedLoginResult (object sender, ReceivedLoginResultEventArgs e)

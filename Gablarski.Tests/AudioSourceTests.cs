@@ -47,7 +47,7 @@ namespace Gablarski.Tests
 			Assert.AreEqual (44100,		source.Frequency);
 			Assert.AreEqual (512,		source.FrameSize);
 			Assert.AreEqual (10,		source.Complexity);
-			Assert.AreEqual (true,		source.Muted);
+			Assert.AreEqual (true,		source.IsMuted);
 		}
 	}
 }

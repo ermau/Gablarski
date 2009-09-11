@@ -399,7 +399,7 @@ namespace Gablarski.Server
 
 			lock (this.sourceLock)
 			{
-				target.Muted = !unmute;
+				target.IsMuted = !unmute;
 			}
 
 			this.connections.Send (new MutedMessage { Target = target.Id, Type = MuteType.AudioSource },

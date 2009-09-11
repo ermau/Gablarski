@@ -27,7 +27,7 @@ namespace Gablarski.Tests
 		/// <summary>
 		/// Gets teh source manager in this context
 		/// </summary>
-		public IIndexedEnumerable<int, AudioSource> Sources { get; set; }
+		public IIndexedEnumerable<int, ClientAudioSource> Sources { get; set; }
 
 		/// <summary>
 		/// Gets the user associated with this context

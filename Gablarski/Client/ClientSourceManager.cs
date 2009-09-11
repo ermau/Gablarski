@@ -47,7 +47,7 @@ using Gablarski.Messages;
 namespace Gablarski.Client
 {
 	public class ClientSourceManager
-		: IAudioReceiver, IIndexedEnumerable<int, AudioSource>, INotifyCollectionChanged
+		: IAudioReceiver, IIndexedEnumerable<int, ClientAudioSource>, INotifyCollectionChanged
 	{
 		protected internal ClientSourceManager (IClientContext context)
 		{
@@ -71,7 +71,7 @@ namespace Gablarski.Client
 		/// <summary>
 		/// An audio source was removed.
 		/// </summary>
-		public event EventHandler<ReceivedListEventArgs<AudioSource>> AudioSourcesRemoved;
+		public event EventHandler<ReceivedListEventArgs<ClientAudioSource>> AudioSourcesRemoved;
 
 		/// <summary>
 		/// An audio source started playing.
@@ -102,22 +102,33 @@ namespace Gablarski.Client
 		/// <summary>
 		/// Gets a listing of the sources that belong to the current user.
 		/// </summary>
-		public IEnumerable<ClientAudioSource> Mine
+		public IEnumerable<OwnedAudioSource> Mine
 		{
-			get { return this.OfType<ClientAudioSource>(); }
+			get { return this.OfType<OwnedAudioSource>(); }
 		}
 
-		public AudioSource this[int sourceID]
+		public ClientAudioSource this[int sourceID]
 		{
 			get
 			{
-				AudioSource source;
+				ClientAudioSource source;
 				lock (this.sources)
 				{
 					this.sources.TryGetValue (sourceID, out source);
 				}
 
 				return source;
+			}
+		}
+
+		public IEnumerable<ClientAudioSource> this[UserInfo user]
+		{
+			get
+			{
+				lock (this.sources)
+				{
+					return this.sources.Values.Where (s => s.OwnerId == user.UserId).ToList();
+				}
 			}
 		}
 
@@ -130,7 +141,7 @@ namespace Gablarski.Client
 		/// A <see cref="T:System.Collections.Generic.IEnumerator`1"/> that can be used to iterate through the collection.
 		/// </returns>
 		/// <filterpriority>1</filterpriority>
-		public IEnumerator<AudioSource> GetEnumerator()
+		public IEnumerator<ClientAudioSource> GetEnumerator()
 		{
 			if (this.sources == null)
 				yield break;
@@ -197,17 +208,17 @@ namespace Gablarski.Client
 		}
 
 		private readonly IClientContext context;
-		private readonly Dictionary<int, AudioSource> sources = new Dictionary<int, AudioSource>();
+		private readonly Dictionary<int, ClientAudioSource> sources = new Dictionary<int, ClientAudioSource>();
 
 		// We'll end up with new instances from the outside world, we can update our
 		// own instances no problem.
-		internal void UpdateSourceFromExternal (AudioSource updatedSource)
+		internal void UpdateSourceFromExternal (ClientAudioSource updatedSource)
 		{
 			NotifyCollectionChangedEventArgs collectionChanged;
 
 			lock (sources)
 			{
-				AudioSource source;
+				ClientAudioSource source;
 				if (!sources.TryGetValue (updatedSource.Id, out source))
 				{
 					sources[updatedSource.Id] = source = updatedSource;
@@ -223,10 +234,10 @@ namespace Gablarski.Client
 			OnCollectionChanged (collectionChanged);
 		}
 
-		internal void UpdateSourcesFromExternal (IEnumerable<AudioSource> updatedSources)
+		internal void UpdateSourcesFromExternal (IEnumerable<ClientAudioSource> updatedSources)
 		{
-			IEnumerable<AudioSource> updatedAndNew;
-			IEnumerable<AudioSource> deleted;
+			IEnumerable<ClientAudioSource> updatedAndNew;
+			IEnumerable<ClientAudioSource> deleted;
 
 			lock (sources)
 			{
@@ -255,7 +266,7 @@ namespace Gablarski.Client
 			target.Id = updatedSource.Id;
 			target.OwnerId = updatedSource.OwnerId;
 			target.Bitrate = updatedSource.Bitrate;
-			target.Muted = updatedSource.Muted;
+			target.IsMuted = updatedSource.IsMuted;
 
 			target.Channels = updatedSource.Channels;
 			target.Frequency = updatedSource.Frequency;
@@ -268,7 +279,7 @@ namespace Gablarski.Client
 
 			lock (sources)
 			{
-				UpdateSourcesFromExternal (msg.Sources.Select (s => (s.OwnerId == context.CurrentUser.UserId) ? new ClientAudioSource (s, this.context.Connection) : s));
+				UpdateSourcesFromExternal (msg.Sources.Select (s => (s.OwnerId == context.CurrentUser.UserId) ? new OwnedAudioSource (s, this.context.Connection) : new ClientAudioSource (s, this.context.Connection)));
 			}
 
 			OnReceivedSourceList (new ReceivedListEventArgs<AudioSource> (msg.Sources));
@@ -277,15 +288,13 @@ namespace Gablarski.Client
 		internal void OnSourceResultMessage (MessageReceivedEventArgs e)
 		{
 		    var sourceMessage = (SourceResultMessage)e.Message;
-			var source = sourceMessage.Source;
+
+			var source = (sourceMessage.Source.OwnerId.Equals (context.CurrentUser.UserId))
+			              	? new OwnedAudioSource (sourceMessage.Source, this.context.Connection)
+			              	: new ClientAudioSource (sourceMessage.Source, this.context.Connection);
+
 			if (sourceMessage.SourceResult == SourceResult.Succeeded || sourceMessage.SourceResult == SourceResult.NewSource)
-		    {
-	        	source = (source.OwnerId.Equals (context.CurrentUser.UserId))
-		        	         	? new ClientAudioSource (source, this.context.Connection)
-		        	         	: source;
-					
 				UpdateSourceFromExternal (source);
-		    }
 
 		    OnReceivedSource (new ReceivedAudioSourceEventArgs (source, sourceMessage.SourceResult));
 		}
@@ -294,7 +303,7 @@ namespace Gablarski.Client
 		{
 			var sourceMessage = (SourcesRemovedMessage)e.Message;
 
-			List<AudioSource> removed = new List<AudioSource>();
+			List<ClientAudioSource> removed = new List<ClientAudioSource>();
 			lock (sources)
 			{
 				foreach (int id in sourceMessage.SourceIds)
@@ -307,7 +316,7 @@ namespace Gablarski.Client
 				}
 			}
 
-			OnSourcesRemoved (new ReceivedListEventArgs<AudioSource> (removed));
+			OnSourcesRemoved (new ReceivedListEventArgs<ClientAudioSource> (removed));
 			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Remove, removed));
 		}
 
@@ -331,11 +340,7 @@ namespace Gablarski.Client
 			var msg = (AudioDataReceivedMessage)e.Message;
 
 			var source = this[msg.SourceId];
-			if (source == null)
-				return;
-
-			var csource = (source as ClientAudioSource);
-			if (csource != null && csource.IsIgnored)
+			if (source == null || source.IsIgnored)
 				return;
 
 			var user = this.context.Users[source.OwnerId];
@@ -388,7 +393,7 @@ namespace Gablarski.Client
 				received (this, e);
 		}
 
-		protected virtual void OnSourcesRemoved (ReceivedListEventArgs<AudioSource> e)
+		protected virtual void OnSourcesRemoved (ReceivedListEventArgs<ClientAudioSource> e)
 		{
 			var removed = this.AudioSourcesRemoved;
 			if (removed != null)
@@ -415,7 +420,7 @@ namespace Gablarski.Client
 	public class AudioSourceMutedEventArgs
 		: AudioSourceEventArgs
 	{
-		public AudioSourceMutedEventArgs (AudioSource source, bool unmuted)
+		public AudioSourceMutedEventArgs (ClientAudioSource source, bool unmuted)
 			: base (source)
 		{
 			this.Unmuted = unmuted;
@@ -427,7 +432,7 @@ namespace Gablarski.Client
 	public class ReceivedAudioSourceEventArgs
 		: EventArgs
 	{
-		public ReceivedAudioSourceEventArgs (AudioSource source, SourceResult result)
+		public ReceivedAudioSourceEventArgs (ClientAudioSource source, SourceResult result)
 		{
 			this.Result = result;
 			this.Source = source;
@@ -445,7 +450,7 @@ namespace Gablarski.Client
 		/// <summary>
 		/// Gets the media source of the event.
 		/// </summary>
-		public AudioSource Source
+		public ClientAudioSource Source
 		{
 			get;
 			private set;

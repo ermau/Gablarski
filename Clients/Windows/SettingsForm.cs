@@ -24,11 +24,13 @@ namespace Gablarski.Clients.Windows
 
 		private void SettingsForm_Load (object sender, EventArgs e)
 		{
+			this.inDisplaySources.Checked = Settings.DisplaySources;
 			this.inPTT.SetText (Settings.PushToTalk.KeyboardKeys.ToString());
 		}
 
 		private void btnOk_Click (object sender, EventArgs e)
 		{
+			Settings.DisplaySources = this.inDisplaySources.Checked;
 			Settings.PushToTalk = new PushToTalk (pttKey);
 			Settings.SaveSettings();
 			this.Close();

@@ -30,7 +30,7 @@ namespace Gablarski.Clients.CLI
 
 		private static IPlaybackProvider playbackProvider;
 		private static ICaptureProvider captureProvider;
-		private static ClientAudioSource captureSource;
+		private static OwnedAudioSource captureSource;
 
 		public static IPlaybackProvider PlaybackProvider
 		{
@@ -150,7 +150,8 @@ namespace Gablarski.Clients.CLI
 
 				Client.Sources.ReceivedAudioSource += SourcesReceivedSource;
 				Client.Sources.ReceivedSourceList += SourcesReceivedSourceList;
-				Client.CurrentUser.ReceivedJoinResult += new EventHandler<ReceivedJoinResultEventArgs> (CurrentUserReceivedJoinResult);
+				Client.Sources.AudioSourcesRemoved += SourcesRemoved;
+				Client.CurrentUser.ReceivedJoinResult += CurrentUserReceivedJoinResult;
 
 				Client.Connect (host, port);
 			}
@@ -288,7 +289,7 @@ namespace Gablarski.Clients.CLI
 						}
 						else
 						{
-							ClientAudioSource source = captureSource;
+							OwnedAudioSource source = captureSource;
 
 							//lock (Sources)
 							//{
@@ -298,7 +299,7 @@ namespace Gablarski.Clients.CLI
 							//        break;
 							//    }
 
-							//    source = (sourceId != 0) ? Sources.OfType<ClientAudioSource>().FirstOrDefault (s => s.Id == sourceId) : Sources.OfType<ClientAudioSource>().First();
+							//    source = (sourceId != 0) ? Sources.OfType<OwnedAudioSource>().FirstOrDefault (s => s.Id == sourceId) : Sources.OfType<OwnedAudioSource>().First();
 							//}
 
 							if (source == null)
@@ -327,6 +328,14 @@ namespace Gablarski.Clients.CLI
 						WriteCommands (Console.Out);
 						break;
 				}
+			}
+		}
+
+		private static void SourcesRemoved (object sender, ReceivedListEventArgs<ClientAudioSource> e)
+		{
+			foreach (var s in e.Data)
+			{
+				Client.Audio.Detach (s);
 			}
 		}
 
@@ -383,7 +392,7 @@ namespace Gablarski.Clients.CLI
 				return;
 			}
 
-			captureSource = (ClientAudioSource)e.Source;
+			captureSource = (OwnedAudioSource)e.Source;
 			Client.Audio.Attach (captureProvider, AudioFormat.Mono16Bit, captureSource, new AudioEngineCaptureOptions());
 			Console.WriteLine ("Received own source. Name: " + e.Source.Name + " Id: " + e.Source.Id + " Owner: " + e.Source.OwnerId + " Bitrate: " + e.Source.Bitrate);
 		}

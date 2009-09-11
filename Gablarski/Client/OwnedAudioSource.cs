@@ -38,58 +38,49 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Gablarski.Client;
+using System.Threading;
+using Gablarski.Audio;
+using Gablarski.Messages;
 
-namespace Gablarski.Audio
+namespace Gablarski.Client
 {
-	public interface IAudioReceiver
+	public class OwnedAudioSource
+		: ClientAudioSource
 	{
-		event EventHandler<AudioSourceEventArgs> AudioSourceStarted;
-		event EventHandler<AudioSourceEventArgs> AudioSourceStopped;
-		event EventHandler<ReceivedAudioEventArgs> ReceivedAudio;
-	}
-
-	public class AudioSourceEventArgs
-		: EventArgs
-	{
-		public AudioSourceEventArgs (ClientAudioSource source)
+		internal OwnedAudioSource (AudioSource source, IClientConnection client)
+			: base (source, client)
 		{
-			this.Source = source;
-		}
-
-		/// <summary>
-		/// Gets the media source audio was received for.
-		/// </summary>
-		public ClientAudioSource Source
-		{
-			get;
-			private set;
-		}
-	}
-
-	public class ReceivedAudioEventArgs
-		: AudioSourceEventArgs
-	{
-		public ReceivedAudioEventArgs (ClientAudioSource source, int sequence, byte[] data)
-			: base (source)
-		{
-			this.AudioData = data;
-			this.Sequence = sequence;
-		}
-
-		/// <summary>
-		/// Gets the audio data.
-		/// </summary>
-		public byte[] AudioData
-		{
-			get;
-			private set;
 		}
 		
-		public int Sequence
+		public void BeginSending (ChannelInfo targetChannel)
 		{
-			get;
-			private set;
+			#if DEBUG
+			if (targetChannel == null)
+				throw new ArgumentNullException("targetChannel");
+			#endif
+
+			this.targetChannelId = targetChannel.ChannelId;
+			Interlocked.Exchange (ref this.sequence, 0);
+
+			this.client.Send (new ClientAudioSourceStateChangeMessage (true, this.Id, this.targetChannelId));
 		}
+
+		public void EndSending ()
+		{
+			this.client.Send (new ClientAudioSourceStateChangeMessage (false, this.Id, this.targetChannelId));
+		}
+
+		public void SendAudioData (byte[] data)
+		{
+			#if DEBUG
+			if (data == null)
+				throw new ArgumentNullException("data");
+			#endif
+
+			this.client.Send (new SendAudioDataMessage (this.targetChannelId, this.Id, Interlocked.Increment (ref this.sequence), Encode (data)));
+		}
+
+		private int targetChannelId;
+		private int sequence;
 	}
 }

@@ -27,6 +27,16 @@ namespace Gablarski.Clients.Windows
 			}
 		}
 
+		public static bool DisplaySources
+		{
+			get { return GetSetting ("DisplaySources", false); }
+			set
+			{
+				SetSetting ("DisplaySources", value);
+				OnSettingsChanged ("DisplaySources");
+			}
+		}
+
 		public static void SaveSettings()
 		{
 			LoadSettings();
@@ -65,6 +75,11 @@ namespace Gablarski.Clients.Windows
 			}
 		}
 
+		private static bool GetSetting (string settingName, bool defaultValue)
+		{
+			return (GetSetting (settingName, (defaultValue) ? "1" : "0") == "1");
+		}
+
 		private static void SetSetting (string settingName, string value)
 		{
 			LoadSettings();
@@ -76,6 +91,11 @@ namespace Gablarski.Clients.Windows
 				else
 					settings[settingName] = new SettingEntry { Name = settingName, Value = value };
 			}
+		}
+
+		private static void SetSetting (string settingName, bool value)
+		{
+			SetSetting (settingName, (value) ? "1" : "0");
 		}
 
 		private static void SetSetting<T> (string settingName, T value)

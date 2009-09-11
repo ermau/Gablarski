@@ -89,7 +89,7 @@ namespace Gablarski.Audio
 		/// <param name="capture">The provider to pump the audio from. (If the device is not preselected, the default device will be used.)</param>
 		/// <param name="source">The audio source to pump the audio to.</param>
 		/// <param name="options">Capturing options.</param>
-		void Attach (ICaptureProvider capture, AudioFormat format, ClientAudioSource source, AudioEngineCaptureOptions options);
+		void Attach (ICaptureProvider capture, AudioFormat format, OwnedAudioSource source, AudioEngineCaptureOptions options);
 
 		/// <summary>
 		/// Stops any captures on the given provider.

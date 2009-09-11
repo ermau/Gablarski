@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Gablarski.Audio;
 using Gablarski.Client;
 using Gablarski.Clients.Windows.Properties;
 
@@ -117,12 +118,9 @@ namespace Gablarski.Clients.Windows
 			if (channelPair.Equals (default(KeyValuePair<ChannelInfo,TreeNode>)))
 				return;
 
-			string imageKey = (!user.IsMuted) ? "silent" : "muted";
-
 			var node = channelPair.Value.Nodes.Add (user.Nickname);
 			node.Tag = user;
-			node.ImageKey = imageKey;
-			node.SelectedImageKey = imageKey;
+			node.ImageKey = node.SelectedImageKey = (!user.IsMuted) ? "silent" : "muted";
 
 			SetupUserContext (node);
 
@@ -130,6 +128,37 @@ namespace Gablarski.Clients.Windows
 
 			node.Parent.Expand();
 		}
+
+		public void AddSource (AudioSource source)
+		{
+			if (source == null)
+				return;
+
+			if (this.InvokeRequired)
+			{
+				this.BeginInvoke ((Action<AudioSource>)this.AddSource, source);
+				return;
+			}
+
+			var user = Client.Users[source.Id];
+			if (user == null)
+				return;
+
+			TreeNode userNode;
+			if (!this.userNodes.TryGetValue (user, out userNode))
+				return;
+
+			var snode = userNode.Nodes.Add (source.Name);
+			snode.Tag = source;
+			snode.SelectedImageKey = snode.ImageKey = (!source.IsMuted) ? "silent" : "muted";
+
+			SetupSourceContext (snode);
+
+			this.sourceNodes[source] = snode;
+
+			userNode.Expand();
+		}
+
 
 		public void RemoveUser (UserInfo user)
 		{
@@ -172,10 +201,8 @@ namespace Gablarski.Clients.Windows
 
 		public void MarkMusic (UserInfo user)
 		{
-			#if DEBUG
 			if (user == null)
 				throw new ArgumentNullException ("user");
-			#endif
 
 			if (this.InvokeRequired)
 			{
@@ -191,6 +218,25 @@ namespace Gablarski.Clients.Windows
 			SetupUserContext (node);
 		}
 
+		public void MarkMuted (AudioSource source)
+		{
+			if (source == null)
+				return;
+
+			if (this.InvokeRequired)
+			{
+				this.BeginInvoke ((Action<AudioSource>)this.MarkMuted, source);
+				return;
+			}
+
+			TreeNode node;
+			if (!sourceNodes.TryGetValue (source, out node))
+				return;
+
+			node.SelectedImageKey = node.ImageKey = "muted";
+			SetupUserContext (node.Parent);
+		}
+
 		public void MarkMuted (UserInfo user)
 		{
 			if (user == null)
@@ -202,12 +248,31 @@ namespace Gablarski.Clients.Windows
 				return;
 			}
 
-			if (!userNodes.ContainsKey (user))
+			TreeNode node;
+			if (!userNodes.TryGetValue (user, out node))
 				return;
 
-			var node = userNodes[user];
-			userNodes[user].SelectedImageKey = node.ImageKey = "muted";
+			node.SelectedImageKey = node.ImageKey = "muted";
 			SetupUserContext (node);
+		}
+
+		public void MarkSilent (AudioSource source)
+		{
+			if (source == null)
+				return;
+
+			if (this.InvokeRequired)
+			{
+				this.BeginInvoke ((Action<AudioSource>)this.MarkSilent, source);
+				return;
+			}
+
+			TreeNode node;
+			if (!sourceNodes.TryGetValue (source, out node) || source.IsMuted)
+				return;
+
+			node.SelectedImageKey = node.ImageKey = "silent";
+			SetupUserContext (node.Parent);
 		}
 
 		public void MarkSilent (UserInfo user)
@@ -221,49 +286,57 @@ namespace Gablarski.Clients.Windows
 				return;
 			}
 
-			if (!userNodes.ContainsKey (user) || user.IsMuted || userNodes[user].ImageKey == "silent")
+			TreeNode node;
+			if (!userNodes.TryGetValue (user, out node) || user.IsMuted)
 				return;
 
-			var node = userNodes[user];
-			userNodes[user].ImageKey = node.SelectedImageKey = "silent";
+			node.ImageKey = node.SelectedImageKey = "silent";
 			SetupUserContext (node);
 		}
 
-		public void Update (IEnumerable<ChannelInfo> channels, IEnumerable<UserInfo> users)
+		public void Update (IEnumerable<ChannelInfo> channels, IEnumerable<UserInfo> users, IEnumerable<ClientAudioSource> sources)
 		{
-			if (this.InvokeRequired)
+			if (InvokeRequired)
 			{
-				this.BeginInvoke ((Action<IEnumerable<ChannelInfo>, IEnumerable<UserInfo>>)Update, channels, users);
+				BeginInvoke ((Action<IEnumerable<ChannelInfo>, IEnumerable<UserInfo>, IEnumerable<ClientAudioSource>>)Update, channels, users, sources);
 				return;
 			}
 
 			this.channelNodes.Clear();
 			this.userNodes.Clear();
+			this.sourceNodes.Clear();
 
-			this.BeginUpdate();
+			BeginUpdate();
 			this.Nodes.Clear();
 			this.serverNode.Nodes.Clear();
 			this.Nodes.Add (this.serverNode);
 
 			foreach (var channel in channels.Where (c => c.ParentChannelId == 0))
 			{
-				this.AddChannel (channel);
-				this.AddChannels (channels, channel);
+				AddChannel (channel);
+				AddChannels (channels, channel);
 			}
 
 			this.serverNode.Expand();
 
 			foreach (var user in users)
-				this.AddUser (user);
+				AddUser (user);
+
+			if (Settings.DisplaySources)
+			{
+				foreach (var source in sources)
+					AddSource (source);
+			}
 
 			UpdateContextMenus (false);
 
-			this.EndUpdate();
+			EndUpdate();
 		}
 
 		private TreeNode serverNode;
 		private readonly Dictionary<ChannelInfo, TreeNode> channelNodes = new Dictionary<ChannelInfo, TreeNode>();
 		private readonly Dictionary<UserInfo, TreeNode> userNodes = new Dictionary<UserInfo, TreeNode>();
+		private readonly Dictionary<AudioSource, TreeNode> sourceNodes = new Dictionary<AudioSource, TreeNode>();
 
 		protected override void OnNodeMouseClick (TreeNodeMouseClickEventArgs e)
 		{
@@ -358,6 +431,20 @@ namespace Gablarski.Clients.Windows
 				MarkMuted (u);
 			else if (!u.IsMuted)
 				MarkSilent (u);
+
+			SetupUserContext (userNodes[u].Parent);
+		}
+
+		private void ContextIgnoreSourceClick (object sender, EventArgs e)
+		{
+			var s = ((ClientAudioSource)((ToolStripMenuItem)sender).Tag);
+			if (s.ToggleIgnore())
+				MarkMuted (s);
+			else if (!s.IsMuted)
+				MarkSilent (s);
+
+			SetupUserContext (sourceNodes[s].Parent);
+			SetupSourceContext (sourceNodes[s]);
 		}
 
 		private void ContextMuteUserClick (object sender, EventArgs e)
@@ -365,10 +452,71 @@ namespace Gablarski.Clients.Windows
 			((ClientUser)this.SelectedNode.Tag).ToggleMute();
 		}
 
+		private void ContextMuteSourceClick (object sender, EventArgs e)
+		{
+			((ClientAudioSource)((TreeNode)sender).Tag).ToggleMute();
+		}
+
 		private GablarskiClient client;
 		private void OnPermissionsChanged (object sender, EventArgs e)
 		{
 			UpdateContextMenus (true);
+		}
+
+		private void SetupSourceContext (TreeNode snode)
+		{
+			snode.ContextMenuStrip = new ContextMenuStrip();
+
+			var target = (ClientAudioSource)snode.Tag;
+
+			if (target.OwnerId != Client.CurrentUser.UserId)
+			{
+				AddSourceContext (snode.ContextMenuStrip.Items, target);
+			}
+		}
+
+		private void AddSourceContext (ToolStripItemCollection items, ClientAudioSource source)
+		{
+			if (!source.IsIgnored)
+			{
+				var ignore = new ToolStripMenuItem ("Ignore '" + source.Name + "'", Resources.SoundMuteImage);
+				ignore.ToolTipText = "Ignores the audio source";
+				ignore.Click += ContextIgnoreSourceClick;
+				ignore.Tag = source;
+
+				items.Add (ignore);
+			}
+			else
+			{
+				var ignore = new ToolStripMenuItem ("Unignore '" + source.Name + "'", Resources.SoundImage);
+				ignore.ToolTipText = "Unignores the audio source";
+				ignore.Click += ContextIgnoreSourceClick;
+				ignore.Tag = source;
+
+				items.Add (ignore);
+			}
+
+			if (Client.CurrentUser.Permissions.CheckPermission (PermissionName.MuteAudioSource))
+			{
+				if (!source.IsMuted)
+				{
+					var mute = new ToolStripMenuItem ("Mute '" + source.Name + "'", Resources.SoundMuteImage);
+					mute.ToolTipText = "Mutes the audio source for everyone";
+					mute.Click += ContextMuteSourceClick;
+					mute.Tag = source;
+
+					items.Add (mute);
+				}
+				else
+				{
+					var mute = new ToolStripMenuItem ("Unmute '" + source.Name + "'", Resources.SoundImage);
+					mute.ToolTipText = "Unmutes the audio source for everyone";
+					mute.Click += ContextMuteSourceClick;
+					mute.Tag = source;
+
+					items.Add (mute);
+				}
+			}
 		}
 
 		private void SetupUserContext (TreeNode un)
@@ -415,6 +563,18 @@ namespace Gablarski.Clients.Windows
 						un.ContextMenuStrip.Items.Add (mute);
 					}
 				}
+
+				ToolStripMenuItem menu = null;
+				foreach (var source in Client.Sources[target])
+				{
+					if (menu == null)
+					{
+						menu = new ToolStripMenuItem ("Sources");
+						un.ContextMenuStrip.Items.Add (menu);
+					}
+
+					AddSourceContext (menu.DropDown.Items, source);
+				}
 			}
 		}
 		
@@ -448,7 +608,7 @@ namespace Gablarski.Clients.Windows
 			}
 		}
 
-		private void UpdateContextMenus(bool full)
+		private void UpdateContextMenus (bool full)
 		{
 			this.ContextMenuStrip = new ContextMenuStrip();
 			

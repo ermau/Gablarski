@@ -53,7 +53,7 @@ namespace Gablarski.Audio
 		}
 
 		public AudioSource (AudioSource source)
-			: this (source.Name, source.Id, source.OwnerId, source.Channels, source.Bitrate, source.Frequency, source.FrameSize, source.Complexity, source.Muted)
+			: this (source.Name, source.Id, source.OwnerId, source.Channels, source.Bitrate, source.Frequency, source.FrameSize, source.Complexity, source.IsMuted)
 		{
 		}
 
@@ -77,7 +77,7 @@ namespace Gablarski.Audio
 			this.OwnerId = ownerId;
 			this.Bitrate = bitrate;
 			this.complexity = complexity;
-			this.Muted = muted;
+			this.IsMuted = muted;
 
 			this.Channels = channels;
 			this.Frequency = frequency;
@@ -87,7 +87,7 @@ namespace Gablarski.Audio
 		/// <summary>
 		/// Gets if the source is muted by you or the server.
 		/// </summary>
-		public bool Muted
+		public bool IsMuted
 		{
 			get;
 			protected internal set;
@@ -233,7 +233,7 @@ namespace Gablarski.Audio
 			writer.WriteByte (this.Channels);
 			writer.WriteInt32 (this.Frequency);
 			writer.WriteInt16 (this.FrameSize);
-			writer.WriteBool (this.Muted);
+			writer.WriteBool (this.IsMuted);
 		}
 
 		protected internal void Deserialize (IValueReader reader)
@@ -245,7 +245,7 @@ namespace Gablarski.Audio
 			this.Channels = reader.ReadByte();
 			this.Frequency = reader.ReadInt32();
 			this.FrameSize = reader.ReadInt16();
-			this.Muted = reader.ReadBool();
+			this.IsMuted = reader.ReadBool();
 		}
 
 		protected static void CheckRanges (byte channels, int frequency, short frameSize)
@@ -256,6 +256,20 @@ namespace Gablarski.Audio
 				throw new ArgumentOutOfRangeException ("frequency");
 			if (frameSize < 64 || frameSize > 512)
 				throw new ArgumentOutOfRangeException ("frameSize");
+		}
+
+		public override int GetHashCode ()
+		{
+			return this.Id.GetHashCode();
+		}
+
+		public override bool Equals (object obj)
+		{
+			var s = (obj as AudioSource);
+			if (s != null)
+				return (this.Id == s.Id);
+
+			return base.Equals (obj);
 		}
 	}
 }

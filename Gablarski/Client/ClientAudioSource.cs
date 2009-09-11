@@ -1,69 +1,14 @@
-﻿// Copyright (c) 2009, Eric Maupin
-// All rights reserved.
-
-// Redistribution and use in source and binary forms, with
-// or without modification, are permitted provided that
-// the following conditions are met:
-
-// - Redistributions of source code must retain the above 
-//   copyright notice, this list of conditions and the
-//   following disclaimer.
-
-// - Redistributions in binary form must reproduce the above
-//   copyright notice, this list of conditions and the
-//   following disclaimer in the documentation and/or other
-//   materials provided with the distribution.
-
-// - Neither the name of Gablarski nor the names of its
-//   contributors may be used to endorse or promote products
-//   derived from this software without specific prior
-//   written permission.
-
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS
-// AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
-// WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-// PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-// HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-// INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
-// GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-// THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
-// DAMAGE.
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using Gablarski.Audio;
 using Gablarski.Messages;
 
 namespace Gablarski.Client
 {
-	public class ClientAudioSource
-		: AudioSource
+	public class ClientAudioSource : AudioSource
 	{
 		internal ClientAudioSource (AudioSource source, IClientConnection client)
-			: base (source.Name, source.Id, source.OwnerId, source.Channels, source.Bitrate, source.Frequency, source.FrameSize, source.Complexity, source.Muted)
+			: base (source.Name, source.Id, source.OwnerId, source.Channels, source.Bitrate, source.Frequency, source.FrameSize, source.Complexity, source.IsMuted)
 		{
 			this.client = client;
-		}
-
-		public void BeginSending (ChannelInfo targetChannel)
-		{
-			#if DEBUG
-			if (targetChannel == null)
-				throw new ArgumentNullException("targetChannel");
-			#endif
-
-			this.targetChannelId = targetChannel.ChannelId;
-			Interlocked.Exchange (ref this.sequence, 0);
-
-			this.client.Send (new ClientAudioSourceStateChangeMessage (true, this.Id, this.targetChannelId));
 		}
 
 		public bool IsIgnored
@@ -71,33 +16,16 @@ namespace Gablarski.Client
 			get; private set;
 		}
 
-		public void EndSending ()
+		public bool ToggleIgnore ()
 		{
-			this.client.Send (new ClientAudioSourceStateChangeMessage (false, this.Id, this.targetChannelId));
-		}
-
-		public void ToggleIgnore ()
-		{
-			this.IsIgnored = !this.IsIgnored;
+			return (this.IsIgnored = !this.IsIgnored);
 		}
 
 		public void ToggleMute ()
 		{
-			this.client.Send (new RequestMuteMessage { Target = this.Id, Type = MuteType.AudioSource, Unmute = !this.Muted });
+			this.client.Send (new RequestMuteMessage { Target = this.Id, Type = MuteType.AudioSource, Unmute = !this.IsMuted });
 		}
 
-		public void SendAudioData (byte[] data)
-		{
-			#if DEBUG
-			if (data == null)
-				throw new ArgumentNullException("data");
-			#endif
-
-			this.client.Send (new SendAudioDataMessage (this.targetChannelId, this.Id, Interlocked.Increment (ref this.sequence), Encode (data)));
-		}
-
-		private int targetChannelId;
-		private int sequence;
-		private readonly IClientConnection client;
+		protected IClientConnection client;
 	}
 }

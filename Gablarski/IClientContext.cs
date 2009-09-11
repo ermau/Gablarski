@@ -63,7 +63,7 @@ namespace Gablarski
 		/// <summary>
 		/// Gets the sources in this context.
 		/// </summary>
-		IIndexedEnumerable<int, AudioSource> Sources { get; }
+		IIndexedEnumerable<int, ClientAudioSource> Sources { get; }
 
 		/// <summary>
 		/// Gets the user associated with this context
