@@ -63,6 +63,11 @@ namespace Gablarski.Audio
 			}
 		}
 
+		public bool DetailedTracing
+		{
+			get { return true; }
+		}
+
 		public void Attach (IPlaybackProvider playback, IEnumerable<AudioSource> sources, AudioEnginePlaybackOptions options)
 		{
 			if (playback == null)
@@ -76,6 +81,8 @@ namespace Gablarski.Audio
 			{
 				foreach (var s in sources)
 				{
+					Trace.WriteLineIf (DetailedTracing, "[Audio] " + s.Name + " attached for playback");
+
 					if (playbacks.ContainsKey (s) && !(s is OwnedAudioSource))
 						continue;
 
@@ -93,6 +100,8 @@ namespace Gablarski.Audio
 				throw new ArgumentNullException ("source");
 			if (options == null)
 				throw new ArgumentNullException ("options");
+
+			Trace.WriteLineIf (DetailedTracing, "[Audio] " + source.Name + " attached for playback");
 
 			playbackLock.EnterWriteLock();
 			{
@@ -113,10 +122,13 @@ namespace Gablarski.Audio
 			if (capture.Device == null)
 				capture.Device = capture.DefaultDevice;
 
-			lock (captures)
+			Trace.WriteLineIf (DetailedTracing, "[Audio] " + source.Name + " attached for capture");
+
+			captureLock.EnterWriteLock();
 			{
 				captures.Add (source, new AudioCaptureEntity (capture, format, source, options));
 			}
+			captureLock.ExitWriteLock();
 		}
 
 		public bool Detatch (IPlaybackProvider provider)
@@ -126,15 +138,17 @@ namespace Gablarski.Audio
 
 			bool removed = false;
 
-			playbackLock.EnterWriteLock();
+			playbackLock.EnterUpgradeableReadLock();
 			{
 				foreach (var entity in playbacks.Values.Where (e => e.Playback == provider).ToList())
 				{
+					playbackLock.EnterWriteLock();
 					playbacks.Remove (entity.Source);
+					playbackLock.ExitWriteLock();
 					removed = true;
 				}
 			}
-			playbackLock.ExitWriteLock();
+			playbackLock.ExitUpgradeableReadLock();
 
 			return removed;
 		}
@@ -146,14 +160,17 @@ namespace Gablarski.Audio
 
 			bool removed = false;
 
-			lock (captures)
+			captureLock.EnterUpgradeableReadLock();
 			{
 				foreach (var entity in captures.Values.Where (e => e.Capture == provider).ToList())
 				{
+					captureLock.EnterWriteLock();
 					captures.Remove (entity.Source);
+					captureLock.ExitWriteLock();
 					removed = true;
 				}
 			}
+			captureLock.ExitUpgradeableReadLock();
 			
 			return removed;
 		}
@@ -164,10 +181,11 @@ namespace Gablarski.Audio
 				throw new ArgumentNullException ("source");
 
 			bool removed;
-			lock (captures)
+			captureLock.EnterWriteLock();
 			{
 				removed = captures.Remove (source);
 			}
+			captureLock.ExitWriteLock();
 
 			if (!removed)
 			{
@@ -190,10 +208,11 @@ namespace Gablarski.Audio
 				throw new ArgumentNullException ("channel");
 			#endif
 
-			lock (captures)
+			captureLock.EnterReadLock();
 			{
 				captures[source].BeginCapture (channel);
 			}
+			captureLock.ExitReadLock();
 		}
 
 		public void EndCapture (AudioSource source)
@@ -203,10 +222,11 @@ namespace Gablarski.Audio
 				throw new ArgumentNullException ("source");				
 			#endif
 
-			lock (captures)
+			captureLock.EnterReadLock();
 			{
 				captures[source].EndCapture();
 			}
+			captureLock.ExitReadLock();
 		}
 
 		public void Start()
@@ -305,7 +325,7 @@ namespace Gablarski.Audio
 				AudioPlaybackEntity playbackEntity;
 				if (playbacks.TryGetValue (e.Source, out playbackEntity))
 				{
-					for (int i = 0; i < 10; ++i)
+					for (int i = 0; i < 20; ++i)
 						playbackEntity.Playback.QueuePlayback (e.Source, new byte[e.Source.FrameSize * 2]);
 
 					playbackEntity.Playing = true;
@@ -324,7 +344,12 @@ namespace Gablarski.Audio
 			{
 				AudioPlaybackEntity p;
 				if (playbacks.TryGetValue (e.Source, out p) && p.Playing)
+				{
 					p.Buffer.Push (packet);
+					Trace.WriteLineIf (DetailedTracing, "[Audio] Received audio packet for '" + e.Source.Name + "'");
+				}
+				else
+					Trace.WriteLine ("[Audio] Received audio packet for unknown or not playing source");
 			}
 			playbackLock.ExitReadLock();
 		}
@@ -348,6 +373,8 @@ namespace Gablarski.Audio
 						while (free-- > 0)
 						{
 							var packet = e.Buffer.Pull (s.FrameSize);
+
+							Trace.WriteLineIf (DetailedTracing && !packet.Encoded, "[Audio] Packet missing");
 
 							e.Playback.QueuePlayback (s, (packet.Encoded) ? s.Decode (packet.Data) : packet.Data);
 						}

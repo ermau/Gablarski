@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using System.IO;
 using System.Windows.Forms;
 using Kennedy.ManagedHooks;
 
@@ -25,6 +27,10 @@ namespace Gablarski.Clients.Windows
 				MessageBox.Show ("Unexpected error" + Environment.NewLine + (e.ExceptionObject as Exception).ToDisplayString(),
 				                 "Unexpected error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			};
+
+			var logger = new TextWriterTraceListener (File.Open (Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.Desktop), "log" + DateTime.Now.Ticks + ".txt"), FileMode.Append));
+			logger.TraceOutputOptions = TraceOptions.ThreadId | TraceOptions.DateTime | TraceOptions.Timestamp;
+			Trace.Listeners.Add (logger);
 
 			KHook.InstallHook();
 			//MHook.InstallHook();

@@ -92,7 +92,7 @@ namespace Gablarski.Audio.OpenAL.Providers
 			lock (this.buffers)
 			{
 				if (!this.buffers.TryGetValue (audioSource, out bufferStack))
-					this.buffers[audioSource] = bufferStack = new Stack<SourceBuffer> (SourceBuffer.Generate (10));
+					this.buffers[audioSource] = bufferStack = new Stack<SourceBuffer> (SourceBuffer.Generate (20));
 			}
 
 			Source source;

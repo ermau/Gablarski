@@ -115,7 +115,6 @@ namespace Gablarski.Audio
 		private readonly ICaptureProvider capture;
 		private readonly OwnedAudioSource source;
 		private readonly AudioEngineCaptureOptions options;
-		private readonly IPlaybackProvider playback;
 		private ChannelInfo channel;
 
 		~AudioCaptureEntity()
