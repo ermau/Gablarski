@@ -24,7 +24,6 @@ namespace Gablarski.WebServer
 			var sstore = new MemorySessionStore();
 			server = new HttpServer.HttpServer (sstore);
 
-			ConnectionManager.SessionStore = sstore;
 			ConnectionManager.ConnectionProvider = this;
 			ConnectionManager.Server = server;
 

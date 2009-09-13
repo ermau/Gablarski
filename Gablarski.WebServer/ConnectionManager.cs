@@ -12,6 +12,11 @@ namespace Gablarski.WebServer
 {
 	public static class ConnectionManager
 	{
+		static ConnectionManager()
+		{
+			SessionStore = new MemorySessionStore();
+		}
+
 		public static WebServerConnectionProvider ConnectionProvider
 		{
 			get; set;
@@ -32,11 +37,6 @@ namespace Gablarski.WebServer
 		{
 			get { return timeBetweenScans; }
 			set { timeBetweenScans = value; }
-		}
-
-		public static IHttpSessionStore SessionStore
-		{
-			get; set;
 		}
 
 		public static void ProcessSession (IHttpSession session, IHttpResponse response)
@@ -69,16 +69,18 @@ namespace Gablarski.WebServer
 			}
 		}
 
-		public static TReceive SendAndReceive<TSend, TReceive> (TSend message, IHttpSession session)
-			where TSend : MessageBase
-			where TReceive : MessageBase
+		public static void SaveSession (IHttpSession session)
 		{
-
-			List<MessageBase> mqueue = (List<MessageBase>)session["mqueue"];
 			lock (sessions)
 			{
-				connections[session.Id].Receive (message);
+				SessionStore.Save (session);
 			}
+		}
+
+		public static TReceive Receive<TReceive> (IHttpSession session)
+			where TReceive : MessageBase
+		{
+			List<MessageBase> mqueue = (List<MessageBase>)session["mqueue"];
 
 			TReceive receive = null;
 			while (receive == null)
@@ -91,6 +93,18 @@ namespace Gablarski.WebServer
 			mqueue.Remove (receive);
 
 			return receive;
+		}
+
+		public static TReceive SendAndReceive<TSend, TReceive> (TSend message, IHttpSession session)
+			where TSend : MessageBase
+			where TReceive : MessageBase
+		{
+			lock (sessions)
+			{
+				connections[session.Id].Receive (message);
+			}
+
+			return Receive<TReceive> (session);
 		}
 
 		public static TReceive SendAndReceive<TSend, TReceive, TError> (TSend message, IHttpSession session, out TError error)
@@ -143,6 +157,13 @@ namespace Gablarski.WebServer
 					connections.Remove (session.Id);
 				}
 			}
+
+			lastScanned = DateTime.Now;
+		}
+
+		private static IHttpSessionStore SessionStore
+		{
+			get; set;
 		}
 	}
 }

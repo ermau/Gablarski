@@ -115,7 +115,10 @@ namespace Gablarski
 		MuteUser = 15,
 
 		ModifyPermissions = 16,
-		// Next: 17
+
+		AdminPanel = 17,
+
+		// Next: 18
 	}
 
 	public class Permission
