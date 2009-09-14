@@ -63,11 +63,6 @@ namespace Gablarski.Audio
 			}
 		}
 
-		public bool DetailedTracing
-		{
-			get { return true; }
-		}
-
 		public void Attach (IPlaybackProvider playback, IEnumerable<AudioSource> sources, AudioEnginePlaybackOptions options)
 		{
 			if (playback == null)
@@ -81,7 +76,7 @@ namespace Gablarski.Audio
 			{
 				foreach (var s in sources)
 				{
-					Trace.WriteLineIf (DetailedTracing, "[Audio] " + s.Name + " attached for playback");
+					Trace.WriteLine ("[Audio] " + s.Name + " attached for playback");
 
 					if (playbacks.ContainsKey (s) && !(s is OwnedAudioSource))
 						continue;
@@ -101,7 +96,7 @@ namespace Gablarski.Audio
 			if (options == null)
 				throw new ArgumentNullException ("options");
 
-			Trace.WriteLineIf (DetailedTracing, "[Audio] " + source.Name + " attached for playback");
+			Trace.WriteLine ("[Audio] " + source.Name + " attached for playback");
 
 			playbackLock.EnterWriteLock();
 			{
@@ -122,7 +117,7 @@ namespace Gablarski.Audio
 			if (capture.Device == null)
 				capture.Device = capture.DefaultDevice;
 
-			Trace.WriteLineIf (DetailedTracing, "[Audio] " + source.Name + " attached for capture");
+			Trace.WriteLine ("[Audio] " + source.Name + " attached for capture");
 
 			captureLock.EnterWriteLock();
 			{
@@ -346,7 +341,7 @@ namespace Gablarski.Audio
 				if (playbacks.TryGetValue (e.Source, out p) && p.Playing)
 				{
 					p.Buffer.Push (packet);
-					Trace.WriteLineIf (DetailedTracing, "[Audio] Received audio packet for '" + e.Source.Name + "'");
+					Trace.WriteLine ("[Audio] Received audio packet for '" + e.Source.Name + "'");
 				}
 				else
 					Trace.WriteLine ("[Audio] Received audio packet for unknown or not playing source");
@@ -374,7 +369,12 @@ namespace Gablarski.Audio
 						{
 							var packet = e.Buffer.Pull (s.FrameSize);
 
-							Trace.WriteLineIf (DetailedTracing && !packet.Encoded, "[Audio] Packet missing");
+							#if TRACE
+							if (!packet.Encoded)
+								Trace.WriteLine ("[Audio] Packet missing");
+							else
+								Trace.WriteLine ("[Audio] Pulled packet #" + packet.Sequence + " with timestamp " + packet.TimeStamp);
+							#endif
 
 							e.Playback.QueuePlayback (s, (packet.Encoded) ? s.Decode (packet.Data) : packet.Data);
 						}

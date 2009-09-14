@@ -28,7 +28,9 @@ namespace Gablarski.Clients.Windows
 				                 "Unexpected error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			};
 
-			var logger = new TextWriterTraceListener (File.Open (Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.Desktop), "log" + DateTime.Now.Ticks + ".txt"), FileMode.Append));
+			string glogs = Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.Desktop), "glogs");
+			Directory.CreateDirectory (glogs);
+			var logger = new TextWriterTraceListener (File.Open (Path.Combine(glogs, DateTime.Now.Ticks + ".txt"), FileMode.Append));
 			logger.TraceOutputOptions = TraceOptions.ThreadId | TraceOptions.DateTime | TraceOptions.Timestamp;
 			Trace.Listeners.Add (logger);
 
