@@ -156,7 +156,7 @@ namespace Gablarski.Audio.OpenAL
 
 			SourceBuffer[] dequeued = new SourceBuffer[bufferIDs.Length];
 			for (int i = 0; i < bufferIDs.Length; ++i)
-				dequeued[i] = SourceBuffer.Buffers[bufferIDs[i]];
+				dequeued[i] = SourceBuffer.GetBuffer(bufferIDs[i]);
 
 			return dequeued;
 		}
