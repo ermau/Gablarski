@@ -55,11 +55,6 @@ namespace Gablarski.Audio
 		IAudioDevice Device { get; set; }
 
 		/// <summary>
-		/// Gets the number of buffers free for this source
-		/// </summary>
-		int GetBuffersFree (AudioSource source);
-
-		/// <summary>
 		/// Queues PCM <paramref name="data"/> to be played back, owned by <paramref name="source"/>.
 		/// </summary>
 		/// <param name="source">The <see cref="AudioSource"/> the audio came from.</param>

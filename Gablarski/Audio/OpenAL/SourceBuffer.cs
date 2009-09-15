@@ -72,12 +72,15 @@ namespace Gablarski.Audio.OpenAL
 			if (this.disposed)
 				return;
 
-			this.disposed = true;
-
 			alDeleteBuffers (1, new[] { this.bufferID });
-			OpenAL.ErrorCheck ();
+			Audio.OpenAL.OpenAL.ErrorCheck ();
 
-			Buffers.Remove (this.bufferID);
+			lock (lck)
+			{
+				Buffers.Remove (this.bufferID);
+			}
+
+			this.disposed = true;
 		}
 
 		#endregion
@@ -91,23 +94,33 @@ namespace Gablarski.Audio.OpenAL
 
 		public static SourceBuffer[] Generate (int count)
 		{
-			if (Buffers == null)
-				Buffers = new Dictionary<uint, SourceBuffer> (count);
-
-			SourceBuffer[] buffers = new SourceBuffer[count];
-
-			uint[] bufferIDs = new uint[count];
-			alGenBuffers (count, bufferIDs);
-			Audio.OpenAL.OpenAL.ErrorCheck ();
-
-			for (int i = 0; i < count; ++i)
+			lock (lck)
 			{
-				buffers[i] = new SourceBuffer (bufferIDs[i]);
-				Buffers.Add (buffers[i].bufferID, buffers[i]);
-			}
+				if (Buffers == null)
+					Buffers = new Dictionary<uint, SourceBuffer> (count);
 
-			return buffers;
+				SourceBuffer[] buffers = new SourceBuffer[count];
+
+				uint[] bufferIDs = new uint[count];
+				alGenBuffers (count, bufferIDs);
+				Audio.OpenAL.OpenAL.ErrorCheck ();
+
+				for (int i = 0; i < count; ++i)
+				{
+					buffers[i] = new SourceBuffer (bufferIDs[i]);
+					Buffers.Add (buffers[i].bufferID, buffers[i]);
+				}
+
+				return buffers;
+			}
 		}
+
+		//public static void Delete (this IEnumerable<SourceBuffer> self)
+		//{
+		//    uint[] bufferIDs = self.Select (b => b.bufferID).ToArray ();
+		//    alDeleteBuffers (bufferIDs.Length, bufferIDs);
+		//    OpenAL.ErrorCheck ();
+		//}
 
 		#region Imports
 		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
@@ -120,10 +133,20 @@ namespace Gablarski.Audio.OpenAL
 		private static extern void alDeleteBuffers (int numBuffers, uint[] bufferIDs);
 		#endregion
 
-		internal static Dictionary<uint, SourceBuffer> Buffers
+		private static object lck = new object ();
+
+		private static Dictionary<uint, SourceBuffer> Buffers
 		{
 			get;
 			set;
+		}
+
+		internal static SourceBuffer GetBuffer (uint bufferID)
+		{
+			lock (lck)
+			{
+				return Buffers[bufferID];
+			}
 		}
 	}
 }

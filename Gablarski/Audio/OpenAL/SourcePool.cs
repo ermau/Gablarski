@@ -47,64 +47,111 @@ namespace Gablarski.Audio.OpenAL
 	{
 		public SourcePool()
 		{
-			this.sources = new Source[Source.MaxSources];
-			this.owners = new T[Source.MaxSources];
+			this.sourcePollerThread = new Thread (this.SourcePoller);
+			this.sourcePollerThread.IsBackground = true;
+			this.sourcePollerThread.Start();
 		}
+
+		public event EventHandler<SourceFinishedEventArgs<T>> SourceFinished;
 
 		public Source RequestSource (T owner)
 		{
-			var s = this.sources;
-			var o = this.owners;
-
-			int lastFree = 0;
-			for (int i = 0; i < this.sources.Length; ++i)
+			Source free = null;
+			lock (this.sourceLock)
 			{
-				if (o[i] == owner)
-					return sources[i];
-
-				if (o[i] == default(T))
-					lastFree = i;
+				foreach (var kvp in owners)
+				{
+					if (kvp.Value == null)
+					{
+						free = kvp.Key;
+						break;
+					}
+					
+					if (kvp.Value == owner)
+						return kvp.Key;
+				}
 			}
+				
+			if (free == null)
+				free = Source.Generate ();
 
-			if (s[lastFree] == null)
-				s[lastFree] = Source.Generate ();
-
-			return s[lastFree];
+			lock (this.sourceLock)
+			{
+				owners[free] = owner;
+			}
+			
+			return free;
 		}
 
-		public void FreeSource (T owner)
+		public void PlayingSource (Source source)
 		{
-			for (int i = 0; i < owners.Length; ++i)
+			lock (this.sourceLock)
 			{
-				if (!owners[i].Equals (owner))
-					continue;
+				if (!this.playing.Contains (source))
+					this.playing.Add (source);
+			}
+		}
 
-				owners[i] = default(T);
+		public void FreeSource (T sourceOwner)
+		{
+			lock (this.sourceLock)
+			{
+				var source = owners.FirstOrDefault (kvp => kvp.Value == sourceOwner).Key;
+				owners[source] = default(T);
+				playing.Remove (source);
 			}
 		}
 
 		public void FreeSource (Source source)
 		{
-			for (int i = 0; i < owners.Length; ++i)
+			lock (this.sourceLock)
 			{
-				if (sources[i] != source)
-					continue;
-
-				owners[i] = default(T);
+				owners[source] = default(T);
 			}
 		}
 
-		public void FreeSources (IEnumerable<Source> freeSources)
+		public void FreeSources (IEnumerable<Source> sources)
 		{
-			for (int i = 0; i < sources.Length; ++i)
+			lock (this.sourceLock)
 			{
-				if (!freeSources.Contains (sources[i]))
-					owners[i] = default(T);
+				foreach (Source csource in sources)
+					owners[csource] = default (T);
 			}
 		}
 
-		private readonly T[] owners;
-		private readonly Source[] sources;
+		private readonly HashSet<Source> playing = new HashSet<Source>();
+		private readonly Dictionary<Source, T> owners = new Dictionary<Source, T> ();
+		
+		private readonly object sourceLock = new object();
+		private readonly Thread sourcePollerThread;
+		private volatile bool listening = true;
+
+		private void OnSourceFinished (SourceFinishedEventArgs<T> e)
+		{
+			var finished = this.SourceFinished;
+			if (finished != null)
+				finished (this, e);
+		}
+
+		private void SourcePoller()
+		{
+			while (this.listening)
+			{
+				lock (sourceLock)
+				{
+					foreach (Source s in owners.Keys)
+					{
+						if (!playing.Contains (s) || !s.IsStopped)
+							continue;
+
+						OnSourceFinished (new SourceFinishedEventArgs<T> (owners[s], s));
+						playing.Remove (s);
+					}
+				}
+
+				Thread.Sleep (1);
+			}
+		}
 	}
 
 	public class SourceFinishedEventArgs<T>

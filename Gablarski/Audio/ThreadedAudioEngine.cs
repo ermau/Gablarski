@@ -36,7 +36,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -76,9 +75,7 @@ namespace Gablarski.Audio
 			{
 				foreach (var s in sources)
 				{
-					Trace.WriteLine ("[Audio] " + s.Name + " attached for playback");
-
-					if (playbacks.ContainsKey (s) && !(s is OwnedAudioSource))
+					if (playbacks.ContainsKey (s) && !(s is ClientAudioSource))
 						continue;
 
 					playbacks.Add (s, new AudioPlaybackEntity (playback, s, options));
@@ -95,8 +92,6 @@ namespace Gablarski.Audio
 				throw new ArgumentNullException ("source");
 			if (options == null)
 				throw new ArgumentNullException ("options");
-
-			Trace.WriteLine ("[Audio] " + source.Name + " attached for playback");
 
 			playbackLock.EnterWriteLock();
 			{
@@ -117,13 +112,10 @@ namespace Gablarski.Audio
 			if (capture.Device == null)
 				capture.Device = capture.DefaultDevice;
 
-			Trace.WriteLine ("[Audio] " + source.Name + " attached for capture");
-
-			captureLock.EnterWriteLock();
+			lock (captures)
 			{
 				captures.Add (source, new AudioCaptureEntity (capture, format, source, options));
 			}
-			captureLock.ExitWriteLock();
 		}
 
 		public bool Detatch (IPlaybackProvider provider)
@@ -133,17 +125,15 @@ namespace Gablarski.Audio
 
 			bool removed = false;
 
-			playbackLock.EnterUpgradeableReadLock();
+			playbackLock.EnterWriteLock();
 			{
 				foreach (var entity in playbacks.Values.Where (e => e.Playback == provider).ToList())
 				{
-					playbackLock.EnterWriteLock();
 					playbacks.Remove (entity.Source);
-					playbackLock.ExitWriteLock();
 					removed = true;
 				}
 			}
-			playbackLock.ExitUpgradeableReadLock();
+			playbackLock.ExitWriteLock();
 
 			return removed;
 		}
@@ -155,17 +145,14 @@ namespace Gablarski.Audio
 
 			bool removed = false;
 
-			captureLock.EnterUpgradeableReadLock();
+			lock (captures)
 			{
 				foreach (var entity in captures.Values.Where (e => e.Capture == provider).ToList())
 				{
-					captureLock.EnterWriteLock();
 					captures.Remove (entity.Source);
-					captureLock.ExitWriteLock();
 					removed = true;
 				}
 			}
-			captureLock.ExitUpgradeableReadLock();
 			
 			return removed;
 		}
@@ -176,11 +163,10 @@ namespace Gablarski.Audio
 				throw new ArgumentNullException ("source");
 
 			bool removed;
-			captureLock.EnterWriteLock();
+			lock (captures)
 			{
 				removed = captures.Remove (source);
 			}
-			captureLock.ExitWriteLock();
 
 			if (!removed)
 			{
@@ -203,11 +189,10 @@ namespace Gablarski.Audio
 				throw new ArgumentNullException ("channel");
 			#endif
 
-			captureLock.EnterReadLock();
+			lock (captures)
 			{
 				captures[source].BeginCapture (channel);
 			}
-			captureLock.ExitReadLock();
 		}
 
 		public void EndCapture (AudioSource source)
@@ -217,11 +202,10 @@ namespace Gablarski.Audio
 				throw new ArgumentNullException ("source");				
 			#endif
 
-			captureLock.EnterReadLock();
+			lock (captures)
 			{
 				captures[source].EndCapture();
 			}
-			captureLock.ExitReadLock();
 		}
 
 		public void Start()
@@ -231,10 +215,9 @@ namespace Gablarski.Audio
 			this.AudioReceiver.ReceivedAudio += OnReceivedAudio;
 			this.AudioReceiver.AudioSourceStarted += OnAudioSourceStarted;
 			this.AudioReceiver.AudioSourceStopped += OnAudioSourceStopped;
-			this.AudioReceiver.AudioSourcesRemoved += OnAudioSourceRemoved;
 
-			this.playbackRunnerThread = new Thread (this.PlaybackRunner) { Name = "ThreadedAudioEngine Playback Runner" };
-			this.playbackRunnerThread.Start();
+		/*	this.playbackRunnerThread = new Thread (this.PlaybackRunner) { Name = "ThreadedAudioEngine Playback Runner" };
+			this.playbackRunnerThread.Start();*/
 		}
 
 		public void Stop ()
@@ -244,7 +227,6 @@ namespace Gablarski.Audio
 			this.AudioReceiver.ReceivedAudio -= OnReceivedAudio;
 			this.AudioReceiver.AudioSourceStarted -= OnAudioSourceStarted;
 			this.AudioReceiver.AudioSourceStopped -= OnAudioSourceStopped;
-			this.AudioReceiver.AudioSourcesRemoved -= OnAudioSourceRemoved;
 			
 			if (this.playbackRunnerThread != null)
 			{
@@ -263,52 +245,21 @@ namespace Gablarski.Audio
 			}
 			playbackLock.ExitWriteLock();
 		}
-		
+
 		private volatile bool running;
 		private Thread playbackRunnerThread;
 
 		private readonly Dictionary<AudioSource, AudioCaptureEntity> captures = new Dictionary<AudioSource, AudioCaptureEntity>();
 		private readonly Dictionary<AudioSource, AudioPlaybackEntity> playbacks = new Dictionary<AudioSource, AudioPlaybackEntity>();
 		private readonly ReaderWriterLockSlim playbackLock = new ReaderWriterLockSlim();
-		private readonly ReaderWriterLockSlim captureLock = new ReaderWriterLockSlim();
 
 		private IAudioReceiver audioReceiver;
-
-		private void OnAudioSourceRemoved (object sender, ReceivedListEventArgs<ClientAudioSource> e)
-		{
-			foreach (var s in e.Data)
-			{
-				playbackLock.EnterUpgradeableReadLock();
-				if (playbacks.ContainsKey (s))
-				{
-					playbackLock.EnterWriteLock();
-					playbacks[s].Playback.FreeSource (s);
-					playbacks.Remove (s);
-					playbackLock.ExitWriteLock();
-				}
-				playbackLock.ExitUpgradeableReadLock();
-
-				captureLock.EnterUpgradeableReadLock();
-				if (captures.ContainsKey (s))
-				{
-					captureLock.EnterWriteLock();
-					captures.Remove (s);
-					captureLock.ExitWriteLock();
-				}
-				captureLock.ExitUpgradeableReadLock();
-			}
-		}
 
 		private void OnAudioSourceStopped (object sender, AudioSourceEventArgs e)
 		{
 			playbackLock.EnterReadLock();
 			{
-				AudioPlaybackEntity playbackEntity;
-				if (playbacks.TryGetValue (e.Source, out playbackEntity))
-				{
-					playbackEntity.Playing = false;
-					playbackEntity.Buffer.Reset();
-				}
+				playbacks[e.Source].Playing = false;
 			}
 			playbackLock.ExitReadLock();
 		}
@@ -317,16 +268,7 @@ namespace Gablarski.Audio
 		{
 			playbackLock.EnterReadLock();
 			{
-				AudioPlaybackEntity playbackEntity;
-				if (playbacks.TryGetValue (e.Source, out playbackEntity))
-				{
-					for (int i = 0; i < 20; ++i)
-						playbackEntity.Playback.QueuePlayback (e.Source, new byte[e.Source.FrameSize * 2]);
-
-					playbackEntity.Playing = true;
-				}
-				else
-					Trace.WriteLine ("[Audio] Attempting to playback an unknown source");
+				playbacks[e.Source].Playing = true;
 			}
 			playbackLock.ExitReadLock();
 		}
@@ -335,55 +277,16 @@ namespace Gablarski.Audio
 		{
 			var packet = new SpeexJitterBufferPacket (e.AudioData, (uint)e.Sequence, e.Source);
 
+			byte[] decoded = e.Source.Decode (e.AudioData);
+
 			playbackLock.EnterReadLock();
 			{
-				AudioPlaybackEntity p;
-				if (playbacks.TryGetValue (e.Source, out p) && p.Playing)
-				{
-					p.Buffer.Push (packet);
-					Trace.WriteLine ("[Audio] Received audio packet for '" + e.Source.Name + "'");
-				}
-				else
-					Trace.WriteLine ("[Audio] Received audio packet for unknown or not playing source");
+				var p = playbacks[e.Source];
+				if (p.Playing)
+					p.Playback.QueuePlayback (e.Source, decoded);
+					//p.Buffer.Push (packet);
 			}
 			playbackLock.ExitReadLock();
-		}
-
-		private void PlaybackRunner()
-		{
-			while (this.running)
-			{
-				playbackLock.EnterReadLock();
-				{
-					foreach (var e in playbacks.Values)
-					{
-						if (!this.running)
-							return;
-						if (!e.Playing)
-							continue;
-
-						var s = e.Source;
-
-						int free = e.Playback.GetBuffersFree (s);
-						while (free-- > 0)
-						{
-							var packet = e.Buffer.Pull (s.FrameSize);
-
-							#if TRACE
-							if (!packet.Encoded)
-								Trace.WriteLine ("[Audio] Packet missing");
-							else
-								Trace.WriteLine ("[Audio] Pulled packet #" + packet.Sequence + " with timestamp " + packet.TimeStamp);
-							#endif
-
-							e.Playback.QueuePlayback (s, (packet.Encoded) ? s.Decode (packet.Data) : packet.Data);
-						}
-					}
-				}
-				playbackLock.ExitReadLock();
-
-				Thread.Sleep (1);
-			}
 		}
 	}
 }
