@@ -49,8 +49,6 @@ namespace Gablarski.Audio
 			this.playback = playback;
 			this.source = source;
 			this.options = options;
-
-			buffer = new SpeexJitterBuffer (source.FrameSize);
 		}
 
 		public DateTime Last
@@ -73,20 +71,13 @@ namespace Gablarski.Audio
 			get { return this.options; }
 		}
 
-		public SpeexJitterBuffer Buffer
-		{
-			get { return this.buffer; }
-		}
-
 		public bool Playing
 		{
 			get; set;
 		}
 		
-		private readonly TimeSpan frameTimeSpan;
 		private readonly IPlaybackProvider playback;
 		private readonly AudioSource source;
 		private readonly AudioEnginePlaybackOptions options;
-		private readonly SpeexJitterBuffer buffer;
 	}
 }

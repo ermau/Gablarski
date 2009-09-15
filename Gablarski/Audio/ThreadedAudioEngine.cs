@@ -275,8 +275,6 @@ namespace Gablarski.Audio
 
 		private void OnReceivedAudio (object sender, ReceivedAudioEventArgs e)
 		{
-			var packet = new SpeexJitterBufferPacket (e.AudioData, (uint)e.Sequence, e.Source);
-
 			byte[] decoded = e.Source.Decode (e.AudioData);
 
 			playbackLock.EnterReadLock();
@@ -284,7 +282,6 @@ namespace Gablarski.Audio
 				var p = playbacks[e.Source];
 				if (p.Playing)
 					p.Playback.QueuePlayback (e.Source, decoded);
-					//p.Buffer.Push (packet);
 			}
 			playbackLock.ExitReadLock();
 		}

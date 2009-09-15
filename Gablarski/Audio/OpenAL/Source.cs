@@ -174,13 +174,13 @@ namespace Gablarski.Audio.OpenAL
 		public void Pause ()
 		{
 			alSourcePause (this.sourceID);
-			Audio.OpenAL.OpenAL.ErrorCheck ();
+			OpenAL.ErrorCheck ();
 		}
 
 		public void Stop ()
 		{
 			alSourceStop (this.sourceID);
-			Audio.OpenAL.OpenAL.ErrorCheck ();
+			OpenAL.ErrorCheck ();
 		}
 
 		private readonly uint sourceID;
