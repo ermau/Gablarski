@@ -11,6 +11,12 @@ namespace Gablarski.WebServer
 	public class WebServerConnectionProvider
 		: IConnectionProvider
 	{
+		public int Port
+		{
+			get { return this.port; }
+			set { this.port = value; }
+		}
+
 		#region Implementation of IConnectionProvider
 
 		public event EventHandler<MessageReceivedEventArgs> ConnectionlessMessageReceived;
@@ -32,7 +38,7 @@ namespace Gablarski.WebServer
 			server.Add (new AdminModule());
 			server.Add (new QueryModule());
 			
-			server.Start (IPAddress.Any, 80);
+			server.Start (IPAddress.Any, port);
 		}
 
 		/// <summary>
@@ -47,6 +53,7 @@ namespace Gablarski.WebServer
 		#endregion
 
 		private HttpServer.HttpServer server;
+		private int port = 80;
 
 		internal protected void OnConnectionMade (ConnectionEventArgs e)
 		{
