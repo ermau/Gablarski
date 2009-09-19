@@ -76,7 +76,7 @@ namespace Gablarski
 		public virtual int ChannelId
 		{
 			get;
-			private set;
+			protected set;
 		}
 
 		/// <summary>
