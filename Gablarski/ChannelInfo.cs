@@ -65,7 +65,7 @@ namespace Gablarski
 			this.ParentChannelId = channel.ParentChannelId;
 			this.Name = channel.Name;
 			this.Description = channel.Description;
-			this.PlayerLimit = channel.PlayerLimit;
+			this.UserLimit = channel.UserLimit;
 
 			this.ReadOnly = channel.ReadOnly;
 		}
@@ -90,7 +90,7 @@ namespace Gablarski
 
 		protected string name;
 		protected string description;
-		protected int playerLimit;
+		protected int userLimit;
 
 		/// <summary>
 		/// Gets or sets the name of the channel.
@@ -125,15 +125,15 @@ namespace Gablarski
 		/// <summary>
 		/// Gets or sets the player limit. 0 for no limit.
 		/// </summary>
-		public virtual int PlayerLimit
+		public virtual int UserLimit
 		{
-			get { return this.playerLimit; }
+			get { return this.userLimit; }
 			set
 			{
 				if (this.ReadOnly)
 					throw new InvalidOperationException ();
 
-				this.playerLimit = value;
+				this.userLimit = value;
 			}
 		}
 
@@ -151,7 +151,7 @@ namespace Gablarski
 			writer.WriteInt32 (this.ChannelId);
 			writer.WriteInt32 (this.ParentChannelId);
 			writer.WriteBool (this.ReadOnly);
-			writer.WriteInt32 (this.PlayerLimit);
+			writer.WriteInt32 (this.UserLimit);
 			writer.WriteString (this.Name);
 			writer.WriteString (this.Description);
 		}
@@ -161,7 +161,7 @@ namespace Gablarski
 			this.ChannelId = reader.ReadInt32();
 			this.ParentChannelId = reader.ReadInt32();
 			this.ReadOnly = reader.ReadBool();
-			this.playerLimit = reader.ReadInt32 ();
+			this.userLimit = reader.ReadInt32 ();
 			this.name = reader.ReadString ();
 			this.description = reader.ReadString ();
 		}
