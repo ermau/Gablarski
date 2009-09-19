@@ -21,6 +21,9 @@ namespace Gablarski.WebServer
 
 		public override bool Process (IHttpRequest request, IHttpResponse response, IHttpSession session)
 		{
+			if (request.UriParts.Length == 0)
+				return false;
+
 			string file = request.UriParts[request.UriParts.Length - 1];
 			string resourceName = "Gablarski.WebServer.Html." + file;
 			if (file.Contains ("."))
