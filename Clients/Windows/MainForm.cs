@@ -234,8 +234,11 @@ namespace Gablarski.Clients.Windows
 		void CurrentUserReceivedLoginResult (object sender, ReceivedLoginResultEventArgs e)
 		{
 			if (!e.Result.Succeeded)
-				//TaskDialog.Show (e.Result.ResultState.ToString(), "Login Failed");
-				MessageBox.Show (this, "Login Failed" + Environment.NewLine + e.Result.ResultState);
+			{
+				Action<Form, string> d = (f, m) => MessageBox.Show (f, m);
+				BeginInvoke (d, this, "Login Failed: " + e.Result.ResultState);
+				gablarski.Disconnect();
+			}
 			else
 				this.gablarski.CurrentUser.Join (this.server.UserNickname);
 		}
@@ -243,7 +246,11 @@ namespace Gablarski.Clients.Windows
 		void CurrentUserReceivedJoinResult (object sender, ReceivedJoinResultEventArgs e)
 		{
 			if (e.Result != LoginResultState.Success)
-				MessageBox.Show (this, "Join failed: " + e.Result);
+			{
+				Action<Form, string> d = (f, m) => MessageBox.Show (f, m);
+				BeginInvoke (d, this, "Join failed: " + e.Result);
+				gablarski.Disconnect();
+			}
 			else
 				this.gablarski.Sources.Request ("voice", 1, 64000);
 		}
