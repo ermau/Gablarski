@@ -203,13 +203,8 @@ namespace Gablarski.Network
 					}
 				}
 
-				if (singleCore || (++loops % 100) == 0)
+				if (!this.stream.DataAvailable)
 					Thread.Sleep (1);
-				else
-					Thread.SpinWait (20);
-
-				if (loops == maxLoops)
-					loops = 0;
 			}
 		}
 

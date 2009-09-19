@@ -231,7 +231,7 @@ namespace Gablarski.Network
 					iwriter.Flush();
 				}
 
-				if (!this.uwaiting && udp.Available > 3)
+				if (!this.uwaiting)
 				{
 					this.uwaiting = true;
 					var ipEndpoint = new IPEndPoint (IPAddress.Any, 0);
@@ -257,13 +257,8 @@ namespace Gablarski.Network
 					}
 				}
 
-				if (singleCore || (++loops % 100) == 0)
+				if (udp.Available == 0 && !rstream.DataAvailable)
 					Thread.Sleep (1);
-				else
-					Thread.SpinWait (20);
-
-				if (loops == maxLoops)
-					loops = 0;
 			}
 		}
 
@@ -326,6 +321,9 @@ namespace Gablarski.Network
 				var ipendpoint = new IPEndPoint (IPAddress.Any, 0);
 				var endpoint = (EndPoint)ipendpoint;
 				
+				if (udp == null)
+					return;
+
 				if (udp.EndReceiveFrom (result, ref endpoint) == 0)
 				{
 					Trace.WriteLineIf (VerboseTracing, "[Network] UDP EndReceiveFrom returned nothing.");

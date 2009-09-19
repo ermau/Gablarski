@@ -260,7 +260,7 @@ namespace Gablarski.Network
 
 			while (this.listening)
 			{
-				if (!this.waiting && udp.Available > 3)
+				if (!this.waiting)
 				{
 					this.waiting = true;
 					var ipEndpoint = new IPEndPoint (IPAddress.Any, 0);
@@ -282,13 +282,8 @@ namespace Gablarski.Network
 					ThreadPool.QueueUserWorkItem (AcceptConnection, tcpListener);
 				}
 
-				if (singleCore || (++loops % 100) == 0)
+				if (udp.Available == 0)
 					Thread.Sleep (1);
-				else
-					Thread.SpinWait (20);
-
-				if (loops == maxLoops)
-					loops = 0;
 			}
 		}
 	}
