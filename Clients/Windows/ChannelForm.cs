@@ -31,7 +31,7 @@ namespace Gablarski.Clients.Windows
 
 			this.inName.Text = channel.Name;
 			this.inDescription.Text = channel.Description;
-			this.inPlayerLimit.Value = channel.PlayerLimit;
+			this.inUserLimit.Value = channel.UserLimit;
 		}
 
 		public ChannelInfo Channel
@@ -45,7 +45,7 @@ namespace Gablarski.Clients.Windows
 
 			this.Channel.Name = this.inName.Text.Trim();
 			this.Channel.Description = this.inDescription.Text.Trim();
-			this.Channel.PlayerLimit = (int)this.inPlayerLimit.Value;
+			this.Channel.UserLimit = (int)this.inUserLimit.Value;
 
 			this.Close();
 		}

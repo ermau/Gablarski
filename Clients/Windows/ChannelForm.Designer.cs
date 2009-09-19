@@ -34,9 +34,9 @@
 			this.inDescription = new System.Windows.Forms.TextBox ();
 			this.btnOk = new System.Windows.Forms.Button ();
 			this.btnCancel = new System.Windows.Forms.Button ();
-			this.inPlayerLimit = new System.Windows.Forms.NumericUpDown ();
-			this.lblPlayerLimit = new System.Windows.Forms.Label ();
-			((System.ComponentModel.ISupportInitialize)(this.inPlayerLimit)).BeginInit ();
+			this.inUserLimit = new System.Windows.Forms.NumericUpDown ();
+			this.lblUserLimit = new System.Windows.Forms.Label ();
+			((System.ComponentModel.ISupportInitialize)(this.inUserLimit)).BeginInit ();
 			this.SuspendLayout ();
 			// 
 			// lblName
@@ -95,21 +95,21 @@
 			this.btnCancel.Text = "Cancel";
 			this.btnCancel.UseVisualStyleBackColor = true;
 			// 
-			// inPlayerLimit
+			// inUserLimit
 			// 
-			this.inPlayerLimit.Location = new System.Drawing.Point (118, 101);
-			this.inPlayerLimit.Name = "inPlayerLimit";
-			this.inPlayerLimit.Size = new System.Drawing.Size (120, 20);
-			this.inPlayerLimit.TabIndex = 2;
+			this.inUserLimit.Location = new System.Drawing.Point (118, 101);
+			this.inUserLimit.Name = "inUserLimit";
+			this.inUserLimit.Size = new System.Drawing.Size (120, 20);
+			this.inUserLimit.TabIndex = 2;
 			// 
-			// lblPlayerLimit
+			// lblUserLimit
 			// 
-			this.lblPlayerLimit.AutoSize = true;
-			this.lblPlayerLimit.Location = new System.Drawing.Point (12, 103);
-			this.lblPlayerLimit.Name = "lblPlayerLimit";
-			this.lblPlayerLimit.Size = new System.Drawing.Size (59, 13);
-			this.lblPlayerLimit.TabIndex = 7;
-			this.lblPlayerLimit.Text = "Player limit:";
+			this.lblUserLimit.AutoSize = true;
+			this.lblUserLimit.Location = new System.Drawing.Point (12, 103);
+			this.lblUserLimit.Name = "lblUserLimit";
+			this.lblUserLimit.Size = new System.Drawing.Size (59, 13);
+			this.lblUserLimit.TabIndex = 7;
+			this.lblUserLimit.Text = "User limit:";
 			// 
 			// ChannelForm
 			// 
@@ -118,8 +118,8 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.CancelButton = this.btnCancel;
 			this.ClientSize = new System.Drawing.Size (284, 165);
-			this.Controls.Add (this.lblPlayerLimit);
-			this.Controls.Add (this.inPlayerLimit);
+			this.Controls.Add (this.lblUserLimit);
+			this.Controls.Add (this.inUserLimit);
 			this.Controls.Add (this.btnCancel);
 			this.Controls.Add (this.btnOk);
 			this.Controls.Add (this.inDescription);
@@ -130,7 +130,7 @@
 			this.Name = "ChannelForm";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "Channel";
-			((System.ComponentModel.ISupportInitialize)(this.inPlayerLimit)).EndInit ();
+			((System.ComponentModel.ISupportInitialize)(this.inUserLimit)).EndInit ();
 			this.ResumeLayout (false);
 			this.PerformLayout ();
 
@@ -144,7 +144,7 @@
 		private System.Windows.Forms.TextBox inDescription;
 		private System.Windows.Forms.Button btnOk;
 		private System.Windows.Forms.Button btnCancel;
-		private System.Windows.Forms.NumericUpDown inPlayerLimit;
-		private System.Windows.Forms.Label lblPlayerLimit;
+		private System.Windows.Forms.NumericUpDown inUserLimit;
+		private System.Windows.Forms.Label lblUserLimit;
 	}
 }
