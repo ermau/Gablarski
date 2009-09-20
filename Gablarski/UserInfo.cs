@@ -99,31 +99,31 @@ namespace Gablarski
 			Deserialize (reader);
 		}
 
-		public string Username
+		public virtual string Username
 		{
 			get;
 			protected set;
 		}
 
-		public string Nickname
+		public virtual string Nickname
 		{
 			get;
 			set;
 		}
 
-		public int UserId
+		public virtual int UserId
 		{
 			get;
 			protected set;
 		}
 
-		public int CurrentChannelId
+		public virtual int CurrentChannelId
 		{
 			get;
 			set;
 		}
 
-		public bool IsMuted
+		public virtual bool IsMuted
 		{
 			get; set;
 		}
