@@ -14,10 +14,11 @@ namespace Gablarski.WebServer
 	public class QueryModule
 		: HttpModule
 	{
-		static QueryModule()
+		public QueryModule(ConnectionManager manager)
 		{
-			Serializer = new JsonSerializer();
-			Serializer.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+			this.cmanager = manager;
+			this.serializer = new JsonSerializer();
+			this.serializer.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
 		}
 
 		#region Overrides of HttpModule
@@ -26,18 +27,21 @@ namespace Gablarski.WebServer
 		{
 			if (request.UriParts.Length > 0 && request.UriParts[0] == "query")
 			{
-				ConnectionManager.ProcessSession (session, response);
+				cmanager.ProcessSession (session, response);
 
 				var bodyWriter = new StreamWriter (response.Body);
 				
 				try
 				{
-					var result = ConnectionManager.SendAndReceive<QueryServerMessage, QueryServerResultMessage> (new QueryServerMessage(), session);
+					var result = cmanager.SendAndReceive<QueryServerMessage, QueryServerResultMessage> (new QueryServerMessage(), session);
 				
 					JsonTextWriter writer = new JsonTextWriter (bodyWriter);
-					Serializer.Serialize (writer, result);
+					serializer.Serialize (writer, result);
 
+					#if !DEBUG
 					response.ContentType = "application/json";
+					#endif
+
 					response.AddHeader ("X-JSON", "true");
 				}
 				catch (Exception ex)
@@ -58,6 +62,7 @@ namespace Gablarski.WebServer
 
 		#endregion
 
-		private static readonly JsonSerializer Serializer;
+		private readonly ConnectionManager cmanager;
+		private readonly JsonSerializer serializer;
 	}
 }

@@ -10,36 +10,31 @@ using Mono.Rocks;
 
 namespace Gablarski.WebServer
 {
-	public static class ConnectionManager
+	public class ConnectionManager
 	{
-		static ConnectionManager()
-		{
-			SessionStore = new MemorySessionStore();
-		}
-
-		public static WebServerConnectionProvider ConnectionProvider
+		public WebServerConnectionProvider ConnectionProvider
 		{
 			get; set;
 		}
 
-		public static HttpServer.HttpServer Server
+		public HttpServer.HttpServer Server
 		{
 			get; set;
 		}
 
-		public static TimeSpan SessionTtl
+		public TimeSpan SessionTtl
 		{
 			get { return sessionTtl; }
 			set { sessionTtl = value; }
 		}
 
-		public static TimeSpan TimeBetweenScans
+		public TimeSpan TimeBetweenScans
 		{
 			get { return timeBetweenScans; }
 			set { timeBetweenScans = value; }
 		}
 
-		public static void ProcessSession (IHttpSession session, IHttpResponse response)
+		public void ProcessSession (IHttpSession session, IHttpResponse response)
 		{
 			bool newSession = false;
 			lock (sessions)
@@ -59,7 +54,7 @@ namespace Gablarski.WebServer
 					session["mqueue"] = new List<MessageBase>();
 					session["connection"] = connection;
 					session["loggedIn"] = false;
-					SessionStore.Save (session);
+					sessionStore.Save (session);
 
 					response.Cookies.Add (new ResponseCookie (Server.SessionCookieName, session.Id, DateTime.Now.Add (SessionTtl)));
 
@@ -69,15 +64,15 @@ namespace Gablarski.WebServer
 			}
 		}
 
-		public static void SaveSession (IHttpSession session)
+		public void SaveSession (IHttpSession session)
 		{
 			lock (sessions)
 			{
-				SessionStore.Save (session);
+				sessionStore.Save (session);
 			}
 		}
 
-		public static TReceive Receive<TReceive> (IHttpSession session)
+		public TReceive Receive<TReceive> (IHttpSession session)
 			where TReceive : MessageBase
 		{
 			List<MessageBase> mqueue = (List<MessageBase>)session["mqueue"];
@@ -95,7 +90,7 @@ namespace Gablarski.WebServer
 			return receive;
 		}
 
-		public static TReceive SendAndReceive<TSend, TReceive> (TSend message, IHttpSession session)
+		public TReceive SendAndReceive<TSend, TReceive> (TSend message, IHttpSession session)
 			where TSend : MessageBase
 			where TReceive : MessageBase
 		{
@@ -107,7 +102,7 @@ namespace Gablarski.WebServer
 			return Receive<TReceive> (session);
 		}
 
-		public static TReceive SendAndReceive<TSend, TReceive, TError> (TSend message, IHttpSession session, out TError error)
+		public TReceive SendAndReceive<TSend, TReceive, TError> (TSend message, IHttpSession session, out TError error)
 			where TSend : MessageBase
 			where TReceive : MessageBase
 			where TError : MessageBase
@@ -135,15 +130,15 @@ namespace Gablarski.WebServer
 			return receive;
 		}
 
-		private static TimeSpan sessionTtl = TimeSpan.FromMinutes (15);
-		private static TimeSpan timeBetweenScans = TimeSpan.FromMinutes (1);
-		private static DateTime lastScanned = DateTime.Now;
+		private TimeSpan sessionTtl = TimeSpan.FromMinutes (15);
+		private TimeSpan timeBetweenScans = TimeSpan.FromMinutes (1);
+		private DateTime lastScanned = DateTime.Now;
 
-		private static readonly Dictionary<string, IHttpSession> sessions = new Dictionary<string, IHttpSession>();
-		private static readonly Dictionary<string, WebServerConnection> connections = new Dictionary<string, WebServerConnection>();
-		private static readonly MemorySessionStore store = new MemorySessionStore();
+		private readonly Dictionary<string, IHttpSession> sessions = new Dictionary<string, IHttpSession>();
+		private readonly Dictionary<string, WebServerConnection> connections = new Dictionary<string, WebServerConnection>();
+		private readonly MemorySessionStore store = new MemorySessionStore();
 
-		private static void KillOldSessions ()
+		private void KillOldSessions ()
 		{
 			lock (sessions)
 			{
@@ -152,8 +147,9 @@ namespace Gablarski.WebServer
 					if (DateTime.Now.Subtract (session.Accessed) <= TimeBetweenScans)
 						continue;
 
-					sessions.Remove (session.Id);
-					connections[session.Id].Disconnect();
+					if (sessions.Remove (session.Id))
+						connections[session.Id].Disconnect();
+
 					connections.Remove (session.Id);
 				}
 			}
@@ -161,9 +157,6 @@ namespace Gablarski.WebServer
 			lastScanned = DateTime.Now;
 		}
 
-		private static IHttpSessionStore SessionStore
-		{
-			get; set;
-		}
+		private IHttpSessionStore sessionStore = new MemorySessionStore();
 	}
 }

@@ -49,6 +49,11 @@ namespace Gablarski.WebServer
 	public class LoginModule
 		: HttpModule
 	{
+		public LoginModule (ConnectionManager cmanager)
+		{
+			this.cmanager = cmanager;
+		}
+
 		public override bool Process (IHttpRequest request, IHttpResponse response, IHttpSession session)
 		{
 			if (request.UriParts.Length > 0 && request.UriParts[0].ToLower() == "login" && request.Method.ToLower() == "post")
@@ -59,19 +64,19 @@ namespace Gablarski.WebServer
 					return true;
 				}
 
-				ConnectionManager.ProcessSession (session, response);
+				cmanager.ProcessSession (session, response);
 
-				var result = ConnectionManager.SendAndReceive<LoginMessage, LoginResultMessage> (
+				var result = cmanager.SendAndReceive<LoginMessage, LoginResultMessage> (
 								new LoginMessage { Username = request.Form["username"].Value, Password = request.Form["password"].Value }, session);
 
-				var permissions = ConnectionManager.Receive<PermissionsMessage> (session);
+				var permissions = cmanager.Receive<PermissionsMessage> (session);
 
 				if (!result.Result.Succeeded)
 					WriteAndFlush (response, "Invalid Login");
 				else if (permissions.Permissions.CheckPermission (PermissionName.AdminPanel))
 				{
 					session["loggedIn"] = true;
-					ConnectionManager.SaveSession (session);
+					cmanager.SaveSession (session);
 					response.Redirect ("/admin");
 				}
 				else
@@ -84,6 +89,8 @@ namespace Gablarski.WebServer
 
 			return false;
 		}
+
+		private readonly ConnectionManager cmanager;
 
 		private static void WriteAndFlush (IHttpResponse response, string body)
 		{

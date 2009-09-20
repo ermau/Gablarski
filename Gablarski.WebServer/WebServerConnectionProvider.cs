@@ -30,15 +30,16 @@ namespace Gablarski.WebServer
 			var sstore = new MemorySessionStore();
 			server = new HttpServer.HttpServer (sstore);
 
-			ConnectionManager.ConnectionProvider = this;
-			ConnectionManager.Server = server;
+			ConnectionManager cmanager = new ConnectionManager();
+			cmanager.ConnectionProvider = this;
+			cmanager.Server = server;
 
 			server.Add (new FileResourceModule());
-			server.Add (new LoginModule());
-			server.Add (new AdminModule());
-			server.Add (new QueryModule());
+			server.Add (new LoginModule(cmanager));
+			server.Add (new AdminModule(cmanager));
+			server.Add (new QueryModule(cmanager));
 			
-			server.Start (IPAddress.Any, port);
+			server.Start (IPAddress.Any, this.Port);
 		}
 
 		/// <summary>
