@@ -44,9 +44,10 @@ using Gablarski.Client;
 
 namespace Gablarski.Audio
 {
-	public class ThreadedAudioEngine
+	public class AudioEngine
 		: IAudioEngine
 	{
+
 		/// <summary>
 		/// Gets or sets the audio receiver
 		/// </summary>
@@ -216,8 +217,7 @@ namespace Gablarski.Audio
 			this.AudioReceiver.AudioSourceStarted += OnAudioSourceStarted;
 			this.AudioReceiver.AudioSourceStopped += OnAudioSourceStopped;
 
-		/*	this.playbackRunnerThread = new Thread (this.PlaybackRunner) { Name = "ThreadedAudioEngine Playback Runner" };
-			this.playbackRunnerThread.Start();*/
+			this.tickTimer = new Timer (Tick, null, 0, 10);
 		}
 
 		public void Stop ()
@@ -227,12 +227,8 @@ namespace Gablarski.Audio
 			this.AudioReceiver.ReceivedAudio -= OnReceivedAudio;
 			this.AudioReceiver.AudioSourceStarted -= OnAudioSourceStarted;
 			this.AudioReceiver.AudioSourceStopped -= OnAudioSourceStopped;
-			
-			if (this.playbackRunnerThread != null)
-			{
-				this.playbackRunnerThread.Join();
-				this.playbackRunnerThread = null;
-			}
+
+			this.tickTimer.Dispose();
 
 			lock (captures)
 			{
@@ -247,11 +243,13 @@ namespace Gablarski.Audio
 		}
 
 		private volatile bool running;
-		private Thread playbackRunnerThread;
-
+		
 		private readonly Dictionary<AudioSource, AudioCaptureEntity> captures = new Dictionary<AudioSource, AudioCaptureEntity>();
 		private readonly Dictionary<AudioSource, AudioPlaybackEntity> playbacks = new Dictionary<AudioSource, AudioPlaybackEntity>();
+		private readonly List<IPlaybackProvider> playbackProviders = new List<IPlaybackProvider>();
 		private readonly ReaderWriterLockSlim playbackLock = new ReaderWriterLockSlim();
+
+		private Timer tickTimer;
 
 		private IAudioReceiver audioReceiver;
 
@@ -284,6 +282,18 @@ namespace Gablarski.Audio
 					p.Playback.QueuePlayback (e.Source, decoded);
 			}
 			playbackLock.ExitReadLock();
+		}
+
+		private void Tick (object state)
+		{
+			if (!this.running)
+				return;
+
+			lock (playbackProviders)
+			{
+				foreach (var p in playbackProviders)
+					p.Tick();
+			}
 		}
 	}
 }

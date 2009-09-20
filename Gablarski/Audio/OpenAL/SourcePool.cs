@@ -45,13 +45,6 @@ namespace Gablarski.Audio.OpenAL
 	public class SourcePool<T>
 		where T : class
 	{
-		public SourcePool()
-		{
-			this.sourcePollerThread = new Thread (this.SourcePoller);
-			this.sourcePollerThread.IsBackground = true;
-			this.sourcePollerThread.Start();
-		}
-
 		public event EventHandler<SourceFinishedEventArgs<T>> SourceFinished;
 
 		public Source RequestSource (T owner)
@@ -119,38 +112,31 @@ namespace Gablarski.Audio.OpenAL
 			}
 		}
 
+		public void Tick()
+		{
+			lock (sourceLock)
+			{
+				foreach (Source s in owners.Keys)
+				{
+					if (!playing.Contains (s) || !s.IsStopped)
+						continue;
+
+					OnSourceFinished (new SourceFinishedEventArgs<T> (owners[s], s));
+					playing.Remove (s);
+				}
+			}
+		}
+
 		private readonly HashSet<Source> playing = new HashSet<Source>();
 		private readonly Dictionary<Source, T> owners = new Dictionary<Source, T> ();
 		
 		private readonly object sourceLock = new object();
-		private readonly Thread sourcePollerThread;
-		private volatile bool listening = true;
 
 		private void OnSourceFinished (SourceFinishedEventArgs<T> e)
 		{
 			var finished = this.SourceFinished;
 			if (finished != null)
 				finished (this, e);
-		}
-
-		private void SourcePoller()
-		{
-			while (this.listening)
-			{
-				lock (sourceLock)
-				{
-					foreach (Source s in owners.Keys)
-					{
-						if (!playing.Contains (s) || !s.IsStopped)
-							continue;
-
-						OnSourceFinished (new SourceFinishedEventArgs<T> (owners[s], s));
-						playing.Remove (s);
-					}
-				}
-
-				Thread.Sleep (1);
-			}
 		}
 	}
 

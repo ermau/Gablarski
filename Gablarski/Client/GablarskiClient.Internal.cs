@@ -199,6 +199,7 @@ namespace Gablarski.Client
 			this.Users.Clear();
 			this.Channels.Clear();
 			this.Sources.Clear();
+
 			this.Audio.Stop();
 
 			OnDisconnected (this, EventArgs.Empty);

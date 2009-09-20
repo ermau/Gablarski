@@ -66,6 +66,11 @@ namespace Gablarski.Audio
 		/// </summary>
 		/// <param name="source">The source to free any resources for.</param>
 		void FreeSource (AudioSource source);
+
+		/// <summary>
+		/// Called each tick of the audio engine, to be used for cleanup.
+		/// </summary>
+		void Tick();
 	}
 
 	public class SourceFinishedEventArgs

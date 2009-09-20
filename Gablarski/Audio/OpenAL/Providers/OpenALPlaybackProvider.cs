@@ -88,6 +88,11 @@ namespace Gablarski.Audio.OpenAL.Providers
 			pool.FreeSource (source);
 		}
 
+		public void Tick()
+		{
+			pool.Tick();
+		}
+
 		public IAudioDevice DefaultDevice
 		{
 			get { return Audio.OpenAL.OpenAL.DefaultPlaybackDevice; }
