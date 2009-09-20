@@ -221,7 +221,7 @@ namespace Gablarski.Server
 			{
 				if (msg.Delete && this.channels.Count == 1)
 					result = ChannelEditResult.FailedLastChannel;
-				else if (!this.channelProvider.UpdateSupported)
+				else if (!this.ChannelProvider.UpdateSupported)
 					result = ChannelEditResult.FailedChannelsReadOnly;
 				else if (this.channels.TryGetValue (msg.Channel.ChannelId, out realChannel) && realChannel.ReadOnly)
 					result = ChannelEditResult.FailedChannelReadOnly;
@@ -238,9 +238,9 @@ namespace Gablarski.Server
 				if (result == ChannelEditResult.FailedUnknown)
 				{
 					if (!msg.Delete)
-						result = this.channelProvider.SaveChannel (msg.Channel);
+						result = this.ChannelProvider.SaveChannel (msg.Channel);
 					else
-						result = this.channelProvider.DeleteChannel (msg.Channel);
+						result = this.ChannelProvider.DeleteChannel (msg.Channel);
 				}
 			}
 

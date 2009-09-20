@@ -303,7 +303,7 @@ namespace Gablarski.Server
 
 		private void OnPermissionsChanged (object sender, PermissionsChangedEventArgs e)
 		{
-			this.connections.GetConnection (e.UserId).Send (new PermissionsMessage (e.UserId, permissionProvider.GetPermissions (e.UserId)));
+			this.connections.GetConnection (e.UserId).Send (new PermissionsMessage (e.UserId, PermissionProvider.GetPermissions (e.UserId)));
 		}
 
 		private void OnChannelsUpdatedExternally (object sender, EventArgs e)
