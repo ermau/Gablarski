@@ -10,7 +10,7 @@ using NUnit.Framework;
 namespace Gablarski.Tests
 {
 	[TestFixture]
-	public class ThreadedAudioEngineTests
+	public class AudioEngineTests
 	{
 		private ICaptureProvider provider;
 		private OwnedAudioSource source;
@@ -32,7 +32,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void InvalidAttach()
 		{
-			var engine = new ThreadedAudioEngine();
+			var engine = new AudioEngine();
 
 			Assert.Throws<ArgumentNullException> (() => engine.Attach (null, AudioFormat.Mono16Bit, this.source, new AudioEngineCaptureOptions()));
 			Assert.Throws<ArgumentNullException> (() => engine.Attach (this.provider, AudioFormat.Mono16Bit, null, new AudioEngineCaptureOptions()));
@@ -42,7 +42,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void InvalidDetatch()
 		{
-			var engine = new ThreadedAudioEngine();
+			var engine = new AudioEngine();
 			Assert.Throws<ArgumentNullException> (() => engine.Detach ((ICaptureProvider)null));
 			Assert.Throws<ArgumentNullException> (() => engine.Detach ((AudioSource)null));
 		}
@@ -50,7 +50,7 @@ namespace Gablarski.Tests
 		//[Test]
 		//public void AttachDetatchSource()
 		//{
-		//    var engine = new ThreadedAudioEngine();
+		//    var engine = new AudioEngine();
 
 		//    engine.Attach (this.provider, this.source, new AudioEngineCaptureOptions());
 		//    Assert.IsTrue (engine.Detach (this.source));
@@ -59,7 +59,7 @@ namespace Gablarski.Tests
 		//[Test]
 		//public void AttachDetatchProvider()
 		//{
-		//    var engine = new ThreadedAudioEngine();
+		//    var engine = new AudioEngine();
 
 		//    engine.Attach (this.provider, this.source, new AudioEngineCaptureOptions());
 		//    Assert.IsTrue (engine.Detach (this.provider));
@@ -68,7 +68,7 @@ namespace Gablarski.Tests
 		//[Test]
 		//public void InvalidBeginCapture()
 		//{
-		//    var engine = new ThreadedAudioEngine();
+		//    var engine = new AudioEngine();
 		//    engine.Attach (this.provider, this.source, new AudioEngineCaptureOptions());
 		//    Assert.Throws<ArgumentNullException> (() => engine.BeginCapture (null));
 		//}
@@ -76,7 +76,7 @@ namespace Gablarski.Tests
 		//[Test]
 		//public void InvalidEndCapture()
 		//{
-		//    var engine = new ThreadedAudioEngine();
+		//    var engine = new AudioEngine();
 		//    engine.Attach (this.provider, this.source, new AudioEngineCaptureOptions());
 		//    Assert.Throws<ArgumentNullException> (() => engine.EndCapture (null));
 		//}

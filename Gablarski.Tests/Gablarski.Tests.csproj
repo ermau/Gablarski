@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>10.0.20506</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{7F9DB2AA-BA94-4C4F-9CD5-536B9B087D2E}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -50,7 +50,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ThreadedAudioEngineTests.cs" />
+    <Compile Include="AudioEngineTests.cs" />
     <Compile Include="AudioSourceTests.cs" />
     <Compile Include="ChannelTests.cs" />
     <Compile Include="ClientChannelManagerTests.cs" />
