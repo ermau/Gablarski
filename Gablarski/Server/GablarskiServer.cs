@@ -94,44 +94,17 @@ namespace Gablarski.Server
 			get; set;
 		}
 
+		public bool IsRunning
+		{
+			get { return this.running; }
+		}
+
+		public int UserCount
+		{
+			get { return this.connections.UserCount; }
+		}
+
 		#region Public Methods
-		/// <summary>
-		/// Gets or sets the list of <c>IConnectionProvider</c>'s for the server to use.
-		/// </summary>
-		public IEnumerable<IConnectionProvider> ConnectionProviders
-		{
-			get
-			{
-				lock (this.availableConnections)
-				{
-					return this.availableConnections.ToArray ();
-				}
-			}
-
-			set
-			{
-				lock (this.availableConnections)
-				{
-					foreach (var provider in this.availableConnections)
-						RemoveConnectionProvider (provider, false);
-
-					this.availableConnections.Clear ();
-
-					foreach (var provider in value)
-						AddConnectionProvider (provider);
-				}
-			}
-		}
-
-		/// <summary>
-		/// Starts the server.
-		/// </summary>
-		public void Start ()
-		{
-			this.running = true;
-			this.messageRunnerThread.Start ();
-		}
-
 		/// <summary>
 		/// Adds and starts an <c>IConnectionProvider</c>.
 		/// </summary>
@@ -160,17 +133,12 @@ namespace Gablarski.Server
 		}
 
 		/// <summary>
-		/// Disconnections an <c>IConnection</c>.
+		/// Starts the server.
 		/// </summary>
-		/// <param name="user">The user to disconnect.</param>
-		public void Disconnect (ServerUserInfo user)
+		public void Start ()
 		{
-			if (user == null)
-				throw new ArgumentNullException ("user");
-
-			var userConnection = this.connections[user];
-			if (userConnection != null)
-				this.Disconnect (userConnection);
+			this.running = true;
+			this.messageRunnerThread.Start ();
 		}
 
 		/// <summary>
@@ -191,10 +159,40 @@ namespace Gablarski.Server
 				}
 			}
 
-			this.messageRunnerThread.Join ();
+			this.messageRunnerThread.Join();
 
 			while (this.connections.ConnectionCount > 0)
 				this.Disconnect (this.connections[0].Key);
+		}
+
+		public IEnumerable<UserInfo> GetUsers()
+		{
+			return this.connections.Users.Select (u => new UserInfo (u));
+		}
+
+		public IEnumerable<ChannelInfo> GetChannels()
+		{
+			IEnumerable<ChannelInfo> cs;
+			lock (channelLock)
+			{
+				cs = this.channels.Values.ToList();
+			}
+
+			return cs.Select (c => new ChannelInfo (c));
+		}
+
+		/// <summary>
+		/// Disconnections an <c>IConnection</c>.
+		/// </summary>
+		/// <param name="user">The user to disconnect.</param>
+		public void Disconnect (ServerUserInfo user)
+		{
+			if (user == null)
+				throw new ArgumentNullException ("user");
+
+			var userConnection = this.connections[user];
+			if (userConnection != null)
+				this.Disconnect (userConnection);
 		}
 		#endregion
 

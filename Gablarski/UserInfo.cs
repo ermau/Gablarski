@@ -56,6 +56,7 @@ namespace Gablarski
 			this.Username = info.Username;
 			this.UserId = info.UserId;
 			this.CurrentChannelId = info.CurrentChannelId;
+			this.IsMuted = info.IsMuted;
 		}
 
 		internal UserInfo (string nickname, string username, int userId, int currentChannelId, bool muted)

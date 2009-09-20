@@ -49,7 +49,7 @@ namespace Gablarski
 		{
 		}
 
-		public ChannelInfo (IValueReader reader)
+		internal ChannelInfo (IValueReader reader)
 		{
 			Deserialize (reader);
 		}
@@ -57,6 +57,11 @@ namespace Gablarski
 		public ChannelInfo (int channelId)
 		{
 			this.ChannelId = channelId;
+		}
+
+		public ChannelInfo (ChannelInfo channelInfo)
+			: this (channelInfo.ChannelId, channelInfo)
+		{
 		}
 
 		public ChannelInfo (int channelId, ChannelInfo channel)

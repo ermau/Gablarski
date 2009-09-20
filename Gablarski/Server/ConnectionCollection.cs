@@ -44,6 +44,11 @@ namespace Gablarski.Server
 {
 	internal class ConnectionCollection
 	{
+		public int UserCount
+		{
+			get { return this.users.Count; }
+		}
+
 		public int ConnectionCount
 		{
 			get { return this.connections.Count; }
@@ -264,7 +269,7 @@ namespace Gablarski.Server
 			}
 		}
 
-		private object lck = new object();
+		private readonly object lck = new object();
 		private readonly List<IConnection> connections = new List<IConnection>();
 		private readonly Dictionary<IConnection, ServerUserInfo> users = new Dictionary<IConnection, ServerUserInfo>();
 	}
