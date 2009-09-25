@@ -24,6 +24,11 @@ namespace Gablarski
 		/// Search the paths supplied recursively.
 		/// </summary>
 		SearchRecursively = 4,
+
+		/// <summary>
+		/// Searches everywhere.
+		/// </summary>
+		SearchAll = SearchCurrent | SearchExecuting | SearchRecursively
 	}
 
 	/// <summary>
@@ -123,11 +128,7 @@ namespace Gablarski
 
 		internal static IEnumerable<Type> SearchAssembly (Assembly asm, Type contract)
 		{
-			foreach (var type in asm.GetTypes ()
-				.Where (t => t.IsPublic && contract.IsAssignableFrom (t) && !t.IsInterface && !t.IsAbstract))
-			{
-				yield return type;
-			}
+			return asm.GetTypes().Where (t => t.IsPublic && contract.IsAssignableFrom (t) && !t.IsInterface && !t.IsAbstract);
 		}
 	}
 }

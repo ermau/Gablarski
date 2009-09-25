@@ -34,6 +34,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
@@ -54,6 +55,25 @@
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Mono Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Mono Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;MONO</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <WarningLevel>3</WarningLevel>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Mono Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Mono Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -98,6 +118,7 @@
     <Compile Include="Audio\AudioEngine.cs" />
     <Compile Include="Client\ClientAudioSource.cs" />
     <Compile Include="IIndexedEnumerable.cs" />
+    <Compile Include="INotifyCollectionChanged.cs" />
     <Compile Include="Messages\AudioSourceStateChangeMessage.cs" />
     <Compile Include="Messages\ClientAudioSourceStateChangeMessage.cs" />
     <Compile Include="Messages\JoinMessage.cs" />
@@ -169,7 +190,6 @@
     <Compile Include="Server\GablarskiServer.cs" />
     <Compile Include="Server\IAuthenticationProvider.cs" />
     <Compile Include="Permission.cs" />
-    <Compile Include="OrderedDictionary.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Server\ServerSettings.cs" />
     <Compile Include="StreamValueReader.cs" />
@@ -189,12 +209,6 @@
     <Compile Include="Server\LobbyChannelProvider.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Mono.Rocks\Mono.Rocks.csproj">
-      <Project>{F656F792-2CDE-4E17-BB5F-6A6F1C266CB8}</Project>
-      <Name>Mono.Rocks</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Audio\CELT\libcelt.dll">
     </None>
     <None Include="Audio\CELT\libcelt.license.txt" />
@@ -210,6 +224,12 @@
     <None Include="Audio\OpenAL\Gablarski.OpenAL.dll.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Mono.Rocks\Mono.Rocks.csproj">
+      <Project>{F656F792-2CDE-4E17-BB5F-6A6F1C266CB8}</Project>
+      <Name>Mono.Rocks</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

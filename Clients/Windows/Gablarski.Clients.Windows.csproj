@@ -71,20 +71,26 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Mono Debug|x64' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Mono Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Mono Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Mono Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Kennedy.ManagedHooks, Version=1.2.0.10, Culture=neutral, PublicKeyToken=null">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>Kennedy.ManagedHooks.dll</HintPath>
-    </Reference>
     <Reference Include="NHibernate, Version=2.0.1.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\fluent-nhibernate\tools\NHibernate\NHibernate.dll</HintPath>
-    </Reference>
-    <Reference Include="PresentationCore">
-      <RequiredTargetFramework>3.0</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="PresentationFramework">
-      <RequiredTargetFramework>3.0</RequiredTargetFramework>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -106,9 +112,6 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Deployment" />
     <Reference Include="WindowsBase">
-      <RequiredTargetFramework>3.0</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="WindowsFormsIntegration">
       <RequiredTargetFramework>3.0</RequiredTargetFramework>
     </Reference>
     <Reference Include="CustomMarshalers" />
@@ -138,6 +141,7 @@
     </Compile>
     <Compile Include="Mappings\ServerMap.cs" />
     <Compile Include="Mappings\SettingMap.cs" />
+    <Compile Include="Modules.cs" />
     <Compile Include="Persistance.cs" />
     <Compile Include="UserTreeView.cs">
       <SubType>Component</SubType>
@@ -164,10 +168,6 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="PushToTalk.cs" />
-    <Compile Include="PushToTalkTextBox.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="RequiredTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -184,6 +184,10 @@
     <ProjectReference Include="..\..\fluent-nhibernate\src\FluentNHibernate\FluentNHibernate.csproj">
       <Project>{529145D5-6CC3-4016-89B5-826563024AF1}</Project>
       <Name>FluentNHibernate</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Gablarski.Clients\Gablarski.Clients.csproj">
+      <Project>{F8A695AA-8BC9-46D4-8B7A-BDBD7B74401F}</Project>
+      <Name>Gablarski.Clients</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Gablarski\Gablarski.csproj">
       <Project>{7347052B-DA5B-4CCA-AB28-3963766E3CDB}</Project>
@@ -207,9 +211,6 @@
     <None Include="Resources\sound_none.png" />
     <None Include="Resources\music.png" />
     <None Include="Resources\group.png" />
-    <None Include="SystemHookCore.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="Resources\cog.png" />
     <None Include="XTaskDlg.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -238,6 +239,10 @@ xcopy /Y "$(SolutionDir)Gablarski\Audio\Speex\libspeexdsp.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Gablarski\Audio\Speex\libspeexdsp.license.txt" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Gablarski\Audio\OpenAL\OpenAL32.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Gablarski\Audio\OpenAL\OpenALSoft.License.txt" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)fluent-nhibernate\tools\NHibernate\*.dll" "$(TargetDir)"</PostBuildEvent>
+xcopy /Y "$(SolutionDir)fluent-nhibernate\tools\NHibernate\*.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Gablarski.Input.ManagedHooks\bin\$(ConfigurationName)\*.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Gablarski.Input.ManagedHooks\bin\$(ConfigurationName)\*.pdb" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Gablarski.Input.DirectInput\bin\$(ConfigurationName)\*.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Gablarski.Input.DirectInput\bin\$(ConfigurationName)\*.pdb" "$(TargetDir)"</PostBuildEvent>
   </PropertyGroup>
 </Project>

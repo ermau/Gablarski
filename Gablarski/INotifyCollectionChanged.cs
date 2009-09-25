@@ -24,6 +24,7 @@
 //	Brian O'Keefe (zer0keefie@gmail.com)
 //
 
+#if MONO
 using System;
 
 namespace System.Collections.Specialized {
@@ -227,3 +228,5 @@ namespace System.Collections.Specialized {
 		#endregion
 	}
 }
+
+#endif

@@ -17,13 +17,23 @@ namespace Gablarski.Clients.Windows
 			get { return true; }
 		}
 
-		public static PushToTalk PushToTalk
+		public static string InputProvider
 		{
-			get { return PushToTalk.Parse (GetSetting ("PushToTalk", "k" + 160)); }
+			get { return GetSetting ("InputProvider", String.Empty); }
 			set
 			{
-				SetSetting ("PushToTalk", value);
-				OnSettingsChanged ("PushToTalk");
+				SetSetting ("InputProvider", value);
+				OnSettingsChanged ("InputProvider");
+			}
+		}
+
+		public static string InputSettings
+		{
+			get { return GetSetting ("InputSettings", String.Empty); }
+			set
+			{
+				SetSetting ("InputSettings", value);
+				OnSettingsChanged ("InputSettings");
 			}
 		}
 
@@ -37,14 +47,29 @@ namespace Gablarski.Clients.Windows
 			}
 		}
 
+		public static bool ShowConnectOnStart
+		{
+			get { return GetSetting ("ShowConnectOnStart", true); }
+			set
+			{
+				SetSetting ("ShowConnectOnStart", value);
+				OnSettingsChanged ("ShowConnectOnStart");
+			}
+		}
+
 		public static void SaveSettings()
 		{
 			LoadSettings();
 
 			lock (SettingLock)
 			{
-				foreach (var entry in settings.Values)
-					Persistance.CurrentSession.SaveOrUpdate (entry);
+				using (var trans = Persistance.CurrentSession.BeginTransaction())
+				{
+					foreach (var entry in settings.Values)
+						Persistance.CurrentSession.SaveOrUpdate (entry);
+
+					trans.Commit();
+				}
 			}
 		}
 

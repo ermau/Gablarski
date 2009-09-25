@@ -5,11 +5,11 @@ using System.Windows.Forms;
 using Gablarski.Audio;
 using Gablarski.Audio.OpenAL.Providers;
 using Gablarski.Client;
+using Gablarski.Clients.Input;
 using Gablarski.Clients.Windows.Entities;
 using Gablarski.Clients.Windows.Properties;
 using Gablarski.Messages;
 using Gablarski.Network;
-using Kennedy.ManagedHooks;
 
 namespace Gablarski.Clients.Windows
 {
@@ -70,13 +70,14 @@ namespace Gablarski.Clients.Windows
 
 		private const string VoiceName = "voice";
 
-		private PushToTalk ptt;
 		private IPlaybackProvider playback;
 		private ICaptureProvider voiceCapture;
 		private OwnedAudioSource voiceSource;
 
 		private void MainForm_Load (object sender, EventArgs e)
 		{
+			SetupInput();
+
 			try
 			{
 				this.playback = new OpenALPlaybackProvider();
@@ -92,8 +93,6 @@ namespace Gablarski.Clients.Windows
 				MessageBox.Show (this, "An error occured initializing OpenAL" + Environment.NewLine + ex.ToDisplayString(),
 				                 "OpenAL Initialization", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
-
-			SetUsePushToTalk (Settings.UsePushToTalk);
 		}
 
 		private void Connect()
@@ -116,63 +115,71 @@ namespace Gablarski.Clients.Windows
 		{
 			switch (e.PropertyName)
 			{
-				case "UsePushToTalk":
-					if (Settings.UsePushToTalk != (this.ptt == null))
-						SetUsePushToTalk (Settings.UsePushToTalk);
-
-					break;
-
-				case "PushToTalk":
-					this.ptt = Settings.PushToTalk;
-					break;
-
 				case "DisplaySources":
 					this.users.Update (this.gablarski.Channels, this.gablarski.Users.Cast<UserInfo>(), this.gablarski.Sources);
 					break;
+
+				case "InputProvider":
+					SetupInput();
+					break;
+
+				case "InputSettings":
+					SetupInput();
+					break;
 			}
 		}
 
-		private void SetUsePushToTalk (bool use)
+		private IInputProvider inputProvider;
+		private void DisableInput()
 		{
-			if (use)
+			if (this.inputProvider == null)
+				return;
+
+			this.inputProvider.Detach();
+			this.inputProvider.InputStateChanged -= OnInputStateChanged;
+			this.inputProvider.Dispose();
+			this.inputProvider = null;
+		}
+
+		private void SetupInput()
+		{
+			DisableInput();
+
+			Type providerType = null;
+
+			try
 			{
-				Program.KHook.KeyboardEvent += KHookKeyboardEvent;
-				//Program.MHook.MouseEvent += MHookMouseEvent;
-				this.ptt = Settings.PushToTalk;
+				providerType = Type.GetType (Settings.InputProvider);
 			}
+			finally
+			{
+				if (providerType == null)
+					providerType = Modules.Input.FirstOrDefault();
+			}
+
+			if (providerType == null)
+				MessageBox.Show ("No input provider could be found.");
 			else
 			{
-				Program.KHook.KeyboardEvent -= KHookKeyboardEvent;
-				//Program.MHook.MouseEvent -= MHookMouseEvent;
-				this.ptt = Settings.PushToTalk;
+				this.inputProvider = (IInputProvider)Activator.CreateInstance (providerType);
+				this.inputProvider.InputStateChanged += OnInputStateChanged;
+				this.inputProvider.Attach (this.Handle, Settings.InputSettings);
 			}
 		}
 
-		//private void MHookMouseEvent (MouseEvents mEvent, Point point)
-		//{
-		//    if (this.ptt.Supplier != PushToTalkSupplier.Mouse)
-		//        return;
-		//}
-
-		private void KHookKeyboardEvent (KeyboardEvents kEvent, Keys key)
+		private void OnInputStateChanged (object sender, InputStateChangedEventArgs e)
 		{
-			if (this.voiceCapture == null || this.voiceSource == null)
-				return;
-
-			if (!this.gablarski.IsConnected || this.ptt == null || this.ptt.Supplier != PushToTalkSupplier.Keyboard || this.ptt.KeyboardKeys != key)
-				return;
-
-			if (kEvent == KeyboardEvents.KeyDown && !this.voiceCapture.IsCapturing)
+			if (e.State == InputState.On)
 			{
 				this.users.MarkTalking (this.gablarski.CurrentUser);
 				this.voiceSource.BeginSending (this.gablarski.CurrentChannel);
 				this.voiceCapture.BeginCapture (AudioFormat.Mono16Bit);
 			}
-			else if (kEvent == KeyboardEvents.KeyUp)
+			else
 			{
 				this.users.MarkSilent (this.gablarski.CurrentUser);
-				this.voiceCapture.EndCapture();
 				this.voiceSource.EndSending();
+				this.voiceCapture.EndCapture();
 			}
 		}
 
@@ -331,8 +338,12 @@ namespace Gablarski.Clients.Windows
 
 		private void btnSettings_Click (object sender, EventArgs e)
 		{
+			DisableInput();
+
 			SettingsForm settingsForm = new SettingsForm();
 			settingsForm.ShowDialog();
+
+			SetupInput();
 		}
 	}
 }
