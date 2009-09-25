@@ -4,7 +4,12 @@
 	
 	<target name="build">
 		<exec program="${DotNetFramework3.5_x86_Path}\msbuild.exe">
-			<arg value='/property:Configuration=Debug;Platform="Any CPU"' />
+			<arg value='/property:Configuration=.NET Debug;Platform="x86"' />
+			<arg value="Gablarski.sln" />
+		</exec>
+
+		<exec program="${DotNetFramework3.5_x86_Path}\msbuild.exe">
+			<arg value='/property:Configuration=Mono Debug;Platform="x86"' />
 			<arg value="Gablarski.sln" />
 		</exec>
 
@@ -14,6 +19,15 @@
 
 		<zip zipfile="Gablarski-CLI-Debug.zip">
 			<fileset basedir="Clients\CLI\bin\x86\Debug">
+				<include name="gablarskicli.exe" />
+				<include name="*.dll" />
+				<include name="*.pdb" />
+				<include name="*.txt" />
+			</fileset>
+		</zip>
+
+		<zip zipfile="Gablarski-CLI-Mono-Debug.zip">
+			<fileset basedir="Clients\CLI\bin\x86\Mono Debug">
 				<include name="gablarskicli.exe" />
 				<include name="*.dll" />
 				<include name="*.pdb" />
