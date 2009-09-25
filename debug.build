@@ -4,12 +4,12 @@
 	
 	<target name="build">
 		<exec program="${DotNetFramework3.5_x86_Path}\msbuild.exe">
-			<arg value='/property:Configuration=.NET Debug;Platform="x86"' />
+			<arg value='/property:Configuration=".NET Debug";Platform="x86"' />
 			<arg value="Gablarski.sln" />
 		</exec>
 
 		<exec program="${DotNetFramework3.5_x86_Path}\msbuild.exe">
-			<arg value='/property:Configuration=Mono Debug;Platform="x86"' />
+			<arg value='/property:Configuration="Mono Debug";Platform="x86"' />
 			<arg value="Gablarski.sln" />
 		</exec>
 
