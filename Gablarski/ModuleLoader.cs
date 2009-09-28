@@ -89,7 +89,7 @@ namespace Gablarski
 				}
 			}
 
-			return implementers;
+			return implementers.Distinct();
 		}
 
 		private readonly Type contract;

@@ -143,7 +143,8 @@ namespace Gablarski.Audio.OpenAL.Providers
 
 		public void Dispose ()
 		{
-			this.device.Dispose ();
+			if (this.device != null)
+				this.device.Dispose ();
 		}
 
 		#endregion
