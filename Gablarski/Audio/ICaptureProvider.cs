@@ -50,7 +50,7 @@ namespace Gablarski.Audio
 	}
 
 	public interface ICaptureProvider
-		: IAudioDeviceProvider, IDisposable
+		: IAudioDeviceProvider
 	{
 		event EventHandler<SamplesAvailableEventArgs> SamplesAvailable;
 

@@ -42,6 +42,7 @@ using System.Text;
 namespace Gablarski.Audio
 {
 	public interface IAudioDeviceProvider
+		: IDisposable
 	{
 		/// <summary>
 		/// Gets a listing of devices for this provider.

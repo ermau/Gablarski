@@ -42,7 +42,7 @@ using System.Text;
 namespace Gablarski.Audio
 {
 	public interface IPlaybackProvider
-		: IAudioDeviceProvider, IDisposable
+		: IAudioDeviceProvider
 	{
 		/// <summary>
 		/// Fired when a source finishes playing.
