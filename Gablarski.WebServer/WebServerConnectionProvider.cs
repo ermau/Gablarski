@@ -54,7 +54,7 @@ namespace Gablarski.WebServer
 		#endregion
 
 		private HttpServer.HttpServer server;
-		private int port = 80;
+		private int port = 6113;
 
 		internal protected void OnConnectionMade (ConnectionEventArgs e)
 		{
