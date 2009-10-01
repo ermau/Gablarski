@@ -124,6 +124,12 @@
     <Compile Include="ChannelForm.Designer.cs">
       <DependentUpon>ChannelForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="DeviceSelector.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DeviceSelector.Designer.cs">
+      <DependentUpon>DeviceSelector.cs</DependentUpon>
+    </Compile>
     <Compile Include="Entities\ServerEntry.cs" />
     <Compile Include="Entities\SettingEntry.cs" />
     <Compile Include="Extensions.cs" />
@@ -142,6 +148,12 @@
     <Compile Include="Mappings\ServerMap.cs" />
     <Compile Include="Mappings\SettingMap.cs" />
     <Compile Include="Modules.cs" />
+    <Compile Include="MusicForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MusicForm.Designer.cs">
+      <DependentUpon>MusicForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Persistance.cs" />
     <Compile Include="UserTreeView.cs">
       <SubType>Component</SubType>
@@ -151,11 +163,17 @@
     <EmbeddedResource Include="ChannelForm.resx">
       <DependentUpon>ChannelForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="DeviceSelector.resx">
+      <DependentUpon>DeviceSelector.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="LoginForm.resx">
       <DependentUpon>LoginForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MusicForm.resx">
+      <DependentUpon>MusicForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <SubType>Designer</SubType>

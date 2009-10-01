@@ -69,10 +69,12 @@ namespace Gablarski.Clients.Windows
 		}
 
 		private const string VoiceName = "voice";
+		private const string MusicName = "music";
 
 		private IPlaybackProvider playback;
 		private ICaptureProvider voiceCapture;
 		private OwnedAudioSource voiceSource;
+		private OwnedAudioSource musicSource;
 
 		private void MainForm_Load (object sender, EventArgs e)
 		{
@@ -205,6 +207,13 @@ namespace Gablarski.Clients.Windows
 			{
 				if (e.Source.Name == VoiceName)
 					voiceSource = (OwnedAudioSource)e.Source;
+				else if (e.Source.Name == MusicName)
+				{
+					musicSource = (OwnedAudioSource)e.Source;
+					gablarski.Audio.Attach (musicprovider, AudioFormat.Mono16Bit, musicSource,
+					                        new AudioEngineCaptureOptions { Mode = AudioEngineCaptureMode.Explicit });
+					gablarski.Audio.BeginCapture (musicSource, gablarski.CurrentChannel);
+				}
 			}
 			else if (e.Result == SourceResult.NewSource)
 				this.gablarski.Audio.Attach (playback, e.Source, new AudioEnginePlaybackOptions());
@@ -214,6 +223,12 @@ namespace Gablarski.Clients.Windows
 
 		private void UsersUserChangedChannel (object sender, ChannelChangedEventArgs e)
 		{
+			if (e.User.Equals (gablarski.CurrentUser) && musicSource != null)
+			{
+				gablarski.Audio.EndCapture (musicSource);
+				gablarski.Audio.BeginCapture (musicSource, e.TargetChannel);
+			}
+
 			this.users.RemoveUser (e.User);
 			this.users.AddUser (e.User);
 		}
@@ -344,6 +359,27 @@ namespace Gablarski.Clients.Windows
 			settingsForm.ShowDialog();
 
 			SetupInput();
+		}
+
+		private ICaptureProvider musicprovider;
+
+		private void musicButton_Click (object sender, EventArgs e)
+		{
+			using (MusicForm mf = new MusicForm())
+			{
+				if (mf.ShowDialog (this) != DialogResult.OK)
+					return;
+			
+				if (mf.ProviderType != null)
+				{
+					musicprovider = (ICaptureProvider)Activator.CreateInstance (mf.ProviderType);
+					musicprovider.Device = mf.CaptureDevice;
+				}
+				else
+				{
+					// TODO: decoding
+				}
+			}
 		}
 	}
 }

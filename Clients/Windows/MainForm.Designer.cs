@@ -29,20 +29,37 @@
 		private void InitializeComponent ()
 		{
 			this.components = new System.ComponentModel.Container ();
+			System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+			System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
 			this.tools = new System.Windows.Forms.ToolStrip ();
 			this.btnConnect = new System.Windows.Forms.ToolStripButton ();
-			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator ();
+			this.musicButton = new System.Windows.Forms.ToolStripButton ();
 			this.btnSettings = new System.Windows.Forms.ToolStripButton ();
 			this.users = new Gablarski.Clients.Windows.UserTreeView ();
+			toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator ();
+			toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator ();
 			this.tools.SuspendLayout ();
 			this.SuspendLayout ();
+			// 
+			// toolStripSeparator1
+			// 
+			toolStripSeparator1.Name = "toolStripSeparator1";
+			toolStripSeparator1.Size = new System.Drawing.Size (6, 25);
+			toolStripSeparator1.Visible = false;
+			// 
+			// toolStripSeparator2
+			// 
+			toolStripSeparator2.Name = "toolStripSeparator2";
+			toolStripSeparator2.Size = new System.Drawing.Size (6, 25);
 			// 
 			// tools
 			// 
 			this.tools.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
 			this.tools.Items.AddRange (new System.Windows.Forms.ToolStripItem[] {
             this.btnConnect,
-            this.toolStripSeparator1,
+            toolStripSeparator1,
+            this.musicButton,
+            toolStripSeparator2,
             this.btnSettings});
 			this.tools.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.HorizontalStackWithOverflow;
 			this.tools.Location = new System.Drawing.Point (0, 0);
@@ -61,10 +78,16 @@
 			this.btnConnect.Text = "Disconnect";
 			this.btnConnect.Click += new System.EventHandler (this.btnConnect_Click);
 			// 
-			// toolStripSeparator1
+			// musicButton
 			// 
-			this.toolStripSeparator1.Name = "toolStripSeparator1";
-			this.toolStripSeparator1.Size = new System.Drawing.Size (6, 25);
+			this.musicButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.musicButton.Image = global::Gablarski.Clients.Windows.Properties.Resources.MusicImage;
+			this.musicButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.musicButton.Name = "musicButton";
+			this.musicButton.Size = new System.Drawing.Size (23, 22);
+			this.musicButton.Text = "Play Music";
+			this.musicButton.Visible = false;
+			this.musicButton.Click += new System.EventHandler (this.musicButton_Click);
 			// 
 			// btnSettings
 			// 
@@ -78,6 +101,7 @@
 			// 
 			// users
 			// 
+			this.users.AllowDrop = true;
 			this.users.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
 						| System.Windows.Forms.AnchorStyles.Left)
 						| System.Windows.Forms.AnchorStyles.Right)));
@@ -98,8 +122,8 @@
 			this.MinimumSize = new System.Drawing.Size (192, 161);
 			this.Name = "MainForm";
 			this.Text = "Gablarski";
-			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler (this.MainForm_FormClosing);
 			this.Load += new System.EventHandler (this.MainForm_Load);
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler (this.MainForm_FormClosing);
 			this.tools.ResumeLayout (false);
 			this.tools.PerformLayout ();
 			this.ResumeLayout (false);
@@ -112,7 +136,7 @@
 		private System.Windows.Forms.ToolStrip tools;
 		private UserTreeView users;
 		private System.Windows.Forms.ToolStripButton btnConnect;
-		private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
 		private System.Windows.Forms.ToolStripButton btnSettings;
+		private System.Windows.Forms.ToolStripButton musicButton;
 	}
 }

@@ -33,6 +33,8 @@ namespace Gablarski.Clients.Windows
 			this.ImageList.Images.Add ("muted",		Resources.SoundMuteImage);
 		}
 
+		[Browsable (false)]
+		[DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
 		public GablarskiClient Client
 		{
 			get { return this.client; }
