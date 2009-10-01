@@ -134,6 +134,9 @@ namespace Gablarski.Client
 			private set;
 		}
 
+		/// <summary>
+		/// Gets the audio engine responsible for playback and capture
+		/// </summary>
 		public IAudioEngine Audio
 		{
 			get; private set;
@@ -186,7 +189,7 @@ namespace Gablarski.Client
 		}
 
 		/// <summary>
-		/// Gets or sets whether to trace verbosely (trace audio data mostly).
+		/// Gets or sets whether to trace verbosely.
 		/// </summary>
 		public bool VerboseTracing
 		{

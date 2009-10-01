@@ -50,87 +50,64 @@ namespace Gablarski.Audio.OpenAL
 		public Source RequestSource (T owner)
 		{
 			Source free = null;
-			lock (this.sourceLock)
+			foreach (var kvp in owners)
 			{
-				foreach (var kvp in owners)
+				if (kvp.Value == null)
 				{
-					if (kvp.Value == null)
-					{
-						free = kvp.Key;
-						break;
-					}
-					
-					if (kvp.Value == owner)
-						return kvp.Key;
+					free = kvp.Key;
+					break;
 				}
+				
+				if (kvp.Value == owner)
+					return kvp.Key;
 			}
 				
 			if (free == null)
 				free = Source.Generate ();
 
-			lock (this.sourceLock)
-			{
-				owners[free] = owner;
-			}
+			owners[free] = owner;
 			
 			return free;
 		}
 
 		public void PlayingSource (Source source)
 		{
-			lock (this.sourceLock)
-			{
-				if (!this.playing.Contains (source))
-					this.playing.Add (source);
-			}
+			if (!this.playing.Contains (source))
+				this.playing.Add (source);
 		}
 
 		public void FreeSource (T sourceOwner)
 		{
-			lock (this.sourceLock)
-			{
-				var source = owners.FirstOrDefault (kvp => kvp.Value == sourceOwner).Key;
-				owners[source] = default(T);
-				playing.Remove (source);
-			}
+			var source = owners.FirstOrDefault (kvp => kvp.Value == sourceOwner).Key;
+			owners[source] = default(T);
+			playing.Remove (source);
 		}
 
 		public void FreeSource (Source source)
 		{
-			lock (this.sourceLock)
-			{
-				owners[source] = default(T);
-			}
+			owners[source] = default(T);
 		}
 
 		public void FreeSources (IEnumerable<Source> sources)
 		{
-			lock (this.sourceLock)
-			{
-				foreach (Source csource in sources)
-					owners[csource] = default (T);
-			}
+			foreach (Source csource in sources)
+				owners[csource] = default (T);
 		}
 
 		public void Tick()
 		{
-			lock (sourceLock)
+			foreach (Source s in owners.Keys)
 			{
-				foreach (Source s in owners.Keys)
-				{
-					if (!playing.Contains (s) || !s.IsStopped)
-						continue;
+				if (!playing.Contains (s) || !s.IsStopped)
+					continue;
 
-					OnSourceFinished (new SourceFinishedEventArgs<T> (owners[s], s));
-					playing.Remove (s);
-				}
+				OnSourceFinished (new SourceFinishedEventArgs<T> (owners[s], s));
+				playing.Remove (s);
 			}
 		}
 
 		private readonly HashSet<Source> playing = new HashSet<Source>();
 		private readonly Dictionary<Source, T> owners = new Dictionary<Source, T> ();
-		
-		private readonly object sourceLock = new object();
 
 		private void OnSourceFinished (SourceFinishedEventArgs<T> e)
 		{

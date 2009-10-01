@@ -38,6 +38,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Gablarski.Client;
 
 namespace Gablarski
 {
@@ -150,8 +151,14 @@ namespace Gablarski
 		public override bool Equals (object obj)
 		{
 			var info = (obj as UserInfo);
+			if (info != null)
+				return Username == info.Username;
 
-			return (info != null) ? Username == info.Username : false;
+			var cu = (obj as CurrentUser);
+			if (cu != null)
+				return (Username == cu.Username);
+
+			return false;
 		}
 
 		public override int GetHashCode ()

@@ -163,11 +163,10 @@ namespace Gablarski.Audio
 			if (source == null)
 				throw new ArgumentNullException ("source");
 
-			bool removed;
-			lock (captures)
-			{
-				removed = captures.Remove (source);
-			}
+			bool removed = false;
+			var osource = source as OwnedAudioSource;
+			if (osource != null)
+				removed = Detatch (osource);
 
 			if (!removed)
 			{
@@ -181,7 +180,21 @@ namespace Gablarski.Audio
 			return removed;
 		}
 
-		public void BeginCapture (AudioSource source, ChannelInfo channel)
+		public bool Detatch (OwnedAudioSource source)
+		{
+			if (source == null)
+				throw new ArgumentNullException ("source");
+
+			bool removed;
+			lock (captures)
+			{
+				removed = captures.Remove (source);
+			}
+
+			return removed;
+		}
+
+		public void BeginCapture (OwnedAudioSource source, ChannelInfo channel)
 		{
 			#if DEBUG
 			if (source == null)
@@ -196,7 +209,7 @@ namespace Gablarski.Audio
 			}
 		}
 
-		public void EndCapture (AudioSource source)
+		public void EndCapture (OwnedAudioSource source)
 		{
 			#if DEBUG
 			if (source == null)
@@ -211,13 +224,20 @@ namespace Gablarski.Audio
 
 		public void Start()
 		{
+			if (this.AudioReceiver == null)
+				throw new InvalidOperationException ("AudioReceive not set.");
+			if (this.running)
+				throw new InvalidOperationException ("Engine is already running.");
+
 			this.running = true;
 
 			this.AudioReceiver.ReceivedAudio += OnReceivedAudio;
 			this.AudioReceiver.AudioSourceStarted += OnAudioSourceStarted;
 			this.AudioReceiver.AudioSourceStopped += OnAudioSourceStopped;
 
-			this.tickTimer = new Timer (Tick, null, 0, 10);
+			this.engineThread = new Thread (Engine);
+			this.engineThread.Name = "Audio Engine";
+			this.engineThread.Start();
 		}
 
 		public void Stop ()
@@ -228,7 +248,8 @@ namespace Gablarski.Audio
 			this.AudioReceiver.AudioSourceStarted -= OnAudioSourceStarted;
 			this.AudioReceiver.AudioSourceStopped -= OnAudioSourceStopped;
 
-			this.tickTimer.Dispose();
+			if (this.engineThread != null)
+				this.engineThread.Join();
 
 			lock (captures)
 			{
@@ -244,12 +265,12 @@ namespace Gablarski.Audio
 
 		private volatile bool running;
 		
-		private readonly Dictionary<AudioSource, AudioCaptureEntity> captures = new Dictionary<AudioSource, AudioCaptureEntity>();
+		private readonly Dictionary<OwnedAudioSource, AudioCaptureEntity> captures = new Dictionary<OwnedAudioSource, AudioCaptureEntity>();
 		private readonly Dictionary<AudioSource, AudioPlaybackEntity> playbacks = new Dictionary<AudioSource, AudioPlaybackEntity>();
 		private readonly List<IPlaybackProvider> playbackProviders = new List<IPlaybackProvider>();
 		private readonly ReaderWriterLockSlim playbackLock = new ReaderWriterLockSlim();
 
-		private Timer tickTimer;
+		private Thread engineThread;
 
 		private IAudioReceiver audioReceiver;
 
@@ -257,7 +278,12 @@ namespace Gablarski.Audio
 		{
 			playbackLock.EnterReadLock();
 			{
-				playbacks[e.Source].Playing = false;
+				AudioPlaybackEntity entity;
+				if (playbacks.TryGetValue (e.Source, out entity))
+				{
+					entity.Playing = false;
+					entity.Playback.FreeSource (e.Source);
+				}
 			}
 			playbackLock.ExitReadLock();
 		}
@@ -266,7 +292,9 @@ namespace Gablarski.Audio
 		{
 			playbackLock.EnterReadLock();
 			{
-				playbacks[e.Source].Playing = true;
+				AudioPlaybackEntity entity;
+				if (playbacks.TryGetValue (e.Source, out entity))
+					entity.Playing = true;
 			}
 			playbackLock.ExitReadLock();
 		}
@@ -277,22 +305,36 @@ namespace Gablarski.Audio
 
 			playbackLock.EnterReadLock();
 			{
-				var p = playbacks[e.Source];
-				if (p.Playing)
-					p.Playback.QueuePlayback (e.Source, decoded);
+				AudioPlaybackEntity entity;
+				if (playbacks.TryGetValue (e.Source, out entity))
+					entity.Playback.QueuePlayback (e.Source, decoded);
 			}
 			playbackLock.ExitReadLock();
 		}
 
-		private void Tick (object state)
+		private void Engine ()
 		{
-			if (!this.running)
-				return;
-
-			lock (playbackProviders)
+			while (this.running)
 			{
-				foreach (var p in playbackProviders)
-					p.Tick();
+				lock (playbackProviders)
+				{
+					foreach (var p in playbackProviders)
+						p.Tick();
+				}
+
+				lock (captures)
+				{
+					foreach (var c in captures)
+					{
+						if (!c.Value.Capture.IsCapturing && c.Value.Options.Mode == AudioEngineCaptureMode.Explicit)
+							continue;
+
+						if (c.Value.Capture.AvailableSampleCount >= c.Key.FrameSize)
+							c.Key.SendAudioData (c.Value.Capture.ReadSamples (c.Key.FrameSize));
+					}
+				}
+
+				Thread.Sleep (1);
 			}
 		}
 	}

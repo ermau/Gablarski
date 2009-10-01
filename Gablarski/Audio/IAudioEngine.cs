@@ -106,6 +106,13 @@ namespace Gablarski.Audio
 		bool Detach (AudioSource source);
 
 		/// <summary>
+		/// Stops any capture to <paramref name="source"/>.
+		/// </summary>
+		/// <param name="source">The source to stop any capturing for.</param>
+		/// <returns><c>true</c> if any capturing was occuring for <paramref name="source"/>.</returns>
+		bool Detatch (OwnedAudioSource source);
+
+		/// <summary>
 		/// Starts the audio engine.
 		/// </summary>
 		void Start();
@@ -115,7 +122,7 @@ namespace Gablarski.Audio
 		/// </summary>
 		void Stop();
 
-		void BeginCapture (AudioSource source, ChannelInfo channel);
-		void EndCapture (AudioSource source);
+		void BeginCapture (OwnedAudioSource source, ChannelInfo channel);
+		void EndCapture (OwnedAudioSource source);
 	}
 }
