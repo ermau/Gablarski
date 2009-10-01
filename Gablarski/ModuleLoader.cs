@@ -110,7 +110,7 @@ namespace Gablarski
 					implementers = implementers.Concat (SearchPath (dirs[i], contract, true));
 			}
 
-			FileInfo[] files = dir.GetFiles();
+			FileInfo[] files = dir.GetFiles("*.dll");
 			for (int i = 0; i < files.Length; ++i)
 			{
 				try
