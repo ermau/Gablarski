@@ -59,15 +59,21 @@ namespace Gablarski.Client
 				throw new ArgumentNullException("targetChannel");
 			#endif
 
+			this.sending = true;
 			this.targetChannelId = targetChannel.ChannelId;
 			Interlocked.Exchange (ref this.sequence, 0);
 
 			this.client.Send (new ClientAudioSourceStateChangeMessage (true, this.Id, this.targetChannelId));
 		}
 
-		public void EndSending ()
+		public bool EndSending ()
 		{
+			if (!this.sending)
+				return false;
+
 			this.client.Send (new ClientAudioSourceStateChangeMessage (false, this.Id, this.targetChannelId));
+			this.sending = false;
+			return true;
 		}
 
 		public void SendAudioData (byte[] data)
@@ -80,6 +86,7 @@ namespace Gablarski.Client
 			this.client.Send (new SendAudioDataMessage (this.targetChannelId, this.Id, Interlocked.Increment (ref this.sequence), Encode (data)));
 		}
 
+		private bool sending;
 		private int targetChannelId;
 		private int sequence;
 	}

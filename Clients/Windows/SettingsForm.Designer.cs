@@ -42,9 +42,11 @@
 			this.lblInputProvider = new System.Windows.Forms.Label ();
 			this.pushLabel = new System.Windows.Forms.Label ();
 			this.voiceTab = new System.Windows.Forms.TabPage ();
+			this.voiceSelector = new Gablarski.DeviceSelector ();
 			this.tabs.SuspendLayout ();
 			this.displayTab.SuspendLayout ();
 			this.controlsTab.SuspendLayout ();
+			this.voiceTab.SuspendLayout ();
 			this.SuspendLayout ();
 			// 
 			// btnOk
@@ -193,6 +195,7 @@
 			// 
 			// voiceTab
 			// 
+			this.voiceTab.Controls.Add (this.voiceSelector);
 			this.voiceTab.Location = new System.Drawing.Point (4, 22);
 			this.voiceTab.Name = "voiceTab";
 			this.voiceTab.Padding = new System.Windows.Forms.Padding (3);
@@ -200,6 +203,13 @@
 			this.voiceTab.TabIndex = 2;
 			this.voiceTab.Text = "Voice";
 			this.voiceTab.UseVisualStyleBackColor = true;
+			// 
+			// voiceSelector
+			// 
+			this.voiceSelector.Location = new System.Drawing.Point (8, 6);
+			this.voiceSelector.Name = "voiceSelector";
+			this.voiceSelector.Size = new System.Drawing.Size (295, 50);
+			this.voiceSelector.TabIndex = 0;
 			// 
 			// SettingsForm
 			// 
@@ -221,6 +231,7 @@
 			this.displayTab.PerformLayout ();
 			this.controlsTab.ResumeLayout (false);
 			this.controlsTab.PerformLayout ();
+			this.voiceTab.ResumeLayout (false);
 			this.ResumeLayout (false);
 
 		}
@@ -241,5 +252,6 @@
 		private System.Windows.Forms.LinkLabel linkSet;
 		private System.Windows.Forms.Label dispInput;
 		private System.Windows.Forms.TabPage voiceTab;
+		private DeviceSelector voiceSelector;
 	}
 }

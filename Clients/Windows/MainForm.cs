@@ -80,19 +80,38 @@ namespace Gablarski.Clients.Windows
 		{
 			SetupInput();
 
+			this.playback = new OpenALPlaybackProvider();
+			this.playback.Device = this.playback.DefaultDevice;
+
+			SetupVoiceCapture();
+		}
+
+		private void SetupVoiceCapture ()
+		{
 			try
 			{
-				this.playback = new OpenALPlaybackProvider();
-				this.playback.Device = this.playback.DefaultDevice;
+				if (this.voiceCapture != null)
+				{
+					this.voiceSource.EndSending();
+					this.voiceCapture.Dispose();
+				}
 
-				this.voiceCapture = new OpenALCaptureProvider();
-				this.voiceCapture.Device = this.voiceCapture.DefaultDevice;
+				this.voiceCapture = (ICaptureProvider)Activator.CreateInstance (Type.GetType (Settings.VoiceProvider));
+
+				if (String.IsNullOrEmpty (Settings.VoiceDevice))
+					this.voiceCapture.Device = this.voiceCapture.DefaultDevice;
+				else
+				{
+					this.voiceCapture.Device = this.voiceCapture.GetDevices().FirstOrDefault (d => d.Name == Settings.VoiceDevice) ??
+					                           this.voiceCapture.DefaultDevice;
+				}
+
 				this.voiceCapture.SamplesAvailable += VoiceCaptureSamplesAvailable;
 			}
 			catch (Exception ex)
 			{
 				//TaskDialog.Show (ex.ToDisplayString(), "An error as occured initializing OpenAL.", "OpenAL Initialization", TaskDialogStandardIcon.Error);
-				MessageBox.Show (this, "An error occured initializing OpenAL" + Environment.NewLine + ex.ToDisplayString(),
+				MessageBox.Show (this, "An error occured initializing audio. " + Environment.NewLine + ex.ToDisplayString(),
 				                 "OpenAL Initialization", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
 		}
@@ -119,6 +138,14 @@ namespace Gablarski.Clients.Windows
 			{
 				case "DisplaySources":
 					this.users.Update (this.gablarski.Channels, this.gablarski.Users.Cast<UserInfo>(), this.gablarski.Sources);
+					break;
+
+				case "VoiceProvider":
+					SetupVoiceCapture();
+					break;
+
+				case "VoiceDevice":
+					SetupVoiceCapture();
 					break;
 
 				case "InputProvider":

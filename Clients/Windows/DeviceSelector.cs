@@ -30,18 +30,28 @@ namespace Gablarski
 
 		public Type Provider
 		{
-			get
-			{
-				return (provider.SelectedItem != null) ? (Type)provider.SelectedItem : null;
-			}
+			get { return (provider.SelectedItem != null) ? (Type)provider.SelectedItem : null; }
 		}
 
 		public IAudioDevice Device
 		{
-			get
-			{
-				return (device.SelectedItem != null) ? (IAudioDevice)provider.SelectedItem : null;
-			}
+			get { return (device.SelectedItem != null) ? (IAudioDevice)device.SelectedItem : null; }
+		}
+
+		public void SetProvider (string providerName)
+		{
+			if (String.IsNullOrEmpty (providerName))
+				return;
+
+			provider.SelectedItem = provider.Items.Cast<Type>().FirstOrDefault (d => d.AssemblyQualifiedName == providerName);
+		}
+
+		public void SetDevice (string deviceName)
+		{
+			if (String.IsNullOrEmpty (deviceName))
+				return;
+
+			device.SelectedItem = device.Items.Cast<IAudioDevice>().FirstOrDefault (d => d.Name == deviceName);
 		}
 
 		private void provider_SelectedIndexChanged (object sender, EventArgs e)
@@ -54,7 +64,10 @@ namespace Gablarski
 			{
 				this.device.Enabled = true;
 				using (var p = ((IAudioDeviceProvider)Activator.CreateInstance (Provider)))
+				{
 					this.device.DataSource = p.GetDevices().ToList();
+					this.device.SelectedItem = p.DefaultDevice;
+				}
 			}
 		}
 	}

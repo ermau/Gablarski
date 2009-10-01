@@ -17,13 +17,33 @@ namespace Gablarski.Clients.Windows
 			get { return true; }
 		}
 
+		public static string VoiceProvider
+		{
+			get { return GetSetting ("VoiceProvider", "Gablarski.Audio.OpenAL.Providers.OpenALCaptureProvider, Gablarski"); }
+			set
+			{
+				if (SetSetting ("VoiceProvider", value))
+					OnSettingsChanged ("VoiceProvider");
+			}
+		}
+
+		public static string VoiceDevice
+		{
+			get { return GetSetting ("VoiceDevice", String.Empty); }
+			set
+			{
+				if (SetSetting ("VoiceDevice", value))
+					OnSettingsChanged ("VoiceDevice");
+			}
+		}
+
 		public static string InputProvider
 		{
 			get { return GetSetting ("InputProvider", String.Empty); }
 			set
 			{
-				SetSetting ("InputProvider", value);
-				OnSettingsChanged ("InputProvider");
+				if (SetSetting ("InputProvider", value))
+					OnSettingsChanged ("InputProvider");
 			}
 		}
 
@@ -32,8 +52,8 @@ namespace Gablarski.Clients.Windows
 			get { return GetSetting ("InputSettings", String.Empty); }
 			set
 			{
-				SetSetting ("InputSettings", value);
-				OnSettingsChanged ("InputSettings");
+				if (SetSetting ("InputSettings", value))
+					OnSettingsChanged ("InputSettings");
 			}
 		}
 
@@ -42,8 +62,8 @@ namespace Gablarski.Clients.Windows
 			get { return GetSetting ("DisplaySources", false); }
 			set
 			{
-				SetSetting ("DisplaySources", value);
-				OnSettingsChanged ("DisplaySources");
+				if (SetSetting ("DisplaySources", value))
+					OnSettingsChanged ("DisplaySources");
 			}
 		}
 
@@ -52,8 +72,8 @@ namespace Gablarski.Clients.Windows
 			get { return GetSetting ("ShowConnectOnStart", true); }
 			set
 			{
-				SetSetting ("ShowConnectOnStart", value);
-				OnSettingsChanged ("ShowConnectOnStart");
+				if (SetSetting ("ShowConnectOnStart", value))
+					OnSettingsChanged ("ShowConnectOnStart");
 			}
 		}
 
@@ -105,27 +125,39 @@ namespace Gablarski.Clients.Windows
 			return (GetSetting (settingName, (defaultValue) ? "1" : "0") == "1");
 		}
 
-		private static void SetSetting (string settingName, string value)
+		private static bool SetSetting (string settingName, string value)
 		{
 			LoadSettings();
 
 			lock (SettingLock)
 			{
-				if (settings.ContainsKey (settingName))
-					settings[settingName].Value = value;
+				SettingEntry entry;
+				if (settings.TryGetValue (settingName, out entry))
+				{
+					if (entry.Value != value)
+					{
+						entry.Value = value;
+						return true;
+					}
+				}
 				else
+				{
 					settings[settingName] = new SettingEntry { Name = settingName, Value = value };
+					return true;
+				}
 			}
+
+			return false;
 		}
 
-		private static void SetSetting (string settingName, bool value)
+		private static bool SetSetting (string settingName, bool value)
 		{
-			SetSetting (settingName, (value) ? "1" : "0");
+			return SetSetting (settingName, (value) ? "1" : "0");
 		}
 
-		private static void SetSetting<T> (string settingName, T value)
+		private static bool SetSetting<T> (string settingName, T value)
 		{
-			SetSetting (settingName, value.ToString());
+			return SetSetting (settingName, value.ToString());
 		}
 
 		private static void OnSettingsChanged (string propertyName)

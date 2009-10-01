@@ -26,6 +26,10 @@ namespace Gablarski.Clients.Windows
 			this.inInputProvider.DisplayMember = "Name";
 			this.inInputProvider.DataSource = Modules.Input.ToList();
 			this.inInputProvider.SelectedText = Settings.InputProvider;
+
+			this.voiceSelector.ProviderSource = Modules.Capture;
+			this.voiceSelector.SetProvider (Settings.VoiceProvider);
+			this.voiceSelector.SetDevice (Settings.VoiceDevice);
 			
 			this.inputSettings = Settings.InputSettings;
 			this.dispInput.Text = currentInputProvider.GetNiceInputName (this.inputSettings);
@@ -36,12 +40,16 @@ namespace Gablarski.Clients.Windows
 
 		private void btnOk_Click (object sender, EventArgs e)
 		{
+			Settings.ShowConnectOnStart = this.inConnectOnStart.Checked;
+			Settings.DisplaySources = this.inDisplaySources.Checked;
+
 			DisableInput();
 			Settings.InputProvider = this.inInputProvider.SelectedItem.ToString();
 			Settings.InputSettings = this.inputSettings;
 
-			Settings.ShowConnectOnStart = this.inConnectOnStart.Checked;
-			Settings.DisplaySources = this.inDisplaySources.Checked;
+			Settings.VoiceProvider = this.voiceSelector.Provider.AssemblyQualifiedName;
+			Settings.VoiceDevice = this.voiceSelector.Device.Name;
+
 			Settings.SaveSettings();
 
 			this.Close();
