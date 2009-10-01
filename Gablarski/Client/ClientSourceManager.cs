@@ -177,7 +177,7 @@ namespace Gablarski.Client
 		/// <param name="name">The user-local name of the source, used to identify the source later.</param>
 		public void Request (string name, int channels)
 		{
-			Request (name, channels, 0);
+			Request (name, channels, 0, 0);
 		}
 
 		/// <summary>
@@ -192,7 +192,23 @@ namespace Gablarski.Client
 		/// </remarks>
 		public void Request (string name, int channels, int targetBitrate)
 		{
-			this.context.Connection.Send (new RequestSourceMessage (name, channels, targetBitrate));
+			Request (name, channels, targetBitrate, 0);
+		}
+
+		/// <summary>
+		/// Requests a channel with <paramref name="channels"/> and a <paramref name="targetBitrate"/>
+		/// </summary>
+		/// <param name="channels">The number of channels to request. 1-2 is the valid range.</param>
+		/// <param name="targetBitrate">The target bitrate to request.</param>
+		/// <param name="name">The user-local name of the source, used to identify the source later.</param>
+		/// <param name="frameSize">The frame requested frame size. The higher the size, the more latency and more quality.</param>
+		/// <remarks>
+		/// The server may not agree with the bitrate you request, do not set up audio based on this
+		/// target, but on the bitrate of the source you actually receive.
+		/// </remarks>
+		public void Request (string name, int channels, int targetBitrate, short frameSize)
+		{
+			this.context.Connection.Send (new RequestSourceMessage (name, channels, targetBitrate, frameSize));
 		}
 
 		/// <summary>

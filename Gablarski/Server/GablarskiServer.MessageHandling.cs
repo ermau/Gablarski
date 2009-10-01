@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Gablarski.Audio;
-using Gablarski.Messages;
-// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 
 // Redistribution and use in source and binary forms, with
@@ -40,6 +34,12 @@ using Gablarski.Messages;
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Gablarski.Audio;
+using Gablarski.Messages;
 using System.Diagnostics;
 using System.Threading;
 
@@ -421,23 +421,29 @@ namespace Gablarski.Server
 			if (user == null || !this.GetPermission (PermissionName.RequestSource, user))
 				result = SourceResult.FailedPermissions;
 
+			if ((request.FrameSize < 64 || request.FrameSize > 1024 || (request.FrameSize % 64) != 0)
+				|| String.IsNullOrEmpty (request.Name))
+			{
+				result = SourceResult.FailedInvalidArguments;
+			}
+
 			AudioSource source = null;
 			try
 			{
-				int sourceId = 1;
-				lock (sourceLock)
-				{
-					if (this.sources.Count > 0)
-						sourceId = this.sources.Max (s => s.Id) + 1;
-				}
-
 				if (result == SourceResult.FailedUnknown)
 				{
+					int sourceId = 1;
+					lock (sourceLock)
+					{
+						if (this.sources.Count > 0)
+							sourceId = this.sources.Max (s => s.Id) + 1;
+					}
+				
 					int bitrate = settings.DefaultAudioBitrate;
 					if (request.TargetBitrate != 0)
 						bitrate = request.TargetBitrate.Trim (settings.MinimumAudioBitrate, settings.MaximumAudioBitrate);
 
-					source = new AudioSource (request.Name, sourceId, user.UserId, 1, bitrate, 44100, 256, 10, false);
+					source = new AudioSource (request.Name, sourceId, user.UserId, 1, bitrate, 44100, request.FrameSize, 10, false);
 
 					lock (sourceLock)
 					{

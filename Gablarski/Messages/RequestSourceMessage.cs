@@ -49,17 +49,24 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public RequestSourceMessage (string name, int channels, int targetBitrate)
+		public RequestSourceMessage (string name, int channels, int targetBitrate, short frameSize)
 			: this ()
 		{
 			if (name == null)
 				throw new ArgumentNullException("name");
 			if (channels < 1 || channels > 2)
 				throw new ArgumentOutOfRangeException ("channels");
+			if ((frameSize != 0 && frameSize < 64) || frameSize > 1024)
+				throw new ArgumentOutOfRangeException ("frameSize");
+			if ((frameSize % 64) != 0)
+				throw new ArgumentException ("frameSize");
 
 			this.Name = name;
 			this.Channels = channels;
 			this.TargetBitrate = targetBitrate;
+
+			if (frameSize != 0)
+				this.FrameSize = frameSize;
 		}
 
 		public string Name
@@ -82,11 +89,20 @@ namespace Gablarski.Messages
 			set;
 		}
 
+		private short frameSize = 256;
+
+		public short FrameSize
+		{
+			get { return this.frameSize; }
+			set { this.frameSize = value; }
+		}
+
 		public override void WritePayload (IValueWriter writer)
 		{
 			writer.WriteString (this.Name);
 			writer.WriteByte ((byte)this.Channels);
 			writer.WriteInt32 (this.TargetBitrate);
+			writer.WriteInt16 (this.FrameSize);
 		}
 
 		public override void ReadPayload (IValueReader reader)
@@ -94,6 +110,7 @@ namespace Gablarski.Messages
 			this.Name = reader.ReadString();
 			this.Channels = reader.ReadByte ();
 			this.TargetBitrate = reader.ReadInt32();
+			this.FrameSize = reader.ReadInt16();
 		}
 	}
 }

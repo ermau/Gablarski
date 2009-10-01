@@ -47,7 +47,7 @@ namespace Gablarski.Server
 {
 	public partial class GablarskiServer
 	{
-		public static readonly Version MinimumApiVersion = new Version (0,9,0,0);
+		public static readonly Version MinimumApiVersion = new Version (0,10,0,0);
 
 		/// <summary>
 		/// Initializes a new <c>GablarskiServer</c> instance.

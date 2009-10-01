@@ -129,5 +129,10 @@ namespace Gablarski.Messages
 		/// Failed because you're only permitted a single source of this type.
 		/// </summary>
 		FailedPermittedSingleSourceOfType = 7,
+
+		/// <summary>
+		/// Failed because invalid arguments were supplied for the request.
+		/// </summary>
+		FailedInvalidArguments = 8,
 	}
 }
