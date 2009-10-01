@@ -23,18 +23,24 @@ namespace Gablarski.Clients.Windows
 
 		private void SettingsForm_Load (object sender, EventArgs e)
 		{
+			this.inInputProvider.DisplayMember = "Name";
 			this.inInputProvider.DataSource = Modules.Input.ToList();
+			this.inInputProvider.SelectedText = Settings.InputProvider;
+			
+			this.inputSettings = Settings.InputSettings;
+			this.dispInput.Text = currentInputProvider.GetNiceInputName (this.inputSettings);
+
 			this.inDisplaySources.Checked = Settings.DisplaySources;
+			this.inConnectOnStart.Checked = Settings.ShowConnectOnStart;
 		}
 
 		private void btnOk_Click (object sender, EventArgs e)
 		{
 			DisableInput();
 			Settings.InputProvider = this.inInputProvider.SelectedItem.ToString();
+			Settings.InputSettings = this.inputSettings;
 
-			if (this.inputSettings != null)
-				Settings.InputSettings = this.inputSettings;
-
+			Settings.ShowConnectOnStart = this.inConnectOnStart.Checked;
 			Settings.DisplaySources = this.inDisplaySources.Checked;
 			Settings.SaveSettings();
 
@@ -61,6 +67,7 @@ namespace Gablarski.Clients.Windows
 			{
 				this.dispInput.Text = s;
 				this.linkSet.Enabled = true;
+				this.linkSet.Text = "Set";
 			}), nice);
 		}
 
@@ -92,8 +99,18 @@ namespace Gablarski.Clients.Windows
 			if (this.currentInputProvider == null)
 				return;
 
-			this.linkSet.Enabled = false;
-			this.currentInputProvider.BeginRecord();
+			if (this.linkSet.Text == "Set")
+			{
+				this.dispInput.Text = "Press a key";
+				this.linkSet.Text = "Cancel";
+				this.currentInputProvider.BeginRecord();
+			}
+			else
+			{
+				this.dispInput.Text = currentInputProvider.GetNiceInputName (this.inputSettings);
+				this.linkSet.Text = "Set";
+				this.currentInputProvider.EndRecord();
+			}
 		}
 
 		private void linkClear_LinkClicked (object sender, LinkLabelLinkClickedEventArgs e)

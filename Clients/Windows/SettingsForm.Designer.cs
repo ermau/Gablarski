@@ -35,12 +35,12 @@
 			this.inConnectOnStart = new System.Windows.Forms.CheckBox ();
 			this.inDisplaySources = new System.Windows.Forms.CheckBox ();
 			this.controlsTab = new System.Windows.Forms.TabPage ();
+			this.linkClear = new System.Windows.Forms.LinkLabel ();
+			this.linkSet = new System.Windows.Forms.LinkLabel ();
+			this.dispInput = new System.Windows.Forms.Label ();
 			this.inInputProvider = new System.Windows.Forms.ComboBox ();
 			this.lblInputProvider = new System.Windows.Forms.Label ();
 			this.pushLabel = new System.Windows.Forms.Label ();
-			this.dispInput = new System.Windows.Forms.Label ();
-			this.linkSet = new System.Windows.Forms.LinkLabel ();
-			this.linkClear = new System.Windows.Forms.LinkLabel ();
 			this.voiceTab = new System.Windows.Forms.TabPage ();
 			this.tabs.SuspendLayout ();
 			this.displayTab.SuspendLayout ();
@@ -130,6 +130,37 @@
 			this.controlsTab.Text = "Controls";
 			this.controlsTab.UseVisualStyleBackColor = true;
 			// 
+			// linkClear
+			// 
+			this.linkClear.AutoSize = true;
+			this.linkClear.Location = new System.Drawing.Point (136, 43);
+			this.linkClear.Name = "linkClear";
+			this.linkClear.Size = new System.Drawing.Size (31, 13);
+			this.linkClear.TabIndex = 10;
+			this.linkClear.TabStop = true;
+			this.linkClear.Text = "Clear";
+			this.linkClear.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler (this.linkClear_LinkClicked);
+			// 
+			// linkSet
+			// 
+			this.linkSet.AutoSize = true;
+			this.linkSet.Location = new System.Drawing.Point (92, 43);
+			this.linkSet.Name = "linkSet";
+			this.linkSet.Size = new System.Drawing.Size (23, 13);
+			this.linkSet.TabIndex = 9;
+			this.linkSet.TabStop = true;
+			this.linkSet.Text = "Set";
+			this.linkSet.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler (this.linkSet_LinkClicked);
+			// 
+			// dispInput
+			// 
+			this.dispInput.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+						| System.Windows.Forms.AnchorStyles.Right)));
+			this.dispInput.Location = new System.Drawing.Point (173, 43);
+			this.dispInput.Name = "dispInput";
+			this.dispInput.Size = new System.Drawing.Size (130, 13);
+			this.dispInput.TabIndex = 8;
+			// 
 			// inInputProvider
 			// 
 			this.inInputProvider.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
@@ -159,37 +190,6 @@
 			this.pushLabel.Size = new System.Drawing.Size (70, 13);
 			this.pushLabel.TabIndex = 2;
 			this.pushLabel.Text = "Push to Talk:";
-			// 
-			// dispInput
-			// 
-			this.dispInput.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-						| System.Windows.Forms.AnchorStyles.Right)));
-			this.dispInput.Location = new System.Drawing.Point (158, 43);
-			this.dispInput.Name = "dispInput";
-			this.dispInput.Size = new System.Drawing.Size (145, 13);
-			this.dispInput.TabIndex = 8;
-			// 
-			// linkSet
-			// 
-			this.linkSet.AutoSize = true;
-			this.linkSet.Location = new System.Drawing.Point (92, 43);
-			this.linkSet.Name = "linkSet";
-			this.linkSet.Size = new System.Drawing.Size (23, 13);
-			this.linkSet.TabIndex = 9;
-			this.linkSet.TabStop = true;
-			this.linkSet.Text = "Set";
-			this.linkSet.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler (this.linkSet_LinkClicked);
-			// 
-			// linkClear
-			// 
-			this.linkClear.AutoSize = true;
-			this.linkClear.Location = new System.Drawing.Point (121, 43);
-			this.linkClear.Name = "linkClear";
-			this.linkClear.Size = new System.Drawing.Size (31, 13);
-			this.linkClear.TabIndex = 10;
-			this.linkClear.TabStop = true;
-			this.linkClear.Text = "Clear";
-			this.linkClear.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler (this.linkClear_LinkClicked);
 			// 
 			// voiceTab
 			// 
