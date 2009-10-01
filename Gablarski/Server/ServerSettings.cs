@@ -191,7 +191,7 @@ namespace Gablarski.Server
 			}
 		}
 
-		public bool allowGuestLogins = true;
+		private bool allowGuestLogins = true;
 		public virtual bool AllowGuestLogins
 		{
 			get
@@ -210,7 +210,31 @@ namespace Gablarski.Server
 						return;
 
 					this.allowGuestLogins = value;
-					OnPropertyChanged ("AllowguestLogins");
+					OnPropertyChanged ("AllowGuestLogins");
+				}
+			}
+		}
+
+		private string serverPassword;
+		public virtual string ServerPassword
+		{
+			get
+			{
+				lock (settingsLock)
+				{
+					return this.serverPassword;
+				}
+			}
+
+			set
+			{
+				lock (settingsLock)
+				{
+					if (value == this.serverPassword)
+						return;
+
+					this.serverPassword = value;
+					OnPropertyChanged ("ServerPassword");
 				}
 			}
 		}

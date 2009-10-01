@@ -81,6 +81,11 @@ namespace Gablarski
 		/// Failed because the supplied nickname is invalid.
 		/// </summary>
 		FailedInvalidNickname = 7,
+		
+		/// <summary>
+		/// Failed because the supplied server password was incorrect.
+		/// </summary>
+		FailedServerPassword = 8
 	}
 
 	/// <summary>

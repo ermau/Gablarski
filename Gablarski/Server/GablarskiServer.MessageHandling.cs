@@ -292,6 +292,12 @@ namespace Gablarski.Server
 				return;
 			}
 
+			if (!String.IsNullOrEmpty (settings.ServerPassword) && join.ServerPassword != settings.ServerPassword)
+			{
+				e.Connection.Send (new JoinResultMessage (LoginResultState.FailedServerPassword, null));
+				return;
+			}
+
 			ServerUserInfo info = this.connections[e.Connection];
 			if (info == null)
 			{

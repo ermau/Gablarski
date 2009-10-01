@@ -247,7 +247,7 @@ namespace Gablarski.Tests
 		}
 
 		[Test]
-		public void SourcesRemovedTest()
+		public void SourcesRemoved()
 		{
 			var sources = new List<AudioSource>
 			{

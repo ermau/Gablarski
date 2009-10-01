@@ -49,16 +49,22 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public JoinMessage (string nickname)
+		public JoinMessage (string nickname, string serverPassword)
 			: this()
 		{
 			if (nickname.IsEmpty())
 				throw new ArgumentNullException("nickname");
 
 			this.Nickname = nickname;
+			this.ServerPassword = serverPassword;
 		}
 
 		public string Nickname
+		{
+			get; set;
+		}
+
+		public string ServerPassword
 		{
 			get; set;
 		}
@@ -68,11 +74,13 @@ namespace Gablarski.Messages
 		public override void WritePayload (IValueWriter writer)
 		{
 			writer.WriteString (this.Nickname);
+			writer.WriteString (this.ServerPassword);
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
 			this.Nickname = reader.ReadString();
+			this.ServerPassword = reader.ReadString();
 		}
 
 		#endregion

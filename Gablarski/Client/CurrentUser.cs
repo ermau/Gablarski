@@ -114,15 +114,16 @@ namespace Gablarski.Client
 		}
 
 		/// <summary>
-		/// Join
+		/// Joins the connected server with the specified nickname and password.
 		/// </summary>
-		/// <param name="nickname"></param>
-		public void Join (string nickname)
+		/// <param name="nickname">The nickname to use when in the server.</param>
+		/// <param name="serverPassword">The password to join the server.</param>
+		public void Join (string nickname, string serverPassword)
 		{
 			if (nickname.IsEmpty())
 				throw new ArgumentNullException ("nickname");
 
-			this.context.Connection.Send (new JoinMessage (nickname));
+			this.context.Connection.Send (new JoinMessage (nickname, serverPassword));
 		}
 
 		private readonly IClientContext context;

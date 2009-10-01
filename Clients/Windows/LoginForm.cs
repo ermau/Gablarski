@@ -74,6 +74,7 @@ namespace Gablarski.Clients.Windows
 			this.inName.Text = this.Entry.Name;
 			this.inServer.Text = this.Entry.Host;
 			this.inPort.Text = this.Entry.Port.ToString();
+			this.inServerPassword.Text = this.Entry.ServerPassword;
 			this.inNickname.Text = this.Entry.UserNickname;
 			this.inUsername.Text = this.Entry.UserName;
 			this.inPassword.Text = this.Entry.UserPassword;
@@ -86,6 +87,7 @@ namespace Gablarski.Clients.Windows
 
 			this.inServer.Clear();
 			this.inPort.Clear();
+			this.inServerPassword.Clear();
 			this.inNickname.Clear();
 			this.inUsername.Clear();
 			this.inPassword.Clear();
@@ -121,6 +123,7 @@ namespace Gablarski.Clients.Windows
 				this.Entry.Name = this.inName.Text.Trim();
 				this.Entry.Host = this.inServer.Text.Trim();
 				this.Entry.Port = Int32.Parse (this.inPort.Text.Trim());
+				this.Entry.ServerPassword = this.inServerPassword.Text.Trim();
 				this.Entry.UserNickname = this.inNickname.Text.Trim();
 				this.Entry.UserName = this.inUsername.Text.Trim();
 				this.Entry.UserPassword = this.inPassword.Text.Trim();

@@ -31,6 +31,12 @@ namespace Gablarski.Clients.Windows.Entities
 			set;
 		}
 
+		public virtual string ServerPassword
+		{
+			get;
+			set;
+		}
+
 		public virtual string UserNickname
 		{
 			get;

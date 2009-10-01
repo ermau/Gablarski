@@ -49,7 +49,7 @@ namespace Gablarski.Tests
 		}
 
 		[Test]
-		public void JoinWithoutLogin()
+		public void Join()
 		{
 			string nickname = "Foo";
 			var msg = new JoinMessage { Nickname = nickname };
@@ -64,10 +64,30 @@ namespace Gablarski.Tests
 			Assert.AreEqual (nickname, msg.Nickname);
 		}
 
+		
+		[Test]
+		public void JoinWithServerPassword()
+		{
+			string nickname = "Foo";
+			string password = "pass";
+			var msg = new JoinMessage (nickname, password);
+			Assert.AreEqual (nickname, msg.Nickname);
+			Assert.AreEqual (password, msg.ServerPassword);
+			msg.WritePayload (writer);
+			long length = stream.Position;
+			stream.Position = 0;
+
+			msg = new JoinMessage();
+			msg.ReadPayload (reader);
+
+			Assert.AreEqual (length, stream.Position);
+			Assert.AreEqual (nickname, msg.Nickname);
+			Assert.AreEqual (password, msg.ServerPassword);
+		}
+
 		[Test]
 		public void Login()
 		{
-			string nickname = "Foo";
 			string username = "foo_";
 			string password = "monkeys";
 
@@ -82,6 +102,32 @@ namespace Gablarski.Tests
 			Assert.AreEqual (length, stream.Position);
 			Assert.AreEqual (username, msg.Username);
 			Assert.AreEqual (password, msg.Password);
+		}
+
+		[Test]
+		public void RequestSource()
+		{
+			string name = "Voice";
+			int bitrate = 64000;
+			short frameSize = 512;
+			int channels = 1;
+
+			var msg = new RequestSourceMessage (name, channels, bitrate, frameSize);
+			Assert.AreEqual (name, msg.Name);
+			Assert.AreEqual (bitrate, msg.TargetBitrate);
+			Assert.AreEqual (frameSize, msg.FrameSize);
+			Assert.AreEqual (channels, msg.Channels);
+			msg.WritePayload (writer);
+			long length = stream.Position;
+			stream.Position = 0;
+
+			msg = new RequestSourceMessage();
+			msg.ReadPayload (reader);
+			Assert.AreEqual (length, stream.Position);
+			Assert.AreEqual (name, msg.Name);
+			Assert.AreEqual (bitrate, msg.TargetBitrate);
+			Assert.AreEqual (frameSize, msg.FrameSize);
+			Assert.AreEqual (channels, msg.Channels);
 		}
 	}
 }

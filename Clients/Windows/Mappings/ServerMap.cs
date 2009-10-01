@@ -16,6 +16,7 @@ namespace Gablarski.Clients.Windows.Mappings
 			Map (x => x.Name);
 			Map (x => x.Host);
 			Map (x => x.Port);
+			Map (x => x.ServerPassword);
 			
 			Map (x => x.UserNickname);
 			Map (x => x.UserName);

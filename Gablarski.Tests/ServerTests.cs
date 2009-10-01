@@ -35,6 +35,8 @@ namespace Gablarski.Tests
 
 		private const string Username = "Bar";
 		private const string Username2 = "Bar2";
+		private const string Password = "password";
+		private const string Password2 = "password2";
 		private const string Nickname = "Foo";
 		private const string Nickname2 = "Foo2";
 
@@ -45,29 +47,38 @@ namespace Gablarski.Tests
 		private GablarskiServer server;
 		private MockConnectionProvider provider;
 
-		private MockServerConnection Login (string username, string nickname)
-		{
-			UserInfo user;
-			return Login (username, nickname, out user);
-		}
-
-
-		private MockServerConnection Login (string username, string nickname, out UserInfo user)
+		private MockServerConnection Login (string username, string password)
 		{
 			var connection = provider.EstablishConnection ();
 			connection.Client.Send (new ConnectMessage (GablarskiServer.MinimumApiVersion));
 			connection.Client.DequeueAndAssertMessage<ServerInfoMessage>();
 
-			connection.Client.Send (new LoginMessage { Username = username, Password = "password" });
+			connection.Client.Send (new LoginMessage { Username = username, Password = password });
 			var loginResultMessage = connection.Client.DequeueAndAssertMessage<LoginResultMessage>();
 			Assert.IsTrue (loginResultMessage.Result.Succeeded);
 
 			connection.Client.DequeueAndAssertMessage<PermissionsMessage>();
 
-			connection.Client.Send (new JoinMessage { Nickname = nickname });
+			return connection;
+		}
+
+		private UserInfo Join (bool loggedIn, MockServerConnection connection, string nickname)
+		{
+			return Join (loggedIn, connection, nickname, null);
+		}
+
+		private UserInfo Join (bool loggedIn, MockServerConnection connection, string nickname, string serverPassword)
+		{
+			UserInfo user;
+			connection.Client.Send (new JoinMessage (nickname, serverPassword));
 
 			var joinResultMessage = connection.Client.DequeueAndAssertMessage<JoinResultMessage>();
 			Assert.AreEqual (LoginResultState.Success, joinResultMessage.Result);
+
+			if (!loggedIn)
+			{
+				connection.Client.DequeueAndAssertMessage<PermissionsMessage>();
+			}
 
 			var userJoinedMessage = connection.Client.DequeueAndAssertMessage<UserJoinedMessage>();
 			user = userJoinedMessage.UserInfo;
@@ -82,7 +93,7 @@ namespace Gablarski.Tests
 			Assert.IsNotNull (usermsg.Users.FirstOrDefault (u => u.UserId == userJoinedMessage.UserInfo.UserId));
 			connection.Client.DequeueAndAssertMessage<SourceListMessage>();
 
-			return connection;
+			return user;
 		}
 
 		[Test]
@@ -139,21 +150,66 @@ namespace Gablarski.Tests
 		[Test]
 		public void NicknameInUse ()
 		{
-			 Login (Username, Nickname);
+			var c = Login (Username, Password);
+			Join (true, c, Nickname);
 
 			var connection = provider.EstablishConnection();
-			connection.Client.Send (new JoinMessage (Nickname));
+			connection.Client.Send (new JoinMessage (Nickname, null));
 
 			var join = connection.Client.DequeueAndAssertMessage<JoinResultMessage>();
 			Assert.AreEqual (LoginResultState.FailedNicknameInUse, join.Result);
 		}
 
 		[Test]
+		public void ServerPassword()
+		{
+			this.server.Settings.ServerPassword = "foo";
+
+			var connection = provider.EstablishConnection();
+			Join (false, connection, Nickname, "foo");
+		}
+
+		[Test]
+		public void ServerPasswordLoggedIn()
+		{
+			this.server.Settings.ServerPassword = "foo";
+
+			var c = Login (Username, Password);
+			Join (true, c, Nickname, "foo");
+		}
+
+		[Test]
+		public void BadServerPassword()
+		{
+			this.server.Settings.ServerPassword = "foo";
+
+			var connection = provider.EstablishConnection();
+			connection.Client.Send (new JoinMessage (Nickname, null));
+
+			var join = connection.Client.DequeueAndAssertMessage<JoinResultMessage>();
+			Assert.AreEqual (LoginResultState.FailedServerPassword, join.Result);
+		}
+
+		[Test]
+		public void BadServerPasswordLoggedIn()
+		{
+			this.server.Settings.ServerPassword = "foo";
+
+			var c = Login (Username, Password);
+			c.Client.Send (new JoinMessage (Nickname, null));
+
+			var join = c.Client.DequeueAndAssertMessage<JoinResultMessage>();
+			Assert.AreEqual (LoginResultState.FailedServerPassword, join.Result);
+		}
+
+		[Test]
 		public void UserDisconnected()
 		{
 			UserInfo foo;
-			var fooc = Login (Username, Nickname, out foo);
-			var barc = Login (Username2, Nickname2);
+			var fooc = Login (Username, Password);
+			foo = Join (true, fooc, Nickname);
+
+			var barc = Login (Username2, Password2);
 
 			fooc.Disconnect();
 

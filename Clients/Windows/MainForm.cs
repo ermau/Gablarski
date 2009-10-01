@@ -289,7 +289,7 @@ namespace Gablarski.Clients.Windows
 				gablarski.Disconnect();
 			}
 			else
-				this.gablarski.CurrentUser.Join (this.server.UserNickname);
+				this.gablarski.CurrentUser.Join (this.server.UserNickname, this.server.ServerPassword);
 		}
 
 		void CurrentUserReceivedJoinResult (object sender, ReceivedJoinResultEventArgs e)
@@ -333,7 +333,7 @@ namespace Gablarski.Clients.Windows
 			});
 
 			if (this.server.UserName.IsEmpty() || this.server.UserPassword == null)
-				this.gablarski.CurrentUser.Join (this.server.UserNickname);
+				this.gablarski.CurrentUser.Join (this.server.UserNickname, this.server.ServerPassword);
 			else
 				this.gablarski.CurrentUser.Login (this.server.UserName, this.server.UserPassword);
 		}
