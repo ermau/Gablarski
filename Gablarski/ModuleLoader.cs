@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Reflection;
+using Mono.Rocks;
 
 namespace Gablarski
 {
@@ -89,7 +90,10 @@ namespace Gablarski
 				}
 			}
 
-			return implementers.Distinct();
+			return from i in implementers.Distinct()
+				   let a = i.GetCustomAttribute<ModuleSelectableAttribute>()
+				   where a == null || a.Selectable
+				   select i;
 		}
 
 		private readonly Type contract;
