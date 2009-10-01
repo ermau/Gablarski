@@ -12,6 +12,7 @@ namespace Gablarski.Tests
 	[TestFixture]
 	public class AudioEngineTests
 	{
+		private IAudioReceiver receiver;
 		private ICaptureProvider provider;
 		private OwnedAudioSource source;
 
@@ -20,6 +21,7 @@ namespace Gablarski.Tests
 		{
 			this.provider = new MockCaptureProvider();
 			this.source = new OwnedAudioSource (new AudioSource ("mockSource", 1, 1, 1, 64000, 44100, 256, 10, false), new MockClientConnection (new MockServerConnection()));
+			this.receiver = new GablarskiClient (new MockClientConnection (new MockConnectionProvider().EstablishConnection())).Sources;
 		}
 
 		[TearDown]
@@ -27,6 +29,7 @@ namespace Gablarski.Tests
 		{
 			this.provider = null;
 			this.source = null;
+			this.receiver = null;
 		}
 
 		[Test]
@@ -45,6 +48,22 @@ namespace Gablarski.Tests
 			var engine = new AudioEngine();
 			Assert.Throws<ArgumentNullException> (() => engine.Detach ((ICaptureProvider)null));
 			Assert.Throws<ArgumentNullException> (() => engine.Detach ((AudioSource)null));
+		}
+
+		[Test]
+		public void StartWithoutReceiver()
+		{
+			var engine = new AudioEngine();
+			Assert.Throws<InvalidOperationException> (engine.Start);
+		}
+
+		[Test]
+		public void StartRunning()
+		{
+			var engine = new AudioEngine();
+			engine.AudioReceiver = receiver;
+			engine.Start();
+			Assert.Throws<InvalidOperationException> (engine.Start);
 		}
 
 		//[Test]
