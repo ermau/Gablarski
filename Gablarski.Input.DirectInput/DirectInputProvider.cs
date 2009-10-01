@@ -152,6 +152,9 @@ namespace Gablarski.Input.DirectInput
 
 		private string GetSettings ()
 		{
+			if (this.keyboardState == null)
+				return null;
+
 			StringBuilder builder = new StringBuilder();
 			foreach (var kvp in EnumerateKeyboardState (this.keyboardState).Where (kvp => kvp.Value))
 			{
