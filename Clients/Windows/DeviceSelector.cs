@@ -56,7 +56,7 @@ namespace Gablarski
 
 		private void provider_SelectedIndexChanged (object sender, EventArgs e)
 		{
-			this.device.Items.Clear();
+			this.device.DataSource = null;
 
 			if (this.provider.SelectedItem == null)
 				this.device.Enabled = false;
