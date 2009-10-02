@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Gablarski.Audio
 {
@@ -26,7 +23,7 @@ namespace Gablarski.Audio
 			DateTime n = DateTime.Now;
 
 			bool result = false;
-			if (talking && avg >= contVol)
+			if (avg >= ((talking) ? contVol : startVol))
 			{
 				result = true;
 				last = n;
@@ -34,11 +31,6 @@ namespace Gablarski.Audio
 			else if (talking && n.Subtract (last) <= threshold)
 			{
 				result = true;
-			}
-			else if (!talking && avg >= startVol)
-			{
-				result = true;
-				last = n;
 			}
 
 			talking = result;

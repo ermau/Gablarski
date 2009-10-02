@@ -180,8 +180,8 @@ namespace Gablarski.Client
 
 		private void DisconnectCore (DisconnectHandling handling, IConnection connection)
 		{
-			if (!this.running)
-				return;
+			//if (!this.running)
+			//    return;
 
 			this.running = false;
 			lock (this.mqueue)

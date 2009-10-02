@@ -134,7 +134,7 @@ namespace Gablarski.Network
 			{
 				var ipendpoint = new IPEndPoint (IPAddress.Any, 0);
 				var endpoint = (EndPoint)ipendpoint;
-				if (udp.EndReceiveFrom (result, ref endpoint) == 0)
+				if (udp == null || udp.EndReceiveFrom (result, ref endpoint) == 0)
 				{
 					Trace.WriteLineIf (VerboseTracing, "[Network] UDP EndReceiveFrom returned nothing.");
 					return;

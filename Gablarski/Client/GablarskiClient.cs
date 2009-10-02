@@ -222,13 +222,13 @@ namespace Gablarski.Client
 				this.messageRunnerThread.SetApartmentState (ApartmentState.STA);
 				this.messageRunnerThread.Start();
 
-				this.Audio.AudioReceiver = this.Sources;
-				this.Audio.Start();
-
 				Connection.Disconnected += this.OnDisconnectedInternal;
 				Connection.MessageReceived += OnMessageReceived;
 				Connection.Connect (endPoint);
 				Connection.Send (new ConnectMessage (ApiVersion));
+
+				this.Audio.AudioReceiver = this.Sources;
+				this.Audio.Start();
 			}
 			catch (SocketException)
 			{
