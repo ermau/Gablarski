@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Gablarski.Audio;
@@ -37,11 +38,35 @@ namespace Gablarski.Tests
 		[Test]
 		public void Values()
 		{
-			int user = 1;
-			var source = new AudioSource ("voice", 1, user, 1, 64000, 44100, 512, 10, true);
+			var source = new AudioSource ("voice", 1, 1, 1, 64000, 44100, 512, 10, true);
 			Assert.AreEqual ("voice",	source.Name);
 			Assert.AreEqual (1,			source.Id);
-			Assert.AreEqual (user,		source.OwnerId);
+			Assert.AreEqual (1,			source.OwnerId);
+			Assert.AreEqual (1,			source.Channels);
+			Assert.AreEqual (64000,		source.Bitrate);
+			Assert.AreEqual (44100,		source.Frequency);
+			Assert.AreEqual (512,		source.FrameSize);
+			Assert.AreEqual (10,		source.Complexity);
+			Assert.AreEqual (true,		source.IsMuted);
+		}
+
+		[Test]
+		public void SerializeDeserialize()
+		{
+			var stream = new MemoryStream (new byte[20480], true);
+			var writer = new StreamValueWriter (stream);
+			var reader = new StreamValueReader (stream);
+
+			var source = new AudioSource ("voice", 1, 1, 1, 64000, 44100, 512, 10, true);
+			source.Serialize (writer);
+			long length = stream.Position;
+			stream.Position = 0;
+
+			source = new AudioSource (reader);
+			Assert.AreEqual (length,	stream.Position);
+			Assert.AreEqual ("voice",	source.Name);
+			Assert.AreEqual (1,			source.Id);
+			Assert.AreEqual (1,			source.OwnerId);
 			Assert.AreEqual (1,			source.Channels);
 			Assert.AreEqual (64000,		source.Bitrate);
 			Assert.AreEqual (44100,		source.Frequency);

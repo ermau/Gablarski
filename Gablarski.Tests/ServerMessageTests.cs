@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using Gablarski.Audio;
 using Gablarski.Messages;
+using Gablarski.Server;
 using NUnit.Framework;
 
 namespace Gablarski.Tests
@@ -267,6 +268,105 @@ namespace Gablarski.Tests
 			Assert.AreEqual (length, stream.Position);
 			Assert.AreEqual (1, msg.SourceIds.Count (sid => sid == sources[0].Id));
 			Assert.AreEqual (1, msg.SourceIds.Count (sid => sid == sources[1].Id));
+		}
+
+		[Test]
+		public void UserJoined()
+		{
+			var user = new UserInfo ("Nickname", "Username", 1, 2, true);
+			var msg = new UserJoinedMessage (user);
+			Assert.AreEqual (user.UserId, msg.UserInfo.UserId);
+			Assert.AreEqual (user.CurrentChannelId, msg.UserInfo.CurrentChannelId);
+			Assert.AreEqual (user.Nickname, msg.UserInfo.Nickname);
+			Assert.AreEqual (user.Username, msg.UserInfo.Username);
+			Assert.AreEqual (user.IsMuted, msg.UserInfo.IsMuted);
+			msg.WritePayload (writer);
+			long length = stream.Position;
+			stream.Position = 0;
+
+			msg = new UserJoinedMessage();
+			msg.ReadPayload (reader);
+			Assert.AreEqual (length, stream.Position);
+			Assert.AreEqual (user.UserId, msg.UserInfo.UserId);
+			Assert.AreEqual (user.CurrentChannelId, msg.UserInfo.CurrentChannelId);
+			Assert.AreEqual (user.Nickname, msg.UserInfo.Nickname);
+			Assert.AreEqual (user.Username, msg.UserInfo.Username);
+			Assert.AreEqual (user.IsMuted, msg.UserInfo.IsMuted);
+		}
+
+		[Test]
+		public void UserChangedChannel()
+		{
+			var changeInfo = new ChannelChangeInfo (1, 2, 3);
+			var msg = new UserChangedChannelMessage { ChangeInfo = changeInfo };
+			Assert.AreEqual (changeInfo.TargetUserId, msg.ChangeInfo.TargetUserId);
+			Assert.AreEqual (changeInfo.TargetChannelId, msg.ChangeInfo.TargetChannelId);
+			Assert.AreEqual (changeInfo.RequestingUserId, msg.ChangeInfo.RequestingUserId);
+			msg.WritePayload (writer);
+			long length = stream.Position;
+			stream.Position = 0;
+
+			msg = new UserChangedChannelMessage();
+			msg.ReadPayload (reader);
+			Assert.AreEqual (length, stream.Position);
+			Assert.AreEqual (changeInfo.TargetUserId, msg.ChangeInfo.TargetUserId);
+			Assert.AreEqual (changeInfo.TargetChannelId, msg.ChangeInfo.TargetChannelId);
+			Assert.AreEqual (changeInfo.RequestingUserId, msg.ChangeInfo.RequestingUserId);
+		}
+
+		[Test]
+		public void UserChangedChannelWithoutRequesting()
+		{
+			var changeInfo = new ChannelChangeInfo (1, 2);
+			var msg = new UserChangedChannelMessage { ChangeInfo = changeInfo };
+			Assert.AreEqual (changeInfo.TargetUserId, msg.ChangeInfo.TargetUserId);
+			Assert.AreEqual (changeInfo.TargetChannelId, msg.ChangeInfo.TargetChannelId);
+			Assert.AreEqual (changeInfo.RequestingUserId, msg.ChangeInfo.RequestingUserId);
+			msg.WritePayload (writer);
+			long length = stream.Position;
+			stream.Position = 0;
+
+			msg = new UserChangedChannelMessage();
+			msg.ReadPayload (reader);
+			Assert.AreEqual (length, stream.Position);
+			Assert.AreEqual (changeInfo.TargetUserId, msg.ChangeInfo.TargetUserId);
+			Assert.AreEqual (changeInfo.TargetChannelId, msg.ChangeInfo.TargetChannelId);
+			Assert.AreEqual (changeInfo.RequestingUserId, msg.ChangeInfo.RequestingUserId);
+		}
+
+		[Test]
+		public void SourceResult()
+		{
+			var result = Messages.SourceResult.Succeeded;
+			var source = new AudioSource ("Name", 1, 2, 1, 64000, 44100, 256, 10, false);
+			var msg = new SourceResultMessage (result, source);
+			Assert.AreEqual (result, msg.SourceResult);
+			msg.WritePayload (writer);
+			long length = stream.Position;
+			stream.Position = 0;
+
+			msg = new SourceResultMessage();
+			msg.ReadPayload (reader);
+			Assert.AreEqual (length, stream.Position);
+			Assert.AreEqual (result, msg.SourceResult);
+		}
+
+		[Test]
+		public void ServerInfo()
+		{
+			var msg = new ServerInfoMessage (new ServerInfo (new ServerSettings
+			{
+				ServerLogo = "logo",
+				Name = "name",
+				Description = "description"
+			}));
+			msg.WritePayload (writer);
+			long length = stream.Position;
+			stream.Position = 0;
+
+			msg = new ServerInfoMessage();
+			msg.ReadPayload (reader);
+			Assert.AreEqual (length, stream.Position);
 		}
 	}
 }

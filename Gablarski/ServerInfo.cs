@@ -43,6 +43,9 @@ namespace Gablarski
 	{
 		internal ServerInfo (IValueReader reader)
 		{
+			if (reader == null)
+				throw new ArgumentNullException ("reader");
+
 			this.Deserialize (reader);
 		}
 
@@ -53,6 +56,7 @@ namespace Gablarski
 
 			this.ServerName = settings.Name;
 			this.ServerDescription = settings.Description;
+			this.ServerLogo = settings.ServerLogo;
 		}
 
 		/// <summary>

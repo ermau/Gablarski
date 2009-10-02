@@ -129,5 +129,81 @@ namespace Gablarski.Tests
 			Assert.AreEqual (frameSize, msg.FrameSize);
 			Assert.AreEqual (channels, msg.Channels);
 		}
+
+		[Test]
+		public void SendAudioData()
+		{
+			var msg = new SendAudioDataMessage (1, 2, 3, new byte[] { 0x4, 0x8, 0xF, 0x10, 0x17, 0x2A });
+			Assert.AreEqual (1, msg.TargetChannelId);
+			Assert.AreEqual (2, msg.SourceId);
+			Assert.AreEqual (3, msg.Sequence);
+			Assert.AreEqual (0x4, msg.Data[0]);
+			Assert.AreEqual (0x8, msg.Data[1]);
+			Assert.AreEqual (0xF, msg.Data[2]);
+			Assert.AreEqual (0x10, msg.Data[3]);
+			Assert.AreEqual (0x17, msg.Data[4]);
+			Assert.AreEqual (0x2A, msg.Data[5]);
+
+			msg.WritePayload (writer);
+			long length = stream.Position;
+			stream.Position = 0;
+
+			msg = new SendAudioDataMessage();
+			msg.ReadPayload (reader);
+			Assert.AreEqual (length, stream.Position);
+			Assert.AreEqual (1, msg.TargetChannelId);
+			Assert.AreEqual (2, msg.SourceId);
+			Assert.AreEqual (3, msg.Sequence);
+			Assert.AreEqual (0x4, msg.Data[0]);
+			Assert.AreEqual (0x8, msg.Data[1]);
+			Assert.AreEqual (0xF, msg.Data[2]);
+			Assert.AreEqual (0x10, msg.Data[3]);
+			Assert.AreEqual (0x17, msg.Data[4]);
+			Assert.AreEqual (0x2A, msg.Data[5]);
+		}
+
+		[Test]
+		public void RequestMuteUser()
+		{
+			var msg = new RequestMuteMessage
+			{
+				Target = "foo",
+				Type = MuteType.User,
+				Unmute = true
+			};
+
+			msg.WritePayload (writer);
+			long length = stream.Position;
+			stream.Position = 0;
+
+			msg = new RequestMuteMessage();
+			msg.ReadPayload (reader);
+			Assert.AreEqual (length, stream.Position);
+			Assert.AreEqual ("foo", msg.Target);
+			Assert.AreEqual (MuteType.User, msg.Type);
+			Assert.AreEqual (true, msg.Unmute);
+		}
+
+		[Test]
+		public void RequestMuteSource()
+		{
+			var msg = new RequestMuteMessage
+			{
+				Target = 5,
+				Type = MuteType.AudioSource,
+				Unmute = true
+			};
+
+			msg.WritePayload (writer);
+			long length = stream.Position;
+			stream.Position = 0;
+
+			msg = new RequestMuteMessage();
+			msg.ReadPayload (reader);
+			Assert.AreEqual (length, stream.Position);
+			Assert.AreEqual (5, msg.Target);
+			Assert.AreEqual (MuteType.AudioSource, msg.Type);
+			Assert.AreEqual (true, msg.Unmute);
+		}
 	}
 }
