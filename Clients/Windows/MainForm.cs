@@ -152,6 +152,7 @@ namespace Gablarski.Clients.Windows
 					break;
 
 				case Settings.UsePushToTalkSettingName:
+					SetupInput();
 					SetupVoiceCapture();
 					break;
 
@@ -195,6 +196,9 @@ namespace Gablarski.Clients.Windows
 
 		private void SetupInput()
 		{
+			if (!Settings.UsePushToTalk)
+				return;
+
 			DisableInput();
 
 			Type providerType = null;
@@ -417,8 +421,6 @@ namespace Gablarski.Clients.Windows
 
 			SettingsForm settingsForm = new SettingsForm();
 			settingsForm.ShowDialog();
-
-			SetupInput();
 		}
 
 		private ICaptureProvider musicprovider;
