@@ -97,6 +97,11 @@ namespace Gablarski.Client
 		/// The collection of sources has changed.
 		/// </summary>
 		public event NotifyCollectionChangedEventHandler CollectionChanged;
+
+		ChannelInfo IAudioReceiver.CurrentChannel
+		{
+			get { return context.Channels[context.CurrentUser.CurrentChannelId]; }
+		}
 		#endregion
 
 		/// <summary>

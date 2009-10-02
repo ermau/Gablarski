@@ -12,9 +12,37 @@ namespace Gablarski.Clients.Windows
 	{
 		public static event PropertyChangedEventHandler SettingChanged;
 
+		public const string UsePushToTalkSettingName = "UsePushToTalk";
 		public static bool UsePushToTalk
 		{
-			get { return true; }
+			get { return GetSetting (UsePushToTalkSettingName, true); }
+			set
+			{
+				if (SetSetting (UsePushToTalkSettingName, value))
+					OnSettingsChanged (UsePushToTalkSettingName);
+			}
+		}
+
+		public const string VoiceActivationLevelSettingName = "VoiceActivationLevel";
+		public static int VoiceActivationLevel
+		{
+			get { return GetSetting (VoiceActivationLevelSettingName, 2200); }
+			set
+			{
+				if (SetSetting (VoiceActivationLevelSettingName, value))
+					OnSettingsChanged (VoiceActivationLevelSettingName);
+			}
+		}
+
+		public const string VoiceActivationContinueThresholdSettingName = "VoiceActivationContinueThreshold";
+		public static int VoiceActivationContinueThreshold
+		{
+			get { return GetSetting (VoiceActivationContinueThresholdSettingName, 600); }
+			set
+			{
+				if (SetSetting (VoiceActivationContinueThresholdSettingName, value))
+					OnSettingsChanged (VoiceActivationContinueThresholdSettingName);
+			}
 		}
 
 		public static string VoiceProvider
@@ -123,6 +151,11 @@ namespace Gablarski.Clients.Windows
 		private static bool GetSetting (string settingName, bool defaultValue)
 		{
 			return (GetSetting (settingName, (defaultValue) ? "1" : "0") == "1");
+		}
+
+		private static int GetSetting (string settingName, int defautlValue)
+		{
+			return Int32.Parse (GetSetting (settingName, defautlValue.ToString()));
 		}
 
 		private static bool SetSetting (string settingName, string value)

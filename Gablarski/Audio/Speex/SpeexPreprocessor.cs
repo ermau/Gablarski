@@ -183,9 +183,9 @@ namespace Gablarski.Audio.Speex
 		}
 		#endregion
 
-		public bool Preprocess (ref byte[] pcm)
+		public bool Preprocess (byte[] pcm)
 		{
-			return speex_preprocess_run (this.state, ref pcm) == 1;
+			return speex_preprocess_run (this.state, pcm) == 1;
 		}
 
 		#region IDisposable Members
@@ -245,7 +245,7 @@ namespace Gablarski.Audio.Speex
 		private static extern void speex_preprocess_state_destroy (IntPtr state);
 
 		[DllImport ("libspeexdsp.dll")]
-		private static extern int speex_preprocess_run (IntPtr state, ref byte[] frames);
+		private static extern int speex_preprocess_run (IntPtr state, byte[] frames);
 
 		[DllImport ("libspeexdsp.dll")]
 		private static extern CtlResult speex_preprocess_ctl (IntPtr state, SPEEX_PREPROCESS request, ref int data);

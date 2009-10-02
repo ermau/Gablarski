@@ -36,11 +36,21 @@ namespace Gablarski.Clients.Windows
 			this.gablarski.Sources.AudioSourceStopped += SourceStoped;
 			this.gablarski.Sources.AudioSourceStarted += SourceStarted;
 
+			this.gablarski.Audio.CaptureSourceStateChanged += OnCaptureSourceStateChanged;
+
 			Settings.SettingChanged += SettingsSettingChanged;
 
 			this.InitializeComponent ();
 
 			this.users.Client = this.gablarski;
+		}
+
+		void OnCaptureSourceStateChanged (object sender, CaptureSourceStateChangedEventArgs e)
+		{
+			if (e.Talking)
+				this.users.MarkTalking (e.Source);
+			else
+				this.users.MarkSilent (e.Source);
 		}
 
 		private void SourcesOnReceivedSourceList(object sender, ReceivedListEventArgs<AudioSource> args)
@@ -90,11 +100,14 @@ namespace Gablarski.Clients.Windows
 		{
 			try
 			{
-				if (this.voiceCapture != null)
+				if (this.voiceSource != null)
 				{
+					gablarski.Audio.Detach (this.voiceSource);
 					this.voiceSource.EndSending();
-					this.voiceCapture.Dispose();
 				}
+
+				if (this.voiceCapture != null)
+					this.voiceCapture.Dispose();
 
 				this.voiceCapture = (ICaptureProvider)Activator.CreateInstance (Type.GetType (Settings.VoiceProvider));
 
@@ -106,7 +119,16 @@ namespace Gablarski.Clients.Windows
 					                           this.voiceCapture.DefaultDevice;
 				}
 
-				this.voiceCapture.SamplesAvailable += VoiceCaptureSamplesAvailable;
+				if (this.voiceSource != null)
+				{
+					gablarski.Audio.Attach (this.voiceCapture, AudioFormat.Mono16Bit, this.voiceSource, new AudioEngineCaptureOptions
+					{
+						StartVolume = Settings.VoiceActivationLevel,
+						ContinuationVolume = Settings.VoiceActivationLevel / 2,
+						ContinueThreshold = TimeSpan.FromMilliseconds (Settings.VoiceActivationContinueThreshold),
+						Mode = (!Settings.UsePushToTalk) ? AudioEngineCaptureMode.Activated : AudioEngineCaptureMode.Explicit
+					});
+				}
 			}
 			catch (Exception ex)
 			{
@@ -121,23 +143,24 @@ namespace Gablarski.Clients.Windows
 			this.gablarski.Connect (this.server.Host, this.server.Port);
 		}
 
-		private void VoiceCaptureSamplesAvailable (object sender, SamplesAvailableEventArgs e)
-		{
-			if (this.voiceSource == null || this.gablarski.CurrentUser == null)
-			{
-				this.voiceCapture.ReadSamples (e.Samples);
-				return;
-			}
-
-			this.voiceSource.SendAudioData (this.voiceCapture.ReadSamples (this.voiceSource.FrameSize));
-		}
-
 		private void SettingsSettingChanged (object sender, PropertyChangedEventArgs e)
 		{
 			switch (e.PropertyName)
 			{
 				case "DisplaySources":
 					this.users.Update (this.gablarski.Channels, this.gablarski.Users.Cast<UserInfo>(), this.gablarski.Sources);
+					break;
+
+				case Settings.UsePushToTalkSettingName:
+					SetupVoiceCapture();
+					break;
+
+				case Settings.VoiceActivationLevelSettingName:
+					SetupVoiceCapture();
+					break;
+
+				case Settings.VoiceActivationContinueThresholdSettingName:
+					SetupVoiceCapture();
 					break;
 
 				case "VoiceProvider":
@@ -233,7 +256,17 @@ namespace Gablarski.Clients.Windows
 			if (e.Result == SourceResult.Succeeded)
 			{
 				if (e.Source.Name == VoiceName)
+				{
 					voiceSource = (OwnedAudioSource)e.Source;
+					gablarski.Audio.Attach (voiceCapture, AudioFormat.Mono16Bit, voiceSource,
+					                        new AudioEngineCaptureOptions
+					                        {
+					                        	StartVolume = Settings.VoiceActivationLevel,
+												ContinuationVolume = Settings.VoiceActivationLevel / 2,
+												ContinueThreshold = TimeSpan.FromMilliseconds (Settings.VoiceActivationContinueThreshold),
+												Mode = (!Settings.UsePushToTalk) ? AudioEngineCaptureMode.Activated : AudioEngineCaptureMode.Explicit
+					                        });
+				}
 				else if (e.Source.Name == MusicName)
 				{
 					musicSource = (OwnedAudioSource)e.Source;

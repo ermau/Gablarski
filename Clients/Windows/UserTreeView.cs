@@ -192,13 +192,37 @@ namespace Gablarski.Clients.Windows
 				return;
 			}
 
-			if (!userNodes.ContainsKey (user) || userNodes[user].ImageKey == "talking")
+			TreeNode node;
+			if (!userNodes.TryGetValue (user, out node) || node.ImageKey == "talking")
 				return;
 
-			var node = userNodes[user];
 			node.ImageKey = "talking";
 			node.SelectedImageKey = "talking";
 			SetupUserContext (node);
+		}
+
+		public void MarkTalking (AudioSource source)
+		{
+			if (source == null)
+				return;
+
+			if (this.InvokeRequired)
+			{
+				BeginInvoke ((Action<AudioSource>)MarkTalking, source);
+				return;
+			}
+
+			TreeNode node;
+			if (Settings.DisplaySources && sourceNodes.TryGetValue (source, out node))
+				SetupUserContext (node.Parent);
+			else if (userNodes.TryGetValue (client.Users[source.OwnerId], out node))
+				SetupUserContext (node);
+
+			if (node != null)
+			{
+				node.ImageKey = "talking";
+				node.SelectedImageKey = "talking";
+			}
 		}
 
 		public void MarkMusic (UserInfo user)
@@ -270,11 +294,15 @@ namespace Gablarski.Clients.Windows
 			}
 
 			TreeNode node;
-			if (!sourceNodes.TryGetValue (source, out node) || source.IsMuted)
+			if (source.IsMuted)
 				return;
+			else if (Settings.DisplaySources && sourceNodes.TryGetValue (source, out node))
+				SetupUserContext (node.Parent);
+			else if (userNodes.TryGetValue (client.Users[source.OwnerId], out node))
+				SetupUserContext (node);
 
-			node.SelectedImageKey = node.ImageKey = "silent";
-			SetupUserContext (node.Parent);
+			if (node != null)
+				node.ImageKey = node.SelectedImageKey = "silent";
 		}
 
 		public void MarkSilent (UserInfo user)
@@ -630,6 +658,6 @@ namespace Gablarski.Clients.Windows
 				foreach (var un in this.userNodes.Values)
 					SetupUserContext (un);
 			}
-		}		
+		}
 	}
 }

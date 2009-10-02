@@ -51,11 +51,11 @@ namespace Gablarski.Audio.OpenAL
 		internal CaptureDevice (string deviceName)
 			: base (deviceName)
 		{
-			this.listenerThread = new Thread (this.SampleListener)
-			{
-				Name = "OpenAL Sample Listener",
-				IsBackground = true
-			};
+			//this.listenerThread = new Thread (this.SampleListener)
+			//{
+			//    Name = "OpenAL Sample Listener",
+			//    IsBackground = true
+			//};
 		}
 
 		/// <summary>

@@ -52,7 +52,7 @@ namespace Gablarski.Audio
 	public interface ICaptureProvider
 		: IAudioDeviceProvider
 	{
-		event EventHandler<SamplesAvailableEventArgs> SamplesAvailable;
+		//event EventHandler<SamplesAvailableEventArgs> SamplesAvailable;
 
 		/// <summary>
 		/// Gets or sets the device to capture from.

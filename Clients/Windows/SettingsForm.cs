@@ -23,6 +23,7 @@ namespace Gablarski.Clients.Windows
 
 		private void SettingsForm_Load (object sender, EventArgs e)
 		{
+			this.ptt.Checked = Settings.UsePushToTalk;
 			this.inInputProvider.DisplayMember = "Name";
 			this.inInputProvider.DataSource = Modules.Input.ToList();
 			this.inInputProvider.SelectedText = Settings.InputProvider;
@@ -33,6 +34,8 @@ namespace Gablarski.Clients.Windows
 			
 			this.inputSettings = Settings.InputSettings;
 			this.dispInput.Text = currentInputProvider.GetNiceInputName (this.inputSettings);
+			this.threshold.Value = Settings.VoiceActivationContinueThreshold / 100;
+			this.vadSensitivity.Value = Settings.VoiceActivationLevel;
 
 			this.inDisplaySources.Checked = Settings.DisplaySources;
 			this.inConnectOnStart.Checked = Settings.ShowConnectOnStart;
@@ -46,9 +49,12 @@ namespace Gablarski.Clients.Windows
 			DisableInput();
 			Settings.InputProvider = this.inInputProvider.SelectedItem.ToString();
 			Settings.InputSettings = this.inputSettings;
+			Settings.UsePushToTalk = this.ptt.Checked;
 
 			Settings.VoiceProvider = this.voiceSelector.Provider.AssemblyQualifiedName;
 			Settings.VoiceDevice = this.voiceSelector.Device.Name;
+			Settings.VoiceActivationContinueThreshold = this.threshold.Value * 100;
+			Settings.VoiceActivationLevel = this.vadSensitivity.Value;
 
 			Settings.SaveSettings();
 
@@ -125,6 +131,11 @@ namespace Gablarski.Clients.Windows
 		{
 			this.dispInput.Text = String.Empty;
 			this.inputSettings = null;
+		}
+
+		private void threshold_Scroll (object sender, EventArgs e)
+		{
+			this.dispThreshold.Text = String.Format ("{0:N1}s", (double)this.threshold.Value / 10);
 		}
 	}
 }

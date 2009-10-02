@@ -47,6 +47,7 @@ namespace Gablarski.Audio
 	public class AudioEngine
 		: IAudioEngine
 	{
+		public event EventHandler<CaptureSourceStateChangedEventArgs> CaptureSourceStateChanged;
 
 		/// <summary>
 		/// Gets or sets the audio receiver
@@ -115,6 +116,9 @@ namespace Gablarski.Audio
 
 			lock (captures)
 			{
+				if (options.Mode == AudioEngineCaptureMode.Activated)
+					capture.BeginCapture (format);
+
 				captures.Add (source, new AudioCaptureEntity (capture, format, source, options));
 			}
 		}
@@ -312,6 +316,13 @@ namespace Gablarski.Audio
 			playbackLock.ExitReadLock();
 		}
 
+		protected void OnCaptureSourceStateChanged (CaptureSourceStateChangedEventArgs e)
+		{
+			var changed = this.CaptureSourceStateChanged;
+			if (changed != null)
+				changed (this, e);
+		}
+
 		private void Engine ()
 		{
 			while (this.running)
@@ -329,8 +340,30 @@ namespace Gablarski.Audio
 						if (!c.Value.Capture.IsCapturing && c.Value.Options.Mode == AudioEngineCaptureMode.Explicit)
 							continue;
 
-						if (c.Value.Capture.AvailableSampleCount >= c.Key.FrameSize)
-							c.Key.SendAudioData (c.Value.Capture.ReadSamples (c.Key.FrameSize));
+						if (c.Value.Capture.AvailableSampleCount < c.Key.FrameSize)
+							continue;
+
+						bool talking = true;
+
+						byte[] samples = c.Value.Capture.ReadSamples (c.Key.FrameSize);
+						if (c.Value.Options.Mode == AudioEngineCaptureMode.Activated)
+							talking = c.Value.VoiceActivation.IsTalking (samples);
+
+						if (talking)
+						{
+							if (!c.Value.Talking)
+							{
+								c.Value.BeginCapture (this.AudioReceiver.CurrentChannel);
+								OnCaptureSourceStateChanged (new CaptureSourceStateChangedEventArgs (c.Key, true));
+							}
+
+							c.Key.SendAudioData (samples);
+						}
+						else if (c.Value.Talking)
+						{
+							OnCaptureSourceStateChanged (new CaptureSourceStateChangedEventArgs (c.Key, false));
+							c.Value.EndCapture();
+						}
 					}
 				}
 

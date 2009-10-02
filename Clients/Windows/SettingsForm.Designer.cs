@@ -35,24 +35,33 @@
 			this.inConnectOnStart = new System.Windows.Forms.CheckBox ();
 			this.inDisplaySources = new System.Windows.Forms.CheckBox ();
 			this.controlsTab = new System.Windows.Forms.TabPage ();
+			this.ptt = new System.Windows.Forms.CheckBox ();
 			this.linkClear = new System.Windows.Forms.LinkLabel ();
 			this.linkSet = new System.Windows.Forms.LinkLabel ();
 			this.dispInput = new System.Windows.Forms.Label ();
 			this.inInputProvider = new System.Windows.Forms.ComboBox ();
 			this.lblInputProvider = new System.Windows.Forms.Label ();
-			this.pushLabel = new System.Windows.Forms.Label ();
 			this.voiceTab = new System.Windows.Forms.TabPage ();
+			this.dispThreshold = new System.Windows.Forms.Label ();
+			this.lblTreshold = new System.Windows.Forms.Label ();
+			this.label3 = new System.Windows.Forms.Label ();
+			this.label2 = new System.Windows.Forms.Label ();
+			this.threshold = new System.Windows.Forms.TrackBar ();
+			this.lblVoiceSensitivity = new System.Windows.Forms.Label ();
+			this.vadSensitivity = new System.Windows.Forms.TrackBar ();
 			this.voiceSelector = new Gablarski.DeviceSelector ();
 			this.tabs.SuspendLayout ();
 			this.displayTab.SuspendLayout ();
 			this.controlsTab.SuspendLayout ();
 			this.voiceTab.SuspendLayout ();
+			((System.ComponentModel.ISupportInitialize)(this.threshold)).BeginInit ();
+			((System.ComponentModel.ISupportInitialize)(this.vadSensitivity)).BeginInit ();
 			this.SuspendLayout ();
 			// 
 			// btnOk
 			// 
-			this.btnOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnOk.Location = new System.Drawing.Point (151, 152);
+			this.btnOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.btnOk.Location = new System.Drawing.Point (151, 242);
 			this.btnOk.Name = "btnOk";
 			this.btnOk.Size = new System.Drawing.Size (75, 23);
 			this.btnOk.TabIndex = 2;
@@ -62,9 +71,9 @@
 			// 
 			// btnCancel
 			// 
-			this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.btnCancel.Location = new System.Drawing.Point (232, 152);
+			this.btnCancel.Location = new System.Drawing.Point (232, 242);
 			this.btnCancel.Name = "btnCancel";
 			this.btnCancel.Size = new System.Drawing.Size (75, 23);
 			this.btnCancel.TabIndex = 3;
@@ -74,14 +83,15 @@
 			// 
 			// tabs
 			// 
+			this.tabs.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+						| System.Windows.Forms.AnchorStyles.Left)));
 			this.tabs.Controls.Add (this.displayTab);
 			this.tabs.Controls.Add (this.controlsTab);
 			this.tabs.Controls.Add (this.voiceTab);
-			this.tabs.Dock = System.Windows.Forms.DockStyle.Top;
 			this.tabs.Location = new System.Drawing.Point (0, 0);
 			this.tabs.Name = "tabs";
 			this.tabs.SelectedIndex = 0;
-			this.tabs.Size = new System.Drawing.Size (319, 146);
+			this.tabs.Size = new System.Drawing.Size (319, 236);
 			this.tabs.TabIndex = 4;
 			// 
 			// displayTab
@@ -91,7 +101,7 @@
 			this.displayTab.Location = new System.Drawing.Point (4, 22);
 			this.displayTab.Name = "displayTab";
 			this.displayTab.Padding = new System.Windows.Forms.Padding (3);
-			this.displayTab.Size = new System.Drawing.Size (311, 120);
+			this.displayTab.Size = new System.Drawing.Size (311, 210);
 			this.displayTab.TabIndex = 0;
 			this.displayTab.Text = "Display";
 			this.displayTab.UseVisualStyleBackColor = true;
@@ -118,24 +128,34 @@
 			// 
 			// controlsTab
 			// 
+			this.controlsTab.Controls.Add (this.ptt);
 			this.controlsTab.Controls.Add (this.linkClear);
 			this.controlsTab.Controls.Add (this.linkSet);
 			this.controlsTab.Controls.Add (this.dispInput);
 			this.controlsTab.Controls.Add (this.inInputProvider);
 			this.controlsTab.Controls.Add (this.lblInputProvider);
-			this.controlsTab.Controls.Add (this.pushLabel);
 			this.controlsTab.Location = new System.Drawing.Point (4, 22);
 			this.controlsTab.Name = "controlsTab";
 			this.controlsTab.Padding = new System.Windows.Forms.Padding (3);
-			this.controlsTab.Size = new System.Drawing.Size (311, 120);
+			this.controlsTab.Size = new System.Drawing.Size (311, 210);
 			this.controlsTab.TabIndex = 1;
 			this.controlsTab.Text = "Controls";
 			this.controlsTab.UseVisualStyleBackColor = true;
 			// 
+			// ptt
+			// 
+			this.ptt.AutoSize = true;
+			this.ptt.Location = new System.Drawing.Point (11, 42);
+			this.ptt.Name = "ptt";
+			this.ptt.Size = new System.Drawing.Size (89, 17);
+			this.ptt.TabIndex = 11;
+			this.ptt.Text = "Push to Talk:";
+			this.ptt.UseVisualStyleBackColor = true;
+			// 
 			// linkClear
 			// 
 			this.linkClear.AutoSize = true;
-			this.linkClear.Location = new System.Drawing.Point (136, 43);
+			this.linkClear.Location = new System.Drawing.Point (143, 43);
 			this.linkClear.Name = "linkClear";
 			this.linkClear.Size = new System.Drawing.Size (31, 13);
 			this.linkClear.TabIndex = 10;
@@ -146,7 +166,7 @@
 			// linkSet
 			// 
 			this.linkSet.AutoSize = true;
-			this.linkSet.Location = new System.Drawing.Point (92, 43);
+			this.linkSet.Location = new System.Drawing.Point (106, 43);
 			this.linkSet.Name = "linkSet";
 			this.linkSet.Size = new System.Drawing.Size (23, 13);
 			this.linkSet.TabIndex = 9;
@@ -158,9 +178,9 @@
 			// 
 			this.dispInput.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
 						| System.Windows.Forms.AnchorStyles.Right)));
-			this.dispInput.Location = new System.Drawing.Point (173, 43);
+			this.dispInput.Location = new System.Drawing.Point (180, 43);
 			this.dispInput.Name = "dispInput";
-			this.dispInput.Size = new System.Drawing.Size (130, 13);
+			this.dispInput.Size = new System.Drawing.Size (123, 13);
 			this.dispInput.TabIndex = 8;
 			// 
 			// inInputProvider
@@ -169,9 +189,9 @@
 						| System.Windows.Forms.AnchorStyles.Right)));
 			this.inInputProvider.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.inInputProvider.FormattingEnabled = true;
-			this.inInputProvider.Location = new System.Drawing.Point (95, 7);
+			this.inInputProvider.Location = new System.Drawing.Point (109, 7);
 			this.inInputProvider.Name = "inInputProvider";
-			this.inInputProvider.Size = new System.Drawing.Size (208, 21);
+			this.inInputProvider.Size = new System.Drawing.Size (194, 21);
 			this.inInputProvider.TabIndex = 5;
 			this.inInputProvider.SelectedIndexChanged += new System.EventHandler (this.inInputProvider_SelectedIndexChanged);
 			// 
@@ -184,25 +204,95 @@
 			this.lblInputProvider.TabIndex = 4;
 			this.lblInputProvider.Text = "Input Provider:";
 			// 
-			// pushLabel
-			// 
-			this.pushLabel.AutoSize = true;
-			this.pushLabel.Location = new System.Drawing.Point (8, 43);
-			this.pushLabel.Name = "pushLabel";
-			this.pushLabel.Size = new System.Drawing.Size (70, 13);
-			this.pushLabel.TabIndex = 2;
-			this.pushLabel.Text = "Push to Talk:";
-			// 
 			// voiceTab
 			// 
+			this.voiceTab.Controls.Add (this.dispThreshold);
+			this.voiceTab.Controls.Add (this.lblTreshold);
+			this.voiceTab.Controls.Add (this.label3);
+			this.voiceTab.Controls.Add (this.label2);
+			this.voiceTab.Controls.Add (this.threshold);
+			this.voiceTab.Controls.Add (this.lblVoiceSensitivity);
+			this.voiceTab.Controls.Add (this.vadSensitivity);
 			this.voiceTab.Controls.Add (this.voiceSelector);
 			this.voiceTab.Location = new System.Drawing.Point (4, 22);
 			this.voiceTab.Name = "voiceTab";
 			this.voiceTab.Padding = new System.Windows.Forms.Padding (3);
-			this.voiceTab.Size = new System.Drawing.Size (311, 120);
+			this.voiceTab.Size = new System.Drawing.Size (311, 210);
 			this.voiceTab.TabIndex = 2;
 			this.voiceTab.Text = "Voice";
 			this.voiceTab.UseVisualStyleBackColor = true;
+			// 
+			// dispThreshold
+			// 
+			this.dispThreshold.Location = new System.Drawing.Point (268, 189);
+			this.dispThreshold.Name = "dispThreshold";
+			this.dispThreshold.Size = new System.Drawing.Size (35, 15);
+			this.dispThreshold.TabIndex = 7;
+			this.dispThreshold.Text = "0.6s";
+			this.dispThreshold.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// lblTreshold
+			// 
+			this.lblTreshold.AutoSize = true;
+			this.lblTreshold.Location = new System.Drawing.Point (8, 143);
+			this.lblTreshold.Name = "lblTreshold";
+			this.lblTreshold.Size = new System.Drawing.Size (91, 13);
+			this.lblTreshold.TabIndex = 6;
+			this.lblTreshold.Text = "Silence threshold:";
+			// 
+			// label3
+			// 
+			this.label3.AutoSize = true;
+			this.label3.Location = new System.Drawing.Point (279, 113);
+			this.label3.Name = "label3";
+			this.label3.Size = new System.Drawing.Size (24, 13);
+			this.label3.TabIndex = 5;
+			this.label3.Text = "Yell";
+			// 
+			// label2
+			// 
+			this.label2.AutoSize = true;
+			this.label2.Location = new System.Drawing.Point (8, 113);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size (46, 13);
+			this.label2.TabIndex = 4;
+			this.label2.Text = "Whisper";
+			// 
+			// threshold
+			// 
+			this.threshold.BackColor = System.Drawing.SystemColors.ControlLightLight;
+			this.threshold.Location = new System.Drawing.Point (11, 159);
+			this.threshold.Maximum = 30;
+			this.threshold.Name = "threshold";
+			this.threshold.Size = new System.Drawing.Size (292, 45);
+			this.threshold.TabIndex = 3;
+			this.threshold.Value = 6;
+			this.threshold.Scroll += new System.EventHandler (this.threshold_Scroll);
+			// 
+			// lblVoiceSensitivity
+			// 
+			this.lblVoiceSensitivity.AutoSize = true;
+			this.lblVoiceSensitivity.Location = new System.Drawing.Point (8, 63);
+			this.lblVoiceSensitivity.Name = "lblVoiceSensitivity";
+			this.lblVoiceSensitivity.Size = new System.Drawing.Size (85, 13);
+			this.lblVoiceSensitivity.TabIndex = 2;
+			this.lblVoiceSensitivity.Text = "Voice sensitivity:";
+			// 
+			// vadSensitivity
+			// 
+			this.vadSensitivity.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+						| System.Windows.Forms.AnchorStyles.Right)));
+			this.vadSensitivity.BackColor = System.Drawing.SystemColors.ControlLightLight;
+			this.vadSensitivity.LargeChange = 500;
+			this.vadSensitivity.Location = new System.Drawing.Point (8, 81);
+			this.vadSensitivity.Maximum = 8000;
+			this.vadSensitivity.Name = "vadSensitivity";
+			this.vadSensitivity.Size = new System.Drawing.Size (295, 45);
+			this.vadSensitivity.SmallChange = 100;
+			this.vadSensitivity.TabIndex = 1;
+			this.vadSensitivity.TickFrequency = 100;
+			this.vadSensitivity.TickStyle = System.Windows.Forms.TickStyle.TopLeft;
+			this.vadSensitivity.Value = 2200;
 			// 
 			// voiceSelector
 			// 
@@ -217,7 +307,7 @@
 			this.AutoScaleDimensions = new System.Drawing.SizeF (6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.CancelButton = this.btnCancel;
-			this.ClientSize = new System.Drawing.Size (319, 187);
+			this.ClientSize = new System.Drawing.Size (319, 277);
 			this.Controls.Add (this.tabs);
 			this.Controls.Add (this.btnCancel);
 			this.Controls.Add (this.btnOk);
@@ -232,6 +322,9 @@
 			this.controlsTab.ResumeLayout (false);
 			this.controlsTab.PerformLayout ();
 			this.voiceTab.ResumeLayout (false);
+			this.voiceTab.PerformLayout ();
+			((System.ComponentModel.ISupportInitialize)(this.threshold)).EndInit ();
+			((System.ComponentModel.ISupportInitialize)(this.vadSensitivity)).EndInit ();
 			this.ResumeLayout (false);
 
 		}
@@ -244,7 +337,6 @@
 		private System.Windows.Forms.TabPage displayTab;
 		private System.Windows.Forms.CheckBox inDisplaySources;
 		private System.Windows.Forms.TabPage controlsTab;
-		private System.Windows.Forms.Label pushLabel;
 		private System.Windows.Forms.ComboBox inInputProvider;
 		private System.Windows.Forms.Label lblInputProvider;
 		private System.Windows.Forms.CheckBox inConnectOnStart;
@@ -253,5 +345,13 @@
 		private System.Windows.Forms.Label dispInput;
 		private System.Windows.Forms.TabPage voiceTab;
 		private DeviceSelector voiceSelector;
+		private System.Windows.Forms.CheckBox ptt;
+		private System.Windows.Forms.TrackBar vadSensitivity;
+		private System.Windows.Forms.Label lblVoiceSensitivity;
+		private System.Windows.Forms.Label label2;
+		private System.Windows.Forms.TrackBar threshold;
+		private System.Windows.Forms.Label label3;
+		private System.Windows.Forms.Label dispThreshold;
+		private System.Windows.Forms.Label lblTreshold;
 	}
 }

@@ -55,7 +55,28 @@ namespace Gablarski.Audio
 			get; set;
 		}
 
-		public int VoiceActivityStartProbability
+		/// <summary>
+		/// The minimum volume required to start 'talking'.
+		/// </summary>
+		/// <remarks>abs(16bitsample - 128)</remarks>
+		public int StartVolume
+		{
+			get; set;
+		}
+
+		/// <summary>
+		/// The minimum volume required to continue 'talking'.
+		/// </summary>
+		/// <remarks>abs(16bitsample - 128)</remarks>
+		public int ContinuationVolume
+		{
+			get; set;
+		}
+
+		/// <summary>
+		/// Gets or sets a threshold time inbetween continuation volume matches to keep talking.
+		/// </summary>
+		public TimeSpan ContinueThreshold
 		{
 			get; set;
 		}
@@ -68,6 +89,8 @@ namespace Gablarski.Audio
 
 	public interface IAudioEngine
 	{
+		event EventHandler<CaptureSourceStateChangedEventArgs> CaptureSourceStateChanged;
+
 		/// <summary>
 		/// Gets or sets the audio receiver.
 		/// </summary>
@@ -124,5 +147,17 @@ namespace Gablarski.Audio
 
 		void BeginCapture (OwnedAudioSource source, ChannelInfo channel);
 		void EndCapture (OwnedAudioSource source);
+	}
+
+	public class CaptureSourceStateChangedEventArgs
+		: AudioSourceEventArgs
+	{
+		public CaptureSourceStateChangedEventArgs (ClientAudioSource source, bool talking)
+			: base (source)
+		{
+			this.Talking = talking;
+		}
+
+		public bool Talking { get; private set; }
 	}
 }

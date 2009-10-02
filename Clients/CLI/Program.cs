@@ -400,7 +400,6 @@ namespace Gablarski.Clients.CLI
 		static void SelectCapture (IAudioDevice device, TextWriter writer)
 		{
 			CaptureProvider.Device = device;
-			CaptureProvider.SamplesAvailable += OnSamplesAvailable;
 			writer.WriteLine (CaptureProvider.Device + " selected.");
 		}
 

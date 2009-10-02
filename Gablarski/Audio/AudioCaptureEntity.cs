@@ -55,7 +55,16 @@ namespace Gablarski.Audio
 			this.frameLength = (this.source.FrameSize/source.Frequency)*1000;
 
 			if (options.Mode == AudioEngineCaptureMode.Activated)
-				preprocessor = new SpeexPreprocessor (this.source.FrameSize, this.source.Frequency);
+			{
+				activation = new VoiceActivation (options.StartVolume, options.ContinuationVolume, options.ContinueThreshold);
+				//preprocessor = new SpeexPreprocessor (this.source.FrameSize, this.source.Frequency);
+			}
+		}
+
+		public bool Talking
+		{
+			get;
+			set;
 		}
 
 		public AudioFormat Format
@@ -96,19 +105,41 @@ namespace Gablarski.Audio
 			get { return this.channel; }
 		}
 
+		public VoiceActivation VoiceActivation
+		{
+			get { return this.activation; }
+		}
+
 		public void BeginCapture (ChannelInfo c)
 		{
-			this.channel = c;
-			this.capture.BeginCapture (this.format);
-			this.Source.BeginSending (channel);
+			if (this.Options.Mode == AudioEngineCaptureMode.Explicit)
+				this.capture.BeginCapture (this.format);
+
+			if (this.channel != null && this.channel != c)
+			{
+				this.Source.EndSending();
+				this.channel = null;
+			}
+
+			if (this.channel == null)
+			{
+				this.Talking = true;
+				this.Source.BeginSending (c);
+				this.channel = c;
+			}
 		}
 
 		public void EndCapture()
 		{
-			this.capture.EndCapture();
+			if (this.Options.Mode == AudioEngineCaptureMode.Explicit)
+				this.capture.EndCapture();
+
+			this.Talking = false;
 			this.Source.EndSending ();
+			this.channel = null;
 		}
 
+		private readonly VoiceActivation activation;
 		private readonly AudioFormat format;
 		private readonly int frameLength;
 		private readonly SpeexPreprocessor preprocessor;

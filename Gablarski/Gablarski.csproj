@@ -114,6 +114,7 @@
     <Compile Include="Audio\OpenAL\SourceBuffer.cs" />
     <Compile Include="Audio\OpenAL\SourcePool.cs" />
     <Compile Include="Audio\Speex\SpeexPreprocessor.cs" />
+    <Compile Include="Audio\VoiceActivation.cs" />
     <Compile Include="ByteArrayValueReader.cs" />
     <Compile Include="Audio\AudioEngine.cs" />
     <Compile Include="Client\ClientAudioSource.cs" />

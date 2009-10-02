@@ -62,7 +62,13 @@ namespace Gablarski.Audio.OpenAL.Providers
 
 		public int AvailableSampleCount
 		{
-			get { return this.device.AvailableSamples; }
+			get
+			{
+				if (!this.device.IsOpen)
+					return 0;
+
+				return this.device.AvailableSamples;
+			}
 		}
 
 		public bool CanCaptureStereo

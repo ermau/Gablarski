@@ -152,11 +152,14 @@ namespace Gablarski.Clients.Windows
 			this.servers.BeginUpdate();
 			this.servers.Items.Clear();
 
+			var saved = this.servers.Groups.Add ("dbentries", "Saved Servers");
+
 			foreach (var entry in Servers.GetEntries())
 			{
 				var li = this.servers.Items.Add (entry.Name);		
 				li.Tag = entry;
 				li.ImageIndex = 0;
+				saved.Items.Add (li);
 			}
 
 			this.servers.EndUpdate();
