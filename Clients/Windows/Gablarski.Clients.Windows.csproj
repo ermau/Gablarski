@@ -100,6 +100,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\fluent-nhibernate\tools\sqlite\System.Data.SQLite.dll</HintPath>
     </Reference>
+    <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -154,6 +155,12 @@
     <Compile Include="MusicForm.Designer.cs">
       <DependentUpon>MusicForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="NicknameForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="NicknameForm.Designer.cs">
+      <DependentUpon>NicknameForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Persistance.cs" />
     <Compile Include="UserTreeView.cs">
       <SubType>Component</SubType>
@@ -174,6 +181,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="MusicForm.resx">
       <DependentUpon>MusicForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NicknameForm.resx">
+      <DependentUpon>NicknameForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <SubType>Designer</SubType>

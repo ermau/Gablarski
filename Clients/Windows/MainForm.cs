@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using Gablarski.Audio;
 using Gablarski.Audio.OpenAL.Providers;
 using Gablarski.Client;
+using Gablarski.Clients.Common;
 using Gablarski.Clients.Input;
 using Gablarski.Clients.Windows.Entities;
 using Gablarski.Clients.Windows.Properties;
@@ -326,7 +327,12 @@ namespace Gablarski.Clients.Windows
 				gablarski.Disconnect();
 			}
 			else
+			{
+				if (LocalServer.IsRunning)
+					LocalServer.Permissions.SetAdmin (e.Result.UserId);
+
 				this.gablarski.CurrentUser.Join (this.server.UserNickname, this.server.ServerPassword);
+			}
 		}
 
 		void CurrentUserReceivedJoinResult (object sender, ReceivedJoinResultEventArgs e)
@@ -410,7 +416,12 @@ namespace Gablarski.Clients.Windows
 		private void btnConnect_Click (object sender, EventArgs e)
 		{
 			if (this.gablarski.IsConnected)
+			{
 				this.gablarski.Disconnect();
+				
+				if (LocalServer.IsRunning)
+					LocalServer.Shutdown();
+			}
 			else
 				this.ShowConnect (false);
 		}

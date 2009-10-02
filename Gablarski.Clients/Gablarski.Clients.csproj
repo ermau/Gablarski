@@ -57,10 +57,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\LocalServer.cs" />
     <Compile Include="IControlMediaPlayer.cs" />
     <Compile Include="Input\IInputProvider.cs" />
     <Compile Include="IMediaPlayer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Gablarski\Gablarski.csproj">
+      <Project>{7347052B-DA5B-4CCA-AB28-3963766E3CDB}</Project>
+      <Name>Gablarski</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

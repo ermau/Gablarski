@@ -6,8 +6,10 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Gablarski.Clients.Common;
 using Gablarski.Clients.Windows.Entities;
 using Gablarski.Clients.Windows.Properties;
+using Gablarski.Server;
 
 namespace Gablarski.Clients.Windows
 {
@@ -176,6 +178,33 @@ namespace Gablarski.Clients.Windows
 			this.servers.SmallImageList = images;
 
 			this.LoadServerEntries();
+		}
+
+		private void startLocal_Click (object sender, EventArgs e)
+		{
+			NicknameForm nickname = new NicknameForm();
+			if (nickname.ShowDialog() == DialogResult.Cancel)
+				return;
+
+			string nick = nickname.nickname.Text.Trim();
+
+			LocalServer.Start();
+
+			this.DialogResult = DialogResult.OK;
+			this.Entry = new ServerEntry
+			{
+				Host = "localhost",
+				Port = 6112,
+				UserName = nick,
+				UserNickname = nick,
+				UserPassword = "password"
+			};
+		}
+
+		private void settingsButton_Click (object sender, EventArgs e)
+		{
+			SettingsForm sf = new SettingsForm();
+			sf.ShowDialog();
 		}
 	}
 }
