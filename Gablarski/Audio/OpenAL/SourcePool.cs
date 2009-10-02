@@ -79,8 +79,11 @@ namespace Gablarski.Audio.OpenAL
 		public void FreeSource (T sourceOwner)
 		{
 			var source = owners.FirstOrDefault (kvp => kvp.Value == sourceOwner).Key;
-			owners[source] = default(T);
-			playing.Remove (source);
+			if (source != null)
+			{
+				owners[source] = default(T);
+				playing.Remove (source);
+			}
 		}
 
 		public void FreeSource (Source source)
