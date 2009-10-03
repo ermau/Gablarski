@@ -59,12 +59,29 @@ namespace Gablarski.Network
 		/// <summary>
 		/// A connectionless message was received.
 		/// </summary>
-		public event EventHandler<MessageReceivedEventArgs> ConnectionlessMessageReceived;
+		public event EventHandler<ConnectionlessMessageReceivedEventArgs> ConnectionlessMessageReceived;
 
 		/// <summary>
 		/// A connection was made.
 		/// </summary>
 		public event EventHandler<ConnectionEventArgs> ConnectionMade;
+
+		/// <summary>
+		/// Sends a connectionless <paramref name="message"/> to the <paramref name="endpoint"/>.
+		/// </summary>
+		/// <param name="message">The message to send.</param>
+		/// <param name="endpoint">The endpoint to send the <paramref name="message"/> to.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="message"/> is <c>null</c>.</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="endpoint"/> is <c>null</c>.</exception>
+		/// <exception cref="ArgumentException"><paramref name="message"/> is set as a reliable message.</exception>
+		/// <seealso cref="IConnectionProvider.ConnectionlessMessageReceived"/>
+		public void SendConnectionlessMessage(MessageBase message, EndPoint endpoint)
+		{
+			lock (this.clmqueue)
+			{
+				this.clmqueue.Enqueue (new ConnectionlessMessageReceivedEventArgs (this, message, endpoint));
+			}
+		}
 
 		/// <summary>
 		/// Starts listening for connections and connectionless messages.
@@ -78,6 +95,7 @@ namespace Gablarski.Network
 			var localEp = new IPEndPoint (IPAddress.Any, port);
 
 			udp = new Socket (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+			udp.EnableBroadcast = true;
 			udp.Bind (localEp);
 
 			tcpListener = new TcpListener (localEp);
@@ -176,7 +194,7 @@ namespace Gablarski.Network
 					if (connection == null)
 					{
 						Trace.WriteLineIf (VerboseTracing, "[Network] Connectionless message received: " + msg.MessageTypeCode);
-						OnConnectionlessMessageReceived (new MessageReceivedEventArgs (null, msg));
+						OnConnectionlessMessageReceived (new ConnectionlessMessageReceivedEventArgs (this, msg, endpoint));
 					}
 					else
 					{
@@ -197,7 +215,7 @@ namespace Gablarski.Network
 			}
 		}
 
-		protected void OnConnectionlessMessageReceived (MessageReceivedEventArgs e)
+		protected void OnConnectionlessMessageReceived (ConnectionlessMessageReceivedEventArgs e)
 		{
 			var received = this.ConnectionlessMessageReceived;
 			if (received != null)
@@ -252,11 +270,10 @@ namespace Gablarski.Network
 				connection (this, e);
 		}
 
+		private readonly Queue<ConnectionlessMessageReceivedEventArgs> clmqueue = new Queue<ConnectionlessMessageReceivedEventArgs>();
 		private void Listener()
 		{
-			const uint maxLoops = UInt32.MaxValue;
-			uint loops = 0;
-			bool singleCore = (Environment.ProcessorCount == 1);
+			SocketValueWriter clWriter = new SocketValueWriter (udp);
 
 			while (this.listening)
 			{
@@ -276,13 +293,30 @@ namespace Gablarski.Network
 					}
 				}
 
+				if (this.clmqueue.Count > 0)
+				{
+					lock (this.clmqueue)
+					{
+						while (this.clmqueue.Count > 0)
+						{
+							var msg = this.clmqueue.Dequeue();
+							clWriter.EndPoint = msg.EndPoint;
+
+							clWriter.WriteByte (42);
+							clWriter.WriteUInt16 (msg.Message.MessageTypeCode);
+							msg.Message.WritePayload (clWriter);
+							clWriter.Flush();
+						}
+					}
+				}
+
 				if (!this.accepting && tcpListener.Pending())
 				{
 					this.accepting = true;
 					ThreadPool.QueueUserWorkItem (AcceptConnection, tcpListener);
 				}
 
-				if (udp.Available == 0)
+				if (udp.Available == 0 && this.clmqueue.Count == 0)
 					Thread.Sleep (1);
 			}
 		}

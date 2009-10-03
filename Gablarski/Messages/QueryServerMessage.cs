@@ -49,12 +49,24 @@ namespace Gablarski.Messages
 		{
 		}
 
+		public bool ServerInfoOnly
+		{
+			get; set;
+		}
+
+		public override bool Reliable
+		{
+			get { return false; }
+		}
+
 		public override void WritePayload (IValueWriter writer)
 		{
+			writer.WriteBool (this.ServerInfoOnly);
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
+			this.ServerInfoOnly = reader.ReadBool();
 		}
 	}
 }

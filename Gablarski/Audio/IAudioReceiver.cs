@@ -73,11 +73,11 @@ namespace Gablarski.Audio
 	public class ReceivedAudioEventArgs
 		: AudioSourceEventArgs
 	{
-		public ReceivedAudioEventArgs (ClientAudioSource source, int sequence, byte[] data)
+		public ReceivedAudioEventArgs (ClientAudioSource source, /*int sequence,*/ byte[] data)
 			: base (source)
 		{
 			this.AudioData = data;
-			this.Sequence = sequence;
+			//this.Sequence = sequence;
 		}
 
 		/// <summary>
@@ -89,10 +89,10 @@ namespace Gablarski.Audio
 			private set;
 		}
 		
-		public int Sequence
-		{
-			get;
-			private set;
-		}
+		//public int Sequence
+		//{
+		//    get;
+		//    private set;
+		//}
 	}
 }

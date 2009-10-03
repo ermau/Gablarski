@@ -33,8 +33,9 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
-
 using System;
+using System.Net;
+using Gablarski.Messages;
 
 namespace Gablarski
 {
@@ -43,7 +44,7 @@ namespace Gablarski
 		/// <summary>
 		/// A connectionless message was received.
 		/// </summary>
-		event EventHandler<MessageReceivedEventArgs> ConnectionlessMessageReceived;
+		event EventHandler<ConnectionlessMessageReceivedEventArgs> ConnectionlessMessageReceived;
 
 		/// <summary>
 		/// A connection was made.
@@ -51,13 +52,26 @@ namespace Gablarski
 		event EventHandler<ConnectionEventArgs> ConnectionMade;
 
 		/// <summary>
+		/// Sends a connectionless <paramref name="message"/> to the <paramref name="endpoint"/>.
+		/// </summary>
+		/// <param name="message">The message to send.</param>
+		/// <param name="endpoint">The endpoint to send the <paramref name="message"/> to.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="message"/> is <c>null</c>.</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="endpoint"/> is <c>null</c>.</exception>
+		/// <exception cref="ArgumentException"><paramref name="message"/> is set as a reliable message.</exception>
+		/// <seealso cref="IConnectionProvider.ConnectionlessMessageReceived"/>
+		void SendConnectionlessMessage (MessageBase message, EndPoint endpoint);
+
+		/// <summary>
 		/// Starts listening for connections and connectionless messages.
 		/// </summary>
+		/// <seealso cref="StopListening"/>
 		void StartListening ();
 
 		/// <summary>
 		/// Stops listening for connections and connectionless messages.
 		/// </summary>
+		/// <see cref="StartListening"/>
 		void StopListening ();
 	}
 
@@ -80,6 +94,29 @@ namespace Gablarski
 		/// Gets the connection made.
 		/// </summary>
 		public IConnection Connection
+		{
+			get;
+			private set;
+		}
+	}
+
+	public class ConnectionlessMessageReceivedEventArgs
+		: MessageReceivedEventArgs
+	{
+		public ConnectionlessMessageReceivedEventArgs (IConnectionProvider provider, MessageBase message, EndPoint endpoint)
+			: base (null, message)
+		{
+			this.EndPoint = endpoint;
+			this.Provider = provider;
+		}
+
+		public IConnectionProvider Provider
+		{
+			get;
+			private set;
+		}
+
+		public EndPoint EndPoint
 		{
 			get;
 			private set;

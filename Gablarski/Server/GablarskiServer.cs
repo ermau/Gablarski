@@ -122,6 +122,7 @@ namespace Gablarski.Server
 			lock (this.availableConnections)
 			{
 				provider.ConnectionMade += OnConnectionMade;
+				provider.ConnectionlessMessageReceived += OnMessageReceived;
 				provider.StartListening ();
 		
 				this.availableConnections.Add (provider);
@@ -260,7 +261,8 @@ namespace Gablarski.Server
 			Trace.WriteLine ("[Server] " + provider.GetType ().Name + " removed.");
 
 			provider.StopListening ();
-			provider.ConnectionMade -= this.OnConnectionMade;
+			provider.ConnectionMade -= OnConnectionMade;
+			provider.ConnectionlessMessageReceived -= OnMessageReceived;
 
 			if (listRemove)
 			{

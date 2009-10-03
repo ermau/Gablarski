@@ -4,8 +4,10 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Windows.Forms;
+using Gablarski.Client;
 using Gablarski.Clients.Common;
 using Gablarski.Clients.Windows.Entities;
 using Gablarski.Clients.Windows.Properties;
@@ -24,6 +26,21 @@ namespace Gablarski.Clients.Windows
 		public ServerEntry Entry
 		{
 			get; private set;
+		}
+
+		private void DisplayLocalServer (ServerInfo info, IPEndPoint endpoint)
+		{
+			if (this.InvokeRequired)
+			{
+				BeginInvoke ((Action<ServerInfo, IPEndPoint>)DisplayLocalServer, info, endpoint);
+				return;
+			}
+
+			var group = this.servers.Groups.Cast<ListViewGroup>().First (g => g.Name == "local");
+
+			var li = servers.Items.Add (endpoint.Address + ":" + endpoint.Port, info.ServerName, 0);
+			li.Tag = new ServerEntry { Host = endpoint.Address.ToString(), Port = endpoint.Port };
+			group.Items.Add (li);
 		}
 
 		private void servers_SelectedIndexChanged (object sender, EventArgs e)
@@ -154,6 +171,9 @@ namespace Gablarski.Clients.Windows
 			this.servers.BeginUpdate();
 			this.servers.Items.Clear();
 
+			GablarskiClient.FindLocalServers (DisplayLocalServer);
+
+			this.servers.Groups.Add ("local", "Local Servers");
 			var saved = this.servers.Groups.Add ("dbentries", "Saved Servers");
 
 			foreach (var entry in Servers.GetEntries())

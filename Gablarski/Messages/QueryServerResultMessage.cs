@@ -49,6 +49,11 @@ namespace Gablarski.Messages
 		{
 		}
 
+		public override bool Reliable
+		{
+			get { return false; }
+		}
+
 		public IEnumerable<UserInfo> Users
 		{
 			get; set;
@@ -68,13 +73,23 @@ namespace Gablarski.Messages
 
 		public override void WritePayload(IValueWriter writer)
 		{
-			writer.WriteInt32 (this.Users.Count());
-			foreach (var u in this.Users)
-				u.Serialize (writer);
+			if (this.Users != null)
+			{
+				writer.WriteInt32 (this.Users.Count());
+				foreach (var u in this.Users)
+					u.Serialize (writer);
+			}
+			else
+				writer.WriteInt32 (0);
 
-			writer.WriteInt32 (this.Channels.Count());
-			foreach (var c in this.Channels)
-				c.Serialize (writer);
+			if (this.Channels != null)
+			{
+				writer.WriteInt32 (this.Channels.Count());
+				foreach (var c in this.Channels)
+					c.Serialize (writer);
+			}
+			else
+				writer.WriteInt32 (0);
 
 			this.ServerInfo.Serialize (writer);
 		}

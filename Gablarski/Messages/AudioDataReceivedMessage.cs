@@ -49,7 +49,7 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public AudioDataReceivedMessage (int sourceId, int sequence, byte[] data)
+		public AudioDataReceivedMessage (int sourceId, /*int sequence,*/ byte[] data)
 			: this()
 		{
 			#if DEBUG
@@ -60,15 +60,15 @@ namespace Gablarski.Messages
 			#endif
 
 			this.SourceId = sourceId;
-			this.Sequence = sequence;
+			//this.Sequence = sequence;
 			this.Data = data;
 		}
 
-		public int Sequence
-		{
-			get;
-			set;
-		}
+		//public int Sequence
+		//{
+		//    get;
+		//    set;
+		//}
 
 		public int SourceId
 		{
@@ -90,14 +90,14 @@ namespace Gablarski.Messages
 		public override void WritePayload (IValueWriter writer)
 		{
 			writer.WriteInt32 (this.SourceId);
-			writer.WriteInt32 (this.Sequence);
+			//writer.WriteInt32 (this.Sequence);
 			writer.WriteBytes (this.Data);
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
 			this.SourceId = reader.ReadInt32 ();
-			this.Sequence = reader.ReadInt32();
+			//this.Sequence = reader.ReadInt32();
 			this.Data = reader.ReadBytes ();
 		}
 	}

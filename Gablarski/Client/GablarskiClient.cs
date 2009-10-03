@@ -43,6 +43,7 @@ using System.Reflection;
 using System.Threading;
 using Gablarski.Audio;
 using Gablarski.Messages;
+using Gablarski.Network;
 
 namespace Gablarski.Client
 {
@@ -295,6 +296,79 @@ namespace Gablarski.Client
 		IIndexedEnumerable<int, ClientUser> IClientContext.Users
 		{
 			get { return this.Users; }
+		}
+		#endregion
+
+		#region Statics
+		/// <summary>
+		/// Searches for local servers and calls <paramref name="serverFound"/> for each server found.
+		/// </summary>
+		/// <param name="serverFound">Called for each server found.</param>
+		public static void FindLocalServers (Action<ServerInfo, IPEndPoint> serverFound)
+		{
+			ThreadPool.QueueUserWorkItem (FindLocalServersCore, serverFound);
+		}
+
+		private static void FindLocalServersCore (object o)
+		{
+			System.Diagnostics.Trace.WriteLine ("FindLocalServersCore");
+			var found = (Action<ServerInfo, IPEndPoint>)o;
+
+			try
+			{
+				Socket s = new Socket (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+				s.EnableBroadcast = true;
+				s.Bind (new IPEndPoint (IPAddress.Any, 0));
+				s.ReceiveTimeout = 5000;
+
+				var msg = new QueryServerMessage { ServerInfoOnly = true };
+
+				SocketValueWriter writer = new SocketValueWriter (s, new IPEndPoint (IPAddress.Broadcast, 6112));
+				writer.WriteByte (42);
+				writer.WriteUInt32 (0);
+				writer.WriteUInt16 (msg.MessageTypeCode);
+				msg.WritePayload (writer);
+				writer.Flush();
+
+				EndPoint server = new IPEndPoint (IPAddress.Any, 0);
+				byte[] buffer = new byte[10240];
+				ByteArrayValueReader reader = new ByteArrayValueReader (buffer);
+
+				DateTime start = DateTime.Now;
+
+				do
+				{
+					try
+					{
+						if (s.ReceiveFrom (buffer, ref server) == 0)
+							continue;
+					}
+					catch (SocketException)
+					{
+						continue;
+					}
+
+					byte sanity = reader.ReadByte();
+					if (sanity != 42)
+						continue;
+
+					ushort type = reader.ReadUInt16();
+
+					var result = new QueryServerResultMessage();
+					if (type != result.MessageTypeCode)
+						continue;
+
+					result.ReadPayload (reader);
+
+					found (result.ServerInfo, (IPEndPoint)server);
+				} while (DateTime.Now.Subtract (start).TotalSeconds < 15);
+			}
+			catch (Exception)
+			{
+				#if DEBUG
+				throw;
+				#endif
+			}
 		}
 		#endregion
 	}

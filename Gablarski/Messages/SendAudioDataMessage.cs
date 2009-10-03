@@ -49,7 +49,7 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public SendAudioDataMessage (int targetChannelId, int sourceId, int sequence, byte[] data)
+		public SendAudioDataMessage (int targetChannelId, int sourceId, /*int sequence,*/ byte[] data)
 			: base (ClientMessageType.AudioData)
 		{
 			#if DEBUG
@@ -64,14 +64,14 @@ namespace Gablarski.Messages
 			this.TargetChannelId = targetChannelId;
 			this.SourceId = sourceId;
 			this.Data = data;
-			this.Sequence = sequence;
+			//this.Sequence = sequence;
 		}
 
-		public int Sequence
-		{
-			get;
-			set;
-		}
+		//public int Sequence
+		//{
+		//    get;
+		//    set;
+		//}
 
 		public int TargetChannelId
 		{
@@ -100,7 +100,7 @@ namespace Gablarski.Messages
 		{
 			writer.WriteInt32 (this.TargetChannelId);
 			writer.WriteInt32 (this.SourceId);
-			writer.WriteInt32 (this.Sequence);
+			//writer.WriteInt32 (this.Sequence);
 			writer.WriteBytes (this.Data);
 		}
 
@@ -108,7 +108,7 @@ namespace Gablarski.Messages
 		{
 			this.TargetChannelId = reader.ReadInt32();
 			this.SourceId = reader.ReadInt32();
-			this.Sequence = reader.ReadInt32();
+			//this.Sequence = reader.ReadInt32();
 			this.Data = reader.ReadBytes();
 		}
 	}

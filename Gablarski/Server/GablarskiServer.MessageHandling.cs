@@ -109,7 +109,7 @@ namespace Gablarski.Server
 
 					Action<MessageReceivedEventArgs> handler;
 					if (Handlers.TryGetValue (msg.MessageType, out handler))
-						handler (new MessageReceivedEventArgs (e.Connection, msg));
+						handler (e);
 				}
 			}
 		}
@@ -143,18 +143,33 @@ namespace Gablarski.Server
 
 		private void ClientQueryServer (MessageReceivedEventArgs e)
 		{
-			if (!GetPermission (PermissionName.RequestChannelList, e.Connection))
-				e.Connection.Send (new PermissionDeniedMessage (ClientMessageType.QueryServer));
-			else
+			var msg = (QueryServerMessage)e.Message;
+			var connectionless = (e as ConnectionlessMessageReceivedEventArgs);
+			
+			if (!msg.ServerInfoOnly && (connectionless != null || !GetPermission (PermissionName.RequestChannelList, e.Connection)))
 			{
-				IEnumerable<ChannelInfo> currentChannels;
+				e.Connection.Send (new PermissionDeniedMessage (ClientMessageType.QueryServer));
+				return;
+			}
+
+			var result = new QueryServerResultMessage();
+
+			if (!msg.ServerInfoOnly)
+			{
 				lock (this.channelLock)
 				{
-					currentChannels = this.channels.Values.ToList();
+					result.Channels = this.channels.Values.ToList();
 				}
 
-				e.Connection.Send (new QueryServerResultMessage { Channels = currentChannels, Users = this.connections.Users, ServerInfo = GetServerInfo() });
+				result.Users = this.connections.Users;
 			}
+
+			result.ServerInfo = GetServerInfo();
+
+			if (connectionless == null)
+				e.Connection.Send (result);
+			else
+				connectionless.Provider.SendConnectionlessMessage (result, connectionless.EndPoint);
 		}
 
 		#region Channels
@@ -509,7 +524,7 @@ namespace Gablarski.Server
 			if (!GetPermission (n, msg.TargetChannelId, speaker.UserId))
 				return;
 
-			this.connections.Send (new AudioDataReceivedMessage (msg.SourceId, msg.Sequence, msg.Data), (con, user) => con != e.Connection && user.CurrentChannelId.Equals (msg.TargetChannelId));
+			this.connections.Send (new AudioDataReceivedMessage (msg.SourceId, /*msg.Sequence,*/ msg.Data), (con, user) => con != e.Connection && user.CurrentChannelId.Equals (msg.TargetChannelId));
 		}
 		#endregion
 	}

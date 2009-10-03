@@ -95,7 +95,7 @@ namespace Gablarski.Server
 			}
 		}
 
-		private int minbitrate = 32000;
+		private int minbitrate = 24000;
 		public virtual int MinimumAudioBitrate
 		{
 			get
@@ -143,7 +143,7 @@ namespace Gablarski.Server
 			}
 		}
 
-		private int defaultbitrate = 64000;
+		private int defaultbitrate = 48000;
 		public virtual int DefaultAudioBitrate
 		{
 			get

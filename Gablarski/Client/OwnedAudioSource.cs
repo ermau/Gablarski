@@ -83,7 +83,7 @@ namespace Gablarski.Client
 				throw new ArgumentNullException("data");
 			#endif
 
-			this.client.Send (new SendAudioDataMessage (this.targetChannelId, this.Id, Interlocked.Increment (ref this.sequence), Encode (data)));
+			this.client.Send (new SendAudioDataMessage (this.targetChannelId, this.Id, /*Interlocked.Increment (ref this.sequence),*/ Encode (data)));
 		}
 
 		private bool sending;

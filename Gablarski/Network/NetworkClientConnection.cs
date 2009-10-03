@@ -199,10 +199,6 @@ namespace Gablarski.Network
 
 		private void Runner()
 		{
-			const uint maxLoops = UInt32.MaxValue;
-			uint loops = 0;
-			bool singleCore = (Environment.ProcessorCount == 1);
-
 			IValueWriter writeReliable = this.rwriter;
 			IValueWriter writeUnreliable = this.uwriter;
 

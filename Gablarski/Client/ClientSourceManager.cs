@@ -366,7 +366,7 @@ namespace Gablarski.Client
 
 			var user = this.context.Users[source.OwnerId];
 			if (user != null && !user.IsIgnored)
-				OnReceivedAudio (new ReceivedAudioEventArgs (source, msg.Sequence, msg.Data));
+				OnReceivedAudio (new ReceivedAudioEventArgs (source, /*msg.Sequence,*/ msg.Data));
 		}
 
 		internal void OnMutedMessage (int sourceId, bool unmuted)

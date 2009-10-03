@@ -63,6 +63,12 @@ namespace Gablarski.Network
 			this.endpoint = sendTo;
 		}
 
+		public EndPoint EndPoint
+		{
+			get { return this.endpoint; }
+			set { this.endpoint = value; }
+		}
+
 		#region Implementation of IDisposable
 
 		/// <summary>
@@ -148,6 +154,7 @@ namespace Gablarski.Network
 
 		public void WriteString (string value)
 		{
+			value = (value ?? String.Empty) + '\0';
 			byte[] str = this.encoding.GetBytes (value);
 			EnsureCapacity (this.size + str.Length);
 
