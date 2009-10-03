@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Gablarski.Audio;
 using Gablarski.Clients.Input;
+using Gablarski.Clients.Music;
 
 namespace Gablarski.Clients.Windows
 {
@@ -55,6 +56,18 @@ namespace Gablarski.Clients.Windows
 					audioEngines = GetLoader<IAudioEngine>();
 
 				return audioEngines.GetImplementers();
+			}
+		}
+
+		private static ModuleLoader<IMediaPlayer> mediaPlayers;
+		public static IEnumerable<Type> MediaPlayers
+		{
+			get
+			{
+				if (mediaPlayers == null)
+					mediaPlayers = GetLoader<IMediaPlayer>();
+
+				return mediaPlayers.GetImplementers();
 			}
 		}
 

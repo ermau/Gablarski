@@ -9,6 +9,7 @@ using System.Text;
 using System.Windows.Forms;
 using Gablarski.Clients.Input;
 using Gablarski.Clients.Windows.Properties;
+using Mono.Rocks;
 
 namespace Gablarski.Clients.Windows
 {
@@ -23,6 +24,9 @@ namespace Gablarski.Clients.Windows
 
 		private void SettingsForm_Load (object sender, EventArgs e)
 		{
+			this.inDisplaySources.Checked = Settings.DisplaySources;
+			this.inConnectOnStart.Checked = Settings.ShowConnectOnStart;
+
 			this.ptt.Checked = Settings.UsePushToTalk;
 			this.inInputProvider.DisplayMember = "Name";
 			this.inInputProvider.DataSource = Modules.Input.ToList();
@@ -37,8 +41,12 @@ namespace Gablarski.Clients.Windows
 			this.threshold.Value = Settings.VoiceActivationContinueThreshold / 100;
 			this.vadSensitivity.Value = Settings.VoiceActivationLevel;
 
-			this.inDisplaySources.Checked = Settings.DisplaySources;
-			this.inConnectOnStart.Checked = Settings.ShowConnectOnStart;
+			this.talkingVolume.Value = Settings.TalkingMusicVolume;
+			this.normalVolume.Value = Settings.NormalMusicVolume;
+			foreach (Type player in Modules.MediaPlayers)
+			{
+				this.musicPlayers.Items.Add (player.Name.Remove ("Integration", "Provider"), Settings.EnabledMediaPlayerIntegrations.Contains (player.Name));
+			}
 		}
 
 		private void btnOk_Click (object sender, EventArgs e)
@@ -55,6 +63,10 @@ namespace Gablarski.Clients.Windows
 			Settings.VoiceDevice = this.voiceSelector.Device.Name;
 			Settings.VoiceActivationContinueThreshold = this.threshold.Value * 100;
 			Settings.VoiceActivationLevel = this.vadSensitivity.Value;
+
+			Settings.TalkingMusicVolume = this.talkingVolume.Value;
+			Settings.NormalMusicVolume = this.normalVolume.Value;
+			//Settings.EnabledMediaPlayerIntegrations = this.musicPlayers.CheckedItems.Cast<string>()
 
 			Settings.SaveSettings();
 

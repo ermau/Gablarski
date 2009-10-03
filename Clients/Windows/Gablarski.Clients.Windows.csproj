@@ -221,6 +221,10 @@
       <Project>{7347052B-DA5B-4CCA-AB28-3963766E3CDB}</Project>
       <Name>Gablarski</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Mono.Rocks\Mono.Rocks.csproj">
+      <Project>{F656F792-2CDE-4E17-BB5F-6A6F1C266CB8}</Project>
+      <Name>Mono.Rocks</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\connect.png" />
@@ -271,6 +275,8 @@ xcopy /Y "$(SolutionDir)fluent-nhibernate\tools\NHibernate\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Gablarski.Input.ManagedHooks\bin\$(ConfigurationName)\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Gablarski.Input.ManagedHooks\bin\$(ConfigurationName)\*.pdb" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Gablarski.Input.DirectInput\bin\$(ConfigurationName)\*.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)Gablarski.Input.DirectInput\bin\$(ConfigurationName)\*.pdb" "$(TargetDir)"</PostBuildEvent>
+xcopy /Y "$(SolutionDir)Gablarski.Input.DirectInput\bin\$(ConfigurationName)\*.pdb" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Gablarski.iTunes\bin\$(ConfigurationName)\*.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Gablarski.iTunes\bin\$(ConfigurationName)\*.pdb" "$(TargetDir)"</PostBuildEvent>
   </PropertyGroup>
 </Project>

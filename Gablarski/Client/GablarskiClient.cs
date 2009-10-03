@@ -311,7 +311,6 @@ namespace Gablarski.Client
 
 		private static void FindLocalServersCore (object o)
 		{
-			System.Diagnostics.Trace.WriteLine ("FindLocalServersCore");
 			var found = (Action<ServerInfo, IPEndPoint>)o;
 
 			try

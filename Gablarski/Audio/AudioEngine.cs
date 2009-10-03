@@ -248,9 +248,12 @@ namespace Gablarski.Audio
 		{
 			this.running = false;
 
-			this.AudioReceiver.ReceivedAudio -= OnReceivedAudio;
-			this.AudioReceiver.AudioSourceStarted -= OnAudioSourceStarted;
-			this.AudioReceiver.AudioSourceStopped -= OnAudioSourceStopped;
+			if (this.AudioReceiver != null)
+			{
+				this.AudioReceiver.ReceivedAudio -= OnReceivedAudio;
+				this.AudioReceiver.AudioSourceStarted -= OnAudioSourceStarted;
+				this.AudioReceiver.AudioSourceStopped -= OnAudioSourceStopped;
+			}
 
 			if (this.engineThread != null)
 				this.engineThread.Join();

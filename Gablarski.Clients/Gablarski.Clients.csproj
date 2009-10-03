@@ -58,9 +58,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\LocalServer.cs" />
-    <Compile Include="IControlMediaPlayer.cs" />
+    <Compile Include="Music\IControlMediaPlayer.cs" />
     <Compile Include="Input\IInputProvider.cs" />
-    <Compile Include="IMediaPlayer.cs" />
+    <Compile Include="Music\IMediaPlayer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Gablarski.Clients.Windows.Entities;
+using Mono.Rocks;
 
 namespace Gablarski.Clients.Windows
 {
@@ -102,6 +103,50 @@ namespace Gablarski.Clients.Windows
 			{
 				if (SetSetting ("ShowConnectOnStart", value))
 					OnSettingsChanged ("ShowConnectOnStart");
+			}
+		}
+
+		public const string EnabledMediaPlayerIntegrationsSettingName = "EnabledMediaPlayerIntegrations";
+		public static IEnumerable<string> EnabledMediaPlayerIntegrations
+		{
+			get { return GetSetting (EnabledMediaPlayerIntegrationsSettingName, "Gablarski.iTunes.iTunesIntegration, Gablarski.iTunes").Split (';'); }
+			set
+			{
+				if (SetSetting (EnabledMediaPlayerIntegrationsSettingName, value.Implode (";")))
+					OnSettingsChanged (EnabledMediaPlayerIntegrationsSettingName);
+			}
+		}
+
+		public const string EnableMediaVolumeControlSettingName = "EnableMediaVolumeControl";
+		public static bool EnableMediaVolumeControl
+		{
+			get { return GetSetting (EnableMediaVolumeControlSettingName, true); }
+			set
+			{
+				if (SetSetting (EnableMediaVolumeControlSettingName, value))
+					OnSettingsChanged (EnableMediaVolumeControlSettingName);
+			}
+		}
+
+		public const string TalkingMusicVolumeSettingName = "TalkingMusicVolume";
+		public static int TalkingMusicVolume
+		{
+			get { return GetSetting (TalkingMusicVolumeSettingName, 30); }
+			set
+			{
+				if (SetSetting (TalkingMusicVolumeSettingName, value))
+					OnSettingsChanged (TalkingMusicVolumeSettingName);
+			}
+		}
+
+		public const string NormalMusicVolumeSettingName = "NormalMusicVolume";
+		public static int NormalMusicVolume
+		{
+			get { return GetSetting (NormalMusicVolumeSettingName, 100); }
+			set
+			{
+				if (SetSetting (NormalMusicVolumeSettingName, value))
+					OnSettingsChanged (NormalMusicVolumeSettingName);
 			}
 		}
 

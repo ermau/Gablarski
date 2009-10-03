@@ -19,7 +19,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentNHibernate", "fluent-
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.Clients.Windows", "Clients\Windows\Gablarski.Clients.Windows.csproj", "{043E20A2-310D-41C0-94BC-766E3BAACAFB}"
 	ProjectSection(ProjectDependencies) = postProject
+		{D5FBD205-094A-46C5-88A8-16D4053733D9} = {D5FBD205-094A-46C5-88A8-16D4053733D9}
 		{3D575035-4F30-4981-9914-1FC4C8618C42} = {3D575035-4F30-4981-9914-1FC4C8618C42}
+		{29A83468-C6AB-4485-BD35-F5BD8FEB8C2E} = {29A83468-C6AB-4485-BD35-F5BD8FEB8C2E}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.WebServer", "Gablarski.WebServer\Gablarski.WebServer.csproj", "{11487129-A8DB-4818-B4AA-236E8CDD92CC}"
@@ -33,6 +35,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.Input.XLib", "Gablarski.Input.XLib\Gablarski.Input.XLib.csproj", "{300CECC2-F9CD-48F5-871C-129EA68D8E6C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.Input.DirectInput", "Gablarski.Input.DirectInput\Gablarski.Input.DirectInput.csproj", "{D5FBD205-094A-46C5-88A8-16D4053733D9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.iTunes", "Gablarski.iTunes\Gablarski.iTunes.csproj", "{29A83468-C6AB-4485-BD35-F5BD8FEB8C2E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -103,6 +107,11 @@ Global
 		{D5FBD205-094A-46C5-88A8-16D4053733D9}..NET Release|x86.ActiveCfg = Release|Any CPU
 		{D5FBD205-094A-46C5-88A8-16D4053733D9}..NET Release|x86.Build.0 = Release|Any CPU
 		{D5FBD205-094A-46C5-88A8-16D4053733D9}.Mono Debug|x86.ActiveCfg = Debug|Any CPU
+		{29A83468-C6AB-4485-BD35-F5BD8FEB8C2E}..NET Debug|x86.ActiveCfg = Debug|Any CPU
+		{29A83468-C6AB-4485-BD35-F5BD8FEB8C2E}..NET Debug|x86.Build.0 = Debug|Any CPU
+		{29A83468-C6AB-4485-BD35-F5BD8FEB8C2E}..NET Release|x86.ActiveCfg = Release|Any CPU
+		{29A83468-C6AB-4485-BD35-F5BD8FEB8C2E}..NET Release|x86.Build.0 = Release|Any CPU
+		{29A83468-C6AB-4485-BD35-F5BD8FEB8C2E}.Mono Debug|x86.ActiveCfg = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

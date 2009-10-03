@@ -7,6 +7,7 @@ using Gablarski.Audio.OpenAL.Providers;
 using Gablarski.Client;
 using Gablarski.Clients.Common;
 using Gablarski.Clients.Input;
+using Gablarski.Clients.Music;
 using Gablarski.Clients.Windows.Entities;
 using Gablarski.Clients.Windows.Properties;
 using Gablarski.Messages;
@@ -92,6 +93,7 @@ namespace Gablarski.Clients.Windows
 		private const string VoiceName = "voice";
 		private const string MusicName = "music";
 
+		private IMediaPlayer mediaPlayer;
 		private IPlaybackProvider playback;
 		private ICaptureProvider voiceCapture;
 		private OwnedAudioSource voiceSource;
@@ -100,11 +102,23 @@ namespace Gablarski.Clients.Windows
 		private void MainForm_Load (object sender, EventArgs e)
 		{
 			SetupInput();
+			SetupMusicIntegration();
 
 			this.playback = new OpenALPlaybackProvider();
 			this.playback.Device = this.playback.DefaultDevice;
 
 			SetupVoiceCapture();
+		}
+
+		private void SetupMusicIntegration()
+		{
+			foreach (IMediaPlayer p in Settings.EnabledMediaPlayerIntegrations.Select (s => (IMediaPlayer)Activator.CreateInstance (Type.GetType (s))))
+			{
+				if (!p.IsRunning)
+					continue;
+
+				mediaPlayer = p;
+			}
 		}
 
 		private void SetupVoiceCapture ()
@@ -252,11 +266,17 @@ namespace Gablarski.Clients.Windows
 
 		void SourceStarted (object sender, AudioSourceEventArgs e)
 		{
+			if (mediaPlayer != null)
+				mediaPlayer.Volume = Settings.TalkingMusicVolume;
+
 			this.users.MarkTalking (this.gablarski.Users[e.Source.OwnerId]);
 		}
 
 		void SourceStoped (object sender, AudioSourceEventArgs e)
 		{
+			if (mediaPlayer != null)
+				mediaPlayer.Volume = Settings.NormalMusicVolume;
+
 			this.users.MarkSilent (this.gablarski.Users[e.Source.OwnerId]);
 		}
 

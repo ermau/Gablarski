@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Gablarski.Clients;
+using Gablarski.Clients.Music;
 using iTunesLib;
 
 namespace Gablarski.iTunes
@@ -11,6 +13,14 @@ namespace Gablarski.iTunes
 		: IControlMediaPlayer
 	{
 		#region IMediaPlayer Members
+
+		/// <summary>
+		/// Gets whether or not the media player is currently running.
+		/// </summary>
+		public bool IsRunning
+		{
+			get { return Process.GetProcessesByName ("itunes").Any(); }
+		}
 
 		public string SongName
 		{

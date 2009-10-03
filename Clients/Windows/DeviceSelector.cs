@@ -20,6 +20,18 @@ namespace Gablarski
 			this.provider.DisplayMember = "Name";
 		}
 
+		public string ProviderLabel
+		{
+			get { return this.label1.Text; }
+			set { this.label1.Text = value; }
+		}
+
+		public string DeviceLabel
+		{
+			get { return this.label2.Text; }
+			set { this.label2.Text = value; }
+		}
+
 		public IEnumerable<Type> ProviderSource
 		{
 			set
