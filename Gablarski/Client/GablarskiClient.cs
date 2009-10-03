@@ -306,7 +306,12 @@ namespace Gablarski.Client
 		/// <param name="serverFound">Called for each server found.</param>
 		public static void FindLocalServers (Action<ServerInfo, IPEndPoint> serverFound)
 		{
-			ThreadPool.QueueUserWorkItem (FindLocalServersCore, serverFound);
+			Thread findthread = new Thread (FindLocalServersCore)
+			{
+				IsBackground = true,
+				Name = "FindLocalServers"
+			};
+			findthread.Start (serverFound);
 		}
 
 		private static void FindLocalServersCore (object o)

@@ -45,6 +45,7 @@ namespace Gablarski.Input.DirectInput
 			this.running = true;
 
 			this.pollThread = new Thread (Poller);
+			this.pollThread.IsBackground = true;
 			this.pollThread.Name = "DirectInput Poller";
 			this.pollThread.Start();
 		}
