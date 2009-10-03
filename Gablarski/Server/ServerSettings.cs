@@ -186,7 +186,7 @@ namespace Gablarski.Server
 						return;
 
 					this.serverLogo = value;
-					OnPropertyChanged ("ServerLogo");
+					OnPropertyChanged ("Logo");
 				}
 			}
 		}

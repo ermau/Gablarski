@@ -116,9 +116,9 @@ namespace Gablarski.Tests
 			connection.Client.Send (new ConnectMessage (GablarskiServer.MinimumApiVersion));
 
 			var msg = connection.Client.DequeueAndAssertMessage<ServerInfoMessage>();
-			Assert.AreEqual (this.settings.Name, msg.ServerInfo.ServerName);
-			Assert.AreEqual (this.settings.Description, msg.ServerInfo.ServerDescription);
-			Assert.AreEqual (String.Empty, msg.ServerInfo.ServerLogo);
+			Assert.AreEqual (this.settings.Name, msg.ServerInfo.Name);
+			Assert.AreEqual (this.settings.Description, msg.ServerInfo.Description);
+			Assert.AreEqual (String.Empty, msg.ServerInfo.Logo);
 		}
 
 		[Test]

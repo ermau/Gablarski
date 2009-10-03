@@ -398,9 +398,9 @@ namespace Gablarski.Clients.Windows
 				this.btnConnect.ToolTipText = "Disconnect (Connected)";
 
 				this.users.SetServerNode (
-					new TreeNode (this.gablarski.ServerInfo.ServerName)
+					new TreeNode (this.gablarski.ServerInfo.Name)
 					{
-						ToolTipText = this.gablarski.ServerInfo.ServerDescription
+						ToolTipText = this.gablarski.ServerInfo.Description
 					}
 				);
 			});

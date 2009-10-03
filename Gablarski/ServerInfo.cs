@@ -46,7 +46,7 @@ namespace Gablarski
 			if (reader == null)
 				throw new ArgumentNullException ("reader");
 
-			this.Deserialize (reader);
+			Deserialize (reader);
 		}
 
 		internal ServerInfo (ServerSettings settings)
@@ -54,15 +54,16 @@ namespace Gablarski
 			if (settings == null)
 				throw new ArgumentNullException("settings");
 
-			this.ServerName = settings.Name;
-			this.ServerDescription = settings.Description;
-			this.ServerLogo = settings.ServerLogo;
+			this.Name = settings.Name;
+			this.Description = settings.Description;
+			this.Logo = settings.ServerLogo;
+			this.Passworded = !String.IsNullOrEmpty (settings.ServerPassword);
 		}
 
 		/// <summary>
 		/// Gets the name of the server.
 		/// </summary>
-		public string ServerName
+		public string Name
 		{
 			get;
 			private set;
@@ -71,7 +72,7 @@ namespace Gablarski
 		/// <summary>
 		/// Gets the server description.
 		/// </summary>
-		public string ServerDescription
+		public string Description
 		{
 			get;
 			private set;
@@ -80,7 +81,16 @@ namespace Gablarski
 		/// <summary>
 		/// Gets the url of the server's logo.
 		/// </summary>
-		public string ServerLogo
+		public string Logo
+		{
+			get;
+			private set;
+		}
+
+		/// <summary>
+		/// Gets whether the server is passworded or not.
+		/// </summary>
+		public bool Passworded
 		{
 			get;
 			private set;
@@ -88,16 +98,18 @@ namespace Gablarski
 
 		internal void Serialize (IValueWriter writer)
 		{
-			writer.WriteString (this.ServerName);
-			writer.WriteString (this.ServerDescription);
-			writer.WriteString (this.ServerLogo);
+			writer.WriteString (this.Name);
+			writer.WriteString (this.Description);
+			writer.WriteString (this.Logo);
+			writer.WriteBool (this.Passworded);
 		}
 
 		internal void Deserialize (IValueReader reader)
 		{
-			this.ServerName = reader.ReadString();
-			this.ServerDescription = reader.ReadString();
-			this.ServerLogo = reader.ReadString();
+			this.Name = reader.ReadString();
+			this.Description = reader.ReadString();
+			this.Logo = reader.ReadString();
+			this.Passworded = reader.ReadBool();
 		}
 	}
 }

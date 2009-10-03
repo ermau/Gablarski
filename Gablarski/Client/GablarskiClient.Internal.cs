@@ -166,8 +166,8 @@ namespace Gablarski.Client
 			this.serverInfo = ((ServerInfoMessage)e.Message).ServerInfo;
 
 			Trace.WriteLine ("[Client] Received server information: ");
-			Trace.WriteLine ("Server name: " + this.serverInfo.ServerName);
-			Trace.WriteLine ("Server description: " + this.serverInfo.ServerDescription);
+			Trace.WriteLine ("Server name: " + this.serverInfo.Name);
+			Trace.WriteLine ("Server description: " + this.serverInfo.Description);
 
 			this.OnConnected (this, EventArgs.Empty);
 		}

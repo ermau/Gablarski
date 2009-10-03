@@ -29,12 +29,14 @@ namespace Gablarski.Tests
 			{
 				ServerLogo = logo,
 				Name = name,
-				Description = desc
+				Description = desc,
+				ServerPassword = "foo",
 			});
 
-			Assert.AreEqual (logo, info.ServerLogo);
-			Assert.AreEqual (name, info.ServerName);
-			Assert.AreEqual (desc, info.ServerDescription);
+			Assert.AreEqual (logo, info.Logo);
+			Assert.AreEqual (name, info.Name);
+			Assert.AreEqual (desc, info.Description);
+			Assert.AreEqual (true, info.Passworded);
 		}
 
 		[Test]
@@ -48,7 +50,8 @@ namespace Gablarski.Tests
 			{
 				ServerLogo = logo,
 				Name = name,
-				Description = desc
+				Description = desc,
+				ServerPassword = "passworded"
 			});
 
 			var stream = new MemoryStream (new byte[20480], true);
@@ -61,9 +64,10 @@ namespace Gablarski.Tests
 
 			info = new ServerInfo (reader);
 			Assert.AreEqual (length, stream.Position);
-			Assert.AreEqual (logo, info.ServerLogo);
-			Assert.AreEqual (name, info.ServerName);
-			Assert.AreEqual (desc, info.ServerDescription);
+			Assert.AreEqual (logo, info.Logo);
+			Assert.AreEqual (name, info.Name);
+			Assert.AreEqual (desc, info.Description);
+			Assert.AreEqual (true, info.Passworded);
 		}
 	}
 }
