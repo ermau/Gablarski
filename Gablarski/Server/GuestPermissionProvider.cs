@@ -66,6 +66,10 @@ namespace Gablarski.Server
 				return GetNamesAsPermissions (PermissionName.Login, PermissionName.RequestChannelList);
 		}
 
+		public void SetPermissions (int userId, IEnumerable<Permission> permissions)
+		{
+			throw new NotSupportedException();
+		}
 
 		public void SetAdmin (int userId)
 		{

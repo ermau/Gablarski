@@ -43,6 +43,11 @@ namespace Gablarski.Server
 		: IAuthenticationProvider
 	{
 		#region IAuthenticationProvider Members
+		public bool UpdateSupported
+		{
+			get { return false; }
+		}
+
 		public Type IdentifyingType
 		{
 			get { return typeof (Int32);}

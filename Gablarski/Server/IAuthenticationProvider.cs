@@ -44,11 +44,16 @@ namespace Gablarski.Server
 	public interface IAuthenticationProvider
 	{
 		/// <summary>
+		/// Gets whether or not users can be updated.
+		/// </summary>
+		bool UpdateSupported { get; }
+
+		/// <summary>
 		/// Gets whether a user exists or not.
 		/// </summary>
 		/// <param name="username">The username to check.</param>
 		/// <returns><c>true</c> if the username exists, <c>false</c> otherwise</returns>
-		//bool UserExists (string username);
+		bool UserExists (string username);
 
 		/// <summary>
 		/// Gets the type used to identify users.

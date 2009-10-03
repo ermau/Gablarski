@@ -57,6 +57,14 @@ namespace Gablarski.Server
 		bool UpdatedSupported { get; }
 
 		IEnumerable<Permission> GetPermissions (int userId);
+
+		/// <summary>
+		/// Sets permissions for the specified user id.
+		/// </summary>
+		/// <param name="userId">The user id to set permissions for.</param>
+		/// <param name="permissions">The permissions to set for the user.</param>
+		/// <exception cref="NotSupportedException">If <see cref="UpdatedSupported"/> is <c>false</c>.</exception>
+		void SetPermissions (int userId, IEnumerable<Permission> permissions);
 	}
 
 	public class PermissionsChangedEventArgs
