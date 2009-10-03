@@ -136,6 +136,9 @@ namespace Gablarski.Clients.Windows
 		{
 			try
 			{
+				if (!ValidateChildren (ValidationConstraints.Visible))
+					return;
+
 				if (this.Entry == null)
 					this.Entry = new ServerEntry();
 
