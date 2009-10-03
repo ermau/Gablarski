@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
+using Gablarski.Messages;
 using HttpServer;
 using HttpServer.Sessions;
 
@@ -19,8 +20,22 @@ namespace Gablarski.WebServer
 
 		#region Implementation of IConnectionProvider
 
-		public event EventHandler<MessageReceivedEventArgs> ConnectionlessMessageReceived;
+		public event EventHandler<ConnectionlessMessageReceivedEventArgs> ConnectionlessMessageReceived;
 		public event EventHandler<ConnectionEventArgs> ConnectionMade;
+
+		/// <summary>
+		/// Sends a connectionless <paramref name="message"/> to the <paramref name="endpoint"/>.
+		/// </summary>
+		/// <param name="message">The message to send.</param>
+		/// <param name="endpoint">The endpoint to send the <paramref name="message"/> to.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="message"/> is <c>null</c>.</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="endpoint"/> is <c>null</c>.</exception>
+		/// <exception cref="ArgumentException"><paramref name="message"/> is set as a reliable message.</exception>
+		/// <seealso cref="IConnectionProvider.ConnectionlessMessageReceived"/>
+		public void SendConnectionlessMessage(MessageBase message, EndPoint endpoint)
+		{
+			throw new NotSupportedException();
+		}
 
 		/// <summary>
 		/// Starts listening for connections and connectionless messages.
