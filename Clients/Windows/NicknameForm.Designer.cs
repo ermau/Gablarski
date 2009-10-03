@@ -84,6 +84,7 @@
 			this.Controls.Add (this.label1);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
 			this.Name = "NicknameForm";
+			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "Enter Nickname";
 			this.ResumeLayout (false);

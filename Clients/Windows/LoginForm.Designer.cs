@@ -35,16 +35,16 @@
 			this.labelPassword = new System.Windows.Forms.Label ();
 			this.labelUsername = new System.Windows.Forms.Label ();
 			this.inPassword = new System.Windows.Forms.TextBox ();
+			this.inPort = new Gablarski.Clients.Windows.NumericRequiredTextBox ();
 			this.labelNickname = new System.Windows.Forms.Label ();
 			this.labelServer = new System.Windows.Forms.Label ();
 			this.labelPort = new System.Windows.Forms.Label ();
 			this.labelName = new System.Windows.Forms.Label ();
 			this.inUsername = new System.Windows.Forms.TextBox ();
-			this.btnCancel = new System.Windows.Forms.Button ();
-			this.inPort = new Gablarski.Clients.Windows.NumericRequiredTextBox ();
 			this.inNickname = new Gablarski.Clients.Windows.RequiredTextBox ();
 			this.inServer = new Gablarski.Clients.Windows.RequiredTextBox ();
 			this.inName = new Gablarski.Clients.Windows.RequiredTextBox ();
+			this.btnCancel = new System.Windows.Forms.Button ();
 			this.btnConnect = new System.Windows.Forms.Button ();
 			this.settingsButton = new System.Windows.Forms.Button ();
 			this.startLocal = new System.Windows.Forms.Button ();
@@ -136,6 +136,16 @@
 			this.inPassword.TabIndex = 9;
 			this.inPassword.UseSystemPasswordChar = true;
 			// 
+			// inPort
+			// 
+			this.inPort.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+						| System.Windows.Forms.AnchorStyles.Right)));
+			this.inPort.Location = new System.Drawing.Point (102, 73);
+			this.inPort.Name = "inPort";
+			this.inPort.Size = new System.Drawing.Size (173, 20);
+			this.inPort.TabIndex = 8;
+			this.inPort.Text = "6112";
+			// 
 			// labelNickname
 			// 
 			this.labelNickname.AutoSize = true;
@@ -181,27 +191,6 @@
 			this.inUsername.Size = new System.Drawing.Size (173, 20);
 			this.inUsername.TabIndex = 3;
 			// 
-			// btnCancel
-			// 
-			this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnCancel.Location = new System.Drawing.Point (221, 280);
-			this.btnCancel.Name = "btnCancel";
-			this.btnCancel.Size = new System.Drawing.Size (66, 24);
-			this.btnCancel.TabIndex = 6;
-			this.btnCancel.Text = "Cancel";
-			this.btnCancel.UseVisualStyleBackColor = true;
-			this.btnCancel.Click += new System.EventHandler (this.btnCancel_Click);
-			// 
-			// inPort
-			// 
-			this.inPort.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-						| System.Windows.Forms.AnchorStyles.Right)));
-			this.inPort.Location = new System.Drawing.Point (102, 73);
-			this.inPort.Name = "inPort";
-			this.inPort.Size = new System.Drawing.Size (173, 20);
-			this.inPort.TabIndex = 8;
-			this.inPort.Text = "6112";
-			// 
 			// inNickname
 			// 
 			this.inNickname.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
@@ -228,6 +217,17 @@
 			this.inName.Name = "inName";
 			this.inName.Size = new System.Drawing.Size (173, 20);
 			this.inName.TabIndex = 0;
+			// 
+			// btnCancel
+			// 
+			this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.btnCancel.Location = new System.Drawing.Point (221, 280);
+			this.btnCancel.Name = "btnCancel";
+			this.btnCancel.Size = new System.Drawing.Size (66, 24);
+			this.btnCancel.TabIndex = 6;
+			this.btnCancel.Text = "Cancel";
+			this.btnCancel.UseVisualStyleBackColor = true;
+			this.btnCancel.Click += new System.EventHandler (this.btnCancel_Click);
 			// 
 			// btnConnect
 			// 
@@ -328,6 +328,7 @@
 			this.Controls.Add (this.servers);
 			this.MinimumSize = new System.Drawing.Size (285, 300);
 			this.Name = "LoginForm";
+			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "Gablarski Login";
 			this.Load += new System.EventHandler (this.LoginForm_Load);
