@@ -26,7 +26,7 @@ namespace Gablarski.iTunes
 		{
 			get
 			{
-				var track = itunes.CurrentTrack;
+				var track = iTunes.CurrentTrack;
 				return track != null ? track.Name : String.Empty;
 			}
 		}
@@ -35,7 +35,7 @@ namespace Gablarski.iTunes
 		{
 			get
 			{
-				var track = itunes.CurrentTrack;
+				var track = iTunes.CurrentTrack;
 				return track != null ? track.Artist : String.Empty;
 			}
 		}
@@ -44,15 +44,15 @@ namespace Gablarski.iTunes
 		{
 			get
 			{
-				var track = itunes.CurrentTrack;
+				var track = iTunes.CurrentTrack;
 				return track != null ? track.Album : String.Empty;
 			}
 		}
 
 		public int Volume
 		{
-			get { return itunes.SoundVolume; }
-			set { itunes.SoundVolume = value; }
+			get { return iTunes.SoundVolume; }
+			set { iTunes.SoundVolume = value; }
 		}
 
 		#endregion
@@ -86,6 +86,16 @@ namespace Gablarski.iTunes
 
 		#endregion
 
-		private readonly iTunesAppClass itunes = new iTunesAppClass();
+		private iTunesAppClass itunes;
+		private iTunesAppClass iTunes
+		{
+			get
+			{
+				if (itunes == null)
+					itunes = new iTunesAppClass();
+
+				return itunes;
+			}
+		}
 	}
 }
