@@ -67,7 +67,7 @@ namespace Gablarski.Clients.Windows
 			var login = new LoginForm();
 			if (login.ShowDialog(this) == DialogResult.OK)
 			{
-				if (!String.IsNullOrEmpty (login.Entry.UserNickname))
+				if (String.IsNullOrEmpty (login.Entry.UserNickname))
 				{
 					NicknameForm nickname = new NicknameForm();
 					if (nickname.ShowDialog() == DialogResult.Cancel)

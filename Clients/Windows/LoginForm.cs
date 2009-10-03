@@ -39,7 +39,7 @@ namespace Gablarski.Clients.Windows
 			var group = this.servers.Groups.Cast<ListViewGroup>().First (g => g.Name == "local");
 
 			var li = servers.Items.Add (endpoint.Address + ":" + endpoint.Port, info.ServerName, 0);
-			li.Tag = new ServerEntry { Host = endpoint.Address.ToString(), Port = endpoint.Port };
+			li.Tag = new ServerEntry { Name = info.ServerName, Host = endpoint.Address.ToString(), Port = endpoint.Port };
 			group.Items.Add (li);
 		}
 
