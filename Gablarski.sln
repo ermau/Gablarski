@@ -38,6 +38,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.Input.DirectInput
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.iTunes", "Gablarski.iTunes\Gablarski.iTunes.csproj", "{29A83468-C6AB-4485-BD35-F5BD8FEB8C2E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.Winamp", "Gablarski.Winamp\Gablarski.Winamp.csproj", "{C9DE76C5-68FC-44E1-AF63-CCE2D80BAA6C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		.NET Debug|x86 = .NET Debug|x86
@@ -112,6 +114,11 @@ Global
 		{29A83468-C6AB-4485-BD35-F5BD8FEB8C2E}..NET Release|x86.ActiveCfg = Release|Any CPU
 		{29A83468-C6AB-4485-BD35-F5BD8FEB8C2E}..NET Release|x86.Build.0 = Release|Any CPU
 		{29A83468-C6AB-4485-BD35-F5BD8FEB8C2E}.Mono Debug|x86.ActiveCfg = Debug|Any CPU
+		{C9DE76C5-68FC-44E1-AF63-CCE2D80BAA6C}..NET Debug|x86.ActiveCfg = Debug|Any CPU
+		{C9DE76C5-68FC-44E1-AF63-CCE2D80BAA6C}..NET Debug|x86.Build.0 = Debug|Any CPU
+		{C9DE76C5-68FC-44E1-AF63-CCE2D80BAA6C}..NET Release|x86.ActiveCfg = Release|Any CPU
+		{C9DE76C5-68FC-44E1-AF63-CCE2D80BAA6C}..NET Release|x86.Build.0 = Release|Any CPU
+		{C9DE76C5-68FC-44E1-AF63-CCE2D80BAA6C}.Mono Debug|x86.ActiveCfg = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

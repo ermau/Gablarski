@@ -441,6 +441,7 @@ namespace Gablarski.Clients.Windows
 		private void MainForm_FormClosing (object sender, FormClosingEventArgs e)
 		{
 			this.gablarski.Disconnect();
+			LocalServer.Shutdown();
 		}
 
 		private void btnConnect_Click (object sender, EventArgs e)
@@ -448,9 +449,7 @@ namespace Gablarski.Clients.Windows
 			if (this.gablarski.IsConnected)
 			{
 				this.gablarski.Disconnect();
-				
-				if (LocalServer.IsRunning)
-					LocalServer.Shutdown();
+				LocalServer.Shutdown();
 			}
 			else
 				this.ShowConnect (false);

@@ -109,7 +109,7 @@ namespace Gablarski.Clients.Windows
 		public const string EnabledMediaPlayerIntegrationsSettingName = "EnabledMediaPlayerIntegrations";
 		public static IEnumerable<string> EnabledMediaPlayerIntegrations
 		{
-			get { return GetSetting (EnabledMediaPlayerIntegrationsSettingName, "Gablarski.iTunes.iTunesIntegration, Gablarski.iTunes").Split (';'); }
+			get { return GetSetting (EnabledMediaPlayerIntegrationsSettingName, "Gablarski.iTunes.iTunesIntegration, Gablarski.iTunes;Gablarski.Winamp.WinampIntegration, Gablarski.Winamp").Split (';'); }
 			set
 			{
 				if (SetSetting (EnabledMediaPlayerIntegrationsSettingName, value.Implode (";")))

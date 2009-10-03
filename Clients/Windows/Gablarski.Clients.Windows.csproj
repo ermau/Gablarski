@@ -277,6 +277,8 @@ xcopy /Y "$(SolutionDir)Gablarski.Input.ManagedHooks\bin\$(ConfigurationName)\*.
 xcopy /Y "$(SolutionDir)Gablarski.Input.DirectInput\bin\$(ConfigurationName)\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Gablarski.Input.DirectInput\bin\$(ConfigurationName)\*.pdb" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Gablarski.iTunes\bin\$(ConfigurationName)\*.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)Gablarski.iTunes\bin\$(ConfigurationName)\*.pdb" "$(TargetDir)"</PostBuildEvent>
+xcopy /Y "$(SolutionDir)Gablarski.iTunes\bin\$(ConfigurationName)\*.pdb" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Gablarski.Winamp\bin\$(ConfigurationName)\*.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Gablarski.Winamp\bin\$(ConfigurationName)\*.pdb" "$(TargetDir)"</PostBuildEvent>
   </PropertyGroup>
 </Project>

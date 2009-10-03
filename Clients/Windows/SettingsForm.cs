@@ -45,7 +45,7 @@ namespace Gablarski.Clients.Windows
 			this.normalVolume.Value = Settings.NormalMusicVolume;
 			foreach (Type player in Modules.MediaPlayers)
 			{
-				this.musicPlayers.Items.Add (player.Name.Remove ("Integration", "Provider"), Settings.EnabledMediaPlayerIntegrations.Contains (player.Name));
+				this.musicPlayers.Items.Add (player.Name.Remove ("Integration", "Provider"), Settings.EnabledMediaPlayerIntegrations.Any (s => s.Contains (player.FullName)));
 			}
 		}
 
