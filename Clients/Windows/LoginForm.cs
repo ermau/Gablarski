@@ -30,6 +30,9 @@ namespace Gablarski.Clients.Windows
 
 		private void DisplayLocalServer (ServerInfo info, IPEndPoint endpoint)
 		{
+			if (this.Disposing || this.IsDisposed)
+				return;
+
 			if (this.InvokeRequired)
 			{
 				BeginInvoke ((Action<ServerInfo, IPEndPoint>)DisplayLocalServer, info, endpoint);
@@ -205,11 +208,11 @@ namespace Gablarski.Clients.Windows
 
 		private void startLocal_Click (object sender, EventArgs e)
 		{
-			NicknameForm nickname = new NicknameForm();
+			InputForm nickname = new InputForm();
 			if (nickname.ShowDialog() == DialogResult.Cancel)
 				return;
 
-			string nick = nickname.nickname.Text.Trim();
+			string nick = nickname.Input.Text.Trim();
 
 			LocalServer.Start();
 

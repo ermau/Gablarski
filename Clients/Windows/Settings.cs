@@ -68,7 +68,7 @@ namespace Gablarski.Clients.Windows
 
 		public static string InputProvider
 		{
-			get { return GetSetting ("InputProvider", String.Empty); }
+			get { return GetSetting ("InputProvider", "Gablarski.Input.DirectInput.DirectInputProvider, Gablarski.Input.DirectInput"); }
 			set
 			{
 				if (SetSetting ("InputProvider", value))
@@ -78,7 +78,7 @@ namespace Gablarski.Clients.Windows
 
 		public static string InputSettings
 		{
-			get { return GetSetting ("InputSettings", String.Empty); }
+			get { return GetSetting ("InputSettings", "k42"); }
 			set
 			{
 				if (SetSetting ("InputSettings", value))

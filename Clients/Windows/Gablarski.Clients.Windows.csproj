@@ -155,11 +155,11 @@
     <Compile Include="MusicForm.Designer.cs">
       <DependentUpon>MusicForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="NicknameForm.cs">
+    <Compile Include="InputForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="NicknameForm.Designer.cs">
-      <DependentUpon>NicknameForm.cs</DependentUpon>
+    <Compile Include="InputForm.Designer.cs">
+      <DependentUpon>InputForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Persistance.cs" />
     <Compile Include="UserTreeView.cs">
@@ -182,8 +182,8 @@
     <EmbeddedResource Include="MusicForm.resx">
       <DependentUpon>MusicForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="NicknameForm.resx">
-      <DependentUpon>NicknameForm.cs</DependentUpon>
+    <EmbeddedResource Include="InputForm.resx">
+      <DependentUpon>InputForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <SubType>Designer</SubType>

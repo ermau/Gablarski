@@ -70,11 +70,11 @@ namespace Gablarski.Clients.Windows
 			{
 				if (String.IsNullOrEmpty (login.Entry.UserNickname))
 				{
-					NicknameForm nickname = new NicknameForm();
+					InputForm nickname = new InputForm();
 					if (nickname.ShowDialog() == DialogResult.Cancel)
 						return false;
 
-					string nick = nickname.nickname.Text.Trim();
+					string nick = nickname.Input.Text.Trim();
 					login.Entry.UserNickname = nick;
 				}
 
@@ -405,10 +405,45 @@ namespace Gablarski.Clients.Windows
 				);
 			});
 
+			string userpassword = this.server.UserPassword;
+			string serverpassword = this.server.ServerPassword;
+
+			if (!this.server.UserName.IsEmpty() && userpassword.IsEmpty())
+			{
+				InputForm input = new InputForm();
+				input.Input.UseSystemPasswordChar = true;
+				input.Label.Text = "User Password:";
+				input.Text = "Enter Password";
+
+				if (input.ShowDialog() != DialogResult.OK)
+				{
+					this.gablarski.Disconnect();
+					return;
+				}
+
+				userpassword = input.Input.Text;
+			}
+
+			if (this.gablarski.ServerInfo.Passworded && serverpassword.IsEmpty())
+			{
+				InputForm input = new InputForm();
+				input.Input.UseSystemPasswordChar = true;
+				input.Label.Text = "Server Password:";
+				input.Text = "Enter Password";
+
+				if (input.ShowDialog() != DialogResult.OK)
+				{
+					this.gablarski.Disconnect();
+					return;
+				}
+
+				serverpassword = input.Input.Text;
+			}
+
 			if (this.server.UserName.IsEmpty() || this.server.UserPassword == null)
-				this.gablarski.CurrentUser.Join (this.server.UserNickname, this.server.ServerPassword);
+				this.gablarski.CurrentUser.Join (this.server.UserNickname, serverpassword);
 			else
-				this.gablarski.CurrentUser.Login (this.server.UserName, this.server.UserPassword);
+				this.gablarski.CurrentUser.Login (this.server.UserName, userpassword);
 		}
 
 		private void GablarskiConnectionRejected (object sender, RejectedConnectionEventArgs e)

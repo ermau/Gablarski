@@ -55,7 +55,7 @@ namespace Gablarski
 			if (String.IsNullOrEmpty (providerName))
 				return;
 
-			provider.SelectedItem = provider.Items.Cast<Type>().FirstOrDefault (d => d.AssemblyQualifiedName == providerName);
+			provider.SelectedItem = provider.Items.Cast<Type>().FirstOrDefault (d => d.AssemblyQualifiedName.Contains (providerName));
 		}
 
 		public void SetDevice (string deviceName)
