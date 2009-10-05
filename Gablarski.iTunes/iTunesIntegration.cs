@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using Gablarski.Clients;
 using Gablarski.Clients.Music;
@@ -26,8 +27,15 @@ namespace Gablarski.iTunes
 		{
 			get
 			{
-				var track = iTunes.CurrentTrack;
-				return track != null ? track.Name : String.Empty;
+				try
+				{
+					var track = iTunes.CurrentTrack;
+					return track != null ? track.Name : String.Empty;
+				}
+				catch (COMException)
+				{
+					return String.Empty;
+				}
 			}
 		}
 
@@ -35,8 +43,15 @@ namespace Gablarski.iTunes
 		{
 			get
 			{
-				var track = iTunes.CurrentTrack;
-				return track != null ? track.Artist : String.Empty;
+				try
+				{
+					var track = iTunes.CurrentTrack;
+					return track != null ? track.Artist : String.Empty;
+				}
+				catch (COMException)
+				{
+					return String.Empty;
+				}
 			}
 		}
 
@@ -44,15 +59,42 @@ namespace Gablarski.iTunes
 		{
 			get
 			{
-				var track = iTunes.CurrentTrack;
-				return track != null ? track.Album : String.Empty;
+				try
+				{
+					var track = iTunes.CurrentTrack;
+					return track != null ? track.Album : String.Empty;
+				}
+				catch (COMException)
+				{
+					return String.Empty;
+				}
 			}
 		}
 
 		public int Volume
 		{
-			get { return iTunes.SoundVolume; }
-			set { iTunes.SoundVolume = value; }
+			get
+			{
+				try
+				{
+					return iTunes.SoundVolume;
+				}
+				catch (COMException)
+				{
+					return 0;
+				}
+			}
+
+			set
+			{
+				try
+				{
+					iTunes.SoundVolume = value;
+				}
+				catch (COMException)
+				{
+				}
+			}
 		}
 
 		#endregion
@@ -61,27 +103,57 @@ namespace Gablarski.iTunes
 
 		public void Play ()
 		{
-			itunes.Play();
+			try
+			{
+				iTunes.Play();
+			}
+			catch (COMException)
+			{
+			}
 		}
 
 		public void Pause ()
 		{
-			itunes.Pause();
+			try
+			{
+				iTunes.Pause();
+			}
+			catch (COMException)
+			{
+			}
 		}
 
 		public void Stop ()
 		{
-			itunes.Stop();
+			try
+			{
+				iTunes.Stop();
+			}
+			catch (COMException)
+			{
+			}
 		}
 
 		public void NextTrack ()
 		{
-			itunes.NextTrack();
+			try
+			{
+				iTunes.NextTrack();
+			}
+			catch (COMException)
+			{
+			}
 		}
 
 		public void PreviousTrack ()
 		{
-			itunes.PreviousTrack();
+			try
+			{
+				iTunes.PreviousTrack();
+			}
+			catch (COMException)
+			{
+			}
 		}
 
 		#endregion
