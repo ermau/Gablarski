@@ -5,12 +5,14 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using Gablarski.Audio;
+using Gablarski.Audio.OpenAL;
 using Gablarski.Audio.OpenAL.Providers;
 using Gablarski.Client;
 using Gablarski.Network;
 using Gablarski.Server;
 using Mono.Options;
 using System.Linq;
+using AudioFormat=Gablarski.Audio.AudioFormat;
 
 namespace Gablarski.Clients.CLI
 {
@@ -235,7 +237,7 @@ namespace Gablarski.Clients.CLI
 							output = output.Trim();
 							if (output != String.Empty)
 							{
-								var device = Audio.OpenAL.OpenAL.PlaybackDevices.FirstOrDefault (d => d.Name == output);
+								var device = Audio.OpenAL.OpenAL.GetPlaybackDevices().FirstOrDefault (d => d.Name == output);
 								if (device == null)
 									Console.WriteLine (output + " not found.");
 								else
@@ -250,7 +252,7 @@ namespace Gablarski.Clients.CLI
 							input = input.Trim();
 							if (input != String.Empty)
 							{
-								var device = Audio.OpenAL.OpenAL.CaptureDevices.FirstOrDefault (d => d.Name == input);
+								var device = Audio.OpenAL.OpenAL.GetCaptureDevices().FirstOrDefault (d => d.Name == input);
 								if (device == null)
 									Console.WriteLine (input + " not found.");
 								else
@@ -423,9 +425,10 @@ namespace Gablarski.Clients.CLI
 		static void DisplayDevices()
 		{
 			Console.WriteLine ("Playback devices:");
-			foreach (var device in Audio.OpenAL.OpenAL.PlaybackDevices)
+			Device defaultDevice;
+			foreach (var device in Audio.OpenAL.OpenAL.GetPlaybackDevices(out defaultDevice))
 			{
-				if (device == Audio.OpenAL.OpenAL.DefaultPlaybackDevice)
+				if (device == defaultDevice)
 					Console.Write ("[Default] ");
 
 				Console.WriteLine ("\"" + device.Name + "\" ");
@@ -433,9 +436,10 @@ namespace Gablarski.Clients.CLI
 
 			Console.WriteLine();
 			Console.WriteLine ("Capture devices:");
-			foreach (var device in Audio.OpenAL.OpenAL.CaptureDevices)
+			CaptureDevice defaultCaptureDevice;
+			foreach (var device in Audio.OpenAL.OpenAL.GetCaptureDevices (out defaultCaptureDevice))
 			{
-				if (device == Audio.OpenAL.OpenAL.DefaultCaptureDevice)
+				if (device == defaultCaptureDevice)
 					Console.Write ("[Default] ");
 
 				Console.WriteLine ("\"" + device.Name + "\"");

@@ -52,7 +52,7 @@ namespace Gablarski.Audio
 			this.source = source;
 			this.options = options;
 
-			this.frameLength = (this.source.FrameSize/source.Frequency)*1000;
+			this.frameLength = (this.source.FrameSize / source.Frequency) * 1000;
 
 			if (options.Mode == AudioEngineCaptureMode.Activated)
 			{
@@ -147,10 +147,5 @@ namespace Gablarski.Audio
 		private readonly OwnedAudioSource source;
 		private readonly AudioEngineCaptureOptions options;
 		private ChannelInfo channel;
-
-		~AudioCaptureEntity()
-		{
-			capture.Dispose();
-		}
 	}
 }

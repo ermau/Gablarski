@@ -73,7 +73,7 @@ namespace Gablarski.Audio.OpenAL
 				return;
 
 			alDeleteBuffers (1, new[] { this.bufferID });
-			Audio.OpenAL.OpenAL.ErrorCheck ();
+			OpenAL.ErrorCheck ();
 
 			lock (lck)
 			{
@@ -81,6 +81,11 @@ namespace Gablarski.Audio.OpenAL
 			}
 
 			this.disposed = true;
+		}
+
+		~SourceBuffer()
+		{
+			Dispose (false);
 		}
 
 		#endregion

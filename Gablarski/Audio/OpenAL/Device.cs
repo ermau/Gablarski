@@ -36,6 +36,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
@@ -74,6 +75,8 @@ namespace Gablarski.Audio.OpenAL
 		{
 			get
 			{
+				ThrowIfDisposed();
+
 				int refresh;
 				Audio.OpenAL.OpenAL.alcGetIntegerv (this.Handle, ALCEnum.ALC_REFRESH, 1, out refresh);
 				return refresh;
@@ -83,6 +86,37 @@ namespace Gablarski.Audio.OpenAL
 		public override string ToString ()
 		{
 			return this.Name;
+		}
+
+		public static bool operator==(Device d1, Device d2)
+		{
+			bool oneNull = Object.ReferenceEquals (d1, null);
+			bool twoNull = Object.ReferenceEquals (d2, null);
+			if (oneNull && twoNull)
+				return true;
+			else if (!twoNull)
+				return false;
+
+			return d1.Equals (d2);
+		}
+
+		public static bool operator!=(Device d1, Device d2)
+		{
+			return !(d1 == d2);
+		}
+
+		public override bool Equals (object obj)
+		{
+			var d = (obj as Device);
+			if (d == null)
+				return false;
+
+			return (d.Name == this.Name);
+		}
+
+		public override int GetHashCode ()
+		{
+			return this.Name.GetHashCode();
 		}
 
 		internal IntPtr Handle;
@@ -109,6 +143,13 @@ namespace Gablarski.Audio.OpenAL
 		~Device ()
 		{
 			this.Dispose (false);
+		}
+
+		[Conditional ("DEBUG")]
+		protected void ThrowIfDisposed()
+		{
+			if (this.disposed)
+				throw new ObjectDisposedException ("Device");
 		}
 		#endregion
 	}

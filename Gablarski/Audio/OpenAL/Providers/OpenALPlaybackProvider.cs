@@ -70,7 +70,7 @@ namespace Gablarski.Audio.OpenAL.Providers
 
 		public IEnumerable<IAudioDevice> GetDevices ()
 		{
-			return Audio.OpenAL.OpenAL.PlaybackDevices.Cast<IAudioDevice>();
+			return Audio.OpenAL.OpenAL.GetPlaybackDevices().Cast<IAudioDevice>();
 		}
 
 		public void FreeSource (AudioSource source)
@@ -86,7 +86,7 @@ namespace Gablarski.Audio.OpenAL.Providers
 
 		public IAudioDevice DefaultDevice
 		{
-			get { return Audio.OpenAL.OpenAL.DefaultPlaybackDevice; }
+			get { return Audio.OpenAL.OpenAL.GetDefaultPlaybackDevice(); }
 		}
 
 		#endregion

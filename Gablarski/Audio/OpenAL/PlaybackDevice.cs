@@ -56,6 +56,8 @@ namespace Gablarski.Audio.OpenAL
 		/// <returns>Returns <c>this</c>.</returns>
 		public PlaybackDevice Open ()
 		{
+			ThrowIfDisposed();
+
 			this.Handle = alcOpenDevice (this.Name);
 			OpenAL.ErrorCheck (this);
 
@@ -71,6 +73,8 @@ namespace Gablarski.Audio.OpenAL
 		/// <returns>The created device context.</returns>
 		public Context CreateContext ()
 		{
+			ThrowIfDisposed();
+
 			return Context.Create (this);
 		}
 
@@ -80,20 +84,18 @@ namespace Gablarski.Audio.OpenAL
 		/// <returns></returns>
 		public Context CreateAndActivateContext ()
 		{
+			ThrowIfDisposed();
+
 			return Context.CreateAndActivate (this);
 		}
 
 		protected override void Dispose (bool disposing)
 		{
-			if (this.disposed)
+			if (this.Handle == IntPtr.Zero)
 				return;
 
-			if (this.IsOpen)
-			{
-				alcCloseDevice (this.Handle);
-				this.Handle = IntPtr.Zero;
-			}
-
+			alcCloseDevice (this.Handle);
+			this.Handle = IntPtr.Zero;
 			this.disposed = true;
 		}
 

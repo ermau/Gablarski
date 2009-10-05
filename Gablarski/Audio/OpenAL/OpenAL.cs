@@ -53,71 +53,7 @@ namespace Gablarski.Audio.OpenAL
 			OpenAL.ErrorChecking = true;
 #endif
 
-			if (GetIsExtensionPresent ("ALC_EXT_CAPTURE"))
-			{
-				OpenAL.IsCaptureSupported = true;
-				
-				string defaultName = Marshal.PtrToStringAnsi (alcGetString (IntPtr.Zero, ALC_CAPTURE_DEFAULT_DEVICE_SPECIFIER));
-
-				var strings = ReadStringsFromMemory (alcGetString (IntPtr.Zero, ALC_CAPTURE_DEVICE_SPECIFIER));
-				CaptureDevice[] devices = new CaptureDevice[strings.Length];
-				for (int i = 0; i < strings.Length; ++i)
-				{
-					string s = strings[i];
-					devices[i] = new CaptureDevice (s);
-
-					if (s == defaultName)
-						OpenAL.DefaultCaptureDevice = devices[i];
-				}
-				
-				OpenAL.CaptureDevices = devices;
-
-				if (OpenAL.DefaultCaptureDevice == null)
-					OpenAL.DefaultCaptureDevice = new CaptureDevice (defaultName);
-			}
-
-			OpenAL.DefaultPlaybackDevice = new PlaybackDevice (Marshal.PtrToStringAnsi (alcGetString (IntPtr.Zero, ALC_DEFAULT_DEVICE_SPECIFIER)));
-
-			if (GetIsExtensionPresent ("ALC_ENUMERATE_ALL_EXT"))
-			{
-				string defaultName = Marshal.PtrToStringAnsi (alcGetString (IntPtr.Zero, ALC_DEFAULT_ALL_DEVICES_SPECIFIER));
-
-				var strings = ReadStringsFromMemory (alcGetString (IntPtr.Zero, ALC_ALL_DEVICES_SPECIFIER));
-				PlaybackDevice[] devices = new PlaybackDevice[strings.Length];
-				for (int i = 0; i < strings.Length; ++i)
-				{
-					string s = strings[i];
-					devices[i] = new PlaybackDevice (s);
-
-					if (s == defaultName)
-						OpenAL.DefaultPlaybackDevice = devices[i];
-				}
-
-				OpenAL.PlaybackDevices = devices;
-
-				if (OpenAL.DefaultPlaybackDevice == null)
-					OpenAL.DefaultPlaybackDevice = new PlaybackDevice (defaultName);
-			}
-			else if (GetIsExtensionPresent ("ALC_ENUMERATION_EXT"))
-			{
-				string defaultName = Marshal.PtrToStringAnsi (alcGetString (IntPtr.Zero, ALC_DEFAULT_DEVICE_SPECIFIER));
-
-				var strings = ReadStringsFromMemory (alcGetString (IntPtr.Zero, ALC_DEVICE_SPECIFIER));
-				PlaybackDevice[] devices = new PlaybackDevice[strings.Length];
-				for (int i = 0; i < strings.Length; ++i)
-				{
-					string s = strings[i];
-					devices[i] = new PlaybackDevice (s);
-
-					if (s == defaultName)
-						OpenAL.DefaultPlaybackDevice = devices[i];
-				}
-
-				OpenAL.PlaybackDevices = devices;
-
-				if (OpenAL.DefaultPlaybackDevice == null)
-					OpenAL.DefaultPlaybackDevice = new PlaybackDevice (defaultName);
-			}
+			IsCaptureSupported = GetIsExtensionPresent ("ALC_EXT_CAPTURE");
 		}
 
 
@@ -167,42 +103,6 @@ namespace Gablarski.Audio.OpenAL
 		}
 
 		/// <summary>
-		/// Gets the default playback device.
-		/// </summary>
-		public static PlaybackDevice DefaultPlaybackDevice
-		{
-			get;
-			private set;
-		}
-
-		/// <summary>
-		/// Gets a listing of playback devices.
-		/// </summary>
-		public static IEnumerable<PlaybackDevice> PlaybackDevices
-		{
-			get;
-			private set;
-		}
-
-		/// <summary>
-		/// Gets the default capture device. <c>null</c> if unsupported.
-		/// </summary>
-		public static CaptureDevice DefaultCaptureDevice
-		{
-			get;
-			private set;
-		}
-
-		/// <summary>
-		/// Gets a listing of capture devices. <c>null</c> if unsupported.
-		/// </summary>
-		public static IEnumerable<CaptureDevice> CaptureDevices
-		{
-			get;
-			private set;
-		}
-
-		/// <summary>
 		/// Gets or sets whether error checking is enabled.
 		/// </summary>
 		public static bool ErrorChecking
@@ -217,6 +117,100 @@ namespace Gablarski.Audio.OpenAL
 		public static string Version
 		{
 			get { return Marshal.PtrToStringAnsi (alGetString (AL_VERSION)); }
+		}
+
+		public static Device GetDefaultPlaybackDevice()
+		{
+			Device defaultDevice;
+			GetPlaybackDevices (out defaultDevice);
+			return defaultDevice;
+		}
+
+		public static IEnumerable<Device> GetPlaybackDevices()
+		{
+			Device defaultDevice;
+			return GetPlaybackDevices (out defaultDevice);
+		}
+
+		public static IEnumerable<Device> GetPlaybackDevices (out Device defaultDevice)
+		{
+			defaultDevice = null;
+
+			if (GetIsExtensionPresent ("ALC_ENUMERATE_ALL_EXT"))
+			{
+				string defaultName = Marshal.PtrToStringAnsi (alcGetString (IntPtr.Zero, ALC_DEFAULT_ALL_DEVICES_SPECIFIER));
+
+				var strings = ReadStringsFromMemory (alcGetString (IntPtr.Zero, ALC_ALL_DEVICES_SPECIFIER));
+				PlaybackDevice[] devices = new PlaybackDevice[strings.Length];
+				for (int i = 0; i < strings.Length; ++i)
+				{
+					string s = strings[i];
+					devices[i] = new PlaybackDevice (s);
+
+					if (s == defaultName)
+						defaultDevice = devices[i];
+				}
+
+				return devices;
+			}
+			else if (GetIsExtensionPresent ("ALC_ENUMERATION_EXT"))
+			{
+				string defaultName = Marshal.PtrToStringAnsi (alcGetString (IntPtr.Zero, ALC_DEFAULT_DEVICE_SPECIFIER));
+
+				var strings = ReadStringsFromMemory (alcGetString (IntPtr.Zero, ALC_DEVICE_SPECIFIER));
+				PlaybackDevice[] devices = new PlaybackDevice[strings.Length];
+				for (int i = 0; i < strings.Length; ++i)
+				{
+					string s = strings[i];
+					devices[i] = new PlaybackDevice (s);
+
+					if (s == defaultName)
+						defaultDevice = devices[i];
+				}
+
+				return devices;
+			}
+
+			return Enumerable.Empty<Device>();
+		}
+
+		public static CaptureDevice GetDefaultCaptureDevice()
+		{
+			if (!IsCaptureSupported)
+				throw new NotSupportedException();
+
+			CaptureDevice defaultDevice;
+			GetCaptureDevices (out defaultDevice);
+			return defaultDevice;
+		}
+
+		public static IEnumerable<CaptureDevice> GetCaptureDevices()
+		{
+			CaptureDevice def;
+			return GetCaptureDevices (out def);
+		}
+
+		public static IEnumerable<CaptureDevice> GetCaptureDevices (out CaptureDevice defaultDevice)
+		{
+			if (!IsCaptureSupported)
+				throw new NotSupportedException();
+
+			defaultDevice = null;
+
+			string defaultName = Marshal.PtrToStringAnsi (alcGetString (IntPtr.Zero, ALC_CAPTURE_DEFAULT_DEVICE_SPECIFIER));
+
+			var strings = ReadStringsFromMemory (alcGetString (IntPtr.Zero, ALC_CAPTURE_DEVICE_SPECIFIER));
+			CaptureDevice[] devices = new CaptureDevice[strings.Length];
+			for (int i = 0; i < strings.Length; ++i)
+			{
+				string s = strings[i];
+				devices[i] = new CaptureDevice (s);
+
+				if (s == defaultName)
+					defaultDevice = devices[i];
+			}
+
+			return devices;
 		}
 
 		#region AudioFormat Extensions

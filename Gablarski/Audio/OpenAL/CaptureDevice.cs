@@ -68,27 +68,6 @@ namespace Gablarski.Audio.OpenAL
 		}
 
 		/// <summary>
-		/// Fired when samples are available for an existing capture.
-		/// </summary>
-		public event EventHandler<SamplesAvailableEventArgs> SamplesAvailable
-		{
-			add
-			{
-				this.StartSampleListener ();
-
-				this.samplesAvailable += value;
-			}
-
-			remove
-			{
-				this.samplesAvailable -= value;
-
-				if (this.samplesAvailable == null)
-					this.mre.Reset ();
-			}
-		}
-
-		/// <summary>
 		/// Gets the current format of the capture device.
 		/// </summary>
 		public AudioFormat Format
@@ -122,6 +101,8 @@ namespace Gablarski.Audio.OpenAL
 		/// <returns>Returns <c>this</c>.</returns>
 		public unsafe CaptureDevice Open (uint frequency, AudioFormat format)
 		{
+			ThrowIfDisposed();
+
 			this.Format = format;
 			this.Frequency = frequency;
 
@@ -139,8 +120,7 @@ namespace Gablarski.Audio.OpenAL
 
 		public void Close ()
 		{
-			alcCaptureCloseDevice (this.Handle);
-			this.Handle = IntPtr.Zero;
+			Dispose (true);
 		}
 
 		/// <summary>
@@ -158,20 +138,11 @@ namespace Gablarski.Audio.OpenAL
 		/// </summary>
 		public void StopCapture ()
 		{
+			ThrowIfDisposed();
+
 			this.capturing = false;
 			alcCaptureStop (this.Handle);
 			OpenAL.ErrorCheck (this);
-		}
-
-		/// <summary>
-		/// Forces the sample listener, if active, to stop.
-		/// </summary>
-		public void StopSampleListener ()
-		{
-			this.listening = false;
-			this.mre.Set ();
-			if (this.listenerThread.IsAlive)
-				this.listenerThread.Join ();
 		}
 
 		/// <summary>
@@ -209,11 +180,9 @@ namespace Gablarski.Audio.OpenAL
 			if (this.Handle == IntPtr.Zero)
 				return;
 
-			if (this.IsOpen)
-			{
-				alcCaptureCloseDevice (this.Handle);
-				this.Handle = IntPtr.Zero;
-			}
+			alcCaptureCloseDevice (this.Handle);
+			this.Handle = IntPtr.Zero;
+			this.pcm = null;
 
 			this.disposed = true;
 		}
@@ -235,42 +204,16 @@ namespace Gablarski.Audio.OpenAL
 		private static extern void alcCaptureCloseDevice (IntPtr device);
 		#endregion
 
-		private EventHandler<SamplesAvailableEventArgs> samplesAvailable;
-
 		private readonly ManualResetEvent mre = new ManualResetEvent (true);
 		private volatile bool capturing;
 		private int minimumSamples = 1;
-		private volatile bool listening;
-		private Thread listenerThread;
 		private byte[] pcm;
 		private IntPtr pcmPtr;
 
-		protected void StartSampleListener ()
-		{
-			this.mre.Set ();
-
-			if (this.listening || this.listenerThread.IsAlive)
-				return;
-			
-			lock (this.listenerThread)
-			{
-				if (!this.listening && !this.listenerThread.IsAlive)
-				{
-					this.listening = true;
-					this.listenerThread.Start ();
-				}
-			}
-		}
-
-		protected virtual void OnCaptureSamplesAvailable (SamplesAvailableEventArgs e)
-		{
-			var available = this.samplesAvailable;
-			if (available != null)
-				available (this, e);
-		}
-
 		private byte[] GetSamples (int numSamples, bool block)
 		{
+			ThrowIfDisposed();
+
 			byte[] samples = new byte[numSamples * 2];
 
 			while (this.capturing && block && this.AvailableSamples < numSamples)
@@ -296,25 +239,12 @@ namespace Gablarski.Audio.OpenAL
 
 		private int GetSamplesAvailable ()
 		{
+			ThrowIfDisposed();
+
 			int samples;
 			OpenAL.alcGetIntegerv (this.Handle, ALCEnum.ALC_CAPTURE_SAMPLES, 4, out samples);
 			OpenAL.ErrorCheck (this);
 			return samples;
-		}
-
-		private void SampleListener (object state)
-		{
-			while (this.listening)
-			{
-				if (this.IsOpen)
-				{
-					int numSamples = AvailableSamples;
-					if (numSamples > this.minimumSamples)
-						OnCaptureSamplesAvailable (new SamplesAvailableEventArgs (numSamples));
-				}
-
-				Thread.Sleep (1);
-			}
 		}
 	}
 }

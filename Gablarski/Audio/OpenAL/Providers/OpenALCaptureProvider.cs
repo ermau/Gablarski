@@ -45,21 +45,6 @@ namespace Gablarski.Audio.OpenAL.Providers
 		: ICaptureProvider
 	{
 		#region ICaptureProvider Members
-		public event EventHandler<SamplesAvailableEventArgs> SamplesAvailable
-		{
-			add
-			{
-				this.CheckDevice();
-				this.device.SamplesAvailable += value;
-			}
-
-			remove
-			{
-				this.CheckDevice();
-				this.device.SamplesAvailable -= value;
-			}
-		}
-
 		public int AvailableSampleCount
 		{
 			get
@@ -135,12 +120,12 @@ namespace Gablarski.Audio.OpenAL.Providers
 		
 		public IEnumerable<IAudioDevice> GetDevices ()
 		{
-			return OpenAL.CaptureDevices.Cast<IAudioDevice>();
+			return OpenAL.GetCaptureDevices().Cast<IAudioDevice>();
 		}
 
 		public IAudioDevice DefaultDevice
 		{
-			get { return OpenAL.DefaultCaptureDevice; }
+			get { return OpenAL.GetDefaultCaptureDevice(); }
 		}
 		
 		#endregion
