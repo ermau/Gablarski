@@ -42,7 +42,7 @@ namespace Gablarski.Clients.Windows
 
 			this.mediaPlayerIntegration = new MediaPlayerIntegration (this.gablarski.Sources,
 			                                                          Settings.EnabledMediaPlayerIntegrations.Select (
-			                                                          	s => (IMediaPlayer)Activator.CreateInstance (Type.GetType (s))));
+			                                                          	s => (IMediaPlayer)Activator.CreateInstance (Type.GetType (s))).ToList());
 			this.mediaPlayerIntegration.NormalVolume = Settings.NormalMusicVolume;
 			this.mediaPlayerIntegration.TalkingVolume = Settings.TalkingMusicVolume;
 
