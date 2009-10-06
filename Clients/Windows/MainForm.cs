@@ -222,10 +222,10 @@ namespace Gablarski.Clients.Windows
 
 		private void SetupInput()
 		{
+			DisableInput();
+
 			if (!Settings.UsePushToTalk)
 				return;
-
-			DisableInput();
 
 			Type providerType = null;
 
@@ -488,8 +488,6 @@ namespace Gablarski.Clients.Windows
 
 		private void btnSettings_Click (object sender, EventArgs e)
 		{
-			DisableInput();
-
 			SettingsForm settingsForm = new SettingsForm();
 			settingsForm.ShowDialog();
 		}
