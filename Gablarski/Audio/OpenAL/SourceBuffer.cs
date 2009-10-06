@@ -73,7 +73,6 @@ namespace Gablarski.Audio.OpenAL
 				return;
 
 			alDeleteBuffers (1, new[] { this.bufferID });
-			OpenAL.ErrorCheck ();
 
 			lock (lck)
 			{
