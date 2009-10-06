@@ -55,12 +55,16 @@
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\LocalServer.cs" />
     <Compile Include="Music\IControlMediaPlayer.cs" />
     <Compile Include="Input\IInputProvider.cs" />
     <Compile Include="Music\IMediaPlayer.cs" />
+    <Compile Include="Music\MediaPlayerIntegration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
