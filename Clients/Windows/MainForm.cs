@@ -357,7 +357,12 @@ namespace Gablarski.Clients.Windows
 				if (LocalServer.IsRunning)
 					LocalServer.Permissions.SetAdmin (e.Result.UserId);
 
-				this.gablarski.CurrentUser.Join (this.server.UserNickname, this.server.ServerPassword);
+				string serverpassword = this.server.ServerPassword;
+				if (this.gablarski.ServerInfo.Passworded && serverpassword.IsEmpty())
+					serverpassword = RequireServerPassword();
+
+				if (this.gablarski.IsConnected)
+					this.gablarski.CurrentUser.Join (this.server.UserNickname, serverpassword);
 			}
 		}
 
@@ -402,7 +407,7 @@ namespace Gablarski.Clients.Windows
 			});
 
 			string userpassword = this.server.UserPassword;
-			string serverpassword = this.server.ServerPassword;
+			
 
 			if (!this.server.UserName.IsEmpty() && userpassword.IsEmpty())
 			{
@@ -411,7 +416,7 @@ namespace Gablarski.Clients.Windows
 				input.Label.Text = "User Password:";
 				input.Text = "Enter Password";
 
-				if (input.ShowDialog() != DialogResult.OK)
+				if (input.ShowDialogOnFormThread (this) != DialogResult.OK)
 				{
 					this.gablarski.Disconnect();
 					return;
@@ -420,26 +425,33 @@ namespace Gablarski.Clients.Windows
 				userpassword = input.Input.Text;
 			}
 
-			if (this.gablarski.ServerInfo.Passworded && serverpassword.IsEmpty())
-			{
-				InputForm input = new InputForm();
-				input.Input.UseSystemPasswordChar = true;
-				input.Label.Text = "Server Password:";
-				input.Text = "Enter Password";
-
-				if (input.ShowDialog() != DialogResult.OK)
-				{
-					this.gablarski.Disconnect();
-					return;
-				}
-
-				serverpassword = input.Input.Text;
-			}
-
 			if (this.server.UserName.IsEmpty() || this.server.UserPassword == null)
-				this.gablarski.CurrentUser.Join (this.server.UserNickname, serverpassword);
+			{
+				string serverpassword = this.server.ServerPassword;
+				if (this.gablarski.ServerInfo.Passworded && serverpassword.IsEmpty())
+					serverpassword = RequireServerPassword();
+
+				if (this.gablarski.IsConnected)
+					this.gablarski.CurrentUser.Join (this.server.UserNickname, serverpassword);
+			}
 			else
 				this.gablarski.CurrentUser.Login (this.server.UserName, userpassword);
+		}
+
+		private string RequireServerPassword ()
+		{
+			InputForm input = new InputForm();
+			input.Input.UseSystemPasswordChar = true;
+			input.Label.Text = "Server Password:";
+			input.Text = "Enter Password";
+
+			if (input.ShowDialogOnFormThread (this) != DialogResult.OK)
+			{
+				this.gablarski.Disconnect();
+				return null;
+			}
+
+			return input.Input.Text;
 		}
 
 		private void GablarskiConnectionRejected (object sender, RejectedConnectionEventArgs e)

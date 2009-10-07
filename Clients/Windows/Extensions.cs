@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 
 namespace Gablarski.Clients.Windows
 {
@@ -36,6 +37,11 @@ namespace Gablarski.Clients.Windows
 			builder.Append (ex.Message);
 
 			DisplayRecurseInnerExceptions (ex.InnerException, builder);
+		}
+
+		public static DialogResult ShowDialogOnFormThread (this Form self, Form formForThread)
+		{
+			return (DialogResult)formForThread.Invoke ((Func<IWin32Window, DialogResult>)self.ShowDialog, formForThread);
 		}
 	}
 }
