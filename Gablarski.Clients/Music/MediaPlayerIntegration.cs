@@ -11,15 +11,25 @@ namespace Gablarski.Clients.Music
 	public class MediaPlayerIntegration
 		: IDisposable
 	{
-		public MediaPlayerIntegration (ClientSourceManager sourceManager, IEnumerable<IMediaPlayer> mediaPlayers)
+		public MediaPlayerIntegration (IClientContext context, IAudioReceiver audioReceiver, IEnumerable<IMediaPlayer> mediaPlayers)
 		{
+			this.context = context;
 			this.mediaPlayers = mediaPlayers;
 
-			this.sources = sourceManager;
-			this.sources.AudioSourceStarted += OnAudioSourceStarted;
-			this.sources.AudioSourceStopped += OnAudioSourceStopped;
+			this.receiver = audioReceiver;
+			this.receiver.AudioSourceStarted += OnAudioSourceStarted;
+			this.receiver.AudioSourceStopped += OnAudioSourceStopped;
 
 			playerTimer = new Timer (Pulse, null, 0, 2500);
+		}
+
+		/// <summary>
+		/// Gets or sets whether the user's own speech quiets the music.
+		/// </summary>
+		public bool UserTalkingCounts
+		{
+			get;
+			set;
 		}
 
 		/// <summary>
@@ -44,7 +54,8 @@ namespace Gablarski.Clients.Music
 		private int normalVolume = 100;
 
 		private int playing;
-		private readonly ClientSourceManager sources;
+		private readonly IClientContext context;
+		private readonly IAudioReceiver receiver;
 		private readonly IEnumerable<IMediaPlayer> mediaPlayers;
 		private readonly HashSet<IMediaPlayer> attachedPlayers = new HashSet<IMediaPlayer>();
 		private readonly Timer playerTimer;
@@ -67,6 +78,9 @@ namespace Gablarski.Clients.Music
 
 		private void OnAudioSourceStopped (object sender, AudioSourceEventArgs e)
 		{
+			if (!UserTalkingCounts && e.Source.OwnerId == context.CurrentUser.UserId)
+				return;
+
 			if (Interlocked.Decrement (ref this.playing) > 0)
 				return;
 
@@ -75,6 +89,9 @@ namespace Gablarski.Clients.Music
 
 		private void OnAudioSourceStarted (object sender, AudioSourceEventArgs e)
 		{
+			if (!UserTalkingCounts && e.Source.OwnerId == context.CurrentUser.UserId)
+				return;
+
 			if (Interlocked.Increment (ref this.playing) > 1)
 				return;
 

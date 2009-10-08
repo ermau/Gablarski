@@ -246,6 +246,8 @@ namespace Gablarski.Client
 				throw new ArgumentNullException ("channel");
 
 			this.context.Connection.Send (new ClientAudioSourceStateChangeMessage (true, source.Id, channel.ChannelId));
+
+			OnAudioSourceStarted (new AudioSourceEventArgs (source));
 		}
 
 		/// <summary>
@@ -295,6 +297,8 @@ namespace Gablarski.Client
 				throw new ArgumentNullException ("channel");
 
 			this.context.Connection.Send (new ClientAudioSourceStateChangeMessage (false, source.Id, channel.ChannelId));
+
+			OnAudioSourceStopped (new AudioSourceEventArgs (source));
 		}
 
 		public void ToggleMute (AudioSource source)

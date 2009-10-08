@@ -89,8 +89,6 @@ namespace Gablarski.Audio
 
 	public interface IAudioEngine
 	{
-		event EventHandler<CaptureSourceStateChangedEventArgs> CaptureSourceStateChanged;
-
 		IClientContext Context { get; set; }
 
 		/// <summary>
@@ -147,17 +145,5 @@ namespace Gablarski.Audio
 
 		void BeginCapture (AudioSource source, ChannelInfo channel);
 		void EndCapture (AudioSource source, ChannelInfo channel);
-	}
-
-	public class CaptureSourceStateChangedEventArgs
-		: AudioSourceEventArgs
-	{
-		public CaptureSourceStateChangedEventArgs (AudioSource source, bool talking)
-			: base (source)
-		{
-			this.Talking = talking;
-		}
-
-		public bool Talking { get; private set; }
 	}
 }

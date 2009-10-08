@@ -62,6 +62,7 @@
 			this.volumeControl = new System.Windows.Forms.CheckBox ();
 			this.label1 = new System.Windows.Forms.Label ();
 			this.musicPlayers = new System.Windows.Forms.CheckedListBox ();
+			this.musicIgnoreYou = new System.Windows.Forms.CheckBox ();
 			this.tabs.SuspendLayout ();
 			this.displayTab.SuspendLayout ();
 			this.controlsTab.SuspendLayout ();
@@ -323,6 +324,7 @@
 			// 
 			// musicTab
 			// 
+			this.musicTab.Controls.Add (this.musicIgnoreYou);
 			this.musicTab.Controls.Add (this.label9);
 			this.musicTab.Controls.Add (this.label8);
 			this.musicTab.Controls.Add (this.label7);
@@ -447,6 +449,18 @@
 			this.musicPlayers.Size = new System.Drawing.Size (294, 64);
 			this.musicPlayers.TabIndex = 1;
 			// 
+			// musicIgnoreYou
+			// 
+			this.musicIgnoreYou.AutoSize = true;
+			this.musicIgnoreYou.Checked = true;
+			this.musicIgnoreYou.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.musicIgnoreYou.Location = new System.Drawing.Point (184, 89);
+			this.musicIgnoreYou.Name = "musicIgnoreYou";
+			this.musicIgnoreYou.Size = new System.Drawing.Size (119, 17);
+			this.musicIgnoreYou.TabIndex = 12;
+			this.musicIgnoreYou.Text = "Ignore your sources";
+			this.musicIgnoreYou.UseVisualStyleBackColor = true;
+			// 
 			// SettingsForm
 			// 
 			this.AcceptButton = this.btnOk;
@@ -515,5 +529,6 @@
 		private System.Windows.Forms.Label label9;
 		private System.Windows.Forms.Label label8;
 		private System.Windows.Forms.Label label7;
+		private System.Windows.Forms.CheckBox musicIgnoreYou;
 	}
 }

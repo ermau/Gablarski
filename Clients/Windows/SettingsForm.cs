@@ -47,6 +47,7 @@ namespace Gablarski.Clients.Windows
 			{
 				this.musicPlayers.Items.Add (player.Name.Remove ("Integration", "Provider"), Settings.EnabledMediaPlayerIntegrations.Any (s => s.Contains (player.FullName)));
 			}
+			this.musicIgnoreYou.Checked = Settings.MediaVolumeControlIgnoresYou;
 		}
 
 		private void btnOk_Click (object sender, EventArgs e)
@@ -67,6 +68,7 @@ namespace Gablarski.Clients.Windows
 			Settings.TalkingMusicVolume = this.talkingVolume.Value;
 			Settings.NormalMusicVolume = this.normalVolume.Value;
 			//Settings.EnabledMediaPlayerIntegrations = this.musicPlayers.CheckedItems.Cast<string>()
+			Settings.MediaVolumeControlIgnoresYou = this.musicIgnoreYou.Checked;
 
 			Settings.SaveSettings();
 

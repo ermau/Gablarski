@@ -47,8 +47,6 @@ namespace Gablarski.Audio
 	public class AudioEngine
 		: IAudioEngine
 	{
-		public event EventHandler<CaptureSourceStateChangedEventArgs> CaptureSourceStateChanged;
-
 		public IClientContext Context
 		{
 			get;
@@ -174,7 +172,7 @@ namespace Gablarski.Audio
 			if (source == null)
 				throw new ArgumentNullException ("source");
 
-			bool removed = false;
+			bool removed;
 			lock (captures)
 			{
 				removed = captures.Remove (source);
@@ -327,13 +325,6 @@ namespace Gablarski.Audio
 			playbackLock.ExitReadLock();
 		}
 
-		protected void OnCaptureSourceStateChanged (CaptureSourceStateChangedEventArgs e)
-		{
-			var changed = this.CaptureSourceStateChanged;
-			if (changed != null)
-				changed (this, e);
-		}
-
 		private void Engine ()
 		{
 			while (this.running)
@@ -361,19 +352,13 @@ namespace Gablarski.Audio
 								talking = c.Value.VoiceActivation.IsTalking (samples);
 
 								if (talking && !c.Value.Talking)
-								{
 									AudioSender.BeginSending (c.Key, Context.GetCurrentChannel());
-									OnCaptureSourceStateChanged (new CaptureSourceStateChangedEventArgs (c.Key, true));
-								}
 							}
 
 							if (talking)
 								AudioSender.SendAudioData (c.Key, Context.GetCurrentChannel(), samples);
 							else if (c.Value.Talking && c.Value.Options.Mode == AudioEngineCaptureMode.Activated)
-							{
-								OnCaptureSourceStateChanged (new CaptureSourceStateChangedEventArgs (c.Key, false));
 								AudioSender.EndSending (c.Key, Context.GetCurrentChannel());
-							}
 
 							c.Value.Talking = talking;
 						}

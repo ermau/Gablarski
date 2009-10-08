@@ -41,7 +41,7 @@ namespace Gablarski.Audio.OpenAL.Providers
 
 			Source source = this.pool.RequestSource (audioSource);
 
-			const int bufferLen = 4;
+			const int bufferLen = 6;
 
 			if (data.Length == 0)
 				return;

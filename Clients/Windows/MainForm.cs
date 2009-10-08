@@ -38,27 +38,18 @@ namespace Gablarski.Clients.Windows
 			this.gablarski.Sources.AudioSourceStopped += SourceStoped;
 			this.gablarski.Sources.AudioSourceStarted += SourceStarted;
 
-			this.gablarski.Audio.CaptureSourceStateChanged += OnCaptureSourceStateChanged;
-
-			this.mediaPlayerIntegration = new MediaPlayerIntegration (this.gablarski.Sources,
+			this.mediaPlayerIntegration = new MediaPlayerIntegration (this.gablarski, this.gablarski.Sources,
 			                                                          Settings.EnabledMediaPlayerIntegrations.Select (
 			                                                          	s => (IMediaPlayer)Activator.CreateInstance (Type.GetType (s))).ToList());
 			this.mediaPlayerIntegration.NormalVolume = Settings.NormalMusicVolume;
 			this.mediaPlayerIntegration.TalkingVolume = Settings.TalkingMusicVolume;
+			this.mediaPlayerIntegration.UserTalkingCounts = !Settings.MediaVolumeControlIgnoresYou;
 
 			Settings.SettingChanged += SettingsSettingChanged;
 
 			this.InitializeComponent ();
 
 			this.users.Client = this.gablarski;
-		}
-
-		void OnCaptureSourceStateChanged (object sender, CaptureSourceStateChangedEventArgs e)
-		{
-			if (e.Talking)
-				this.users.MarkTalking (e.Source);
-			else
-				this.users.MarkSilent (e.Source);
 		}
 
 		private void SourcesOnReceivedSourceList(object sender, ReceivedListEventArgs<AudioSource> args)
@@ -188,6 +179,10 @@ namespace Gablarski.Clients.Windows
 
 				case Settings.NormalMusicVolumeSettingName:
 					this.mediaPlayerIntegration.NormalVolume = Settings.NormalMusicVolume;
+					break;
+
+				case Settings.MediaVolumeControlIgnoresYouSettingName:
+					this.mediaPlayerIntegration.UserTalkingCounts = !Settings.MediaVolumeControlIgnoresYou;
 					break;
 
 				case "VoiceProvider":
@@ -505,7 +500,7 @@ namespace Gablarski.Clients.Windows
 		}
 
 		private ICaptureProvider musicprovider;
-		private MediaPlayerIntegration mediaPlayerIntegration;
+		private readonly MediaPlayerIntegration mediaPlayerIntegration;
 
 		private void musicButton_Click (object sender, EventArgs e)
 		{

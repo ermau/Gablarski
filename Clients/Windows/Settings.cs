@@ -128,6 +128,17 @@ namespace Gablarski.Clients.Windows
 			}
 		}
 
+		public const string MediaVolumeControlIgnoresYouSettingName = "MediaVolumeControlIgnoresYou";
+		public static bool MediaVolumeControlIgnoresYou
+		{
+			get { return GetSetting (MediaVolumeControlIgnoresYouSettingName, true); }
+			set
+			{
+				if (SetSetting (MediaVolumeControlIgnoresYouSettingName, value))
+					OnSettingsChanged (MediaVolumeControlIgnoresYouSettingName);
+			}
+		}
+
 		public const string TalkingMusicVolumeSettingName = "TalkingMusicVolume";
 		public static int TalkingMusicVolume
 		{
