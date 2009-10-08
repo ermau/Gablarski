@@ -360,7 +360,7 @@ namespace Gablarski.Audio
 							{
 								talking = c.Value.VoiceActivation.IsTalking (samples);
 
-								if (!c.Value.Talking)
+								if (talking && !c.Value.Talking)
 								{
 									AudioSender.BeginSending (c.Key, Context.GetCurrentChannel());
 									OnCaptureSourceStateChanged (new CaptureSourceStateChangedEventArgs (c.Key, true));
