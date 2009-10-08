@@ -47,7 +47,7 @@ using Gablarski.Messages;
 namespace Gablarski.Client
 {
 	public class ClientSourceManager
-		: IAudioReceiver, IIndexedEnumerable<int, ClientAudioSource>, INotifyCollectionChanged
+		: IAudioSender, IAudioReceiver, IIndexedEnumerable<int, AudioSource>, INotifyCollectionChanged
 	{
 		protected internal ClientSourceManager (IClientContext context)
 		{
@@ -71,7 +71,7 @@ namespace Gablarski.Client
 		/// <summary>
 		/// An audio source was removed.
 		/// </summary>
-		public event EventHandler<ReceivedListEventArgs<ClientAudioSource>> AudioSourcesRemoved;
+		public event EventHandler<ReceivedListEventArgs<AudioSource>> AudioSourcesRemoved;
 
 		/// <summary>
 		/// An audio source started playing.
@@ -97,36 +97,36 @@ namespace Gablarski.Client
 		/// The collection of sources has changed.
 		/// </summary>
 		public event NotifyCollectionChangedEventHandler CollectionChanged;
-
-		ChannelInfo IAudioReceiver.CurrentChannel
-		{
-			get { return context.Channels[context.CurrentUser.CurrentChannelId]; }
-		}
 		#endregion
 
 		/// <summary>
 		/// Gets a listing of the sources that belong to the current user.
 		/// </summary>
-		public IEnumerable<OwnedAudioSource> Mine
-		{
-			get { return this.OfType<OwnedAudioSource>(); }
-		}
-
-		public ClientAudioSource this[int sourceID]
+		public IEnumerable<AudioSource> Mine
 		{
 			get
 			{
-				ClientAudioSource source;
+				lock (this.sources)
+				{
+					return this.Where (s => s.OwnerId == context.CurrentUser.UserId).ToList();
+				}
+			}
+		}
+
+		public AudioSource this[int sourceID]
+		{
+			get
+			{
+				AudioSource source;
 				lock (this.sources)
 				{
 					this.sources.TryGetValue (sourceID, out source);
 				}
-
 				return source;
 			}
 		}
 
-		public IEnumerable<ClientAudioSource> this[UserInfo user]
+		public IEnumerable<AudioSource> this[UserInfo user]
 		{
 			get
 			{
@@ -146,7 +146,7 @@ namespace Gablarski.Client
 		/// A <see cref="T:System.Collections.Generic.IEnumerator`1"/> that can be used to iterate through the collection.
 		/// </returns>
 		/// <filterpriority>1</filterpriority>
-		public IEnumerator<ClientAudioSource> GetEnumerator()
+		public IEnumerator<AudioSource> GetEnumerator()
 		{
 			if (this.sources == null)
 				yield break;
@@ -228,18 +228,117 @@ namespace Gablarski.Client
 			}
 		}
 
+		/// <summary>
+		/// Sends notifications that you're begining to send audio from <paramref name="source"/> to <paramref name="channel"/>.
+		/// </summary>
+		/// <param name="source">The source to send from.</param>
+		/// <param name="channel">The channel to send to.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
+		/// <exception cref="ArgumentException"><paramref name="source"/> does not belong to you.</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="channel"/> is <c>null</c>.</exception>
+		public void BeginSending (AudioSource source, ChannelInfo channel)
+		{
+			if (source == null)
+				throw new ArgumentNullException ("source");
+			if (source.OwnerId != this.context.CurrentUser.UserId)
+				throw new ArgumentException ("Can not send audio from a source you don't own", "source");
+			if (channel == null)
+				throw new ArgumentNullException ("channel");
+
+			this.context.Connection.Send (new ClientAudioSourceStateChangeMessage (true, source.Id, channel.ChannelId));
+		}
+
+		/// <summary>
+		/// Sends a frame of audio data to the source
+		/// </summary>
+		/// <param name="source">The source to send from.</param>
+		/// <param name="channel">The channel to send to.</param>
+		/// <param name="data"></param>
+		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
+		/// <exception cref="ArgumentException"><paramref name="source"/> does not belong to you.</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="channel"/> is <c>null</c>.</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="data"/> is <c>null</c>.</exception>
+		/// <exception cref="ArgumentException"><paramref name="data"/> is empty.</exception>
+		public void SendAudioData (AudioSource source, ChannelInfo channel, byte[] data)
+		{
+			#if DEBUG
+			if (source == null)
+				throw new ArgumentNullException ("source");
+			if (source.OwnerId != this.context.CurrentUser.UserId)
+				throw new ArgumentException ("Can not send audio from a source you don't own", "source");
+			if (channel == null)
+				throw new ArgumentNullException ("channel");
+			if (data == null)
+				throw new ArgumentNullException ("data");
+			if (data.Length == 0)
+				throw new ArgumentException ("Audio frame can not be empty", "data");
+			#endif
+
+			this.context.Connection.Send (new SendAudioDataMessage (channel.ChannelId, source.Id, source.Encode (data)));
+		}
+
+		/// <summary>
+		/// Sends notifications that you're finished sending audio from <paramref name="source"/> to <paramref name="channel"/>.
+		/// </summary>
+		/// <param name="source">The source to send from.</param>
+		/// <param name="channel">The channel to send to.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
+		/// <exception cref="ArgumentException"><paramref name="source"/> does not belong to you.</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="channel"/> is <c>null</c>.</exception>
+		public void EndSending (AudioSource source, ChannelInfo channel)
+		{
+			if (source == null)
+				throw new ArgumentNullException ("source");
+			if (source.OwnerId != this.context.CurrentUser.UserId)
+				throw new ArgumentException ("Can not send audio from a source you don't own", "source");
+			if (channel == null)
+				throw new ArgumentNullException ("channel");
+
+			this.context.Connection.Send (new ClientAudioSourceStateChangeMessage (false, source.Id, channel.ChannelId));
+		}
+
+		public void ToggleMute (AudioSource source)
+		{
+			context.Connection.Send (new RequestMuteMessage { Target = source.Id, Type = MuteType.AudioSource, Unmute = source.IsMuted });
+		}
+
+		public bool GetIsIgnored (AudioSource source)
+		{
+			lock (sources)
+			{
+				return ignoredSources.Contains (source);
+			}
+		}
+
+		/// <returns>The new state of ignore on <paramref name="source"/>.</returns>
+		public bool ToggleIgnore (AudioSource source)
+		{
+			lock (sources)
+			{
+				bool ignored = ignoredSources.Contains (source);
+
+				if (ignored)
+					ignoredSources.Remove (source);
+				else
+					ignoredSources.Add (source);
+
+				return !ignored;
+			}
+		}
+
 		private readonly IClientContext context;
-		private readonly Dictionary<int, ClientAudioSource> sources = new Dictionary<int, ClientAudioSource>();
+		private readonly Dictionary<int, AudioSource> sources = new Dictionary<int, AudioSource>();
+		private readonly HashSet<AudioSource> ignoredSources = new HashSet<AudioSource>();
 
 		// We'll end up with new instances from the outside world, we can update our
 		// own instances no problem.
-		internal void UpdateSourceFromExternal (ClientAudioSource updatedSource)
+		internal void UpdateSourceFromExternal (AudioSource updatedSource)
 		{
 			NotifyCollectionChangedEventArgs collectionChanged;
 
 			lock (sources)
 			{
-				ClientAudioSource source;
+				AudioSource source;
 				if (!sources.TryGetValue (updatedSource.Id, out source))
 				{
 					sources[updatedSource.Id] = source = updatedSource;
@@ -255,10 +354,10 @@ namespace Gablarski.Client
 			OnCollectionChanged (collectionChanged);
 		}
 
-		internal void UpdateSourcesFromExternal (IEnumerable<ClientAudioSource> updatedSources)
+		internal void UpdateSourcesFromExternal (IEnumerable<AudioSource> updatedSources)
 		{
-			IEnumerable<ClientAudioSource> updatedAndNew;
-			IEnumerable<ClientAudioSource> deleted;
+			IEnumerable<AudioSource> updatedAndNew;
+			IEnumerable<AudioSource> deleted;
 
 			lock (sources)
 			{
@@ -300,7 +399,7 @@ namespace Gablarski.Client
 
 			lock (sources)
 			{
-				UpdateSourcesFromExternal (msg.Sources.Select (s => (s.OwnerId == context.CurrentUser.UserId) ? new OwnedAudioSource (s, this.context.Connection) : new ClientAudioSource (s, this.context.Connection)));
+				UpdateSourcesFromExternal (msg.Sources);
 			}
 
 			OnReceivedSourceList (new ReceivedListEventArgs<AudioSource> (msg.Sources));
@@ -308,23 +407,21 @@ namespace Gablarski.Client
 
 		internal void OnSourceResultMessage (MessageReceivedEventArgs e)
 		{
-		    var sourceMessage = (SourceResultMessage)e.Message;
+		    var msg = (SourceResultMessage)e.Message;
 
-			var source = (sourceMessage.Source.OwnerId.Equals (context.CurrentUser.UserId))
-			              	? new OwnedAudioSource (sourceMessage.Source, this.context.Connection)
-			              	: new ClientAudioSource (sourceMessage.Source, this.context.Connection);
+			var source = new AudioSource (msg.Source);
 
-			if (sourceMessage.SourceResult == SourceResult.Succeeded || sourceMessage.SourceResult == SourceResult.NewSource)
+			if (msg.SourceResult == SourceResult.Succeeded || msg.SourceResult == SourceResult.NewSource)
 				UpdateSourceFromExternal (source);
 
-		    OnReceivedSource (new ReceivedAudioSourceEventArgs (source, sourceMessage.SourceResult));
+		    OnReceivedSource (new ReceivedAudioSourceEventArgs (source, msg.SourceResult));
 		}
 
 		internal void OnSourcesRemovedMessage (MessageReceivedEventArgs e)
 		{
 			var sourceMessage = (SourcesRemovedMessage)e.Message;
 
-			List<ClientAudioSource> removed = new List<ClientAudioSource>();
+			List<AudioSource> removed = new List<AudioSource>();
 			lock (sources)
 			{
 				foreach (int id in sourceMessage.SourceIds)
@@ -337,7 +434,7 @@ namespace Gablarski.Client
 				}
 			}
 
-			OnSourcesRemoved (new ReceivedListEventArgs<ClientAudioSource> (removed));
+			OnSourcesRemoved (new ReceivedListEventArgs<AudioSource> (removed));
 			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Remove, removed));
 		}
 
@@ -361,21 +458,28 @@ namespace Gablarski.Client
 			var msg = (AudioDataReceivedMessage)e.Message;
 
 			var source = this[msg.SourceId];
-			if (source == null || source.IsIgnored)
+			if (source == null || GetIsIgnored (source))
 				return;
 
 			var user = this.context.Users[source.OwnerId];
 			if (user != null && !user.IsIgnored)
-				OnReceivedAudio (new ReceivedAudioEventArgs (source, /*msg.Sequence,*/ msg.Data));
+				OnReceivedAudio (new ReceivedAudioEventArgs (source, msg.Data));
 		}
 
 		internal void OnMutedMessage (int sourceId, bool unmuted)
 		{
-			var source = this[sourceId];
-			if (source == null)
-				return;
+			AudioSource source;
+			lock (sources)
+			{
+				sources.TryGetValue (sourceId, out source);
+				if (source == null)
+					return;
+
+				source.IsMuted = !unmuted;
+			}
 
 			OnAudioSourceMuted (new AudioSourceMutedEventArgs (source, unmuted));
+			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Replace, source, source));
 		}
 
 		#region Event Invokers
@@ -414,7 +518,7 @@ namespace Gablarski.Client
 				received (this, e);
 		}
 
-		protected virtual void OnSourcesRemoved (ReceivedListEventArgs<ClientAudioSource> e)
+		protected virtual void OnSourcesRemoved (ReceivedListEventArgs<AudioSource> e)
 		{
 			var removed = this.AudioSourcesRemoved;
 			if (removed != null)
@@ -441,7 +545,7 @@ namespace Gablarski.Client
 	public class AudioSourceMutedEventArgs
 		: AudioSourceEventArgs
 	{
-		public AudioSourceMutedEventArgs (ClientAudioSource source, bool unmuted)
+		public AudioSourceMutedEventArgs (AudioSource source, bool unmuted)
 			: base (source)
 		{
 			this.Unmuted = unmuted;
@@ -453,7 +557,7 @@ namespace Gablarski.Client
 	public class ReceivedAudioSourceEventArgs
 		: EventArgs
 	{
-		public ReceivedAudioSourceEventArgs (ClientAudioSource source, SourceResult result)
+		public ReceivedAudioSourceEventArgs (AudioSource source, SourceResult result)
 		{
 			this.Result = result;
 			this.Source = source;
@@ -471,7 +575,7 @@ namespace Gablarski.Client
 		/// <summary>
 		/// Gets the media source of the event.
 		/// </summary>
-		public ClientAudioSource Source
+		public AudioSource Source
 		{
 			get;
 			private set;

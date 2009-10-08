@@ -49,6 +49,12 @@ namespace Gablarski.Audio
 	{
 		public event EventHandler<CaptureSourceStateChangedEventArgs> CaptureSourceStateChanged;
 
+		public IClientContext Context
+		{
+			get;
+			set;
+		}
+
 		/// <summary>
 		/// Gets or sets the audio receiver
 		/// </summary>
@@ -63,6 +69,12 @@ namespace Gablarski.Audio
 				this.audioReceiver = value;
 			}
 		}
+		
+		public IAudioSender AudioSender
+		{
+			get;
+			set;
+		}
 
 		public void Attach (IPlaybackProvider playback, IEnumerable<AudioSource> sources, AudioEnginePlaybackOptions options)
 		{
@@ -75,13 +87,8 @@ namespace Gablarski.Audio
 
 			playbackLock.EnterWriteLock();
 			{
-				foreach (var s in sources)
-				{
-					if (playbacks.ContainsKey (s) && !(s is ClientAudioSource))
-						continue;
-
+				foreach (var s in sources.Where (s => !playbacks.ContainsKey (s) && s.OwnerId != Context.CurrentUser.UserId))
 					playbacks.Add (s, new AudioPlaybackEntity (playback, s, options));
-				}
 			}
 			playbackLock.ExitWriteLock();
 		}
@@ -102,7 +109,7 @@ namespace Gablarski.Audio
 			playbackLock.ExitWriteLock();
 		}
 
-		public void Attach (ICaptureProvider capture, AudioFormat format, OwnedAudioSource source, AudioEngineCaptureOptions options)
+		public void Attach (ICaptureProvider capture, AudioFormat format, AudioSource source, AudioEngineCaptureOptions options)
 		{
 			if (capture == null)
 				throw new ArgumentNullException ("capture");
@@ -168,9 +175,10 @@ namespace Gablarski.Audio
 				throw new ArgumentNullException ("source");
 
 			bool removed = false;
-			var osource = source as OwnedAudioSource;
-			if (osource != null)
-				removed = Detatch (osource);
+			lock (captures)
+			{
+				removed = captures.Remove (source);
+			}
 
 			if (!removed)
 			{
@@ -184,21 +192,7 @@ namespace Gablarski.Audio
 			return removed;
 		}
 
-		public bool Detatch (OwnedAudioSource source)
-		{
-			if (source == null)
-				throw new ArgumentNullException ("source");
-
-			bool removed;
-			lock (captures)
-			{
-				removed = captures.Remove (source);
-			}
-
-			return removed;
-		}
-
-		public void BeginCapture (OwnedAudioSource source, ChannelInfo channel)
+		public void BeginCapture (AudioSource source, ChannelInfo channel)
 		{
 			#if DEBUG
 			if (source == null)
@@ -209,20 +203,32 @@ namespace Gablarski.Audio
 
 			lock (captures)
 			{
-				captures[source].BeginCapture (channel);
+				AudioCaptureEntity e;
+				if (!captures.TryGetValue (source, out e))
+					return;
+
+				AudioSender.BeginSending (source, channel);
+				e.Capture.BeginCapture (AudioFormat.Mono16Bit);
 			}
 		}
 
-		public void EndCapture (OwnedAudioSource source)
+		public void EndCapture (AudioSource source, ChannelInfo channel)
 		{
 			#if DEBUG
 			if (source == null)
-				throw new ArgumentNullException ("source");				
+				throw new ArgumentNullException ("source");
+			if (channel == null)
+				throw new ArgumentNullException ("channel");
 			#endif
 
 			lock (captures)
 			{
-				captures[source].EndCapture();
+				AudioCaptureEntity e;
+				if (!captures.TryGetValue (source, out e))
+					return;
+
+				AudioSender.EndSending (source, channel);
+				e.Capture.EndCapture ();
 			}
 		}
 
@@ -272,7 +278,7 @@ namespace Gablarski.Audio
 
 		private volatile bool running;
 		
-		private readonly Dictionary<OwnedAudioSource, AudioCaptureEntity> captures = new Dictionary<OwnedAudioSource, AudioCaptureEntity>();
+		private readonly Dictionary<AudioSource, AudioCaptureEntity> captures = new Dictionary<AudioSource, AudioCaptureEntity>();
 		private readonly Dictionary<AudioSource, AudioPlaybackEntity> playbacks = new Dictionary<AudioSource, AudioPlaybackEntity>();
 		private readonly List<IPlaybackProvider> playbackProviders = new List<IPlaybackProvider>();
 		private readonly ReaderWriterLockSlim playbackLock = new ReaderWriterLockSlim();
@@ -343,29 +349,31 @@ namespace Gablarski.Audio
 						if (!c.Value.Capture.IsCapturing && c.Value.Options.Mode == AudioEngineCaptureMode.Explicit)
 							continue;
 
-						if (c.Value.Capture.AvailableSampleCount < c.Key.FrameSize)
-							continue;
-
-						bool talking = true;
-
-						byte[] samples = c.Value.Capture.ReadSamples (c.Key.FrameSize);
-						if (c.Value.Options.Mode == AudioEngineCaptureMode.Activated)
-							talking = c.Value.VoiceActivation.IsTalking (samples);
-
-						if (talking)
+						while (c.Value.Capture.AvailableSampleCount > c.Key.FrameSize)
 						{
-							if (!c.Value.Talking)
+							bool talking = true;
+
+							byte[] samples = c.Value.Capture.ReadSamples (c.Key.FrameSize);
+							if (c.Value.Options.Mode == AudioEngineCaptureMode.Activated)
+								talking = c.Value.VoiceActivation.IsTalking (samples);
+
+							if (talking)
 							{
-								c.Value.BeginCapture (this.AudioReceiver.CurrentChannel);
-								OnCaptureSourceStateChanged (new CaptureSourceStateChangedEventArgs (c.Key, true));
+								if (!c.Value.Talking)
+								{
+									AudioSender.BeginSending (c.Key, Context.GetCurrentChannel());
+									OnCaptureSourceStateChanged (new CaptureSourceStateChangedEventArgs (c.Key, true));
+								}
+
+								AudioSender.SendAudioData (c.Key, Context.GetCurrentChannel(), samples);
+							}
+							else if (c.Value.Talking)
+							{
+								OnCaptureSourceStateChanged (new CaptureSourceStateChangedEventArgs (c.Key, false));
+								AudioSender.EndSending (c.Key, Context.GetCurrentChannel());
 							}
 
-							c.Key.SendAudioData (samples);
-						}
-						else if (c.Value.Talking)
-						{
-							OnCaptureSourceStateChanged (new CaptureSourceStateChangedEventArgs (c.Key, false));
-							c.Value.EndCapture();
+							c.Value.Talking = talking;
 						}
 					}
 				}

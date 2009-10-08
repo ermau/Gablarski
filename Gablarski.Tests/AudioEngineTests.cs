@@ -14,13 +14,13 @@ namespace Gablarski.Tests
 	{
 		private IAudioReceiver receiver;
 		private ICaptureProvider provider;
-		private OwnedAudioSource source;
+		private AudioSource source;
 
 		[SetUp]
 		public void Setup()
 		{
 			this.provider = new MockCaptureProvider();
-			this.source = new OwnedAudioSource (new AudioSource ("mockSource", 1, 1, 1, 64000, 44100, 256, 10, false), new MockClientConnection (new MockServerConnection()));
+			this.source = new AudioSource ("mockSource", 1, 1, 1, 64000, 44100, 256, 10, false);
 			this.receiver = new GablarskiClient (new MockClientConnection (new MockConnectionProvider().EstablishConnection())).Sources;
 		}
 

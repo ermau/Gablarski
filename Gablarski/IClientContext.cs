@@ -63,7 +63,7 @@ namespace Gablarski
 		/// <summary>
 		/// Gets the sources in this context.
 		/// </summary>
-		IIndexedEnumerable<int, ClientAudioSource> Sources { get; }
+		IIndexedEnumerable<int, AudioSource> Sources { get; }
 
 		/// <summary>
 		/// Gets the user associated with this context
@@ -74,5 +74,13 @@ namespace Gablarski
 		/// Gets the current logged in user.
 		/// </summary>
 		CurrentUser CurrentUser { get; }
+	}
+
+	public static class ContextExtensions
+	{
+		public static ChannelInfo GetCurrentChannel (this IClientContext self)
+		{
+			return self.Channels[self.CurrentUser.CurrentChannelId];
+		}
 	}
 }

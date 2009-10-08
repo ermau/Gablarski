@@ -101,8 +101,8 @@ namespace Gablarski.Clients.Windows
 
 		private IPlaybackProvider playback;
 		private ICaptureProvider voiceCapture;
-		private OwnedAudioSource voiceSource;
-		private OwnedAudioSource musicSource;
+		private AudioSource voiceSource;
+		private AudioSource musicSource;
 
 		private void MainForm_Load (object sender, EventArgs e)
 		{
@@ -121,7 +121,7 @@ namespace Gablarski.Clients.Windows
 				if (this.voiceSource != null)
 				{
 					gablarski.Audio.Detach (this.voiceSource);
-					this.voiceSource.EndSending();
+					gablarski.Sources.EndSending (voiceSource, gablarski.CurrentChannel);
 				}
 
 				if (this.voiceCapture != null)
@@ -262,7 +262,7 @@ namespace Gablarski.Clients.Windows
 			else
 			{
 				this.users.MarkSilent (this.gablarski.CurrentUser);
-				this.gablarski.Audio.EndCapture (voiceSource);
+				this.gablarski.Audio.EndCapture (voiceSource, this.gablarski.CurrentChannel);
 			}
 		}
 
@@ -276,7 +276,7 @@ namespace Gablarski.Clients.Windows
 			this.users.MarkSilent (this.gablarski.Users[e.Source.OwnerId]);
 		}
 
-		void SourcesRemoved (object sender, ReceivedListEventArgs<ClientAudioSource> e)
+		void SourcesRemoved (object sender, ReceivedListEventArgs<AudioSource> e)
 		{
 			foreach (var s in e.Data)
 				this.gablarski.Audio.Detach (s);
@@ -288,7 +288,7 @@ namespace Gablarski.Clients.Windows
 			{
 				if (e.Source.Name == VoiceName)
 				{
-					voiceSource = (OwnedAudioSource)e.Source;
+					voiceSource = e.Source;
 					gablarski.Audio.Attach (voiceCapture, AudioFormat.Mono16Bit, voiceSource,
 					                        new AudioEngineCaptureOptions
 					                        {
@@ -300,7 +300,7 @@ namespace Gablarski.Clients.Windows
 				}
 				else if (e.Source.Name == MusicName)
 				{
-					musicSource = (OwnedAudioSource)e.Source;
+					musicSource = e.Source;
 					gablarski.Audio.Attach (musicprovider, AudioFormat.Mono16Bit, musicSource,
 					                        new AudioEngineCaptureOptions { Mode = AudioEngineCaptureMode.Explicit });
 					gablarski.Audio.BeginCapture (musicSource, gablarski.CurrentChannel);
@@ -316,7 +316,7 @@ namespace Gablarski.Clients.Windows
 		{
 			if (e.User.Equals (gablarski.CurrentUser) && musicSource != null)
 			{
-				gablarski.Audio.EndCapture (musicSource);
+				gablarski.Audio.EndCapture (musicSource, e.TargetChannel);
 				gablarski.Audio.BeginCapture (musicSource, e.TargetChannel);
 			}
 

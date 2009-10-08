@@ -272,8 +272,6 @@ xcopy /Y "$(SolutionDir)Gablarski\Audio\Speex\libspeexdsp.license.txt" "$(Target
 xcopy /Y "$(SolutionDir)Gablarski\Audio\OpenAL\OpenAL32.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Gablarski\Audio\OpenAL\OpenALSoft.License.txt" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)fluent-nhibernate\tools\NHibernate\*.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)Gablarski.Input.ManagedHooks\bin\$(ConfigurationName)\*.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)Gablarski.Input.ManagedHooks\bin\$(ConfigurationName)\*.pdb" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Gablarski.Input.DirectInput\bin\$(ConfigurationName)\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Gablarski.Input.DirectInput\bin\$(ConfigurationName)\*.pdb" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Gablarski.iTunes\bin\$(ConfigurationName)\*.dll" "$(TargetDir)"

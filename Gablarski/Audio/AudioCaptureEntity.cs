@@ -45,7 +45,7 @@ namespace Gablarski.Audio
 {
 	internal class AudioCaptureEntity
 	{
-		public AudioCaptureEntity (ICaptureProvider capture, AudioFormat format, OwnedAudioSource source, AudioEngineCaptureOptions options)
+		public AudioCaptureEntity (ICaptureProvider capture, AudioFormat format, AudioSource source, AudioEngineCaptureOptions options)
 		{
 			this.format = format;
 			this.capture = capture;
@@ -85,7 +85,7 @@ namespace Gablarski.Audio
 			get { return this.capture; }
 		}
 
-		public OwnedAudioSource Source
+		public AudioSource Source
 		{
 			get { return this.source; }
 		}
@@ -110,41 +110,12 @@ namespace Gablarski.Audio
 			get { return this.activation; }
 		}
 
-		public void BeginCapture (ChannelInfo c)
-		{
-			if (this.Options.Mode == AudioEngineCaptureMode.Explicit)
-				this.capture.BeginCapture (this.format);
-
-			if (this.channel != null && this.channel != c)
-			{
-				this.Source.EndSending();
-				this.channel = null;
-			}
-
-			if (this.channel == null)
-			{
-				this.Talking = true;
-				this.Source.BeginSending (c);
-				this.channel = c;
-			}
-		}
-
-		public void EndCapture()
-		{
-			if (this.Options.Mode == AudioEngineCaptureMode.Explicit)
-				this.capture.EndCapture();
-
-			this.Talking = false;
-			this.Source.EndSending ();
-			this.channel = null;
-		}
-
 		private readonly VoiceActivation activation;
 		private readonly AudioFormat format;
 		private readonly int frameLength;
 		private readonly SpeexPreprocessor preprocessor;
 		private readonly ICaptureProvider capture;
-		private readonly OwnedAudioSource source;
+		private readonly AudioSource source;
 		private readonly AudioEngineCaptureOptions options;
 		private ChannelInfo channel;
 	}

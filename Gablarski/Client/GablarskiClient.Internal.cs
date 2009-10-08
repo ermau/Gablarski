@@ -182,6 +182,7 @@ namespace Gablarski.Client
 		{
 			//if (!this.running)
 			//    return;
+			OnDisconnected (this, EventArgs.Empty);
 
 			this.running = false;
 			lock (this.mqueue)
@@ -201,8 +202,6 @@ namespace Gablarski.Client
 			this.Sources.Clear();
 
 			this.Audio.Stop();
-
-			OnDisconnected (this, EventArgs.Empty);
 		}
 
 		private void OnDisconnectedInternal (object sender, ConnectionEventArgs e)

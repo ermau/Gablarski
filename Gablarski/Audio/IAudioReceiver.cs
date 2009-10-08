@@ -47,15 +47,13 @@ namespace Gablarski.Audio
 		event EventHandler<AudioSourceEventArgs> AudioSourceStarted;
 		event EventHandler<AudioSourceEventArgs> AudioSourceStopped;
 		event EventHandler<ReceivedAudioEventArgs> ReceivedAudio;
-		event EventHandler<ReceivedListEventArgs<ClientAudioSource>> AudioSourcesRemoved;
-
-		ChannelInfo CurrentChannel { get; }
+		event EventHandler<ReceivedListEventArgs<AudioSource>> AudioSourcesRemoved;
 	}
 
 	public class AudioSourceEventArgs
 		: EventArgs
 	{
-		public AudioSourceEventArgs (ClientAudioSource source)
+		public AudioSourceEventArgs (AudioSource source)
 		{
 			this.Source = source;
 		}
@@ -63,7 +61,7 @@ namespace Gablarski.Audio
 		/// <summary>
 		/// Gets the media source audio was received for.
 		/// </summary>
-		public ClientAudioSource Source
+		public AudioSource Source
 		{
 			get;
 			private set;
@@ -73,11 +71,10 @@ namespace Gablarski.Audio
 	public class ReceivedAudioEventArgs
 		: AudioSourceEventArgs
 	{
-		public ReceivedAudioEventArgs (ClientAudioSource source, /*int sequence,*/ byte[] data)
+		public ReceivedAudioEventArgs (AudioSource source, byte[] data)
 			: base (source)
 		{
 			this.AudioData = data;
-			//this.Sequence = sequence;
 		}
 
 		/// <summary>
@@ -88,11 +85,5 @@ namespace Gablarski.Audio
 			get;
 			private set;
 		}
-		
-		//public int Sequence
-		//{
-		//    get;
-		//    private set;
-		//}
 	}
 }

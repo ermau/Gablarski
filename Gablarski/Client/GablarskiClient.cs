@@ -228,6 +228,8 @@ namespace Gablarski.Client
 				Connection.Connect (endPoint);
 				Connection.Send (new ConnectMessage (ApiVersion));
 
+				this.Audio.Context = this;
+				this.Audio.AudioSender = this.Sources;
 				this.Audio.AudioReceiver = this.Sources;
 				this.Audio.Start();
 			}
@@ -288,7 +290,7 @@ namespace Gablarski.Client
 			get { return this.Channels; }
 		}
 
-		IIndexedEnumerable<int, ClientAudioSource> IClientContext.Sources
+		IIndexedEnumerable<int, AudioSource> IClientContext.Sources
 		{
 			get { return this.Sources; }
 		}

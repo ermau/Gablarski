@@ -32,7 +32,7 @@ namespace Gablarski.Clients.CLI
 
 		private static IPlaybackProvider playbackProvider;
 		private static ICaptureProvider captureProvider;
-		private static OwnedAudioSource captureSource;
+		private static AudioSource captureSource;
 
 		public static IPlaybackProvider PlaybackProvider
 		{
@@ -284,14 +284,14 @@ namespace Gablarski.Clients.CLI
 						{
 							if (CaptureProvider.IsCapturing)
 							{
-								captureSource.EndSending ();
+								Client.Sources.EndSending (captureSource, Client.CurrentChannel);
 								CaptureProvider.EndCapture();
 								//Client.Audio.EndCapture (captureSource);
 							}
 						}
 						else
 						{
-							OwnedAudioSource source = captureSource;
+							AudioSource source = captureSource;
 
 							//lock (Sources)
 							//{
@@ -310,7 +310,7 @@ namespace Gablarski.Clients.CLI
 							{
 								if (!CaptureProvider.IsCapturing)
 								{
-									captureSource.BeginSending (Client.Channels[Client.Users.Current.CurrentChannelId]);
+									Client.Sources.BeginSending (captureSource, Client.CurrentChannel);
 									CaptureProvider.BeginCapture (AudioFormat.Mono16Bit);
 									//Client.Audio.BeginCapture (captureSource, Client.Channels[Client.Users.Current.CurrentChannelId]);
 								}
@@ -333,7 +333,7 @@ namespace Gablarski.Clients.CLI
 			}
 		}
 
-		private static void SourcesRemoved (object sender, ReceivedListEventArgs<ClientAudioSource> e)
+		private static void SourcesRemoved (object sender, ReceivedListEventArgs<AudioSource> e)
 		{
 			foreach (var s in e.Data)
 			{
@@ -369,7 +369,7 @@ namespace Gablarski.Clients.CLI
 		static void OnSamplesAvailable (object sender, SamplesAvailableEventArgs e)
 		{
 			if (captureSource != null)
-				captureSource.SendAudioData (CaptureProvider.ReadSamples (captureSource.FrameSize));
+				Client.Sources.SendAudioData (captureSource, Client.CurrentChannel, CaptureProvider.ReadSamples (captureSource.FrameSize));
 		}
 
 		static void ListSources (TextWriter writer)
@@ -394,7 +394,7 @@ namespace Gablarski.Clients.CLI
 				return;
 			}
 
-			captureSource = (OwnedAudioSource)e.Source;
+			captureSource = e.Source;
 			Client.Audio.Attach (captureProvider, AudioFormat.Mono16Bit, captureSource, new AudioEngineCaptureOptions());
 			Console.WriteLine ("Received own source. Name: " + e.Source.Name + " Id: " + e.Source.Id + " Owner: " + e.Source.OwnerId + " Bitrate: " + e.Source.Bitrate);
 		}

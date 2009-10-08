@@ -30,6 +30,17 @@ namespace Gablarski.Tests
 			this.manager = new ClientSourceManager (context);
 		}
 
+		private void CreateSources()
+		{
+			manager.OnSourceListReceivedMessage (new MessageReceivedEventArgs (this.client, 
+			                                                                   new SourceListMessage (new []
+			                                                                   {
+			                                                                   	new AudioSource ("ownvoice", 1, 1, 1, 64000, 44100, 256, 10, false),
+			                                                                   	new AudioSource ("voice", 2, 2, 1, 96000, 44100, 512, 10, true),
+			                                                                   })
+			                                     	));
+		}
+
 		private ClientSourceManager manager;
 		private MockConnectionProvider provider;
 		private MockServerConnection server;
@@ -64,17 +75,10 @@ namespace Gablarski.Tests
 		[Test]
 		public void SourceListReceived()
 		{
-			manager.OnSourceListReceivedMessage (new MessageReceivedEventArgs (this.client, 
-				new SourceListMessage (new []
-				{
-					new AudioSource ("ownvoice", 1, 1, 1, 64000, 44100, 256, 10, false),
-					new AudioSource ("voice", 2, 2, 1, 96000, 44100, 512, 10, true),
-				})
-			));
+			CreateSources();
 
 			var csource = manager.FirstOrDefault (s => s.Id == 1);
 			Assert.IsNotNull (csource, "Source not found");
-			Assert.IsInstanceOf (typeof (OwnedAudioSource), csource);
 			Assert.AreEqual ("ownvoice", csource.Name, "Name not matching");
 			Assert.AreEqual (1, csource.OwnerId, "OwnerId not matching");
 			Assert.AreEqual (1, csource.Channels, "Channels not matching");
@@ -86,7 +90,6 @@ namespace Gablarski.Tests
 
 			var source = manager.FirstOrDefault (s => s.Id == 2);
 			Assert.IsNotNull (source, "Source not found");
-			Assert.IsInstanceOf (typeof (ClientAudioSource), csource);
 			Assert.AreEqual ("voice", source.Name, "Name not matching");
 			Assert.AreEqual (2, source.OwnerId, "OwnerId not matching");
 			Assert.AreEqual (1, source.Channels, "Channels not matching");
@@ -97,6 +100,34 @@ namespace Gablarski.Tests
 			Assert.AreEqual (true, source.IsMuted, "IsMuted not matching");
 		}
 
-		//manager.OnSourceResultMessage (new SourceResultMessage (SourceResult.));
+		[Test]
+		public void ToggleIgnore()
+		{
+			CreateSources();
+
+			var source = manager.First();
+			Assert.IsFalse (manager.GetIsIgnored (source));
+			Assert.IsTrue (manager.ToggleIgnore (source));
+			Assert.IsTrue (manager.GetIsIgnored (source));
+			Assert.IsFalse (manager.ToggleIgnore (source));
+			Assert.IsFalse (manager.GetIsIgnored (source));
+		}
+
+		[Test]
+		public void ToggleIgnorePersisted()
+		{
+			CreateSources();
+
+			var source = manager.First();
+			Assert.IsFalse (manager.GetIsIgnored (source));
+			Assert.IsTrue (manager.ToggleIgnore (source));
+			Assert.IsTrue (manager.GetIsIgnored (source));
+
+			CreateSources();
+
+			Assert.IsTrue (manager.GetIsIgnored (source));
+			Assert.IsFalse (manager.ToggleIgnore (source));
+			Assert.IsFalse (manager.GetIsIgnored (source));
+		}
 	}
 }

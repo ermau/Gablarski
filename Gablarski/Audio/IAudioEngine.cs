@@ -91,10 +91,17 @@ namespace Gablarski.Audio
 	{
 		event EventHandler<CaptureSourceStateChangedEventArgs> CaptureSourceStateChanged;
 
+		IClientContext Context { get; set; }
+
 		/// <summary>
 		/// Gets or sets the audio receiver.
 		/// </summary>
 		IAudioReceiver AudioReceiver { get; set; }
+
+		/// <summary>
+		/// Gets or sets the audio sender.
+		/// </summary>
+		IAudioSender AudioSender { get; set; }
 
 		/// <summary>
 		/// Attaches a playback provider to all <paramref name="sources"/> not already attached, skipping any ClientAudioSources.
@@ -112,7 +119,7 @@ namespace Gablarski.Audio
 		/// <param name="capture">The provider to pump the audio from. (If the device is not preselected, the default device will be used.)</param>
 		/// <param name="source">The audio source to pump the audio to.</param>
 		/// <param name="options">Capturing options.</param>
-		void Attach (ICaptureProvider capture, AudioFormat format, OwnedAudioSource source, AudioEngineCaptureOptions options);
+		void Attach (ICaptureProvider capture, AudioFormat format, AudioSource source, AudioEngineCaptureOptions options);
 
 		/// <summary>
 		/// Stops any captures on the given provider.
@@ -129,13 +136,6 @@ namespace Gablarski.Audio
 		bool Detach (AudioSource source);
 
 		/// <summary>
-		/// Stops any capture to <paramref name="source"/>.
-		/// </summary>
-		/// <param name="source">The source to stop any capturing for.</param>
-		/// <returns><c>true</c> if any capturing was occuring for <paramref name="source"/>.</returns>
-		bool Detatch (OwnedAudioSource source);
-
-		/// <summary>
 		/// Starts the audio engine.
 		/// </summary>
 		void Start();
@@ -145,14 +145,14 @@ namespace Gablarski.Audio
 		/// </summary>
 		void Stop();
 
-		void BeginCapture (OwnedAudioSource source, ChannelInfo channel);
-		void EndCapture (OwnedAudioSource source);
+		void BeginCapture (AudioSource source, ChannelInfo channel);
+		void EndCapture (AudioSource source, ChannelInfo channel);
 	}
 
 	public class CaptureSourceStateChangedEventArgs
 		: AudioSourceEventArgs
 	{
-		public CaptureSourceStateChangedEventArgs (ClientAudioSource source, bool talking)
+		public CaptureSourceStateChangedEventArgs (AudioSource source, bool talking)
 			: base (source)
 		{
 			this.Talking = talking;

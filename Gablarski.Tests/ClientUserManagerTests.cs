@@ -115,5 +115,35 @@ namespace Gablarski.Tests
 			Assert.AreEqual (manager[2].Nickname, old.Nickname);
 			Assert.AreEqual (manager[2].CurrentChannelId, 2);
 		}
+
+		[Test]
+		public void IgnoreUser()
+		{
+			CreateUsers (this.server.Client, this.manager);
+
+			var user = manager.First();
+			int userId = user.UserId;
+			
+			Assert.IsFalse (user.IsIgnored);
+			Assert.IsTrue (user.ToggleIgnore());
+			Assert.IsTrue (manager[userId].IsIgnored);
+		}
+
+		[Test]
+		public void IgnoreUserPersists()
+		{
+			CreateUsers (this.server.Client, this.manager);
+
+			var user = manager.First();
+			int userId = user.UserId;
+			
+			Assert.IsFalse (user.IsIgnored);
+			Assert.IsTrue (user.ToggleIgnore());
+			Assert.IsTrue (manager[userId].IsIgnored);
+
+			CreateUsers (this.server.Client, this.manager);
+
+			Assert.IsTrue (manager[userId].IsIgnored);
+		}
 	}
 }
