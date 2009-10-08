@@ -207,6 +207,7 @@ namespace Gablarski.Audio
 				if (!captures.TryGetValue (source, out e))
 					return;
 
+				e.Talking = true;
 				AudioSender.BeginSending (source, channel);
 				e.Capture.BeginCapture (AudioFormat.Mono16Bit);
 			}
@@ -227,6 +228,7 @@ namespace Gablarski.Audio
 				if (!captures.TryGetValue (source, out e))
 					return;
 
+				e.Talking = false;
 				AudioSender.EndSending (source, channel);
 				e.Capture.EndCapture ();
 			}
@@ -351,23 +353,23 @@ namespace Gablarski.Audio
 
 						while (c.Value.Capture.AvailableSampleCount > c.Key.FrameSize)
 						{
-							bool talking = true;
+							bool talking = c.Value.Talking;
 
 							byte[] samples = c.Value.Capture.ReadSamples (c.Key.FrameSize);
 							if (c.Value.Options.Mode == AudioEngineCaptureMode.Activated)
+							{
 								talking = c.Value.VoiceActivation.IsTalking (samples);
 
-							if (talking)
-							{
 								if (!c.Value.Talking)
 								{
 									AudioSender.BeginSending (c.Key, Context.GetCurrentChannel());
 									OnCaptureSourceStateChanged (new CaptureSourceStateChangedEventArgs (c.Key, true));
 								}
-
-								AudioSender.SendAudioData (c.Key, Context.GetCurrentChannel(), samples);
 							}
-							else if (c.Value.Talking)
+
+							if (talking)
+								AudioSender.SendAudioData (c.Key, Context.GetCurrentChannel(), samples);
+							else if (c.Value.Talking && c.Value.Options.Mode == AudioEngineCaptureMode.Activated)
 							{
 								OnCaptureSourceStateChanged (new CaptureSourceStateChangedEventArgs (c.Key, false));
 								AudioSender.EndSending (c.Key, Context.GetCurrentChannel());
