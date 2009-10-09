@@ -12,6 +12,7 @@ using Gablarski.Clients.Common;
 using Gablarski.Clients.Windows.Entities;
 using Gablarski.Clients.Windows.Properties;
 using Gablarski.Server;
+using Mono.Rocks;
 
 namespace Gablarski.Clients.Windows
 {
@@ -28,22 +29,57 @@ namespace Gablarski.Clients.Windows
 			get; private set;
 		}
 
-		private void DisplayLocalServer (ServerInfo info, IPEndPoint endpoint)
+		private HashSet<IPEndPoint> localServers = new HashSet<IPEndPoint>();
+		private void DisplayLocalServer (IEnumerable<Tuple<ServerInfo, IPEndPoint>> foundServers)
 		{
 			if (this.Disposing || this.IsDisposed)
 				return;
 
 			if (this.InvokeRequired)
 			{
-				BeginInvoke ((Action<ServerInfo, IPEndPoint>)DisplayLocalServer, info, endpoint);
-				return;
+			    BeginInvoke ((Action<IEnumerable<Tuple<ServerInfo, IPEndPoint>>>)DisplayLocalServer, foundServers);
+			    return;
 			}
 
 			var group = this.servers.Groups.Cast<ListViewGroup>().First (g => g.Name == "local");
 
-			var li = servers.Items.Add (endpoint.Address + ":" + endpoint.Port, info.Name, 0);
-			li.Tag = new ServerEntry { Name = info.Name, Host = endpoint.Address.ToString(), Port = endpoint.Port };
-			group.Items.Add (li);
+			servers.BeginUpdate();
+
+			var found = foundServers.ToDictionary (t => t._2);
+			var updated = localServers.Intersect (found.Keys).Select (e => found[e]);
+			var deleted = localServers.Where (s => !found.ContainsKey (s));
+			var newly = foundServers.Where (s => !localServers.Contains (s._2));
+
+			foreach (var server in updated.Concat (newly))
+			{
+				var info = server._1;
+				var endpoint = server._2;
+
+				string key = endpoint.Address + ":" + endpoint.Port;
+
+				ListViewItem li;
+				if (servers.Items.ContainsKey (key))
+				{
+					li = servers.Items[key];
+					li.Text = server._1.Name;
+				}
+				else
+					li = servers.Items.Add (key, info.Name, 0);
+
+				li.Tag = new ServerEntry { Name = info.Name, Host = endpoint.Address.ToString(), Port = endpoint.Port };
+				group.Items.Add (li);
+			}
+
+			foreach (var endpoint in deleted)
+			{
+				string key = endpoint.Address + ":" + endpoint.Port;
+
+				if (servers.Items.ContainsKey (key))
+					servers.Items.RemoveByKey (key);
+			}
+			servers.EndUpdate();
+
+			this.localServers = new HashSet<IPEndPoint> (foundServers.Select (s => s._2));
 		}
 
 		private void servers_SelectedIndexChanged (object sender, EventArgs e)
@@ -177,7 +213,7 @@ namespace Gablarski.Clients.Windows
 			this.servers.BeginUpdate();
 			this.servers.Items.Clear();
 
-			GablarskiClient.FindLocalServers (DisplayLocalServer);
+			GablarskiClient.FindLocalServers (0, DisplayLocalServer, () => !(this.IsDisposed || !this.Visible));
 
 			this.servers.Groups.Add ("local", "Local Servers");
 			var saved = this.servers.Groups.Add ("dbentries", "Saved Servers");

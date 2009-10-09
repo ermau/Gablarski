@@ -44,6 +44,7 @@ using System.Threading;
 using Gablarski.Audio;
 using Gablarski.Messages;
 using Gablarski.Network;
+using Mono.Rocks;
 
 namespace Gablarski.Client
 {
@@ -305,76 +306,93 @@ namespace Gablarski.Client
 		/// <summary>
 		/// Searches for local servers and calls <paramref name="serverFound"/> for each server found.
 		/// </summary>
-		/// <param name="serverFound">Called for each server found.</param>
-		public static void FindLocalServers (Action<ServerInfo, IPEndPoint> serverFound)
+		/// <param name="serversFound">Called each <paramref name="frequency"/> when servers return.</param>
+		/// <param name="frequency">How many milliseconds between arrival of servers and the next query.</param>
+		/// <param name="keepSearching">Returns <c>true</c> to keep searching, <c>false</c> to stop.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="serversFound"/> is <c>null</c>.</exception>
+		public static void FindLocalServers (int frequency, Action<IEnumerable<Tuple<ServerInfo, IPEndPoint>>> serversFound, Func<bool> keepSearching)
 		{
+			if (serversFound == null)
+				throw new ArgumentNullException ("serversFound");
+			if (keepSearching == null)
+				throw new ArgumentNullException ("keepSearching");
+
 			Thread findthread = new Thread (FindLocalServersCore)
 			{
 				IsBackground = true,
 				Name = "FindLocalServers"
 			};
-			findthread.Start (serverFound);
+			findthread.Start (new Tuple<int, Action<IEnumerable<Tuple<ServerInfo, IPEndPoint>>>, Func<bool>> (frequency, serversFound, keepSearching));
 		}
 
 		private static void FindLocalServersCore (object o)
 		{
-			var found = (Action<ServerInfo, IPEndPoint>)o;
+			var found = (Tuple<int, Action<IEnumerable<Tuple<ServerInfo, IPEndPoint>>>, Func<bool>>)o;
 
-			try
+			do
 			{
-				Socket s = new Socket (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-				s.EnableBroadcast = true;
-				s.Bind (new IPEndPoint (IPAddress.Any, 0));
-				s.ReceiveTimeout = 5000;
+				List<Tuple<QueryServerResultMessage, IPEndPoint>> results = new List<Tuple<QueryServerResultMessage, IPEndPoint>>();
 
-				var msg = new QueryServerMessage { ServerInfoOnly = true };
-
-				SocketValueWriter writer = new SocketValueWriter (s, new IPEndPoint (IPAddress.Broadcast, 6112));
-				writer.WriteByte (42);
-				writer.WriteUInt32 (0);
-				writer.WriteUInt16 (msg.MessageTypeCode);
-				msg.WritePayload (writer);
-				writer.Flush();
-
-				EndPoint server = new IPEndPoint (IPAddress.Any, 0);
-				byte[] buffer = new byte[10240];
-				ByteArrayValueReader reader = new ByteArrayValueReader (buffer);
-
-				DateTime start = DateTime.Now;
-
-				do
+				try
 				{
-					try
+					Socket s = new Socket (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+					s.EnableBroadcast = true;
+					s.Bind (new IPEndPoint (IPAddress.Any, 0));
+					s.ReceiveTimeout = 1500;
+
+					var msg = new QueryServerMessage { ServerInfoOnly = true };
+
+					SocketValueWriter writer = new SocketValueWriter (s, new IPEndPoint (IPAddress.Broadcast, 6112));
+					writer.WriteByte (42);
+					writer.WriteUInt32 (0);
+					writer.WriteUInt16 (msg.MessageTypeCode);
+					msg.WritePayload (writer);
+					writer.Flush();
+
+					EndPoint server = new IPEndPoint (IPAddress.Any, 0);
+					byte[] buffer = new byte[131072];
+					ByteArrayValueReader reader = new ByteArrayValueReader (buffer);
+
+					DateTime start = DateTime.Now;
+
+					do
 					{
-						if (s.ReceiveFrom (buffer, ref server) == 0)
+						try
+						{
+							if (s.ReceiveFrom (buffer, ref server) == 0)
+								continue;
+						}
+						catch (SocketException)
+						{
 							continue;
-					}
-					catch (SocketException)
-					{
-						continue;
-					}
+						}
 
-					byte sanity = reader.ReadByte();
-					if (sanity != 42)
-						continue;
+						byte sanity = reader.ReadByte();
+						if (sanity != 42)
+							continue;
 
-					ushort type = reader.ReadUInt16();
+						ushort type = reader.ReadUInt16();
 
-					var result = new QueryServerResultMessage();
-					if (type != result.MessageTypeCode)
-						continue;
+						var result = new QueryServerResultMessage();
+						if (type != result.MessageTypeCode)
+							continue;
 
-					result.ReadPayload (reader);
+						result.ReadPayload (reader);
 
-					found (result.ServerInfo, (IPEndPoint)server);
-				} while (DateTime.Now.Subtract (start).TotalSeconds < 15);
-			}
-			catch (Exception)
-			{
-				#if DEBUG
-				throw;
-				#endif
-			}
+						results.Add (new Tuple<QueryServerResultMessage,IPEndPoint> (result, (IPEndPoint)server));
+					} while (DateTime.Now.Subtract (start).TotalSeconds < 2);
+				}
+				catch (Exception)
+				{
+					#if DEBUG
+					throw;
+					#endif
+				}
+
+				found._2 (results.Select (r => new Tuple<ServerInfo, IPEndPoint> (r._1.ServerInfo, r._2)));
+
+				Thread.Sleep (found._1);
+			} while (found._3());
 		}
 		#endregion
 	}
