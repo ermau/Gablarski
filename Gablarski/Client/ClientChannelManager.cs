@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 
 // Redistribution and use in source and binary forms, with
@@ -44,7 +44,7 @@ using Gablarski.Messages;
 namespace Gablarski.Client
 {
 	public class ClientChannelManager
-		: IIndexedEnumerable<int, ChannelInfo>, INotifyCollectionChanged
+		: IIndexedEnumerable<int, ChannelInfo>
 	{
 		protected internal ClientChannelManager (IClientContext context)
 		{
@@ -64,8 +64,6 @@ namespace Gablarski.Client
 		/// A new or updated player list has been received.
 		/// </summary>
 		public event EventHandler<ReceivedListEventArgs<ChannelInfo>> ReceivedChannelList;
-
-		public event NotifyCollectionChangedEventHandler CollectionChanged;
 		#endregion
 
 		/// <summary>Gets the channel with id <paramref name="channelId"/></summary>
@@ -140,7 +138,6 @@ namespace Gablarski.Client
 			lock (channelLock)
 			{
 				this.channels = null;
-				OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Reset));
 			}
 		}
 
@@ -177,7 +174,6 @@ namespace Gablarski.Client
 			}
 
 			OnReceivedChannelList (new ReceivedListEventArgs<ChannelInfo> (msg.Channels));
-			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Reset));
 		}
 
 		internal void OnChannelEditResultMessage (MessageReceivedEventArgs e)
@@ -205,13 +201,6 @@ namespace Gablarski.Client
 			var received = this.ReceivedChannelEditResult;
 			if (received != null)
 				received (this, e);
-		}
-
-		protected virtual void OnCollectionChanged (NotifyCollectionChangedEventArgs e)
-		{
-			var changed = this.CollectionChanged;
-			if (changed != null)
-				changed (this, e);
 		}
 	}
 

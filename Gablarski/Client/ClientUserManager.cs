@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 
 // Redistribution and use in source and binary forms, with
@@ -45,7 +45,7 @@ using Gablarski.Messages;
 namespace Gablarski.Client
 {
 	public class ClientUserManager
-		: IIndexedEnumerable<int, ClientUser>, INotifyCollectionChanged
+		: IIndexedEnumerable<int, ClientUser>
 	{
 		protected internal ClientUserManager (IClientContext context)
 		{
@@ -85,8 +85,6 @@ namespace Gablarski.Client
 		/// Received an unsucessful result of a change channel request.
 		/// </summary>
 		public event EventHandler<ReceivedChannelChannelResultEventArgs> ReceivedChannelChangeResult;
-
-		public event NotifyCollectionChangedEventHandler CollectionChanged;
 		#endregion
 
 		/// <summary>
@@ -122,7 +120,6 @@ namespace Gablarski.Client
 			lock (userLock)
 			{
 				this.users = null;
-				OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Reset));
 			}
 		}
 
@@ -178,7 +175,6 @@ namespace Gablarski.Client
 			}
 
 			OnReceivedUserList (new ReceivedListEventArgs<UserInfo> (userlist));
-			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Reset));
 		}
 
 		internal void OnMutedMessage (string username, bool unmuted)
@@ -191,7 +187,6 @@ namespace Gablarski.Client
 
 		        user.IsMuted = true;
 
-		        OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Replace, user, user));
 			    OnUserMuted (new UserMutedEventArgs (user, unmuted));
 			}
 		}
@@ -208,7 +203,6 @@ namespace Gablarski.Client
 			}
 
 			OnUserDisconnected (new UserEventArgs (user));
-			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Remove, user));
 		}
 
 		internal void OnUserLoggedInMessage (MessageReceivedEventArgs e)
@@ -226,25 +220,6 @@ namespace Gablarski.Client
 			}
 
 			OnUserLoggedIn (new UserEventArgs (user));
-			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Add, user));
-		}
-
-		internal void OnChangeChannelResultMessage (MessageReceivedEventArgs e)
-		{
-		    var msg = (ChannelChangeResultMessage)e.Message;
-
-		    if (msg.Result != ChannelChangeResult.Success)
-		        return;
-
-			//lock (this.playerLock)
-			//{
-			//    if (!this.players.ContainsKey (msg.MoveInfo.TargetUserId))
-			//        return;
-
-			//    this.players[msg.MoveInfo.TargetUserId].CurrentChannelId = msg.MoveInfo.TargetChannelId;
-			//}
-
-			//this.OnPlayerChangedChannnel (new ChannelChangedEventArgs (msg.MoveInfo));
 		}
 
 		internal void OnUserChangedChannelMessage (MessageReceivedEventArgs e)
@@ -273,7 +248,6 @@ namespace Gablarski.Client
 			}
 
 			OnUserChangedChannnel (new ChannelChangedEventArgs (user, channel, movedBy));
-			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Replace, user, old));
 		}
 		#endregion
 
@@ -318,13 +292,6 @@ namespace Gablarski.Client
 			var result = this.ReceivedChannelChangeResult;
 			if (result != null)
 				result (this, e);
-		}
-
-		protected virtual void OnCollectionChanged (NotifyCollectionChangedEventArgs e)
-		{
-			var changed = this.CollectionChanged;
-			if (changed != null)
-				changed (this, e);
 		}
 		#endregion
 	}

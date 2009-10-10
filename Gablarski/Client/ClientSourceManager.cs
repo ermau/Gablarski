@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 
 // Redistribution and use in source and binary forms, with
@@ -47,7 +47,7 @@ using Gablarski.Messages;
 namespace Gablarski.Client
 {
 	public class ClientSourceManager
-		: IAudioSender, IAudioReceiver, IIndexedEnumerable<int, AudioSource>, INotifyCollectionChanged
+		: IAudioSender, IAudioReceiver, IIndexedEnumerable<int, AudioSource>
 	{
 		protected internal ClientSourceManager (IClientContext context)
 		{
@@ -92,11 +92,6 @@ namespace Gablarski.Client
 		/// Audio has been received.
 		/// </summary>
 		public event EventHandler<ReceivedAudioEventArgs> ReceivedAudio;
-
-		/// <summary>
-		/// The collection of sources has changed.
-		/// </summary>
-		public event NotifyCollectionChangedEventHandler CollectionChanged;
 		#endregion
 
 		/// <summary>
@@ -224,7 +219,6 @@ namespace Gablarski.Client
 			lock (this.sources)
 			{
 				this.sources.Clear();
-				OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Reset));
 			}
 		}
 
@@ -338,24 +332,18 @@ namespace Gablarski.Client
 		// own instances no problem.
 		internal void UpdateSourceFromExternal (AudioSource updatedSource)
 		{
-			NotifyCollectionChangedEventArgs collectionChanged;
-
 			lock (sources)
 			{
 				AudioSource source;
 				if (!sources.TryGetValue (updatedSource.Id, out source))
 				{
 					sources[updatedSource.Id] = source = updatedSource;
-					collectionChanged = new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Add, source);
 				}
 				else
 				{
 					CopySource (source, updatedSource);
-					collectionChanged = new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Replace, updatedSource, source);
 				}
 			}
-
-			OnCollectionChanged (collectionChanged);
 		}
 
 		internal void UpdateSourcesFromExternal (IEnumerable<AudioSource> updatedSources)
@@ -379,8 +367,6 @@ namespace Gablarski.Client
 				{
 					sources.Remove (d.Id);
 				}
-
-				OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Remove, d));
 			}
 		}
 
@@ -439,7 +425,6 @@ namespace Gablarski.Client
 			}
 
 			OnSourcesRemoved (new ReceivedListEventArgs<AudioSource> (removed));
-			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Remove, removed));
 		}
 
 		internal void OnAudioSourceStateChangedMessage (MessageReceivedEventArgs e)
@@ -483,7 +468,6 @@ namespace Gablarski.Client
 			}
 
 			OnAudioSourceMuted (new AudioSourceMutedEventArgs (source, unmuted));
-			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Replace, source, source));
 		}
 
 		#region Event Invokers
@@ -527,13 +511,6 @@ namespace Gablarski.Client
 			var removed = this.AudioSourcesRemoved;
 			if (removed != null)
 				removed (this, e);
-		}
-
-		protected virtual void OnCollectionChanged (NotifyCollectionChangedEventArgs e)
-		{
-			var changed = this.CollectionChanged;
-			if (changed != null)
-				changed (this, e);
 		}
 
 		protected virtual void OnAudioSourceMuted (AudioSourceMutedEventArgs e)
