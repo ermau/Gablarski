@@ -7,12 +7,7 @@
 			<arg value='/property:Configuration=".NET Debug";Platform="x86"' />
 			<arg value="Gablarski.sln" />
 		</exec>
-
-		<exec program="${DotNetFramework3.5_x86_Path}\msbuild.exe">
-			<arg value='/property:Configuration="Mono Debug";Platform="x86"' />
-			<arg value="Gablarski.sln" />
-		</exec>
-
+    
 		<nunit2>
 			<test assemblyname="Gablarski.Tests\bin\Debug\Gablarski.Tests.dll" />
 		</nunit2>
@@ -26,17 +21,8 @@
 			</fileset>
 		</zip>
 
-		<zip zipfile="Gablarski-CLI-Mono-Debug.zip">
-			<fileset basedir="Clients\CLI\bin\x86\Mono Debug">
-				<include name="gablarskicli.exe" />
-				<include name="*.dll" />
-				<include name="*.pdb" />
-				<include name="*.txt" />
-			</fileset>
-		</zip>
-
 		<zip zipfile="Gablarski-Win32-Debug.zip">
-			<fileset basedir="Clients\Windows\bin\x86\Debug">
+			<fileset basedir="Clients\WinForms\bin\x86\Debug">
 				<include name="GablarskiClient.exe" />
 				<include name="*.dll" />
 				<include name="*.pdb" />
