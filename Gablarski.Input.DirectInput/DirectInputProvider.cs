@@ -33,7 +33,12 @@ namespace Gablarski.Input.DirectInput
 				throw new ArgumentException ("Invalid window", "window");
 
 			if (!String.IsNullOrEmpty (settings))
-				this.keys = ParseKeySettings (settings);
+			{
+				if (settings.Contains ("m"))
+					this.mouseButton = ParseMouseSettings (settings);
+				else
+					this.keys = ParseKeySettings (settings);
+			}
 
 			this.keyboardWait = new AutoResetEvent (false);
 			this.keyboard = new Device (SystemGuid.Keyboard);
@@ -41,6 +46,13 @@ namespace Gablarski.Input.DirectInput
 			this.keyboard.SetDataFormat (DeviceDataFormat.Keyboard);
 			this.keyboard.SetEventNotification (this.keyboardWait);
 			this.keyboard.Acquire();
+
+			this.mouseWait = new AutoResetEvent (false);
+			this.mouse = new Device (SystemGuid.Mouse);
+			this.mouse.SetCooperativeLevel (window, CooperativeLevelFlags.Background | CooperativeLevelFlags.NonExclusive);
+			this.mouse.SetDataFormat (DeviceDataFormat.Mouse);
+			this.mouse.SetEventNotification (this.mouseWait);
+			this.mouse.Acquire ();
 
 			this.running = true;
 
@@ -60,21 +72,14 @@ namespace Gablarski.Input.DirectInput
 			if (this.pollThread != null)
 			{
 				this.keyboardWait.Set();
+				this.mouseWait.Set();
 
 				this.pollThread.Join();
 				this.pollThread = null;
 			}
 
-			if (this.keyboard == null)
-				return;
-
-			this.keyboard.Unacquire();
-			this.keyboard.SetEventNotification (null);
-			this.keyboard.Dispose();
-			this.keyboard = null;
-
-			this.keyboardWait.Close();
-			this.keyboardWait = null;
+			ShutdownDevice (ref this.keyboard, ref this.keyboardWait);
+			ShutdownDevice (ref this.mouse, ref this.mouseWait);
 		}
 
 		/// <summary>
@@ -95,7 +100,19 @@ namespace Gablarski.Input.DirectInput
 		/// <returns>The nice display name for <paramref name="inputSettings"/>.</returns>
 		public string GetNiceInputName (string inputSettings)
 		{
-			return GetNiceString (ParseKeySettings (inputSettings));
+			if (String.IsNullOrEmpty (inputSettings))
+				return String.Empty;
+
+			if (inputSettings.Contains ("m"))
+			{
+				int mouseb;
+				if (Int32.TryParse (inputSettings.Substring (1).Substring (0, inputSettings.Length - 2), out mouseb))
+					return "Mouse " + (mouseb + 1);
+				else
+					return String.Empty;
+			}
+			else
+				return GetNiceString (ParseKeySettings (inputSettings));
 		}
 
 		/// <summary>
@@ -147,24 +164,79 @@ namespace Gablarski.Input.DirectInput
 		private AutoResetEvent keyboardWait;
 		private Device keyboard;
 
+		private int mouseButton = -1;
+		private MouseState mouseState;
+		private AutoResetEvent mouseWait;
 		private Device mouse;
 
 		private Thread pollThread;
 
-		private string GetSettings ()
+		private void ShutdownDevice (ref Device d, ref AutoResetEvent wait)
 		{
-			if (this.keyboardState == null)
-				return null;
-
-			StringBuilder builder = new StringBuilder();
-			foreach (var kvp in EnumerateKeyboardState (this.keyboardState).Where (kvp => kvp.Value))
+			if (d != null)
 			{
-				builder.Append ("k");
-				builder.Append ((int)kvp.Key);
-				builder.Append (";");
+				d.Unacquire ();
+				d.SetEventNotification (null);
+				d.Dispose ();
+				d = null;
 			}
 
-			return builder.ToString();
+			if (wait != null)
+			{
+				wait.Close ();
+				wait = null;
+			}
+		}
+
+		private string GetSettings ()
+		{
+			string settings = null;
+
+			if (this.keyboardState != null)
+			{
+				StringBuilder builder = new StringBuilder ();
+				foreach (var kvp in EnumerateKeyboardState (this.keyboardState).Where (kvp => kvp.Value))
+				{
+					builder.Append ("k");
+					builder.Append ((int)kvp.Key);
+					builder.Append (";");
+				}
+
+				settings = builder.ToString ();
+			}
+			else
+			{
+				byte[] buttons = this.mouseState.GetMouseButtons();
+
+				int button = -1;
+				for (int i = 0; i < buttons.Length; ++i)
+				{
+					if (buttons[i] != 0)
+					{
+						button = i;
+						break;
+					}
+				}
+
+				if (button == -1)
+					return null;
+
+				settings = "m" + button + ";";
+			}
+
+			this.keyboardState = null;
+			return settings;
+		}
+
+		private static int ParseMouseSettings (string settings)
+		{
+			string[] pieces = settings.Split (';');
+
+			int button;
+			if (pieces.Length > 0 && Int32.TryParse (pieces[0].Substring (1), out button))
+				return button;
+			else
+				return -1;
 		}
 
 		private static Key[] ParseKeySettings (string settings)
@@ -196,8 +268,14 @@ namespace Gablarski.Input.DirectInput
 			}
 		}
 
-		private bool CheckInputState (bool any)
+		private bool CheckKeyboardState (bool any)
 		{
+			if ((this.keys == null || this.keys.Length == 0) && !any)
+			{
+				this.keyboardState = null;
+				return false;
+			}
+
 			KeyboardState s = this.keyboardState;
 
 			if (!any)
@@ -221,6 +299,18 @@ namespace Gablarski.Input.DirectInput
 			{
 				return EnumerateKeyboardState (s).Any (kvp => kvp.Value);
 			}
+		}
+
+		private bool CheckMouseState (bool any)
+		{
+			if (this.mouseButton == -1 && !any)
+				return false;
+
+			byte[] buttons = this.mouseState.GetMouseButtons ();
+			if (!any)
+				return (buttons[this.mouseButton] != 0);
+			else
+				return buttons.Any (i => i != 0);
 		}
 
 		private static string GetNiceString (Key[] ks)
@@ -256,26 +346,56 @@ namespace Gablarski.Input.DirectInput
 		{
 			bool previous = false;
 
+			WaitHandle[] waits = new[] { keyboardWait, mouseWait };
+
 			while (this.running)
 			{
-				keyboardWait.WaitOne();
-
-				this.keyboard.Poll();
-
-				try
+				switch (AutoResetEvent.WaitAny (waits))
 				{
-					this.keyboardState = this.keyboard.GetCurrentKeyboardState();
+					case 0:
+					{
+						this.keyboard.Poll ();
 
-					bool state = CheckInputState (this.recording);
-					bool changed = (state != previous);
-					previous = state;
+						try
+						{
+							this.keyboardState = this.keyboard.GetCurrentKeyboardState ();
 
-					if (changed)
-						OnStateChanged (new InputStateChangedEventArgs ((state) ? InputState.On : InputState.Off));
+							bool state = CheckKeyboardState (this.recording);
+							bool changed = (state != previous);
+							previous = state;
+
+							if (changed)
+								OnStateChanged (new InputStateChangedEventArgs ((state) ? InputState.On : InputState.Off));
+						}
+						catch (NotAcquiredException)
+						{
+						}
+
+						break;
+					}
+
+					case 1:
+					{
+						this.mouse.Poll ();
+
+						try
+						{
+							this.mouseState = this.mouse.CurrentMouseState;
+
+							bool state = CheckMouseState (this.recording);
+							bool changed = (state != previous);
+							previous = state;
+
+							if (changed)
+								OnStateChanged (new InputStateChangedEventArgs ((state) ? InputState.On : InputState.Off));
+						}
+						catch (NotAcquiredException)
+						{
+						}
+
+						break;
+					}
 				}
-				catch (NotAcquiredException)
-				{
-				}				
 			}
 		}
 
