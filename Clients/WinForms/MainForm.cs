@@ -33,7 +33,7 @@ namespace Gablarski.Clients.Windows
 			this.gablarski.CurrentUser.ReceivedJoinResult += this.CurrentUserReceivedJoinResult;
 
 			this.gablarski.Sources.ReceivedSourceList += SourcesOnReceivedSourceList;
-			this.gablarski.Sources.ReceivedAudioSource += this.SourcesReceivedSource;
+			this.gablarski.Sources.ReceivedAudioSource += SourcesReceivedSource;
 			this.gablarski.Sources.AudioSourcesRemoved += SourcesRemoved;
 			this.gablarski.Sources.AudioSourceStopped += SourceStoped;
 			this.gablarski.Sources.AudioSourceStarted += SourceStarted;
@@ -300,11 +300,16 @@ namespace Gablarski.Clients.Windows
 					                        new AudioEngineCaptureOptions { Mode = AudioEngineCaptureMode.Explicit });
 					gablarski.Audio.BeginCapture (musicSource, gablarski.CurrentChannel);
 				}
+
+				users.Update (gablarski.Channels, gablarski.Users.Cast<UserInfo>(), gablarski.Sources);
 			}
 			else if (e.Result == SourceResult.NewSource)
-				this.gablarski.Audio.Attach (playback, e.Source, new AudioEnginePlaybackOptions());
+			{
+				this.gablarski.Audio.Attach (playback, e.Source, new AudioEnginePlaybackOptions ());
+				users.Update (gablarski.Channels, gablarski.Users.Cast<UserInfo>(), gablarski.Sources);
+			}
 			else
-				MessageBox.Show (this, e.Result.ToString());
+				MessageBox.Show (this, e.Result.ToString ());
 		}
 
 		private void UsersUserChangedChannel (object sender, ChannelChangedEventArgs e)
