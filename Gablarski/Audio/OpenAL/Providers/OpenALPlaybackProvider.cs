@@ -53,7 +53,7 @@ namespace Gablarski.Audio.OpenAL.Providers
 				for (int i = 0; i < bufferLen; ++i)
 				{
 					SourceBuffer wait = bufferStack.Pop();
-					wait.Buffer (new byte[audioSource.FrameSize*2*audioSource.Channels],
+					wait.Buffer (new byte[audioSource.FrameSize * 2 * audioSource.Channels],
 					             (audioSource.Channels == 1) ? AudioFormat.Mono16Bit : AudioFormat.Stereo16Bit,
 					             (uint)audioSource.Frequency);
 					source.QueueAndPlay (wait);

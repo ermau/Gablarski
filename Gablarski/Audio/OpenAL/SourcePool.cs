@@ -49,25 +49,39 @@ namespace Gablarski.Audio.OpenAL
 
 		public Source RequestSource (T owner)
 		{
-			Source free = null;
-			foreach (var kvp in owners)
-			{
-				if (kvp.Value == null)
-				{
-					free = kvp.Key;
-					break;
-				}
-				
-				if (kvp.Value == owner)
-					return kvp.Key;
-			}
-				
-			if (free == null)
-				free = Source.Generate ();
+			Source free = owners.Where (kvp => kvp.Value == owner).Select (kvp => kvp.Key).FirstOrDefault();
 
-			owners[free] = owner;
-			
+			if (free == null)
+			{
+				free = owners.Where (kvp => kvp.Value == null).Select (kvp => kvp.Key).FirstOrDefault ();
+
+				if (free == null)
+					free = Source.Generate ();
+
+				owners[free] = owner;
+			}
+
 			return free;
+
+			//Source free = null;
+			//foreach (var kvp in owners)
+			//{
+			//    if (kvp.Value == null)
+			//    {
+			//        free = kvp.Key;
+			//        break;
+			//    }
+
+			//    if (kvp.Value == owner)
+			//        return kvp.Key;
+			//}
+
+			//if (free == null)
+			//    free = Source.Generate ();
+
+			//owners[free] = owner;
+
+			//return free;
 		}
 
 		public void PlayingSource (Source source)
