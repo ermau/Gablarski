@@ -137,6 +137,8 @@ namespace Gablarski.Clients.Windows
 			this.inUsername.Text = this.Entry.UserName;
 			this.inPassword.Text = this.Entry.UserPassword;
 			this.pnlModServer.Visible = true;
+
+			this.btnConnect.Enabled = false;
 		}
 
 		private void ClearEdit()
@@ -203,9 +205,13 @@ namespace Gablarski.Clients.Windows
 		private void btnCancel_Click (object sender, EventArgs e)
 		{
 			if (this.pnlModServer.Visible)
-				this.ClearEdit();
+			{
+				this.ClearEdit ();
+				if (this.servers.SelectedItems.Count > 0)
+					this.btnConnect.Enabled = true;
+			}
 			else
-				this.Close();
+				this.Close ();
 		}
 
 		private void LoadServerEntries()
