@@ -7,7 +7,6 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using Gablarski.Client;
-using Gablarski.Clients.Windows.Entities;
 using Gablarski.Network;
 
 namespace Gablarski.Clients.Windows

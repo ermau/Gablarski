@@ -131,7 +131,8 @@ namespace Gablarski.Client
 					Trace.WriteLineIf ((VerboseTracing || msg.MessageType != ServerMessageType.AudioDataReceived),
 										"[Client] Message Received: " + msg.MessageType);
 
-					this.handlers[msg.MessageType] (e);
+					if (this.running)
+                        this.handlers[msg.MessageType] (e);
 				}
 			}
 		}
@@ -180,22 +181,18 @@ namespace Gablarski.Client
 
 		private void DisconnectCore (DisconnectHandling handling, IConnection connection)
 		{
-			//if (!this.running)
-			//    return;
-			OnDisconnected (this, EventArgs.Empty);
-
 			this.running = false;
+
 			lock (this.mqueue)
 			{
 				this.mqueue.Clear();
 			}
 
+			OnDisconnected (this, EventArgs.Empty);
+			
 			connection.Disconnected -= this.OnDisconnectedInternal;
 			connection.MessageReceived -= this.OnMessageReceived;
 			connection.Disconnect();
-
-			if (this.messageRunnerThread != null)
-				this.messageRunnerThread.Join ();
 
 			this.Users.Clear();
 			this.Channels.Clear();

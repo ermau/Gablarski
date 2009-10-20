@@ -217,7 +217,7 @@ namespace Gablarski.Audio.OpenAL
 			byte[] samples = new byte[numSamples * 2];
 
 			while (this.capturing && block && this.AvailableSamples < numSamples)
-				Thread.Sleep (1);
+				Thread.Sleep (0);
 
 			int diff = numSamples - this.AvailableSamples;
 			if (diff > 0)

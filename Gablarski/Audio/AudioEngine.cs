@@ -335,6 +335,8 @@ namespace Gablarski.Audio
 						p.Tick();
 				}
 
+				bool skipSwitch = false;
+
 				lock (captures)
 				{
 					foreach (var c in captures)
@@ -342,7 +344,7 @@ namespace Gablarski.Audio
 						if (!c.Value.Capture.IsCapturing && c.Value.Options.Mode == AudioEngineCaptureMode.Explicit)
 							continue;
 
-						while (c.Value.Capture.AvailableSampleCount > c.Key.FrameSize)
+						if (c.Value.Capture.AvailableSampleCount > c.Key.FrameSize)
 						{
 							bool talking = c.Value.Talking;
 
@@ -362,10 +364,13 @@ namespace Gablarski.Audio
 
 							c.Value.Talking = talking;
 						}
+
+						skipSwitch = (c.Value.Capture.AvailableSampleCount > c.Key.FrameSize);
 					}
 				}
 
-				Thread.Sleep (1);
+				if (!skipSwitch)
+					Thread.Sleep (1);
 			}
 		}
 	}

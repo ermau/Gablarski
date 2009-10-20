@@ -66,7 +66,7 @@ namespace Gablarski.Client
 		public GablarskiClient (IClientConnection connection, ClientUserManager userMananger, ClientChannelManager channelManager, ClientSourceManager sourceManager, CurrentUser currentUser, IAudioEngine audioEngine)
 			: this (connection, false)
 		{
-			this.Setup (userMananger, channelManager, sourceManager, currentUser, audioEngine);
+			Setup (userMananger, channelManager, sourceManager, currentUser, audioEngine);
 		}
 
 		private GablarskiClient (IClientConnection connection, bool setupDefaults)
@@ -74,7 +74,7 @@ namespace Gablarski.Client
 			this.Connection = connection;
 
 			if (setupDefaults)
-				this.Setup (new ClientUserManager (this), new ClientChannelManager (this), new ClientSourceManager (this), new CurrentUser (this), new AudioEngine());
+				Setup (new ClientUserManager (this), new ClientChannelManager (this), new ClientSourceManager (this), new CurrentUser (this), new AudioEngine());
 		}
 
 		#region Events
@@ -217,6 +217,12 @@ namespace Gablarski.Client
 			try
 			{
 				IPEndPoint endPoint = new IPEndPoint (Dns.GetHostAddresses (host).Where (ip => ip.AddressFamily == AddressFamily.InterNetwork).First(), port);
+
+				if (this.messageRunnerThread != null)
+				{
+					this.messageRunnerThread.Join();
+					this.messageRunnerThread = null;
+				}
 
 				this.running = true;
 

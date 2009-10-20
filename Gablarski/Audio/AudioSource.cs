@@ -63,8 +63,8 @@ namespace Gablarski.Audio
 				throw new ArgumentNullException ("name");
 			if (sourceId <= 0)
 				throw new ArgumentOutOfRangeException ("sourceId");
-			if (ownerId < 0)
-				throw new ArgumentOutOfRangeException ("ownerId");
+			if (ownerId == 0)
+				throw new ArgumentException ("ownerId");
 			if (bitrate <= 0)
 				throw new ArgumentOutOfRangeException ("bitrate");
 			if (complexity < 1 || complexity > 10)
