@@ -58,8 +58,8 @@ namespace Gablarski.Client
 		internal CurrentUser (IClientContext context, int userId, string nickname, int currentChannelId)
 			: this (context)
 		{
-			if (userId < 0)
-				throw new ArgumentOutOfRangeException("userId");
+			if (userId == 0)
+				throw new ArgumentException("userId");
 			if (nickname.IsEmpty())
 				throw new ArgumentNullException("nickname", "nickname is null or empty.");
 			if (currentChannelId < 0)

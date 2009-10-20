@@ -49,8 +49,8 @@ namespace Gablarski.Messages
 
 		public ChannelChangeInfo (int targetUserId, int targetChannelId)
 		{
-			if (targetUserId < 0)
-				throw new ArgumentOutOfRangeException ("targetUserId");
+			if (targetUserId == 0)
+				throw new ArgumentException ("targetUserId");
 			if (targetChannelId < 0)
 				throw new ArgumentOutOfRangeException ("targetChannelId");
 
@@ -61,8 +61,8 @@ namespace Gablarski.Messages
 		public ChannelChangeInfo (int targetUserId, int targetChannelId, int requestingUserId)
 			: this (targetUserId, targetChannelId)
 		{
-			if (requestingUserId < 0)
-				throw new ArgumentOutOfRangeException ("requestingUserId");
+			if (requestingUserId == 0)
+				throw new ArgumentException ("requestingUserId");
 
 			this.RequestingUserId = requestingUserId;
 		}
