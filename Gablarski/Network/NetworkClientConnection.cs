@@ -207,24 +207,25 @@ namespace Gablarski.Network
 			while (this.running)
 			{
 				MessageBase toSend = null;
-				lock (queue)
-				{
-					if (queue.Count > 0)
-						toSend = queue.Dequeue();
-				}
 
-				if (toSend != null)
+				if (queue.Count > 0)
 				{
+					lock (queue)
+					{
+						if (queue.Count > 0)
+							toSend = queue.Dequeue ();
+					}
+
 					IValueWriter iwriter = (!toSend.Reliable) ? writeUnreliable : writeReliable;
 					iwriter.WriteByte (0x2A);
-					
+
 					if (!toSend.Reliable)
 						iwriter.WriteUInt32 (this.nid);
 
 					iwriter.WriteUInt16 (toSend.MessageTypeCode);
 
 					toSend.WritePayload (iwriter);
-					iwriter.Flush();
+					iwriter.Flush ();
 				}
 
 				if (!this.uwaiting)
@@ -253,7 +254,7 @@ namespace Gablarski.Network
 					}
 				}
 
-				if (udp.Available == 0 && !rstream.DataAvailable)
+				if (udp.Available == 0 && !rstream.DataAvailable && queue.Count == 0)
 					Thread.Sleep (1);
 			}
 		}
