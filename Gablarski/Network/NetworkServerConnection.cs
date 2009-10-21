@@ -43,6 +43,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using Gablarski.Messages;
+using log4net;
 
 namespace Gablarski.Network
 {
@@ -51,6 +52,8 @@ namespace Gablarski.Network
 	{
 		public NetworkServerConnection (uint nid, IPEndPoint endPoint, TcpClient tcp, IValueWriter unreliableWriter)
 		{
+			this.log = LogManager.GetLogger ("NetworkServerConnection " + nid);
+
 			this.nid = nid;
 			this.endPoint = endPoint;
 
@@ -87,10 +90,14 @@ namespace Gablarski.Network
 		/// <exception cref="System.ArgumentNullException"><paramref name="message"/> is <c>null</c>.</exception>
 		public void Send (MessageBase message)
 		{
+			log.Debug ("Enqueing " + message.GetType ());
+
 			lock (sendQueue)
 			{
 				sendQueue.Enqueue (message);
 			}
+
+			log.Debug ("Enqueued " + message.GetType().Name);
 		}
 
 		/// <summary>
@@ -98,6 +105,8 @@ namespace Gablarski.Network
 		/// </summary>
 		public void Disconnect()
 		{
+			log.Debug ("Disconnecting");
+
 			this.running = false;
 			this.tcp.Close();
 
@@ -112,6 +121,8 @@ namespace Gablarski.Network
 		}
 
 		#endregion
+
+		private readonly ILog log;
 
 		private readonly IPEndPoint endPoint;
 
@@ -139,9 +150,7 @@ namespace Gablarski.Network
 
 		private void Runner()
 		{
-			bool singleCore = (Environment.ProcessorCount == 1);
-			const uint maxLoops = UInt32.MaxValue;
-			uint loops = 0;
+			log.Debug ("Runner starting");
 
 			IValueWriter urWriter = this.uwriter;
 			IValueWriter rWriter = this.writer;
@@ -158,6 +167,8 @@ namespace Gablarski.Network
 						toSend = queue.Dequeue ();
 					}
 
+					log.Debug ("Dequeued " + toSend.GetType().Name);
+
 					try
 					{
 						IValueWriter iwriter = (!toSend.Reliable) ? urWriter : rWriter;
@@ -166,10 +177,12 @@ namespace Gablarski.Network
 
 						toSend.WritePayload (iwriter);
 						iwriter.Flush ();
+
+						log.Debug (toSend.GetType().Name + " flushed");
 					}
 					catch (Exception ex)
 					{
-						Trace.WriteLine ("[Server] Error writing, disconnecting: " + ex.Message);
+						log.Warn ("Error writing, disconnecting", ex);
 						this.Disconnect ();
 						return;
 					}
@@ -181,22 +194,19 @@ namespace Gablarski.Network
 					{
 						if (!this.tcp.Connected)
 						{
-							Trace.WriteLine ("[Server] Client disconnected.");
+							log.Info ("Client disconnected");
 							this.Disconnect();
 							return;
 						}
 						
-						//if (this.stream.DataAvailable)
-						//{
-							this.waiting = true;
-							byte[] mbuffer = new byte[1];
+						this.waiting = true;
+						byte[] mbuffer = new byte[1];
 
-							this.stream.BeginRead (mbuffer, 0, 1, this.Received, mbuffer);
-						//}
+						this.stream.BeginRead (mbuffer, 0, 1, this.Received, mbuffer);
 					}
 					catch (Exception ex)
 					{
-						Trace.WriteLine ("[Server] Error starting read, disconnecting: " + ex.Message);
+						log.Warn ("Error starting read, disconnecting", ex);
 						this.Disconnect();
 						return;
 					}
@@ -225,26 +235,33 @@ namespace Gablarski.Network
 		{
 			try
 			{
+				log.Debug ("Received reliable data");
+
 				if (this.stream.EndRead (ar) == 0)
-					this.Disconnect();
+					this.Disconnect ();
 
 				byte[] mbuffer = (ar.AsyncState as byte[]);
 
 				if (mbuffer[0] != 0x2A)
+				{
+					log.Warn ("Failed sanity check");
 					return;
+				}
 
 				ushort type = this.reader.ReadUInt16();
 				MessageBase msg;
 				if (MessageBase.GetMessage (type, out msg))
 				{
+					log.Debug (msg.GetType ().Name + " received");
 					msg.ReadPayload (this.reader);
+					log.Debug (msg.GetType ().Name + " payload read");
 
 					OnMessageReceived (new MessageReceivedEventArgs (this, msg));
 				}
 			}
 			catch (Exception ex)
 			{
-				Trace.WriteLine ("[Server] Error reading payload, disconnecting: " + ex.Message);
+				log.Warn ("Error reading payload, disconnecting", ex);
 				this.Disconnect();
 				return;
 			}
