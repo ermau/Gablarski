@@ -151,14 +151,13 @@ namespace Gablarski.Network
 			while (this.running)
 			{
 				MessageBase toSend = null;
-				lock (queue)
+				if (queue.Count > 0)
 				{
-					if (queue.Count > 0)
-						toSend = queue.Dequeue();
-				}
+					lock (queue)
+					{
+						toSend = queue.Dequeue ();
+					}
 
-				if (toSend != null)
-				{
 					try
 					{
 						IValueWriter iwriter = (!toSend.Reliable) ? urWriter : rWriter;
@@ -166,12 +165,12 @@ namespace Gablarski.Network
 						iwriter.WriteUInt16 (toSend.MessageTypeCode);
 
 						toSend.WritePayload (iwriter);
-						iwriter.Flush();
+						iwriter.Flush ();
 					}
 					catch (Exception ex)
 					{
 						Trace.WriteLine ("[Server] Error writing, disconnecting: " + ex.Message);
-						this.Disconnect();
+						this.Disconnect ();
 						return;
 					}
 				}
@@ -203,7 +202,7 @@ namespace Gablarski.Network
 					}
 				}
 
-				if (!this.stream.DataAvailable)
+				if (!this.stream.DataAvailable && queue.Count == 0)
 					Thread.Sleep (1);
 			}
 		}

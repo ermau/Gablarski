@@ -212,8 +212,7 @@ namespace Gablarski.Network
 				{
 					lock (queue)
 					{
-						if (queue.Count > 0)
-							toSend = queue.Dequeue ();
+						toSend = queue.Dequeue ();
 					}
 
 					IValueWriter iwriter = (!toSend.Reliable) ? writeUnreliable : writeReliable;
