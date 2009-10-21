@@ -42,12 +42,18 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using Gablarski.Messages;
+using log4net;
 
 namespace Gablarski.Network
 {
 	public class NetworkServerConnectionProvider
 		: IConnectionProvider
 	{
+		public NetworkServerConnectionProvider ()
+		{
+			this.log = LogManager.GetLogger (GetType ());
+		}
+
 		public int Port
 		{
 			get { return this.port; }
@@ -136,6 +142,7 @@ namespace Gablarski.Network
 		}
 		#endregion
 
+		private readonly ILog log;
 		private Thread listenerThread;
 		private volatile bool waiting;
 		private volatile bool listening;
@@ -148,6 +155,9 @@ namespace Gablarski.Network
 
 		private void UnreliableReceive (IAsyncResult result)
 		{
+			if (log.IsDebugEnabled)
+				log.Debug ("UnreliableReceive");
+
 			try
 			{
 				var ipendpoint = new IPEndPoint (IPAddress.Any, 0);
@@ -164,14 +174,18 @@ namespace Gablarski.Network
 				{
 					if (buffer[0] == 24)
 						udp.SendTo (new byte[] { 24, 24 }, endpoint);
+					else
+						log.Debug ("Failed sanity check");
 
-					Trace.WriteLineIf (VerboseTracing, "[Network] Unreliable message failed sanity check.");
 					return;
 				}
 
 				IValueReader reader = new ByteArrayValueReader (buffer, 1);
 
 				uint nid = reader.ReadUInt32();
+
+				if (log.IsDebugEnabled)
+					log.Debug ("Message from " + nid);
 
 				NetworkServerConnection connection;
 				lock (connections)
@@ -184,7 +198,7 @@ namespace Gablarski.Network
 				MessageBase msg;
 				if (!MessageBase.GetMessage (mtype, out msg))
 				{
-					Trace.WriteLineIf (VerboseTracing, "[Network] Message type " + mtype + " not found from " + connection);
+					log.Warn ("Message type " + mtype + " not found from " + connection);
 					return;
 				}
 				else
@@ -193,12 +207,16 @@ namespace Gablarski.Network
 
 					if (connection == null)
 					{
-						Trace.WriteLineIf (VerboseTracing, "[Network] Connectionless message received: " + msg.MessageTypeCode);
+						if (log.IsDebugEnabled)
+							log.Debug ("Connectionless message received: " + msg.MessageTypeCode);
+
 						OnConnectionlessMessageReceived (new ConnectionlessMessageReceivedEventArgs (this, msg, endpoint));
 					}
 					else
 					{
-						Trace.WriteLineIf (VerboseTracing, "[Network] Unreliable message received: " + msg.MessageTypeCode);
+						if (log.IsDebugEnabled)
+							log.Debug ("Unreliable message received: " + msg.MessageTypeCode);
+
 						connection.Receive (msg);
 					}
 				}

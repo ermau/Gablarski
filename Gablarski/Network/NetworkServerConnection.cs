@@ -90,14 +90,16 @@ namespace Gablarski.Network
 		/// <exception cref="System.ArgumentNullException"><paramref name="message"/> is <c>null</c>.</exception>
 		public void Send (MessageBase message)
 		{
-			log.Debug ("Enqueing " + message.GetType ());
+			if (log.IsDebugEnabled)
+				log.Debug ("Enqueing " + message.GetType ());
 
 			lock (sendQueue)
 			{
 				sendQueue.Enqueue (message);
 			}
 
-			log.Debug ("Enqueued " + message.GetType().Name);
+			if (log.IsDebugEnabled)
+				log.Debug ("Enqueued " + message.GetType().Name);
 		}
 
 		/// <summary>
@@ -167,7 +169,8 @@ namespace Gablarski.Network
 						toSend = queue.Dequeue ();
 					}
 
-					log.Debug ("Dequeued " + toSend.GetType().Name);
+					if (log.IsDebugEnabled)
+						log.Debug ("Dequeued " + toSend.GetType().Name);
 
 					try
 					{
@@ -178,7 +181,8 @@ namespace Gablarski.Network
 						toSend.WritePayload (iwriter);
 						iwriter.Flush ();
 
-						log.Debug (toSend.GetType().Name + " flushed");
+						if (log.IsDebugEnabled)
+							log.Debug (toSend.GetType().Name + " flushed");
 					}
 					catch (Exception ex)
 					{
@@ -235,7 +239,8 @@ namespace Gablarski.Network
 		{
 			try
 			{
-				log.Debug ("Received reliable data");
+				if (log.IsDebugEnabled)
+					log.Debug ("Received reliable data");
 
 				if (this.stream.EndRead (ar) == 0)
 					this.Disconnect ();
@@ -252,9 +257,13 @@ namespace Gablarski.Network
 				MessageBase msg;
 				if (MessageBase.GetMessage (type, out msg))
 				{
-					log.Debug (msg.GetType ().Name + " received");
+					if (log.IsDebugEnabled)
+						log.Debug (msg.GetType ().Name + " received");
+
 					msg.ReadPayload (this.reader);
-					log.Debug (msg.GetType ().Name + " payload read");
+
+					if (log.IsDebugEnabled)
+						log.Debug (msg.GetType ().Name + " payload read");
 
 					OnMessageReceived (new MessageReceivedEventArgs (this, msg));
 				}
