@@ -90,13 +90,12 @@ namespace Gablarski.Network
 		/// <exception cref="System.ArgumentNullException"><paramref name="message"/> is <c>null</c>.</exception>
 		public void Send (MessageBase message)
 		{
-			if (log.IsDebugEnabled)
-				log.Debug ("Enqueing " + message.GetType ());
-
 			lock (sendQueue)
 			{
 				sendQueue.Enqueue (message);
 			}
+
+			outgoingWait.Set ();
 
 			if (log.IsDebugEnabled)
 				log.Debug ("Enqueued " + message.GetType().Name);
@@ -135,6 +134,8 @@ namespace Gablarski.Network
 		private readonly IValueReader reader;
 		private readonly IValueWriter writer;
 
+		private readonly AutoResetEvent outgoingWait = new AutoResetEvent (false);
+		private readonly AutoResetEvent incomingWait = new AutoResetEvent (false);
 		private readonly Queue<MessageBase> sendQueue = new Queue<MessageBase>();
 
 		private volatile bool running;
@@ -159,11 +160,13 @@ namespace Gablarski.Network
 
 			Queue<MessageBase> queue = this.sendQueue;
 
+			WaitHandle[] waits = new[] { outgoingWait, incomingWait };
+
 			while (this.running)
 			{
-				MessageBase toSend = null;
 				if (queue.Count > 0)
 				{
+					MessageBase toSend;
 					lock (queue)
 					{
 						toSend = queue.Dequeue ();
@@ -216,8 +219,7 @@ namespace Gablarski.Network
 					}
 				}
 
-				if (!this.stream.DataAvailable && queue.Count == 0)
-					Thread.Sleep (1);
+				AutoResetEvent.WaitAny (waits);
 			}
 		}
 
@@ -276,6 +278,7 @@ namespace Gablarski.Network
 			}
 			finally
 			{
+				incomingWait.Set ();
 				this.waiting = false;
 			}
 		}

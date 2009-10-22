@@ -42,6 +42,7 @@ using Gablarski.Audio;
 using Gablarski.Messages;
 using System.Diagnostics;
 using System.Threading;
+using log4net;
 
 namespace Gablarski.Server
 {
@@ -78,16 +79,14 @@ namespace Gablarski.Server
 
 		private readonly Thread messageRunnerThread;
 		private readonly Queue<MessageReceivedEventArgs> mqueue = new Queue<MessageReceivedEventArgs> (1000);
+		private readonly AutoResetEvent incomingWait = new AutoResetEvent (false);
 
 		private void MessageRunner ()
 		{
 			while (this.running)
 			{
 				if (mqueue.Count == 0)
-				{
-					Thread.Sleep (1);
-					continue;
-				}
+					incomingWait.WaitOne ();
 
 				while (mqueue.Count > 0)
 				{
@@ -120,6 +119,8 @@ namespace Gablarski.Server
 			{
 				mqueue.Enqueue (e);
 			}
+
+			incomingWait.Set ();
 		}
 
 		protected ServerInfo GetServerInfo()
