@@ -100,6 +100,9 @@ namespace Gablarski.Network
 
 			if (this.outgoingThread != null)
 			{
+				if (outgoingWait != null)
+					outgoingWait.Set ();
+
 				this.outgoingThread.Join ();
 				this.outgoingThread = null;
 			}
@@ -276,35 +279,38 @@ namespace Gablarski.Network
 
 		private void ReliableReceive (IAsyncResult result)
 		{
-			//try
-			//{
+			NetworkServerConnection connection = null;
+
+			try
+			{
 				var state = (Tuple<NetworkServerConnection, byte[]>)result.AsyncState;
-				var stream = state._1.ReliableStream;
+				connection = state._1;
+				var stream = connection.ReliableStream;
 
 				if (stream.EndRead (result) == 0)
 				{
-					state._1.Disconnect ();
+					connection.Disconnect ();
 					return;
 				}
 
 				if (state._2[0] == 0x2A)
 				{
-					ushort type = state._1.ReliableReader.ReadUInt16 ();
+					ushort type = connection.ReliableReader.ReadUInt16 ();
 					MessageBase msg;
 					if (MessageBase.GetMessage (type, out msg))
 					{
-						msg.ReadPayload (state._1.ReliableReader);
+						msg.ReadPayload (connection.ReliableReader);
 
-						state._1.Receive (msg);
+						connection.Receive (msg);
 					}
 				}
 
 				stream.BeginRead (state._2, 0, 1, ReliableReceive, state);
-			//}
-			//catch (Exception ex)
-			//{
-			//    throw;
-			//}
+			}
+			catch (Exception ex)
+			{
+				connection.Disconnect ();
+			}
 		}
 
 		private void Send (NetworkServerConnection connection, MessageBase message)
