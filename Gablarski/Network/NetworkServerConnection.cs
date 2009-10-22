@@ -149,6 +149,8 @@ namespace Gablarski.Network
 			var received = this.MessageReceived;
 			if (received != null)
 				received (this, new MessageReceivedEventArgs (this, message));
+
+			incomingWait.Set ();
 		}
 
 		private void Runner()
@@ -219,7 +221,10 @@ namespace Gablarski.Network
 					}
 				}
 
-				AutoResetEvent.WaitAny (waits);
+				if (queue.Count > 0 || !this.waiting)
+					continue;
+
+				int which = AutoResetEvent.WaitAny (waits);
 			}
 		}
 
