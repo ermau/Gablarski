@@ -129,7 +129,7 @@ namespace Gablarski.Clients.CLI
 				Server.VerboseTracing = veryverbose;
 				
 				if (connectionProviders.Count == 0)
-					Server.AddConnectionProvider (new NetworkServerConnectionProvider { Port = port, VerboseTracing = veryverbose });
+					Server.AddConnectionProvider (new NetworkServerConnectionProvider { Port = port });//, VerboseTracing = veryverbose });
 				else
 					FindTypes<IConnectionProvider> (connectionProviders, Server.AddConnectionProvider);
 

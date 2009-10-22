@@ -36,23 +36,22 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Net;
-using System.Net.Sockets;
-using System.Threading;
 using Gablarski.Messages;
-using log4net;
+using System.Threading;
+using System.Net.Sockets;
+using System.Diagnostics;
+using Mono.Rocks;
 
 namespace Gablarski.Network
 {
 	public class NetworkServerConnectionProvider
 		: IConnectionProvider
 	{
-		public NetworkServerConnectionProvider ()
-		{
-			this.log = LogManager.GetLogger (GetType ());
-		}
+		public event EventHandler<ConnectionlessMessageReceivedEventArgs> ConnectionlessMessageReceived;
+		public event EventHandler<ConnectionEventArgs> ConnectionMade;
 
 		public int Port
 		{
@@ -60,43 +59,14 @@ namespace Gablarski.Network
 			set { this.port = value; }
 		}
 
-		#region Implementation of IConnectionProvider
-
-		/// <summary>
-		/// A connectionless message was received.
-		/// </summary>
-		public event EventHandler<ConnectionlessMessageReceivedEventArgs> ConnectionlessMessageReceived;
-
-		/// <summary>
-		/// A connection was made.
-		/// </summary>
-		public event EventHandler<ConnectionEventArgs> ConnectionMade;
-
-		/// <summary>
-		/// Sends a connectionless <paramref name="message"/> to the <paramref name="endpoint"/>.
-		/// </summary>
-		/// <param name="message">The message to send.</param>
-		/// <param name="endpoint">The endpoint to send the <paramref name="message"/> to.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="message"/> is <c>null</c>.</exception>
-		/// <exception cref="ArgumentNullException"><paramref name="endpoint"/> is <c>null</c>.</exception>
-		/// <exception cref="ArgumentException"><paramref name="message"/> is set as a reliable message.</exception>
-		/// <seealso cref="IConnectionProvider.ConnectionlessMessageReceived"/>
-		public void SendConnectionlessMessage(MessageBase message, EndPoint endpoint)
+		public void SendConnectionlessMessage (MessageBase message, EndPoint endpoint)
 		{
-			lock (this.clmqueue)
-			{
-				this.clmqueue.Enqueue (new ConnectionlessMessageReceivedEventArgs (this, message, endpoint));
-			}
+			throw new NotImplementedException ();
 		}
 
-		/// <summary>
-		/// Starts listening for connections and connectionless messages.
-		/// </summary>
-		public void StartListening()
+		public void StartListening ()
 		{
 			this.listening = true;
-			
-			Trace.WriteLineIf (VerboseTracing, "[Network] Listening on port " + port);
 
 			var localEp = new IPEndPoint (IPAddress.Any, port);
 
@@ -106,154 +76,173 @@ namespace Gablarski.Network
 
 			tcpListener = new TcpListener (localEp);
 			tcpListener.Start ();
+			tcpListener.BeginAcceptSocket (AcceptConnection, null);
 
-			this.listenerThread = new Thread (this.Listener) { Name = "Network Provider Listener" };
-			this.listenerThread.Start();
+			(incomingThread = new Thread (Incoming)
+			{
+				Name = "Incoming",
+				IsBackground = true
+			}).Start ();
+
+			(outgoingThread = new Thread (Outgoing)
+			{
+				Name = "Outgoing",
+				IsBackground = true
+			}).Start ();
 		}
 
-		/// <summary>
-		/// Stops listening for connections and connectionless messages.
-		/// </summary>
-		public void StopListening()
+		public void StopListening ()
 		{
 			this.listening = false;
 
-			Trace.WriteLineIf (VerboseTracing, "[Network] Stopped listening to port " + port);
+			tcpListener.Stop ();
+			udp.Close ();
 
-			udp.Close();
-			tcpListener.Stop();
-
-			if (this.listenerThread != null)
+			if (this.outgoingThread != null)
 			{
-				this.listenerThread.Join();
-				this.listenerThread = null;
+				this.outgoingThread.Join ();
+				this.outgoingThread = null;
+			}
+
+			if (this.incomingThread != null)
+			{
+				this.incomingThread.Join();
+				this.incomingThread = null;
 			}
 
 			udp = null;
 			tcpListener = null;
 		}
 
-		/// <summary>
-		/// Whether to output detailed tracing.
-		/// </summary>
-		public bool VerboseTracing
+		internal void EnqueueToSend (IConnection connection, MessageBase message)
 		{
-			get; set;
-		}
-		#endregion
+			var sc = connection as NetworkServerConnection;
 
-		private readonly ILog log;
-		private Thread listenerThread;
-		private volatile bool waiting;
+			lock (outgoing)
+			{
+				outgoing.Enqueue (new KeyValuePair<NetworkServerConnection, MessageBase> (sc, message));
+			}
+
+			outgoingWait.Set ();
+		}
+
 		private volatile bool listening;
-		private TcpListener tcpListener;
-		private Socket udp;
 		private int port = 6112;
-		private volatile bool accepting;
+		private Socket udp;
+		private SocketValueWriter clWriter;
+		private TcpListener tcpListener;
+		private readonly Dictionary<uint, NetworkServerConnection> connections = new Dictionary<uint, NetworkServerConnection> (20);
 
-		private readonly Dictionary<uint, NetworkServerConnection> connections = new Dictionary<uint, NetworkServerConnection>();
+		private readonly AutoResetEvent outgoingWait = new AutoResetEvent (false);
+		private readonly Queue<KeyValuePair<NetworkServerConnection, MessageBase>> outgoing = new Queue<KeyValuePair<NetworkServerConnection, MessageBase>> (100);
 
-		private void UnreliableReceive (IAsyncResult result)
+		private Thread outgoingThread;
+		private Thread incomingThread;		
+
+		private void Incoming ()
 		{
-			if (log.IsDebugEnabled)
-				log.Debug ("UnreliableReceive");
+			var cs = this.connections;
+			var tl = this.tcpListener;
 
-			try
+			byte[] buffer = new byte[5120];
+			var reader = new ByteArrayValueReader (buffer);
+
+			var ipEndPoint = new IPEndPoint (IPAddress.Any, 0);
+			var tendpoint = (EndPoint)ipEndPoint;
+
+			while (this.listening)
 			{
-				var ipendpoint = new IPEndPoint (IPAddress.Any, 0);
-				var endpoint = (EndPoint)ipendpoint;
-				if (udp == null || udp.EndReceiveFrom (result, ref endpoint) == 0)
+				try
 				{
-					Trace.WriteLineIf (VerboseTracing, "[Network] UDP EndReceiveFrom returned nothing.");
-					return;
-				}
+					int received = udp.ReceiveFrom (buffer, ref tendpoint);
+					if (received == 0)
+						return;
 
-				byte[] buffer = (byte[])result.AsyncState;
-
-				if (buffer[0] != 0x2A)
-				{
-					if (buffer[0] == 24)
-						udp.SendTo (new byte[] { 24, 24 }, endpoint);
-					else
-						log.Debug ("Failed sanity check");
-
-					return;
-				}
-
-				IValueReader reader = new ByteArrayValueReader (buffer, 1);
-
-				uint nid = reader.ReadUInt32();
-
-				if (log.IsDebugEnabled)
-					log.Debug ("Message from " + nid);
-
-				NetworkServerConnection connection;
-				lock (connections)
-				{
-					connections.TryGetValue (nid, out connection);
-				}
-
-				ushort mtype = reader.ReadUInt16();
-
-				MessageBase msg;
-				if (!MessageBase.GetMessage (mtype, out msg))
-				{
-					log.Warn ("Message type " + mtype + " not found from " + connection);
-					return;
-				}
-				else
-				{
-					msg.ReadPayload (reader);
-
-					if (connection == null)
+					if (buffer[0] != 0x2A)
 					{
-						if (log.IsDebugEnabled)
-							log.Debug ("Connectionless message received: " + msg.MessageTypeCode);
+						if (buffer[0] == 24)
+							udp.SendTo (new byte[] { 24, 24 }, tendpoint);
 
-						OnConnectionlessMessageReceived (new ConnectionlessMessageReceivedEventArgs (this, msg, endpoint));
+						continue;
+					}
+
+					reader.Position = 1;
+
+					uint nid = reader.ReadUInt32 ();
+
+					NetworkServerConnection connection;
+					lock (connections)
+					{
+						connections.TryGetValue (nid, out connection);
+					}
+
+					ushort mtype = reader.ReadUInt16 ();
+
+					MessageBase msg;
+					if (!MessageBase.GetMessage (mtype, out msg))
+					{
+						Trace.WriteLine ("[Network] Message type " + mtype + " not found from " + connection);
+						return;
 					}
 					else
 					{
-						if (log.IsDebugEnabled)
-							log.Debug ("Unreliable message received: " + msg.MessageTypeCode);
+						msg.ReadPayload (reader);
 
-						connection.Receive (msg);
+						if (connection == null)
+						{
+							//Trace.WriteLineIf (VerboseTracing, "[Network] Connectionless message received: " + msg.MessageTypeCode);
+							//OnConnectionlessMessageReceived (new ConnectionlessMessageReceivedEventArgs (this, msg, endpoint));
+						}
+						else
+						{
+							//Trace.WriteLine ("[Network] Unreliable message received: " + msg.MessageTypeCode);
+							connection.Receive (msg);
+						}
 					}
+
+					if (udp.Available == 0)
+						Thread.Sleep (1);
+				}
+				catch (SocketException)
+				{
+				}
+				catch (ObjectDisposedException)
+				{
 				}
 			}
-			catch (SocketException)
-			{
-			}
-			catch (ObjectDisposedException)
-			{
-			}
-			finally
-			{
-				this.waiting = false;
-			}
 		}
 
-		protected void OnConnectionlessMessageReceived (ConnectionlessMessageReceivedEventArgs e)
+		private void Outgoing ()
 		{
-			var received = this.ConnectionlessMessageReceived;
-			if (received != null)
-				received (this, e);
+			var o = this.outgoing;
+			var ow = this.outgoingWait;
+
+			while (this.listening)
+			{
+				if (o.Count == 0)
+					ow.WaitOne ();
+
+				while (o.Count > 0)
+				{
+					KeyValuePair<NetworkServerConnection, MessageBase> m;
+					lock (o)
+					{
+						m = o.Dequeue ();
+					}
+
+					Send (m.Key, m.Value);
+				}
+			}
 		}
 
-		private void AcceptConnection (object result)
+		private void AcceptConnection (IAsyncResult result)
 		{
 			try
 			{
-				var listener = (result as TcpListener);
-				#if DEBUG
-				if (listener == null)
-					throw new ArgumentException ("result");
-				#endif
-
-				TcpClient client = listener.AcceptTcpClient();
+				TcpClient client = tcpListener.EndAcceptTcpClient (result);
 				client.NoDelay = true;
-				
-				var stream = client.GetStream();
+
+				var stream = client.GetStream ();
 				var tendpoint = (IPEndPoint)client.Client.RemoteEndPoint;
 				Trace.WriteLine ("[Server] Accepted TCP Connection from " + tendpoint);
 
@@ -263,80 +252,89 @@ namespace Gablarski.Network
 				{
 					while (connections.ContainsKey (++nid)) ;
 
-					connection = new NetworkServerConnection (nid, tendpoint, client, new SocketValueWriter (this.udp, tendpoint));
+					connection = new NetworkServerConnection (this, nid, client, tendpoint, new SocketValueWriter (this.udp, tendpoint));
 					connections.Add (nid, connection);
 				}
 
-				stream.Write (BitConverter.GetBytes (nid), 0, sizeof (uint));		
+				stream.Write (BitConverter.GetBytes (nid), 0, sizeof (uint));
 
 				OnConnectionMade (new ConnectionEventArgs (connection));
+
+				byte[] buffer = new byte[1];
+				client.GetStream ().BeginRead (buffer, 0, 1, ReliableReceive, new Tuple<NetworkServerConnection, byte[]> (connection, buffer));
+
+				tcpListener.BeginAcceptTcpClient (AcceptConnection, null);
 			}
 			catch (SocketException sex)
 			{
 				Trace.WriteLine ("[Server] Failed to accept connection: " + sex.Message);
 			}
-			finally
+			catch (ObjectDisposedException)
 			{
-				this.accepting = false;
 			}
 		}
 
-		protected void OnConnectionMade (ConnectionEventArgs e)
+		private void ReliableReceive (IAsyncResult result)
+		{
+			//try
+			//{
+				var state = (Tuple<NetworkServerConnection, byte[]>)result.AsyncState;
+				var stream = state._1.ReliableStream;
+
+				if (stream.EndRead (result) == 0)
+				{
+					state._1.Disconnect ();
+					return;
+				}
+
+				if (state._2[0] == 0x2A)
+				{
+					ushort type = state._1.ReliableReader.ReadUInt16 ();
+					MessageBase msg;
+					if (MessageBase.GetMessage (type, out msg))
+					{
+						msg.ReadPayload (state._1.ReliableReader);
+
+						state._1.Receive (msg);
+					}
+				}
+
+				stream.BeginRead (state._2, 0, 1, ReliableReceive, state);
+			//}
+			//catch (Exception ex)
+			//{
+			//    throw;
+			//}
+		}
+
+		private void Send (NetworkServerConnection connection, MessageBase message)
+		{
+			try
+			{
+				IValueWriter iwriter;
+				if (connection != null)
+					iwriter = (!message.Reliable) ? connection.UnreliableWriter : connection.ReliableWriter;
+				else
+					iwriter = clWriter;
+
+				iwriter.WriteByte (42);
+				iwriter.WriteUInt16 (message.MessageTypeCode);
+
+				message.WritePayload (iwriter);
+				iwriter.Flush ();
+			}
+			catch (Exception ex)
+			{
+				connection.Disconnect ();
+			    return;
+			}
+		}
+
+		private void OnConnectionMade (ConnectionEventArgs e)
 		{
 			var connection = this.ConnectionMade;
 			if (connection != null)
 				connection (this, e);
-		}
-
-		private readonly Queue<ConnectionlessMessageReceivedEventArgs> clmqueue = new Queue<ConnectionlessMessageReceivedEventArgs>();
-		private void Listener()
-		{
-			SocketValueWriter clWriter = new SocketValueWriter (udp);
-
-			while (this.listening)
-			{
-				if (!this.waiting)
-				{
-					this.waiting = true;
-					var ipEndpoint = new IPEndPoint (IPAddress.Any, 0);
-					var tendpoint = (EndPoint)ipEndpoint;
-					byte[] buffer = new byte[5120];
-
-					try
-					{
-						udp.BeginReceiveFrom (buffer, 0, 5120, SocketFlags.None, ref tendpoint, UnreliableReceive, buffer);
-					}
-					catch (SocketException)
-					{
-					}
-				}
-
-				if (this.clmqueue.Count > 0)
-				{
-					lock (this.clmqueue)
-					{
-						while (this.clmqueue.Count > 0)
-						{
-							var msg = this.clmqueue.Dequeue();
-							clWriter.EndPoint = msg.EndPoint;
-
-							clWriter.WriteByte (42);
-							clWriter.WriteUInt16 (msg.Message.MessageTypeCode);
-							msg.Message.WritePayload (clWriter);
-							clWriter.Flush();
-						}
-					}
-				}
-
-				if (!this.accepting && tcpListener.Pending())
-				{
-					this.accepting = true;
-					ThreadPool.QueueUserWorkItem (AcceptConnection, tcpListener);
-				}
-
-				if (udp.Available == 0 && this.clmqueue.Count == 0)
-					Thread.Sleep (1);
-			}
 		}
 	}
 }

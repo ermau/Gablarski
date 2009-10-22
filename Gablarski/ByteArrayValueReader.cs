@@ -61,6 +61,12 @@ namespace Gablarski
 			this.position = position;
 		}
 
+		public int Position
+		{
+			get { return this.position; }
+			set { this.position = value; }
+		}
+
 		#region Implementation of IDisposable
 
 		/// <summary>
