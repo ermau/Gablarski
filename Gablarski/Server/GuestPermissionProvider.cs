@@ -44,6 +44,14 @@ namespace Gablarski.Server
 	public class GuestPermissionProvider
 		: IPermissionsProvider
 	{
+		public GuestPermissionProvider ()
+		{
+			this.adminPermissions = GetNamesAsPermissions (Permission.GetAllNames ()).ToList();
+			this.guestPermissions = GetNamesAsPermissions (PermissionName.Login, PermissionName.ChangeChannel, PermissionName.AddChannel,
+				                              PermissionName.EditChannel, PermissionName.DeleteChannel,
+				                              PermissionName.RequestChannelList, PermissionName.RequestSource, PermissionName.SendAudioToCurrentChannel).ToList();
+		}
+
 		public event EventHandler<PermissionsChangedEventArgs> PermissionsChanged;
 
 		public bool UpdatedSupported
@@ -53,17 +61,7 @@ namespace Gablarski.Server
 
 		public IEnumerable<Permission> GetPermissions (int userID)
 		{
-			if (this.admins.Contains (userID))
-				return GetNamesAsPermissions (Permission.GetAllNames());
-
-			if (userID != 0) // User
-			{
-				return GetNamesAsPermissions (PermissionName.Login, PermissionName.ChangeChannel, PermissionName.AddChannel,
-				                              PermissionName.EditChannel, PermissionName.DeleteChannel,
-				                              PermissionName.RequestChannelList, PermissionName.RequestSource, PermissionName.SendAudioToCurrentChannel);
-			}
-			else // Non-user client.
-				return GetNamesAsPermissions (PermissionName.Login, PermissionName.RequestChannelList);
+			return (this.admins.Contains (userID)) ? adminPermissions : guestPermissions;
 		}
 
 		public void SetPermissions (int userId, IEnumerable<Permission> permissions)
@@ -82,6 +80,8 @@ namespace Gablarski.Server
 			OnPermissionsChanged (new PermissionsChangedEventArgs (userId));
 		}
 
+		private readonly IEnumerable<Permission> adminPermissions;
+		private readonly IEnumerable<Permission> guestPermissions;
 		private readonly HashSet<int> admins = new HashSet<int> ();
 
 		private IEnumerable<Permission> GetNamesAsPermissions (IEnumerable<PermissionName> names)
