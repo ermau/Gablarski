@@ -165,6 +165,7 @@ namespace Gablarski.Server
 				}
 			}
 
+			this.incomingWait.Set ();
 			this.messageRunnerThread.Join();
 
 			while (this.connections.ConnectionCount > 0)
