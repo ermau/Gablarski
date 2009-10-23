@@ -218,12 +218,6 @@ namespace Gablarski.Client
 			{
 				IPEndPoint endPoint = new IPEndPoint (Dns.GetHostAddresses (host).Where (ip => ip.AddressFamily == AddressFamily.InterNetwork).First(), port);
 
-				if (this.messageRunnerThread != null)
-				{
-					this.messageRunnerThread.Join();
-					this.messageRunnerThread = null;
-				}
-
 				this.running = true;
 
 				this.messageRunnerThread = new Thread (this.MessageRunner) { Name = "Gablarski Client Message Runner" };

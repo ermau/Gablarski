@@ -56,6 +56,7 @@ namespace Gablarski.Client
 		}
 
 		private volatile bool running;
+		private readonly AutoResetEvent outgoingWait = new AutoResetEvent (false);
 		private readonly Queue<MessageReceivedEventArgs> mqueue = new Queue<MessageReceivedEventArgs> (100);
 		private Thread messageRunnerThread;
 
@@ -106,12 +107,6 @@ namespace Gablarski.Client
 		{
 			while (this.running)
 			{
-				if (mqueue.Count == 0)
-				{
-					Thread.Sleep (1);
-					continue;
-				}
-
 				while (mqueue.Count > 0)
 				{
 					MessageReceivedEventArgs e;
@@ -134,6 +129,9 @@ namespace Gablarski.Client
 					if (this.running)
                         this.handlers[msg.MessageType] (e);
 				}
+
+				if (mqueue.Count == 0)
+					outgoingWait.WaitOne ();
 			}
 		}
 
@@ -143,6 +141,8 @@ namespace Gablarski.Client
 			{
 				mqueue.Enqueue (e);
 			}
+
+			outgoingWait.Set ();
 		}
 
 		private void OnMuted (MessageReceivedEventArgs obj)
@@ -183,9 +183,17 @@ namespace Gablarski.Client
 		{
 			this.running = false;
 
+			this.outgoingWait.Set ();
+
 			lock (this.mqueue)
 			{
 				this.mqueue.Clear();
+			}
+
+			if (this.messageRunnerThread != null)
+			{
+				this.messageRunnerThread.Join ();
+				this.messageRunnerThread = null;
 			}
 
 			OnDisconnected (this, EventArgs.Empty);
