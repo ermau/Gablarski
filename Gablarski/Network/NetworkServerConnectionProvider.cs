@@ -36,13 +36,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Net;
-using Gablarski.Messages;
-using System.Threading;
-using System.Net.Sockets;
 using System.Diagnostics;
+using System.Net;
+using System.Net.Sockets;
+using System.Threading;
+using Gablarski.Messages;
 using Mono.Rocks;
 
 namespace Gablarski.Network
@@ -129,6 +127,14 @@ namespace Gablarski.Network
 			outgoingWait.Set ();
 		}
 
+		internal void Disconnect (NetworkServerConnection connection)
+		{
+			lock (connections)
+			{
+				connections.Remove (connection.NetworkId);
+			}
+		}
+
 		private volatile bool listening;
 		private int port = 6112;
 		private Socket udp;
@@ -157,9 +163,11 @@ namespace Gablarski.Network
 			{
 				try
 				{
-					int received = udp.ReceiveFrom (buffer, ref tendpoint);
-					if (received == 0)
+					if (udp == null || udp.ReceiveFrom (buffer, ref tendpoint) == 0)
+					{
+						Trace.WriteLine ("[Network] UDP ReceiveFrom returned nothing");
 						return;
+					}
 
 					if (buffer[0] != 0x2A)
 					{
@@ -202,9 +210,6 @@ namespace Gablarski.Network
 							connection.Receive (msg);
 						}
 					}
-
-					if (udp.Available == 0)
-						Thread.Sleep (1);
 				}
 				catch (SocketException)
 				{
@@ -305,7 +310,8 @@ namespace Gablarski.Network
 					}
 				}
 
-				stream.BeginRead (state._2, 0, 1, ReliableReceive, state);
+				if (connection.IsConnected)
+					stream.BeginRead (state._2, 0, 1, ReliableReceive, state);
 			}
 			catch (Exception ex)
 			{
