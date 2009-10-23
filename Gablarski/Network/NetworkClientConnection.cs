@@ -81,6 +81,8 @@ namespace Gablarski.Network
 			{
 				sendQueue.Enqueue (message);
 			}
+
+			this.sendWait.Set ();
 		}
 
 		/// <summary>
@@ -107,6 +109,7 @@ namespace Gablarski.Network
 
 			lock (this.sendQueue)
 			{
+				this.sendWait.Set ();
 				this.sendQueue.Clear();
 			}
 
@@ -174,6 +177,14 @@ namespace Gablarski.Network
 
 			this.uwriter = new SocketValueWriter (this.udp, endpoint);
 			
+			byte[] rbuffer = new byte[1];
+			this.rstream.BeginRead (rbuffer, 0, 1, ReliableReceived, rbuffer);
+
+			var ipendpoint = new IPEndPoint (IPAddress.Any, 0);
+			var tendpoint = (EndPoint)ipendpoint;
+			byte[] urbuffer = new byte[5120];
+			this.udp.BeginReceiveFrom (urbuffer, 0, urbuffer.Length, SocketFlags.None, ref tendpoint, UnreliableReceive, urbuffer);
+
 			this.runnerThread = new Thread (this.Runner) { Name = "NetworkClientConnection Runner" };
 			this.runnerThread.Start();
 		}
@@ -195,6 +206,7 @@ namespace Gablarski.Network
 		private IValueReader ureader;
 		private volatile bool uwaiting;
 
+		private readonly AutoResetEvent sendWait = new AutoResetEvent (false);
 		private readonly Queue<MessageBase> sendQueue = new Queue<MessageBase>();
 
 		private void Runner()
@@ -202,13 +214,14 @@ namespace Gablarski.Network
 			IValueWriter writeReliable = this.rwriter;
 			IValueWriter writeUnreliable = this.uwriter;
 
+			AutoResetEvent wait = this.sendWait;
 			Queue<MessageBase> queue = this.sendQueue;
 
 			while (this.running)
 			{
 				MessageBase toSend = null;
 
-				if (queue.Count > 0)
+				while (queue.Count > 0)
 				{
 					lock (queue)
 					{
@@ -227,34 +240,8 @@ namespace Gablarski.Network
 					iwriter.Flush ();
 				}
 
-				if (!this.uwaiting)
-				{
-					this.uwaiting = true;
-					var ipEndpoint = new IPEndPoint (IPAddress.Any, 0);
-					var tendpoint = (EndPoint)ipEndpoint;
-					byte[] buffer = new byte[5120];
-					udp.BeginReceiveFrom (buffer, 0, buffer.Length, SocketFlags.None, ref tendpoint, UnreliableReceive, buffer);
-				}
-
-				if (!this.rwaiting)
-				{
-					this.rwaiting = true;
-					byte[] mbuffer = new byte[1];
-
-					try
-					{
-						this.rstream.BeginRead (mbuffer, 0, 1, this.ReliableReceived, mbuffer);
-					}
-					catch (SocketException sex)
-					{
-						Trace.WriteLine ("[Server] Error starting read, disconnecting: " + sex.Message);
-						this.Disconnect();
-						return;
-					}
-				}
-
-				if (udp.Available == 0 && !rstream.DataAvailable && queue.Count == 0)
-					Thread.Sleep (1);
+				if (queue.Count == 0)
+					wait.WaitOne ();
 			}
 		}
 
@@ -294,6 +281,9 @@ namespace Gablarski.Network
 					msg.ReadPayload (this.rreader);
 
 					OnMessageReceived (new MessageReceivedEventArgs (this, msg));
+
+					if (rstream != null && running)
+						rstream.BeginRead (mbuffer, 0, 1, ReliableReceived, mbuffer);
 				}
 				else
 					this.Disconnect();
@@ -312,21 +302,21 @@ namespace Gablarski.Network
 
 		private void UnreliableReceive (IAsyncResult result)
 		{
+			var ipendpoint = new IPEndPoint (IPAddress.Any, 0);
+			var endpoint = (EndPoint)ipendpoint;
+
+			byte[] buffer = (byte[])result.AsyncState;
+
+			if (udp == null)
+				return;
+
 			try
 			{
-				var ipendpoint = new IPEndPoint (IPAddress.Any, 0);
-				var endpoint = (EndPoint)ipendpoint;
-				
-				if (udp == null)
-					return;
-
 				if (udp.EndReceiveFrom (result, ref endpoint) == 0)
 				{
 					Trace.WriteLineIf (VerboseTracing, "[Network] UDP EndReceiveFrom returned nothing.");
 					return;
 				}
-
-				byte[] buffer = (byte[])result.AsyncState;
 
 				if (buffer[0] != 0x2A)
 				{
@@ -360,6 +350,9 @@ namespace Gablarski.Network
 			finally
 			{
 				this.uwaiting = false;
+
+				if (udp != null && running)
+					udp.BeginReceiveFrom (buffer, 0, buffer.Length, SocketFlags.None, ref endpoint, UnreliableReceive, buffer);
 			}
 		}
 	}
