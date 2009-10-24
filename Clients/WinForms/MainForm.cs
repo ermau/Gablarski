@@ -62,6 +62,11 @@ namespace Gablarski.Clients.Windows
 			}
 		}
 
+		public void Connect (string host, int port)
+		{
+			this.gablarski.Connect (host, port);
+		}
+
 		public bool ShowConnect (bool cancelExits)
 		{
 			var login = new LoginForm();
@@ -149,9 +154,9 @@ namespace Gablarski.Clients.Windows
 			}
 		}
 
-		private void Connect()
+		private void Connect ()
 		{
-			this.gablarski.Connect (this.server.Host, this.server.Port);
+			Connect (this.server.Host, this.server.Port);
 		}
 
 		private void SettingsSettingChanged (object sender, PropertyChangedEventArgs e)
@@ -455,9 +460,20 @@ namespace Gablarski.Clients.Windows
 				);
 			});
 
-			string userpassword = this.server.UserPassword;
-			
+			if (this.server == null)
+				this.server = new ServerEntry ();
 
+			string userpassword = this.server.UserPassword;
+
+			if (this.server.UserNickname.IsEmpty ())
+			{
+				InputForm nickname = new InputForm ();
+				if (nickname.ShowDialogOnFormThread (this) == DialogResult.Cancel)
+					return;
+
+				this.server.UserNickname = nickname.Input.Text.Trim ();
+			}
+			
 			if (!this.server.UserName.IsEmpty() && userpassword.IsEmpty())
 			{
 				InputForm input = new InputForm();

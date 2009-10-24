@@ -253,7 +253,7 @@ namespace Gablarski.Clients.Windows
 		private void startLocal_Click (object sender, EventArgs e)
 		{
 			InputForm nickname = new InputForm();
-			if (nickname.ShowDialog() == DialogResult.Cancel)
+			if (nickname.ShowDialogOnFormThread (this) == DialogResult.Cancel)
 				return;
 
 			string nick = nickname.Input.Text.Trim();

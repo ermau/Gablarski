@@ -13,6 +13,16 @@ namespace Gablarski.Clients.Windows
 	{
 		public static event PropertyChangedEventHandler SettingChanged;
 
+		public static bool FirstRun
+		{
+			get { return GetSetting ("FirstRun", true); }
+			set
+			{
+				if (SetSetting ("FirstRun", value))
+					OnSettingsChanged ("FirstRun");
+			}
+		}
+
 		public const string UsePushToTalkSettingName = "UsePushToTalk";
 		public static bool UsePushToTalk
 		{
@@ -172,6 +182,17 @@ namespace Gablarski.Clients.Windows
 			{
 				if (SetSetting (NormalMusicVolumeSettingName, value))
 					OnSettingsChanged (NormalMusicVolumeSettingName);
+			}
+		}
+
+		public const string EnableGablarskiURLsSettingName = "EnableGablarskiURLs";
+		public static bool EnableGablarskiURLs
+		{
+			get { return GetSetting (EnableGablarskiURLsSettingName, true); }
+			set
+			{
+				if (SetSetting (EnableGablarskiURLsSettingName, value))
+					OnSettingsChanged (EnableGablarskiURLsSettingName);
 			}
 		}
 
