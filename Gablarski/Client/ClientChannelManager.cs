@@ -40,6 +40,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using Gablarski.Messages;
+using System.Threading;
 
 namespace Gablarski.Client
 {
@@ -144,7 +145,18 @@ namespace Gablarski.Client
 		#region IEnumerable<Channel> members
 		public IEnumerator<ChannelInfo> GetEnumerator ()
 		{
-			if (this.channels == null || this.channels.Count == 0)
+			if (this.channels == null)
+			{
+				if (this.context.Connection == null || !this.context.Connection.IsConnected)
+					throw new InvalidOperationException ("Not connected");
+
+				this.context.Connection.Send (new RequestChannelListMessage ());
+
+				while (this.channels == null)
+					Thread.Sleep (1);
+			}
+
+			if (this.channels.Count == 0)
 				return Enumerable.Empty<ChannelInfo> ().GetEnumerator();
 
 			lock (channelLock)

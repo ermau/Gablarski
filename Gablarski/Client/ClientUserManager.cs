@@ -41,6 +41,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using Gablarski.Messages;
+using System.Threading;
 
 namespace Gablarski.Client
 {
@@ -135,7 +136,15 @@ namespace Gablarski.Client
 		public IEnumerator<ClientUser> GetEnumerator()
 		{
 			if (this.users == null)
-				yield break;
+			{
+				if (this.context.Connection == null || !this.context.Connection.IsConnected)
+					throw new InvalidOperationException ("Not connected");
+
+				this.context.Connection.Send (new RequestUserListMessage ());
+
+				while (this.users == null)
+					Thread.Sleep (1);
+			}
 
 			lock (userLock)
 			{
