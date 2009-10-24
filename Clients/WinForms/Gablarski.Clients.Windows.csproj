@@ -32,6 +32,7 @@
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <ApplicationIcon>Headphones.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
     <DebugSymbols>true</DebugSymbols>
@@ -101,6 +102,7 @@
       <HintPath>..\..\fluent-nhibernate\tools\sqlite\System.Data.SQLite.dll</HintPath>
     </Reference>
     <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Speech" />
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -161,6 +163,11 @@
       <DependentUpon>InputForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Persistance.cs" />
+    <Compile Include="Properties\Resources1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="UserTreeView.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -174,9 +181,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="LoginForm.resx">
       <DependentUpon>LoginForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="MainForm.resx">
-      <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MusicForm.resx">
       <DependentUpon>MusicForm.cs</DependentUpon>
@@ -192,9 +196,6 @@
     <EmbeddedResource Include="SettingsForm.resx">
       <DependentUpon>SettingsForm.cs</DependentUpon>
     </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <Compile Include="RequiredTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -271,6 +272,16 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\user_add.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Headphones.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Headphones.ico" />
+    <None Include="Resources\Headphones.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

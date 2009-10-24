@@ -178,9 +178,9 @@
 			this.labelName.AutoSize = true;
 			this.labelName.Location = new System.Drawing.Point (6, 6);
 			this.labelName.Name = "labelName";
-			this.labelName.Size = new System.Drawing.Size (38, 13);
+			this.labelName.Size = new System.Drawing.Size (88, 13);
 			this.labelName.TabIndex = 4;
-			this.labelName.Text = "Name:";
+			this.labelName.Text = "Name the server:";
 			// 
 			// inUsername
 			// 
@@ -331,7 +331,7 @@
 			this.Name = "LoginForm";
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-			this.Text = "Gablarski Login";
+			this.Text = "Connect";
 			this.Load += new System.EventHandler (this.LoginForm_Load);
 			this.pnlModServer.ResumeLayout (false);
 			this.pnlModServer.PerformLayout ();

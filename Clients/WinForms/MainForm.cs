@@ -20,6 +20,8 @@ namespace Gablarski.Clients.Windows
 	{
 		public MainForm ()
 		{
+			this.Icon = Resources.Headphones;
+
 			this.gablarski = new GablarskiClient (new NetworkClientConnection());
 			this.gablarski.ConnectionRejected += this.GablarskiConnectionRejected;
 			this.gablarski.Connected += this.GablarskiConnected;
