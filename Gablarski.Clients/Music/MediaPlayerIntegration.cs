@@ -23,6 +23,22 @@ namespace Gablarski.Clients.Music
 			playerTimer = new Timer (Pulse, null, 0, 2500);
 		}
 
+		public IEnumerable<IMediaPlayer> MediaPlayers
+		{
+			get { return this.mediaPlayers; }
+			set
+			{
+				SetVolume (NormalVolume);
+
+				lock (this.attachedPlayers)
+				{
+					this.attachedPlayers.Clear ();
+				}
+
+				this.mediaPlayers = value;
+			}
+		}
+
 		/// <summary>
 		/// Gets or sets whether the user's own speech quiets the music.
 		/// </summary>
@@ -52,11 +68,11 @@ namespace Gablarski.Clients.Music
 
 		private int talkingVolume = 30;
 		private int normalVolume = 100;
+		private IEnumerable<IMediaPlayer> mediaPlayers;
 
 		private int playing;
 		private readonly IClientContext context;
 		private readonly IAudioReceiver receiver;
-		private readonly IEnumerable<IMediaPlayer> mediaPlayers;
 		private readonly HashSet<IMediaPlayer> attachedPlayers = new HashSet<IMediaPlayer>();
 		private readonly Timer playerTimer;
 

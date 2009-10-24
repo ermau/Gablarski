@@ -65,6 +65,20 @@ namespace Gablarski.Clients.Windows
 			Settings.VoiceActivationContinueThreshold = this.threshold.Value * 100;
 			Settings.VoiceActivationLevel = this.vadSensitivity.Value;
 
+			List<string> enabledPlayers = new List<string> ();
+			foreach (Type playerSupport in Modules.MediaPlayers)
+			{
+				foreach (string enabled in this.musicPlayers.CheckedItems.Cast<string> ())
+				{
+					if (!playerSupport.Name.Contains (enabled))
+						continue;
+					
+					enabledPlayers.Add (playerSupport.FullName + ", " + playerSupport.Assembly.GetName().Name);
+				}
+			}
+
+			Settings.EnabledMediaPlayerIntegrations = enabledPlayers;
+
 			Settings.TalkingMusicVolume = this.talkingVolume.Value;
 			Settings.NormalMusicVolume = this.normalVolume.Value;
 

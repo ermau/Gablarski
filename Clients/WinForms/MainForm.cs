@@ -175,6 +175,11 @@ namespace Gablarski.Clients.Windows
 					SetupVoiceCapture();
 					break;
 
+				case Settings.EnabledMediaPlayerIntegrationsSettingName:
+					this.mediaPlayerIntegration.MediaPlayers = Settings.EnabledMediaPlayerIntegrations.Select (
+																		s => (IMediaPlayer)Activator.CreateInstance (Type.GetType (s))).ToList ();
+					break;
+
 				case Settings.TalkingMusicVolumeSettingName:
 					this.mediaPlayerIntegration.TalkingVolume = Settings.TalkingMusicVolume;
 					break;
@@ -419,7 +424,7 @@ namespace Gablarski.Clients.Windows
 				gablarski.Disconnect();
 			}
 			else
-				this.gablarski.Sources.Request ("voice", 1, 64000);
+				this.gablarski.Sources.Request ("voice", 1);
 		}
 
 		void GablarskiDisconnected (object sender, EventArgs e)
