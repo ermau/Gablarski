@@ -358,7 +358,7 @@ namespace Gablarski.Tests
 		public void SourceResultWithoutSource ()
 		{
 			const string name = "Name";
-			var result = Messages.SourceResult.Succeeded;
+			var result = Messages.SourceResult.FailedPermissions;
 			var msg = new SourceResultMessage (name, result, null);
 			Assert.AreEqual (result, msg.SourceResult);
 			Assert.AreEqual (name, msg.SourceName);
