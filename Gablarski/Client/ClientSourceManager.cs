@@ -404,7 +404,7 @@ namespace Gablarski.Client
 			if (msg.SourceResult == SourceResult.Succeeded || msg.SourceResult == SourceResult.NewSource)
 				UpdateSourceFromExternal (source);
 
-		    OnReceivedSource (new ReceivedAudioSourceEventArgs (source, msg.SourceResult));
+		    OnReceivedSource (new ReceivedAudioSourceEventArgs (msg.SourceName, source, msg.SourceResult));
 		}
 
 		internal void OnSourcesRemovedMessage (MessageReceivedEventArgs e)
@@ -538,10 +538,20 @@ namespace Gablarski.Client
 	public class ReceivedAudioSourceEventArgs
 		: EventArgs
 	{
-		public ReceivedAudioSourceEventArgs (AudioSource source, SourceResult result)
+		public ReceivedAudioSourceEventArgs (string sourceName, AudioSource source, SourceResult result)
 		{
+			this.SourceName = sourceName;
 			this.Result = result;
 			this.Source = source;
+		}
+
+		/// <summary>
+		/// Gets the name of the requested source.
+		/// </summary>
+		public string SourceName
+		{
+			get;
+			private set;
 		}
 
 		/// <summary>
@@ -554,7 +564,7 @@ namespace Gablarski.Client
 		}
 
 		/// <summary>
-		/// Gets the media source of the event.
+		/// Gets the media source of the event. <c>null</c> if failed.
 		/// </summary>
 		public AudioSource Source
 		{

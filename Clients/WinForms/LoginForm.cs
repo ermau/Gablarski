@@ -22,6 +22,8 @@ namespace Gablarski.Clients.Windows
 		public LoginForm ()
 		{
 			InitializeComponent ();
+
+			this.Icon = Resources.ServerConnectImage.ToIcon ();
 		}
 
 		public ServerEntry Entry

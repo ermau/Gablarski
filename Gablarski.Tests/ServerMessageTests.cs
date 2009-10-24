@@ -337,10 +337,12 @@ namespace Gablarski.Tests
 		[Test]
 		public void SourceResult()
 		{
+			const string name = "Name";
 			var result = Messages.SourceResult.Succeeded;
-			var source = new AudioSource ("Name", 1, 2, 1, 64000, 44100, 256, 10, false);
-			var msg = new SourceResultMessage (result, source);
+			var source = new AudioSource (name, 1, 2, 1, 64000, 44100, 256, 10, false);
+			var msg = new SourceResultMessage (name, result, source);
 			Assert.AreEqual (result, msg.SourceResult);
+			Assert.AreEqual (name, msg.SourceName);
 			msg.WritePayload (writer);
 			long length = stream.Position;
 			stream.Position = 0;
@@ -349,6 +351,36 @@ namespace Gablarski.Tests
 			msg.ReadPayload (reader);
 			Assert.AreEqual (length, stream.Position);
 			Assert.AreEqual (result, msg.SourceResult);
+			Assert.AreEqual (name, msg.SourceName);
+		}
+
+		[Test]
+		public void SourceResultWithoutSource ()
+		{
+			const string name = "Name";
+			var result = Messages.SourceResult.Succeeded;
+			var msg = new SourceResultMessage (name, result, null);
+			Assert.AreEqual (result, msg.SourceResult);
+			Assert.AreEqual (name, msg.SourceName);
+			msg.WritePayload (writer);
+			long length = stream.Position;
+			stream.Position = 0;
+
+			msg = new SourceResultMessage ();
+			msg.ReadPayload (reader);
+			Assert.AreEqual (length, stream.Position);
+			Assert.AreEqual (result, msg.SourceResult);
+			Assert.AreEqual (name, msg.SourceName);
+		}
+
+		[Test]
+		public void SourceResultInvalid ()
+		{
+			Assert.Throws<ArgumentNullException> (() => new SourceResultMessage (null, Messages.SourceResult.Succeeded, new AudioSource ("name", 1, 2, 1, 64000, 44100, 256, 10, false)));
+			Assert.Throws<ArgumentNullException> (() => new SourceResultMessage ("name", Messages.SourceResult.Succeeded, null));
+			Assert.Throws<ArgumentNullException> (() => new SourceResultMessage ("name", Messages.SourceResult.SourceRemoved, null));
+			Assert.Throws<ArgumentNullException> (() => new SourceResultMessage ("name", Messages.SourceResult.NewSource, null));
+			Assert.DoesNotThrow (() => new SourceResultMessage ("name", Messages.SourceResult.FailedLimit, null));
 		}
 
 		[Test]

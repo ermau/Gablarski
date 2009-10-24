@@ -67,7 +67,7 @@ namespace Gablarski.Clients.Windows
 
 			Settings.TalkingMusicVolume = this.talkingVolume.Value;
 			Settings.NormalMusicVolume = this.normalVolume.Value;
-			//Settings.EnabledMediaPlayerIntegrations = this.musicPlayers.CheckedItems.Cast<string>()
+
 			Settings.MediaVolumeControlIgnoresYou = this.musicIgnoreYou.Checked;
 
 			Settings.SaveSettings();

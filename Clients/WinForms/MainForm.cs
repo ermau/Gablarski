@@ -28,7 +28,7 @@ namespace Gablarski.Clients.Windows
 			this.gablarski.Disconnected += this.GablarskiDisconnected;
 			this.gablarski.Channels.ReceivedChannelList += this.ChannelsReceivedChannelList;
 			this.gablarski.Users.ReceivedUserList += this.UsersReceivedUserList;
-			this.gablarski.Users.UserLoggedIn += UsersUserLoggedIn;
+			this.gablarski.Users.UserJoined += UsersUserLoggedIn;
 			this.gablarski.Users.UserDisconnected += UsersUserDisconnected;
 			this.gablarski.Users.UserChangedChannel += UsersUserChangedChannel;
 			this.gablarski.CurrentUser.ReceivedLoginResult += this.CurrentUserReceivedLoginResult;
@@ -308,10 +308,28 @@ namespace Gablarski.Clients.Windows
 			else if (e.Result == SourceResult.NewSource)
 			{
 				this.gablarski.Audio.Attach (playback, e.Source, new AudioEnginePlaybackOptions ());
-				users.Update (gablarski.Channels, gablarski.Users.Cast<UserInfo>(), gablarski.Sources);
+				users.Update (gablarski.Channels, gablarski.Users.Cast<UserInfo> (), gablarski.Sources);
 			}
 			else
-				MessageBox.Show (this, e.Result.ToString ());
+			{
+				string reason;
+				switch (e.Result)
+				{
+					case SourceResult.FailedPermissions:
+						reason = "Insufficient permissions";
+						break;
+
+					case SourceResult.FailedLimit:
+						reason = "You or the server are at source capacity";
+						break;
+
+					default:
+						reason = e.Result.ToString();
+						break;
+				}
+
+				MessageBox.Show (this, "Source '" + e.SourceName + "' request failed: " + reason, "Source Request", MessageBoxButtons.OK, MessageBoxIcon.Error);
+			}
 		}
 
 		private void UsersUserChangedChannel (object sender, ChannelChangedEventArgs e)
@@ -372,8 +390,32 @@ namespace Gablarski.Clients.Windows
 		{
 			if (e.Result != LoginResultState.Success)
 			{
+				string reason = e.Result.ToString ();
+				switch (e.Result)
+				{
+					case LoginResultState.FailedUsernameAndPassword:
+						reason = "Username and password combination not found.";
+						break;
+
+					case LoginResultState.FailedUsername:
+						reason = "The username supplied was not found or is invalid.";
+						break;
+
+					case LoginResultState.FailedServerPassword:
+						reason = "The server password supplied was incorrect.";
+						break;
+
+					case LoginResultState.FailedNicknameInUse:
+						reason = "The nickname supplied is already in use.";
+						break;
+
+					case LoginResultState.FailedPassword:
+						reason = "The password for the username supplied was incorrect.";
+						break;
+				}
+
 				Action<Form, string> d = (f, m) => MessageBox.Show (f, m);
-				BeginInvoke (d, this, "Join failed: " + e.Result);
+				BeginInvoke (d, this, "Join failed: " + reason);
 				gablarski.Disconnect();
 			}
 			else

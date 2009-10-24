@@ -132,6 +132,7 @@
     <Compile Include="DeviceSelector.Designer.cs">
       <DependentUpon>DeviceSelector.cs</DependentUpon>
     </Compile>
+    <Compile Include="Entities\IgnoreEntry.cs" />
     <Compile Include="Entities\ServerEntry.cs" />
     <Compile Include="Entities\SettingEntry.cs" />
     <Compile Include="Extensions.cs" />
@@ -147,6 +148,7 @@
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Mappings\IgnoreMap.cs" />
     <Compile Include="Mappings\ServerMap.cs" />
     <Compile Include="Mappings\SettingMap.cs" />
     <Compile Include="Modules.cs" />

@@ -149,9 +149,6 @@
     <Compile Include="Messages\MutedMessage.cs" />
     <Compile Include="ModuleSelectableAttribute.cs" />
     <Compile Include="MusicFileCaptureProvider.cs" />
-    <Compile Include="Network\NetworkClientConnection.cs" />
-    <Compile Include="Network\NetworkServerConnection.cs" />
-    <Compile Include="Network\NetworkServerConnectionProvider.cs" />
     <Compile Include="ChannelInfo.cs" />
     <Compile Include="Client\ClientChannelManager.cs" />
     <Compile Include="Client\GablarskiClient.cs" />
@@ -187,6 +184,9 @@
     <Compile Include="ModuleLoader.cs" />
     <Compile Include="MutableLookup.cs" />
     <Compile Include="ByteArrayExtensions.cs" />
+    <Compile Include="Network\NetworkClientConnection.cs" />
+    <Compile Include="Network\NetworkServerConnection.cs" />
+    <Compile Include="Network\NetworkServerConnectionProvider.cs" />
     <Compile Include="Network\SocketValueWriter.cs" />
     <Compile Include="Server\IServerPersistance.cs" />
     <Compile Include="Server\ServerUserInfo.cs" />

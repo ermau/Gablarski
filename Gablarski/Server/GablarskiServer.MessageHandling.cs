@@ -460,7 +460,7 @@ namespace Gablarski.Server
 						if (this.sources.Count > 0)
 							sourceId = this.sources.Max (s => s.Id) + 1;
 					}
-				
+
 					int bitrate = settings.DefaultAudioBitrate;
 					if (request.TargetBitrate != 0)
 						bitrate = request.TargetBitrate.Trim (settings.MinimumAudioBitrate, settings.MaximumAudioBitrate);
@@ -482,10 +482,10 @@ namespace Gablarski.Server
 			}
 			finally
 			{
-				e.Connection.Send (new SourceResultMessage (result, source));
+				e.Connection.Send (new SourceResultMessage (request.Name, result, source));
 				if (result == SourceResult.Succeeded)
 				{
-					connections.Send (new SourceResultMessage (SourceResult.NewSource, source), (IConnection c) => c != e.Connection);
+					connections.Send (new SourceResultMessage (request.Name, SourceResult.NewSource, source), (IConnection c) => c != e.Connection);
 				}
 			}
 		}

@@ -55,7 +55,7 @@ namespace Gablarski
 		Success = 1,
 
 		/// <summary>
-		/// Failed because the username does not exist, is invalid.
+		/// Failed because the username does not exist or is invalid.
 		/// </summary>
 		FailedUsername = 2,
 

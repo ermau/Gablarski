@@ -50,11 +50,32 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public SourceResultMessage (SourceResult result, AudioSource source)
+		public SourceResultMessage (string sourceName, SourceResult result, AudioSource source)
 			: this ()
 		{
+			if (sourceName == null)
+				throw new ArgumentNullException ("sourceName");
+
+			this.SourceName = sourceName;
 			this.SourceResult = result;
 			this.Source = source;
+
+			if (source == null)
+			{
+				switch (result)
+				{
+					case Messages.SourceResult.NewSource:
+					case Messages.SourceResult.SourceRemoved:
+					case Messages.SourceResult.Succeeded:
+						throw new ArgumentNullException ("source", "source can not be null if the result didn't fail");
+				}
+			}
+		}
+
+		public string SourceName
+		{
+			get;
+			set;
 		}
 
 		public SourceResult SourceResult
@@ -71,14 +92,26 @@ namespace Gablarski.Messages
 
 		public override void WritePayload (IValueWriter writer)
 		{
+			writer.WriteString (this.SourceName);
 			writer.WriteByte ((byte)this.SourceResult);
-			this.Source.Serialize (writer);
+
+			if (this.Source != null)
+				this.Source.Serialize (writer);
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
+			this.SourceName = reader.ReadString ();
 			this.SourceResult = (SourceResult)reader.ReadByte ();
-			this.Source = new AudioSource (reader);
+
+			switch (this.SourceResult)
+			{
+				case Messages.SourceResult.NewSource:
+				case Messages.SourceResult.SourceRemoved:
+				case Messages.SourceResult.Succeeded:
+					this.Source = new AudioSource (reader);
+					break;
+			}
 		}
 	}
 
@@ -118,21 +151,21 @@ namespace Gablarski.Messages
 		/// <summary>
 		/// Failed because the MediaType requested is not allowed.
 		/// </summary>
-		FailedDisallowedType = 5,
+		//FailedDisallowedType = 5,
 
 		/// <summary>
 		/// Failed because the server does not support the requested type.
 		/// </summary>
-		FailedNotSupportedType = 6,
+		//FailedNotSupportedType = 6,
 
 		/// <summary>
 		/// Failed because you're only permitted a single source of this type.
 		/// </summary>
-		FailedPermittedSingleSourceOfType = 7,
+		//FailedPermittedSingleSourceOfType = 7,
 
 		/// <summary>
 		/// Failed because invalid arguments were supplied for the request.
 		/// </summary>
-		FailedInvalidArguments = 8,
+		FailedInvalidArguments = 9,
 	}
 }

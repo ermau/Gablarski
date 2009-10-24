@@ -62,9 +62,9 @@ namespace Gablarski.Client
 		public event EventHandler<ReceivedListEventArgs<UserInfo>> ReceivedUserList;
 
 		/// <summary>
-		/// A new user has logged in.
+		/// A new user has joined.
 		/// </summary>
-		public event EventHandler<UserEventArgs> UserLoggedIn;
+		public event EventHandler<UserEventArgs> UserJoined;
 
 		/// <summary>
 		/// A user has disconnected.
@@ -275,7 +275,7 @@ namespace Gablarski.Client
 
 		protected virtual void OnUserLoggedIn (UserEventArgs e)
 		{
-			var result = this.UserLoggedIn;
+			var result = this.UserJoined;
 			if (result != null)
 				result (this, e);
 		}
