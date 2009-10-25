@@ -103,9 +103,6 @@ namespace Gablarski.Server
 						return;
 					}
 
-					Trace.WriteLineIf ((VerboseTracing || msg.MessageType != ClientMessageType.AudioData),
-										"[Server] Message Received: " + msg.MessageType);
-
 					Action<MessageReceivedEventArgs> handler;
 					if (Handlers.TryGetValue (msg.MessageType, out handler))
 						handler (e);
@@ -132,10 +129,10 @@ namespace Gablarski.Server
 		{
 			var msg = (ConnectMessage)e.Message;
 
-			if (msg.ApiVersion < MinimumApiVersion)
+			if (msg.ProtocolVersion < ProtocolVersion)
 			{
 				e.Connection.Send (new ConnectionRejectedMessage (ConnectionRejectedReason.IncompatibleVersion));
-				e.Connection.Disconnect ();
+				//e.Connection.Disconnect ();
 				return;
 			}
 
