@@ -50,7 +50,7 @@ namespace Gablarski.Tests
 		private MockServerConnection Login (string username, string password)
 		{
 			var connection = provider.EstablishConnection ();
-			connection.Client.Send (new ConnectMessage (GablarskiServer.MinimumApiVersion));
+			connection.Client.Send (new ConnectMessage (GablarskiServer.ProtocolVersion));
 			connection.Client.DequeueAndAssertMessage<ServerInfoMessage>();
 
 			connection.Client.Send (new LoginMessage { Username = username, Password = password });
@@ -100,7 +100,7 @@ namespace Gablarski.Tests
 		public void OldVersionReject ()
 		{
 			var connection = provider.EstablishConnection ();
-			connection.Client.Send (new ConnectMessage (new Version (0,0,0,1)));
+			connection.Client.Send (new ConnectMessage (0));
 
 			MessageBase message = connection.Client.DequeueMessage ();
 			Assert.IsInstanceOf<ConnectionRejectedMessage> (message);
@@ -113,7 +113,7 @@ namespace Gablarski.Tests
 		public void ServerInfo()
 		{
 			var connection = provider.EstablishConnection ();
-			connection.Client.Send (new ConnectMessage (GablarskiServer.MinimumApiVersion));
+			connection.Client.Send (new ConnectMessage (GablarskiServer.ProtocolVersion));
 
 			var msg = connection.Client.DequeueAndAssertMessage<ServerInfoMessage>();
 			Assert.AreEqual (this.settings.Name, msg.ServerInfo.Name);

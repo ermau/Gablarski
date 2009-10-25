@@ -51,7 +51,7 @@ namespace Gablarski.Client
 	public partial class GablarskiClient
 		: IClientContext
 	{
-		public static readonly Version ApiVersion = Assembly.GetAssembly (typeof (GablarskiClient)).GetName ().Version;
+		public static readonly int ProtocolVersion = 2;
 
 		public GablarskiClient (IClientConnection connection)
 			: this (connection, true)
@@ -227,7 +227,7 @@ namespace Gablarski.Client
 				Connection.Disconnected += this.OnDisconnectedInternal;
 				Connection.MessageReceived += OnMessageReceived;
 				Connection.Connect (endPoint);
-				Connection.Send (new ConnectMessage (ApiVersion));
+				Connection.Send (new ConnectMessage (ProtocolVersion));
 
 				this.Audio.Context = this;
 				this.Audio.AudioSender = this.Sources;
@@ -303,6 +303,11 @@ namespace Gablarski.Client
 		#endregion
 
 		#region Statics
+		public static void QueryServer (IPEndPoint endpoint, IClientConnection connection)
+		{
+			connection.Connect (endpoint);
+		}
+
 		/// <summary>
 		/// Searches for local servers and calls <paramref name="serverFound"/> for each server found.
 		/// </summary>

@@ -533,8 +533,9 @@ namespace Gablarski.Clients.Windows
 					break;
 
 				case ConnectionRejectedReason.IncompatibleVersion:
+					BeginInvoke ((Action)(() =>
 					MessageBox.Show (this, "Connecting to the server failed because it is running a newer version of Gablarski than you are.", "Connecting",
-					                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
+					                 MessageBoxButtons.OK, MessageBoxIcon.Warning)));
 					break;
 
 				default:

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Gablarski.Messages;
 using NUnit.Framework;
+using Gablarski.Client;
 
 namespace Gablarski.Tests
 {
@@ -33,9 +34,8 @@ namespace Gablarski.Tests
 		[Test]
 		public void Connect()
 		{
-			var ver = new Version (1, 2, 32, 4321);
-			var msg = new ConnectMessage (ver);
-			Assert.AreEqual (ver, msg.ApiVersion);
+			var msg = new ConnectMessage (42);
+			Assert.AreEqual (42, msg.ProtocolVersion);
 
 			msg.WritePayload (writer);
 			long length = stream.Position;
@@ -45,7 +45,7 @@ namespace Gablarski.Tests
 			msg.ReadPayload (reader);
 
 			Assert.AreEqual (length, stream.Position);
-			Assert.AreEqual (ver, msg.ApiVersion);
+			Assert.AreEqual (42, msg.ProtocolVersion);
 		}
 
 		[Test]

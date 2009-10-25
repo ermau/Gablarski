@@ -49,13 +49,13 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public ConnectMessage (Version apiVersion)
+		public ConnectMessage (int protocolVersion)
 			: this ()
 		{
-			this.ApiVersion = apiVersion;
+			this.ProtocolVersion = protocolVersion;
 		}
 
-		public Version ApiVersion
+		public int ProtocolVersion
 		{
 			get;
 			private set;
@@ -63,12 +63,12 @@ namespace Gablarski.Messages
 
 		public override void WritePayload (IValueWriter writer)
 		{
-			writer.WriteVersion (this.ApiVersion);
+			writer.WriteInt32 (this.ProtocolVersion);
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
-			this.ApiVersion = reader.ReadVersion ();
+			this.ProtocolVersion = reader.ReadInt32 ();
 		}
 	}
 }
