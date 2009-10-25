@@ -338,7 +338,6 @@ namespace Gablarski.Network
 			catch (Exception)
 			{
 				connection.Disconnect ();
-			    return;
 			}
 		}
 

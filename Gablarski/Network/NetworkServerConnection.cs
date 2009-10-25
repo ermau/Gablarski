@@ -73,6 +73,7 @@ namespace Gablarski.Network
 		public void Disconnect ()
 		{
 			this.Tcp.Close ();
+			provider.Disconnect (this);
 
 			OnDisconnected ();
 		}
