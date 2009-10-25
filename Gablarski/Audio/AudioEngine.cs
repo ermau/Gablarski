@@ -347,6 +347,9 @@ namespace Gablarski.Audio
 						if (c.Value.Capture.AvailableSampleCount > c.Key.FrameSize)
 						{
 							bool talking = c.Value.Talking;
+							ChannelInfo channel = Context.GetCurrentChannel ();
+							if (channel == null)
+								break;
 
 							byte[] samples = c.Value.Capture.ReadSamples (c.Key.FrameSize);
 							if (c.Value.Options.Mode == AudioEngineCaptureMode.Activated)
