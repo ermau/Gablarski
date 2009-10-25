@@ -99,6 +99,7 @@ namespace Gablarski
 		private readonly Type contract;
 		private readonly IEnumerable<DirectoryInfo> paths;
 
+		private static readonly HashSet<string> badPaths = new HashSet<string> ();
 		internal static IEnumerable<Type> SearchPath (DirectoryInfo dir, Type contract, bool recursive)
 		{
 			IEnumerable<Type> implementers = Enumerable.Empty<Type>();
@@ -113,17 +114,33 @@ namespace Gablarski
 			FileInfo[] files = dir.GetFiles("*.dll");
 			for (int i = 0; i < files.Length; ++i)
 			{
+				FileInfo file = files[i];
+
+				lock (badPaths)
+				{
+					if (badPaths.Contains (file.FullName))
+						continue;
+				}
+
 				try
 				{
-					var asm = Assembly.LoadFile (files[i].FullName);
+					var asm = Assembly.LoadFile (file.FullName);
 					implementers = implementers.Concat (SearchAssembly (asm, contract));
 				}
 				// Ignoring non-assemblies or invalid assemblies.
 				catch (BadImageFormatException)
 				{
+					lock (badPaths)
+					{
+						badPaths.Add (file.FullName);
+					}
 				}
 				catch (FileLoadException)
 				{
+					lock (badPaths)
+					{
+						badPaths.Add (file.FullName);
+					}
 				}
 			}
 
