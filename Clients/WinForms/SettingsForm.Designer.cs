@@ -64,7 +64,6 @@
 			this.volumeControl = new System.Windows.Forms.CheckBox ();
 			this.label1 = new System.Windows.Forms.Label ();
 			this.musicPlayers = new System.Windows.Forms.CheckedListBox ();
-			this.errorProvider = new System.Windows.Forms.ErrorProvider ();
 			this.tabs.SuspendLayout ();
 			this.generalTab.SuspendLayout ();
 			this.controlsTab.SuspendLayout ();
@@ -472,10 +471,6 @@
 			this.musicPlayers.Size = new System.Drawing.Size (294, 64);
 			this.musicPlayers.TabIndex = 1;
 			// 
-			// errorProvider
-			// 
-			this.errorProvider.ContainerControl = this;
-			// 
 			// SettingsForm
 			// 
 			this.AcceptButton = this.btnOk;
@@ -542,6 +537,5 @@
 		private System.Windows.Forms.Label label7;
 		private System.Windows.Forms.CheckBox musicIgnoreYou;
 		private System.Windows.Forms.CheckBox gablarskiURLs;
-		private System.Windows.Forms.ErrorProvider errorProvider;
 	}
 }

@@ -55,14 +55,6 @@ namespace Gablarski.Clients.Windows
 
 		private void btnOk_Click (object sender, EventArgs e)
 		{
-			this.errorProvider.Clear();
-
-			if (this.inInputProvider.SelectedItem == null && this.ptt.Checked)
-			{
-				this.errorProvider.SetError (this.inInputProvider, "Push to talk requires a input provider.");
-				return;
-			}
-
 			Settings.ShowConnectOnStart = this.inConnectOnStart.Checked;
 			Settings.DisplaySources = this.inDisplaySources.Checked;
 
