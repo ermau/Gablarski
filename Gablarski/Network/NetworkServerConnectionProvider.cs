@@ -313,7 +313,7 @@ namespace Gablarski.Network
 				if (connection.IsConnected)
 					stream.BeginRead (state._2, 0, 1, ReliableReceive, state);
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
 				connection.Disconnect ();
 			}
@@ -335,7 +335,7 @@ namespace Gablarski.Network
 				message.WritePayload (iwriter);
 				iwriter.Flush ();
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
 				connection.Disconnect ();
 			    return;

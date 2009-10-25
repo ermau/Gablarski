@@ -73,10 +73,10 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public ChannelChangeResultMessage (ChannelChangeInfo moveInfo)
+		public ChannelChangeResultMessage (ChannelChangeResult result, ChannelChangeInfo moveInfo)
 			: this ()
 		{
-			this.Result = ChannelChangeResult.Success;
+			this.Result = result;
 			this.MoveInfo = moveInfo;
 		}
 
@@ -95,17 +95,13 @@ namespace Gablarski.Messages
 		public override void WritePayload (IValueWriter writer)
 		{
 			writer.WriteByte ((byte)this.Result);
-			
-			if (this.Result == ChannelChangeResult.Success)
-				this.MoveInfo.Serialize (writer);
+			this.MoveInfo.Serialize (writer);
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
 			this.Result = (ChannelChangeResult)reader.ReadByte ();
-
-			if (this.Result == ChannelChangeResult.Success)
-				this.MoveInfo = new ChannelChangeInfo (reader);
+			this.MoveInfo = new ChannelChangeInfo (reader);
 		}
 	}
 }

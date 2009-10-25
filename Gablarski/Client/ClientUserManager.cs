@@ -258,6 +258,13 @@ namespace Gablarski.Client
 
 			OnUserChangedChannnel (new ChannelChangedEventArgs (user, channel, movedBy));
 		}
+
+		internal void OnChannelChangeResultMessage (MessageReceivedEventArgs e)
+		{
+			var msg = (ChannelChangeResultMessage)e.Message;
+
+			OnReceivedChannelChangeResult (new ReceivedChannelChannelResultEventArgs (msg.MoveInfo, msg.Result));
+		}
 		#endregion
 
 		#region Event Invokers
@@ -372,9 +379,24 @@ namespace Gablarski.Client
 	public class ReceivedChannelChannelResultEventArgs
 		: EventArgs
 	{
-		public ReceivedChannelChannelResultEventArgs (ChannelChangeResult result)
+		public ReceivedChannelChannelResultEventArgs (ChannelChangeInfo moveInfo, ChannelChangeResult result)
 		{
+			if (moveInfo == null)
+				throw new ArgumentNullException ("moveInfo");
+			if (result == null)
+				throw new ArgumentNullException ("result");
+
+			this.MoveInfo = moveInfo;
 			this.Result = result;
+		}
+
+		/// <summary>
+		/// Gets information about the move this result is for.
+		/// </summary>
+		public ChannelChangeInfo MoveInfo
+		{
+			get;
+			private set;
 		}
 
 		/// <summary>

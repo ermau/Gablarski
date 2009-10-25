@@ -83,6 +83,7 @@ namespace Gablarski.Client
 				{ ServerMessageType.ChannelListReceived, this.Channels.OnChannelListReceivedMessage },
 				{ ServerMessageType.UserChangedChannel, this.Users.OnUserChangedChannelMessage },
 				{ ServerMessageType.ChannelEditResult, this.Channels.OnChannelEditResultMessage },
+				{ ServerMessageType.ChangeChannelResult, this.Users.OnChannelChangeResultMessage },
 
 				{ ServerMessageType.ConnectionRejected, OnConnectionRejectedMessage },
 				{ ServerMessageType.LoginResult, this.CurrentUser.OnLoginResultMessage },
@@ -166,11 +167,7 @@ namespace Gablarski.Client
 		{
 			this.serverInfo = ((ServerInfoMessage)e.Message).ServerInfo;
 
-			Trace.WriteLine ("[Client] Received server information: ");
-			Trace.WriteLine ("Server name: " + this.serverInfo.Name);
-			Trace.WriteLine ("Server description: " + this.serverInfo.Description);
-
-			this.OnConnected (this, EventArgs.Empty);
+			OnConnected (this, EventArgs.Empty);
 		}
 
 		private enum DisconnectHandling
