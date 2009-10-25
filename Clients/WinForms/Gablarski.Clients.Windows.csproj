@@ -195,9 +195,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources1.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="SettingsForm.resx">
-      <DependentUpon>SettingsForm.cs</DependentUpon>
-    </EmbeddedResource>
     <Compile Include="RequiredTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -229,6 +226,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="Resources\connect.png" />
     <None Include="Resources\server_add.png" />
     <None Include="Resources\server_connect.png" />
