@@ -380,6 +380,12 @@ namespace Gablarski.Clients.Windows
 		private readonly Dictionary<UserInfo, TreeNode> userNodes = new Dictionary<UserInfo, TreeNode>();
 		private readonly Dictionary<AudioSource, TreeNode> sourceNodes = new Dictionary<AudioSource, TreeNode>();
 
+		protected override void DefWndProc (ref Message m)
+		{
+			if (m.Msg != 515)
+				base.DefWndProc (ref m);
+		}
+
 		protected override void OnNodeMouseClick (TreeNodeMouseClickEventArgs e)
 		{
 			this.SelectedNode = e.Node;
