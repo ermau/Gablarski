@@ -29,7 +29,6 @@
 		private void InitializeComponent ()
 		{
 			this.components = new System.ComponentModel.Container ();
-			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager (typeof (MainForm));
 			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator ();
 			this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator ();
 			this.tools = new System.Windows.Forms.ToolStrip ();
@@ -72,6 +71,7 @@
 			// btnConnect
 			// 
 			this.btnConnect.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.btnConnect.Enabled = false;
 			this.btnConnect.Image = global::Gablarski.Clients.Windows.Properties.Resources.DisconnectImage;
 			this.btnConnect.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.btnConnect.Name = "btnConnect";
