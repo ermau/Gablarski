@@ -31,7 +31,8 @@
 			this.btnOk = new System.Windows.Forms.Button ();
 			this.btnCancel = new System.Windows.Forms.Button ();
 			this.tabs = new System.Windows.Forms.TabControl ();
-			this.displayTab = new System.Windows.Forms.TabPage ();
+			this.generalTab = new System.Windows.Forms.TabPage ();
+			this.gablarskiURLs = new System.Windows.Forms.CheckBox ();
 			this.inConnectOnStart = new System.Windows.Forms.CheckBox ();
 			this.inDisplaySources = new System.Windows.Forms.CheckBox ();
 			this.controlsTab = new System.Windows.Forms.TabPage ();
@@ -51,6 +52,7 @@
 			this.vadSensitivity = new System.Windows.Forms.TrackBar ();
 			this.voiceSelector = new Gablarski.DeviceSelector ();
 			this.musicTab = new System.Windows.Forms.TabPage ();
+			this.musicIgnoreYou = new System.Windows.Forms.CheckBox ();
 			this.label9 = new System.Windows.Forms.Label ();
 			this.label8 = new System.Windows.Forms.Label ();
 			this.label7 = new System.Windows.Forms.Label ();
@@ -62,16 +64,12 @@
 			this.volumeControl = new System.Windows.Forms.CheckBox ();
 			this.label1 = new System.Windows.Forms.Label ();
 			this.musicPlayers = new System.Windows.Forms.CheckedListBox ();
-			this.musicIgnoreYou = new System.Windows.Forms.CheckBox ();
+			this.errorProvider = new System.Windows.Forms.ErrorProvider ();
 			this.tabs.SuspendLayout ();
-			this.displayTab.SuspendLayout ();
+			this.generalTab.SuspendLayout ();
 			this.controlsTab.SuspendLayout ();
 			this.voiceTab.SuspendLayout ();
-			((System.ComponentModel.ISupportInitialize)(this.threshold)).BeginInit ();
-			((System.ComponentModel.ISupportInitialize)(this.vadSensitivity)).BeginInit ();
 			this.musicTab.SuspendLayout ();
-			((System.ComponentModel.ISupportInitialize)(this.normalVolume)).BeginInit ();
-			((System.ComponentModel.ISupportInitialize)(this.talkingVolume)).BeginInit ();
 			this.SuspendLayout ();
 			// 
 			// btnOk
@@ -102,7 +100,7 @@
 			this.tabs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
 						| System.Windows.Forms.AnchorStyles.Left)
 						| System.Windows.Forms.AnchorStyles.Right)));
-			this.tabs.Controls.Add (this.displayTab);
+			this.tabs.Controls.Add (this.generalTab);
 			this.tabs.Controls.Add (this.controlsTab);
 			this.tabs.Controls.Add (this.voiceTab);
 			this.tabs.Controls.Add (this.musicTab);
@@ -112,21 +110,34 @@
 			this.tabs.Size = new System.Drawing.Size (319, 289);
 			this.tabs.TabIndex = 4;
 			// 
-			// displayTab
+			// generalTab
 			// 
-			this.displayTab.Controls.Add (this.inConnectOnStart);
-			this.displayTab.Controls.Add (this.inDisplaySources);
-			this.displayTab.Location = new System.Drawing.Point (4, 22);
-			this.displayTab.Name = "displayTab";
-			this.displayTab.Padding = new System.Windows.Forms.Padding (3);
-			this.displayTab.Size = new System.Drawing.Size (311, 263);
-			this.displayTab.TabIndex = 0;
-			this.displayTab.Text = "Display";
-			this.displayTab.UseVisualStyleBackColor = true;
+			this.generalTab.Controls.Add (this.gablarskiURLs);
+			this.generalTab.Controls.Add (this.inConnectOnStart);
+			this.generalTab.Controls.Add (this.inDisplaySources);
+			this.generalTab.Location = new System.Drawing.Point (4, 22);
+			this.generalTab.Name = "generalTab";
+			this.generalTab.Padding = new System.Windows.Forms.Padding (3);
+			this.generalTab.Size = new System.Drawing.Size (311, 263);
+			this.generalTab.TabIndex = 0;
+			this.generalTab.Text = "General";
+			this.generalTab.UseVisualStyleBackColor = true;
+			// 
+			// gablarskiURLs
+			// 
+			this.gablarskiURLs.AutoSize = true;
+			this.gablarskiURLs.Enabled = false;
+			this.gablarskiURLs.Location = new System.Drawing.Point (8, 52);
+			this.gablarskiURLs.Name = "gablarskiURLs";
+			this.gablarskiURLs.Size = new System.Drawing.Size (136, 17);
+			this.gablarskiURLs.TabIndex = 2;
+			this.gablarskiURLs.Text = "Enable Gablarski URLs";
+			this.gablarskiURLs.UseVisualStyleBackColor = true;
 			// 
 			// inConnectOnStart
 			// 
 			this.inConnectOnStart.AutoSize = true;
+			this.inConnectOnStart.Enabled = false;
 			this.inConnectOnStart.Location = new System.Drawing.Point (8, 29);
 			this.inConnectOnStart.Name = "inConnectOnStart";
 			this.inConnectOnStart.Size = new System.Drawing.Size (146, 17);
@@ -344,6 +355,18 @@
 			this.musicTab.Text = "Music";
 			this.musicTab.UseVisualStyleBackColor = true;
 			// 
+			// musicIgnoreYou
+			// 
+			this.musicIgnoreYou.AutoSize = true;
+			this.musicIgnoreYou.Checked = true;
+			this.musicIgnoreYou.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.musicIgnoreYou.Location = new System.Drawing.Point (184, 89);
+			this.musicIgnoreYou.Name = "musicIgnoreYou";
+			this.musicIgnoreYou.Size = new System.Drawing.Size (119, 17);
+			this.musicIgnoreYou.TabIndex = 12;
+			this.musicIgnoreYou.Text = "Ignore your sources";
+			this.musicIgnoreYou.UseVisualStyleBackColor = true;
+			// 
 			// label9
 			// 
 			this.label9.AutoSize = true;
@@ -449,17 +472,9 @@
 			this.musicPlayers.Size = new System.Drawing.Size (294, 64);
 			this.musicPlayers.TabIndex = 1;
 			// 
-			// musicIgnoreYou
+			// errorProvider
 			// 
-			this.musicIgnoreYou.AutoSize = true;
-			this.musicIgnoreYou.Checked = true;
-			this.musicIgnoreYou.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.musicIgnoreYou.Location = new System.Drawing.Point (184, 89);
-			this.musicIgnoreYou.Name = "musicIgnoreYou";
-			this.musicIgnoreYou.Size = new System.Drawing.Size (119, 17);
-			this.musicIgnoreYou.TabIndex = 12;
-			this.musicIgnoreYou.Text = "Ignore your sources";
-			this.musicIgnoreYou.UseVisualStyleBackColor = true;
+			this.errorProvider.ContainerControl = this;
 			// 
 			// SettingsForm
 			// 
@@ -477,18 +492,14 @@
 			this.Text = "Settings";
 			this.Load += new System.EventHandler (this.SettingsForm_Load);
 			this.tabs.ResumeLayout (false);
-			this.displayTab.ResumeLayout (false);
-			this.displayTab.PerformLayout ();
+			this.generalTab.ResumeLayout (false);
+			this.generalTab.PerformLayout ();
 			this.controlsTab.ResumeLayout (false);
 			this.controlsTab.PerformLayout ();
 			this.voiceTab.ResumeLayout (false);
 			this.voiceTab.PerformLayout ();
-			((System.ComponentModel.ISupportInitialize)(this.threshold)).EndInit ();
-			((System.ComponentModel.ISupportInitialize)(this.vadSensitivity)).EndInit ();
 			this.musicTab.ResumeLayout (false);
 			this.musicTab.PerformLayout ();
-			((System.ComponentModel.ISupportInitialize)(this.normalVolume)).EndInit ();
-			((System.ComponentModel.ISupportInitialize)(this.talkingVolume)).EndInit ();
 			this.ResumeLayout (false);
 
 		}
@@ -498,7 +509,7 @@
 		private System.Windows.Forms.Button btnOk;
 		private System.Windows.Forms.Button btnCancel;
 		private System.Windows.Forms.TabControl tabs;
-		private System.Windows.Forms.TabPage displayTab;
+		private System.Windows.Forms.TabPage generalTab;
 		private System.Windows.Forms.CheckBox inDisplaySources;
 		private System.Windows.Forms.TabPage controlsTab;
 		private System.Windows.Forms.ComboBox inInputProvider;
@@ -530,5 +541,7 @@
 		private System.Windows.Forms.Label label8;
 		private System.Windows.Forms.Label label7;
 		private System.Windows.Forms.CheckBox musicIgnoreYou;
+		private System.Windows.Forms.CheckBox gablarskiURLs;
+		private System.Windows.Forms.ErrorProvider errorProvider;
 	}
 }

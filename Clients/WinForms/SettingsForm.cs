@@ -37,7 +37,10 @@ namespace Gablarski.Clients.Windows
 			this.voiceSelector.SetDevice (Settings.VoiceDevice);
 			
 			this.inputSettings = Settings.InputSettings;
-			this.dispInput.Text = currentInputProvider.GetNiceInputName (this.inputSettings);
+
+			if (currentInputProvider != null)
+				this.dispInput.Text = currentInputProvider.GetNiceInputName (this.inputSettings);
+
 			this.threshold.Value = Settings.VoiceActivationContinueThreshold / 100;
 			this.vadSensitivity.Value = Settings.VoiceActivationLevel;
 
@@ -52,11 +55,19 @@ namespace Gablarski.Clients.Windows
 
 		private void btnOk_Click (object sender, EventArgs e)
 		{
+			this.errorProvider.Clear();
+
+			if (this.inInputProvider.SelectedItem == null && this.ptt.Checked)
+			{
+				this.errorProvider.SetError (this.inInputProvider, "Push to talk requires a input provider.");
+				return;
+			}
+
 			Settings.ShowConnectOnStart = this.inConnectOnStart.Checked;
 			Settings.DisplaySources = this.inDisplaySources.Checked;
 
 			DisableInput();
-			Settings.InputProvider = this.inInputProvider.SelectedItem.ToString();
+			Settings.InputProvider = (this.inInputProvider.SelectedItem != null) ? this.inInputProvider.SelectedItem.ToString () : String.Empty;
 			Settings.InputSettings = this.inputSettings;
 			Settings.UsePushToTalk = this.ptt.Checked;
 
@@ -86,7 +97,7 @@ namespace Gablarski.Clients.Windows
 
 			Settings.SaveSettings();
 
-			this.Close();
+			Close();
 		}
 
 		private void btnCancel_Click (object sender, EventArgs e)
