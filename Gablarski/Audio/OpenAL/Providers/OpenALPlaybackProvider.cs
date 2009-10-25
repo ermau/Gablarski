@@ -82,10 +82,9 @@ namespace Gablarski.Audio.OpenAL.Providers
 			if (data.Length == 0)
 				return;
 
-			RequireBuffers (bufferStack, source, (source.IsPlaying) ? 1 : bufferLen + 1);
-
 			if (!source.IsPlaying)
 			{
+				RequireBuffers (bufferStack, source, bufferLen);
 				for (int i = 0; i < bufferLen; ++i)
 				{
 					SourceBuffer wait = bufferStack.Pop();
@@ -97,6 +96,7 @@ namespace Gablarski.Audio.OpenAL.Providers
 				}
 			}
 
+			RequireBuffers (bufferStack, source, 1);
 			SourceBuffer buffer = bufferStack.Pop ();
 
 			buffer.Buffer (data, (audioSource.Channels == 1) ? AudioFormat.Mono16Bit : AudioFormat.Stereo16Bit, (uint)audioSource.Frequency);
@@ -164,6 +164,9 @@ namespace Gablarski.Audio.OpenAL.Providers
 		private static void PushBuffers (Stack<SourceBuffer> bufferStack, int number)
 		{
 			SourceBuffer[] sbuffers = SourceBuffer.Generate (number);
+			if (sbuffers.Length != number)
+				throw new Exception ("Generated buffer count doesn't match requested.");
+
 			for (int i = 0; i < sbuffers.Length; ++i)
 				bufferStack.Push (sbuffers[i]);
 		}

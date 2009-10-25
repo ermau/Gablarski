@@ -19,6 +19,8 @@ namespace Gablarski.Clients.Windows
 			StringBuilder builder = new StringBuilder(self.GetType().Name);
 			builder.Append (": ");
 			builder.Append (self.Message);
+			builder.AppendLine ();
+			builder.AppendLine (self.StackTrace);
 
 			DisplayRecurseInnerExceptions (self.InnerException, builder);
 
