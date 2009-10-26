@@ -52,6 +52,8 @@ namespace Gablarski.Clients.Windows
 			this.InitializeComponent ();
 
 			this.users.Client = this.gablarski;
+
+			new EventSpeech (this.gablarski, this.mediaPlayerIntegration);
 		}
 
 		private void SourcesOnReceivedSourceList(object sender, ReceivedListEventArgs<AudioSource> args)

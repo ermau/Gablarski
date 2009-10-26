@@ -66,6 +66,22 @@ namespace Gablarski.Clients.Music
 			set { this.normalVolume = value; }
 		}
 
+		public void AddTalker ()
+		{
+			if (Interlocked.Increment (ref this.playing) > 1)
+				return;
+
+			SetVolume (TalkingVolume);
+		}
+
+		public void RemoveTalker ()
+		{
+			if (Interlocked.Decrement (ref this.playing) > 0)
+				return;
+
+			SetVolume (NormalVolume);
+		}
+
 		private int talkingVolume = 30;
 		private int normalVolume = 100;
 		private IEnumerable<IMediaPlayer> mediaPlayers;
@@ -97,10 +113,7 @@ namespace Gablarski.Clients.Music
 			if (!UserTalkingCounts && e.Source.OwnerId == context.CurrentUser.UserId)
 				return;
 
-			if (Interlocked.Decrement (ref this.playing) > 0)
-				return;
-
-			SetVolume (NormalVolume);
+			RemoveTalker ();
 		}
 
 		private void OnAudioSourceStarted (object sender, AudioSourceEventArgs e)
@@ -108,10 +121,7 @@ namespace Gablarski.Clients.Music
 			if (!UserTalkingCounts && e.Source.OwnerId == context.CurrentUser.UserId)
 				return;
 
-			if (Interlocked.Increment (ref this.playing) > 1)
-				return;
-
-			SetVolume (TalkingVolume);
+			AddTalker ();
 		}
 
 		private void SetVolume (int volume)

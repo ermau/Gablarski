@@ -135,6 +135,7 @@
     <Compile Include="Entities\IgnoreEntry.cs" />
     <Compile Include="Entities\ServerEntry.cs" />
     <Compile Include="Entities\SettingEntry.cs" />
+    <Compile Include="EventSpeech.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="LoginForm.cs">
       <SubType>Form</SubType>
