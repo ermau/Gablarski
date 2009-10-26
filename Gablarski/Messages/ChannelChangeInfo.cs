@@ -47,19 +47,22 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public ChannelChangeInfo (int targetUserId, int targetChannelId)
+		public ChannelChangeInfo (int targetUserId, int targetChannelId, int previousChannelId)
 		{
 			if (targetUserId == 0)
 				throw new ArgumentException ("targetUserId");
 			if (targetChannelId < 0)
 				throw new ArgumentOutOfRangeException ("targetChannelId");
+			if (previousChannelId < 0)
+				throw new ArgumentOutOfRangeException ("previousChannelId");
 
 			this.TargetUserId = targetUserId;
 			this.TargetChannelId = targetChannelId;
+			this.PreviousChannelId = previousChannelId;
 		}
 
-		public ChannelChangeInfo (int targetUserId, int targetChannelId, int requestingUserId)
-			: this (targetUserId, targetChannelId)
+		public ChannelChangeInfo (int targetUserId, int targetChannelId, int previousChannelId, int requestingUserId)
+			: this (targetUserId, targetChannelId, previousChannelId)
 		{
 			if (requestingUserId == 0)
 				throw new ArgumentException ("requestingUserId");
@@ -102,11 +105,21 @@ namespace Gablarski.Messages
 			private set;
 		}
 
+		/// <summary>
+		/// Gets the ID of the channel the player is being moved from.
+		/// </summary>
+		public int PreviousChannelId
+		{
+			get;
+			private set;
+		}
+
 		internal void Serialize (IValueWriter writer)
 		{
 			writer.WriteInt32 (this.RequestingUserId);
 			writer.WriteInt32 (this.TargetUserId);
 			writer.WriteInt32 (this.TargetChannelId);
+			writer.WriteInt32 (this.PreviousChannelId);
 		}
 
 		internal void Deserialize (IValueReader reader)
@@ -114,6 +127,7 @@ namespace Gablarski.Messages
 			this.RequestingUserId = reader.ReadInt32();
 			this.TargetUserId = reader.ReadInt32();
 			this.TargetChannelId = reader.ReadInt32();
+			this.PreviousChannelId = reader.ReadInt32 ();
 		}
 	}
 }

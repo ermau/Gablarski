@@ -194,7 +194,7 @@ namespace Gablarski.Server
 			ChannelChangeResult resultState = ChannelChangeResult.FailedUnknown;
 			lock (this.channelLock)
 			{
-				if (!this.channels.ContainsKey (change.MoveInfo.TargetChannelId))
+				if (!this.channels.ContainsKey (change.TargetChannelId))
 					resultState = ChannelChangeResult.FailedUnknownChannel;
 			}
 
@@ -202,11 +202,15 @@ namespace Gablarski.Server
 			if (requestingPlayer == null)
 				return;
 
-			var changeInfo = new ChannelChangeInfo (change.MoveInfo.TargetUserId, change.MoveInfo.TargetChannelId, requestingPlayer.UserId);
+			UserInfo targetPlayer = this.connections.GetUser (change.TargetUserId);
+			if (targetPlayer == null || targetPlayer.CurrentChannelId == change.TargetChannelId)
+				return;
+
+			var changeInfo = new ChannelChangeInfo (change.TargetUserId, change.TargetChannelId, targetPlayer.CurrentChannelId, requestingPlayer.UserId);
 
 			if (resultState == ChannelChangeResult.FailedUnknown)
 			{
-				if (requestingPlayer.UserId.Equals (change.MoveInfo.TargetUserId))
+				if (requestingPlayer.UserId.Equals (change.TargetUserId))
 				{
 					if (!GetPermission (PermissionName.ChangeChannel, requestingPlayer))
 						resultState = ChannelChangeResult.FailedPermissions;
@@ -216,7 +220,7 @@ namespace Gablarski.Server
 				
 				if (resultState == ChannelChangeResult.FailedUnknown)
 				{
-					if (this.connections.UpdateIfExists (e.Connection, new ServerUserInfo (requestingPlayer) { CurrentChannelId = change.MoveInfo.TargetChannelId }))
+					if (this.connections.UpdateIfExists (e.Connection, new ServerUserInfo (targetPlayer) { CurrentChannelId = change.TargetChannelId }))
 						this.connections.Send (new UserChangedChannelMessage { ChangeInfo = changeInfo });
 					
 					return;

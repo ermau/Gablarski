@@ -235,9 +235,11 @@ namespace Gablarski.Client
 		{
 			var msg = (UserChangedChannelMessage)e.Message;
 
-			ChannelInfo channel = this.context.Channels.FirstOrDefault (c => c.ChannelId.Equals (msg.ChangeInfo.TargetChannelId));
+			var channel = this.context.Channels[msg.ChangeInfo.TargetChannelId];
 			if (channel == null)
 				return;
+
+			var previous = this.context.Channels[msg.ChangeInfo.PreviousChannelId];
 
 			ClientUser old;
 			ClientUser user;
@@ -256,7 +258,7 @@ namespace Gablarski.Client
 					this.users.TryGetValue (msg.ChangeInfo.RequestingUserId, out movedBy);
 			}
 
-			OnUserChangedChannnel (new ChannelChangedEventArgs (user, channel, movedBy));
+			OnUserChangedChannnel (new ChannelChangedEventArgs (user, channel, previous, movedBy));
 		}
 
 		internal void OnChannelChangeResultMessage (MessageReceivedEventArgs e)
@@ -349,7 +351,7 @@ namespace Gablarski.Client
 	public class ChannelChangedEventArgs
 		: UserEventArgs
 	{
-		public ChannelChangedEventArgs (ClientUser target, ChannelInfo targetChannel, ClientUser movedBy)
+		public ChannelChangedEventArgs (ClientUser target, ChannelInfo targetChannel, ChannelInfo previousChannel, ClientUser movedBy)
 			: base (target)
 		{
 			if (targetChannel == null)
@@ -357,6 +359,7 @@ namespace Gablarski.Client
 
 			this.TargetChannel = targetChannel;
 			this.MovedBy = movedBy;
+			this.PreviousChannel = previousChannel;
 		}
 
 		/// <summary>
@@ -365,6 +368,15 @@ namespace Gablarski.Client
 		public ChannelInfo TargetChannel
 		{
 			get; private set;
+		}
+
+		/// <summary>
+		/// Gets the channel the user is being moved from.
+		/// </summary>
+		public ChannelInfo PreviousChannel
+		{
+			get;
+			private set;
 		}
 
 		/// <summary>

@@ -52,29 +52,32 @@ namespace Gablarski.Messages
 		public ChannelChangeMessage (int targetUserId, int targetChannelId)
 			: this()
 		{
-			this.MoveInfo = new ChannelChangeInfo (targetUserId, targetChannelId);
+			this.TargetUserId = targetUserId;
+			this.TargetChannelId = targetChannelId;
 		}
 
-		public ChannelChangeMessage (int targetUserId, int targetChannelId, int requestingPlayerId)
-			: this ()
-		{
-			this.MoveInfo = new ChannelChangeInfo (targetUserId, targetChannelId, requestingPlayerId);
-		}
-
-		public ChannelChangeInfo MoveInfo
+		public int TargetUserId
 		{
 			get;
-			set;
+			private set;
+		}
+
+		public int TargetChannelId
+		{
+			get;
+			private set;
 		}
 
 		public override void WritePayload (IValueWriter writer)
 		{
-			this.MoveInfo.Serialize (writer);
+			writer.WriteInt32 (this.TargetUserId);
+			writer.WriteInt32 (this.TargetChannelId);
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
-			this.MoveInfo = new ChannelChangeInfo (reader);
+			this.TargetUserId = reader.ReadInt32 ();
+			this.TargetChannelId = reader.ReadInt32 ();
 		}
 	}
 }

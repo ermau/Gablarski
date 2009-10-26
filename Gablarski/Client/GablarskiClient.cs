@@ -51,7 +51,7 @@ namespace Gablarski.Client
 	public partial class GablarskiClient
 		: IClientContext
 	{
-		public static readonly int ProtocolVersion = 2;
+		public static readonly int ProtocolVersion = 3;
 
 		public GablarskiClient (IClientConnection connection)
 			: this (connection, true)

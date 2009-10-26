@@ -35,14 +35,19 @@ namespace Gablarski.Clients.Windows
 
 		private void OnUserJoined (object sender, UserEventArgs e)
 		{
-			//if (!e.User.Equals (client.CurrentUser))
+			if (!e.User.Equals (client.CurrentUser))
 				Speak (e.User.Nickname + " has joined the server.");
 		}
 
 		void OnUserChangedChannel (object sender, ChannelChangedEventArgs e)
 		{
-			if (!e.User.Equals (client.CurrentUser) && e.TargetChannel.Equals (client.CurrentChannel))
+			if (e.User.Equals (client.CurrentUser))
+			    return;
+
+			if (e.TargetChannel.Equals (client.CurrentChannel))
 				Speak (e.User.Nickname + " joined the channel.");
+			else if (e.PreviousChannel.Equals (client.CurrentChannel))
+				Speak (e.User.Nickname + " left the channel.");
 		}
 
 		private readonly MediaPlayerIntegration media;

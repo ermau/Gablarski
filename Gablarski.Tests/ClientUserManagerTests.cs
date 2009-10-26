@@ -108,7 +108,7 @@ namespace Gablarski.Tests
 			manager.OnUserChangedChannelMessage (new MessageReceivedEventArgs (this.server.Client,
 				new UserChangedChannelMessage
 				{
-					ChangeInfo = new ChannelChangeInfo (2, 2)
+					ChangeInfo = new ChannelChangeInfo (2, 2, 1)
 				}));
 
 			Assert.AreEqual (manager[2].UserId, 2);

@@ -47,7 +47,7 @@ namespace Gablarski.Server
 {
 	public partial class GablarskiServer
 	{
-		public static readonly int ProtocolVersion = 2;
+		public static readonly int ProtocolVersion = 3;
 
 		/// <summary>
 		/// Initializes a new <c>GablarskiServer</c> instance.
@@ -302,7 +302,7 @@ namespace Gablarski.Server
 				foreach (var userId in movedUsers)
 				{
 					this.connections.Send (new UserChangedChannelMessage 
-						{ ChangeInfo = new ChannelChangeInfo (userId, defaultChannelId) });
+						{ ChangeInfo = new ChannelChangeInfo (userId, defaultChannelId, defaultChannelId) });
 				}
 
 				this.connections.Send (new ChannelListMessage (this.channels.Values));

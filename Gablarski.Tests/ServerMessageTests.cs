@@ -317,10 +317,11 @@ namespace Gablarski.Tests
 		[Test]
 		public void UserChangedChannelWithoutRequesting()
 		{
-			var changeInfo = new ChannelChangeInfo (1, 2);
+			var changeInfo = new ChannelChangeInfo (1, 2, 1);
 			var msg = new UserChangedChannelMessage { ChangeInfo = changeInfo };
 			Assert.AreEqual (changeInfo.TargetUserId, msg.ChangeInfo.TargetUserId);
 			Assert.AreEqual (changeInfo.TargetChannelId, msg.ChangeInfo.TargetChannelId);
+			Assert.AreEqual (changeInfo.PreviousChannelId, msg.ChangeInfo.PreviousChannelId);
 			Assert.AreEqual (changeInfo.RequestingUserId, msg.ChangeInfo.RequestingUserId);
 			msg.WritePayload (writer);
 			long length = stream.Position;
@@ -331,6 +332,7 @@ namespace Gablarski.Tests
 			Assert.AreEqual (length, stream.Position);
 			Assert.AreEqual (changeInfo.TargetUserId, msg.ChangeInfo.TargetUserId);
 			Assert.AreEqual (changeInfo.TargetChannelId, msg.ChangeInfo.TargetChannelId);
+			Assert.AreEqual (changeInfo.PreviousChannelId, msg.ChangeInfo.PreviousChannelId);
 			Assert.AreEqual (changeInfo.RequestingUserId, msg.ChangeInfo.RequestingUserId);
 		}
 
