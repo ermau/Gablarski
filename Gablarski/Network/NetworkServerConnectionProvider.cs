@@ -312,6 +312,8 @@ namespace Gablarski.Network
 
 				if (connection.IsConnected)
 					stream.BeginRead (state._2, 0, 1, ReliableReceive, state);
+				else
+					connection.Disconnect ();
 			}
 			catch (Exception)
 			{
