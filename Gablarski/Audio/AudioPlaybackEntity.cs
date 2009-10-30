@@ -70,11 +70,6 @@ namespace Gablarski.Audio
 		{
 			get { return this.options; }
 		}
-
-		public bool Playing
-		{
-			get; set;
-		}
 		
 		private readonly IPlaybackProvider playback;
 		private readonly AudioSource source;

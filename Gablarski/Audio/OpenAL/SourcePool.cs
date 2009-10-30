@@ -62,42 +62,13 @@ namespace Gablarski.Audio.OpenAL
 			}
 
 			return free;
-
-			//Source free = null;
-			//foreach (var kvp in owners)
-			//{
-			//    if (kvp.Value == null)
-			//    {
-			//        free = kvp.Key;
-			//        break;
-			//    }
-
-			//    if (kvp.Value == owner)
-			//        return kvp.Key;
-			//}
-
-			//if (free == null)
-			//    free = Source.Generate ();
-
-			//owners[free] = owner;
-
-			//return free;
-		}
-
-		public void PlayingSource (Source source)
-		{
-			if (!this.playing.Contains (source))
-				this.playing.Add (source);
 		}
 
 		public void FreeSource (T sourceOwner)
 		{
 			var source = owners.FirstOrDefault (kvp => kvp.Value == sourceOwner).Key;
 			if (source != null)
-			{
 				owners[source] = default(T);
-				playing.Remove (source);
-			}
 		}
 
 		public void FreeSource (Source source)
@@ -113,17 +84,23 @@ namespace Gablarski.Audio.OpenAL
 
 		public void Tick()
 		{
+			Source[] tofree = new Source[owners.Count];
+			int i = 0;
+
 			foreach (Source s in owners.Keys)
 			{
-				if (!playing.Contains (s) || !s.IsStopped)
+				if (!s.IsStopped)
 					continue;
 
+				tofree[i++] = s;
+
 				OnSourceFinished (new SourceFinishedEventArgs<T> (owners[s], s));
-				playing.Remove (s);
 			}
+
+			for (i = 0; i < tofree.Length && tofree[i] != null; ++i)
+			    FreeSource (tofree[i]);
 		}
 
-		private readonly HashSet<Source> playing = new HashSet<Source>();
 		private readonly Dictionary<Source, T> owners = new Dictionary<Source, T> ();
 
 		private void OnSourceFinished (SourceFinishedEventArgs<T> e)

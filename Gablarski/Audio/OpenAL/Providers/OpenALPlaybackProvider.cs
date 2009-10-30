@@ -92,7 +92,6 @@ namespace Gablarski.Audio.OpenAL.Providers
 					             (audioSource.Channels == 1) ? AudioFormat.Mono16Bit : AudioFormat.Stereo16Bit,
 					             (uint)audioSource.Frequency);
 					source.QueueAndPlay (wait);
-					pool.PlayingSource (source);
 				}
 			}
 
@@ -101,7 +100,6 @@ namespace Gablarski.Audio.OpenAL.Providers
 
 			buffer.Buffer (data, (audioSource.Channels == 1) ? AudioFormat.Mono16Bit : AudioFormat.Stereo16Bit, (uint)audioSource.Frequency);
 			source.QueueAndPlay (buffer);
-			pool.PlayingSource (source);
 		}
 
 		public IEnumerable<IAudioDevice> GetDevices ()

@@ -182,7 +182,12 @@ namespace Gablarski.Audio
 			{
 				playbackLock.EnterWriteLock();
 				{
-					removed = playbacks.Remove (source);
+					AudioPlaybackEntity p;
+					if (playbacks.TryGetValue (source, out p))
+					{
+						p.Playback.FreeSource (source);
+						removed = playbacks.Remove (source);
+					}
 				}
 				playbackLock.ExitWriteLock();
 			}
@@ -242,8 +247,8 @@ namespace Gablarski.Audio
 			this.running = true;
 
 			this.AudioReceiver.ReceivedAudio += OnReceivedAudio;
-			this.AudioReceiver.AudioSourceStarted += OnAudioSourceStarted;
-			this.AudioReceiver.AudioSourceStopped += OnAudioSourceStopped;
+			//this.AudioReceiver.AudioSourceStarted += OnAudioSourceStarted;
+			//this.AudioReceiver.AudioSourceStopped += OnAudioSourceStopped;
 
 			this.engineThread = new Thread (Engine);
 			this.engineThread.Name = "Audio Engine";
@@ -257,8 +262,8 @@ namespace Gablarski.Audio
 			if (this.AudioReceiver != null)
 			{
 				this.AudioReceiver.ReceivedAudio -= OnReceivedAudio;
-				this.AudioReceiver.AudioSourceStarted -= OnAudioSourceStarted;
-				this.AudioReceiver.AudioSourceStopped -= OnAudioSourceStopped;
+				//this.AudioReceiver.AudioSourceStarted -= OnAudioSourceStarted;
+				//this.AudioReceiver.AudioSourceStopped -= OnAudioSourceStopped;
 			}
 
 			if (this.engineThread != null)
@@ -287,30 +292,30 @@ namespace Gablarski.Audio
 
 		private IAudioReceiver audioReceiver;
 
-		private void OnAudioSourceStopped (object sender, AudioSourceEventArgs e)
-		{
-			playbackLock.EnterReadLock();
-			{
-				AudioPlaybackEntity entity;
-				if (playbacks.TryGetValue (e.Source, out entity))
-				{
-					entity.Playing = false;
-					entity.Playback.FreeSource (e.Source);
-				}
-			}
-			playbackLock.ExitReadLock();
-		}
+		//private void OnAudioSourceStopped (object sender, AudioSourceEventArgs e)
+		//{
+		//    playbackLock.EnterReadLock();
+		//    {
+		//        AudioPlaybackEntity entity;
+		//        if (playbacks.TryGetValue (e.Source, out entity))
+		//        {
+		//            entity.Playing = false;
+		//            entity.Playback.FreeSource (e.Source);
+		//        }
+		//    }
+		//    playbackLock.ExitReadLock();
+		//}
 
-		private void OnAudioSourceStarted (object sender, AudioSourceEventArgs e)
-		{
-			playbackLock.EnterReadLock();
-			{
-				AudioPlaybackEntity entity;
-				if (playbacks.TryGetValue (e.Source, out entity))
-					entity.Playing = true;
-			}
-			playbackLock.ExitReadLock();
-		}
+		//private void OnAudioSourceStarted (object sender, AudioSourceEventArgs e)
+		//{
+		//    playbackLock.EnterReadLock();
+		//    {
+		//        AudioPlaybackEntity entity;
+		//        if (playbacks.TryGetValue (e.Source, out entity))
+		//            entity.Playing = true;
+		//    }
+		//    playbackLock.ExitReadLock();
+		//}
 
 		private void OnReceivedAudio (object sender, ReceivedAudioEventArgs e)
 		{
