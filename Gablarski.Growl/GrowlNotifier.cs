@@ -12,6 +12,9 @@ namespace Gablarski.Growl
 	{
 		public GrowlNotifier ()
 		{
+			gablarskiApp = new Application ("Gablarski");
+			gablarskiApp.Icon = Path.Combine (Environment.CurrentDirectory, "Headphones.ico");
+
 			string[] names = Enum.GetNames (typeof (Gablarski.Clients.NotificationType));
 			NotificationType[] types = new NotificationType[names.Length];
 			for (int i = 0; i < types.Length; ++i)
@@ -40,11 +43,8 @@ namespace Gablarski.Growl
 							});
 		}
 
-		private GrowlConnector growl = new GrowlConnector ();
-		private Application gablarskiApp = new Application ("Gablarski")
-		{
-			Icon = Path.Combine (Environment.CurrentDirectory, "headphones.ico")
-		};
+		private readonly GrowlConnector growl = new GrowlConnector ();
+		private readonly Application gablarskiApp;
 
 		private static string UpperPascalToNormal (string s)
 		{

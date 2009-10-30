@@ -280,7 +280,9 @@
     <None Include="Resources\user_add.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Headphones.ico" />
+    <Content Include="Headphones.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="Resources\Headphones.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
