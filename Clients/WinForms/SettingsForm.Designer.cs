@@ -36,15 +36,18 @@
 			this.inConnectOnStart = new System.Windows.Forms.CheckBox ();
 			this.inDisplaySources = new System.Windows.Forms.CheckBox ();
 			this.voiceTab = new System.Windows.Forms.TabPage ();
+			this.groupBox1 = new System.Windows.Forms.GroupBox ();
+			this.voiceActivation = new System.Windows.Forms.CheckBox ();
 			this.dispThreshold = new System.Windows.Forms.Label ();
-			this.lblTreshold = new System.Windows.Forms.Label ();
 			this.label3 = new System.Windows.Forms.Label ();
-			this.label2 = new System.Windows.Forms.Label ();
+			this.lblTreshold = new System.Windows.Forms.Label ();
 			this.threshold = new System.Windows.Forms.TrackBar ();
+			this.label2 = new System.Windows.Forms.Label ();
 			this.lblVoiceSensitivity = new System.Windows.Forms.Label ();
 			this.vadSensitivity = new System.Windows.Forms.TrackBar ();
 			this.voiceSelector = new Gablarski.DeviceSelector ();
 			this.controlsTab = new System.Windows.Forms.TabPage ();
+			this.label10 = new System.Windows.Forms.Label ();
 			this.linkClear = new System.Windows.Forms.LinkLabel ();
 			this.linkSet = new System.Windows.Forms.LinkLabel ();
 			this.dispInput = new System.Windows.Forms.Label ();
@@ -61,17 +64,13 @@
 			this.normalVolume = new System.Windows.Forms.TrackBar ();
 			this.talkingVolume = new System.Windows.Forms.TrackBar ();
 			this.volumeControl = new System.Windows.Forms.CheckBox ();
-			this.label1 = new System.Windows.Forms.Label ();
 			this.musicPlayers = new System.Windows.Forms.CheckedListBox ();
-			this.groupBox1 = new System.Windows.Forms.GroupBox ();
-			this.voiceActivation = new System.Windows.Forms.CheckBox ();
-			this.label10 = new System.Windows.Forms.Label ();
 			this.tabs.SuspendLayout ();
 			this.generalTab.SuspendLayout ();
-			this.controlsTab.SuspendLayout ();
 			this.voiceTab.SuspendLayout ();
-			this.musicTab.SuspendLayout ();
 			this.groupBox1.SuspendLayout ();
+			this.controlsTab.SuspendLayout ();
+			this.musicTab.SuspendLayout ();
 			this.SuspendLayout ();
 			// 
 			// btnOk
@@ -169,6 +168,33 @@
 			this.voiceTab.Text = "Voice";
 			this.voiceTab.UseVisualStyleBackColor = true;
 			// 
+			// groupBox1
+			// 
+			this.groupBox1.Controls.Add (this.voiceActivation);
+			this.groupBox1.Controls.Add (this.dispThreshold);
+			this.groupBox1.Controls.Add (this.label3);
+			this.groupBox1.Controls.Add (this.lblTreshold);
+			this.groupBox1.Controls.Add (this.threshold);
+			this.groupBox1.Controls.Add (this.label2);
+			this.groupBox1.Controls.Add (this.lblVoiceSensitivity);
+			this.groupBox1.Controls.Add (this.vadSensitivity);
+			this.groupBox1.Location = new System.Drawing.Point (8, 65);
+			this.groupBox1.Name = "groupBox1";
+			this.groupBox1.Size = new System.Drawing.Size (295, 168);
+			this.groupBox1.TabIndex = 8;
+			this.groupBox1.TabStop = false;
+			this.groupBox1.Text = "                                ";
+			// 
+			// voiceActivation
+			// 
+			this.voiceActivation.AutoSize = true;
+			this.voiceActivation.Location = new System.Drawing.Point (9, 1);
+			this.voiceActivation.Name = "voiceActivation";
+			this.voiceActivation.Size = new System.Drawing.Size (103, 17);
+			this.voiceActivation.TabIndex = 6;
+			this.voiceActivation.Text = "Voice Activation";
+			this.voiceActivation.UseVisualStyleBackColor = true;
+			// 
 			// dispThreshold
 			// 
 			this.dispThreshold.Location = new System.Drawing.Point (260, 145);
@@ -177,15 +203,6 @@
 			this.dispThreshold.TabIndex = 7;
 			this.dispThreshold.Text = "0.6s";
 			this.dispThreshold.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// lblTreshold
-			// 
-			this.lblTreshold.AutoSize = true;
-			this.lblTreshold.Location = new System.Drawing.Point (6, 99);
-			this.lblTreshold.Name = "lblTreshold";
-			this.lblTreshold.Size = new System.Drawing.Size (91, 13);
-			this.lblTreshold.TabIndex = 6;
-			this.lblTreshold.Text = "Silence threshold:";
 			// 
 			// label3
 			// 
@@ -196,14 +213,14 @@
 			this.label3.TabIndex = 5;
 			this.label3.Text = "Yell";
 			// 
-			// label2
+			// lblTreshold
 			// 
-			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point (6, 69);
-			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size (46, 13);
-			this.label2.TabIndex = 4;
-			this.label2.Text = "Whisper";
+			this.lblTreshold.AutoSize = true;
+			this.lblTreshold.Location = new System.Drawing.Point (6, 99);
+			this.lblTreshold.Name = "lblTreshold";
+			this.lblTreshold.Size = new System.Drawing.Size (91, 13);
+			this.lblTreshold.TabIndex = 6;
+			this.lblTreshold.Text = "Silence threshold:";
 			// 
 			// threshold
 			// 
@@ -216,6 +233,15 @@
 			this.threshold.TickStyle = System.Windows.Forms.TickStyle.TopLeft;
 			this.threshold.Value = 6;
 			this.threshold.Scroll += new System.EventHandler (this.threshold_Scroll);
+			// 
+			// label2
+			// 
+			this.label2.AutoSize = true;
+			this.label2.Location = new System.Drawing.Point (6, 69);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size (46, 13);
+			this.label2.TabIndex = 4;
+			this.label2.Text = "Whisper";
 			// 
 			// lblVoiceSensitivity
 			// 
@@ -266,6 +292,15 @@
 			this.controlsTab.TabIndex = 1;
 			this.controlsTab.Text = "Controls";
 			this.controlsTab.UseVisualStyleBackColor = true;
+			// 
+			// label10
+			// 
+			this.label10.AutoSize = true;
+			this.label10.Location = new System.Drawing.Point (8, 43);
+			this.label10.Name = "label10";
+			this.label10.Size = new System.Drawing.Size (70, 13);
+			this.label10.TabIndex = 12;
+			this.label10.Text = "Push to Talk:";
 			// 
 			// linkClear
 			// 
@@ -331,7 +366,6 @@
 			this.musicTab.Controls.Add (this.normalVolume);
 			this.musicTab.Controls.Add (this.talkingVolume);
 			this.musicTab.Controls.Add (this.volumeControl);
-			this.musicTab.Controls.Add (this.label1);
 			this.musicTab.Controls.Add (this.musicPlayers);
 			this.musicTab.Location = new System.Drawing.Point (4, 22);
 			this.musicTab.Name = "musicTab";
@@ -346,7 +380,7 @@
 			this.musicIgnoreYou.AutoSize = true;
 			this.musicIgnoreYou.Checked = true;
 			this.musicIgnoreYou.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.musicIgnoreYou.Location = new System.Drawing.Point (184, 89);
+			this.musicIgnoreYou.Location = new System.Drawing.Point (189, 6);
 			this.musicIgnoreYou.Name = "musicIgnoreYou";
 			this.musicIgnoreYou.Size = new System.Drawing.Size (119, 17);
 			this.musicIgnoreYou.TabIndex = 12;
@@ -434,65 +468,20 @@
 			this.volumeControl.AutoSize = true;
 			this.volumeControl.Checked = true;
 			this.volumeControl.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.volumeControl.Location = new System.Drawing.Point (9, 89);
+			this.volumeControl.Location = new System.Drawing.Point (9, 6);
 			this.volumeControl.Name = "volumeControl";
 			this.volumeControl.Size = new System.Drawing.Size (131, 17);
 			this.volumeControl.TabIndex = 3;
 			this.volumeControl.Text = "Enable volume control";
 			this.volumeControl.UseVisualStyleBackColor = true;
 			// 
-			// label1
-			// 
-			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point (6, 3);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size (112, 13);
-			this.label1.TabIndex = 2;
-			this.label1.Text = "Enable player support:";
-			// 
 			// musicPlayers
 			// 
 			this.musicPlayers.FormattingEnabled = true;
-			this.musicPlayers.Location = new System.Drawing.Point (9, 19);
+			this.musicPlayers.Location = new System.Drawing.Point (9, 26);
 			this.musicPlayers.Name = "musicPlayers";
-			this.musicPlayers.Size = new System.Drawing.Size (294, 64);
+			this.musicPlayers.Size = new System.Drawing.Size (294, 79);
 			this.musicPlayers.TabIndex = 1;
-			// 
-			// groupBox1
-			// 
-			this.groupBox1.Controls.Add (this.voiceActivation);
-			this.groupBox1.Controls.Add (this.dispThreshold);
-			this.groupBox1.Controls.Add (this.label3);
-			this.groupBox1.Controls.Add (this.lblTreshold);
-			this.groupBox1.Controls.Add (this.threshold);
-			this.groupBox1.Controls.Add (this.label2);
-			this.groupBox1.Controls.Add (this.lblVoiceSensitivity);
-			this.groupBox1.Controls.Add (this.vadSensitivity);
-			this.groupBox1.Location = new System.Drawing.Point (8, 65);
-			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size (295, 168);
-			this.groupBox1.TabIndex = 8;
-			this.groupBox1.TabStop = false;
-			this.groupBox1.Text = "                                ";
-			// 
-			// voiceActivation
-			// 
-			this.voiceActivation.AutoSize = true;
-			this.voiceActivation.Location = new System.Drawing.Point (9, 1);
-			this.voiceActivation.Name = "voiceActivation";
-			this.voiceActivation.Size = new System.Drawing.Size (103, 17);
-			this.voiceActivation.TabIndex = 6;
-			this.voiceActivation.Text = "Voice Activation";
-			this.voiceActivation.UseVisualStyleBackColor = true;
-			// 
-			// label10
-			// 
-			this.label10.AutoSize = true;
-			this.label10.Location = new System.Drawing.Point (8, 43);
-			this.label10.Name = "label10";
-			this.label10.Size = new System.Drawing.Size (70, 13);
-			this.label10.TabIndex = 12;
-			this.label10.Text = "Push to Talk:";
 			// 
 			// SettingsForm
 			// 
@@ -512,13 +501,13 @@
 			this.tabs.ResumeLayout (false);
 			this.generalTab.ResumeLayout (false);
 			this.generalTab.PerformLayout ();
-			this.controlsTab.ResumeLayout (false);
-			this.controlsTab.PerformLayout ();
 			this.voiceTab.ResumeLayout (false);
-			this.musicTab.ResumeLayout (false);
-			this.musicTab.PerformLayout ();
 			this.groupBox1.ResumeLayout (false);
 			this.groupBox1.PerformLayout ();
+			this.controlsTab.ResumeLayout (false);
+			this.controlsTab.PerformLayout ();
+			this.musicTab.ResumeLayout (false);
+			this.musicTab.PerformLayout ();
 			this.ResumeLayout (false);
 
 		}
@@ -547,7 +536,6 @@
 		private System.Windows.Forms.Label dispThreshold;
 		private System.Windows.Forms.Label lblTreshold;
 		private System.Windows.Forms.TabPage musicTab;
-		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.CheckedListBox musicPlayers;
 		private System.Windows.Forms.TrackBar normalVolume;
 		private System.Windows.Forms.TrackBar talkingVolume;
