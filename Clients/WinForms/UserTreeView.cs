@@ -480,7 +480,7 @@ namespace Gablarski.Clients.Windows
 			else if (!u.IsMuted)
 				MarkSilent (u);
 
-			SetupUserContext (userNodes[u].Parent);
+			SetupUserContext (userNodes[u]);
 		}
 
 		private void ContextIgnoreSourceClick (object sender, EventArgs e)
