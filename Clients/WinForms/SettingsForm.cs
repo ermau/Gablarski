@@ -27,7 +27,7 @@ namespace Gablarski.Clients.Windows
 			this.inDisplaySources.Checked = Settings.DisplaySources;
 			this.inConnectOnStart.Checked = Settings.ShowConnectOnStart;
 
-			this.ptt.Checked = Settings.UsePushToTalk;
+			this.voiceActivation.Checked = !Settings.UsePushToTalk;
 			this.inInputProvider.DisplayMember = "Name";
 			this.inInputProvider.DataSource = Modules.Input.ToList();
 			this.inInputProvider.SelectedText = Settings.InputProvider;
@@ -61,7 +61,7 @@ namespace Gablarski.Clients.Windows
 			DisableInput();
 			Settings.InputProvider = (this.inInputProvider.SelectedItem != null) ? this.inInputProvider.SelectedItem.ToString () : String.Empty;
 			Settings.InputSettings = this.inputSettings;
-			Settings.UsePushToTalk = this.ptt.Checked;
+			Settings.UsePushToTalk = !this.voiceActivation.Checked;
 
 			Settings.VoiceProvider = this.voiceSelector.Provider.AssemblyQualifiedName;
 			Settings.VoiceDevice = this.voiceSelector.Device.Name;
