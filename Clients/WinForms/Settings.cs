@@ -78,14 +78,7 @@ namespace Gablarski.Clients.Windows
 
 		public static string InputProvider
 		{
-			get
-			{
-				#if !MONO
-				return GetSetting ("InputProvider", "Gablarski.Input.DirectInput.DirectInputProvider, Gablarski.Input.DirectInput");
-				#else
-				return GetSetting ("InputProvider", String.Empty);
-				#endif
-			}
+			get { return GetSetting ("InputProvider", "Gablarski.Input.DirectInput.DirectInputProvider, Gablarski.Input.DirectInput"); }
 			set
 			{
 				if (SetSetting ("InputProvider", value))
@@ -95,14 +88,7 @@ namespace Gablarski.Clients.Windows
 
 		public static string InputSettings
 		{
-			get
-			{
-				#if !MONO
-				return GetSetting ("InputSettings", "k45");
-				#else
-				return GetSetting ("InputSettings", String.Empty);
-				#endif
-			}
+			get { return GetSetting ("InputSettings", "k45"); }
 			set
 			{
 				if (SetSetting ("InputSettings", value))
@@ -130,10 +116,44 @@ namespace Gablarski.Clients.Windows
 			}
 		}
 
+		public const string EnableNotificationsSettingName = "EnabledNotifications";
+		public static bool EnableNotifications
+		{
+			get { return GetSetting (EnableNotificationsSettingName, true); }
+			set
+			{
+				if (SetSetting (EnableNotificationsSettingName, value))
+					OnSettingsChanged (EnableNotificationsSettingName);
+			}
+		}
+
+		public const string EnabledNotifiersSettingName = "EnabledNotifiers";
+		public static IEnumerable<string> EnabledNotifiers
+		{
+			get
+			{
+				return GetSetting (EnabledNotifiersSettingName,
+					"Gablarski.Growl.GrowlNotifier, Gablarski.Growl;Gablarski.SpeechNotifier.EventSpeech, Gablarski.SpeechNotifier"
+					).Split (';').Where (s => !s.IsEmpty());
+			}
+
+			set
+			{
+				if (SetSetting (EnabledNotifiersSettingName, value.Implode (";")))
+					OnSettingsChanged (EnabledNotifiersSettingName);
+			}
+		}
+
 		public const string EnabledMediaPlayerIntegrationsSettingName = "EnabledMediaPlayerIntegrations";
 		public static IEnumerable<string> EnabledMediaPlayerIntegrations
 		{
-			get { return GetSetting (EnabledMediaPlayerIntegrationsSettingName, "Gablarski.iTunes.iTunesIntegration, Gablarski.iTunes;Gablarski.Winamp.WinampIntegration, Gablarski.Winamp").Split (';'); }
+			get
+			{
+				return GetSetting (EnabledMediaPlayerIntegrationsSettingName,
+					"Gablarski.iTunes.iTunesIntegration, Gablarski.iTunes;Gablarski.Winamp.WinampIntegration, Gablarski.Winamp"
+					).Split (';').Where (s => !s.IsEmpty());
+			}
+
 			set
 			{
 				if (SetSetting (EnabledMediaPlayerIntegrationsSettingName, value.Implode (";")))

@@ -38,56 +38,36 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Gablarski.Clients.Media;
 
-namespace Gablarski.Clients.Media
+namespace Gablarski.Clients
 {
-	/// <summary>
-	/// Provides a media-player integration contract.
-	/// </summary>
-	public interface IMediaPlayer
+	public interface INotifier
 	{
-		/// <summary>
-		/// Gets whether or not the media player is currently running.
-		/// </summary>
-		bool IsRunning { get; }
+		string Name { get; }
 
 		/// <summary>
-		/// Gets the currently playing song name.
+		/// Sets media player integration for use with audio notifications.
 		/// </summary>
-		string SongName { get; }
+		IMediaController Media { set; }
 
-		/// <summary>
-		/// Gets the currently playing artist name.
-		/// </summary>
-		string ArtistName { get; }
-
-		/// <summary>
-		/// Gets the currently playing album name.
-		/// </summary>
-		string AlbumName { get; }
-
-		/// <summary>
-		/// Sets the volume	for the media player. 0 - 100.
-		/// </summary>
-		/// <exception cref="ArgumentOutOfRangeException">When value is < 0 or > 100.</exception>
-		int Volume { get; set; }
+		void Notify (NotificationType type, string contents, NotifyPriority priority);
 	}
 
-	public class MediaPlayerException
-		: ApplicationException
+	public enum NotificationType
 	{
-		public MediaPlayerException()
-		{
-		}
+		Connected,
+		Disconnected,
+		UserJoinedServer,
+		UserLeftServer,
+		UserJoinedChannel,
+		UserLeftChannel,
+		SourceStartsPlaying,
+		SourceStopsPlaying,
+	}
 
-		public MediaPlayerException (string message)
-			: base (message)
-		{
-		}
-
-		public MediaPlayerException (string message, Exception innerException)
-			: base (message, innerException)
-		{
-		}
+	public enum NotifyPriority
+	{
+		Info
 	}
 }

@@ -51,6 +51,33 @@ namespace Gablarski.Clients.Windows
 				this.musicPlayers.Items.Add (player.Name.Remove ("Integration", "Provider"), Settings.EnabledMediaPlayerIntegrations.Any (s => s.Contains (player.FullName)));
 			}
 			this.musicIgnoreYou.Checked = Settings.MediaVolumeControlIgnoresYou;
+
+			this.enableNotifications.Checked = Settings.EnableNotifications;
+			foreach (Type t in Modules.Notifiers)
+			{
+				try
+				{
+					var n = (INotifier)Activator.CreateInstance (t);
+
+					bool enabled = false;
+					foreach (var s in Settings.EnabledNotifiers)
+					{
+						if (!t.AssemblyQualifiedName.Contains (s))
+							continue;
+
+						enabled = true;
+					}
+
+					this.notifiers.Items.Add (new ListViewItem (n.Name)
+					{
+						Tag = t,
+						Checked = enabled
+					});
+				}
+				catch
+				{
+				}
+			}
 		}
 
 		private void btnOk_Click (object sender, EventArgs e)
@@ -81,11 +108,18 @@ namespace Gablarski.Clients.Windows
 			}
 
 			Settings.EnabledMediaPlayerIntegrations = enabledPlayers;
-
 			Settings.TalkingMusicVolume = this.talkingVolume.Value;
 			Settings.NormalMusicVolume = this.normalVolume.Value;
-
 			Settings.MediaVolumeControlIgnoresYou = this.musicIgnoreYou.Checked;
+
+			Settings.EnableNotifications = this.enableNotifications.Checked;
+			List<string> enabledNotifiers = new List<string>();
+			foreach (ListViewItem li in this.notifiers.CheckedItems.Cast<ListViewItem>().Where (li => li.Checked))
+			{
+				var t = ((Type)li.Tag);
+				enabledNotifiers.Add (t.FullName + ", " + t.Assembly.GetName().Name);
+			}
+			Settings.EnabledNotifiers = enabledNotifiers;
 
 			Settings.SaveSettings();
 

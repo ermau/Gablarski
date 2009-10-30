@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using Gablarski.Clients.Music;
+using Gablarski.Clients.Media;
 
 namespace Gablarski.Winamp
 {

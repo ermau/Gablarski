@@ -8,7 +8,7 @@ using System.Net;
 using System.Text;
 using System.Windows.Forms;
 using Gablarski.Client;
-using Gablarski.Clients.Common;
+using Gablarski.Clients;
 using Gablarski.Clients.Windows.Entities;
 using Gablarski.Clients.Windows.Properties;
 using Gablarski.Server;

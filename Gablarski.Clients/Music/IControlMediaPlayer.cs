@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Gablarski.Clients.Music
+namespace Gablarski.Clients.Media
 {
 	public interface IControlMediaPlayer
 		: IMediaPlayer
@@ -11,7 +11,8 @@ namespace Gablarski.Clients.Music
 		void Play();
 		void Pause();
 		void Stop();
-		void NextTrack();
-		void PreviousTrack();
+
+		void NextInPlaylist();
+		void PreviousInPlaylist();
 	}
 }

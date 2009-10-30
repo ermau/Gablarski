@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using Gablarski.Audio;
 using Gablarski.Clients.Input;
-using Gablarski.Clients.Music;
+using Gablarski.Clients.Media;
 
 namespace Gablarski.Clients.Windows
 {
@@ -68,6 +68,18 @@ namespace Gablarski.Clients.Windows
 					mediaPlayers = GetLoader<IMediaPlayer>();
 
 				return mediaPlayers.GetImplementers();
+			}
+		}
+
+		private static ModuleLoader<INotifier> notifiers;
+		public static IEnumerable<Type> Notifiers
+		{
+			get
+			{
+				if (notifiers == null)
+					notifiers = GetLoader<INotifier> ();
+
+				return notifiers.GetImplementers ();
 			}
 		}
 

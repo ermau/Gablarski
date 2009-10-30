@@ -38,56 +38,37 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using Gablarski.Clients;
+using System.Speech.Synthesis;
+using Gablarski.Clients.Media;
 
-namespace Gablarski.Clients.Media
+namespace Gablarski.SpeechNotifier
 {
-	/// <summary>
-	/// Provides a media-player integration contract.
-	/// </summary>
-	public interface IMediaPlayer
+	public class EventSpeech
+		: INotifier
 	{
-		/// <summary>
-		/// Gets whether or not the media player is currently running.
-		/// </summary>
-		bool IsRunning { get; }
-
-		/// <summary>
-		/// Gets the currently playing song name.
-		/// </summary>
-		string SongName { get; }
-
-		/// <summary>
-		/// Gets the currently playing artist name.
-		/// </summary>
-		string ArtistName { get; }
-
-		/// <summary>
-		/// Gets the currently playing album name.
-		/// </summary>
-		string AlbumName { get; }
-
-		/// <summary>
-		/// Sets the volume	for the media player. 0 - 100.
-		/// </summary>
-		/// <exception cref="ArgumentOutOfRangeException">When value is < 0 or > 100.</exception>
-		int Volume { get; set; }
-	}
-
-	public class MediaPlayerException
-		: ApplicationException
-	{
-		public MediaPlayerException()
+		public string Name
 		{
+			get { return "Text to Speech"; }
 		}
 
-		public MediaPlayerException (string message)
-			: base (message)
+		public IMediaController Media
 		{
+			get;
+			set;
 		}
 
-		public MediaPlayerException (string message, Exception innerException)
-			: base (message, innerException)
+		private static readonly SpeechSynthesizer speech = new SpeechSynthesizer ();
+
+		public void Notify (NotificationType type, string say, NotifyPriority priority)
 		{
+			ThreadPool.QueueUserWorkItem ((o) =>
+			{
+				Media.AddTalker ();
+				speech.Speak ((string)o);
+				Media.RemoveTalker ();
+			}, say);
 		}
 	}
 }

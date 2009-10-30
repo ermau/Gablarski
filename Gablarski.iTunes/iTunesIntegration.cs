@@ -5,7 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using Gablarski.Clients;
-using Gablarski.Clients.Music;
+using Gablarski.Clients.Media;
 using iTunesLib;
 
 namespace Gablarski.iTunes
@@ -134,7 +134,7 @@ namespace Gablarski.iTunes
 			}
 		}
 
-		public void NextTrack ()
+		public void NextInPlaylist ()
 		{
 			try
 			{
@@ -145,7 +145,7 @@ namespace Gablarski.iTunes
 			}
 		}
 
-		public void PreviousTrack ()
+		public void PreviousInPlaylist ()
 		{
 			try
 			{

@@ -135,7 +135,6 @@
     <Compile Include="Entities\IgnoreEntry.cs" />
     <Compile Include="Entities\ServerEntry.cs" />
     <Compile Include="Entities\SettingEntry.cs" />
-    <Compile Include="EventSpeech.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="LoginForm.cs">
       <SubType>Form</SubType>
@@ -207,6 +206,9 @@
     <Compile Include="SettingsForm.Designer.cs">
       <DependentUpon>SettingsForm.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="SettingsForm.resx">
+      <DependentUpon>SettingsForm.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\fluent-nhibernate\src\FluentNHibernate\FluentNHibernate.csproj">
@@ -278,9 +280,6 @@
     <None Include="Resources\user_add.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Headphones.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Headphones.ico" />
     <None Include="Resources\Headphones.ico" />
   </ItemGroup>
@@ -298,6 +297,10 @@ xcopy /Y "$(SolutionDir)Gablarski.Input.DirectInput\bin\$(ConfigurationName)\*.p
 xcopy /Y "$(SolutionDir)Gablarski.iTunes\bin\$(ConfigurationName)\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Gablarski.iTunes\bin\$(ConfigurationName)\*.pdb" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Gablarski.Winamp\bin\$(ConfigurationName)\*.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)Gablarski.Winamp\bin\$(ConfigurationName)\*.pdb" "$(TargetDir)"</PostBuildEvent>
+xcopy /Y "$(SolutionDir)Gablarski.Winamp\bin\$(ConfigurationName)\*.pdb" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Gablarski.SpeechNotifier\bin\$(ConfigurationName)\*.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Gablarski.SpeechNotifier\bin\$(ConfigurationName)\*.pdb" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Gablarski.Growl\bin\$(ConfigurationName)\*.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Gablarski.Growl\bin\$(ConfigurationName)\*.pdb" "$(TargetDir)"</PostBuildEvent>
   </PropertyGroup>
 </Project>

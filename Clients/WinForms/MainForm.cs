@@ -5,13 +5,14 @@ using System.Windows.Forms;
 using Gablarski.Audio;
 using Gablarski.Audio.OpenAL.Providers;
 using Gablarski.Client;
-using Gablarski.Clients.Common;
+using Gablarski.Clients;
 using Gablarski.Clients.Input;
-using Gablarski.Clients.Music;
+using Gablarski.Clients.Media;
 using Gablarski.Clients.Windows.Entities;
 using Gablarski.Clients.Windows.Properties;
 using Gablarski.Messages;
 using Gablarski.Network;
+using System.Collections.Generic;
 
 namespace Gablarski.Clients.Windows
 {
@@ -39,21 +40,31 @@ namespace Gablarski.Clients.Windows
 			this.gablarski.Sources.AudioSourcesRemoved += SourcesRemoved;
 			this.gablarski.Sources.AudioSourceStopped += SourceStoped;
 			this.gablarski.Sources.AudioSourceStarted += SourceStarted;
+			
+			IEnumerable<IMediaPlayer> players = Enumerable.Empty<IMediaPlayer>();
+			if (Settings.EnableMediaVolumeControl)
+				players = Settings.EnabledMediaPlayerIntegrations.Select (s => (IMediaPlayer)Activator.CreateInstance (Type.GetType (s))).ToList ();
 
-			this.mediaPlayerIntegration = new MediaPlayerIntegration (this.gablarski, this.gablarski.Sources,
-			                                                          Settings.EnabledMediaPlayerIntegrations.Select (
-			                                                          	s => (IMediaPlayer)Activator.CreateInstance (Type.GetType (s))).ToList());
+			this.mediaPlayerIntegration = new MediaController (this.gablarski, this.gablarski.Sources, players);
 			this.mediaPlayerIntegration.NormalVolume = Settings.NormalMusicVolume;
 			this.mediaPlayerIntegration.TalkingVolume = Settings.TalkingMusicVolume;
 			this.mediaPlayerIntegration.UserTalkingCounts = !Settings.MediaVolumeControlIgnoresYou;
+
+			if (Settings.EnableNotifications)
+				SetupNotifications ();
 
 			Settings.SettingChanged += SettingsSettingChanged;
 
 			this.InitializeComponent ();
 
 			this.users.Client = this.gablarski;
+		}
 
-			new EventSpeech (this.gablarski, this.mediaPlayerIntegration);
+		private void SetupNotifications ()
+		{
+			this.notifications = new NotificationHandler (this.gablarski);
+			this.notifications.MediaController = this.mediaPlayerIntegration;
+			this.notifications.Notifiers = Settings.EnabledNotifiers.Select (n => ((INotifier)Activator.CreateInstance (Type.GetType (n))));
 		}
 
 		private void SourcesOnReceivedSourceList(object sender, ReceivedListEventArgs<AudioSource> args)
@@ -182,9 +193,13 @@ namespace Gablarski.Clients.Windows
 					SetupVoiceCapture();
 					break;
 
-				case Settings.EnabledMediaPlayerIntegrationsSettingName:
-					this.mediaPlayerIntegration.MediaPlayers = Settings.EnabledMediaPlayerIntegrations.Select (
-																		s => (IMediaPlayer)Activator.CreateInstance (Type.GetType (s))).ToList ();
+				case Settings.EnableMediaVolumeControlSettingName:
+				case Settings.EnabledMediaPlayerIntegrationsSettingName:		
+					IEnumerable<IMediaPlayer> players = Enumerable.Empty<IMediaPlayer>();
+					if (Settings.EnableMediaVolumeControl)
+						players = Settings.EnabledMediaPlayerIntegrations.Select (s => (IMediaPlayer)Activator.CreateInstance (Type.GetType (s))).ToList ();
+
+					this.mediaPlayerIntegration.MediaPlayers = players;
 					break;
 
 				case Settings.TalkingMusicVolumeSettingName:
@@ -197,6 +212,23 @@ namespace Gablarski.Clients.Windows
 
 				case Settings.MediaVolumeControlIgnoresYouSettingName:
 					this.mediaPlayerIntegration.UserTalkingCounts = !Settings.MediaVolumeControlIgnoresYou;
+					break;
+
+				case Settings.EnableNotificationsSettingName:
+					if (!Settings.EnableNotifications)
+					{
+						this.notifications.Close ();
+						this.notifications = null;
+					}
+					else
+						SetupNotifications ();
+
+					break;
+
+				case Settings.EnabledNotifiersSettingName:
+					if (Settings.EnableNotifications)
+						this.notifications.Notifiers = Settings.EnabledNotifiers.Select (t => (INotifier)Activator.CreateInstance (Type.GetType (t))).ToList();
+
 					break;
 
 				case "VoiceProvider":
@@ -573,7 +605,8 @@ namespace Gablarski.Clients.Windows
 		}
 
 		private ICaptureProvider musicprovider;
-		private readonly MediaPlayerIntegration mediaPlayerIntegration;
+		private readonly MediaController mediaPlayerIntegration;
+		private NotificationHandler notifications;
 
 		private void musicButton_Click (object sender, EventArgs e)
 		{

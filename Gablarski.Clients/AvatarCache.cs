@@ -36,58 +36,72 @@
 
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
+using System.Threading;
+using Gablarski.Client;
+using Gablarski.Network;
 
-namespace Gablarski.Clients.Media
+namespace Gablarski.Clients.Windows
 {
-	/// <summary>
-	/// Provides a media-player integration contract.
-	/// </summary>
-	public interface IMediaPlayer
+	public class AvatarCache
 	{
 		/// <summary>
-		/// Gets whether or not the media player is currently running.
+		/// Gets an <see cref="Bitmap"/> for the specified from the URL, from the cache if available.
 		/// </summary>
-		bool IsRunning { get; }
-
-		/// <summary>
-		/// Gets the currently playing song name.
-		/// </summary>
-		string SongName { get; }
-
-		/// <summary>
-		/// Gets the currently playing artist name.
-		/// </summary>
-		string ArtistName { get; }
-
-		/// <summary>
-		/// Gets the currently playing album name.
-		/// </summary>
-		string AlbumName { get; }
-
-		/// <summary>
-		/// Sets the volume	for the media player. 0 - 100.
-		/// </summary>
-		/// <exception cref="ArgumentOutOfRangeException">When value is < 0 or > 100.</exception>
-		int Volume { get; set; }
-	}
-
-	public class MediaPlayerException
-		: ApplicationException
-	{
-		public MediaPlayerException()
+		/// <param name="url">The URL to retrieve the image from.</param>
+		/// <returns>The <see cref="Bitmap"/> for the url. <c>null</c> if <paramref name="url"/> is invalid.</returns>
+		/// <exception cref="ArgumentNullException">If <paramref name="url"/> is null.</exception>
+		public Bitmap GetAvatar (string url)
 		{
+			if (url == null)
+				throw new ArgumentNullException("url");
+			
+			if (url.Trim() == String.Empty)
+				return null;
+
+			lock (Avatars)
+			{
+				if (Avatars.ContainsKey (url))
+					return Avatars[url];
+			}
+
+			Uri imageUri;
+			try
+			{
+				imageUri = new Uri (url);
+				if (imageUri.IsFile)
+					return null;
+			}
+			catch (FormatException)
+			{
+				return null;
+			}
+
+			byte[] image = wclient.DownloadData (imageUri);
+
+			Bitmap avatar;
+			try
+			{
+				avatar = new Bitmap (new MemoryStream (image));
+			}
+			catch (ArgumentException)
+			{
+				return null;
+			}
+
+			lock (Avatars)
+			{
+				Avatars.Add (url, avatar);
+			}
+
+			return avatar;
 		}
 
-		public MediaPlayerException (string message)
-			: base (message)
-		{
-		}
-
-		public MediaPlayerException (string message, Exception innerException)
-			: base (message, innerException)
-		{
-		}
+		private readonly Dictionary<string, Bitmap> Avatars = new Dictionary<string, Bitmap>();
+		private static readonly WebClient wclient = new WebClient();
 	}
 }

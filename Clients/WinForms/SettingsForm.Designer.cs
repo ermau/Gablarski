@@ -28,6 +28,7 @@
 		/// </summary>
 		private void InitializeComponent ()
 		{
+			System.Windows.Forms.ColumnHeader columnHeader1;
 			this.btnOk = new System.Windows.Forms.Button ();
 			this.btnCancel = new System.Windows.Forms.Button ();
 			this.tabs = new System.Windows.Forms.TabControl ();
@@ -65,13 +66,23 @@
 			this.talkingVolume = new System.Windows.Forms.TrackBar ();
 			this.volumeControl = new System.Windows.Forms.CheckBox ();
 			this.musicPlayers = new System.Windows.Forms.CheckedListBox ();
+			this.tabNotifications = new System.Windows.Forms.TabPage ();
+			this.enableNotifications = new System.Windows.Forms.CheckBox ();
+			this.notifiers = new System.Windows.Forms.ListView ();
+			columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader ()));
 			this.tabs.SuspendLayout ();
 			this.generalTab.SuspendLayout ();
 			this.voiceTab.SuspendLayout ();
 			this.groupBox1.SuspendLayout ();
 			this.controlsTab.SuspendLayout ();
 			this.musicTab.SuspendLayout ();
+			this.tabNotifications.SuspendLayout ();
 			this.SuspendLayout ();
+			// 
+			// columnHeader1
+			// 
+			columnHeader1.Text = "Notifier";
+			columnHeader1.Width = 266;
 			// 
 			// btnOk
 			// 
@@ -105,6 +116,7 @@
 			this.tabs.Controls.Add (this.voiceTab);
 			this.tabs.Controls.Add (this.controlsTab);
 			this.tabs.Controls.Add (this.musicTab);
+			this.tabs.Controls.Add (this.tabNotifications);
 			this.tabs.Location = new System.Drawing.Point (0, 0);
 			this.tabs.Name = "tabs";
 			this.tabs.SelectedIndex = 0;
@@ -483,6 +495,42 @@
 			this.musicPlayers.Size = new System.Drawing.Size (294, 79);
 			this.musicPlayers.TabIndex = 1;
 			// 
+			// tabNotifications
+			// 
+			this.tabNotifications.Controls.Add (this.enableNotifications);
+			this.tabNotifications.Controls.Add (this.notifiers);
+			this.tabNotifications.Location = new System.Drawing.Point (4, 22);
+			this.tabNotifications.Name = "tabNotifications";
+			this.tabNotifications.Padding = new System.Windows.Forms.Padding (3);
+			this.tabNotifications.Size = new System.Drawing.Size (311, 263);
+			this.tabNotifications.TabIndex = 4;
+			this.tabNotifications.Text = "Notifications";
+			this.tabNotifications.UseVisualStyleBackColor = true;
+			// 
+			// enableNotifications
+			// 
+			this.enableNotifications.AutoSize = true;
+			this.enableNotifications.Checked = true;
+			this.enableNotifications.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.enableNotifications.Location = new System.Drawing.Point (8, 6);
+			this.enableNotifications.Name = "enableNotifications";
+			this.enableNotifications.Size = new System.Drawing.Size (120, 17);
+			this.enableNotifications.TabIndex = 1;
+			this.enableNotifications.Text = "Enable Notifications";
+			this.enableNotifications.UseVisualStyleBackColor = true;
+			// 
+			// notifiers
+			// 
+			this.notifiers.CheckBoxes = true;
+			this.notifiers.Columns.AddRange (new System.Windows.Forms.ColumnHeader[] {
+            columnHeader1});
+			this.notifiers.Location = new System.Drawing.Point (8, 27);
+			this.notifiers.Name = "notifiers";
+			this.notifiers.Size = new System.Drawing.Size (295, 97);
+			this.notifiers.TabIndex = 0;
+			this.notifiers.UseCompatibleStateImageBehavior = false;
+			this.notifiers.View = System.Windows.Forms.View.Details;
+			// 
 			// SettingsForm
 			// 
 			this.AcceptButton = this.btnOk;
@@ -508,6 +556,8 @@
 			this.controlsTab.PerformLayout ();
 			this.musicTab.ResumeLayout (false);
 			this.musicTab.PerformLayout ();
+			this.tabNotifications.ResumeLayout (false);
+			this.tabNotifications.PerformLayout ();
 			this.ResumeLayout (false);
 
 		}
@@ -551,5 +601,8 @@
 		private System.Windows.Forms.GroupBox groupBox1;
 		private System.Windows.Forms.CheckBox voiceActivation;
 		private System.Windows.Forms.Label label10;
+		private System.Windows.Forms.TabPage tabNotifications;
+		private System.Windows.Forms.CheckBox enableNotifications;
+		private System.Windows.Forms.ListView notifiers;
 	}
 }

@@ -76,12 +76,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Common\AvatarCache.cs" />
-    <Compile Include="Common\LocalServer.cs" />
+    <Compile Include="AvatarCache.cs" />
+    <Compile Include="INotifier.cs" />
+    <Compile Include="LocalServer.cs" />
     <Compile Include="Music\IControlMediaPlayer.cs" />
     <Compile Include="Input\IInputProvider.cs" />
     <Compile Include="Music\IMediaPlayer.cs" />
-    <Compile Include="Music\MediaPlayerIntegration.cs" />
+    <Compile Include="Music\IMediaController.cs" />
+    <Compile Include="Music\MediaController.cs" />
+    <Compile Include="NotificationHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
