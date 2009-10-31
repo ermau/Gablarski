@@ -42,6 +42,7 @@ namespace Gablarski.Clients.Windows
 				this.dispInput.Text = currentInputProvider.GetNiceInputName (this.inputSettings);
 
 			this.threshold.Value = Settings.VoiceActivationContinueThreshold / 100;
+			this.dispThreshold.Text = String.Format ("{0:N1}s", (double)this.threshold.Value / 10);
 			this.vadSensitivity.Value = Settings.VoiceActivationLevel;
 
 			this.talkingVolume.Value = Settings.TalkingMusicVolume;
