@@ -583,6 +583,8 @@ namespace Gablarski.Clients.Windows
 
 		private void MainForm_FormClosing (object sender, FormClosingEventArgs e)
 		{
+			this.notifications.Close ();
+
 			this.gablarski.Disconnect();
 			LocalServer.Shutdown();
 		}
