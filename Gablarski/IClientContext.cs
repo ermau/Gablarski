@@ -66,9 +66,9 @@ namespace Gablarski
 		IIndexedEnumerable<int, AudioSource> Sources { get; }
 
 		/// <summary>
-		/// Gets the user associated with this context
+		/// Gets the user manager associated with this context.
 		/// </summary>
-		IIndexedEnumerable<int, ClientUser> Users { get; }
+		IClientUserManager Users { get; }
 
 		/// <summary>
 		/// Gets the current logged in user.

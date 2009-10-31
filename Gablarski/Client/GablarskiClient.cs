@@ -296,7 +296,7 @@ namespace Gablarski.Client
 			get { return this.Sources; }
 		}
 
-		IIndexedEnumerable<int, ClientUser> IClientContext.Users
+		IClientUserManager IClientContext.Users
 		{
 			get { return this.Users; }
 		}

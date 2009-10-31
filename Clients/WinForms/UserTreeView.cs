@@ -418,13 +418,13 @@ namespace Gablarski.Clients.Windows
 				if (destinationNode != null)
 				{
 					var channel = destinationNode.Tag as ChannelInfo;
-					var user = movedNode.Tag as ClientUser;
+					var user = movedNode.Tag as UserInfo;
 					if (channel != null && user != null)
 					{
 						if (user.CurrentChannelId.Equals (channel.ChannelId))
 							return;
 
-						user.Move (channel);
+						Client.Users.Move (user, channel);
 					}
 				}
 			}
@@ -441,7 +441,7 @@ namespace Gablarski.Clients.Windows
 				return;
 			}
 
-			Client.CurrentUser.Move (channel);
+			Client.Users.Move (Client.CurrentUser, channel);
 		}
 
 		private void AddChannels (IEnumerable<ChannelInfo> channels, ChannelInfo parent)
@@ -474,8 +474,8 @@ namespace Gablarski.Clients.Windows
 
 		private void ContextIgnoreUserClick (object sender, EventArgs e)
 		{
-			var u = (ClientUser)this.SelectedNode.Tag;
-			if (u.ToggleIgnore ())
+			var u = (UserInfo)this.SelectedNode.Tag;
+			if (Client.Users.ToggleIgnore (u))
 				MarkMuted (u);
 			else if (!u.IsMuted)
 				MarkSilent (u);
@@ -491,13 +491,14 @@ namespace Gablarski.Clients.Windows
 			else if (!s.IsMuted)
 				MarkSilent (s);
 
-			SetupUserContext (sourceNodes[s].Parent);
-			SetupSourceContext (sourceNodes[s]);
+			SetupUserContext (userNodes[userNodes.Keys.FirstOrDefault (u => u.UserId == s.OwnerId)]);
+			if (sourceNodes.ContainsKey (s))
+				SetupSourceContext (sourceNodes[s]);
 		}
 
 		private void ContextMuteUserClick (object sender, EventArgs e)
 		{
-			((ClientUser)this.SelectedNode.Tag).ToggleMute();
+			Client.Users.ToggleMute ((UserInfo)this.SelectedNode.Tag);
 		}
 
 		private void ContextMuteSourceClick (object sender, EventArgs e)
@@ -577,11 +578,11 @@ namespace Gablarski.Clients.Windows
 
 			un.ContextMenuStrip = new ContextMenuStrip();
 			
-			var target = (ClientUser)un.Tag;
+			var target = (UserInfo)un.Tag;
 
 			//if (target.Username != Client.CurrentUser.Username)
 			//{
-				if (!target.IsIgnored)
+				if (!Client.Users.GetIsIgnored (target))
 				{
 					var ignore = new ToolStripMenuItem ("Ignore user", Resources.SoundMuteImage);
 					ignore.ToolTipText = "Ignores the user";

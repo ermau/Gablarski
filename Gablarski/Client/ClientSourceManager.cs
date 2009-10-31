@@ -451,7 +451,7 @@ namespace Gablarski.Client
 				return;
 
 			var user = this.context.Users[source.OwnerId];
-			if (user != null && !user.IsIgnored)
+			if (user != null && !this.context.Users.GetIsIgnored (user))
 				OnReceivedAudio (new ReceivedAudioEventArgs (source, msg.Data));
 		}
 

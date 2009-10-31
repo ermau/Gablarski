@@ -46,7 +46,7 @@ using System.Threading;
 namespace Gablarski.Client
 {
 	public class ClientUserManager
-		: IIndexedEnumerable<int, ClientUser>
+		: IClientUserManager
 	{
 		protected internal ClientUserManager (IClientContext context)
 		{
@@ -96,14 +96,14 @@ namespace Gablarski.Client
 			get { return this.context.CurrentUser; }
 		}
 
-		public ClientUser this[int identifier]
+		public UserInfo this[int identifier]
 		{
 			get
 			{
 				if (users == null)
 					return null;
 
-				ClientUser user;
+				UserInfo user;
 				lock (userLock)
 				{
 					this.users.TryGetValue (identifier, out user);
@@ -111,6 +111,76 @@ namespace Gablarski.Client
 
 				return user;
 			}
+		}
+
+		/// <summary>
+		/// Requests to move <paramref name="user"/> to <paramref name="targetChannel"/>.
+		/// </summary>
+		/// <param name="user">The user to move.</param>
+		/// <param name="targetChannel">The target channel to move the user to.</param>
+		public void Move (UserInfo user, ChannelInfo targetChannel)
+		{
+			if (user == null)
+				throw new ArgumentNullException ("user");
+			if (targetChannel == null)
+				throw new ArgumentNullException ("targetChannel");
+
+			this.context.Connection.Send (new ChannelChangeMessage (user.UserId, targetChannel.ChannelId));
+		}
+
+		/// <summary>
+		/// Gets whether or not <paramref name="user"/> is currently ignored.
+		/// </summary>
+		/// <param name="user">The user to check.</param>
+		/// <returns><c>true</c> if ignored, <c>false</c> if not.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
+		public bool GetIsIgnored (UserInfo user)
+		{
+			if (user == null)
+				throw new ArgumentNullException ("user");
+
+			lock (userLock)
+			{
+				return ignores.Contains (user.UserId);
+			}
+		}
+
+		/// <summary>
+		/// Toggles <paramref name="user"/>'s ignored status.
+		/// </summary>
+		/// <param name="user">The user to toggle ignored status.</param>
+		/// <returns><c>true</c> if the user is now ignored, <c>false</c> if now unignored.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
+		public bool ToggleIgnore (UserInfo user)
+		{
+			if (user == null)
+				throw new ArgumentNullException ("user");
+
+			bool ignored;
+			lock (userLock)
+			{
+				ignored = ignores.Contains (user.UserId);
+
+				if (ignored)
+					ignores.Remove (user.UserId);
+				else
+					ignores.Add (user.UserId);
+			}
+
+			return !ignored;
+		}
+
+		/// <summary>
+		/// Requests a mute toggle for <paramref name="user"/>.
+		/// </summary>
+		/// <param name="user">The user to attempt to mute or unmute.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
+		public void ToggleMute (UserInfo user)
+		{
+			if (user == null)
+				throw new ArgumentNullException ("user");
+
+			context.Connection.Send (new RequestMuteMessage { Target = user.Username, Type = MuteType.User, Unmute = user.IsMuted });
 		}
 
 		/// <summary>
@@ -133,7 +203,7 @@ namespace Gablarski.Client
 		/// A <see cref="T:System.Collections.Generic.IEnumerator`1"/> that can be used to iterate through the collection.
 		/// </returns>
 		/// <filterpriority>1</filterpriority>
-		public IEnumerator<ClientUser> GetEnumerator()
+		public IEnumerator<UserInfo> GetEnumerator()
 		{
 			if (this.users == null)
 			{
@@ -168,7 +238,8 @@ namespace Gablarski.Client
 		#endregion
 
 		private readonly object userLock = new object();
-		private Dictionary<int, ClientUser> users;
+		private Dictionary<int, UserInfo> users;
+		private readonly HashSet<int> ignores = new HashSet<int> ();
 		private readonly IClientContext context;
 
 		#region Message handlers
@@ -179,8 +250,11 @@ namespace Gablarski.Client
 			IEnumerable<UserInfo> userlist;
 			lock (userLock)
 			{
-				this.users = msg.Users.ToDictionary (p => p.UserId, p => new ClientUser (p, this.context.Connection));
-				userlist = this.users.Values.Cast<UserInfo>().ToList();
+				this.users = msg.Users.ToDictionary (p => p.UserId, p => new UserInfo (p));
+				userlist = this.users.Values.ToList();
+
+				foreach (int ignoredId in this.ignores.ToList ().Where (id => !this.users.ContainsKey (id)))
+					this.ignores.Remove (ignoredId);
 			}
 
 			OnReceivedUserList (new ReceivedListEventArgs<UserInfo> (userlist));
@@ -204,11 +278,12 @@ namespace Gablarski.Client
 		{
 			var msg = (UserDisconnectedMessage) e.Message;
 
-			ClientUser user;
+			UserInfo user;
 			lock (userLock)
 			{
 				user = this.users[msg.UserId];
 				this.users.Remove (msg.UserId);
+				ignores.Remove (msg.UserId);
 			}
 
 			OnUserDisconnected (new UserEventArgs (user));
@@ -218,13 +293,13 @@ namespace Gablarski.Client
 		{
 			var msg = (UserJoinedMessage)e.Message;
 
-			ClientUser user;
+			UserInfo user;
 			lock (userLock)
 			{
 				if (this.users == null)
-					this.users = new Dictionary<int, ClientUser>();
+					this.users = new Dictionary<int, UserInfo> ();
 
-				user = new ClientUser (msg.UserInfo, this.context.Connection);
+				user = new UserInfo (msg.UserInfo);
 				this.users.Add (msg.UserInfo.UserId, user);
 			}
 
@@ -241,15 +316,15 @@ namespace Gablarski.Client
 
 			var previous = this.context.Channels[msg.ChangeInfo.PreviousChannelId];
 
-			ClientUser old;
-			ClientUser user;
-			ClientUser movedBy = null;
+			UserInfo old;
+			UserInfo user;
+			UserInfo movedBy = null;
 			lock (userLock)
 			{
 				if (!this.users.TryGetValue (msg.ChangeInfo.TargetUserId, out old))
 					return;
 
-				user = this.users[msg.ChangeInfo.TargetUserId] = new ClientUser (old.Nickname, old.UserId, msg.ChangeInfo.TargetChannelId, this.context.Connection, old.IsMuted);
+				user = this.users[msg.ChangeInfo.TargetUserId] = new UserInfo (old.Nickname, old.Username, old.UserId, msg.ChangeInfo.TargetChannelId, old.IsMuted);
 				
 				if (user.Equals (context.CurrentUser))
 					context.CurrentUser.CurrentChannelId = msg.ChangeInfo.TargetChannelId;
@@ -318,7 +393,7 @@ namespace Gablarski.Client
 	public class UserMutedEventArgs
 		: UserEventArgs
 	{
-		public UserMutedEventArgs (ClientUser userInfo, bool unmuted)
+		public UserMutedEventArgs (UserInfo userInfo, bool unmuted)
 			: base (userInfo)
 		{
 			this.Unmuted = unmuted;
@@ -330,7 +405,7 @@ namespace Gablarski.Client
 	public class UserEventArgs
 		: EventArgs
 	{
-		public UserEventArgs (ClientUser userInfo)
+		public UserEventArgs (UserInfo userInfo)
 		{
 			if (userInfo == null)
 				throw new ArgumentNullException ("userInfo");
@@ -341,7 +416,7 @@ namespace Gablarski.Client
 		/// <summary>
 		/// Gets the user target of the event.
 		/// </summary>
-		public ClientUser User
+		public UserInfo User
 		{
 			get;
 			private set;
@@ -351,7 +426,7 @@ namespace Gablarski.Client
 	public class ChannelChangedEventArgs
 		: UserEventArgs
 	{
-		public ChannelChangedEventArgs (ClientUser target, ChannelInfo targetChannel, ChannelInfo previousChannel, ClientUser movedBy)
+		public ChannelChangedEventArgs (UserInfo target, ChannelInfo targetChannel, ChannelInfo previousChannel, UserInfo movedBy)
 			: base (target)
 		{
 			if (targetChannel == null)
@@ -382,7 +457,7 @@ namespace Gablarski.Client
 		/// <summary>
 		/// Gets the user the target user was moved by
 		/// </summary>
-		public ClientUser MovedBy
+		public UserInfo MovedBy
 		{
 			get; private set;
 		}
@@ -395,8 +470,6 @@ namespace Gablarski.Client
 		{
 			if (moveInfo == null)
 				throw new ArgumentNullException ("moveInfo");
-			if (result == null)
-				throw new ArgumentNullException ("result");
 
 			this.MoveInfo = moveInfo;
 			this.Result = result;

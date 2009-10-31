@@ -32,7 +32,7 @@ namespace Gablarski.Tests
 		/// <summary>
 		/// Gets the user associated with this context
 		/// </summary>
-		public IIndexedEnumerable<int, ClientUser> Users { get; set; }
+		public IClientUserManager Users { get; set; }
 
 		/// <summary>
 		/// Gets the current logged in user.

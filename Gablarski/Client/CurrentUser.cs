@@ -44,10 +44,9 @@ using Gablarski.Server;
 namespace Gablarski.Client
 {
 	public class CurrentUser
-		: ClientUser
+		: UserInfo
 	{
 		internal CurrentUser (IClientContext context)
-			: base (context.Connection)
 		{
 			if (context == null)
 				throw new ArgumentNullException ("context");

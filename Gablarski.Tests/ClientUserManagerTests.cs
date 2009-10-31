@@ -48,7 +48,7 @@ namespace Gablarski.Tests
 			VerifyDefaultUsers (manager);
 		}
 
-		private static void VerifyDefaultUsers (IEnumerable<ClientUser> manager)
+		private static void VerifyDefaultUsers (IEnumerable<UserInfo> manager)
 		{
 			Assert.AreEqual (1, manager.Count (u => u.UserId == 1 && u.Nickname == "Foo" && !u.IsMuted && u.CurrentChannelId == 1));
 			Assert.AreEqual (1, manager.Count (u => u.UserId == 2 && u.Nickname == "Bar" && !u.IsMuted && u.CurrentChannelId == 1));
@@ -124,27 +124,26 @@ namespace Gablarski.Tests
 			var user = manager.First();
 			int userId = user.UserId;
 			
-			Assert.IsFalse (user.IsIgnored);
-			Assert.IsTrue (user.ToggleIgnore());
-			Assert.IsTrue (manager[userId].IsIgnored);
+			Assert.IsFalse (manager.GetIsIgnored (user));
+			Assert.IsTrue (manager.ToggleIgnore (user));
+			Assert.IsTrue (manager.GetIsIgnored (user));
 		}
 
-		// Known issue
-		//[Test]
-		//public void IgnoreUserPersists()
-		//{
-		//    CreateUsers (this.server.Client, this.manager);
+		[Test]
+		public void IgnoreUserPersists ()
+		{
+			CreateUsers (this.server.Client, this.manager);
 
-		//    var user = manager.First();
-		//    int userId = user.UserId;
-			
-		//    Assert.IsFalse (user.IsIgnored);
-		//    Assert.IsTrue (user.ToggleIgnore());
-		//    Assert.IsTrue (manager[userId].IsIgnored);
+			var user = manager.First ();
+			int userId = user.UserId;
 
-		//    CreateUsers (this.server.Client, this.manager);
+			Assert.IsTrue (manager.GetIsIgnored (user));
+			Assert.IsTrue (manager.ToggleIgnore (user));
+			Assert.IsTrue (manager.GetIsIgnored (user));
 
-		//    Assert.IsTrue (manager[userId].IsIgnored);
-		//}
+			CreateUsers (this.server.Client, this.manager);
+
+			Assert.IsTrue (manager.GetIsIgnored (user));
+		}
 	}
 }

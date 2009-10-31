@@ -136,7 +136,9 @@
     <Compile Include="ByteArrayValueReader.cs" />
     <Compile Include="Audio\AudioEngine.cs" />
     <Compile Include="Audio\IAudioSender.cs" />
+    <Compile Include="Client\IClientUserManager.cs" />
     <Compile Include="IIndexedEnumerable.cs" />
+    <Compile Include="IUserManager.cs" />
     <Compile Include="Messages\AudioSourceStateChangeMessage.cs" />
     <Compile Include="Messages\ClientAudioSourceStateChangeMessage.cs" />
     <Compile Include="Messages\JoinMessage.cs" />
@@ -216,7 +218,6 @@
     <Compile Include="StreamValueWriter.cs" />
     <Compile Include="Client\GablarskiClient.Internal.cs" />
     <Compile Include="Messages\UserDisconnectedMessage.cs" />
-    <Compile Include="Client\ClientUser.cs" />
     <Compile Include="Client\ClientUserManager.cs" />
     <Compile Include="Client\ClientSourceManager.cs" />
     <Compile Include="Client\CurrentUser.cs" />
