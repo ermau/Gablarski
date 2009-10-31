@@ -228,7 +228,7 @@ namespace Gablarski.Clients.Windows
 
 			foreach (var entry in Servers.GetEntries())
 			{
-				var li = this.servers.Items.Add (entry.Name);		
+				var li = this.servers.Items.Add (entry.Name);
 				li.Tag = entry;
 				li.ImageIndex = 0;
 				saved.Items.Add (li);
@@ -275,6 +275,21 @@ namespace Gablarski.Clients.Windows
 		{
 			SettingsForm sf = new SettingsForm();
 			sf.ShowDialog();
+		}
+
+		private void servers_KeyUp (object sender, KeyEventArgs e)
+		{
+			if (e.KeyCode != Keys.Delete || this.servers.SelectedItems.Count == 0)
+				return;
+
+			foreach (var li in this.servers.SelectedItems.Cast<ListViewItem> ())
+			{
+				var s = (ServerEntry)li.Tag;
+				Servers.DeleteServer (s);
+				this.servers.Items.Remove (li);
+			}
+
+			Persistance.CurrentSession.Flush ();
 		}
 	}
 }
