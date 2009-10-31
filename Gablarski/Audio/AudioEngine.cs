@@ -377,15 +377,13 @@ namespace Gablarski.Audio
 							if (talking)
 								AudioSender.SendAudioData (c.Key, Context.GetCurrentChannel(), samples);
 							else if (c.Value.Talking && c.Value.Options.Mode == AudioEngineCaptureMode.Activated)
-							{
 								AudioSender.EndSending (c.Key, Context.GetCurrentChannel());
-								previousFrame = null;
-							}
 
 							c.Value.Talking = talking;
 						}
 
-						skipSwitch = (c.Value.Capture.AvailableSampleCount > c.Key.FrameSize);
+						if (!skipSwitch)
+							skipSwitch = (c.Value.Capture.AvailableSampleCount > c.Key.FrameSize);
 					}
 				}
 
