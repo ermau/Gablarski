@@ -366,7 +366,9 @@ namespace Gablarski.Audio
 								if (talking && !c.Value.Talking)
 								{
 									AudioSender.BeginSending (c.Key, Context.GetCurrentChannel ());
-									AudioSender.SendAudioData (c.Key, Context.GetCurrentChannel (), previousFrame);
+									
+									if (previousFrame != null)
+										AudioSender.SendAudioData (c.Key, Context.GetCurrentChannel (), previousFrame);
 								}
 
 								previousFrame = samples;
