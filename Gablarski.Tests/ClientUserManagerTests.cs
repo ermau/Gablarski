@@ -137,7 +137,7 @@ namespace Gablarski.Tests
 			var user = manager.First ();
 			int userId = user.UserId;
 
-			Assert.IsTrue (manager.GetIsIgnored (user));
+			Assert.IsFalse (manager.GetIsIgnored (user));
 			Assert.IsTrue (manager.ToggleIgnore (user));
 			Assert.IsTrue (manager.GetIsIgnored (user));
 
