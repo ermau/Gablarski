@@ -332,6 +332,8 @@ namespace Gablarski.Audio
 
 		private void Engine ()
 		{
+			byte[] previousFrame = null;
+
 			while (this.running)
 			{
 				lock (playbackProviders)
@@ -362,13 +364,21 @@ namespace Gablarski.Audio
 								talking = c.Value.VoiceActivation.IsTalking (samples);
 
 								if (talking && !c.Value.Talking)
-									AudioSender.BeginSending (c.Key, Context.GetCurrentChannel());
+								{
+									AudioSender.BeginSending (c.Key, Context.GetCurrentChannel ());
+									AudioSender.SendAudioData (c.Key, Context.GetCurrentChannel (), previousFrame);
+								}
+
+								previousFrame = samples;
 							}
 
 							if (talking)
 								AudioSender.SendAudioData (c.Key, Context.GetCurrentChannel(), samples);
 							else if (c.Value.Talking && c.Value.Options.Mode == AudioEngineCaptureMode.Activated)
+							{
 								AudioSender.EndSending (c.Key, Context.GetCurrentChannel());
+								previousFrame = null;
+							}
 
 							c.Value.Talking = talking;
 						}
