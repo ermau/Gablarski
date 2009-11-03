@@ -36,7 +36,10 @@ namespace Gablarski
 		{
 			set
 			{
-				this.provider.DataSource = value.ToList();
+				IList<Type> pvalue = value.ToList ();
+				this.provider.DataSource = pvalue;
+				if (pvalue.Count == 1)
+					this.provider.SelectedItem = pvalue[0];
 			}
 		}
 
@@ -75,10 +78,17 @@ namespace Gablarski
 			else
 			{
 				this.device.Enabled = true;
-				using (var p = ((IAudioDeviceProvider)Activator.CreateInstance (Provider)))
+				try
 				{
-					this.device.DataSource = p.GetDevices().ToList();
-					this.device.SelectedItem = p.DefaultDevice;
+					using (var p = ((IAudioDeviceProvider)Activator.CreateInstance (Provider)))
+					{
+						this.device.DataSource = p.GetDevices ().ToList ();
+						this.device.SelectedItem = p.DefaultDevice;
+					}
+				}
+				catch
+				{
+					this.provider.SelectedItem = null;
 				}
 			}
 		}

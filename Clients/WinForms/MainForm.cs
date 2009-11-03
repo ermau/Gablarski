@@ -119,24 +119,47 @@ namespace Gablarski.Clients.Windows
 		{
 			SetupInput();
 
-			this.playback = new OpenALPlaybackProvider();
-			this.playback.Device = this.playback.DefaultDevice;
-
+			SetupPlayback ();
 			SetupVoiceCapture();
+		}
+
+		private void SetupPlayback ()
+		{
+			if (this.playback != null)
+			{
+				this.gablarski.Audio.Detach (this.playback);
+				this.playback.Dispose ();
+			}
+
+			this.playback = (IPlaybackProvider)Activator.CreateInstance (Type.GetType (Settings.PlaybackProvider));
+
+			if (Settings.PlaybackDevice.IsEmpty ())
+				this.playback.Device = this.playback.DefaultDevice;
+			else
+			{
+				this.playback.Device = this.playback.GetDevices ().FirstOrDefault (d => d.Name == Settings.PlaybackDevice) ??
+										this.playback.DefaultDevice;
+			}
 		}
 
 		private void SetupVoiceCapture ()
 		{
 			try
 			{
-				if (this.voiceSource != null)
-				{
-					gablarski.Audio.Detach (this.voiceSource);
-					gablarski.Sources.EndSending (voiceSource, gablarski.CurrentChannel);
-				}
+				foreach (var source in gablarski.Sources.Where (s => s.OwnerId == gablarski.CurrentUser.UserId))
+					gablarski.Sources.EndSending (source, gablarski.CurrentChannel);
 
 				if (this.voiceCapture != null)
-					this.voiceCapture.Dispose();
+				{
+					gablarski.Audio.Detach (this.voiceCapture);
+					this.voiceCapture.Dispose ();
+				}
+
+				if (this.musicprovider != null)
+				{
+					gablarski.Audio.Detach (this.musicprovider);
+					this.musicprovider.Dispose ();
+				}
 
 				this.voiceCapture = (ICaptureProvider)Activator.CreateInstance (Type.GetType (Settings.VoiceProvider));
 
@@ -161,9 +184,9 @@ namespace Gablarski.Clients.Windows
 			}
 			catch (Exception ex)
 			{
-				//TaskDialog.Show (ex.ToDisplayString(), "An error as occured initializing OpenAL.", "OpenAL Initialization", TaskDialogStandardIcon.Error);
-				MessageBox.Show (this, "An error occured initializing audio. " + Environment.NewLine + ex.ToDisplayString(),
-				                 "OpenAL Initialization", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				//TaskDialog.Show (ex.ToDisplayString(), "An error as occured initializing capture.", "Capture Initialization", TaskDialogStandardIcon.Error);
+				MessageBox.Show (this, "An error occured initializing capture. " + Environment.NewLine + ex.ToDisplayString(),
+				                 "Capture Initialization", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
 		}
 
@@ -229,6 +252,14 @@ namespace Gablarski.Clients.Windows
 					if (Settings.EnableNotifications)
 						this.notifications.Notifiers = Settings.EnabledNotifiers.Select (t => (INotifier)Activator.CreateInstance (Type.GetType (t))).ToList();
 
+					break;
+
+				case Settings.PlaybackProviderSettingName:
+					SetupPlayback ();
+					break;
+
+				case Settings.PlaybackDeviceSettingName:
+					SetupPlayback ();
 					break;
 
 				case "VoiceProvider":

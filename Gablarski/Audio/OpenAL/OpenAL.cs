@@ -50,6 +50,9 @@ namespace Gablarski.Audio.OpenAL
 		static OpenAL ()
 		{
 #if DEBUG
+			Log = log4net.LogManager.GetLogger ("OpenAL");
+			Log.Info ("OpenAL Version: " + Version);
+
 			OpenAL.ErrorChecking = true;
 #endif
 
@@ -110,6 +113,14 @@ namespace Gablarski.Audio.OpenAL
 			get;
 			private set;
 		}
+
+		#if DEBUG
+		public static log4net.ILog Log
+		{
+			get;
+			private set;
+		}
+		#endif
 
 		/// <summary>
 		/// Gets the underlying OpenAL provider version.

@@ -117,6 +117,7 @@ namespace Gablarski.Audio
 		/// <param name="capture">The provider to pump the audio from. (If the device is not preselected, the default device will be used.)</param>
 		/// <param name="source">The audio source to pump the audio to.</param>
 		/// <param name="options">Capturing options.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="capture"/> or <paramref name="source"/> or <paramref name="options"/> are <c>null</c>.</exception>
 		void Attach (ICaptureProvider capture, AudioFormat format, AudioSource source, AudioEngineCaptureOptions options);
 
 		/// <summary>
@@ -125,6 +126,13 @@ namespace Gablarski.Audio
 		/// <param name="provider">The provider to stop any captures for.</param>
 		/// <returns><c>true</c> if there were any captures for the <paramref name="provider"/>.</returns>
 		bool Detach (ICaptureProvider provider);
+
+		/// <summary>
+		/// Stops any playbacks on the given provider.
+		/// </summary>
+		/// <param name="provider">The provider to stop playback for.</param>
+		/// <returns><c>true</c> if any sources were attached with <paramref name="provider"/>, <c>false</c> otherwise.</returns>
+		bool Detach (IPlaybackProvider provider);
 
 		/// <summary>
 		/// Stops any playback or capturing to <paramref name="source"/>.
@@ -143,6 +151,13 @@ namespace Gablarski.Audio
 		/// </summary>
 		void Stop();
 
+		/// <summary>
+		/// Begins an explicit capture for <paramref name="source"/>.
+		/// </summary>
+		/// <param name="source"></param>
+		/// <param name="channel"></param>
+		/// <exception cref="ArgumentNullException"><paramref name="source"/> or <paramref name="channel"/> are <c>null</c>.</exception>
+		/// <exception cref="InvalidOperationException"><see cref="AudioSender"/> is not set or <paramref name="source"/> is configured for <see cref="AudioEngineCaptureMode.Activated"/>.</exception>
 		void BeginCapture (AudioSource source, ChannelInfo channel);
 		void EndCapture (AudioSource source, ChannelInfo channel);
 	}

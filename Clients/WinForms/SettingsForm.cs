@@ -32,6 +32,10 @@ namespace Gablarski.Clients.Windows
 			this.inInputProvider.DataSource = Modules.Input.ToList();
 			this.inInputProvider.SelectedText = Settings.InputProvider;
 
+			this.playbackSelector.ProviderSource = Modules.Playback;
+			this.playbackSelector.SetProvider (Settings.PlaybackProvider);
+			this.playbackSelector.SetDevice (Settings.PlaybackDevice);
+
 			this.voiceSelector.ProviderSource = Modules.Capture;
 			this.voiceSelector.SetProvider (Settings.VoiceProvider);
 			this.voiceSelector.SetDevice (Settings.VoiceDevice);
@@ -45,13 +49,15 @@ namespace Gablarski.Clients.Windows
 			this.dispThreshold.Text = String.Format ("{0:N1}s", (double)this.threshold.Value / 10);
 			this.vadSensitivity.Value = Settings.VoiceActivationLevel;
 
+			this.volumeControl.Checked = Settings.EnableMediaVolumeControl;
+			this.musicIgnoreYou.Checked = Settings.MediaVolumeControlIgnoresYou;
 			this.talkingVolume.Value = Settings.TalkingMusicVolume;
 			this.normalVolume.Value = Settings.NormalMusicVolume;
+
 			foreach (Type player in Modules.MediaPlayers)
 			{
 				this.musicPlayers.Items.Add (player.Name.Remove ("Integration", "Provider"), Settings.EnabledMediaPlayerIntegrations.Any (s => s.Contains (player.FullName)));
 			}
-			this.musicIgnoreYou.Checked = Settings.MediaVolumeControlIgnoresYou;
 
 			this.enableNotifications.Checked = Settings.EnableNotifications;
 			foreach (Type t in Modules.Notifiers)
@@ -91,10 +97,18 @@ namespace Gablarski.Clients.Windows
 			Settings.InputSettings = this.inputSettings;
 			Settings.UsePushToTalk = !this.voiceActivation.Checked;
 
+			Settings.PlaybackProvider = this.playbackSelector.Provider.AssemblyQualifiedName;
+			Settings.PlaybackDevice = this.playbackSelector.Device.Name;
+
 			Settings.VoiceProvider = this.voiceSelector.Provider.AssemblyQualifiedName;
 			Settings.VoiceDevice = this.voiceSelector.Device.Name;
 			Settings.VoiceActivationContinueThreshold = this.threshold.Value * 100;
 			Settings.VoiceActivationLevel = this.vadSensitivity.Value;
+
+			Settings.EnableMediaVolumeControl = this.volumeControl.Checked;
+			Settings.TalkingMusicVolume = this.talkingVolume.Value;
+			Settings.NormalMusicVolume = this.normalVolume.Value;
+			Settings.MediaVolumeControlIgnoresYou = this.musicIgnoreYou.Checked;
 
 			List<string> enabledPlayers = new List<string> ();
 			foreach (Type playerSupport in Modules.MediaPlayers)
@@ -107,11 +121,7 @@ namespace Gablarski.Clients.Windows
 					enabledPlayers.Add (playerSupport.FullName + ", " + playerSupport.Assembly.GetName().Name);
 				}
 			}
-
 			Settings.EnabledMediaPlayerIntegrations = enabledPlayers;
-			Settings.TalkingMusicVolume = this.talkingVolume.Value;
-			Settings.NormalMusicVolume = this.normalVolume.Value;
-			Settings.MediaVolumeControlIgnoresYou = this.musicIgnoreYou.Checked;
 
 			Settings.EnableNotifications = this.enableNotifications.Checked;
 			List<string> enabledNotifiers = new List<string>();

@@ -76,6 +76,28 @@ namespace Gablarski.Clients.Windows
 			}
 		}
 
+		public const string PlaybackProviderSettingName = "PlaybackProvider";
+		public static string PlaybackProvider
+		{
+			get { return GetSetting (PlaybackProviderSettingName, "Gablarski.Audio.OpenAL.Providers.OpenALPlaybackProvider, Gablarski"); }
+			set
+			{
+				if (SetSetting (PlaybackProviderSettingName, value))
+					OnSettingsChanged (PlaybackProviderSettingName);
+			}
+		}
+
+		public const string PlaybackDeviceSettingName = "PlaybackDevice";
+		public static string PlaybackDevice
+		{
+			get { return GetSetting (PlaybackDeviceSettingName, String.Empty); }
+			set
+			{
+				if (SetSetting (PlaybackDeviceSettingName, value))
+					OnSettingsChanged (PlaybackDeviceSettingName);
+			}
+		}
+
 		public static string InputProvider
 		{
 			get { return GetSetting ("InputProvider", "Gablarski.Input.DirectInput.DirectInputProvider, Gablarski.Input.DirectInput"); }

@@ -34,6 +34,7 @@
 			this.tools = new System.Windows.Forms.ToolStrip ();
 			this.btnConnect = new System.Windows.Forms.ToolStripButton ();
 			this.btnRegister = new System.Windows.Forms.ToolStripButton ();
+			this.btnMute = new System.Windows.Forms.ToolStripButton ();
 			this.musicButton = new System.Windows.Forms.ToolStripButton ();
 			this.btnSettings = new System.Windows.Forms.ToolStripButton ();
 			this.users = new Gablarski.Clients.Windows.UserTreeView ();
@@ -58,6 +59,7 @@
             this.btnConnect,
             this.btnRegister,
             this.toolStripSeparator1,
+            this.btnMute,
             this.musicButton,
             this.toolStripSeparator2,
             this.btnSettings});
@@ -65,7 +67,7 @@
 			this.tools.Location = new System.Drawing.Point (0, 0);
 			this.tools.Name = "tools";
 			this.tools.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-			this.tools.Size = new System.Drawing.Size (187, 25);
+			this.tools.Size = new System.Drawing.Size (229, 25);
 			this.tools.TabIndex = 0;
 			// 
 			// btnConnect
@@ -87,6 +89,17 @@
 			this.btnRegister.Size = new System.Drawing.Size (69, 22);
 			this.btnRegister.Text = "Register";
 			this.btnRegister.Visible = false;
+			// 
+			// btnMute
+			// 
+			this.btnMute.CheckOnClick = true;
+			this.btnMute.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.btnMute.Image = global::Gablarski.Clients.Windows.Properties.Resources.SoundMuteImage;
+			this.btnMute.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.btnMute.Name = "btnMute";
+			this.btnMute.Size = new System.Drawing.Size (23, 22);
+			this.btnMute.Text = "Mute";
+			this.btnMute.Visible = false;
 			// 
 			// musicButton
 			// 
@@ -119,14 +132,14 @@
 			this.users.Location = new System.Drawing.Point (-1, 25);
 			this.users.Name = "users";
 			this.users.SelectedImageIndex = 0;
-			this.users.Size = new System.Drawing.Size (189, 267);
+			this.users.Size = new System.Drawing.Size (231, 358);
 			this.users.TabIndex = 1;
 			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF (6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size (187, 291);
+			this.ClientSize = new System.Drawing.Size (229, 382);
 			this.Controls.Add (this.tools);
 			this.Controls.Add (this.users);
 			this.MinimumSize = new System.Drawing.Size (192, 161);
@@ -151,5 +164,6 @@
 		private System.Windows.Forms.ToolStripButton btnRegister;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+		private System.Windows.Forms.ToolStripButton btnMute;
 	}
 }

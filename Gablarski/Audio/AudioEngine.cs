@@ -128,7 +128,7 @@ namespace Gablarski.Audio
 			}
 		}
 
-		public bool Detatch (IPlaybackProvider provider)
+		public bool Detach (IPlaybackProvider provider)
 		{
 			if (provider == null)
 				throw new ArgumentNullException("provider");
@@ -202,6 +202,8 @@ namespace Gablarski.Audio
 				throw new ArgumentNullException ("source");
 			if (channel == null)
 				throw new ArgumentNullException ("channel");
+			if (AudioSender == null)
+				throw new InvalidOperationException ("AudioSender not set.");
 			#endif
 
 			lock (captures)

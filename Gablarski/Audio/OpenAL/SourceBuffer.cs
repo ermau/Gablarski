@@ -72,12 +72,15 @@ namespace Gablarski.Audio.OpenAL
 			if (this.disposed)
 				return;
 
-			alDeleteBuffers (1, new[] { this.bufferID });
-
 			lock (lck)
 			{
+				alDeleteBuffers (1, new[] { this.bufferID });
 				Buffers.Remove (this.bufferID);
 			}
+
+			#if DEBUG
+			OpenAL.Log.Debug ("Deleting buffer " + this.bufferID);
+			#endif
 
 			this.disposed = true;
 		}

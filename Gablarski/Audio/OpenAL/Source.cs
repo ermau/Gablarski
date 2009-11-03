@@ -209,9 +209,12 @@ namespace Gablarski.Audio.OpenAL
 			if (this.disposed)
 				return;
 
-			uint[] id = new [] { this.sourceID };
+			uint[] id = new[] { this.sourceID };
 			alDeleteSources (1, id);
-			//OpenAL.ErrorCheck ();
+			
+			#if DEBUG
+			OpenAL.Log.Debug ("Deleting source " + this.sourceID);
+			#endif
 
 			this.disposed = true;
 		}

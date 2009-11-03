@@ -282,6 +282,11 @@ namespace Gablarski.Clients.Windows
 			if (e.KeyCode != Keys.Delete || this.servers.SelectedItems.Count == 0)
 				return;
 
+			DeleteServers ();
+		}
+
+		private void DeleteServers ()
+		{
 			foreach (var li in this.servers.SelectedItems.Cast<ListViewItem> ())
 			{
 				var s = (ServerEntry)li.Tag;

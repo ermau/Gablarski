@@ -69,6 +69,7 @@
 			this.tabNotifications = new System.Windows.Forms.TabPage ();
 			this.enableNotifications = new System.Windows.Forms.CheckBox ();
 			this.notifiers = new System.Windows.Forms.ListView ();
+			this.playbackSelector = new Gablarski.DeviceSelector ();
 			columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader ()));
 			this.tabs.SuspendLayout ();
 			this.generalTab.SuspendLayout ();
@@ -87,7 +88,7 @@
 			// btnOk
 			// 
 			this.btnOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnOk.Location = new System.Drawing.Point (151, 295);
+			this.btnOk.Location = new System.Drawing.Point (151, 327);
 			this.btnOk.Name = "btnOk";
 			this.btnOk.Size = new System.Drawing.Size (75, 23);
 			this.btnOk.TabIndex = 2;
@@ -99,7 +100,7 @@
 			// 
 			this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.btnCancel.Location = new System.Drawing.Point (232, 295);
+			this.btnCancel.Location = new System.Drawing.Point (232, 327);
 			this.btnCancel.Name = "btnCancel";
 			this.btnCancel.Size = new System.Drawing.Size (75, 23);
 			this.btnCancel.TabIndex = 3;
@@ -120,7 +121,7 @@
 			this.tabs.Location = new System.Drawing.Point (0, 0);
 			this.tabs.Name = "tabs";
 			this.tabs.SelectedIndex = 0;
-			this.tabs.Size = new System.Drawing.Size (319, 289);
+			this.tabs.Size = new System.Drawing.Size (319, 321);
 			this.tabs.TabIndex = 4;
 			// 
 			// generalTab
@@ -170,12 +171,13 @@
 			// 
 			// voiceTab
 			// 
+			this.voiceTab.Controls.Add (this.playbackSelector);
 			this.voiceTab.Controls.Add (this.groupBox1);
 			this.voiceTab.Controls.Add (this.voiceSelector);
 			this.voiceTab.Location = new System.Drawing.Point (4, 22);
 			this.voiceTab.Name = "voiceTab";
 			this.voiceTab.Padding = new System.Windows.Forms.Padding (3);
-			this.voiceTab.Size = new System.Drawing.Size (311, 263);
+			this.voiceTab.Size = new System.Drawing.Size (311, 295);
 			this.voiceTab.TabIndex = 2;
 			this.voiceTab.Text = "Voice";
 			this.voiceTab.UseVisualStyleBackColor = true;
@@ -190,7 +192,7 @@
 			this.groupBox1.Controls.Add (this.label2);
 			this.groupBox1.Controls.Add (this.lblVoiceSensitivity);
 			this.groupBox1.Controls.Add (this.vadSensitivity);
-			this.groupBox1.Location = new System.Drawing.Point (8, 65);
+			this.groupBox1.Location = new System.Drawing.Point (6, 118);
 			this.groupBox1.Name = "groupBox1";
 			this.groupBox1.Size = new System.Drawing.Size (295, 168);
 			this.groupBox1.TabIndex = 8;
@@ -283,7 +285,7 @@
 			// voiceSelector
 			// 
 			this.voiceSelector.DeviceLabel = "Capture Device:";
-			this.voiceSelector.Location = new System.Drawing.Point (8, 6);
+			this.voiceSelector.Location = new System.Drawing.Point (6, 62);
 			this.voiceSelector.Name = "voiceSelector";
 			this.voiceSelector.ProviderLabel = "Capture Provider:";
 			this.voiceSelector.Size = new System.Drawing.Size (295, 50);
@@ -531,13 +533,22 @@
 			this.notifiers.UseCompatibleStateImageBehavior = false;
 			this.notifiers.View = System.Windows.Forms.View.Details;
 			// 
+			// playbackSelector
+			// 
+			this.playbackSelector.DeviceLabel = "Playback Device:";
+			this.playbackSelector.Location = new System.Drawing.Point (6, 6);
+			this.playbackSelector.Name = "playbackSelector";
+			this.playbackSelector.ProviderLabel = "Playback Provider:";
+			this.playbackSelector.Size = new System.Drawing.Size (295, 50);
+			this.playbackSelector.TabIndex = 9;
+			// 
 			// SettingsForm
 			// 
 			this.AcceptButton = this.btnOk;
 			this.AutoScaleDimensions = new System.Drawing.SizeF (6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.CancelButton = this.btnCancel;
-			this.ClientSize = new System.Drawing.Size (319, 330);
+			this.ClientSize = new System.Drawing.Size (319, 362);
 			this.Controls.Add (this.tabs);
 			this.Controls.Add (this.btnCancel);
 			this.Controls.Add (this.btnOk);
@@ -604,5 +615,6 @@
 		private System.Windows.Forms.TabPage tabNotifications;
 		private System.Windows.Forms.CheckBox enableNotifications;
 		private System.Windows.Forms.ListView notifiers;
+		private DeviceSelector playbackSelector;
 	}
 }
