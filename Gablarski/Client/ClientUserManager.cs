@@ -281,7 +281,9 @@ namespace Gablarski.Client
 			UserInfo user;
 			lock (userLock)
 			{
-				user = this.users[msg.UserId];
+				if (!this.users.TryGetValue (msg.UserId, out user))
+					return;
+
 				this.users.Remove (msg.UserId);
 				ignores.Remove (msg.UserId);
 			}

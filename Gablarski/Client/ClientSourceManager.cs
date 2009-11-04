@@ -416,10 +416,11 @@ namespace Gablarski.Client
 			{
 				foreach (int id in sourceMessage.SourceIds)
 				{
-					if (!this.sources.ContainsKey (id))
+					AudioSource source;
+					if (!this.sources.TryGetValue (id, out source))
 						continue;
 
-					removed.Add (this.sources[id]);
+					removed.Add (source);
 					this.sources.Remove (id);
 				}
 			}
