@@ -29,6 +29,8 @@ namespace Gablarski.Input.DirectInput
 		/// <param name="settings">The settings provided by <see cref="IInputProvider.EndRecord()"/>. <c>null</c> or <c>String.Empty</c> if not yet set.</param>
 		public void Attach (IntPtr window, string settings)
 		{
+			if (this.running)
+				throw new InvalidOperationException ("Already attached");
 			if (window == IntPtr.Zero)
 				throw new ArgumentException ("Invalid window", "window");
 
@@ -289,11 +291,11 @@ namespace Gablarski.Input.DirectInput
 
 				for (int i = 0; i < k.Length; ++i)
 				{
-					if (!s[k[i]])
-						return false;
+					if (s[k[i]])
+						return true;
 				}
 
-				return true;
+				return false;
 			}
 			else
 			{
@@ -355,6 +357,8 @@ namespace Gablarski.Input.DirectInput
 					case 0:
 					{
 						this.keyboard.Poll ();
+						if ((this.keys == null || this.keys.Length == 0) && !recording)
+							continue;
 
 						try
 						{
@@ -377,6 +381,8 @@ namespace Gablarski.Input.DirectInput
 					case 1:
 					{
 						this.mouse.Poll ();
+						if (this.mouseButton == -1 && !this.recording)
+							continue;
 
 						try
 						{
