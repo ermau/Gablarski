@@ -349,7 +349,7 @@ namespace Gablarski.Server
 				result = LoginResultState.FailedPermissions;
 			else if (this.connections.NicknameInUse (join.Nickname, e.Connection))
 				result = LoginResultState.FailedNicknameInUse;
-			else if (this.connections.Contains (e.Connection))
+			else if (this.connections.Contains (e.Connection) && !this.connections[e.Connection].IsLoggedIn)
 				result = LoginResultState.FailedAlreadyJoined;
 			else
 				this.connections.Add (e.Connection, info);
