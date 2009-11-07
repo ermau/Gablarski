@@ -302,7 +302,7 @@ namespace Gablarski.Client
 					this.users = new Dictionary<int, UserInfo> ();
 
 				user = new UserInfo (msg.UserInfo);
-				this.users.Add (msg.UserInfo.UserId, user);
+				this.users[msg.UserInfo.UserId] = user;
 			}
 
 			OnUserLoggedIn (new UserEventArgs (user));
