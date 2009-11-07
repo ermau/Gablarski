@@ -85,7 +85,12 @@ namespace Gablarski
 		/// <summary>
 		/// Failed because the supplied server password was incorrect.
 		/// </summary>
-		FailedServerPassword = 8
+		FailedServerPassword = 8,
+
+		/// <summary>
+		/// Failed because the connection is already joined.
+		/// </summary>
+		FailedAlreadyJoined = 9
 	}
 
 	/// <summary>

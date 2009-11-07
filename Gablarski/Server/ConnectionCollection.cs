@@ -155,6 +155,14 @@ namespace Gablarski.Server
 			}
 		}
 
+		public bool Contains (IConnection connection)
+		{
+			lock (lck)
+			{
+				return this.users.Keys.Contains (connection);
+			}
+		}
+
 		public IConnection GetConnection (int userId)
 		{
 			lock (lck)

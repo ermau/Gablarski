@@ -349,6 +349,8 @@ namespace Gablarski.Server
 				result = LoginResultState.FailedPermissions;
 			else if (this.connections.NicknameInUse (join.Nickname, e.Connection))
 				result = LoginResultState.FailedNicknameInUse;
+			else if (this.connections.Contains (e.Connection))
+				result = LoginResultState.FailedAlreadyJoined;
 			else
 				this.connections.Add (e.Connection, info);
 
