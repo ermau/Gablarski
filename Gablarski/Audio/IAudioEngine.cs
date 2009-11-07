@@ -125,6 +125,7 @@ namespace Gablarski.Audio
 		/// </summary>
 		/// <param name="provider">The provider to stop any captures for.</param>
 		/// <returns><c>true</c> if there were any captures for the <paramref name="provider"/>.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="provider"/> is <c>null</c>.</exception>
 		bool Detach (ICaptureProvider provider);
 
 		/// <summary>
@@ -132,6 +133,7 @@ namespace Gablarski.Audio
 		/// </summary>
 		/// <param name="provider">The provider to stop playback for.</param>
 		/// <returns><c>true</c> if any sources were attached with <paramref name="provider"/>, <c>false</c> otherwise.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="provider"/> is <c>null</c>.</exception>
 		bool Detach (IPlaybackProvider provider);
 
 		/// <summary>
@@ -139,7 +141,16 @@ namespace Gablarski.Audio
 		/// </summary>
 		/// <param name="source">The source to stop any playback or capturing for.</param>
 		/// <returns><c>true</c> if any playback or capturing was occuring for <paramref name="source"/>, <c>false</c> otherwise.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
 		bool Detach (AudioSource source);
+
+		/// <exception cref="ArgumentNullException"><paramref name="capture"/> is <c>null</c>.</exception>
+		void Mute (ICaptureProvider capture);
+		void Unmute (ICaptureProvider capture);
+
+		/// <exception cref="ArgumentNullException"><paramref name="playback"/> is <c>null</c>.</exception>
+		void Mute (IPlaybackProvider playback);
+		void Unmute (IPlaybackProvider playback);
 
 		/// <summary>
 		/// Starts the audio engine.

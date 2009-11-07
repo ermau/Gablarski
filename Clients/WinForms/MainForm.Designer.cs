@@ -45,7 +45,6 @@
 			// 
 			this.toolStripSeparator1.Name = "toolStripSeparator1";
 			this.toolStripSeparator1.Size = new System.Drawing.Size (6, 25);
-			this.toolStripSeparator1.Visible = false;
 			// 
 			// toolStripSeparator2
 			// 
@@ -99,7 +98,7 @@
 			this.btnMute.Name = "btnMute";
 			this.btnMute.Size = new System.Drawing.Size (23, 22);
 			this.btnMute.Text = "Mute";
-			this.btnMute.Visible = false;
+			this.btnMute.Click += new System.EventHandler (this.btnMute_Click);
 			// 
 			// musicButton
 			// 

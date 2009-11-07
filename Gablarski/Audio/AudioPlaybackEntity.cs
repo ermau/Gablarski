@@ -70,6 +70,12 @@ namespace Gablarski.Audio
 		{
 			get { return this.options; }
 		}
+
+		public bool Muted
+		{
+			get;
+			set;
+		}
 		
 		private readonly IPlaybackProvider playback;
 		private readonly AudioSource source;

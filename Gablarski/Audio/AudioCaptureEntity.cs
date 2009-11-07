@@ -110,6 +110,12 @@ namespace Gablarski.Audio
 			get { return this.activation; }
 		}
 
+		public bool Muted
+		{
+			get;
+			set;
+		}
+
 		private readonly VoiceActivation activation;
 		private readonly AudioFormat format;
 		private readonly int frameLength;
