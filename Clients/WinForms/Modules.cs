@@ -88,7 +88,7 @@ namespace Gablarski.Clients.Windows
 		{
 			return new ModuleLoader<T>(
 						ModuleLoaderOptions.SearchAll,
-						Environment.CurrentDirectory,
+						(new FileInfo (System.Diagnostics.Process.GetCurrentProcess ().MainModule.FileName)).Directory.FullName,
 						Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.ApplicationData), "Gablarski"));
 		}
 	}
