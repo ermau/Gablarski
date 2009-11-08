@@ -34,7 +34,7 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <ApplicationIcon>
     </ApplicationIcon>
-    <Win32Resource>F:\Projects\Gablarski\trunk\Clients\WinForms\Resources.res</Win32Resource>
+    <Win32Resource>Resources.res</Win32Resource>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
     <DebugSymbols>true</DebugSymbols>
