@@ -25,8 +25,6 @@ namespace Gablarski
 
 		#region ICaptureProvider Members
 
-		public event EventHandler<SamplesAvailableEventArgs> SamplesAvailable;
-
 		public IAudioDevice Device
 		{
 			get; set;
