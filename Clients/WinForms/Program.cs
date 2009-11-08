@@ -84,11 +84,18 @@ namespace Gablarski.Clients.Windows
 						IconReference = new IconReference (exe, 0)
 					};
 				}
-
+				
 				serverCategory.AddJumpListItems (links);
 
 				jl.AddCustomCategories (serverCategory);
-				jl.Refresh ();
+
+				try
+				{
+					jl.Refresh ();
+				}
+				catch (UnauthorizedAccessException)
+				{
+				}
 			}
 
 			if (args.Length > 0)
