@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<project name="Gablarski" default="build" basedir=".">
+<project name="Gablarski" default="clients" basedir=".">
 	<property name="nant.settings.currentframework" value="net-3.5" />
-	
-	<target name="build">
+
+	<target name="library">
 		<exec program="${DotNetFramework3.5_x86_Path}\msbuild.exe">
 			<arg value='/property:Configuration="Debug";Platform="Any CPU"' />
 			<arg value="Gablarski.sln" />
@@ -11,12 +11,7 @@
 		<nunit2>
 			<test assemblyname="Gablarski.Tests\bin\Debug\Gablarski.Tests.dll" />
 		</nunit2>
-		
-		<exec program="${DotNetFramework3.5_x86_Path}\msbuild.exe">
-			<arg value='/property:Configuration="Debug";Platform="x86"' />
-			<arg value="Clients\WinForms\Gablarski-WinForms.sln" />
-		</exec>
- 
+
 		<zip zipfile="Gablarski-Debug.zip">
 			<fileset basedir="Gablarski\bin\Debug">
 				<include name="*.dll" />
@@ -25,18 +20,37 @@
 				<include name="*.txt" />
 			</fileset>
 		</zip>
+	</target>
 
-		<!--<zip zipfile="Gablarski-CLI-Debug.zip">
-			<fileset basedir="Clients\CLI\bin\x86\Debug">
-				<include name="gablarskicli.exe" />
-				<include name="*.dll" />
-				<include name="*.pdb" />
-				<include name="*.txt" />
-			</fileset>
-		</zip>-->
+	<target name="clients" depends="winforms,gtk">
+	</target>
+
+	<target name="winforms" depends="library">
+		<exec program="${DotNetFramework3.5_x86_Path}\msbuild.exe">
+			<arg value='/property:Configuration="Debug";Platform="x86"' />
+			<arg value="Clients\WinForms\Gablarski-WinForms.sln" />
+		</exec>
 
 		<zip zipfile="Gablarski-Win32-Debug.zip">
 			<fileset basedir="Clients\WinForms\bin\x86\Debug">
+				<include name="GablarskiClient.exe" />
+				<include name="Headphones.ico" />
+				<include name="*.dll" />
+				<include name="*.pdb" />
+				<include name="*.xsd" />
+				<include name="*.txt" />
+			</fileset>
+		</zip>
+	</target>
+
+	<target name="gtk" depends="library">
+		<exec program="${DotNetFramework3.5_x86_Path}\msbuild.exe">
+			<arg value='/property:Configuration="Debug";Platform="x86"' />
+			<arg value="Clients\Gablarski-Gtk\Gablarski-Gtk.sln" />
+		</exec>
+
+		<zip zipfile="Gablarski-Gtk-Debug.zip">
+			<fileset basedir="Clients\Gablarski-Gtk\bin\x86\Debug">
 				<include name="GablarskiClient.exe" />
 				<include name="Headphones.ico" />
 				<include name="*.dll" />

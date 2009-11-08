@@ -9,9 +9,9 @@ namespace GablarskiGtk
 		{
 			Application.Init ();
 			
+			ConnectWindow connect = new ConnectWindow();
+			connect.Show ();
 			
-			MainWindow win = new MainWindow ();
-			win.Show ();
 			Application.Run ();
 		}
 	}

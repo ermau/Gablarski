@@ -8,7 +8,7 @@
     <ProjectGuid>{8021A1E4-B984-40A4-BB16-357BA2ED04AA}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>GablarskiGtk</RootNamespace>
-    <AssemblyName>Gablarski-Gtk</AssemblyName>
+    <AssemblyName>GablarskiClient</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -61,7 +61,7 @@
     <Compile Include="ConnectWindow.cs" />
     <Compile Include="SettingsDialog.cs" />
     <Compile Include="gtk-gui\GablarskiGtk.SettingsDialog.cs" />
-    <Compile Include="gtk-gui\hbuttonbox1.cs" />
+    <Compile Include="gtk-gui\GablarskiGtk.ConnectWindow.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

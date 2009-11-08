@@ -13,21 +13,11 @@ using System;
 
 namespace GablarskiGtk
 {
-
-
 	public partial class ConnectWindow : Gtk.Window
-	{
-	
-		public string Nickname;
-	
-		protected virtual void OnOkButtonClicked (object sender, System.EventArgs e)
-		{
-			
-		}
-		
+	{		
 		public ConnectWindow () : base(Gtk.WindowType.Toplevel)
 		{
-			this.Build ();
+			Build();
 		}
 	}
 }
