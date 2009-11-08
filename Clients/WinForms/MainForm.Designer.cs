@@ -158,7 +158,6 @@
 			this.Name = "MainForm";
 			this.Text = "Gablarski";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler (this.MainForm_FormClosing);
-			this.Load += new System.EventHandler (this.MainForm_Load);
 			this.tools.ResumeLayout (false);
 			this.tools.PerformLayout ();
 			this.ResumeLayout (false);

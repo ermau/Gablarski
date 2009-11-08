@@ -3,6 +3,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
 using System.ComponentModel;
+using Gablarski.Clients.Windows.Entities;
+using System.Linq;
+using Microsoft.WindowsAPICodePack.Taskbar;
+using System.Collections.Generic;
+using Microsoft.WindowsAPICodePack.Shell;
 
 namespace Gablarski.Clients.Windows
 {
@@ -22,6 +27,10 @@ namespace Gablarski.Clients.Windows
 
 			if (Settings.FirstRun)
 			{
+				DialogResult result = MessageBox.Show ("Register gablarski:// urls with this client?", "Register gablarski://", MessageBoxButtons.OKCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1);
+				Settings.EnableGablarskiURLs = (result == DialogResult.OK);
+				Settings.SaveSettings ();
+
 				try
 				{
 					if (Settings.EnableGablarskiURLs)
@@ -57,10 +66,53 @@ namespace Gablarski.Clients.Windows
 			var m = new MainForm();
 			m.Show();
 
+			if (TaskbarManager.IsPlatformSupported)
+			{
+				var jl = JumpList.CreateJumpList ();
+				var serverCategory = new JumpListCustomCategory ("Servers");
+
+				string exe = Process.GetCurrentProcess ().MainModule.FileName;
+
+				IList<ServerEntry> servers = Servers.GetEntries ().ToList ();
+				JumpListLink[] links = new JumpListLink[servers.Count];
+				for (int i = 0; i < servers.Count; ++i)
+				{
+					var s = servers[i];
+					links[i] = new JumpListLink (exe, s.Name)
+					{
+						Arguments = s.Id.ToString(),
+						IconReference = new IconReference (exe, 0)
+					};
+				}
+
+				serverCategory.AddJumpListItems (links);
+
+				jl.AddCustomCategories (serverCategory);
+				jl.Refresh ();
+			}
+
 			if (args.Length > 0)
 			{
-				Uri server = new Uri (args[0]);
-				m.Connect (server.Host, (server.Port != -1) ? server.Port : 6112);
+				int id;
+				if (Int32.TryParse (args[0], out id))
+				{
+					ServerEntry server = Servers.GetEntries ().FirstOrDefault (s => s.Id == id);
+					if (server == null)
+					{
+						if (m.ShowConnect (true))
+							Application.Run (m);
+					}
+					else
+					{
+						m.Connect (server);
+					}
+				}
+				else
+				{
+					Uri server = new Uri (args[0]);
+					m.Connect (server.Host, (server.Port != -1) ? server.Port : 6112);
+				}
+
 				Application.Run (m);
 			}
 			else if (m.ShowConnect (true))

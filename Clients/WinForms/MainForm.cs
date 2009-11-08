@@ -1,18 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
 using Gablarski.Audio;
-using Gablarski.Audio.OpenAL.Providers;
 using Gablarski.Client;
-using Gablarski.Clients;
 using Gablarski.Clients.Input;
 using Gablarski.Clients.Media;
 using Gablarski.Clients.Windows.Entities;
 using Gablarski.Clients.Windows.Properties;
 using Gablarski.Messages;
 using Gablarski.Network;
-using System.Collections.Generic;
+using Microsoft.WindowsAPICodePack.Taskbar;
+using System.IO;
+using System.Diagnostics;
 
 namespace Gablarski.Clients.Windows
 {
@@ -58,6 +59,11 @@ namespace Gablarski.Clients.Windows
 			this.InitializeComponent ();
 
 			this.users.Client = this.gablarski;
+
+			SetupInput ();
+
+			SetupPlayback ();
+			SetupVoiceCapture ();
 		}
 
 		private void SetupNotifications ()
@@ -78,6 +84,22 @@ namespace Gablarski.Clients.Windows
 		public void Connect (string host, int port)
 		{
 			this.gablarski.Connect (host, port);
+		}
+
+		public void Connect (ServerEntry server)
+		{
+			if (String.IsNullOrEmpty (server.UserNickname))
+			{
+				InputForm nickname = new InputForm();
+				if (nickname.ShowDialog () == DialogResult.Cancel)
+					return;
+
+				string nick = nickname.Input.Text.Trim();
+				server.UserNickname = nick;
+			}
+
+			this.server = server;
+			Connect ();
 		}
 
 		public bool ShowConnect (bool cancelExits)
@@ -114,14 +136,6 @@ namespace Gablarski.Clients.Windows
 		private ICaptureProvider voiceCapture;
 		private AudioSource voiceSource;
 		private AudioSource musicSource;
-
-		private void MainForm_Load (object sender, EventArgs e)
-		{
-			SetupInput();
-
-			SetupPlayback ();
-			SetupVoiceCapture();
-		}
 
 		private void SetupPlayback ()
 		{
@@ -501,6 +515,11 @@ namespace Gablarski.Clients.Windows
 		{
 			this.Invoke ((Action)delegate
 			{
+				if (TaskbarManager.IsPlatformSupported)
+				{
+					TaskbarManager.Instance.SetOverlayIcon (this.Handle, Resources.DisconnectImage.ToIcon (), "Disconnected");
+				}
+
 				this.users.Nodes.Clear();
 
 				this.btnConnect.Image = Resources.DisconnectImage;
@@ -513,6 +532,9 @@ namespace Gablarski.Clients.Windows
 		{
 			this.Invoke ((Action)delegate
 			{
+				if (TaskbarManager.IsPlatformSupported)
+					TaskbarManager.Instance.SetOverlayIcon (this.Handle, Resources.ConnectImage.ToIcon (), "Connected");
+
 				this.btnConnect.Image = Resources.ConnectImage;
 				this.btnConnect.Text = "Disconnect";
 				this.btnConnect.ToolTipText = "Disconnect (Connected)";
@@ -648,14 +670,14 @@ namespace Gablarski.Clients.Windows
 				if (mf.ShowDialog (this) != DialogResult.OK)
 					return;
 			
-				if (mf.ProviderType != null)
+				if (!mf.File && mf.ProviderType != null)
 				{
 					musicprovider = (ICaptureProvider)Activator.CreateInstance (mf.ProviderType);
 					musicprovider.Device = mf.CaptureDevice;
 				}
 				else
 				{
-					// TODO: decoding
+					//musicprovider = new MusicFileCaptureProvider (new FileInfo (mf.FilePath));
 				}
 			}
 		}

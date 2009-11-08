@@ -151,6 +151,13 @@ namespace Gablarski.Clients.Windows.Properties {
             }
         }
         
+        internal static System.Drawing.Icon ServerIcon {
+            get {
+                object obj = ResourceManager.GetObject("ServerIcon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap ServerImage {
             get {
                 object obj = ResourceManager.GetObject("ServerImage", resourceCulture);
