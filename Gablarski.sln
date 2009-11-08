@@ -1,21 +1,14 @@
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski", "Gablarski\Gablarski.csproj", "{7347052B-DA5B-4CCA-AB28-3963766E3CDB}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6A109469-1A29-4967-BB7A-B9DEDD48C4A5}"
 	ProjectSection(SolutionItems) = preProject
 		debug.build = debug.build
 		Gablarski.License.txt = Gablarski.License.txt
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.Clients.CLI", "Clients\CLI\Gablarski.Clients.CLI.csproj", "{DABD979A-6930-4250-A770-E746736F4AAF}"
-	ProjectSection(ProjectDependencies) = postProject
-		{11487129-A8DB-4818-B4AA-236E8CDD92CC} = {11487129-A8DB-4818-B4AA-236E8CDD92CC}
-	EndProjectSection
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski", "Gablarski\Gablarski.csproj", "{7347052B-DA5B-4CCA-AB28-3963766E3CDB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.Tests", "Gablarski.Tests\Gablarski.Tests.csproj", "{7F9DB2AA-BA94-4C4F-9CD5-536B9B087D2E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentNHibernate", "fluent-nhibernate\src\FluentNHibernate\FluentNHibernate.csproj", "{529145D5-6CC3-4016-89B5-826563024AF1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.WebServer", "Gablarski.WebServer\Gablarski.WebServer.csproj", "{11487129-A8DB-4818-B4AA-236E8CDD92CC}"
 EndProject
@@ -23,86 +16,32 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.Clients", "Gablar
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Rocks", "Mono.Rocks\Mono.Rocks.csproj", "{F656F792-2CDE-4E17-BB5F-6A6F1C266CB8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.Input.XLib", "Gablarski.Input.XLib\Gablarski.Input.XLib.csproj", "{300CECC2-F9CD-48F5-871C-129EA68D8E6C}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.Input.DirectInput", "Gablarski.Input.DirectInput\Gablarski.Input.DirectInput.csproj", "{D5FBD205-094A-46C5-88A8-16D4053733D9}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.iTunes", "Gablarski.iTunes\Gablarski.iTunes.csproj", "{29A83468-C6AB-4485-BD35-F5BD8FEB8C2E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.Winamp", "Gablarski.Winamp\Gablarski.Winamp.csproj", "{C9DE76C5-68FC-44E1-AF63-CCE2D80BAA6C}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.Clients.Windows", "Clients\WinForms\Gablarski.Clients.WinForms.csproj", "{043E20A2-310D-41C0-94BC-766E3BAACAFB}"
-	ProjectSection(ProjectDependencies) = postProject
-		{B3605103-A797-4F0F-9C3A-8566DD13700A} = {B3605103-A797-4F0F-9C3A-8566DD13700A}
-		{D5FBD205-094A-46C5-88A8-16D4053733D9} = {D5FBD205-094A-46C5-88A8-16D4053733D9}
-		{542BFF13-39BF-456B-B36F-7F65C6AE0830} = {542BFF13-39BF-456B-B36F-7F65C6AE0830}
-		{11487129-A8DB-4818-B4AA-236E8CDD92CC} = {11487129-A8DB-4818-B4AA-236E8CDD92CC}
-		{29A83468-C6AB-4485-BD35-F5BD8FEB8C2E} = {29A83468-C6AB-4485-BD35-F5BD8FEB8C2E}
-		{C9DE76C5-68FC-44E1-AF63-CCE2D80BAA6C} = {C9DE76C5-68FC-44E1-AF63-CCE2D80BAA6C}
-	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.SpeechNotifier", "Gablarski.SpeechNotifier\Gablarski.SpeechNotifier.csproj", "{542BFF13-39BF-456B-B36F-7F65C6AE0830}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.Growl", "Gablarski.Growl\Gablarski.Growl.csproj", "{B3605103-A797-4F0F-9C3A-8566DD13700A}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Windows Debug|x86 = Windows Debug|x86
-		Windows Release|x86 = Windows Release|x86
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{7347052B-DA5B-4CCA-AB28-3963766E3CDB}.Windows Debug|x86.ActiveCfg = Debug|Any CPU
-		{7347052B-DA5B-4CCA-AB28-3963766E3CDB}.Windows Debug|x86.Build.0 = Debug|Any CPU
-		{7347052B-DA5B-4CCA-AB28-3963766E3CDB}.Windows Release|x86.ActiveCfg = Release|Any CPU
-		{7347052B-DA5B-4CCA-AB28-3963766E3CDB}.Windows Release|x86.Build.0 = Release|Any CPU
-		{DABD979A-6930-4250-A770-E746736F4AAF}.Windows Debug|x86.ActiveCfg = Debug|x86
-		{DABD979A-6930-4250-A770-E746736F4AAF}.Windows Debug|x86.Build.0 = Debug|x86
-		{DABD979A-6930-4250-A770-E746736F4AAF}.Windows Release|x86.ActiveCfg = Release|x86
-		{DABD979A-6930-4250-A770-E746736F4AAF}.Windows Release|x86.Build.0 = Release|x86
-		{7F9DB2AA-BA94-4C4F-9CD5-536B9B087D2E}.Windows Debug|x86.ActiveCfg = Debug|Any CPU
-		{7F9DB2AA-BA94-4C4F-9CD5-536B9B087D2E}.Windows Debug|x86.Build.0 = Debug|Any CPU
-		{7F9DB2AA-BA94-4C4F-9CD5-536B9B087D2E}.Windows Release|x86.ActiveCfg = Release|Any CPU
-		{7F9DB2AA-BA94-4C4F-9CD5-536B9B087D2E}.Windows Release|x86.Build.0 = Release|Any CPU
-		{529145D5-6CC3-4016-89B5-826563024AF1}.Windows Debug|x86.ActiveCfg = Debug|Any CPU
-		{529145D5-6CC3-4016-89B5-826563024AF1}.Windows Debug|x86.Build.0 = Debug|Any CPU
-		{529145D5-6CC3-4016-89B5-826563024AF1}.Windows Release|x86.ActiveCfg = Release|Any CPU
-		{529145D5-6CC3-4016-89B5-826563024AF1}.Windows Release|x86.Build.0 = Release|Any CPU
-		{11487129-A8DB-4818-B4AA-236E8CDD92CC}.Windows Debug|x86.ActiveCfg = Debug|x86
-		{11487129-A8DB-4818-B4AA-236E8CDD92CC}.Windows Debug|x86.Build.0 = Debug|x86
-		{11487129-A8DB-4818-B4AA-236E8CDD92CC}.Windows Release|x86.ActiveCfg = Release|x86
-		{11487129-A8DB-4818-B4AA-236E8CDD92CC}.Windows Release|x86.Build.0 = Release|x86
-		{F8A695AA-8BC9-46D4-8B7A-BDBD7B74401F}.Windows Debug|x86.ActiveCfg = Debug|Any CPU
-		{F8A695AA-8BC9-46D4-8B7A-BDBD7B74401F}.Windows Debug|x86.Build.0 = Debug|Any CPU
-		{F8A695AA-8BC9-46D4-8B7A-BDBD7B74401F}.Windows Release|x86.ActiveCfg = Release|Any CPU
-		{F8A695AA-8BC9-46D4-8B7A-BDBD7B74401F}.Windows Release|x86.Build.0 = Release|Any CPU
-		{F656F792-2CDE-4E17-BB5F-6A6F1C266CB8}.Windows Debug|x86.ActiveCfg = Debug|Any CPU
-		{F656F792-2CDE-4E17-BB5F-6A6F1C266CB8}.Windows Debug|x86.Build.0 = Debug|Any CPU
-		{F656F792-2CDE-4E17-BB5F-6A6F1C266CB8}.Windows Release|x86.ActiveCfg = Release|Any CPU
-		{F656F792-2CDE-4E17-BB5F-6A6F1C266CB8}.Windows Release|x86.Build.0 = Release|Any CPU
-		{300CECC2-F9CD-48F5-871C-129EA68D8E6C}.Windows Debug|x86.ActiveCfg = Mono Debug|Any CPU
-		{300CECC2-F9CD-48F5-871C-129EA68D8E6C}.Windows Release|x86.ActiveCfg = Mono Release|Any CPU
-		{D5FBD205-094A-46C5-88A8-16D4053733D9}.Windows Debug|x86.ActiveCfg = Debug|Any CPU
-		{D5FBD205-094A-46C5-88A8-16D4053733D9}.Windows Debug|x86.Build.0 = Debug|Any CPU
-		{D5FBD205-094A-46C5-88A8-16D4053733D9}.Windows Release|x86.ActiveCfg = Release|Any CPU
-		{D5FBD205-094A-46C5-88A8-16D4053733D9}.Windows Release|x86.Build.0 = Release|Any CPU
-		{29A83468-C6AB-4485-BD35-F5BD8FEB8C2E}.Windows Debug|x86.ActiveCfg = Debug|Any CPU
-		{29A83468-C6AB-4485-BD35-F5BD8FEB8C2E}.Windows Debug|x86.Build.0 = Debug|Any CPU
-		{29A83468-C6AB-4485-BD35-F5BD8FEB8C2E}.Windows Release|x86.ActiveCfg = Release|Any CPU
-		{29A83468-C6AB-4485-BD35-F5BD8FEB8C2E}.Windows Release|x86.Build.0 = Release|Any CPU
-		{C9DE76C5-68FC-44E1-AF63-CCE2D80BAA6C}.Windows Debug|x86.ActiveCfg = Debug|Any CPU
-		{C9DE76C5-68FC-44E1-AF63-CCE2D80BAA6C}.Windows Debug|x86.Build.0 = Debug|Any CPU
-		{C9DE76C5-68FC-44E1-AF63-CCE2D80BAA6C}.Windows Release|x86.ActiveCfg = Release|Any CPU
-		{C9DE76C5-68FC-44E1-AF63-CCE2D80BAA6C}.Windows Release|x86.Build.0 = Release|Any CPU
-		{043E20A2-310D-41C0-94BC-766E3BAACAFB}.Windows Debug|x86.ActiveCfg = Debug|x86
-		{043E20A2-310D-41C0-94BC-766E3BAACAFB}.Windows Debug|x86.Build.0 = Debug|x86
-		{043E20A2-310D-41C0-94BC-766E3BAACAFB}.Windows Release|x86.ActiveCfg = Release|x86
-		{043E20A2-310D-41C0-94BC-766E3BAACAFB}.Windows Release|x86.Build.0 = Release|x86
-		{542BFF13-39BF-456B-B36F-7F65C6AE0830}.Windows Debug|x86.ActiveCfg = Debug|Any CPU
-		{542BFF13-39BF-456B-B36F-7F65C6AE0830}.Windows Debug|x86.Build.0 = Debug|Any CPU
-		{542BFF13-39BF-456B-B36F-7F65C6AE0830}.Windows Release|x86.ActiveCfg = Release|Any CPU
-		{B3605103-A797-4F0F-9C3A-8566DD13700A}.Windows Debug|x86.ActiveCfg = Debug|Any CPU
-		{B3605103-A797-4F0F-9C3A-8566DD13700A}.Windows Debug|x86.Build.0 = Debug|Any CPU
-		{B3605103-A797-4F0F-9C3A-8566DD13700A}.Windows Release|x86.ActiveCfg = Release|Any CPU
+		{7347052B-DA5B-4CCA-AB28-3963766E3CDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7347052B-DA5B-4CCA-AB28-3963766E3CDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7347052B-DA5B-4CCA-AB28-3963766E3CDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7347052B-DA5B-4CCA-AB28-3963766E3CDB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F9DB2AA-BA94-4C4F-9CD5-536B9B087D2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F9DB2AA-BA94-4C4F-9CD5-536B9B087D2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F9DB2AA-BA94-4C4F-9CD5-536B9B087D2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F9DB2AA-BA94-4C4F-9CD5-536B9B087D2E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11487129-A8DB-4818-B4AA-236E8CDD92CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11487129-A8DB-4818-B4AA-236E8CDD92CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11487129-A8DB-4818-B4AA-236E8CDD92CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11487129-A8DB-4818-B4AA-236E8CDD92CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8A695AA-8BC9-46D4-8B7A-BDBD7B74401F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8A695AA-8BC9-46D4-8B7A-BDBD7B74401F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8A695AA-8BC9-46D4-8B7A-BDBD7B74401F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8A695AA-8BC9-46D4-8B7A-BDBD7B74401F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F656F792-2CDE-4E17-BB5F-6A6F1C266CB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F656F792-2CDE-4E17-BB5F-6A6F1C266CB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F656F792-2CDE-4E17-BB5F-6A6F1C266CB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F656F792-2CDE-4E17-BB5F-6A6F1C266CB8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
