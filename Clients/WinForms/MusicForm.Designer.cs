@@ -54,10 +54,10 @@
 			this.fileMusic.AutoSize = true;
 			this.fileMusic.Location = new System.Drawing.Point (12, 102);
 			this.fileMusic.Name = "fileMusic";
-			this.fileMusic.Size = new System.Drawing.Size (67, 17);
+			this.fileMusic.Size = new System.Drawing.Size (64, 17);
 			this.fileMusic.TabIndex = 1;
 			this.fileMusic.TabStop = true;
-			this.fileMusic.Text = "From File";
+			this.fileMusic.Text = "From file";
 			this.fileMusic.UseVisualStyleBackColor = true;
 			// 
 			// filename
@@ -98,6 +98,7 @@
 			this.okButton.TabIndex = 9;
 			this.okButton.Text = "OK";
 			this.okButton.UseVisualStyleBackColor = true;
+			this.okButton.Click += new System.EventHandler (this.okButton_Click);
 			// 
 			// cancelButton
 			// 
@@ -111,8 +112,10 @@
 			// 
 			// deviceSelector
 			// 
+			this.deviceSelector.DeviceLabel = "Device:";
 			this.deviceSelector.Location = new System.Drawing.Point (12, 35);
 			this.deviceSelector.Name = "deviceSelector";
+			this.deviceSelector.ProviderLabel = "Provider:";
 			this.deviceSelector.Size = new System.Drawing.Size (328, 50);
 			this.deviceSelector.TabIndex = 11;
 			this.deviceSelector.Enter += new System.EventHandler (this.deviceSelector_Enter);

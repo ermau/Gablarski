@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Gablarski.Audio;
+using Gablarski.Clients.Windows.Properties;
 
 namespace Gablarski.Clients.Windows
 {
@@ -15,7 +16,13 @@ namespace Gablarski.Clients.Windows
 	{
 		public MusicForm ()
 		{
+			this.Icon = Resources.MusicImage.ToIcon ();
 			InitializeComponent ();
+		}
+
+		public bool File
+		{
+			get { return this.fileMusic.Checked; }
 		}
 
 		public Type ProviderType
@@ -63,6 +70,20 @@ namespace Gablarski.Clients.Windows
 		{
 			this.captureMusic.Checked = true;
 			this.fileMusic.Checked = false;
+		}
+
+		private void okButton_Click (object sender, EventArgs e)
+		{
+			if (File && !System.IO.File.Exists (FilePath))
+			{
+				this.filename.BackColor = Color.Red;
+				return;
+			}
+			else
+				this.filename.BackColor = Color.Empty;
+
+			DialogResult = System.Windows.Forms.DialogResult.OK;
+			Close ();
 		}
 	}		
 }
