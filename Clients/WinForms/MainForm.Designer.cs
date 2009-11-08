@@ -35,6 +35,7 @@
 			this.btnConnect = new System.Windows.Forms.ToolStripButton ();
 			this.btnRegister = new System.Windows.Forms.ToolStripButton ();
 			this.btnMute = new System.Windows.Forms.ToolStripButton ();
+			this.btnMuteMic = new System.Windows.Forms.ToolStripButton ();
 			this.musicButton = new System.Windows.Forms.ToolStripButton ();
 			this.btnSettings = new System.Windows.Forms.ToolStripButton ();
 			this.users = new Gablarski.Clients.Windows.UserTreeView ();
@@ -59,6 +60,7 @@
             this.btnRegister,
             this.toolStripSeparator1,
             this.btnMute,
+            this.btnMuteMic,
             this.musicButton,
             this.toolStripSeparator2,
             this.btnSettings});
@@ -97,8 +99,19 @@
 			this.btnMute.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.btnMute.Name = "btnMute";
 			this.btnMute.Size = new System.Drawing.Size (23, 22);
-			this.btnMute.Text = "Mute";
+			this.btnMute.Text = "Mute Sound";
 			this.btnMute.Click += new System.EventHandler (this.btnMute_Click);
+			// 
+			// btnMuteMic
+			// 
+			this.btnMuteMic.CheckOnClick = true;
+			this.btnMuteMic.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.btnMuteMic.Image = global::Gablarski.Clients.Windows.Properties.Resources.SoundDeleteImage;
+			this.btnMuteMic.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.btnMuteMic.Name = "btnMuteMic";
+			this.btnMuteMic.Size = new System.Drawing.Size (23, 22);
+			this.btnMuteMic.Text = "Mute Microphone";
+			this.btnMuteMic.Click += new System.EventHandler (this.btnMuteMic_Click);
 			// 
 			// musicButton
 			// 
@@ -164,5 +177,6 @@
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
 		private System.Windows.Forms.ToolStripButton btnMute;
+		private System.Windows.Forms.ToolStripButton btnMuteMic;
 	}
 }

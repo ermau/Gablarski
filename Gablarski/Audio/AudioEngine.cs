@@ -367,8 +367,15 @@ namespace Gablarski.Audio
 				{
 					foreach (var c in captures)
 					{
-						if (c.Value.Muted || (!c.Value.Capture.IsCapturing && c.Value.Options.Mode == AudioEngineCaptureMode.Explicit))
+						if ((!c.Value.Talking && c.Value.Muted) || (!c.Value.Capture.IsCapturing && c.Value.Options.Mode == AudioEngineCaptureMode.Explicit))
 							continue;
+
+						if (c.Value.Talking && c.Value.Muted)
+						{
+							c.Value.Talking = false;
+							AudioSender.EndSending (c.Key, Context.GetCurrentChannel ());
+							continue;
+						}
 
 						if (c.Value.Capture.AvailableSampleCount > c.Key.FrameSize)
 						{

@@ -670,5 +670,16 @@ namespace Gablarski.Clients.Windows
 			else
 				gablarski.Audio.Unmute (this.playback);
 		}
+
+		private void btnMuteMic_Click (object sender, EventArgs e)
+		{
+			if (gablarski == null)
+				return;
+
+			if (this.btnMuteMic.Checked)
+				gablarski.Audio.Mute (this.voiceCapture);
+			else
+				gablarski.Audio.Unmute (this.voiceCapture);
+		}
 	}
 }
