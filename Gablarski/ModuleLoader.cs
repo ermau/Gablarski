@@ -104,44 +104,67 @@ namespace Gablarski
 		{
 			IEnumerable<Type> implementers = Enumerable.Empty<Type>();
 
-			if (recursive)
+			try
 			{
-				DirectoryInfo[] dirs = dir.GetDirectories();
-				for (int i = 0; i < dirs.Length; ++i)
-					implementers = implementers.Concat (SearchPath (dirs[i], contract, true));
+				if (recursive)
+				{
+					DirectoryInfo[] dirs = dir.GetDirectories ();
+					for (int i = 0; i < dirs.Length; ++i)
+						implementers = implementers.Concat (SearchPath (dirs[i], contract, true));
+				}
+
+				FileInfo[] files = dir.GetFiles ("*.dll");
+				for (int i = 0; i < files.Length; ++i)
+				{
+					FileInfo file = files[i];
+
+					lock (badPaths)
+					{
+						if (badPaths.Contains (file.FullName))
+							continue;
+					}
+
+					try
+					{
+						var asm = Assembly.LoadFile (file.FullName);
+						implementers = implementers.Concat (SearchAssembly (asm, contract));
+					}
+					// Ignoring non-assemblies or invalid assemblies.
+					catch (BadImageFormatException)
+					{
+						lock (badPaths)
+						{
+							badPaths.Add (file.FullName);
+						}
+					}
+					catch (FileLoadException)
+					{
+						lock (badPaths)
+						{
+							badPaths.Add (file.FullName);
+						}
+					}
+					catch (AccessViolationException)
+					{
+						lock (badPaths)
+						{
+							badPaths.Add (file.FullName);
+						}
+					}
+					catch (UnauthorizedAccessException)
+					{
+						lock (badPaths)
+						{
+							badPaths.Add (file.FullName);
+						}
+					}
+				}
 			}
-
-			FileInfo[] files = dir.GetFiles("*.dll");
-			for (int i = 0; i < files.Length; ++i)
+			catch (AccessViolationException)
 			{
-				FileInfo file = files[i];
-
-				lock (badPaths)
-				{
-					if (badPaths.Contains (file.FullName))
-						continue;
-				}
-
-				try
-				{
-					var asm = Assembly.LoadFile (file.FullName);
-					implementers = implementers.Concat (SearchAssembly (asm, contract));
-				}
-				// Ignoring non-assemblies or invalid assemblies.
-				catch (BadImageFormatException)
-				{
-					lock (badPaths)
-					{
-						badPaths.Add (file.FullName);
-					}
-				}
-				catch (FileLoadException)
-				{
-					lock (badPaths)
-					{
-						badPaths.Add (file.FullName);
-					}
-				}
+			}
+			catch (UnauthorizedAccessException)
+			{
 			}
 
 			return implementers;
