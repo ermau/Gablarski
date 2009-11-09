@@ -98,6 +98,10 @@
     <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821">
       <HintPath>..\log4net.dll</HintPath>
     </Reference>
+    <Reference Include="NAudio, Version=1.3.8.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\NAudio.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -114,6 +118,7 @@
   <ItemGroup>
     <Compile Include="AES.cs" />
     <Compile Include="Audio\AudioCaptureEntity.cs" />
+    <Compile Include="Audio\AudioExtensions.cs" />
     <Compile Include="Audio\AudioPlaybackEntity.cs" />
     <Compile Include="Audio\CELT\Celt.cs" />
     <Compile Include="Audio\CELT\CeltDecoder.cs" />
@@ -234,9 +239,7 @@
     <None Include="Audio\OpenAL\OpenAL32.dll" />
     <None Include="Audio\OpenAL\OpenALSoft.License.txt" />
     <None Include="Audio\Speex\libspeexdsp.dll" />
-    <None Include="Audio\Speex\libspeexdsp.license.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <None Include="Audio\Speex\libspeexdsp.license.txt" />
     <None Include="Audio\OpenAL\Gablarski.OpenAL.dll.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
