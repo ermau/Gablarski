@@ -302,7 +302,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy /Y "$(SolutionDir)..\..\Gablarski\Audio\CELT\libcelt.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)..\..\Gablarski\Audio\CELT\libcelt.license.txt" "$(SolutionDir)Clients\Windows\$(OutDir)"
+xcopy /Y "$(SolutionDir)..\..\Gablarski\Audio\CELT\libcelt.license.txt" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)..\..\Gablarski\Audio\Speex\libspeexdsp.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)..\..\Gablarski\Audio\Speex\libspeexdsp.license.txt" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)..\..\Gablarski.OpenAL\OpenAL32.dll" "$(TargetDir)"
