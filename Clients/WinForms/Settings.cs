@@ -58,7 +58,7 @@ namespace Gablarski.Clients.Windows
 
 		public static string VoiceProvider
 		{
-			get { return GetSetting ("VoiceProvider", "Gablarski.Audio.OpenAL.Providers.OpenALCaptureProvider, Gablarski"); }
+			get { return GetSetting ("VoiceProvider", "Gablarski.Audio.OpenAL.Providers.OpenALCaptureProvider, Gablarski.OpenAL"); }
 			set
 			{
 				if (SetSetting ("VoiceProvider", value))
@@ -79,7 +79,7 @@ namespace Gablarski.Clients.Windows
 		public const string PlaybackProviderSettingName = "PlaybackProvider";
 		public static string PlaybackProvider
 		{
-			get { return GetSetting (PlaybackProviderSettingName, "Gablarski.Audio.OpenAL.Providers.OpenALPlaybackProvider, Gablarski"); }
+			get { return GetSetting (PlaybackProviderSettingName, "Gablarski.Audio.OpenAL.Providers.OpenALPlaybackProvider, Gablarski.OpenAL"); }
 			set
 			{
 				if (SetSetting (PlaybackProviderSettingName, value))

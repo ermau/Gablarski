@@ -82,6 +82,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Gablarski.OpenAL\Gablarski.OpenAL.csproj">
+      <Project>{4B71AD86-B6E7-4833-82B0-3CF38A128984}</Project>
+      <Name>Gablarski.OpenAL</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Gablarski\Gablarski.csproj">
       <Project>{7347052B-DA5B-4CCA-AB28-3963766E3CDB}</Project>
       <Name>Gablarski</Name>

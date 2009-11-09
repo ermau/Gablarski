@@ -78,10 +78,6 @@ namespace Gablarski.Audio.OpenAL
 				Buffers.Remove (this.bufferID);
 			}
 
-			#if DEBUG
-			OpenAL.Log.Debug ("Deleting buffer " + this.bufferID);
-			#endif
-
 			this.disposed = true;
 		}
 

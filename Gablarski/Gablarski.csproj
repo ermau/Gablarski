@@ -71,6 +71,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Mono Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -116,7 +117,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AES.cs" />
     <Compile Include="Audio\AudioCaptureEntity.cs" />
     <Compile Include="Audio\AudioExtensions.cs" />
     <Compile Include="Audio\AudioPlaybackEntity.cs" />
@@ -126,17 +126,6 @@
     <Compile Include="Audio\CELT\CeltMode.cs" />
     <Compile Include="Audio\IAudioEngine.cs" />
     <Compile Include="Audio\IAudioReceiver.cs" />
-    <Compile Include="Audio\OpenAL\CaptureDevice.cs" />
-    <Compile Include="Audio\OpenAL\Context.cs" />
-    <Compile Include="Audio\OpenAL\Device.cs" />
-    <Compile Include="Audio\OpenAL\Extension.cs" />
-    <Compile Include="Audio\OpenAL\OpenAL.cs" />
-    <Compile Include="Audio\OpenAL\PlaybackDevice.cs" />
-    <Compile Include="Audio\OpenAL\Providers\OpenALCaptureProvider.cs" />
-    <Compile Include="Audio\OpenAL\Providers\OpenALPlaybackProvider.cs" />
-    <Compile Include="Audio\OpenAL\Source.cs" />
-    <Compile Include="Audio\OpenAL\SourceBuffer.cs" />
-    <Compile Include="Audio\OpenAL\SourcePool.cs" />
     <Compile Include="Audio\Speex\SpeexPreprocessor.cs" />
     <Compile Include="Audio\VoiceActivation.cs" />
     <Compile Include="ByteArrayValueReader.cs" />
@@ -236,13 +225,8 @@
   <ItemGroup>
     <None Include="Audio\CELT\libcelt.dll" />
     <None Include="Audio\CELT\libcelt.license.txt" />
-    <None Include="Audio\OpenAL\OpenAL32.dll" />
-    <None Include="Audio\OpenAL\OpenALSoft.License.txt" />
     <None Include="Audio\Speex\libspeexdsp.dll" />
     <None Include="Audio\Speex\libspeexdsp.license.txt" />
-    <None Include="Audio\OpenAL\Gablarski.OpenAL.dll.config">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mono.Rocks\Mono.Rocks.csproj">

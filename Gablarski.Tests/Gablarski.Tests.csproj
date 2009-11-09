@@ -133,6 +133,6 @@
   <PropertyGroup>
     <PostBuildEvent>xcopy /y "$(SolutionDir)Gablarski\Audio\CELT\libcelt.dll" "$(TargetDir)"
 xcopy /y "$(SolutionDir)Gablarski\Audio\Speex\libspeexdsp.dll" "$(TargetDir)"
-xcopy /y "$(SolutionDir)Gablarski\Audio\OpenAL\OpenAL32.dll" "$(TargetDir)"</PostBuildEvent>
+xcopy /y "$(SolutionDir)Gablarski.OpenAL\OpenAL32.dll" "$(TargetDir)"</PostBuildEvent>
   </PropertyGroup>
 </Project>
