@@ -158,6 +158,9 @@ namespace Gablarski
 							badPaths.Add (file.FullName);
 						}
 					}
+					catch (ReflectionTypeLoadException)
+					{
+					}
 				}
 			}
 			catch (AccessViolationException)
