@@ -13,7 +13,7 @@
 		</nunit2>
 
 		<zip zipfile="Gablarski-Debug.zip">
-			<fileset basedir="Gablarski\bin\x86\Debug">
+			<fileset basedir="Gablarski\bin\Debug">
 				<include name="*.dll" />
 				<include name="*.xml" />
 				<include name="*.pdb" />
