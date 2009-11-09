@@ -4,7 +4,7 @@
 
 	<target name="library">
 		<exec program="${DotNetFramework3.5_x86_Path}\msbuild.exe">
-			<arg value='/property:Configuration="Debug";Platform="Any CPU"' />
+			<arg value='/property:Configuration="Debug";Platform="x86"' />
 			<arg value="Gablarski.sln" />
 		</exec>
 
@@ -13,7 +13,16 @@
 		</nunit2>
 
 		<zip zipfile="Gablarski-Debug.zip">
-			<fileset basedir="Gablarski\bin\Debug">
+			<fileset basedir="Gablarski\bin\x86">
+				<include name="*.dll" />
+				<include name="*.xml" />
+				<include name="*.pdb" />
+				<include name="*.txt" />
+			</fileset>
+		</zip>
+
+		<zip zipfile="Gablarski-CLI-Debug.zip">
+			<fileset basedir="Clients\CLI\bin\x86">
 				<include name="*.dll" />
 				<include name="*.xml" />
 				<include name="*.pdb" />
