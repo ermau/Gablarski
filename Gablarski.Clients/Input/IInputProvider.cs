@@ -81,6 +81,7 @@ namespace Gablarski.Clients.Input
 		/// <param name="window">Application window handle.</param>
 		/// <param name="settings">The settings provided by <see cref="EndRecord()"/>. <c>null</c> or <c>String.Empty</c> if not yet set.</param>
 		/// <exception cref="ArgumentException">If <paramref name="window"/> is equal to <see cref="IntPtr.Zero"/>.</exception>
+		/// <exception cref="InvalidOperationException">If it's already attached.</exception>
 		void Attach (IntPtr window, string settings);
 
 		/// <summary>

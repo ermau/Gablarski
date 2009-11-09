@@ -93,7 +93,7 @@ namespace Gablarski.Clients.Windows
 				{
 					jl.Refresh ();
 				}
-				catch (UnauthorizedAccessException)
+				catch (UnauthorizedAccessException) // Jumplists disabled
 				{
 				}
 			}
