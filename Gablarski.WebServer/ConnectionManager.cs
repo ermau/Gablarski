@@ -34,7 +34,7 @@ namespace Gablarski.WebServer
 			set { timeBetweenScans = value; }
 		}
 
-		public void ProcessSession (IHttpSession session, IHttpResponse response)
+		public bool ProcessSession (IHttpSession session, IHttpResponse response)
 		{
 			bool newSession = false;
 			lock (sessions)
@@ -61,6 +61,8 @@ namespace Gablarski.WebServer
 					ConnectionProvider.OnConnectionMade (new ConnectionEventArgs (connection));
 					connections.Add (session.Id, connection);
 				}
+
+				return (bool)session["loggedIn"];
 			}
 		}
 

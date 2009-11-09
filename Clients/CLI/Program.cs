@@ -366,12 +366,6 @@ namespace Gablarski.Clients.CLI
 			Client.Audio.Attach (playbackProvider, e.Data, new AudioEnginePlaybackOptions());
 		}
 
-		static void OnSamplesAvailable (object sender, SamplesAvailableEventArgs e)
-		{
-			if (captureSource != null)
-				Client.Sources.SendAudioData (captureSource, Client.CurrentChannel, CaptureProvider.ReadSamples (captureSource.FrameSize));
-		}
-
 		static void ListSources (TextWriter writer)
 		{
 			lock (Sources)

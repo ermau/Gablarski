@@ -61,7 +61,7 @@ namespace Gablarski.WebServer
 				try
 				{
 					if (!((bool)session["loggedIn"]))
-						response.Redirect (new Uri ("http://" + request.Uri.Host + "/admin/login.html", UriKind.Absolute));
+						response.Redirect ("/admin/login.html");
 					else
 					{
 						if (request.UriParts.Length > 1)

@@ -5,6 +5,7 @@ using System.Net;
 using System.Text;
 using Gablarski.Messages;
 using HttpServer;
+using HttpServer.HttpModules;
 using HttpServer.Sessions;
 
 namespace Gablarski.WebServer
@@ -48,6 +49,10 @@ namespace Gablarski.WebServer
 			ConnectionManager cmanager = new ConnectionManager();
 			cmanager.ConnectionProvider = this;
 			cmanager.Server = server;
+
+			ControllerModule controller = new ControllerModule();
+			controller.Add (new UserController (cmanager));
+			controller.Add (new ChannelController (cmanager));
 
 			server.Add (new FileResourceModule());
 			server.Add (new LoginModule(cmanager));
