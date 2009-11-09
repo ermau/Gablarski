@@ -81,7 +81,7 @@ namespace Gablarski.Clients.Windows
 					links[i] = new JumpListLink (exe, s.Name)
 					{
 						Arguments = s.Id.ToString(),
-						IconReference = new IconReference (exe, 0)
+						IconReference = new IconReference (exe, 6)
 					};
 				}
 				
