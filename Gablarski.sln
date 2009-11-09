@@ -1,5 +1,5 @@
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6A109469-1A29-4967-BB7A-B9DEDD48C4A5}"
 	ProjectSection(SolutionItems) = preProject
 		debug.build = debug.build
@@ -17,6 +17,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Rocks", "Mono.Rocks\Mono.Rocks.csproj", "{F656F792-2CDE-4E17-BB5F-6A6F1C266CB8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.Clients.CLI", "Clients\CLI\Gablarski.Clients.CLI.csproj", "{DABD979A-6930-4250-A770-E746736F4AAF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{11487129-A8DB-4818-B4AA-236E8CDD92CC} = {11487129-A8DB-4818-B4AA-236E8CDD92CC}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -60,4 +63,3 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal
-
