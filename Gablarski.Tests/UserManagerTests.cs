@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -46,30 +46,30 @@ namespace Gablarski.Tests
 	public class UserManagerTests
 	{
 		[Test]
-		public void Add ()
+		public void Join ()
 		{
 			var user = new UserInfo ("Nickname", "Username", 1, 2, true);
 
 			var manager = new UserManager ();
-			manager.Add (user);
+			manager.Join (user);
 
-			Assert.IsTrue (manager.Contains (user));
+			Assert.IsTrue (manager.IsJoined (user));
 			Assert.IsTrue (((IEnumerable<UserInfo>)manager).Contains (user));
 			Assert.AreEqual (user, manager[user.UserId]);
 		}
-
+		
 		[Test]
-		public void AddNullUser ()
+		public void JoinNullUser ()
 		{
 			var manager = new UserManager ();
-			Assert.Throws<ArgumentNullException> (() => manager.Add (null));
+			Assert.Throws<ArgumentNullException> (() => manager.Join (null));
 		}
 
 		[Test]
-		public void ContainsNullUser()
+		public void IsJoinedNullUser()
 		{
 			var manager = new UserManager();
-			Assert.Throws<ArgumentNullException> (() => manager.Contains (null));
+			Assert.Throws<ArgumentNullException> (() => manager.IsJoined (null));
 		}
 
 		[Test]

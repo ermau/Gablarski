@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -45,7 +45,7 @@ namespace Gablarski
 	public class UserManager
 		: IUserManager
 	{
-		public void Add (UserInfo user)
+		public void Join (UserInfo user)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
@@ -57,7 +57,7 @@ namespace Gablarski
 			}
 		}
 
-		public bool Contains (UserInfo user)
+		public bool IsJoined (UserInfo user)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
@@ -68,7 +68,7 @@ namespace Gablarski
 			}
 		}
 
-		public bool Remove (UserInfo user)
+		public bool Depart (UserInfo user)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
@@ -89,11 +89,6 @@ namespace Gablarski
 			}
 		}
 
-		public void Update (IEnumerable<UserInfo> users, out IEnumerable<UserInfo> added, out IEnumerable<UserInfo> removed, out IEnumerable<UserInfo> changed)
-		{
-			throw new NotImplementedException();
-		}
-
 		public IEnumerable<UserInfo> GetUsersInChannel (int channelId)
 		{
 			lock (users)
@@ -107,7 +102,14 @@ namespace Gablarski
 			if (user == null)
 				throw new ArgumentNullException ("user");
 
-			throw new NotImplementedException ();
+			lock (userLock)
+			{
+				UserInfo oldUser;
+				if (!users.TryGetValue (user.UserId, out oldUser))
+					oldUser = user;
+				
+				UserInfo newUser = new UserInfo (oldUser.Nickname, user.Username, user.UserId, user.CurrentChannelId, !user.IsMuted);
+			}
 		}
 
 		public UserInfo this[int key]

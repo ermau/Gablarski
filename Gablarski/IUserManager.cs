@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -44,13 +44,21 @@ namespace Gablarski
 	public interface IUserManager
 		: IIndexedEnumerable<int, UserInfo>
 	{
+		void Join (UserInfo user);
+		
+		/// <summary>
+		/// Departs a user.
+		/// </summary>
+		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c></exception>
+		bool Depart (UserInfo user);
+		
 		/// <summary>
 		/// Gets whether or not <paramref name="user"/> is currently in the manager.
 		/// </summary>
 		/// <param name="user">The user to check for.</param>
 		/// <returns><c>true</c> if <paramref name="user"/> is in the manager, <c>false</c> otherwise.</returns>
 		/// <exception cref="ArgumentNullException"></exception>
-		bool Contains (UserInfo user);
+		bool IsJoined (UserInfo user);
 
 		IEnumerable<UserInfo> GetUsersInChannel (int channelId);
 

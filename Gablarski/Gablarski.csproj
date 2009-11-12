@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -15,7 +15,6 @@
     </FileUpgradeFlags>
     <OldToolsVersion>3.5</OldToolsVersion>
     <UpgradeBackupLocation />
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
@@ -99,7 +98,7 @@
     <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821">
       <HintPath>..\log4net.dll</HintPath>
     </Reference>
-    <Reference Include="NAudio, Version=1.3.8.0, Culture=neutral, processorArchitecture=x86">
+    <Reference Include="NAudio, Version=1.3.8.0, Culture=neutral, PublicKeyToken=null">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\NAudio.dll</HintPath>
     </Reference>
@@ -216,13 +215,14 @@
     <Compile Include="Client\ClientUserManager.cs" />
     <Compile Include="Client\ClientSourceManager.cs" />
     <Compile Include="Client\CurrentUser.cs" />
-    <Compile Include="IClientContext.cs" />
     <Compile Include="Audio\AudioSource.cs" />
     <Compile Include="Messages\SourcesRemovedMessage.cs" />
     <Compile Include="Messages\UserChangedChannelMessage.cs" />
     <Compile Include="Messages\UserJoinedMessage.cs" />
     <Compile Include="Server\LobbyChannelProvider.cs" />
     <Compile Include="UserManager.cs" />
+    <Compile Include="Server\IServerUserManager.cs" />
+    <Compile Include="Client\IClientContext.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Audio\CELT\libcelt.dll" />
@@ -239,18 +239,12 @@
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
       <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
-      <Install>false</Install>
     </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
       <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>false</Install>
     </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.VisualBasic.PowerPacks.10.0">
       <Visible>False</Visible>
-      <ProductName>Microsoft Visual Basic PowerPacks 10.0</ProductName>
-      <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
@@ -263,7 +257,7 @@
   -->
   <ProjectExtensions>
     <MonoDevelop>
-      <Properties>
+      <Properties InternalTargetFrameworkVersion="3.5">
         <Policies>
           <TextStylePolicy FileWidth="120" TabWidth="4" RemoveTrailingWhitespace="True" inheritsSet="Mono" inheritsScope="text/plain" />
         </Policies>
