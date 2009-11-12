@@ -46,7 +46,7 @@ using System.Threading;
 namespace Gablarski.Client
 {
 	public class ClientUserManager
-		: IClientUserManager
+		: UserManager, IClientUserManager
 	{
 		protected internal ClientUserManager (IClientContext context)
 		{

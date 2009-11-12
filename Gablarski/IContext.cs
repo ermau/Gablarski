@@ -41,24 +41,8 @@ using System.Text;
 
 namespace Gablarski
 {
-	public interface IUserManager
-		: IIndexedEnumerable<int, UserInfo>
+	public interface IContext
 	{
-		/// <summary>
-		/// Gets whether or not <paramref name="user"/> is currently in the manager.
-		/// </summary>
-		/// <param name="user">The user to check for.</param>
-		/// <returns><c>true</c> if <paramref name="user"/> is in the manager, <c>false</c> otherwise.</returns>
-		/// <exception cref="ArgumentNullException"></exception>
-		bool Contains (UserInfo user);
-
-		IEnumerable<UserInfo> GetUsersInChannel (int channelId);
-
-		/// <summary>
-		/// Toggles mute on <paramref name="user"/>.
-		/// </summary>
-		/// <param name="user"></param>
-		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
-		void ToggleMute (UserInfo user);
+		IUserManager Users { get; }
 	}
 }

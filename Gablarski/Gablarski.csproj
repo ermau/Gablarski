@@ -132,6 +132,7 @@
     <Compile Include="Audio\AudioEngine.cs" />
     <Compile Include="Audio\IAudioSender.cs" />
     <Compile Include="Client\IClientUserManager.cs" />
+    <Compile Include="IContext.cs" />
     <Compile Include="IIndexedEnumerable.cs" />
     <Compile Include="IUserManager.cs" />
     <Compile Include="Messages\AudioSourceStateChangeMessage.cs" />
@@ -221,6 +222,7 @@
     <Compile Include="Messages\UserChangedChannelMessage.cs" />
     <Compile Include="Messages\UserJoinedMessage.cs" />
     <Compile Include="Server\LobbyChannelProvider.cs" />
+    <Compile Include="UserManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Audio\CELT\libcelt.dll" />

@@ -93,6 +93,7 @@
     <Compile Include="ServerMessageTests.cs" />
     <Compile Include="ServerTests.cs" />
     <Compile Include="UserInfoTests.cs" />
+    <Compile Include="UserManagerTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Gablarski\Gablarski.csproj">
