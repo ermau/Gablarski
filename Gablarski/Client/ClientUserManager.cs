@@ -96,23 +96,6 @@ namespace Gablarski.Client
 			get { return this.context.CurrentUser; }
 		}
 
-		public UserInfo this[int identifier]
-		{
-			get
-			{
-				if (users == null)
-					return null;
-
-				UserInfo user;
-				lock (userLock)
-				{
-					this.users.TryGetValue (identifier, out user);
-				}
-
-				return user;
-			}
-		}
-
 		/// <summary>
 		/// Requests to move <paramref name="user"/> to <paramref name="targetChannel"/>.
 		/// </summary>
@@ -139,7 +122,7 @@ namespace Gablarski.Client
 			if (user == null)
 				throw new ArgumentNullException ("user");
 
-			lock (userLock)
+			lock (SyncRoot)
 			{
 				return ignores.Contains (user.UserId);
 			}
@@ -157,7 +140,7 @@ namespace Gablarski.Client
 				throw new ArgumentNullException ("user");
 
 			bool ignored;
-			lock (userLock)
+			lock (SyncRoot)
 			{
 				ignored = ignores.Contains (user.UserId);
 
@@ -183,62 +166,6 @@ namespace Gablarski.Client
 			context.Connection.Send (new RequestMuteMessage { Target = user.Username, Type = MuteType.User, Unmute = user.IsMuted });
 		}
 
-		/// <summary>
-		/// Clears the user manager of all users.
-		/// </summary>
-		public void Clear()
-		{
-			lock (userLock)
-			{
-				this.users = null;
-			}
-		}
-
-		#region Implementation of IEnumerable
-
-		/// <summary>
-		/// Returns an enumerator that iterates through the collection.
-		/// </summary>
-		/// <returns>
-		/// A <see cref="T:System.Collections.Generic.IEnumerator`1"/> that can be used to iterate through the collection.
-		/// </returns>
-		/// <filterpriority>1</filterpriority>
-		public IEnumerator<UserInfo> GetEnumerator()
-		{
-			if (this.users == null)
-			{
-				if (this.context.Connection == null || !this.context.Connection.IsConnected)
-					throw new InvalidOperationException ("Not connected");
-
-				this.context.Connection.Send (new RequestUserListMessage ());
-
-				while (this.users == null)
-					Thread.Sleep (1);
-			}
-
-			lock (userLock)
-			{
-				foreach (var user in users.Values)
-					yield return user;
-			}
-		}
-
-		/// <summary>
-		/// Returns an enumerator that iterates through a collection.
-		/// </summary>
-		/// <returns>
-		/// An <see cref="T:System.Collections.IEnumerator"/> object that can be used to iterate through the collection.
-		/// </returns>
-		/// <filterpriority>2</filterpriority>
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return this.GetEnumerator();
-		}
-
-		#endregion
-
-		private readonly object userLock = new object();
-		private Dictionary<int, UserInfo> users;
 		private readonly HashSet<int> ignores = new HashSet<int> ();
 		private readonly IClientContext context;
 
@@ -248,12 +175,12 @@ namespace Gablarski.Client
 			var msg = (UserListMessage)e.Message;
 
 			IEnumerable<UserInfo> userlist;
-			lock (userLock)
+			lock (SyncRoot)
 			{
-				this.users = msg.Users.ToDictionary (p => p.UserId, p => new UserInfo (p));
-				userlist = this.users.Values.ToList();
+				Update (msg.Users);
+				userlist = msg.Users.ToList();
 
-				foreach (int ignoredId in this.ignores.ToList ().Where (id => !this.users.ContainsKey (id)))
+				foreach (int ignoredId in this.ignores.ToList ().Where (id => !IsJoined (id)))
 					this.ignores.Remove (ignoredId);
 			}
 
@@ -262,9 +189,9 @@ namespace Gablarski.Client
 
 		internal void OnMutedMessage (string username, bool unmuted)
 		{
-			lock (userLock)
+			lock (SyncRoot)
 			{
-		        var user = this.users.Values.FirstOrDefault (u => u.Username == username);
+		        var user = this.SingleOrDefault (u => u.Username == username);
 		        if (user == null)
 		            return;
 
@@ -279,33 +206,27 @@ namespace Gablarski.Client
 			var msg = (UserDisconnectedMessage) e.Message;
 
 			UserInfo user;
-			lock (userLock)
+			lock (SyncRoot)
 			{
-				if (!this.users.TryGetValue (msg.UserId, out user))
+				if (!this.TryGetUser (msg.UserId, out user))
 					return;
 
-				this.users.Remove (msg.UserId);
+				Depart (user);
 				ignores.Remove (msg.UserId);
 			}
 
 			OnUserDisconnected (new UserEventArgs (user));
 		}
 
-		internal void OnUserLoggedInMessage (MessageReceivedEventArgs e)
+		internal void OnUserJoinedMessage (MessageReceivedEventArgs e)
 		{
 			var msg = (UserJoinedMessage)e.Message;
 
-			UserInfo user;
-			lock (userLock)
-			{
-				if (this.users == null)
-					this.users = new Dictionary<int, UserInfo> ();
+			UserInfo user = new UserInfo (msg.UserInfo);
+			
+			Join (user);
 
-				user = new UserInfo (msg.UserInfo);
-				this.users[msg.UserInfo.UserId] = user;
-			}
-
-			OnUserLoggedIn (new UserEventArgs (user));
+			OnUserJoined (new UserEventArgs (user));
 		}
 
 		internal void OnUserChangedChannelMessage (MessageReceivedEventArgs e)
@@ -321,18 +242,19 @@ namespace Gablarski.Client
 			UserInfo old;
 			UserInfo user;
 			UserInfo movedBy = null;
-			lock (userLock)
+			lock (SyncRoot)
 			{
-				if (!this.users.TryGetValue (msg.ChangeInfo.TargetUserId, out old))
+				if (!TryGetUser (msg.ChangeInfo.TargetUserId, out old))
 					return;
 
-				user = this.users[msg.ChangeInfo.TargetUserId] = new UserInfo (old.Nickname, old.Username, old.UserId, msg.ChangeInfo.TargetChannelId, old.IsMuted);
+				user = new UserInfo (old.Nickname, old.Username, old.UserId, msg.ChangeInfo.TargetChannelId, old.IsMuted);
+				Update (user);
 				
 				if (user.Equals (context.CurrentUser))
 					context.CurrentUser.CurrentChannelId = msg.ChangeInfo.TargetChannelId;
 
 				if (msg.ChangeInfo.RequestingUserId != 0)
-					this.users.TryGetValue (msg.ChangeInfo.RequestingUserId, out movedBy);
+					TryGetUser (msg.ChangeInfo.RequestingUserId, out movedBy);
 			}
 
 			OnUserChangedChannnel (new ChannelChangedEventArgs (user, channel, previous, movedBy));
@@ -368,7 +290,7 @@ namespace Gablarski.Client
 				received (this, e);
 		}
 
-		protected virtual void OnUserLoggedIn (UserEventArgs e)
+		protected virtual void OnUserJoined (UserEventArgs e)
 		{
 			var result = this.UserJoined;
 			if (result != null)

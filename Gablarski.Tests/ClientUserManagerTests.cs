@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -72,12 +72,12 @@ namespace Gablarski.Tests
 		}
 
 		[Test]
-		public void UserLoggedIn()
+		public void UserJoined()
 		{
 			CreateUsers (this.server.Client, this.manager);
 
 			var newGuy = new UserInfo ("New", "new", 4, 3, false);
-			manager.OnUserLoggedInMessage (new MessageReceivedEventArgs (this.server.Client,
+			manager.OnUserJoinedMessage (new MessageReceivedEventArgs (this.server.Client,
 				new UserJoinedMessage(newGuy)));
 
 			VerifyDefaultUsers (this.manager);

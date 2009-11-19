@@ -50,7 +50,7 @@ namespace Gablarski
 			if (user == null)
 				throw new ArgumentNullException ("user");
 
-			lock (userLock)
+			lock (SyncRoot)
 			{
 				users.Add (user.UserId, user);
 				channels.Add (user.CurrentChannelId, user);
@@ -62,9 +62,17 @@ namespace Gablarski
 			if (user == null)
 				throw new ArgumentNullException ("user");
 
-			lock (userLock)
+			lock (SyncRoot)
 			{
 				return users.ContainsValue (user);
+			}
+		}
+		
+		public bool IsJoined (int userId)
+		{
+			lock (SyncRoot)
+			{
+				return users.Any (kvp => kvp.Value.UserId == userId);
 			}
 		}
 
@@ -73,16 +81,43 @@ namespace Gablarski
 			if (user == null)
 				throw new ArgumentNullException ("user");
 
-			lock (userLock)
+			lock (SyncRoot)
 			{
 				users.Remove (user.UserId);
 				return channels.Remove (user.CurrentChannelId, user);
 			}
 		}
+		
+		public void Update (IEnumerable<UserInfo> userUpdate)
+		{
+			if (userUpdate == null)
+				throw new ArgumentNullException ("users");
+				
+			lock (SyncRoot)
+			{
+				users = userUpdate.ToDictionary (u => u.UserId);
+				channels = new MutableLookup<int, UserInfo> (userUpdate.ToLookup (u => u.CurrentChannelId));
+			}
+		}
+		
+		public void Update (UserInfo user)
+		{
+			if (user == null)
+				throw new ArgumentNullException ("user");
+				
+			lock (SyncRoot)
+			{
+				UserInfo oldUser;
+				if (users.TryGetValue (user.UserId, out oldUser))
+					channels.Remove (oldUser.CurrentChannelId, oldUser);
+					
+				channels.Add (user.CurrentChannelId, users[user.UserId] = new UserInfo (user));
+			}
+		}
 
 		public void Clear ()
 		{
-			lock (userLock)
+			lock (SyncRoot)
 			{
 				users.Clear();
 				channels.Clear();
@@ -91,7 +126,7 @@ namespace Gablarski
 
 		public IEnumerable<UserInfo> GetUsersInChannel (int channelId)
 		{
-			lock (users)
+			lock (SyncRoot)
 			{
 				return this.channels[channelId].ToList();
 			}
@@ -102,7 +137,7 @@ namespace Gablarski
 			if (user == null)
 				throw new ArgumentNullException ("user");
 
-			lock (userLock)
+			lock (SyncRoot)
 			{
 				UserInfo oldUser;
 				if (!users.TryGetValue (user.UserId, out oldUser))
@@ -111,13 +146,21 @@ namespace Gablarski
 				UserInfo newUser = new UserInfo (oldUser.Nickname, user.Username, user.UserId, user.CurrentChannelId, !user.IsMuted);
 			}
 		}
+		
+		public bool TryGetUser (int userId, out UserInfo user)
+		{
+			lock (SyncRoot)
+			{
+				return users.TryGetValue (userId, out user);
+			}
+		}
 
 		public UserInfo this[int key]
 		{
 			get
 			{
 				UserInfo user;
-				lock (userLock)
+				lock (SyncRoot)
 				{
 					this.users.TryGetValue (key, out user);
 				}
@@ -129,7 +172,7 @@ namespace Gablarski
 		public IEnumerator<UserInfo> GetEnumerator ()
 		{
 			IEnumerable<UserInfo> returnUsers;
-			lock (users)
+			lock (SyncRoot)
 			{
 				 returnUsers = this.users.Values.ToList();
 			}
@@ -142,9 +185,9 @@ namespace Gablarski
 			return GetEnumerator ();
 		}
 
-		private readonly object userLock = new object ();
+		protected readonly object SyncRoot = new object ();
 
-		private readonly Dictionary<int, UserInfo> users = new Dictionary<int, UserInfo> ();
-		private readonly MutableLookup<int, UserInfo> channels = new MutableLookup<int, UserInfo> ();
+		private Dictionary<int, UserInfo> users = new Dictionary<int, UserInfo> ();
+		private MutableLookup<int, UserInfo> channels = new MutableLookup<int, UserInfo> ();
 	}
 }

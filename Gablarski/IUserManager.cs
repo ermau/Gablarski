@@ -44,6 +44,13 @@ namespace Gablarski
 	public interface IUserManager
 		: IIndexedEnumerable<int, UserInfo>
 	{
+		/// <summary>
+		/// Joins <paramref name="user"/>.
+		/// </summary>
+		/// <param name="user">
+		/// A <see cref="UserInfo"/>
+		/// </param>
+		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
 		void Join (UserInfo user);
 		
 		/// <summary>
@@ -53,13 +60,44 @@ namespace Gablarski
 		bool Depart (UserInfo user);
 		
 		/// <summary>
+		/// Updates the manager using <paramref name="users"/> as the new list of users.
+		/// </summary>
+		/// <param name="users">The new list of users.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="users"/> is <c>null</c></exception>
+		void Update (IEnumerable<UserInfo> users);
+		
+		/// <summary>
+		/// Updates the user internally to match the properties of <paramref name="user"/>.
+		/// </summary>
+		/// <param name="user">The new set of properties for the user.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
+		void Update (UserInfo user);
+		
+		/// <summary>
 		/// Gets whether or not <paramref name="user"/> is currently in the manager.
 		/// </summary>
 		/// <param name="user">The user to check for.</param>
 		/// <returns><c>true</c> if <paramref name="user"/> is in the manager, <c>false</c> otherwise.</returns>
-		/// <exception cref="ArgumentNullException"></exception>
+		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
 		bool IsJoined (UserInfo user);
 
+		bool IsJoined (int userId);
+		
+		/// <summary>
+		/// Tries to get <parmref name="user"/> from <paramref name="userId"/>.
+		/// </summary>
+		/// <param name="userId">The id of the user to try to get.</param>
+		/// <param name="user">The user, if found.</param>
+		/// <returns><c>true</c> if the user was found, <c>false</c> otherwise.</returns>
+		bool TryGetUser (int userId, out UserInfo user);
+
+		/// <summary>
+		/// Gets the users in the given channel.
+		/// </summary>
+		/// <param name="channelId">The id of the channel.</param>
+		/// <returns>
+		/// A <see cref="IEnumerable<UserInfo>"/> of the users in the channel. <c>null</c> if the channel was not found.
+		/// </returns>
 		IEnumerable<UserInfo> GetUsersInChannel (int channelId);
 
 		/// <summary>

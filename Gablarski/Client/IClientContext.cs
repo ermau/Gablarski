@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -39,9 +39,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Gablarski.Audio;
-using Gablarski.Client;
 
-namespace Gablarski
+namespace Gablarski.Client
 {
 	/// <summary>
 	/// Represents a gablarski client context.

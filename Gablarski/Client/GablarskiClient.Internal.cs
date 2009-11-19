@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -89,7 +89,7 @@ namespace Gablarski.Client
 				{ ServerMessageType.LoginResult, this.CurrentUser.OnLoginResultMessage },
 				{ ServerMessageType.JoinResult, this.CurrentUser.OnJoinResultMessage },
 				{ ServerMessageType.Permissions, this.CurrentUser.OnPermissionsMessage },
-				{ ServerMessageType.UserLoggedIn, this.Users.OnUserLoggedInMessage },
+				{ ServerMessageType.UserLoggedIn, this.Users.OnUserJoinedMessage },
 				{ ServerMessageType.UserDisconnected, this.Users.OnUserDisconnectedMessage },
 				{ ServerMessageType.Muted, OnMuted },
 				

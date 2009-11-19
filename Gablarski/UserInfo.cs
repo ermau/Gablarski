@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -44,10 +44,10 @@ namespace Gablarski
 {
 	public class UserInfo
 	{
-		public UserInfo()
+		internal UserInfo()
 		{
 		}
-
+		
 		internal UserInfo (UserInfo info)
 		{
 			if (info == null)
