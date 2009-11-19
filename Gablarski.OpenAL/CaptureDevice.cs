@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -102,6 +102,8 @@ namespace Gablarski.Audio.OpenAL
 		public unsafe CaptureDevice Open (uint frequency, AudioFormat format)
 		{
 			ThrowIfDisposed();
+			
+			OpenAL.Log.DebugFormat ("Opening capture device {0} at {1} {2}", Name, frequency, format);
 
 			this.Format = format;
 			this.Frequency = frequency;
@@ -128,6 +130,10 @@ namespace Gablarski.Audio.OpenAL
 		/// </summary>
 		public void StartCapture ()
 		{
+			ThrowIfDisposed();
+			
+			OpenAL.Log.DebugFormat ("Starting capture for {0}", Name);
+			
 			this.capturing = true;
 			alcCaptureStart (this.Handle);
 			OpenAL.ErrorCheck (this);
@@ -139,7 +145,9 @@ namespace Gablarski.Audio.OpenAL
 		public void StopCapture ()
 		{
 			ThrowIfDisposed();
-
+			
+			OpenAL.Log.DebugFormat ("Stopping capture for {0}", Name);
+			
 			this.capturing = false;
 			alcCaptureStop (this.Handle);
 			OpenAL.ErrorCheck (this);
@@ -183,8 +191,10 @@ namespace Gablarski.Audio.OpenAL
 			alcCaptureCloseDevice (this.Handle);
 			this.Handle = IntPtr.Zero;
 			this.pcm = null;
-
+			
 			this.disposed = true;
+			
+			OpenAL.Log.DebugFormat ("Deleted capture device {0}", Name);		
 		}
 
 		#region Imports

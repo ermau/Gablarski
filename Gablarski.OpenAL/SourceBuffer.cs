@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -97,6 +97,8 @@ namespace Gablarski.Audio.OpenAL
 
 		public static SourceBuffer[] Generate (int count)
 		{
+			OpenAL.Log.DebugFormat ("Generating {0} source buffers", count);
+			
 			lock (lck)
 			{
 				if (Buffers == null)
@@ -110,6 +112,7 @@ namespace Gablarski.Audio.OpenAL
 
 				for (int i = 0; i < count; ++i)
 				{
+					OpenAL.Log.DebugFormat ("Generated source buffer {0}", bufferIDs[i]);
 					buffers[i] = new SourceBuffer (bufferIDs[i]);
 					Buffers.Add (buffers[i].bufferID, buffers[i]);
 				}

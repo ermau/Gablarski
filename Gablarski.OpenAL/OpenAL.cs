@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -53,9 +53,14 @@ namespace Gablarski.Audio.OpenAL
 			OpenAL.ErrorChecking = true;
 			#endif
 
+			Log = log4net.LogManager.GetLogger ("OpenAL");
 			IsCaptureSupported = GetIsExtensionPresent ("ALC_EXT_CAPTURE");
 		}
-
+		
+		public static log4net.ILog Log
+		{
+			get; private set;
+		}
 
 		/// <summary>
 		/// Sets the distance model for OpenAL.
@@ -119,59 +124,51 @@ namespace Gablarski.Audio.OpenAL
 			get { return Marshal.PtrToStringAnsi (alGetString (AL_VERSION)); }
 		}
 
-		public static Device GetDefaultPlaybackDevice()
+		public static PlaybackDevice GetDefaultPlaybackDevice()
 		{
-			Device defaultDevice;
+			PlaybackDevice defaultDevice;
 			GetPlaybackDevices (out defaultDevice);
 			return defaultDevice;
 		}
 
-		public static IEnumerable<Device> GetPlaybackDevices()
+		public static IEnumerable<PlaybackDevice> GetPlaybackDevices()
 		{
-			Device defaultDevice;
+			PlaybackDevice defaultDevice;
 			return GetPlaybackDevices (out defaultDevice);
 		}
 
-		public static IEnumerable<Device> GetPlaybackDevices (out Device defaultDevice)
+		public static IEnumerable<PlaybackDevice> GetPlaybackDevices (out PlaybackDevice defaultDevice)
 		{
 			defaultDevice = null;
+			
+			OpenAL.Log.Debug ("Getting playback devices");
 
+			string defaultName = null;
+			string[] strings = new string[0];
 			if (GetIsExtensionPresent ("ALC_ENUMERATE_ALL_EXT"))
 			{
-				string defaultName = Marshal.PtrToStringAnsi (alcGetString (IntPtr.Zero, ALC_DEFAULT_ALL_DEVICES_SPECIFIER));
-
-				var strings = ReadStringsFromMemory (alcGetString (IntPtr.Zero, ALC_ALL_DEVICES_SPECIFIER));
-				PlaybackDevice[] devices = new PlaybackDevice[strings.Length];
-				for (int i = 0; i < strings.Length; ++i)
-				{
-					string s = strings[i];
-					devices[i] = new PlaybackDevice (s);
-
-					if (s == defaultName)
-						defaultDevice = devices[i];
-				}
-
-				return devices;
+				defaultName = Marshal.PtrToStringAnsi (alcGetString (IntPtr.Zero, ALC_DEFAULT_ALL_DEVICES_SPECIFIER));
+				strings = ReadStringsFromMemory (alcGetString (IntPtr.Zero, ALC_ALL_DEVICES_SPECIFIER));
 			}
 			else if (GetIsExtensionPresent ("ALC_ENUMERATION_EXT"))
 			{
-				string defaultName = Marshal.PtrToStringAnsi (alcGetString (IntPtr.Zero, ALC_DEFAULT_DEVICE_SPECIFIER));
+				defaultName = Marshal.PtrToStringAnsi (alcGetString (IntPtr.Zero, ALC_DEFAULT_DEVICE_SPECIFIER));
+				strings = ReadStringsFromMemory (alcGetString (IntPtr.Zero, ALC_DEVICE_SPECIFIER));
+			}
+			
+			PlaybackDevice[] devices = new PlaybackDevice[strings.Length];
+			for (int i = 0; i < strings.Length; ++i)
+			{
+				string s = strings[i];
+				devices[i] = new PlaybackDevice (s);
 
-				var strings = ReadStringsFromMemory (alcGetString (IntPtr.Zero, ALC_DEVICE_SPECIFIER));
-				PlaybackDevice[] devices = new PlaybackDevice[strings.Length];
-				for (int i = 0; i < strings.Length; ++i)
-				{
-					string s = strings[i];
-					devices[i] = new PlaybackDevice (s);
-
-					if (s == defaultName)
-						defaultDevice = devices[i];
-				}
-
-				return devices;
+				if (s == defaultName)
+					defaultDevice = devices[i];
+				
+				OpenAL.Log.DebugFormat ("Found playback device {0}{1}", s, (s == defaultName) ? " (Default)" : String.Empty);
 			}
 
-			return Enumerable.Empty<Device>();
+			return devices;
 		}
 
 		public static CaptureDevice GetDefaultCaptureDevice()
@@ -194,6 +191,8 @@ namespace Gablarski.Audio.OpenAL
 		{
 			if (!IsCaptureSupported)
 				throw new NotSupportedException();
+			
+			OpenAL.Log.Debug ("Getting capture devices");
 
 			defaultDevice = null;
 
@@ -208,6 +207,8 @@ namespace Gablarski.Audio.OpenAL
 
 				if (s == defaultName)
 					defaultDevice = devices[i];
+				
+				OpenAL.Log.DebugFormat ("Found capture device {0}{1}", s, (s == defaultName) ? " (Default)" : String.Empty);
 			}
 
 			return devices;
@@ -430,6 +431,11 @@ namespace Gablarski.Audio.OpenAL
 		ALC_INVALID_ENUM	= 0xA003,
 		ALC_INVALID_VALUE	= 0xA004,
 		ALC_OUT_OF_MEMORY	= 0xA005
+	}
+	
+	internal enum ALEnum
+	{
+		AL_GAIN
 	}
 
 	internal enum ALCEnum

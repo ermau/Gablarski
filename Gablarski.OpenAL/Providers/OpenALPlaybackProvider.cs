@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -52,6 +52,12 @@ namespace Gablarski.Audio.OpenAL.Providers
 		#region IPlaybackProvider Members
 		public event EventHandler<SourceFinishedEventArgs> SourceFinished;
 
+		public float Gain
+		{
+			get { return Listener.Gain; }
+			set { Listener.Gain = value; }
+		}
+		
 		public IAudioDevice Device
 		{
 			get { return this.device; }

@@ -55,6 +55,11 @@ namespace Gablarski.Audio
 		IAudioDevice Device { get; set; }
 
 		/// <summary>
+		/// Overall gain.
+		/// </summary>
+		float Gain { get; set; }
+		
+		/// <summary>
 		/// Queues PCM <paramref name="data"/> to be played back, owned by <paramref name="source"/>.
 		/// </summary>
 		/// <param name="source">The <see cref="AudioSource"/> the audio came from.</param>

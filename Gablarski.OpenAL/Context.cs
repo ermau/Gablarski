@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -59,6 +59,8 @@ namespace Gablarski.Audio.OpenAL
 
 		public void Activate ()
 		{
+			OpenAL.Log.DebugFormat ("Activating context for device {0}", this.Device.Name);
+			
 			alcMakeContextCurrent (this.Handle);
 			Audio.OpenAL.OpenAL.ErrorCheck (this.Device);
 			
@@ -85,7 +87,14 @@ namespace Gablarski.Audio.OpenAL
 
 			if (this.Handle != IntPtr.Zero)
 				alcDestroyContext (this.Handle);
-
+			
+			lock (lck)
+			{
+				contexts.Remove (this.Handle);
+			}
+			
+			OpenAL.Log.DebugFormat ("Destroying context for {0}", Device.Name);
+			
 			this.disposed = true;
 		}
 
@@ -122,6 +131,8 @@ namespace Gablarski.Audio.OpenAL
 
 		internal static Context Create (PlaybackDevice device)
 		{
+			OpenAL.Log.DebugFormat ("Creating context for {0}", device.Name);
+			
 			Context c = null;
 			lock (lck)
 			{

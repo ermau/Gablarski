@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -58,6 +58,8 @@ namespace Gablarski.Audio.OpenAL
 		{
 			ThrowIfDisposed();
 
+			OpenAL.Log.DebugFormat ("Opening playback device {0}", Name);
+			
 			this.Handle = alcOpenDevice (this.Name);
 			OpenAL.ErrorCheck (this);
 
