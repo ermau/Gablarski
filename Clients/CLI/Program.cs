@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
@@ -419,8 +419,8 @@ namespace Gablarski.Clients.CLI
 		static void DisplayDevices()
 		{
 			Console.WriteLine ("Playback devices:");
-			Device defaultDevice;
-			foreach (var device in Audio.OpenAL.OpenAL.GetPlaybackDevices(out defaultDevice))
+			PlaybackDevice defaultDevice;
+			foreach (var device in Audio.OpenAL.OpenAL.GetPlaybackDevices (out defaultDevice))
 			{
 				if (device == defaultDevice)
 					Console.Write ("[Default] ");
