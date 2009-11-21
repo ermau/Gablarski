@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <project name="Gablarski" default="clients" basedir=".">
 	<property name="nant.settings.currentframework" value="net-3.5" />
 
@@ -43,6 +43,7 @@
 		<zip zipfile="Gablarski-Win32-Debug.zip">
 			<fileset basedir="Clients\WinForms\bin\x86\Debug">
 				<include name="GablarskiClient.exe" />
+				<include name="GablarskiClient.exe.config" />
 				<include name="Headphones.ico" />
 				<include name="*.dll" />
 				<include name="*.pdb" />
