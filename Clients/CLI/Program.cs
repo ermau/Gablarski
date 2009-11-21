@@ -237,7 +237,7 @@ namespace Gablarski.Clients.CLI
 							output = output.Trim();
 							if (output != String.Empty)
 							{
-								var device = Audio.OpenAL.OpenAL.GetPlaybackDevices().FirstOrDefault (d => d.Name == output);
+								var device = OpenAL.OpenAL.GetPlaybackDevices().FirstOrDefault (d => d.Name == output);
 								if (device == null)
 									Console.WriteLine (output + " not found.");
 								else
@@ -252,7 +252,7 @@ namespace Gablarski.Clients.CLI
 							input = input.Trim();
 							if (input != String.Empty)
 							{
-								var device = Audio.OpenAL.OpenAL.GetCaptureDevices().FirstOrDefault (d => d.Name == input);
+								var device = OpenAL.OpenAL.GetCaptureDevices().FirstOrDefault (d => d.Name == input);
 								if (device == null)
 									Console.WriteLine (input + " not found.");
 								else
@@ -420,7 +420,7 @@ namespace Gablarski.Clients.CLI
 		{
 			Console.WriteLine ("Playback devices:");
 			PlaybackDevice defaultDevice;
-			foreach (var device in Audio.OpenAL.OpenAL.GetPlaybackDevices (out defaultDevice))
+			foreach (var device in OpenAL.OpenAL.GetPlaybackDevices (out defaultDevice))
 			{
 				if (device == defaultDevice)
 					Console.Write ("[Default] ");
@@ -431,7 +431,7 @@ namespace Gablarski.Clients.CLI
 			Console.WriteLine();
 			Console.WriteLine ("Capture devices:");
 			CaptureDevice defaultCaptureDevice;
-			foreach (var device in Audio.OpenAL.OpenAL.GetCaptureDevices (out defaultCaptureDevice))
+			foreach (var device in OpenAL.OpenAL.GetCaptureDevices (out defaultCaptureDevice))
 			{
 				if (device == defaultCaptureDevice)
 					Console.Write ("[Default] ");
