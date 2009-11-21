@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -7,13 +8,21 @@ using System.Text;
 using FluentNHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
 using NHibernate;
-using NHibernate.Cfg;
 using NHibernate.Tool.hbm2ddl;
+using Configuration = NHibernate.Cfg.Configuration;
 
 namespace Gablarski.Clients.Windows
 {
 	public static class Persistance
 	{
+		static Persistance()
+		{
+			if (Boolean.Parse (ConfigurationManager.AppSettings["useLocalDatabase"]))
+				DbFile = new FileInfo ("gablarski.db");
+			else
+				DbFile = new FileInfo (Path.Combine (System.Environment.GetFolderPath (System.Environment.SpecialFolder.ApplicationData), "Gablarski\\gablarski.db"));
+		}
+
 		public static ISession CurrentSession
 		{
 			get
@@ -30,7 +39,7 @@ namespace Gablarski.Clients.Windows
 
 		private static ISession currentSession;
 
-		private static readonly FileInfo DbFile = new FileInfo (Path.Combine (System.Environment.GetFolderPath (System.Environment.SpecialFolder.ApplicationData), "Gablarski\\gablarski.db"));
+		private static readonly FileInfo DbFile;
 		private static ISessionFactory CreateSessionFactory()
 		{
 			return Fluently.Configure()

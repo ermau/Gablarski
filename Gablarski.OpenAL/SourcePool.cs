@@ -39,8 +39,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using Gablarski.OpenAL;
 
-namespace Gablarski.Audio.OpenAL
+namespace Gablarski.OpenAL
 {
 	public class SourcePool<T>
 		where T : class

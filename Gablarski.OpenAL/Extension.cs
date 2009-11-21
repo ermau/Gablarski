@@ -39,7 +39,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Gablarski.Audio.OpenAL
+namespace Gablarski.OpenAL
 {
 	public class Extension
 	{

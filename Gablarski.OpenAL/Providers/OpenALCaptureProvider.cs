@@ -38,8 +38,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Gablarski.Audio;
 
-namespace Gablarski.Audio.OpenAL.Providers
+namespace Gablarski.OpenAL.Providers
 {
 	public class OpenALCaptureProvider
 		: ICaptureProvider

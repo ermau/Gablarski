@@ -25,6 +25,9 @@ namespace Gablarski.Clients.Windows
 				                 "Unexpected error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			};
 
+			log4net.Config.XmlConfigurator.Configure ();
+			log4net.LogManager.GetLogger ("Gablarski WinForms").Info ("Program Start");
+
 			if (Settings.FirstRun)
 			{
 				DialogResult result = MessageBox.Show ("Register gablarski:// urls with this client?", "Register gablarski://", MessageBoxButtons.OKCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1);

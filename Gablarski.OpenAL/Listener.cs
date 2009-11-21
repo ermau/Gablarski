@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Gablarski.Audio.OpenAL
+namespace Gablarski.OpenAL
 {
 	public static class Listener
 	{

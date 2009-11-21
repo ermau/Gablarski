@@ -33,13 +33,15 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Gablarski.Audio;
+using Gablarski.OpenAL;
+using AudioFormat = Gablarski.OpenAL.AudioFormat;
 
-namespace Gablarski.Audio.OpenAL.Providers
+namespace Gablarski.OpenAL.Providers
 {
 	public class OpenALPlaybackProvider
 		: IPlaybackProvider
@@ -110,7 +112,7 @@ namespace Gablarski.Audio.OpenAL.Providers
 
 		public IEnumerable<IAudioDevice> GetDevices ()
 		{
-			return Audio.OpenAL.OpenAL.GetPlaybackDevices().Cast<IAudioDevice>();
+			return Gablarski.OpenAL.OpenAL.GetPlaybackDevices().Cast<IAudioDevice>();
 		}
 
 		public void FreeSource (AudioSource source)
@@ -126,7 +128,7 @@ namespace Gablarski.Audio.OpenAL.Providers
 
 		public IAudioDevice DefaultDevice
 		{
-			get { return Audio.OpenAL.OpenAL.GetDefaultPlaybackDevice(); }
+			get { return Gablarski.OpenAL.OpenAL.GetDefaultPlaybackDevice(); }
 		}
 
 		#endregion

@@ -41,7 +41,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 using System.Security;
 
-namespace Gablarski.Audio.OpenAL
+namespace Gablarski.OpenAL
 {
 	[SuppressUnmanagedCodeSecurity]
 	public class SourceBuffer
@@ -108,7 +108,7 @@ namespace Gablarski.Audio.OpenAL
 
 				uint[] bufferIDs = new uint[count];
 				alGenBuffers (count, bufferIDs);
-				Audio.OpenAL.OpenAL.ErrorCheck ();
+				OpenAL.ErrorCheck ();
 
 				for (int i = 0; i < count; ++i)
 				{

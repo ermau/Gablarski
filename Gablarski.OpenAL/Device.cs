@@ -40,8 +40,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
+using Gablarski.Audio;
 
-namespace Gablarski.Audio.OpenAL
+namespace Gablarski.OpenAL
 {
 	public abstract class Device
 		: IAudioDevice
@@ -78,7 +79,7 @@ namespace Gablarski.Audio.OpenAL
 				ThrowIfDisposed();
 
 				int refresh;
-				Audio.OpenAL.OpenAL.alcGetIntegerv (this.Handle, ALCEnum.ALC_REFRESH, 1, out refresh);
+				OpenAL.alcGetIntegerv (this.Handle, ALCEnum.ALC_REFRESH, 1, out refresh);
 				return refresh;
 			}
 		}

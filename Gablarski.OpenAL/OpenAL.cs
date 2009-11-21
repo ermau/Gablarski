@@ -41,8 +41,9 @@ using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 using System.Security;
+using Gablarski.OpenAL;
 
-namespace Gablarski.Audio.OpenAL
+namespace Gablarski.OpenAL
 {
 	[SuppressUnmanagedCodeSecurity]
 	public static class OpenAL

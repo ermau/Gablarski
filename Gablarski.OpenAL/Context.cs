@@ -33,14 +33,14 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
+using Gablarski.OpenAL;
 
-namespace Gablarski.Audio.OpenAL
+namespace Gablarski.OpenAL
 {
 	public class Context
 		: IDisposable
@@ -59,10 +59,10 @@ namespace Gablarski.Audio.OpenAL
 
 		public void Activate ()
 		{
-			OpenAL.Log.DebugFormat ("Activating context for device {0}", this.Device.Name);
+			Gablarski.OpenAL.OpenAL.Log.DebugFormat ("Activating context for device {0}", this.Device.Name);
 			
 			alcMakeContextCurrent (this.Handle);
-			Audio.OpenAL.OpenAL.ErrorCheck (this.Device);
+			Gablarski.OpenAL.OpenAL.ErrorCheck (this.Device);
 			
 			lock (lck)
 			{
@@ -93,7 +93,7 @@ namespace Gablarski.Audio.OpenAL
 				contexts.Remove (this.Handle);
 			}
 			
-			OpenAL.Log.DebugFormat ("Destroying context for {0}", Device.Name);
+			Gablarski.OpenAL.OpenAL.Log.DebugFormat ("Destroying context for {0}", Device.Name);
 			
 			this.disposed = true;
 		}
@@ -131,7 +131,7 @@ namespace Gablarski.Audio.OpenAL
 
 		internal static Context Create (PlaybackDevice device)
 		{
-			OpenAL.Log.DebugFormat ("Creating context for {0}", device.Name);
+			Gablarski.OpenAL.OpenAL.Log.DebugFormat ("Creating context for {0}", device.Name);
 			
 			Context c = null;
 			lock (lck)
@@ -140,11 +140,11 @@ namespace Gablarski.Audio.OpenAL
 					contexts = new Dictionary<IntPtr, Context> ();
 
 				c = new Context (alcCreateContext (device.Handle, IntPtr.Zero), device);
-				Audio.OpenAL.OpenAL.ErrorCheck(device);
+				Gablarski.OpenAL.OpenAL.ErrorCheck(device);
 				contexts.Add (c.Handle, c);
 			}
 
-			Audio.OpenAL.OpenAL.ErrorCheck (device);
+			Gablarski.OpenAL.OpenAL.ErrorCheck (device);
 			return c;
 		}
 

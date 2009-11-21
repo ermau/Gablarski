@@ -33,7 +33,6 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,8 +40,9 @@ using System.Text;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Security;
+using Gablarski.OpenAL;
 
-namespace Gablarski.Audio.OpenAL
+namespace Gablarski.OpenAL
 {
 	[SuppressUnmanagedCodeSecurity]
 	public class CaptureDevice
@@ -103,7 +103,7 @@ namespace Gablarski.Audio.OpenAL
 		{
 			ThrowIfDisposed();
 			
-			OpenAL.Log.DebugFormat ("Opening capture device {0} at {1} {2}", Name, frequency, format);
+			Gablarski.OpenAL.OpenAL.Log.DebugFormat ("Opening capture device {0} at {1} {2}", Name, frequency, format);
 
 			this.Format = format;
 			this.Frequency = frequency;
@@ -111,7 +111,7 @@ namespace Gablarski.Audio.OpenAL
 			uint bufferSize = format.GetBytes (format.GetSamplesPerSecond (frequency)) * 2;
 
 			this.Handle = alcCaptureOpenDevice (this.Name, frequency, format, (int)bufferSize);
-			OpenAL.ErrorCheck (this);
+			Gablarski.OpenAL.OpenAL.ErrorCheck (this);
 
 			pcm = new byte[bufferSize];
 			fixed (byte* bppcm = pcm)
@@ -132,11 +132,11 @@ namespace Gablarski.Audio.OpenAL
 		{
 			ThrowIfDisposed();
 			
-			OpenAL.Log.DebugFormat ("Starting capture for {0}", Name);
+			Gablarski.OpenAL.OpenAL.Log.DebugFormat ("Starting capture for {0}", Name);
 			
 			this.capturing = true;
 			alcCaptureStart (this.Handle);
-			OpenAL.ErrorCheck (this);
+			Gablarski.OpenAL.OpenAL.ErrorCheck (this);
 		}
 
 		/// <summary>
@@ -146,11 +146,11 @@ namespace Gablarski.Audio.OpenAL
 		{
 			ThrowIfDisposed();
 			
-			OpenAL.Log.DebugFormat ("Stopping capture for {0}", Name);
+			Gablarski.OpenAL.OpenAL.Log.DebugFormat ("Stopping capture for {0}", Name);
 			
 			this.capturing = false;
 			alcCaptureStop (this.Handle);
-			OpenAL.ErrorCheck (this);
+			Gablarski.OpenAL.OpenAL.ErrorCheck (this);
 		}
 
 		/// <summary>
@@ -194,7 +194,7 @@ namespace Gablarski.Audio.OpenAL
 			
 			this.disposed = true;
 			
-			OpenAL.Log.DebugFormat ("Deleted capture device {0}", Name);		
+			Gablarski.OpenAL.OpenAL.Log.DebugFormat ("Deleted capture device {0}", Name);		
 		}
 
 		#region Imports
@@ -241,7 +241,7 @@ namespace Gablarski.Audio.OpenAL
 			}
 
 			alcCaptureSamples (this.Handle, pcmPtr, numSamples);
-			OpenAL.ErrorCheck (this);
+			Gablarski.OpenAL.OpenAL.ErrorCheck (this);
 			Array.Copy (pcm, samples, samples.Length);
 
 			return samples;
@@ -252,8 +252,8 @@ namespace Gablarski.Audio.OpenAL
 			ThrowIfDisposed();
 
 			int samples;
-			OpenAL.alcGetIntegerv (this.Handle, ALCEnum.ALC_CAPTURE_SAMPLES, 4, out samples);
-			OpenAL.ErrorCheck (this);
+			Gablarski.OpenAL.OpenAL.alcGetIntegerv (this.Handle, ALCEnum.ALC_CAPTURE_SAMPLES, 4, out samples);
+			Gablarski.OpenAL.OpenAL.ErrorCheck (this);
 			return samples;
 		}
 	}

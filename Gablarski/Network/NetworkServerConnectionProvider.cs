@@ -247,6 +247,9 @@ namespace Gablarski.Network
 		{
 			try
 			{
+				if (tcpListener == null)
+					return;
+
 				TcpClient client = tcpListener.EndAcceptTcpClient (result);
 				client.NoDelay = true;
 

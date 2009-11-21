@@ -33,15 +33,15 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 using System.Security;
+using Gablarski.OpenAL;
 
-namespace Gablarski.Audio.OpenAL
+namespace Gablarski.OpenAL
 {
 	[SuppressUnmanagedCodeSecurity]
 	public class Source
@@ -58,7 +58,7 @@ namespace Gablarski.Audio.OpenAL
 			{
 				int state;
 				alGetSourcei (this.sourceID, IntSourceProperty.AL_SOURCE_STATE, out state);
-				Audio.OpenAL.OpenAL.ErrorCheck ();
+				Gablarski.OpenAL.OpenAL.ErrorCheck ();
 
 				return (SourceState)state;
 			}
@@ -85,7 +85,7 @@ namespace Gablarski.Audio.OpenAL
 			{
 				int buffers;
 				alGetSourcei (this.sourceID, IntSourceProperty.AL_BUFFERS_PROCESSED, out buffers);
-				Audio.OpenAL.OpenAL.ErrorCheck();
+				Gablarski.OpenAL.OpenAL.ErrorCheck();
 
 				return buffers;
 			}
@@ -137,31 +137,31 @@ namespace Gablarski.Audio.OpenAL
 
 		public void Queue (IEnumerable<SourceBuffer> buffers)
 		{
-			OpenAL.Log.DebugFormat ("Enqueuing buffers {0} to source {1}", buffers, this.sourceID);
+			Gablarski.OpenAL.OpenAL.Log.DebugFormat ("Enqueuing buffers {0} to source {1}", buffers, this.sourceID);
 			
 			uint[] bufferIDs = buffers.Select (b => b.bufferID).ToArray ();
 			alSourceQueueBuffers (this.sourceID, bufferIDs.Length, bufferIDs);
-			OpenAL.ErrorCheck ();
+			Gablarski.OpenAL.OpenAL.ErrorCheck ();
 		}
 
 		public SourceBuffer[] Dequeue ()
 		{
-			OpenAL.Log.DebugFormat ("Dequeing all processed buffers for source {0}", this.sourceID);
+			Gablarski.OpenAL.OpenAL.Log.DebugFormat ("Dequeing all processed buffers for source {0}", this.sourceID);
 			return Dequeue (this.ProcessedBuffers);
 		}
 
 		public SourceBuffer[] Dequeue (int buffers)
 		{
-			OpenAL.Log.DebugFormat ("Dequeing {0} buffers for source {1}", buffers, this.sourceID);
+			Gablarski.OpenAL.OpenAL.Log.DebugFormat ("Dequeing {0} buffers for source {1}", buffers, this.sourceID);
 			
 			uint[] bufferIDs = new uint[buffers];
 			alSourceUnqueueBuffers (this.sourceID, buffers, bufferIDs);
-			OpenAL.ErrorCheck ();
+			Gablarski.OpenAL.OpenAL.ErrorCheck ();
 
 			SourceBuffer[] dequeued = new SourceBuffer[bufferIDs.Length];
 			for (int i = 0; i < bufferIDs.Length; ++i)
 			{
-				OpenAL.Log.DebugFormat ("Dequeued source buffer {0} for source {1}", bufferIDs[i], this.sourceID);
+				Gablarski.OpenAL.OpenAL.Log.DebugFormat ("Dequeued source buffer {0} for source {1}", bufferIDs[i], this.sourceID);
 				dequeued[i] = SourceBuffer.GetBuffer(bufferIDs[i]);
 			}
 
@@ -180,16 +180,16 @@ namespace Gablarski.Audio.OpenAL
 
 		public void Pause ()
 		{
-			OpenAL.Log.DebugFormat ("Pausing source {0}", this.sourceID);
+			Gablarski.OpenAL.OpenAL.Log.DebugFormat ("Pausing source {0}", this.sourceID);
 			alSourcePause (this.sourceID);
-			OpenAL.ErrorCheck ();
+			Gablarski.OpenAL.OpenAL.ErrorCheck ();
 		}
 
 		public void Stop ()
 		{
-			OpenAL.Log.DebugFormat ("Stopping source {0}", this.sourceID);
+			Gablarski.OpenAL.OpenAL.Log.DebugFormat ("Stopping source {0}", this.sourceID);
 			alSourceStop (this.sourceID);
-			OpenAL.ErrorCheck ();
+			Gablarski.OpenAL.OpenAL.ErrorCheck ();
 		}
 
 		private readonly uint sourceID;
@@ -199,9 +199,9 @@ namespace Gablarski.Audio.OpenAL
 			if (check && this.IsPlaying)
 				return;
 
-			OpenAL.Log.DebugFormat ("Playing source {0}", this.sourceID);
+			Gablarski.OpenAL.OpenAL.Log.DebugFormat ("Playing source {0}", this.sourceID);
 			alSourcePlay (this.sourceID);
-			OpenAL.ErrorCheck ();
+			Gablarski.OpenAL.OpenAL.ErrorCheck ();
 		}
 
 		#region IDisposable Members
@@ -221,7 +221,7 @@ namespace Gablarski.Audio.OpenAL
 
 			uint[] id = new[] { this.sourceID };
 			alDeleteSources (1, id);
-			OpenAL.Log.DebugFormat ("Deleting source {0}", id);
+			Gablarski.OpenAL.OpenAL.Log.DebugFormat ("Deleting source {0}", id);
 			
 			this.disposed = true;
 		}
@@ -240,10 +240,10 @@ namespace Gablarski.Audio.OpenAL
 
 		public static Source[] Generate (int count)
 		{
-			OpenAL.Log.DebugFormat ("Generating {0} sources", count);
+			Gablarski.OpenAL.OpenAL.Log.DebugFormat ("Generating {0} sources", count);
 			if (count > MaxSources)
 			{
-				OpenAL.Log.ErrorFormat ("Requested {0} sources which is more than maximum {1}", count, MaxSources);
+				Gablarski.OpenAL.OpenAL.Log.ErrorFormat ("Requested {0} sources which is more than maximum {1}", count, MaxSources);
 				throw new InvalidOperationException();
 			}
 
@@ -251,11 +251,11 @@ namespace Gablarski.Audio.OpenAL
 
 			uint[] sourceIDs = new uint[count];
 			alGenSources (count, sourceIDs);
-			OpenAL.ErrorCheck ();
+			Gablarski.OpenAL.OpenAL.ErrorCheck ();
 
 			for (int i = 0; i < count; ++i)
 			{
-				OpenAL.Log.DebugFormat ("Generated source {0}", sourceIDs[i]);
+				Gablarski.OpenAL.OpenAL.Log.DebugFormat ("Generated source {0}", sourceIDs[i]);
 				sources[i] = new Source (sourceIDs[i]);
 			}
 
@@ -297,16 +297,16 @@ namespace Gablarski.Audio.OpenAL
 		{
 			float value;
 			alGetSourcef (sourceID, property, out value);
-			Audio.OpenAL.OpenAL.ErrorCheck ();
+			Gablarski.OpenAL.OpenAL.ErrorCheck ();
 
 			return value;
 		}
 
 		internal static void SetPropertyF (uint sourceID, FloatSourceProperty property, float value)
 		{
-			OpenAL.Log.DebugFormat ("Setting source {0} property {1} to {2}", sourceID, property, value);
+			Gablarski.OpenAL.OpenAL.Log.DebugFormat ("Setting source {0} property {1} to {2}", sourceID, property, value);
 			alSourcef (sourceID, property, value);
-			Audio.OpenAL.OpenAL.ErrorCheck ();
+			Gablarski.OpenAL.OpenAL.ErrorCheck ();
 		}
 
 		internal static int MaxSources

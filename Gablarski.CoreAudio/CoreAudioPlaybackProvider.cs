@@ -60,6 +60,12 @@ namespace Gablarski.CoreAudio
 			}
 		}
 
+		public float Gain
+		{
+			get { throw new NotImplementedException(); }
+			set { throw new NotImplementedException(); }
+		}
+
 		public void QueuePlayback (AudioSource source, byte[] data)
 		{
 			throw new NotImplementedException ();

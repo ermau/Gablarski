@@ -201,6 +201,9 @@ namespace Gablarski.Clients.Windows
 				//TaskDialog.Show (ex.ToDisplayString(), "An error as occured initializing capture.", "Capture Initialization", TaskDialogStandardIcon.Error);
 				MessageBox.Show (this, "An error occured initializing capture. " + Environment.NewLine + ex.ToDisplayString(),
 				                 "Capture Initialization", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+				btnMuteMic.Checked = true;
+				btnMuteMic.Enabled = false;
 			}
 		}
 
