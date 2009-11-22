@@ -59,7 +59,7 @@ namespace Gablarski.OpenAL
 			{
 				int state;
 				alGetSourcei (this.sourceID, IntSourceProperty.AL_SOURCE_STATE, out state);
-				Gablarski.OpenAL.OpenAL.ErrorCheck ();
+				OpenAL.ErrorCheck ();
 
 				return (SourceState)state;
 			}
@@ -86,7 +86,7 @@ namespace Gablarski.OpenAL
 			{
 				int buffers;
 				alGetSourcei (this.sourceID, IntSourceProperty.AL_BUFFERS_PROCESSED, out buffers);
-				Gablarski.OpenAL.OpenAL.ErrorCheck();
+				OpenAL.ErrorCheck();
 
 				return buffers;
 			}
@@ -127,7 +127,7 @@ namespace Gablarski.OpenAL
 
 		public void Queue (SourceBuffer buffer)
 		{
-			Queue (new [] { buffer });
+			Queue (new [] { buffer.bufferID });
 		}
 
 		public void QueueAndPlay (SourceBuffer buffer)
@@ -138,31 +138,28 @@ namespace Gablarski.OpenAL
 
 		public void Queue (IEnumerable<SourceBuffer> buffers)
 		{
-			Gablarski.OpenAL.OpenAL.Log.DebugFormat ("Enqueuing buffers {0} to source {1}", buffers, this.sourceID);
-			
 			uint[] bufferIDs = buffers.Select (b => b.bufferID).ToArray ();
-			alSourceQueueBuffers (this.sourceID, bufferIDs.Length, bufferIDs);
-			Gablarski.OpenAL.OpenAL.ErrorCheck ();
+			Queue (bufferIDs);
 		}
 
 		public SourceBuffer[] Dequeue ()
 		{
-			Gablarski.OpenAL.OpenAL.Log.DebugFormat ("Dequeing all processed buffers for source {0}", this.sourceID);
+			OpenAL.Log.DebugFormat ("Dequeing all processed buffers for source {0}", this.sourceID);
 			return Dequeue (this.ProcessedBuffers);
 		}
 
 		public SourceBuffer[] Dequeue (int buffers)
 		{
-			Gablarski.OpenAL.OpenAL.Log.DebugFormat ("Dequeing {0} buffers for source {1}", buffers, this.sourceID);
+			OpenAL.Log.DebugFormat ("Dequeing {0} buffers for source {1}", buffers, this.sourceID);
 			
 			uint[] bufferIDs = new uint[buffers];
 			alSourceUnqueueBuffers (this.sourceID, buffers, bufferIDs);
-			Gablarski.OpenAL.OpenAL.ErrorCheck ();
+			OpenAL.ErrorCheck ();
 
 			SourceBuffer[] dequeued = new SourceBuffer[bufferIDs.Length];
 			for (int i = 0; i < bufferIDs.Length; ++i)
 			{
-				Gablarski.OpenAL.OpenAL.Log.DebugFormat ("Dequeued source buffer {0} for source {1}", bufferIDs[i], this.sourceID);
+				OpenAL.Log.DebugFormat ("Dequeued source buffer {0} for source {1}", bufferIDs[i], this.sourceID);
 				dequeued[i] = SourceBuffer.GetBuffer(bufferIDs[i]);
 			}
 
@@ -181,28 +178,36 @@ namespace Gablarski.OpenAL
 
 		public void Pause ()
 		{
-			Gablarski.OpenAL.OpenAL.Log.DebugFormat ("Pausing source {0}", this.sourceID);
+			OpenAL.Log.DebugFormat ("Pausing source {0}", this.sourceID);
 			alSourcePause (this.sourceID);
-			Gablarski.OpenAL.OpenAL.ErrorCheck ();
+			OpenAL.ErrorCheck ();
 		}
 
 		public void Stop ()
 		{
-			Gablarski.OpenAL.OpenAL.Log.DebugFormat ("Stopping source {0}", this.sourceID);
+			OpenAL.Log.DebugFormat ("Stopping source {0}", this.sourceID);
 			alSourceStop (this.sourceID);
-			Gablarski.OpenAL.OpenAL.ErrorCheck ();
+			OpenAL.ErrorCheck ();
 		}
 
 		private readonly uint sourceID;
+
+		protected void Queue (uint[] bufferIDs)
+		{
+			OpenAL.Log.DebugFormat ("Enqueuing buffers {0} to source {1}", bufferIDs, this.sourceID);
+
+			alSourceQueueBuffers (this.sourceID, bufferIDs.Length, bufferIDs);
+			OpenAL.ErrorCheck ();
+		}
 
 		protected void PlayCore (bool check)
 		{
 			if (check && this.IsPlaying)
 				return;
 
-			Gablarski.OpenAL.OpenAL.Log.DebugFormat ("Playing source {0}", this.sourceID);
+			OpenAL.Log.DebugFormat ("Playing source {0}", this.sourceID);
 			alSourcePlay (this.sourceID);
-			Gablarski.OpenAL.OpenAL.ErrorCheck ();
+			OpenAL.ErrorCheck ();
 		}
 
 		#region IDisposable Members
@@ -222,7 +227,7 @@ namespace Gablarski.OpenAL
 
 			uint[] id = new[] { this.sourceID };
 			alDeleteSources (1, id);
-			Gablarski.OpenAL.OpenAL.Log.DebugFormat ("Destroying source {0}", id);
+			OpenAL.Log.DebugFormat ("Destroying source {0}", id);
 			
 			this.disposed = true;
 		}
@@ -241,10 +246,10 @@ namespace Gablarski.OpenAL
 
 		public static Source[] Generate (int count)
 		{
-			Gablarski.OpenAL.OpenAL.Log.DebugFormat ("Generating {0} sources", count);
+			OpenAL.Log.DebugFormat ("Generating {0} sources", count);
 			if (count > MaxSources)
 			{
-				Gablarski.OpenAL.OpenAL.Log.ErrorFormat ("Requested {0} sources which is more than maximum {1}", count, MaxSources);
+				OpenAL.Log.ErrorFormat ("Requested {0} sources which is more than maximum {1}", count, MaxSources);
 				throw new InvalidOperationException();
 			}
 
@@ -252,11 +257,11 @@ namespace Gablarski.OpenAL
 
 			uint[] sourceIDs = new uint[count];
 			alGenSources (count, sourceIDs);
-			Gablarski.OpenAL.OpenAL.ErrorCheck ();
+			OpenAL.ErrorCheck ();
 
 			for (int i = 0; i < count; ++i)
 			{
-				Gablarski.OpenAL.OpenAL.Log.DebugFormat ("Generated source {0}", sourceIDs[i]);
+				OpenAL.Log.DebugFormat ("Generated source {0}", sourceIDs[i]);
 				sources[i] = new Source (sourceIDs[i]);
 			}
 
@@ -298,16 +303,16 @@ namespace Gablarski.OpenAL
 		{
 			float value;
 			alGetSourcef (sourceID, property, out value);
-			Gablarski.OpenAL.OpenAL.ErrorCheck ();
+			OpenAL.ErrorCheck ();
 
 			return value;
 		}
 
 		internal static void SetPropertyF (uint sourceID, FloatSourceProperty property, float value)
 		{
-			Gablarski.OpenAL.OpenAL.Log.DebugFormat ("Setting source {0} property {1} to {2}", sourceID, property, value);
+			OpenAL.Log.DebugFormat ("Setting source {0} property {1} to {2}", sourceID, property, value);
 			alSourcef (sourceID, property, value);
-			Gablarski.OpenAL.OpenAL.ErrorCheck ();
+			OpenAL.ErrorCheck ();
 		}
 
 		internal static int MaxSources

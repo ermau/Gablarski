@@ -219,6 +219,11 @@ namespace Gablarski.Audio
 			return this.decoder.Decode (data);
 		}
 
+		public override string ToString ()
+		{
+			return OwnerId + ":" + Name + ":" + Id;
+		}
+
 		private readonly object codecLock = new object();
 		private CeltEncoder encoder;
 		private CeltDecoder decoder;
