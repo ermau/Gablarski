@@ -82,6 +82,9 @@ namespace Gablarski.Network
 		/// <exception cref="System.ArgumentNullException"><paramref name="message"/> is <c>null</c>.</exception>
 		public void Send (MessageBase message)
 		{
+			if (log.IsDebugEnabled)
+				log.DebugFormat ("Enqueuing {1} message {0} for send", message.MessageTypeCode, (message.Reliable) ? "reliable" : "unreliable");
+
 			lock (sendQueue)
 			{
 				sendQueue.Enqueue (message);
@@ -236,6 +239,9 @@ namespace Gablarski.Network
 					{
 						toSend = queue.Dequeue ();
 					}
+
+					if (log.IsDebugEnabled)
+						log.DebugFormat ("Dequeued {1} message {0} for send", toSend.MessageTypeCode, (toSend.Reliable) ? "reliable" : "unreliable");
 
 					IValueWriter iwriter = (!toSend.Reliable) ? writeUnreliable : writeReliable;
 					iwriter.WriteByte (0x2A);

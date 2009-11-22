@@ -55,8 +55,16 @@ namespace Gablarski.OpenAL
 
 			Source free;
 
-			lock (owner)
+			lock (owners)
 			{
+				if (owner == lastOwner && lastSource != null)
+				{
+					if (OpenAL.Log.IsDebugEnabled)
+						OpenAL.Log.DebugFormat ("SourcePool: Returning last source for {0}", owner);
+
+					return lastSource;
+				}
+
 				free = owners.Where (kvp => kvp.Value == owner).Select (kvp => kvp.Key).FirstOrDefault();
 	
 				if (free == null)
@@ -75,6 +83,9 @@ namespace Gablarski.OpenAL
 				}
 				else if (OpenAL.Log.IsDebugEnabled)
 					OpenAL.Log.DebugFormat ("SourcePool: Found owned source {0} for {1}", free, owner);
+
+				lastOwner = owner;
+				lastSource = free;
 			}
 			
 			return free;
@@ -86,7 +97,12 @@ namespace Gablarski.OpenAL
 			{
 				var source = owners.FirstOrDefault (kvp => kvp.Value == sourceOwner).Key;
 				if (source != null)
-					owners[source] = default(T);
+				{
+					owners[source] = default (T);
+
+					if (source == lastSource)
+						lastSource = null;
+				}
 			}
 		}
 
@@ -95,6 +111,9 @@ namespace Gablarski.OpenAL
 			lock (owners)
 			{
 				owners[source] = default(T);
+
+				if (source == lastSource)
+					lastSource = null;
 			}
 		}
 
@@ -103,7 +122,12 @@ namespace Gablarski.OpenAL
 			lock (owners)
 			{
 				foreach (Source csource in sources)
+				{
 					owners[csource] = default (T);
+
+					if (csource == lastSource)
+						lastSource = null;
+				}
 			}
 		}
 
@@ -136,6 +160,8 @@ namespace Gablarski.OpenAL
 		}
 
 		private readonly Dictionary<Source, T> owners = new Dictionary<Source, T> ();
+		private T lastOwner;
+		private Source lastSource;
 
 		private void OnSourceFinished (SourceFinishedEventArgs<T> e)
 		{

@@ -48,6 +48,8 @@ namespace Gablarski.Client
 	{
 		protected ServerInfo serverInfo;
 
+		protected log4net.ILog log = log4net.LogManager.GetLogger ("GablarskiClient");
+
 		protected Dictionary<ServerMessageType, Action<MessageReceivedEventArgs>> handlers;
 		protected internal IClientConnection Connection
 		{
@@ -119,13 +121,13 @@ namespace Gablarski.Client
 					var msg = (e.Message as ServerMessage);
 					if (msg == null)
 					{
-						Trace.WriteLine ("[Client] Non ServerMessage received (" + e.Message.MessageTypeCode + "), disconnecting.");
+						log.Error ("Non ServerMessage received (" + e.Message.MessageTypeCode + "), disconnecting.");
 						Connection.Disconnect();
 						return;
 					}
 
-					Trace.WriteLineIf ((VerboseTracing || msg.MessageType != ServerMessageType.AudioDataReceived),
-										"[Client] Message Received: " + msg.MessageType);
+					if (log.IsDebugEnabled)
+						log.Debug ("Message Received: " + msg.MessageType);
 
 					if (this.running)
                         this.handlers[msg.MessageType] (e);
