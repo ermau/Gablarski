@@ -52,10 +52,12 @@ namespace Gablarski.OpenAL
 		{
 			if (OpenAL.Log.IsDebugEnabled)
 				OpenAL.Log.DebugFormat ("SourcePool: Requesting source for {0}", owner);
-			
+
+			Source free;
+
 			lock (owner)
 			{
-				Source free = owners.Where (kvp => kvp.Value == owner).Select (kvp => kvp.Key).FirstOrDefault();
+				free = owners.Where (kvp => kvp.Value == owner).Select (kvp => kvp.Key).FirstOrDefault();
 	
 				if (free == null)
 				{
