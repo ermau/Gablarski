@@ -221,7 +221,7 @@ namespace Gablarski.OpenAL
 
 			uint[] id = new[] { this.sourceID };
 			alDeleteSources (1, id);
-			Gablarski.OpenAL.OpenAL.Log.DebugFormat ("Deleting source {0}", id);
+			Gablarski.OpenAL.OpenAL.Log.DebugFormat ("Destroying source {0}", id);
 			
 			this.disposed = true;
 		}

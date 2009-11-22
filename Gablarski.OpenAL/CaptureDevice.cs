@@ -103,7 +103,7 @@ namespace Gablarski.OpenAL
 		{
 			ThrowIfDisposed();
 			
-			Gablarski.OpenAL.OpenAL.Log.DebugFormat ("Opening capture device {0} at {1} {2}", Name, frequency, format);
+			OpenAL.Log.DebugFormat ("Opening capture device {0} at {1} {2}", Name, frequency, format);
 
 			this.Format = format;
 			this.Frequency = frequency;
@@ -111,7 +111,7 @@ namespace Gablarski.OpenAL
 			uint bufferSize = format.GetBytes (format.GetSamplesPerSecond (frequency)) * 2;
 
 			this.Handle = alcCaptureOpenDevice (this.Name, frequency, format, (int)bufferSize);
-			Gablarski.OpenAL.OpenAL.ErrorCheck (this);
+			OpenAL.ErrorCheck (this);
 
 			pcm = new byte[bufferSize];
 			fixed (byte* bppcm = pcm)
@@ -132,11 +132,11 @@ namespace Gablarski.OpenAL
 		{
 			ThrowIfDisposed();
 			
-			Gablarski.OpenAL.OpenAL.Log.DebugFormat ("Starting capture for {0}", Name);
+			OpenAL.Log.DebugFormat ("Starting capture for {0}", Name);
 			
 			this.capturing = true;
 			alcCaptureStart (this.Handle);
-			Gablarski.OpenAL.OpenAL.ErrorCheck (this);
+			OpenAL.ErrorCheck (this);
 		}
 
 		/// <summary>
@@ -146,11 +146,11 @@ namespace Gablarski.OpenAL
 		{
 			ThrowIfDisposed();
 			
-			Gablarski.OpenAL.OpenAL.Log.DebugFormat ("Stopping capture for {0}", Name);
+			OpenAL.Log.DebugFormat ("Stopping capture for {0}", Name);
 			
 			this.capturing = false;
 			alcCaptureStop (this.Handle);
-			Gablarski.OpenAL.OpenAL.ErrorCheck (this);
+			OpenAL.ErrorCheck (this);
 		}
 
 		/// <summary>
@@ -194,7 +194,7 @@ namespace Gablarski.OpenAL
 			
 			this.disposed = true;
 			
-			Gablarski.OpenAL.OpenAL.Log.DebugFormat ("Deleted capture device {0}", Name);		
+			OpenAL.Log.DebugFormat ("Destroying capture device {0}", Name);		
 		}
 
 		#region Imports
@@ -241,7 +241,7 @@ namespace Gablarski.OpenAL
 			}
 
 			alcCaptureSamples (this.Handle, pcmPtr, numSamples);
-			Gablarski.OpenAL.OpenAL.ErrorCheck (this);
+			OpenAL.ErrorCheck (this);
 			Array.Copy (pcm, samples, samples.Length);
 
 			return samples;
@@ -252,8 +252,8 @@ namespace Gablarski.OpenAL
 			ThrowIfDisposed();
 
 			int samples;
-			Gablarski.OpenAL.OpenAL.alcGetIntegerv (this.Handle, ALCEnum.ALC_CAPTURE_SAMPLES, 4, out samples);
-			Gablarski.OpenAL.OpenAL.ErrorCheck (this);
+			OpenAL.alcGetIntegerv (this.Handle, ALCEnum.ALC_CAPTURE_SAMPLES, 4, out samples);
+			OpenAL.ErrorCheck (this);
 			return samples;
 		}
 	}

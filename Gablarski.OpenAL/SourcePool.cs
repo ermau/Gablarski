@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -50,56 +50,87 @@ namespace Gablarski.OpenAL
 
 		public Source RequestSource (T owner)
 		{
-			Source free = owners.Where (kvp => kvp.Value == owner).Select (kvp => kvp.Key).FirstOrDefault();
-
-			if (free == null)
+			if (OpenAL.Log.IsDebugEnabled)
+				OpenAL.Log.DebugFormat ("SourcePool: Requesting source for {0}", owner);
+			
+			lock (owner)
 			{
-				free = owners.Where (kvp => kvp.Value == null).Select (kvp => kvp.Key).FirstOrDefault ();
-
+				Source free = owners.Where (kvp => kvp.Value == owner).Select (kvp => kvp.Key).FirstOrDefault();
+	
 				if (free == null)
-					free = Source.Generate ();
-
-				owners[free] = owner;
+				{
+					free = owners.Where (kvp => kvp.Value == null).Select (kvp => kvp.Key).FirstOrDefault ();
+	
+					if (free == null)
+					{
+						free = Source.Generate ();
+						OpenAL.Log.DebugFormat ("SourcePool: Couldn't find a free source for {0}, created {1}", owner, free);
+					}
+					else if (OpenAL.Log.IsDebugEnabled)
+						OpenAL.Log.DebugFormat ("SourcePool: Found free source {0} for {1}", free, owner);
+	
+					owners[free] = owner;
+				}
+				else if (OpenAL.Log.IsDebugEnabled)
+					OpenAL.Log.DebugFormat ("SourcePool: Found owned source {0} for {1}", free, owner);
 			}
-
+			
 			return free;
 		}
 
 		public void FreeSource (T sourceOwner)
 		{
-			var source = owners.FirstOrDefault (kvp => kvp.Value == sourceOwner).Key;
-			if (source != null)
-				owners[source] = default(T);
+			lock (owners)
+			{
+				var source = owners.FirstOrDefault (kvp => kvp.Value == sourceOwner).Key;
+				if (source != null)
+					owners[source] = default(T);
+			}
 		}
 
 		public void FreeSource (Source source)
 		{
-			owners[source] = default(T);
+			lock (owners)
+			{
+				owners[source] = default(T);
+			}
 		}
 
 		public void FreeSources (IEnumerable<Source> sources)
 		{
-			foreach (Source csource in sources)
-				owners[csource] = default (T);
+			lock (owners)
+			{
+				foreach (Source csource in sources)
+					owners[csource] = default (T);
+			}
 		}
 
 		public void Tick()
 		{
+			if (OpenAL.Log.IsDebugEnabled)
+				OpenAL.Log.Debug ("SourcePool: Tick");
+		
 			Source[] tofree = new Source[owners.Count];
 			int i = 0;
 
-			foreach (Source s in owners.Keys)
+			lock (owners)
 			{
-				if (!s.IsStopped)
-					continue;
-
-				tofree[i++] = s;
-
-				OnSourceFinished (new SourceFinishedEventArgs<T> (owners[s], s));
+				foreach (Source s in owners.Keys)
+				{
+					if (!s.IsStopped)
+						continue;
+	
+					if (OpenAL.Log.IsDebugEnabled)
+						OpenAL.Log.DebugFormat ("SourcePool: {0} is stopped, freeing", s);
+					
+					tofree[i++] = s;
+	
+					OnSourceFinished (new SourceFinishedEventArgs<T> (owners[s], s));
+				}
+	
+				for (i = 0; i < tofree.Length && tofree[i] != null; ++i)
+				    FreeSource (tofree[i]);
 			}
-
-			for (i = 0; i < tofree.Length && tofree[i] != null; ++i)
-			    FreeSource (tofree[i]);
 		}
 
 		private readonly Dictionary<Source, T> owners = new Dictionary<Source, T> ();

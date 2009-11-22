@@ -69,16 +69,18 @@ namespace Gablarski.OpenAL
 
 		protected virtual void Dispose (bool disposing)
 		{
-			if (this.disposed)
-				return;
-
 			lock (lck)
 			{
+				if (this.disposed)
+					return;
+					
+				OpenAL.Log.DebugFormat ("Destroying source buffer {0}", this.bufferID);
+
 				alDeleteBuffers (1, new[] { this.bufferID });
 				Buffers.Remove (this.bufferID);
+				
+				this.disposed = true;
 			}
-
-			this.disposed = true;
 		}
 
 		~SourceBuffer()

@@ -97,6 +97,8 @@ namespace Gablarski.OpenAL
 			if (this.Handle == IntPtr.Zero)
 				return;
 
+			OpenAL.Log.DebugFormat ("Destroying playback device {0}", Name);
+
 			alcCloseDevice (this.Handle);
 			this.Handle = IntPtr.Zero;
 			this.disposed = true;
