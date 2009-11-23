@@ -92,6 +92,9 @@ namespace Gablarski.OpenAL.Providers
 
 			if (!source.IsPlaying)
 			{
+				if (OpenAL.Log.IsDebugEnabled)
+					OpenAL.Log.DebugFormat ("{0} bound to {1} isn't playing, inserting silent buffers", audioSource, source);
+
 				RequireBuffers (bufferStack, source, bufferLen);
 				for (int i = 0; i < bufferLen; ++i)
 				{
@@ -112,23 +115,29 @@ namespace Gablarski.OpenAL.Providers
 
 		public IEnumerable<IAudioDevice> GetDevices ()
 		{
-			return Gablarski.OpenAL.OpenAL.GetPlaybackDevices().Cast<IAudioDevice>();
+			return OpenAL.GetPlaybackDevices().Cast<IAudioDevice>();
 		}
 
 		public void FreeSource (AudioSource source)
 		{
+			if (OpenAL.Log.IsDebugEnabled)
+				OpenAL.Log.DebugFormat ("Freeing source {0}", source);
+
 			buffers.Remove (source);
 			pool.FreeSource (source);
 		}
 
 		public void Tick()
 		{
+			if (OpenAL.Log.IsDebugEnabled)
+				OpenAL.Log.Debug ("Tick");
+
 			pool.Tick();
 		}
 
 		public IAudioDevice DefaultDevice
 		{
-			get { return Gablarski.OpenAL.OpenAL.GetDefaultPlaybackDevice(); }
+			get { return OpenAL.GetDefaultPlaybackDevice(); }
 		}
 
 		#endregion

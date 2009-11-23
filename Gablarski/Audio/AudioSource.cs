@@ -221,7 +221,7 @@ namespace Gablarski.Audio
 
 		public override string ToString ()
 		{
-			return OwnerId + ":" + Name + ":" + Id;
+			return "AudioSource:" + Name + ":" + Id + ":" + OwnerId;
 		}
 
 		private readonly object codecLock = new object();

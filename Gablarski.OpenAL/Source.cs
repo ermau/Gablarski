@@ -40,7 +40,7 @@ using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 using System.Security;
-using Gablarski.OpenAL;
+using Mono.Rocks;
 
 namespace Gablarski.OpenAL
 {
@@ -194,7 +194,8 @@ namespace Gablarski.OpenAL
 
 		protected void Queue (uint[] bufferIDs)
 		{
-			OpenAL.Log.DebugFormat ("Enqueuing buffers {0} to source {1}", bufferIDs, this.sourceID);
+			if (OpenAL.Log.IsDebugEnabled)
+				OpenAL.Log.DebugFormat ("Enqueuing buffers {0} to source {1}", bufferIDs.Implode (", "), this.sourceID);
 
 			alSourceQueueBuffers (this.sourceID, bufferIDs.Length, bufferIDs);
 			OpenAL.ErrorCheck ();
@@ -208,6 +209,11 @@ namespace Gablarski.OpenAL
 			OpenAL.Log.DebugFormat ("Playing source {0}", this.sourceID);
 			alSourcePlay (this.sourceID);
 			OpenAL.ErrorCheck ();
+		}
+
+		public override string ToString ()
+		{
+			return "Source:" + this.sourceID;
 		}
 
 		#region IDisposable Members
