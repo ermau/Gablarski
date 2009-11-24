@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -72,6 +72,7 @@ namespace Gablarski
 				throw new ArgumentNullException ("file");
 			if (!file.Exists)
 				throw new FileNotFoundException ("file not found", file.FullName);
+			
 			switch (file.Extension.ToLower ())
 			{
 				case ".mp3":
