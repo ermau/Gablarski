@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -391,19 +391,19 @@ namespace Gablarski.Audio
 
 								if (talking && !c.Value.Talking)
 								{
-									AudioSender.BeginSending (c.Key, Context.GetCurrentChannel ());
+									AudioSender.BeginSending (c.Key, channel);
 									
 									if (previousFrame != null)
-										AudioSender.SendAudioData (c.Key, Context.GetCurrentChannel (), previousFrame);
+										AudioSender.SendAudioData (c.Key, channel, previousFrame);
 								}
 
 								previousFrame = samples;
 							}
 
 							if (talking)
-								AudioSender.SendAudioData (c.Key, Context.GetCurrentChannel(), samples);
+								AudioSender.SendAudioData (c.Key, channel, samples);
 							else if (c.Value.Talking && c.Value.Options.Mode == AudioEngineCaptureMode.Activated)
-								AudioSender.EndSending (c.Key, Context.GetCurrentChannel());
+								AudioSender.EndSending (c.Key, channel);
 
 							c.Value.Talking = talking;
 						}
