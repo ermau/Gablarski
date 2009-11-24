@@ -79,7 +79,7 @@ namespace Gablarski.Growl
 							});
 		}
 		
-		public void Notify (NotificationType type, string say, string nickname, string phonetic, NotifyPriority priority)
+		public void Notify (NotificationType type, string say, string nickname, string phonetic, Clients.NotifyPriority priority)
 		{
 			Notify (type, String.Format (say, nickname), priority);
 		}
