@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -126,9 +126,8 @@ namespace Gablarski.Clients
 		void OnUserChangedChannel (object sender, ChannelChangedEventArgs e)
 		{
 			if (e.User.Equals (client.CurrentUser))
-				return;
-
-			if (e.TargetChannel.Equals (client.CurrentChannel))
+				Notify (NotificationType.SwitchedChannel, "Switched to channel " + e.TargetChannel.Name);
+			else if (e.TargetChannel.Equals (client.CurrentChannel))
 				Notify (NotificationType.UserJoinedChannel, e.User.Nickname + " joined the channel.");
 			else if (e.PreviousChannel.Equals (client.CurrentChannel))
 				Notify (NotificationType.UserLeftChannel, e.User.Nickname + " left the channel.");

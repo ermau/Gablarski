@@ -61,6 +61,7 @@ namespace Gablarski.Clients
 		Disconnected,
 		UserJoinedServer,
 		UserLeftServer,
+		SwitchedChannel,
 		UserJoinedChannel,
 		UserLeftChannel,
 		SourceStartsPlaying,
