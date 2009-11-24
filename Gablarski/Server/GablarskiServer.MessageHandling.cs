@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -333,13 +333,13 @@ namespace Gablarski.Server
 					e.Connection.Send (new JoinResultMessage (r.ResultState, null));
 					return;
 				}
-
-				info = new ServerUserInfo (new UserInfo (join.Nickname, join.Nickname, r.UserId, defaultChannel.ChannelId, false));
+				
+				info = new ServerUserInfo (new UserInfo (join.Nickname, join.Phonetic, join.Nickname, r.UserId, defaultChannel.ChannelId, false));
 				this.connections.Add (e.Connection, info);
 			}
 			else
 			{
-				info = new ServerUserInfo (info) { Nickname = join.Nickname };
+				info = new ServerUserInfo (info) { Nickname = join.Nickname, Phonetic = join.Phonetic };
 				this.connections.UpdateIfExists (e.Connection, info);
 			}
 

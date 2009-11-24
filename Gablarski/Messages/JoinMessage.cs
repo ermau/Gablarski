@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -38,6 +38,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Mono.Rocks;
 
 namespace Gablarski.Messages
 {
@@ -48,18 +49,29 @@ namespace Gablarski.Messages
 			: base (ClientMessageType.Join)
 		{
 		}
-
+		
 		public JoinMessage (string nickname, string serverPassword)
+			: this (nickname, null, serverPassword)
+		{
+		}
+
+		public JoinMessage (string nickname, string phonetic, string serverPassword)
 			: this()
 		{
-			if (nickname.IsEmpty())
+			if (nickname.IsNullOrWhitespace())
 				throw new ArgumentNullException("nickname");
 
 			this.Nickname = nickname;
+			this.Phonetic = phonetic;
 			this.ServerPassword = serverPassword;
 		}
 
 		public string Nickname
+		{
+			get; set;
+		}
+		
+		public string Phonetic
 		{
 			get; set;
 		}
@@ -74,12 +86,14 @@ namespace Gablarski.Messages
 		public override void WritePayload (IValueWriter writer)
 		{
 			writer.WriteString (this.Nickname);
+			writer.WriteString (this.Phonetic);
 			writer.WriteString (this.ServerPassword);
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
 			this.Nickname = reader.ReadString();
+			this.Phonetic = reader.ReadString();
 			this.ServerPassword = reader.ReadString();
 		}
 

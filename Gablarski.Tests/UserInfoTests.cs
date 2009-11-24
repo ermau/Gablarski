@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -12,6 +12,7 @@ namespace Gablarski.Tests
 	{
 		private const string Username = "Bar";
 		private const string Nickname = "Foo";
+		private const string Phonetic = "Phoo";
 		private const int UserId = 1;
 		private const int ChanId = 2;
 		private const bool Muted = true;
@@ -26,10 +27,11 @@ namespace Gablarski.Tests
 			Assert.Throws<ArgumentException> (() => new UserInfo (Username, 0, ChanId, Muted));
 			Assert.Throws<ArgumentOutOfRangeException> (() => new UserInfo (Username, UserId, -1, Muted));
 
-			Assert.Throws<ArgumentNullException> (() => new UserInfo (null, Username, UserId, ChanId, Muted));
-			Assert.Throws<ArgumentNullException> (() => new UserInfo (Nickname, null, UserId, ChanId, Muted));
-			Assert.Throws<ArgumentException> (() => new UserInfo (Nickname, Username, 0, ChanId, Muted));
-			Assert.Throws<ArgumentOutOfRangeException> (() => new UserInfo (Nickname, Username, UserId, -1, Muted));
+			Assert.Throws<ArgumentNullException> (() => new UserInfo (null, Phonetic, Username, UserId, ChanId, Muted));
+			Assert.Throws<ArgumentNullException> (() => new UserInfo (Nickname, Phonetic, null, UserId, ChanId, Muted));
+			Assert.DoesNotThrow (() => new UserInfo (Nickname, null, Username, UserId, ChanId, Muted));
+			Assert.Throws<ArgumentException> (() => new UserInfo (Nickname, Phonetic, Username, 0, ChanId, Muted));
+			Assert.Throws<ArgumentOutOfRangeException> (() => new UserInfo (Nickname, Phonetic, Username, UserId, -1, Muted));
 		}
 
 		[Test]
@@ -42,11 +44,12 @@ namespace Gablarski.Tests
 			Assert.AreEqual (Username, info.Username);
 			Assert.AreEqual (Muted, info.IsMuted);
 
-			info = new UserInfo (Nickname, Username, UserId, ChanId, Muted);
+			info = new UserInfo (Nickname, Phonetic, Username, UserId, ChanId, Muted);
 
 			Assert.AreEqual (UserId, info.UserId);
 			Assert.AreEqual (ChanId, info.CurrentChannelId);
 			Assert.AreEqual (Nickname, info.Nickname);
+			Assert.AreEqual (Phonetic, info.Phonetic);
 			Assert.AreEqual (Username, info.Username);
 			Assert.AreEqual (Muted, info.IsMuted);
 		}
@@ -58,7 +61,7 @@ namespace Gablarski.Tests
 			var writer = new StreamValueWriter (stream);
 			var reader = new StreamValueReader (stream);
 
-			var info = new UserInfo (Nickname, Username, UserId, ChanId, Muted);
+			var info = new UserInfo (Nickname, Phonetic, Username, UserId, ChanId, Muted);
 			info.Serialize (writer);
 			long length = stream.Position;
 			stream.Position = 0;
@@ -68,14 +71,15 @@ namespace Gablarski.Tests
 			Assert.AreEqual (UserId, info.UserId);
 			Assert.AreEqual (ChanId, info.CurrentChannelId);
 			Assert.AreEqual (Nickname, info.Nickname);
+			Assert.AreEqual (Phonetic, info.Phonetic);
 			Assert.AreEqual (Muted, info.IsMuted);
 		}
 
 		[Test]
 		public void Equals()
 		{
-			UserInfo foo = new UserInfo (Nickname, Username, 1, 2, Muted);
-			UserInfo bar = new UserInfo (Nickname, Username, 1, 2, Muted);
+			UserInfo foo = new UserInfo (Nickname, Phonetic, Username, 1, 2, Muted);
+			UserInfo bar = new UserInfo (Nickname, Phonetic, Username, 1, 2, Muted);
 
 			Assert.AreEqual (foo, bar);
 		}
@@ -83,8 +87,8 @@ namespace Gablarski.Tests
 		[Test]
 		public void HashCode()
 		{
-			UserInfo foo = new UserInfo (Nickname, Username, 1, 2, Muted);
-			UserInfo bar = new UserInfo (Nickname, Username, 1, 2, Muted);
+			UserInfo foo = new UserInfo (Nickname, Phonetic, Username, 1, 2, Muted);
+			UserInfo bar = new UserInfo (Nickname, Phonetic, Username, 1, 2, Muted);
 
 			Assert.AreEqual (foo.GetHashCode(), bar.GetHashCode());
 		}

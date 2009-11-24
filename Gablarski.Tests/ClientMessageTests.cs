@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -70,7 +70,7 @@ namespace Gablarski.Tests
 		{
 			string nickname = "Foo";
 			string password = "pass";
-			var msg = new JoinMessage (nickname, password);
+			var msg = new JoinMessage { Nickname = nickname, ServerPassword = password };
 			Assert.AreEqual (nickname, msg.Nickname);
 			Assert.AreEqual (password, msg.ServerPassword);
 			msg.WritePayload (writer);
@@ -82,6 +82,29 @@ namespace Gablarski.Tests
 
 			Assert.AreEqual (length, stream.Position);
 			Assert.AreEqual (nickname, msg.Nickname);
+			Assert.AreEqual (password, msg.ServerPassword);
+		}
+		
+		[Test]
+		public void JoinWithPhonetic ()
+		{
+			string nickname = "Foo";
+			string password = "pass";
+			string phonetic = "Phoo";
+			var msg = new JoinMessage (nickname, phonetic, password);
+			Assert.AreEqual (nickname, msg.Nickname);
+			Assert.AreEqual (phonetic, msg.Phonetic);
+			Assert.AreEqual (password, msg.ServerPassword);
+			msg.WritePayload (writer);
+			long length = stream.Position;
+			stream.Position = 0;
+			
+			msg = new JoinMessage ();
+			msg.ReadPayload (reader);
+			
+			Assert.AreEqual (length, stream.Position);
+			Assert.AreEqual (nickname, msg.Nickname);
+			Assert.AreEqual (phonetic, msg.Phonetic);
 			Assert.AreEqual (password, msg.ServerPassword);
 		}
 

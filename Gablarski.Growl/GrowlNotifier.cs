@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -77,6 +77,11 @@ namespace Gablarski.Growl
 							{
 								Priority = ToPriority (priority)
 							});
+		}
+		
+		public void Notify (NotificationType type, string say, string nickname, string phonetic, NotifyPriority priority)
+		{
+			Notify (type, String.Format (say, nickname), priority);
 		}
 
 		private readonly GrowlConnector growl = new GrowlConnector ();

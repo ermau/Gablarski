@@ -475,7 +475,7 @@ namespace Gablarski.Clients.CLI
 			else
 				Console.WriteLine ("Login failed: " + e.Result.ResultState);
 
-			Client.CurrentUser.Join (nickname, null);
+			Client.CurrentUser.Join (nickname, null, null);
 		}
 
 		static void ClientConnectionRejected (object sender, RejectedConnectionEventArgs e)
@@ -489,7 +489,7 @@ namespace Gablarski.Clients.CLI
 			Client.CurrentUser.ReceivedLoginResult += CurrentUserReceivedLoginResult;
 
 			if (username.IsEmpty() || password.IsEmpty())
-				Client.CurrentUser.Join (nickname, null);
+				Client.CurrentUser.Join (nickname, null, null);
 			else
 				Client.CurrentUser.Login (username, password);
 		}

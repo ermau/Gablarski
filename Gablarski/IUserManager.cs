@@ -83,6 +83,8 @@ namespace Gablarski
 
 		bool IsJoined (int userId);
 		
+		bool IsJoined (string username);
+		
 		/// <summary>
 		/// Tries to get <parmref name="user"/> from <paramref name="userId"/>.
 		/// </summary>

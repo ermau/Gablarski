@@ -54,13 +54,19 @@ namespace Gablarski
 				throw new ArgumentNullException ("info");
 
 			this.Nickname = info.Nickname;
+			this.Phonetic = info.Phonetic;
 			this.Username = info.Username;
 			this.UserId = info.UserId;
 			this.CurrentChannelId = info.CurrentChannelId;
 			this.IsMuted = info.IsMuted;
 		}
-
+		
 		internal UserInfo (string nickname, string username, int userId, int currentChannelId, bool muted)
+			: this (nickname, null, username, userId, currentChannelId, muted)
+		{
+		}
+
+		internal UserInfo (string nickname, string phonetic, string username, int userId, int currentChannelId, bool muted)
 		{
 			if (nickname.IsEmpty())
 				throw new ArgumentNullException ("nickname");
@@ -72,6 +78,7 @@ namespace Gablarski
 				throw new ArgumentOutOfRangeException ("currentChannelId");
 
 			this.Nickname = nickname;
+			this.Phonetic = phonetic;
 			this.Username = username;
 			this.UserId = userId;
 			this.CurrentChannelId = currentChannelId;
@@ -112,6 +119,12 @@ namespace Gablarski
 			get;
 			set;
 		}
+		
+		public virtual string Phonetic
+		{
+			get;
+			set;
+		}
 
 		public virtual int UserId
 		{
@@ -136,6 +149,7 @@ namespace Gablarski
 			writer.WriteString (this.Username);
 			writer.WriteInt32 (this.CurrentChannelId);
 			writer.WriteString (this.Nickname);
+			writer.WriteString (this.Phonetic);
 			writer.WriteBool (this.IsMuted);
 		}
 
@@ -145,6 +159,7 @@ namespace Gablarski
 			this.Username = reader.ReadString();
 			this.CurrentChannelId = reader.ReadInt32();
 			this.Nickname = reader.ReadString();
+			this.Phonetic = reader.ReadString();
 			this.IsMuted = reader.ReadBool();
 		}
 

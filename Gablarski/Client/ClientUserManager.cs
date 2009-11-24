@@ -247,7 +247,7 @@ namespace Gablarski.Client
 				if (!TryGetUser (msg.ChangeInfo.TargetUserId, out old))
 					return;
 
-				user = new UserInfo (old.Nickname, old.Username, old.UserId, msg.ChangeInfo.TargetChannelId, old.IsMuted);
+				user = new UserInfo (old.Nickname, old.Phonetic, old.Username, old.UserId, msg.ChangeInfo.TargetChannelId, old.IsMuted);
 				Update (user);
 				
 				if (user.Equals (context.CurrentUser))

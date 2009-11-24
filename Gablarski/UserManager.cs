@@ -75,6 +75,17 @@ namespace Gablarski
 				return users.Any (kvp => kvp.Value.UserId == userId);
 			}
 		}
+		
+		public bool IsJoined (string username)
+		{
+			if (username == null)
+				throw new ArgumentNullException ("username");
+		
+			lock (SyncRoot)
+			{
+				return users.Any (kvp => kvp.Value.Username == username);
+			}
+		}
 
 		public bool Depart (UserInfo user)
 		{
@@ -143,7 +154,7 @@ namespace Gablarski
 				if (!users.TryGetValue (user.UserId, out oldUser))
 					oldUser = user;
 				
-				UserInfo newUser = new UserInfo (oldUser.Nickname, user.Username, user.UserId, user.CurrentChannelId, !user.IsMuted);
+				UserInfo newUser = new UserInfo (oldUser.Nickname, user.Phonetic, user.Username, user.UserId, user.CurrentChannelId, !user.IsMuted);
 			}
 		}
 		

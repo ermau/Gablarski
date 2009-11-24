@@ -48,7 +48,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void Join ()
 		{
-			var user = new UserInfo ("Nickname", "Username", 1, 2, true);
+			var user = new UserInfo ("Nickname", "Phonetic", "Username", 1, 2, true);
 
 			var manager = new UserManager ();
 			manager.Join (user);
@@ -68,7 +68,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void Depart()
 		{
-			var user = new UserInfo ("Nickname", "Username", 1, 2, true);
+			var user = new UserInfo ("Nickname", "Phonetic", "Username", 1, 2, true);
 			
 			var manager = new UserManager();
 			manager.Join (user);
@@ -87,7 +87,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void DepartNonJoined()
 		{
-			var user = new UserInfo ("Nickname", "Username", 1, 2, true);
+			var user = new UserInfo ("Nickname", "Phonetic", "Username", 1, 2, true);
 			
 			var manager = new UserManager();
 			
@@ -112,8 +112,8 @@ namespace Gablarski.Tests
 		[Test]
 		public void UpdateEmpty()
 		{
-			var user = new UserInfo ("Nickname", "Username", 1, 2, true);
-			var user2 = new UserInfo ("Nickname2", "Username2", 2, 3, false);
+			var user = new UserInfo ("Nickname", "Phonetic", "Username", 1, 2, true);
+			var user2 = new UserInfo ("Nickname2", "Phonetic2", "Username2", 2, 3, false);
 			
 			var manager = new UserManager();
 			
@@ -126,19 +126,20 @@ namespace Gablarski.Tests
 		[Test]
 		public void Update()
 		{
-			var user = new UserInfo ("Nickname", "Username", 1, 2, true);
+			var user = new UserInfo ("Nickname", "Phonetic", "Username", 1, 2, true);
 			
 			var manager = new UserManager();
 			manager.Join (user);
 			
-			user = new UserInfo ("NicknameU", "Username2", 1, 2, false);
-			var user2 = new UserInfo ("Nickname2U", "Username2U", 2, 3, false);
+			user = new UserInfo ("NicknameU", "PhoneticU", "Username2", 1, 2, false);
+			var user2 = new UserInfo ("Nickname2U", "PhoneticU", "Username2U", 2, 3, false);
 			
 			manager.Update (new [] { user, user2 });
 			
 			Assert.IsTrue (manager.IsJoined (user));
 			Assert.AreEqual (user, manager[user.UserId]);
 			Assert.AreEqual (user.Nickname, manager[user.UserId].Nickname);
+			Assert.AreEqual (user.Phonetic, manager[user.UserId].Phonetic);
 			Assert.AreEqual (user.Username, manager[user.UserId].Username);
 			Assert.AreEqual (user.UserId, manager[user.UserId].UserId);
 			Assert.AreEqual (user.CurrentChannelId, manager[user.UserId].CurrentChannelId);
@@ -147,6 +148,7 @@ namespace Gablarski.Tests
 			Assert.IsTrue (manager.IsJoined (user2));
 			Assert.AreEqual (user2, manager[user2.UserId]);
 			Assert.AreEqual (user2.Nickname, manager[user2.UserId].Nickname);
+			Assert.AreEqual (user2.Phonetic, manager[user2.UserId].Phonetic);
 			Assert.AreEqual (user2.Username, manager[user2.UserId].Username);
 			Assert.AreEqual (user2.UserId, manager[user2.UserId].UserId);
 			Assert.AreEqual (user2.CurrentChannelId, manager[user2.UserId].CurrentChannelId);
@@ -163,20 +165,21 @@ namespace Gablarski.Tests
 		[Test]
 		public void UpdateUser()
 		{
-			var user = new UserInfo ("Nickname", "Username", 1, 2, true);
-			var user2 = new UserInfo ("Nickname2", "Username2", 2, 3, false);
+			var user = new UserInfo ("Nickname", "Phonetic", "Username", 1, 2, true);
+			var user2 = new UserInfo ("Nickname2", "Phonetic2", "Username2", 2, 3, false);
 			
 			var manager = new UserManager();
 			manager.Join (user);
 			
-			user = new UserInfo ("NicknameU", "Username2", 1, 2, false);
-			user2 = new UserInfo ("Nickname2U", "Username2U", 2, 3, false);
+			user = new UserInfo ("NicknameU", "PhoneticU", "Username2", 1, 2, false);
+			user2 = new UserInfo ("Nickname2U", "Phonetic2U", "Username2", 2, 3, false);
 			
 			manager.Update (user);
 			
 			Assert.IsTrue (manager.IsJoined (user));
 			Assert.AreEqual (user, manager[user.UserId]);
 			Assert.AreEqual (user.Nickname, manager[user.UserId].Nickname);
+			Assert.AreEqual (user.Phonetic, manager[user.UserId].Phonetic);
 			Assert.AreEqual (user.Username, manager[user.UserId].Username);
 			Assert.AreEqual (user.UserId, manager[user.UserId].UserId);
 			Assert.AreEqual (user.CurrentChannelId, manager[user.UserId].CurrentChannelId);
@@ -187,6 +190,7 @@ namespace Gablarski.Tests
 			Assert.IsTrue (manager.IsJoined (user2));
 			Assert.AreEqual (user2, manager[user2.UserId]);
 			Assert.AreEqual (user2.Nickname, manager[user2.UserId].Nickname);
+			Assert.AreEqual (user2.Phonetic, manager[user2.UserId].Phonetic);
 			Assert.AreEqual (user2.Username, manager[user2.UserId].Username);
 			Assert.AreEqual (user2.UserId, manager[user2.UserId].UserId);
 			Assert.AreEqual (user2.CurrentChannelId, manager[user2.UserId].CurrentChannelId);
@@ -196,8 +200,8 @@ namespace Gablarski.Tests
 		[Test]
 		public void IsJoined()
 		{
-			var user = new UserInfo ("Nickname", "Username", 1, 2, true);
-			var user2 = new UserInfo ("Nickname2", "Username2", 2, 3, false);
+			var user = new UserInfo ("Nickname", "Phonetic", "Username", 1, 2, true);
+			var user2 = new UserInfo ("Nickname2", "Phonetic", "Username2", 2, 3, false);
 			
 			var manager = new UserManager();
 			manager.Join (user);
@@ -230,18 +234,38 @@ namespace Gablarski.Tests
 			manager.Depart (user);
 			Assert.IsFalse (manager.IsJoined (user.UserId));
 		}
+
+		[Test]
+		public void IsJoinedUsername()
+		{
+			var user = new UserInfo ("Nickname", "Phonetic", "Username", 1, 2, true);
+			var user2 = new UserInfo ("Nickname2", "Phonetic", "Username2", 2, 3, false);
+			
+			var manager = new UserManager();
+			manager.Join (user);
+			
+			Assert.IsTrue (manager.IsJoined (user.Username));
+			Assert.IsFalse (manager.IsJoined (user2.Username));
+			
+			manager.Join (user2);
+			Assert.IsTrue (manager.IsJoined (user2.Username));
+			
+			manager.Depart (user);
+			Assert.IsFalse (manager.IsJoined (user.Username));
+		}
 		
 		[Test]
-		public void IsJoinedNullUser()
+		public void IsJoinedNullUser ()
 		{
-			var manager = new UserManager();
-			Assert.Throws<ArgumentNullException> (() => manager.IsJoined (null));
+			var manager = new UserManager ();;
+			Assert.Throws<ArgumentNullException> (() => manager.IsJoined ((string)null));
+			Assert.Throws<ArgumentNullException> (() => manager.IsJoined ((UserInfo)null));
 		}
 		
 		[Test]
 		public void TryGetValueFound()
 		{
-			var user = new UserInfo ("Nickname", "Username", 1, 2, true);
+			var user = new UserInfo ("Nickname", "Phonetic", "Username", 1, 2, true);
 			var user2 = new UserInfo ("Nickname2", "Username2", 2, 3, false);
 			
 			var manager = new UserManager();
@@ -255,8 +279,8 @@ namespace Gablarski.Tests
 		[Test]
 		public void TryGetValueNotFound()
 		{
-			var user = new UserInfo ("Nickname", "Username", 1, 2, true);
-			var user2 = new UserInfo ("Nickname2", "Username2", 2, 3, false);
+			var user = new UserInfo ("Nickname", "Phonetic", "Username", 1, 2, true);
+			var user2 = new UserInfo ("Nickname2", "Phonetic2", "Username2", 2, 3, false);
 			
 			var manager = new UserManager();
 			manager.Join (user2);
@@ -269,8 +293,8 @@ namespace Gablarski.Tests
 		[Test]
 		public void IndexerNotPresent()
 		{
-			var user = new UserInfo ("Nickname", "Username", 1, 2, true);
-			var user2 = new UserInfo ("Nickname2", "Username2", 2, 3, false);
+			var user = new UserInfo ("Nickname", "Phonetic", "Username", 1, 2, true);
+			var user2 = new UserInfo ("Nickname2", "Phonetic2", "Username2", 2, 3, false);
 			
 			var manager = new UserManager();
 			manager.Join (user);
@@ -281,7 +305,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void IndexerPresent()
 		{
-			var user = new UserInfo ("Nickname", "Username", 1, 2, true);
+			var user = new UserInfo ("Nickname", "Phonetic", "Username", 1, 2, true);
 			
 			var manager = new UserManager();
 			manager.Join (user);

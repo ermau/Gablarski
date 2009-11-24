@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -52,6 +52,7 @@ namespace Gablarski.Clients
 		IMediaController Media { set; }
 
 		void Notify (NotificationType type, string contents, NotifyPriority priority);
+		void Notify (NotificationType type, string contents, string nickname, string phonetic, NotifyPriority priority);
 	}
 
 	public enum NotificationType

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -111,7 +111,7 @@ namespace Gablarski.Client
 				Password = password
 			});
 		}
-
+		
 		/// <summary>
 		/// Joins the connected server with the specified nickname and password.
 		/// </summary>
@@ -119,10 +119,21 @@ namespace Gablarski.Client
 		/// <param name="serverPassword">The password to join the server.</param>
 		public void Join (string nickname, string serverPassword)
 		{
+			Join (nickname, null, serverPassword);
+		}
+
+		/// <summary>
+		/// Joins the connected server with the specified nickname and password.
+		/// </summary>
+		/// <param name="nickname">The nickname to use when in the server.</param>
+		/// <param name="phonetic">The phonetic spelling for the nickname.</param>
+		/// <param name="serverPassword">The password to join the server.</param>
+		public void Join (string nickname, string phonetic, string serverPassword)
+		{
 			if (nickname.IsEmpty())
 				throw new ArgumentNullException ("nickname");
 
-			this.context.Connection.Send (new JoinMessage (nickname, serverPassword));
+			this.context.Connection.Send (new JoinMessage (nickname, phonetic, serverPassword));
 		}
 
 		private readonly IClientContext context;
