@@ -12,7 +12,7 @@ using Gablarski.Clients;
 using Gablarski.Clients.Windows.Entities;
 using Gablarski.Clients.Windows.Properties;
 using Gablarski.Server;
-using Mono.Rocks;
+using Cadenza;
 
 namespace Gablarski.Clients.Windows
 {

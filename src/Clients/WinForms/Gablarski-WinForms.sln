@@ -15,8 +15,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.Clients.WinForms"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski", "..\..\Gablarski\Gablarski.csproj", "{7347052B-DA5B-4CCA-AB28-3963766E3CDB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Rocks", "..\..\Mono.Rocks\Mono.Rocks.csproj", "{F656F792-2CDE-4E17-BB5F-6A6F1C266CB8}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.Input.DirectInput", "..\..\Gablarski.Input.DirectInput\Gablarski.Input.DirectInput.csproj", "{D5FBD205-094A-46C5-88A8-16D4053733D9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.SpeechNotifier", "..\..\Gablarski.SpeechNotifier\Gablarski.SpeechNotifier.csproj", "{542BFF13-39BF-456B-B36F-7F65C6AE0830}"
@@ -28,8 +26,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.Growl", "..\..\Gablarski.Growl\Gablarski.Growl.csproj", "{B3605103-A797-4F0F-9C3A-8566DD13700A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.Clients", "..\..\Gablarski.Clients\Gablarski.Clients.csproj", "{F8A695AA-8BC9-46D4-8B7A-BDBD7B74401F}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentNHibernate", "..\..\fluent-nhibernate\src\FluentNHibernate\FluentNHibernate.csproj", "{529145D5-6CC3-4016-89B5-826563024AF1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.CoreAudio", "..\..\Gablarski.CoreAudio\Gablarski.CoreAudio.csproj", "{7AF6C5B8-E0C0-4E6E-86BB-F9984E5804AA}"
 EndProject
@@ -51,9 +47,6 @@ Global
 		{7347052B-DA5B-4CCA-AB28-3963766E3CDB}.Debug|x86.Build.0 = Debug|Any CPU
 		{7347052B-DA5B-4CCA-AB28-3963766E3CDB}.Release|x86.ActiveCfg = Release|x86
 		{7347052B-DA5B-4CCA-AB28-3963766E3CDB}.Release|x86.Build.0 = Release|x86
-		{F656F792-2CDE-4E17-BB5F-6A6F1C266CB8}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{F656F792-2CDE-4E17-BB5F-6A6F1C266CB8}.Debug|x86.Build.0 = Debug|Any CPU
-		{F656F792-2CDE-4E17-BB5F-6A6F1C266CB8}.Release|x86.ActiveCfg = Release|Any CPU
 		{D5FBD205-094A-46C5-88A8-16D4053733D9}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{D5FBD205-094A-46C5-88A8-16D4053733D9}.Debug|x86.Build.0 = Debug|Any CPU
 		{D5FBD205-094A-46C5-88A8-16D4053733D9}.Release|x86.ActiveCfg = Release|Any CPU
@@ -72,9 +65,6 @@ Global
 		{F8A695AA-8BC9-46D4-8B7A-BDBD7B74401F}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{F8A695AA-8BC9-46D4-8B7A-BDBD7B74401F}.Debug|x86.Build.0 = Debug|Any CPU
 		{F8A695AA-8BC9-46D4-8B7A-BDBD7B74401F}.Release|x86.ActiveCfg = Release|Any CPU
-		{529145D5-6CC3-4016-89B5-826563024AF1}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{529145D5-6CC3-4016-89B5-826563024AF1}.Debug|x86.Build.0 = Debug|Any CPU
-		{529145D5-6CC3-4016-89B5-826563024AF1}.Release|x86.ActiveCfg = Release|Any CPU
 		{7AF6C5B8-E0C0-4E6E-86BB-F9984E5804AA}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{7AF6C5B8-E0C0-4E6E-86BB-F9984E5804AA}.Debug|x86.Build.0 = Debug|Any CPU
 		{7AF6C5B8-E0C0-4E6E-86BB-F9984E5804AA}.Release|x86.ActiveCfg = Release|Any CPU

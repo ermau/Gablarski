@@ -92,9 +92,16 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Cadenza">
+      <HintPath>..\..\..\lib\Cadenza.dll</HintPath>
+    </Reference>
+    <Reference Include="FluentNHibernate, Version=1.0.0.0, Culture=neutral, PublicKeyToken=8aa435e3cb308880, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\lib\FluentNHibernate.dll</HintPath>
+    </Reference>
     <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\log4net.dll</HintPath>
+      <HintPath>..\..\..\lib\log4net.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.WindowsAPICodePack, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -104,9 +111,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>.\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
     </Reference>
-    <Reference Include="NHibernate, Version=2.0.1.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4">
+    <Reference Include="NHibernate, Version=2.1.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\fluent-nhibernate\tools\NHibernate\NHibernate.dll</HintPath>
+      <HintPath>..\..\..\lib\NHibernate.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -229,10 +236,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\fluent-nhibernate\src\FluentNHibernate\FluentNHibernate.csproj">
-      <Project>{529145D5-6CC3-4016-89B5-826563024AF1}</Project>
-      <Name>FluentNHibernate</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Gablarski.Clients\Gablarski.Clients.csproj">
       <Project>{F8A695AA-8BC9-46D4-8B7A-BDBD7B74401F}</Project>
       <Name>Gablarski.Clients</Name>
@@ -240,10 +243,6 @@
     <ProjectReference Include="..\..\Gablarski\Gablarski.csproj">
       <Project>{7347052B-DA5B-4CCA-AB28-3963766E3CDB}</Project>
       <Name>Gablarski</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Mono.Rocks\Mono.Rocks.csproj">
-      <Project>{F656F792-2CDE-4E17-BB5F-6A6F1C266CB8}</Project>
-      <Name>Mono.Rocks</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
