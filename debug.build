@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<project name="Gablarski" default="clients" basedir=".">
+<project name="Gablarski" default="everything" basedir=".">
 	<property name="nant.settings.currentframework" value="net-3.5" />
 
 	<target name="library">
@@ -31,6 +31,9 @@
 		</zip>
 	</target>
 
+	<target name="everything" depends="clients,barrelserver">
+	</target>
+	
 	<target name="clients" depends="winforms,gtk">
 	</target>
 
@@ -64,6 +67,24 @@
 				<include name="GablarskiClient.exe" />
 				<include name="Headphones.ico" />
 				<include name="*.dll" />
+				<include name="*.pdb" />
+				<include name="*.xsd" />
+				<include name="*.txt" />
+			</fileset>
+		</zip>
+	</target>
+
+	<target name="barrelserver" depends="library">
+		<exec program="${DotNetFramework3.5_x86_Path}\msbuild.exe">
+			<arg value='/property:Configuration="Debug";Platform="Any CPU"' />
+			<arg value="Server\Barrel.sln" />
+		</exec>
+
+		<zip zipfile="Gablarski-Gtk-Debug.zip">
+			<fileset basedir="Clients\Gablarski-Gtk\bin\Debug">
+				<include name="Barrel.exe" />
+				<include name="*.dll" />
+				<incldue name="*.xml" />
 				<include name="*.pdb" />
 				<include name="*.xsd" />
 				<include name="*.txt" />
