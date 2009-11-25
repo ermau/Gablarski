@@ -71,8 +71,12 @@
     <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="log4net">
-      <HintPath>..\log4net.dll</HintPath>
+    <Reference Include="Cadenza">
+      <HintPath>..\..\lib\Cadenza.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\log4net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -100,10 +104,6 @@
     <ProjectReference Include="..\Gablarski\Gablarski.csproj">
       <Project>{7347052B-DA5B-4CCA-AB28-3963766E3CDB}</Project>
       <Name>Gablarski</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Mono.Rocks\Mono.Rocks.csproj">
-      <Project>{F656F792-2CDE-4E17-BB5F-6A6F1C266CB8}</Project>
-      <Name>Mono.Rocks</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

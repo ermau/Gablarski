@@ -40,7 +40,7 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using System.Reflection.Emit;
-using Mono.Rocks;
+using Cadenza;
 
 namespace Gablarski.Messages
 {

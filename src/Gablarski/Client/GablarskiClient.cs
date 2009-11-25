@@ -44,7 +44,7 @@ using System.Threading;
 using Gablarski.Audio;
 using Gablarski.Messages;
 using Gablarski.Network;
-using Mono.Rocks;
+using Cadenza;
 
 namespace Gablarski.Client
 {

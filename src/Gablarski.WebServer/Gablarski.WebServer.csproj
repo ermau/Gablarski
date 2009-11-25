@@ -91,14 +91,20 @@
     <Optimize>false</Optimize>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Fadd, Version=1.0.0.0, Culture=neutral, PublicKeyToken=41411ef5f05a116f, processorArchitecture=MSIL" />
-    <Reference Include="HttpServer, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0505b774db687742">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>HttpServer.dll</HintPath>
+    <Reference Include="Cadenza">
+      <HintPath>..\..\lib\Cadenza.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=3.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
+    <Reference Include="Fadd, Version=1.0.0.0, Culture=neutral, PublicKeyToken=41411ef5f05a116f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\..\lib\Fadd.dll</HintPath>
+    </Reference>
+    <Reference Include="HttpServer, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0505b774db687742, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\HttpServer.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=3.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -130,21 +136,6 @@
       <Project>{7347052B-DA5B-4CCA-AB28-3963766E3CDB}</Project>
       <Name>Gablarski</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Mono.Rocks\Mono.Rocks.csproj">
-      <Project>{F656F792-2CDE-4E17-BB5F-6A6F1C266CB8}</Project>
-      <Name>Mono.Rocks</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Fadd.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="HttpServer.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="HttpServer.License.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Html\login.html" />

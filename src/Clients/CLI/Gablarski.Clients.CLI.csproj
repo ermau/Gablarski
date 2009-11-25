@@ -65,6 +65,9 @@
     <Optimize>false</Optimize>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Cadenza">
+      <HintPath>..\..\..\lib\Cadenza.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -102,10 +105,6 @@
       <Project>{7347052B-DA5B-4CCA-AB28-3963766E3CDB}</Project>
       <Name>Gablarski</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Mono.Rocks\Mono.Rocks.csproj">
-      <Project>{F656F792-2CDE-4E17-BB5F-6A6F1C266CB8}</Project>
-      <Name>Mono.Rocks</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -135,15 +134,15 @@
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
-    <PostBuildEvent>xcopy /Y "$(SolutionDir)Gablarski\Audio\CELT\libcelt.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)Gablarski\Audio\CELT\libcelt.license.txt" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)Gablarski\Audio\Speex\libspeexdsp.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)Gablarski\Audio\Speex\libspeexdsp.license.txt" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)Gablarski\Audio\OpenAL\OpenAL32.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)Gablarski\Audio\OpenAL\OpenALSoft.License.txt" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)Gablarski.WebServer\bin\Debug\*.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)Gablarski.WebServer\bin\Debug\*.pdb" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)Gablarski.WebServer\bin\Debug\HttpServer.License.txt" "$(TargetDir)"</PostBuildEvent>
+    <PostBuildEvent>xcopy /Y "$(SolutionDir)lib\libcelt.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)lib\libcelt.license.txt" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)lib\libspeexdsp.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)lib\libspeexdsp.license.txt" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)lib\OpenAL32.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)lib\OpenALSoft.License.txt" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)src\Gablarski.WebServer\bin\Debug\*.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)src\Gablarski.WebServer\bin\Debug\*.pdb" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)lib\HttpServer.License.txt" "$(TargetDir)"</PostBuildEvent>
   </PropertyGroup>
   <ProjectExtensions>
     <MonoDevelop>

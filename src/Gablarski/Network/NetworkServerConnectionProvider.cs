@@ -41,7 +41,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using Gablarski.Messages;
-using Mono.Rocks;
+using Cadenza;
 
 namespace Gablarski.Network
 {
