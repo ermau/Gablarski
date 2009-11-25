@@ -9,11 +9,11 @@
 		</exec>
 
 		<nunit2>
-			<test assemblyname="Gablarski.Tests\bin\Debug\Gablarski.Tests.dll" />
+			<test assemblyname="src\Gablarski.Tests\bin\Debug\Gablarski.Tests.dll" />
 		</nunit2>
 
 		<zip zipfile="Gablarski-Debug.zip">
-			<fileset basedir="Gablarski\bin\Debug">
+			<fileset basedir="src\Gablarski\bin\Debug">
 				<include name="*.dll" />
 				<include name="*.xml" />
 				<include name="*.pdb" />
@@ -22,7 +22,7 @@
 		</zip>
 
 		<zip zipfile="Gablarski-CLI-Debug.zip">
-			<fileset basedir="Clients\CLI\bin\x86\Debug">
+			<fileset basedir="src\Clients\CLI\bin\x86\Debug">
 				<include name="*.dll" />
 				<include name="*.xml" />
 				<include name="*.pdb" />
@@ -40,11 +40,11 @@
 	<target name="winforms" depends="library">
 		<exec program="${DotNetFramework3.5_x86_Path}\msbuild.exe">
 			<arg value='/property:Configuration="Debug";Platform="x86"' />
-			<arg value="Clients\WinForms\Gablarski-WinForms.sln" />
+			<arg value="src\Clients\WinForms\Gablarski-WinForms.sln" />
 		</exec>
 
 		<zip zipfile="Gablarski-Win32-Debug.zip">
-			<fileset basedir="Clients\WinForms\bin\x86\Debug">
+			<fileset basedir="src\Clients\WinForms\bin\x86\Debug">
 				<include name="GablarskiClient.exe" />
 				<include name="GablarskiClient.exe.config" />
 				<include name="Headphones.ico" />
@@ -59,11 +59,11 @@
 	<target name="gtk" depends="library">
 		<exec program="${DotNetFramework3.5_x86_Path}\msbuild.exe">
 			<arg value='/property:Configuration="Debug";Platform="x86"' />
-			<arg value="Clients\Gablarski-Gtk\Gablarski-Gtk.sln" />
+			<arg value="src\Clients\Gablarski-Gtk\Gablarski-Gtk.sln" />
 		</exec>
 
 		<zip zipfile="Gablarski-Gtk-Debug.zip">
-			<fileset basedir="Clients\Gablarski-Gtk\bin\Debug">
+			<fileset basedir="src\Clients\Gablarski-Gtk\bin\Debug">
 				<include name="GablarskiClient.exe" />
 				<include name="Headphones.ico" />
 				<include name="*.dll" />
@@ -77,11 +77,11 @@
 	<target name="barrelserver" depends="library">
 		<exec program="${DotNetFramework3.5_x86_Path}\msbuild.exe">
 			<arg value='/property:Configuration="Debug";Platform="Any CPU"' />
-			<arg value="Server\Barrel.sln" />
+			<arg value="src\Server\Barrel.sln" />
 		</exec>
 
-		<zip zipfile="Gablarski-Gtk-Debug.zip">
-			<fileset basedir="Clients\Gablarski-Gtk\bin\Debug">
+		<zip zipfile="Gablarski-Server-Debug.zip">
+			<fileset basedir="src\Server\Barrel\bin\Debug">
 				<include name="Barrel.exe" />
 				<include name="*.dll" />
 				<incldue name="*.xml" />
