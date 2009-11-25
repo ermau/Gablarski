@@ -3,7 +3,6 @@ using System.Configuration;
 using System.Collections.Generic;
 using Gablarski.Server;
 using System.Linq;
-using FluentNHibernate.Cfg.Db;
 
 namespace Gablarski.Barrel
 {

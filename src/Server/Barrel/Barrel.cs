@@ -6,7 +6,7 @@ namespace Barrel
 	{
 		public static void Main (string[] args)
 		{
-			
+			log4net.Config.XmlConfigurator.Configure();
 		}
 	}
 }

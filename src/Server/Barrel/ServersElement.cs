@@ -11,7 +11,7 @@ namespace Gablarski.Barrel
 	{
 		public new IEnumerator<ServerElement> GetEnumerator ()
 		{
-			return base.Cast<ServerElement>();
+			throw new NotImplementedException();
 		}
 
 		protected override ConfigurationElement CreateNewElement()

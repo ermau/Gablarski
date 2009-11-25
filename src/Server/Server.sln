@@ -3,14 +3,10 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski", "..\Gablarski\Gablarski.csproj", "{7347052B-DA5B-4CCA-AB28-3963766E3CDB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Rocks", "..\Mono.Rocks\Mono.Rocks.csproj", "{F656F792-2CDE-4E17-BB5F-6A6F1C266CB8}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Barrel", "Barrel\Barrel.csproj", "{30C9010C-4948-4E83-B73B-04EB92A134FC}"
 	ProjectSection(ProjectDependencies) = postProject
 		{11487129-A8DB-4818-B4AA-236E8CDD92CC} = {11487129-A8DB-4818-B4AA-236E8CDD92CC}
 	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentNHibernate", "..\fluent-nhibernate\src\FluentNHibernate\FluentNHibernate.csproj", "{529145D5-6CC3-4016-89B5-826563024AF1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.WebServer", "..\Gablarski.WebServer\Gablarski.WebServer.csproj", "{11487129-A8DB-4818-B4AA-236E8CDD92CC}"
 EndProject
@@ -36,18 +32,6 @@ Global
 		{7347052B-DA5B-4CCA-AB28-3963766E3CDB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7347052B-DA5B-4CCA-AB28-3963766E3CDB}.Release|x86.ActiveCfg = Release|x86
 		{7347052B-DA5B-4CCA-AB28-3963766E3CDB}.Release|x86.Build.0 = Release|x86
-		{F656F792-2CDE-4E17-BB5F-6A6F1C266CB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F656F792-2CDE-4E17-BB5F-6A6F1C266CB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F656F792-2CDE-4E17-BB5F-6A6F1C266CB8}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{F656F792-2CDE-4E17-BB5F-6A6F1C266CB8}.Debug|x86.Build.0 = Debug|Any CPU
-		{F656F792-2CDE-4E17-BB5F-6A6F1C266CB8}.Mono Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F656F792-2CDE-4E17-BB5F-6A6F1C266CB8}.Mono Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F656F792-2CDE-4E17-BB5F-6A6F1C266CB8}.Mono Debug|x86.ActiveCfg = Debug|Any CPU
-		{F656F792-2CDE-4E17-BB5F-6A6F1C266CB8}.Mono Debug|x86.Build.0 = Debug|Any CPU
-		{F656F792-2CDE-4E17-BB5F-6A6F1C266CB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F656F792-2CDE-4E17-BB5F-6A6F1C266CB8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F656F792-2CDE-4E17-BB5F-6A6F1C266CB8}.Release|x86.ActiveCfg = Release|Any CPU
-		{F656F792-2CDE-4E17-BB5F-6A6F1C266CB8}.Release|x86.Build.0 = Release|Any CPU
 		{30C9010C-4948-4E83-B73B-04EB92A134FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{30C9010C-4948-4E83-B73B-04EB92A134FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{30C9010C-4948-4E83-B73B-04EB92A134FC}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -60,18 +44,6 @@ Global
 		{30C9010C-4948-4E83-B73B-04EB92A134FC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{30C9010C-4948-4E83-B73B-04EB92A134FC}.Release|x86.ActiveCfg = Release|Any CPU
 		{30C9010C-4948-4E83-B73B-04EB92A134FC}.Release|x86.Build.0 = Release|Any CPU
-		{529145D5-6CC3-4016-89B5-826563024AF1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{529145D5-6CC3-4016-89B5-826563024AF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{529145D5-6CC3-4016-89B5-826563024AF1}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{529145D5-6CC3-4016-89B5-826563024AF1}.Debug|x86.Build.0 = Debug|Any CPU
-		{529145D5-6CC3-4016-89B5-826563024AF1}.Mono Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{529145D5-6CC3-4016-89B5-826563024AF1}.Mono Debug|Any CPU.Build.0 = Debug|Any CPU
-		{529145D5-6CC3-4016-89B5-826563024AF1}.Mono Debug|x86.ActiveCfg = Debug|Any CPU
-		{529145D5-6CC3-4016-89B5-826563024AF1}.Mono Debug|x86.Build.0 = Debug|Any CPU
-		{529145D5-6CC3-4016-89B5-826563024AF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{529145D5-6CC3-4016-89B5-826563024AF1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{529145D5-6CC3-4016-89B5-826563024AF1}.Release|x86.ActiveCfg = Release|Any CPU
-		{529145D5-6CC3-4016-89B5-826563024AF1}.Release|x86.Build.0 = Release|Any CPU
 		{11487129-A8DB-4818-B4AA-236E8CDD92CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{11487129-A8DB-4818-B4AA-236E8CDD92CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{11487129-A8DB-4818-B4AA-236E8CDD92CC}.Debug|x86.ActiveCfg = Debug|x86
