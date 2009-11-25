@@ -7,22 +7,22 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Gablarski.License.txt = Gablarski.License.txt
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski", "Gablarski\Gablarski.csproj", "{7347052B-DA5B-4CCA-AB28-3963766E3CDB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski", "src\Gablarski\Gablarski.csproj", "{7347052B-DA5B-4CCA-AB28-3963766E3CDB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.Tests", "Gablarski.Tests\Gablarski.Tests.csproj", "{7F9DB2AA-BA94-4C4F-9CD5-536B9B087D2E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.Tests", "src\Gablarski.Tests\Gablarski.Tests.csproj", "{7F9DB2AA-BA94-4C4F-9CD5-536B9B087D2E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.WebServer", "Gablarski.WebServer\Gablarski.WebServer.csproj", "{11487129-A8DB-4818-B4AA-236E8CDD92CC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.WebServer", "src\Gablarski.WebServer\Gablarski.WebServer.csproj", "{11487129-A8DB-4818-B4AA-236E8CDD92CC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.Clients", "Gablarski.Clients\Gablarski.Clients.csproj", "{F8A695AA-8BC9-46D4-8B7A-BDBD7B74401F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.Clients", "src\Gablarski.Clients\Gablarski.Clients.csproj", "{F8A695AA-8BC9-46D4-8B7A-BDBD7B74401F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Rocks", "Mono.Rocks\Mono.Rocks.csproj", "{F656F792-2CDE-4E17-BB5F-6A6F1C266CB8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Rocks", "src\Mono.Rocks\Mono.Rocks.csproj", "{F656F792-2CDE-4E17-BB5F-6A6F1C266CB8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.Clients.CLI", "Clients\CLI\Gablarski.Clients.CLI.csproj", "{DABD979A-6930-4250-A770-E746736F4AAF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.Clients.CLI", "src\Clients\CLI\Gablarski.Clients.CLI.csproj", "{DABD979A-6930-4250-A770-E746736F4AAF}"
 	ProjectSection(ProjectDependencies) = postProject
 		{11487129-A8DB-4818-B4AA-236E8CDD92CC} = {11487129-A8DB-4818-B4AA-236E8CDD92CC}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.OpenAL", "Gablarski.OpenAL\Gablarski.OpenAL.csproj", "{4B71AD86-B6E7-4833-82B0-3CF38A128984}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.OpenAL", "src\Gablarski.OpenAL\Gablarski.OpenAL.csproj", "{4B71AD86-B6E7-4833-82B0-3CF38A128984}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
