@@ -15,6 +15,7 @@ namespace Gablarski.Barrel
 			set { this["name"] = value; }
 		}
 
+		[ConfigurationProperty ("description", IsRequired = false)]
 		public string Description
 		{
 			get { return (string) this["description"]; }

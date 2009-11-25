@@ -249,6 +249,7 @@
   <ItemGroup>
     <None Include="GablarskiClient.exe.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </None>
     <None Include="Resources.res" />
     <None Include="Resources\connect.png" />

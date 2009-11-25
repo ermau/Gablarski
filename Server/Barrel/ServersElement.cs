@@ -19,9 +19,9 @@ namespace Gablarski.Barrel
 			return new ServerElement();
 		}
 
-		protected override object GetElementKey(ConfigurationElement element)
+		protected override object GetElementKey (ConfigurationElement element)
 		{
-			throw new NotImplementedException();
+			return ((ServerElement)element).Port;
 		}
 	}
 }
