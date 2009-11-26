@@ -84,7 +84,7 @@
 			<fileset basedir="src\Server\Barrel\bin\Debug">
 				<include name="Barrel.exe" />
 				<include name="*.dll" />
-				<incldue name="*.xml" />
+				<include name="*.xml" />
 				<include name="*.pdb" />
 				<include name="*.xsd" />
 				<include name="*.txt" />
