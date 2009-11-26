@@ -6,7 +6,7 @@ using System.Text;
 namespace Gablarski.Barrel
 {
 	public class ServerElement
-		: ConfigurationElement
+		: ConfigurationElementCollection
 	{
 		[ConfigurationProperty ("name", IsRequired = true)]
 		public string Name
@@ -27,6 +27,16 @@ namespace Gablarski.Barrel
 		{
 			get { return (int)this["port"]; }
 			set { this["port"] = value; }
+		}
+
+		protected override ConfigurationElement CreateNewElement()
+		{
+			return new ConnectionProviderElement();
+		}
+
+		protected override object GetElementKey(ConfigurationElement element)
+		{
+			throw new NotImplementedException();
 		}
 	}
 }

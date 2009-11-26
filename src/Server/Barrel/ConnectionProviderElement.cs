@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Gablarski.Barrel
 {
-	public class ChannelsElement
+	public class ConnectionProviderElement
 		: ConfigurationElement
 	{
 	}
