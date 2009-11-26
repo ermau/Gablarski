@@ -92,6 +92,13 @@ namespace Gablarski.Network
 		{
 			this.running = false;
 
+			ManualResetEvent mre = new ManualResetEvent (false);
+
+			if (pinger != null)
+				pinger.Dispose (mre);
+
+			mre.WaitOne();
+
 			try
 			{
 				if (this.tcp != null)
@@ -165,7 +172,9 @@ namespace Gablarski.Network
 
 			this.udp = new Socket (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 			this.udp.Bind ((IPEndPoint)this.tcp.Client.LocalEndPoint);
-			this.udp.SendTo (new byte[] { 24, 24 }, endpoint);
+			Ping (endpoint);
+
+			pinger = new Timer (Ping, endpoint, 45000, 45000);
 
 			Trace.WriteLine ("[Client] UDP Local Endpoint: " + this.udp.LocalEndPoint);
 
@@ -205,9 +214,15 @@ namespace Gablarski.Network
 		private IValueWriter uwriter;
 		private IValueReader ureader;
 		private volatile bool uwaiting;
+		private Timer pinger;
 
 		private readonly AutoResetEvent sendWait = new AutoResetEvent (false);
 		private readonly Queue<MessageBase> sendQueue = new Queue<MessageBase>();
+
+		private void Ping (object state)
+		{
+			this.udp.SendTo (new byte[] { 24, 24 }, (IPEndPoint) state);
+		}
 
 		private void Runner()
 		{
