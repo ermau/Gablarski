@@ -11,7 +11,10 @@ namespace Gablarski.Barrel
 	{
 		public new IEnumerator<ServerElement> GetEnumerator ()
 		{
-			throw new NotImplementedException();
+			var en = base.GetEnumerator();
+			en.Reset ();
+			while (en.MoveNext ())
+				yield return (ServerElement)en.Current;
 		}
 
 		protected override ConfigurationElement CreateNewElement()

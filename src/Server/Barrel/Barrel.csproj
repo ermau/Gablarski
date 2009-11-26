@@ -59,6 +59,7 @@
     <Compile Include="Barrel.cs" />
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="BarrelConfiguration.cs" />
+    <Compile Include="ChannelsElement.cs" />
     <Compile Include="ServerElement.cs" />
     <Compile Include="ServersElement.cs" />
   </ItemGroup>
