@@ -77,7 +77,7 @@
 	<target name="barrelserver" depends="library">
 		<exec program="${DotNetFramework3.5_x86_Path}\msbuild.exe">
 			<arg value='/property:Configuration="Debug";Platform="Any CPU"' />
-			<arg value="src\Server\Barrel.sln" />
+			<arg value="src\Server\Server.sln" />
 		</exec>
 
 		<zip zipfile="Gablarski-Server-Debug.zip">
