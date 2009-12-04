@@ -35,9 +35,6 @@
 // DAMAGE.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Cadenza;
 
 namespace Gablarski.Messages
@@ -86,14 +83,22 @@ namespace Gablarski.Messages
 		public override void WritePayload (IValueWriter writer)
 		{
 			writer.WriteString (this.Nickname);
-			writer.WriteString (this.Phonetic);
+
+			// temp hack
+			if (Gablarski.Client.GablarskiClient.ProtocolVersion > 3)
+				writer.WriteString (this.Phonetic);
+
 			writer.WriteString (this.ServerPassword);
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
 			this.Nickname = reader.ReadString();
-			this.Phonetic = reader.ReadString();
+			
+			// temp hack
+			if (Gablarski.Server.GablarskiServer.ProtocolVersion > 3)
+				this.Phonetic = reader.ReadString();
+
 			this.ServerPassword = reader.ReadString();
 		}
 
