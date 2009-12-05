@@ -140,31 +140,31 @@ namespace Gablarski.Client
 
 		private void OnMessageReceived (object sender, MessageReceivedEventArgs e)
 		{
-			if (!e.Message.Reliable)
-			{
-				var msg = (e.Message as ServerMessage);
-				if (msg == null)
-				{
-					log.Error ("Non ServerMessage received (" + e.Message.MessageTypeCode + "), disconnecting.");
-					Connection.Disconnect ();
-					return;
-				}
+			//if (!e.Message.Reliable)
+			//{
+			//    var msg = (e.Message as ServerMessage);
+			//    if (msg == null)
+			//    {
+			//        log.Error ("Non ServerMessage received (" + e.Message.MessageTypeCode + "), disconnecting.");
+			//        Connection.Disconnect ();
+			//        return;
+			//    }
 
-				if (log.IsDebugEnabled)
-					log.Debug ("Message Received: " + msg.MessageType);
+			//    if (log.IsDebugEnabled)
+			//        log.Debug ("Message Received: " + msg.MessageType);
 
-				if (this.running)
-					this.handlers[msg.MessageType] (e);
-			}
-			else
-			{
+			//    if (this.running)
+			//        this.handlers[msg.MessageType] (e);
+			//}
+			//else
+			//{
 				lock (mqueue)
 				{
 					mqueue.Enqueue (e);
 				}
 
 				incomingWait.Set ();
-			}
+			//}
 		}
 
 		private void OnMuted (MessageReceivedEventArgs obj)
