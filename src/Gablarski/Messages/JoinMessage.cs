@@ -84,7 +84,7 @@ namespace Gablarski.Messages
 		{
 			writer.WriteString (this.Nickname);
 
-			// temp hack
+			// TEMP HACK
 			if (Gablarski.Client.GablarskiClient.ProtocolVersion > 3)
 				writer.WriteString (this.Phonetic);
 

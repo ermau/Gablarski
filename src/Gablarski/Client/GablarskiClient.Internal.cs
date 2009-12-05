@@ -106,59 +106,65 @@ namespace Gablarski.Client
 			OnPermissionDenied (new PermissionDeniedEventArgs (((PermissionDeniedMessage)obj.Message).DeniedMessage));
 		}
 
-		//private void MessageRunner ()
-		//{
-		//    while (this.running)
-		//    {
-		//        while (mqueue.Count > 0)
-		//        {
-		//            MessageReceivedEventArgs e;
-		//            lock (mqueue)
-		//            {
-		//                e = mqueue.Dequeue();
-		//            }
+		private void MessageRunner ()
+		{
+			while (this.running)
+			{
+				while (mqueue.Count > 0)
+				{
+					MessageReceivedEventArgs e;
+					lock (mqueue)
+					{
+						e = mqueue.Dequeue ();
+					}
 
-		//            var msg = (e.Message as ServerMessage);
-		//            if (msg == null)
-		//            {
-		//                log.Error ("Non ServerMessage received (" + e.Message.MessageTypeCode + "), disconnecting.");
-		//                Connection.Disconnect();
-		//                return;
-		//            }
+					var msg = (e.Message as ServerMessage);
+					if (msg == null)
+					{
+						log.Error ("Non ServerMessage received (" + e.Message.MessageTypeCode + "), disconnecting.");
+						Connection.Disconnect ();
+						return;
+					}
 
-		//            if (log.IsDebugEnabled)
-		//                log.Debug ("Message Received: " + msg.MessageType);
+					if (log.IsDebugEnabled)
+						log.Debug ("Message Received: " + msg.MessageType);
 
-		//            if (this.running)
-		//                this.handlers[msg.MessageType] (e);
-		//        }
+					if (this.running)
+						this.handlers[msg.MessageType] (e);
+				}
 
-		//        if (mqueue.Count == 0)
-		//            incomingWait.WaitOne ();
-		//    }
-		//}
+				if (mqueue.Count == 0)
+					incomingWait.WaitOne ();
+			}
+		}
 
 		private void OnMessageReceived (object sender, MessageReceivedEventArgs e)
 		{
-			var msg = (e.Message as ServerMessage);
-			if (msg == null)
+			if (!e.Message.Reliable)
 			{
-				log.Error ("Non ServerMessage received (" + e.Message.MessageTypeCode + "), disconnecting.");
-				Connection.Disconnect ();
-				return;
+				var msg = (e.Message as ServerMessage);
+				if (msg == null)
+				{
+					log.Error ("Non ServerMessage received (" + e.Message.MessageTypeCode + "), disconnecting.");
+					Connection.Disconnect ();
+					return;
+				}
+
+				if (log.IsDebugEnabled)
+					log.Debug ("Message Received: " + msg.MessageType);
+
+				if (this.running)
+					this.handlers[msg.MessageType] (e);
 			}
+			else
+			{
+				lock (mqueue)
+				{
+					mqueue.Enqueue (e);
+				}
 
-			if (log.IsDebugEnabled)
-				log.Debug ("Message Received: " + msg.MessageType);
-
-			if (this.running)
-				this.handlers[msg.MessageType] (e);
-			//lock (mqueue)
-			//{
-			//    mqueue.Enqueue (e);
-			//}
-
-			//incomingWait.Set ();
+				incomingWait.Set ();
+			}
 		}
 
 		private void OnMuted (MessageReceivedEventArgs obj)

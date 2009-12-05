@@ -177,31 +177,24 @@ namespace Gablarski.Clients.Windows
 
 		private void btnSaveServer_Click (object sender, EventArgs e)
 		{
-			try
-			{
-				if (!ValidateChildren (ValidationConstraints.Visible))
-					return;
+			if (!ValidateChildren (ValidationConstraints.Visible))
+				return;
 
-				if (this.Entry == null)
-					this.Entry = new ServerEntry();
+			if (this.Entry == null)
+				this.Entry = new ServerEntry();
 
-				this.Entry.Name = this.inName.Text.Trim();
-				this.Entry.Host = this.inServer.Text.Trim();
-				this.Entry.Port = Int32.Parse (this.inPort.Text.Trim());
-				this.Entry.ServerPassword = this.inServerPassword.Text.Trim();
-				this.Entry.UserNickname = this.inNickname.Text.Trim();
-				this.Entry.UserName = this.inUsername.Text.Trim();
-				this.Entry.UserPassword = this.inPassword.Text.Trim();
-				Persistance.CurrentSession.SaveOrUpdate (this.Entry);
-				Persistance.CurrentSession.Flush();
+			this.Entry.Name = this.inName.Text.Trim();
+			this.Entry.Host = this.inServer.Text.Trim();
+			this.Entry.Port = Int32.Parse (this.inPort.Text.Trim());
+			this.Entry.ServerPassword = this.inServerPassword.Text.Trim();
+			this.Entry.UserNickname = this.inNickname.Text.Trim();
+			this.Entry.UserName = this.inUsername.Text.Trim();
+			this.Entry.UserPassword = this.inPassword.Text.Trim();
+			Persistance.CurrentSession.SaveOrUpdate (this.Entry);
+			Persistance.CurrentSession.Flush();
 
-				this.ClearEdit();
-				this.LoadServerEntries();
-			}
-			catch (Exception)
-			{
-				throw;
-			}
+			this.ClearEdit();
+			this.LoadServerEntries();
 		}
 
 		private void btnCancel_Click (object sender, EventArgs e)

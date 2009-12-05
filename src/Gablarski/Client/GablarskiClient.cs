@@ -220,9 +220,9 @@ namespace Gablarski.Client
 
 				this.running = true;
 
-				//this.messageRunnerThread = new Thread (this.MessageRunner) { Name = "Gablarski Client Message Runner" };
-				//this.messageRunnerThread.SetApartmentState (ApartmentState.STA);
-				//this.messageRunnerThread.Start();
+				this.messageRunnerThread = new Thread (this.MessageRunner) { Name = "Gablarski Client Message Runner" };
+				this.messageRunnerThread.SetApartmentState (ApartmentState.STA);
+				this.messageRunnerThread.Start ();
 
 				Connection.Disconnected += this.OnDisconnectedInternal;
 				Connection.MessageReceived += OnMessageReceived;

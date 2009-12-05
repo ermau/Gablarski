@@ -149,7 +149,10 @@ namespace Gablarski
 			writer.WriteString (this.Username);
 			writer.WriteInt32 (this.CurrentChannelId);
 			writer.WriteString (this.Nickname);
-			writer.WriteString (this.Phonetic);
+
+			if (GablarskiClient.ProtocolVersion > 3)
+				writer.WriteString (this.Phonetic);
+
 			writer.WriteBool (this.IsMuted);
 		}
 
@@ -159,7 +162,10 @@ namespace Gablarski
 			this.Username = reader.ReadString();
 			this.CurrentChannelId = reader.ReadInt32();
 			this.Nickname = reader.ReadString();
-			this.Phonetic = reader.ReadString();
+			
+			if (GablarskiClient.ProtocolVersion > 3)
+				this.Phonetic = reader.ReadString();
+
 			this.IsMuted = reader.ReadBool();
 		}
 

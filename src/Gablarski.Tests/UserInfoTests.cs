@@ -71,7 +71,10 @@ namespace Gablarski.Tests
 			Assert.AreEqual (UserId, info.UserId);
 			Assert.AreEqual (ChanId, info.CurrentChannelId);
 			Assert.AreEqual (Nickname, info.Nickname);
-			Assert.AreEqual (Phonetic, info.Phonetic);
+
+			if (Gablarski.Client.GablarskiClient.ProtocolVersion > 3) // HACK
+				Assert.AreEqual (Phonetic, info.Phonetic);
+
 			Assert.AreEqual (Muted, info.IsMuted);
 		}
 
