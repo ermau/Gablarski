@@ -63,7 +63,6 @@ namespace Gablarski.Tests
 			Assert.AreEqual (length, stream.Position);
 			Assert.AreEqual (nickname, msg.Nickname);
 		}
-
 		
 		[Test]
 		public void JoinWithServerPassword()
@@ -104,7 +103,12 @@ namespace Gablarski.Tests
 			
 			Assert.AreEqual (length, stream.Position);
 			Assert.AreEqual (nickname, msg.Nickname);
-			Assert.AreEqual (phonetic, msg.Phonetic);
+
+			if (GablarskiClient.ProtocolVersion > 3) // TEMP HACK
+				Assert.AreEqual (phonetic, msg.Phonetic);
+			else
+				Assert.AreEqual (null, msg.Phonetic);
+
 			Assert.AreEqual (password, msg.ServerPassword);
 		}
 

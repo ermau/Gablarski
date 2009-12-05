@@ -95,8 +95,8 @@ namespace Gablarski.Messages
 		{
 			this.Nickname = reader.ReadString();
 			
-			// temp hack
-			if (Gablarski.Server.GablarskiServer.ProtocolVersion > 3)
+			// TEMP HACK
+			if (Gablarski.Client.GablarskiClient.ProtocolVersion > 3)
 				this.Phonetic = reader.ReadString();
 
 			this.ServerPassword = reader.ReadString();
