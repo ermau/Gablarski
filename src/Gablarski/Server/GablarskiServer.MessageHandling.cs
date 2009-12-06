@@ -513,7 +513,7 @@ namespace Gablarski.Server
 			if (!GetPermission (n, msg.ChannelId, speaker.UserId))
 				return;
 
-			this.connections.Send (new AudioSourceStateChangeMessage (msg.Starting, msg.SourceId, msg.ChannelId), (con, user) => con != e.Connection && user.CurrentChannelId == msg.ChannelId);
+			this.connections.Send (new AudioSourceStateChangeMessage (msg.Starting, msg.SourceId, msg.ChannelId));//, (con, user) => con != e.Connection && user.CurrentChannelId == msg.ChannelId);
 		}
 
 		protected void AudioDataReceived (MessageReceivedEventArgs e)
