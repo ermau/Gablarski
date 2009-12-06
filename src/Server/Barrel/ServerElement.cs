@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Text;
@@ -36,7 +36,7 @@ namespace Gablarski.Barrel
 
 		protected override object GetElementKey(ConfigurationElement element)
 		{
-			throw new NotImplementedException();
+			return ((ConnectionProviderElement)element).Type;
 		}
 	}
 }
