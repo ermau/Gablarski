@@ -52,6 +52,7 @@ namespace Gablarski.Audio
 			int total = 0;
 			for (int i = 0; i < samples.Length; i += 2)
 			{
+				// fixed (byte *b = samples) { while () { short s = ((short)*b) - 128; total += (short < 0 ? short * -1 : short); b++ } }
 				//total += Math.Abs ((samples[i] | (samples[i + 1] << 8)) - 128);
 				total += Math.Abs (BitConverter.ToInt16 (samples, i) - 128);
 			}
