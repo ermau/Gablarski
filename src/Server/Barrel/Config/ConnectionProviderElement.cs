@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using System.Text;
+﻿using System.Configuration;
 
-namespace Gablarski.Barrel
+namespace Gablarski.Barrel.Config
 {
 	public class ConnectionProviderElement
 		: ConfigurationElement
@@ -12,8 +8,8 @@ namespace Gablarski.Barrel
 		[ConfigurationProperty ("type", IsRequired = true)]
 		public string Type
 		{
-			get;
-			set;
+			get { return (string) this["type"]; }
+			set { this["type"] = value; }
 		}
 	}
 }

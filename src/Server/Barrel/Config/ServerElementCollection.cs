@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Configuration;
-using System.Text;
-using System.Linq;
 
-namespace Gablarski.Barrel
+namespace Gablarski.Barrel.Config
 {
-	public class ServersElement
+	public class ServerElementCollection
 		: ConfigurationElementCollection, IEnumerable<ServerElement>
 	{
 		public new IEnumerator<ServerElement> GetEnumerator ()
