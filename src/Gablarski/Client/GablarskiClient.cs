@@ -222,6 +222,7 @@ namespace Gablarski.Client
 
 				this.messageRunnerThread = new Thread (this.MessageRunner) { Name = "Gablarski Client Message Runner" };
 				this.messageRunnerThread.SetApartmentState (ApartmentState.STA);
+				this.messageRunnerThread.Priority = ThreadPriority.Highest;
 				this.messageRunnerThread.Start ();
 
 				Connection.Disconnected += this.OnDisconnectedInternal;
