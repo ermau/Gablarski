@@ -8,6 +8,6 @@ namespace Gablarski.Clients.CLI
 {
 	public abstract class CommandModule
 	{
-		public abstract bool Process (string part, TextWriter writer);
+		public abstract bool Process (string line);
 	}
 }

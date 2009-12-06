@@ -10,16 +10,23 @@ namespace Gablarski.Clients.CLI
 	public abstract class GClientModule
 		: CommandModule
 	{
+		private readonly TextWriter writer;
 		private readonly GablarskiClient client;
 
-		protected GClientModule (GablarskiClient client)
+		protected GClientModule (GablarskiClient client, TextWriter writer)
 		{
 			this.client = client;
+			this.writer = writer;
 		}
 
 		protected GablarskiClient Client
 		{
 			get { return this.client; }
+		}
+
+		protected TextWriter Writer
+		{
+			get { return this.writer; }
 		}
 
 		protected UserInfo FindUser (string part)

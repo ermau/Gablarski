@@ -8,16 +8,11 @@ using Gablarski.Server;
 namespace Gablarski.Clients.CLI
 {
 	public class ServerModule
-		: GServerModule
+		: CommandModule
 	{
-		public ServerModule(GablarskiServer server)
-			: base (server)
-		{
-		}
-
 		#region Overrides of CommandModule
 
-		public override bool Process (string part, TextWriter writer)
+		public override bool Process (string part)
 		{
 			throw new NotImplementedException();
 		}

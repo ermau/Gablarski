@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using Mono.Options;
@@ -7,19 +8,19 @@ using Cadenza;
 
 namespace Gablarski.Clients.CLI
 {
-	public static class OptionsExtensions
+	public static class CommandLine
 	{
-		public static List<string> Parse (this OptionSet self, string args)
+		public static IList<string> Parse (this OptionSet self, string args)
 		{
 			if (self == null)
 				throw new ArgumentNullException("self");
 			if (args == null)
 				throw new ArgumentNullException("args");
 
-			return self.Parse (ParseCore (args));
+			return self.Parse (Parse (args));
 		}
 
-		internal static IEnumerable<string> ParseCore (string args)
+		public static IList<string> Parse (string args)
 		{
 			if (args == null)
 				throw new ArgumentNullException ("args");
@@ -28,7 +29,8 @@ namespace Gablarski.Clients.CLI
 
 			int lastSpace = 0;
 			bool inQuotes = false;
-			for (int i = 0; i < args.Length; ++i)
+			int i = 0;
+			for (; i < args.Length; ++i)
 			{		
 				switch (args[i])
 				{
@@ -42,17 +44,27 @@ namespace Gablarski.Clients.CLI
 					case ' ':
 						if (inQuotes)
 							break;
-						
-						arglist.Add (args.Substring (lastSpace, i - lastSpace));
+
+						string arg = args.Substring (lastSpace, i - lastSpace);
+						if (arg.StartsWith ("\"") && arg.EndsWith ("\""))
+							arg = arg.Substring (1, arg.Length - 2);
+
+						arglist.Add (arg);
 						lastSpace = i + 1;
 						break;
 				}
 			}
 
 			if (lastSpace != args.Length)
-				arglist.Add (args.Substring (lastSpace, args.Length - lastSpace));
+			{
+				string arg = args.Substring (lastSpace, args.Length - lastSpace);
+				if (arg.StartsWith ("\"") && arg.EndsWith ("\""))
+					arg = arg.Substring (1, arg.Length - 2);
 
-			return arglist;
+				arglist.Add (arg);
+			}
+
+			return new ReadOnlyCollection<string> (arglist);
 		}
 	}
 }
