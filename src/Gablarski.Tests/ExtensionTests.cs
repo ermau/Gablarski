@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cadenza;
 using NUnit.Framework;
 
 namespace Gablarski.Tests
@@ -13,16 +14,16 @@ namespace Gablarski.Tests
 		public void IsEmpty()
 		{
 			string foo = null;
-			Assert.IsTrue (foo.IsEmpty());
+			Assert.IsTrue (foo.IsNullOrWhitespace());
 
 			foo = String.Empty;
-			Assert.IsTrue (foo.IsEmpty());
+			Assert.IsTrue (foo.IsNullOrWhitespace());
 
 			foo = "   ";
-			Assert.IsTrue (foo.IsEmpty());
+			Assert.IsTrue (foo.IsNullOrWhitespace());
 
 			foo = "wee ";
-			Assert.IsFalse (foo.IsEmpty());
+			Assert.IsFalse (foo.IsNullOrWhitespace());
 		}
 
 		[Test]
