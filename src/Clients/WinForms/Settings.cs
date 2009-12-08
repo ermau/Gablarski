@@ -156,7 +156,7 @@ namespace Gablarski.Clients.Windows
 			{
 				return GetSetting (EnabledNotifiersSettingName,
 					"Gablarski.Growl.GrowlNotifier, Gablarski.Growl;Gablarski.SpeechNotifier.EventSpeech, Gablarski.SpeechNotifier"
-					).Split (';').Where (s => !s.IsEmpty());
+					).Split (';').Where (s => !s.IsNullOrWhitespace());
 			}
 
 			set
@@ -173,7 +173,7 @@ namespace Gablarski.Clients.Windows
 			{
 				return GetSetting (EnabledMediaPlayerIntegrationsSettingName,
 					"Gablarski.iTunes.iTunesIntegration, Gablarski.iTunes;Gablarski.Winamp.WinampIntegration, Gablarski.Winamp"
-					).Split (';').Where (s => !s.IsEmpty());
+					).Split (';').Where (s => !s.IsNullOrWhitespace());
 			}
 
 			set

@@ -147,7 +147,7 @@ namespace Gablarski.Clients.Windows
 
 			this.playback = (IPlaybackProvider)Activator.CreateInstance (Type.GetType (Settings.PlaybackProvider));
 
-			if (Settings.PlaybackDevice.IsEmpty ())
+			if (Settings.PlaybackDevice.IsNullOrWhitespace ())
 				this.playback.Device = this.playback.DefaultDevice;
 			else
 			{
@@ -470,7 +470,7 @@ namespace Gablarski.Clients.Windows
 					LocalServer.Permissions.SetAdmin (e.Result.UserId);
 
 				string serverpassword = this.server.ServerPassword;
-				if (this.gablarski.ServerInfo.Passworded && serverpassword.IsEmpty())
+				if (this.gablarski.ServerInfo.Passworded && serverpassword.IsNullOrWhitespace())
 					serverpassword = RequireServerPassword();
 
 				if (this.gablarski.IsConnected)
@@ -555,7 +555,7 @@ namespace Gablarski.Clients.Windows
 
 			string userpassword = this.server.UserPassword;
 
-			if (this.server.UserNickname.IsEmpty ())
+			if (this.server.UserNickname.IsNullOrWhitespace ())
 			{
 				InputForm nickname = new InputForm ();
 				if (nickname.ShowDialogOnFormThread (this) == DialogResult.Cancel)
@@ -564,7 +564,7 @@ namespace Gablarski.Clients.Windows
 				this.server.UserNickname = nickname.Input.Text.Trim ();
 			}
 			
-			if (!this.server.UserName.IsEmpty() && userpassword.IsEmpty())
+			if (!this.server.UserName.IsNullOrWhitespace() && userpassword.IsNullOrWhitespace())
 			{
 				InputForm input = new InputForm();
 				input.Input.UseSystemPasswordChar = true;
@@ -580,10 +580,10 @@ namespace Gablarski.Clients.Windows
 				userpassword = input.Input.Text;
 			}
 
-			if (this.server.UserName.IsEmpty() || this.server.UserPassword == null)
+			if (this.server.UserName.IsNullOrWhitespace() || this.server.UserPassword == null)
 			{
 				string serverpassword = this.server.ServerPassword;
-				if (this.gablarski.ServerInfo.Passworded && serverpassword.IsEmpty())
+				if (this.gablarski.ServerInfo.Passworded && serverpassword.IsNullOrWhitespace())
 					serverpassword = RequireServerPassword();
 
 				if (this.gablarski.IsConnected)
