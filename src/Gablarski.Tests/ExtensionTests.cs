@@ -11,22 +11,6 @@ namespace Gablarski.Tests
 	public class ExtensionTests
 	{
 		[Test]
-		public void IsEmpty()
-		{
-			string foo = null;
-			Assert.IsTrue (foo.IsNullOrWhitespace());
-
-			foo = String.Empty;
-			Assert.IsTrue (foo.IsNullOrWhitespace());
-
-			foo = "   ";
-			Assert.IsTrue (foo.IsNullOrWhitespace());
-
-			foo = "wee ";
-			Assert.IsFalse (foo.IsNullOrWhitespace());
-		}
-
-		[Test]
 		public void Trim()
 		{
 			int bar = 2;
