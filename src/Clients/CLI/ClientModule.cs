@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -32,6 +32,7 @@ namespace Gablarski.Clients.CLI
 				Writer.WriteLine ("client commands:");
 				Writer.WriteLine ("connect - connects to a server");
 				Writer.WriteLine ("join - joins the server as a user");
+				Writer.WriteLine ("disconnect - disconnects from the current server");
 				return true;
 			}
 
@@ -51,6 +52,16 @@ namespace Gablarski.Clients.CLI
 
 					Client.Connect (hostParts[0], port);
 
+					return true;
+				}
+				
+				case "disconnect":
+				{
+					if (Client.IsConnected)
+						Client.Disconnect();
+					else
+						Writer.WriteLine ("Not connected");
+					
 					return true;
 				}
 

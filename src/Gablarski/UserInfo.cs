@@ -39,6 +39,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Gablarski.Client;
+using Cadenza;
 
 namespace Gablarski
 {
@@ -68,9 +69,9 @@ namespace Gablarski
 
 		internal UserInfo (string nickname, string phonetic, string username, int userId, int currentChannelId, bool muted)
 		{
-			if (nickname.IsEmpty())
+			if (nickname.IsNullOrWhitespace())
 				throw new ArgumentNullException ("nickname");
-			if (username.IsEmpty())
+			if (username.IsNullOrWhitespace())
 				throw new ArgumentNullException ("username");
 			if (userId == 0)
 				throw new ArgumentException ("userId");
@@ -87,7 +88,7 @@ namespace Gablarski
 
 		internal UserInfo (string username, int userId, int currentChannelId, bool muted)
 		{
-			if (username.IsEmpty())
+			if (username.IsNullOrWhitespace())
 				throw new ArgumentNullException ("username");
 			if (userId == 0)
 				throw new ArgumentException ("userId");

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -15,7 +15,7 @@ namespace Gablarski.Clients.CLI
 			: base (client, writer)
 		{
 		}
-
+		
 		public override bool Process (string command)
 		{
 			string[] parts = command.Split (' ');
@@ -105,6 +105,14 @@ namespace Gablarski.Clients.CLI
 
 				default:
 					return false;
+			}
+		}
+		
+		static void WriteChannels (IEnumerable<ChannelInfo> channels, TextWriter writer, ChannelInfo parent)
+		{
+			foreach (var c in channels.Where (ci => (parent != null) ? ci.ParentChannelId == parent.ChannelId : ci.ParentChannelId == 0))
+			{
+				WriteChannels (channels, writer, c);
 			}
 		}
 	}

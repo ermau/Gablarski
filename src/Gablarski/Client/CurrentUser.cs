@@ -40,6 +40,7 @@ using System.Linq;
 using System.Text;
 using Gablarski.Messages;
 using Gablarski.Server;
+using Cadenza;
 
 namespace Gablarski.Client
 {
@@ -59,7 +60,7 @@ namespace Gablarski.Client
 		{
 			if (userId == 0)
 				throw new ArgumentException("userId");
-			if (nickname.IsEmpty())
+			if (nickname.IsNullOrWhitespace())
 				throw new ArgumentNullException("nickname", "nickname is null or empty.");
 			if (currentChannelId < 0)
 				throw new ArgumentOutOfRangeException("currentChannelId");
@@ -100,7 +101,7 @@ namespace Gablarski.Client
 		/// <exception cref="System.ArgumentNullException"><paramref name="password"/> is null.</exception>
 		public void Login (string username, string password)
 		{
-			if (username.IsEmpty())
+			if (username.IsNullOrWhitespace())
 				throw new ArgumentNullException("username");
 			if (password == null)
 				throw new ArgumentNullException("password");
@@ -130,7 +131,7 @@ namespace Gablarski.Client
 		/// <param name="serverPassword">The password to join the server.</param>
 		public void Join (string nickname, string phonetic, string serverPassword)
 		{
-			if (nickname.IsEmpty())
+			if (nickname.IsNullOrWhitespace())
 				throw new ArgumentNullException ("nickname");
 
 			this.context.Connection.Send (new JoinMessage (nickname, phonetic, serverPassword));

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -58,11 +58,6 @@ namespace Gablarski
 			}
 
 			return buffer;
-		}
-
-		public static bool IsEmpty (this string self)
-		{
-			return (String.IsNullOrEmpty (self) || self.Trim () == String.Empty);
 		}
 
 		public static T Trim<T> (this T self, T maximum)

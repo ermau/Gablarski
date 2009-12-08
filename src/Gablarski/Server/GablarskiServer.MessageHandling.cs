@@ -43,6 +43,7 @@ using Gablarski.Messages;
 using System.Diagnostics;
 using System.Threading;
 using log4net;
+using Cadenza;
 
 namespace Gablarski.Server
 {
@@ -306,7 +307,7 @@ namespace Gablarski.Server
 		{
 			var join = (JoinMessage)e.Message;
 
-			if (join.Nickname.IsEmpty ())
+			if (join.Nickname.IsNullOrWhitespace ())
 			{
 				e.Connection.Send (new JoinResultMessage (LoginResultState.FailedInvalidNickname, null));
 				return;
@@ -384,7 +385,7 @@ namespace Gablarski.Server
 		{
 			var login = (LoginMessage)e.Message;
 
-			if (login.Username.IsEmpty())
+			if (login.Username.IsNullOrWhitespace())
 			{
 				e.Connection.Send (new LoginResultMessage (new LoginResult (0, LoginResultState.FailedUsername)));
 				return;

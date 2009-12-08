@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
@@ -48,6 +48,9 @@ namespace Gablarski.Clients.CLI
 					default:
 						if (line.StartsWith ("connect"))
 							line = line.Replace ("connect", "client connect");
+							
+						if (line.StartsWith ("disconnect"))
+							line = line.Replace ("disconnect", "client disconnect");
 
 						if (line.StartsWith ("join"))
 							line = line.Replace ("join", "client join");

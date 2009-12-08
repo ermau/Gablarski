@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -211,7 +211,7 @@ namespace Gablarski.Client
 		/// <exception cref="System.Net.Sockets.SocketException">Hostname could not be resolved.</exception>
 		public void Connect (string host, int port)
 		{
-			if (host.IsEmpty ())
+			if (host.IsNullOrWhitespace ())
 				throw new ArgumentException ("host must not be null or empty", "host");
 
 			try
