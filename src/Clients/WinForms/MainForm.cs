@@ -14,6 +14,7 @@ using Gablarski.Network;
 using Microsoft.WindowsAPICodePack.Taskbar;
 using System.IO;
 using System.Diagnostics;
+using Cadenza;
 
 namespace Gablarski.Clients.Windows
 {
