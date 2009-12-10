@@ -102,6 +102,15 @@ namespace Gablarski.Network
 			
 			this.running = false;
 
+			ManualResetEvent mre = new ManualResetEvent (false);
+
+			if (pinger != null)
+				pinger.Dispose (mre);
+			else
+				mre.Set ();
+
+			mre.WaitOne ();
+
 			try
 			{
 				if (this.tcp != null)
@@ -218,9 +227,15 @@ namespace Gablarski.Network
 		private IValueWriter uwriter;
 		private IValueReader ureader;
 		private volatile bool uwaiting;
+		private Timer pinger;
 
 		private readonly AutoResetEvent sendWait = new AutoResetEvent (false);
 		private readonly Queue<MessageBase> sendQueue = new Queue<MessageBase>();
+
+		private void Ping (object state)
+		{
+			this.udp.SendTo (new byte[] { 24, 24 }, (IPEndPoint)state);
+		}
 
 		private void Runner()
 		{
@@ -358,9 +373,12 @@ namespace Gablarski.Network
 						log.DebugFormat ("Received message {0} from {1}", msg.MessageTypeCode, endpoint);
 				
 					msg.ReadPayload (reader);
-					
+
 					if (msg.MessageTypeCode == (ushort)ClientMessageType.PunchThrough)
+					{
 						Send (new PunchThroughMessage (PunchThroughStatus.Bleeding));
+						pinger = new Timer (Ping, endpoint, 45000, 45000);
+					}
 					else
 						OnMessageReceived (new MessageReceivedEventArgs (this, msg));
 				}
