@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 
 // Redistribution and use in source and binary forms, with
@@ -206,8 +206,16 @@ namespace Gablarski.Network
 						}
 						else
 						{
-							//Trace.WriteLine ("[Network] Unreliable message received: " + msg.MessageTypeCode);
-							connection.Receive (msg);
+							if (msg.MessageTypeCode == (ushort)ServerMessageType.PunchThroughReceived)
+							{
+								var punch = (PunchThroughMessage)msg;
+								if (punch.Status == PunchThroughStatus.Punch)
+									connection.Send (new PunchThroughReceivedMessage ());
+								else if (punch.Status == PunchThroughStatus.Bleeding)
+									connection.bleeding = true;
+							}
+							else
+								connection.Receive (msg);
 						}
 					}
 				}
@@ -330,7 +338,7 @@ namespace Gablarski.Network
 			{
 				IValueWriter iwriter;
 				if (connection != null)
-					iwriter = (!message.Reliable) ? connection.UnreliableWriter : connection.ReliableWriter;
+					iwriter = (!message.Reliable && connection.bleeding) ? connection.UnreliableWriter : connection.ReliableWriter;
 				else
 					iwriter = clWriter;
 

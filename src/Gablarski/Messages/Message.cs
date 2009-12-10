@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -41,7 +41,7 @@ using System.Text;
 
 namespace Gablarski.Messages
 {
-	// Next: 39
+	// Next: 41
 
 	public enum ClientMessageType
 		: ushort
@@ -51,6 +51,7 @@ namespace Gablarski.Messages
 		Join = 37,
 		Disconnect = 5,
 		QueryServer = 34,
+		PunchThrough = 39,
 
 		RequestSourceList = 15,
 		RequestSource = 7,
@@ -72,6 +73,8 @@ namespace Gablarski.Messages
 		: ushort
 	{
 		ConnectionRejected = 2,
+		PunchThroughReceived = 40,
+		
 		QueryServerResult = 36,
 		ServerInfoReceived = 12,
 		LoginResult = 4,

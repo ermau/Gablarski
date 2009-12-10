@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -78,6 +78,7 @@ namespace Gablarski.Network
 			OnDisconnected ();
 		}
 
+		internal bool bleeding;
 		internal readonly uint NetworkId;
 		internal readonly TcpClient Tcp;
 		internal readonly Stream ReliableStream;

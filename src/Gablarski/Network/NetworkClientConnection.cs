@@ -176,7 +176,6 @@ namespace Gablarski.Network
 
 			this.udp = new Socket (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 			this.udp.Bind ((IPEndPoint)this.tcp.Client.LocalEndPoint);
-			this.udp.SendTo (new byte[] { 24, 24 }, endpoint);
 
 			log.DebugFormat ("UDP Local Endpoint: {0}", this.udp.LocalEndPoint);
 
@@ -195,6 +194,8 @@ namespace Gablarski.Network
 			var tendpoint = (EndPoint)ipendpoint;
 			byte[] urbuffer = new byte[5120];
 			this.udp.BeginReceiveFrom (urbuffer, 0, urbuffer.Length, SocketFlags.None, ref tendpoint, UnreliableReceive, urbuffer);
+			
+			Send (new PunchThroughMessage (PunchThroughStatus.Punch));
 
 			this.runnerThread = new Thread (this.Runner) { Name = "NetworkClientConnection Runner" };
 			this.runnerThread.Start();
@@ -357,8 +358,11 @@ namespace Gablarski.Network
 						log.DebugFormat ("Received message {0} from {1}", msg.MessageTypeCode, endpoint);
 				
 					msg.ReadPayload (reader);
-
-					OnMessageReceived (new MessageReceivedEventArgs (this, msg));
+					
+					if (msg.MessageTypeCode == (ushort)ClientMessageType.PunchThrough)
+						Send (new PunchThroughMessage (PunchThroughStatus.Bleeding));
+					else
+						OnMessageReceived (new MessageReceivedEventArgs (this, msg));
 				}
 			}
 			catch (SocketException sex)
