@@ -206,7 +206,7 @@ namespace Gablarski.Network
 						}
 						else
 						{
-							if (msg.MessageTypeCode == (ushort)ServerMessageType.PunchThroughReceived)
+							if (msg.MessageTypeCode == (ushort)ClientMessageType.PunchThrough)
 							{
 								var punch = (PunchThroughMessage)msg;
 								if (punch.Status == PunchThroughStatus.Punch)

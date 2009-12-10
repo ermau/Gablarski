@@ -128,7 +128,11 @@ namespace Gablarski.Client
 										"[Client] Message Received: " + msg.MessageType);
 
 					if (this.running)
-                        this.handlers[msg.MessageType] (e);
+					{
+						Action<MessageReceivedEventArgs> handler;
+						if (this.handlers.TryGetValue (msg.MessageType, out handler))
+							handler (e);
+					}
 				}
 
 				if (mqueue.Count == 0)

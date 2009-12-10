@@ -374,7 +374,7 @@ namespace Gablarski.Network
 				
 					msg.ReadPayload (reader);
 
-					if (msg.MessageTypeCode == (ushort)ClientMessageType.PunchThrough)
+					if (msg.MessageTypeCode == (ushort)ServerMessageType.PunchThroughReceived)
 					{
 						Send (new PunchThroughMessage (PunchThroughStatus.Bleeding));
 						pinger = new Timer (Ping, endpoint, 45000, 45000);
