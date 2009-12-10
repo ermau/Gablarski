@@ -47,7 +47,7 @@ namespace Gablarski.Server
 {
 	public partial class GablarskiServer
 	{
-		public static readonly int ProtocolVersion = 3;
+		public static readonly int ProtocolVersion = 4;
 
 		/// <summary>
 		/// Initializes a new <c>GablarskiServer</c> instance.

@@ -1,24 +1,24 @@
-﻿// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
-
+//
 // Redistribution and use in source and binary forms, with
 // or without modification, are permitted provided that
 // the following conditions are met:
-
+//
 // - Redistributions of source code must retain the above 
 //   copyright notice, this list of conditions and the
 //   following disclaimer.
-
+//
 // - Redistributions in binary form must reproduce the above
 //   copyright notice, this list of conditions and the
 //   following disclaimer in the documentation and/or other
 //   materials provided with the distribution.
-
+//
 // - Neither the name of Gablarski nor the names of its
 //   contributors may be used to endorse or promote products
-//   derived from this software without specific prior
-//   written permission.
-
+//   or services derived from this software without specific
+//   prior written permission.
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS
 // AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 // WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -50,6 +50,11 @@ namespace Gablarski.Network
 	public class NetworkClientConnection
 		: IClientConnection
 	{
+		public NetworkClientConnection()
+		{
+			this.log = log4net.LogManager.GetLogger ("CNetwork");
+		}
+	
 		#region Implementation of IConnection
 
 		/// <summary>
@@ -77,6 +82,9 @@ namespace Gablarski.Network
 		/// <exception cref="System.ArgumentNullException"><paramref name="message"/> is <c>null</c>.</exception>
 		public void Send (MessageBase message)
 		{
+			if (log.IsDebugEnabled)
+				log.DebugFormat ("Enqueuing {1} message {0} for send", message.MessageTypeCode, (message.Reliable) ? "reliable" : "unreliable");
+
 			lock (sendQueue)
 			{
 				sendQueue.Enqueue (message);
@@ -90,14 +98,9 @@ namespace Gablarski.Network
 		/// </summary>
 		public void Disconnect()
 		{
+			log.Info ("Disconnecting");
+			
 			this.running = false;
-
-			ManualResetEvent mre = new ManualResetEvent (false);
-
-			if (pinger != null)
-				pinger.Dispose (mre);
-
-			mre.WaitOne();
 
 			try
 			{
@@ -110,8 +113,9 @@ namespace Gablarski.Network
 				if (this.udp != null)
 					this.udp.Close();
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
+				log.Warn ("Exception during disconnection.", ex);
 			}
 
 			lock (this.sendQueue)
@@ -160,23 +164,20 @@ namespace Gablarski.Network
 		/// <exception cref="System.ArgumentNullException"><paramref name="endpoint"/> is <c>null</c>.</exception>
 		public void Connect (IPEndPoint endpoint)
 		{
+			log.InfoFormat ("Connecting to {0}", endpoint);
+			
 			this.running = true;
-
-			Trace.WriteLine ("[Client] Connecting to " + endpoint.Address + ":" + endpoint.Port);
 
 			this.tcp = new TcpClient (new IPEndPoint (IPAddress.Any, 0));
 			this.tcp.Connect (endpoint);
 			this.rstream = this.tcp.GetStream();
 
-			Trace.WriteLine ("[Client] TCP Local Endpoint: " + this.tcp.Client.LocalEndPoint);
+			log.DebugFormat ("TCP Local Endpoint: {0}", this.tcp.Client.LocalEndPoint);
 
 			this.udp = new Socket (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 			this.udp.Bind ((IPEndPoint)this.tcp.Client.LocalEndPoint);
-			Ping (endpoint);
 
-			pinger = new Timer (Ping, endpoint, 45000, 45000);
-
-			Trace.WriteLine ("[Client] UDP Local Endpoint: " + this.udp.LocalEndPoint);
+			log.DebugFormat ("UDP Local Endpoint: {0}", this.udp.LocalEndPoint);
 
 			this.rwriter = new StreamValueWriter (this.rstream);
 			this.rreader = new StreamValueReader (this.rstream);
@@ -193,6 +194,8 @@ namespace Gablarski.Network
 			var tendpoint = (EndPoint)ipendpoint;
 			byte[] urbuffer = new byte[5120];
 			this.udp.BeginReceiveFrom (urbuffer, 0, urbuffer.Length, SocketFlags.None, ref tendpoint, UnreliableReceive, urbuffer);
+			
+			Send (new PunchThroughMessage (PunchThroughStatus.Punch));
 
 			this.runnerThread = new Thread (this.Runner) { Name = "NetworkClientConnection Runner" };
 			this.runnerThread.Start();
@@ -203,6 +206,7 @@ namespace Gablarski.Network
 		private volatile bool running;
 		private Thread runnerThread;
 
+		private readonly log4net.ILog log;
 		private TcpClient tcp;
 		private NetworkStream rstream;
 		private IValueWriter rwriter;
@@ -214,15 +218,9 @@ namespace Gablarski.Network
 		private IValueWriter uwriter;
 		private IValueReader ureader;
 		private volatile bool uwaiting;
-		private Timer pinger;
 
 		private readonly AutoResetEvent sendWait = new AutoResetEvent (false);
 		private readonly Queue<MessageBase> sendQueue = new Queue<MessageBase>();
-
-		private void Ping (object state)
-		{
-			this.udp.SendTo (new byte[] { 24, 24 }, (IPEndPoint) state);
-		}
 
 		private void Runner()
 		{
@@ -242,6 +240,9 @@ namespace Gablarski.Network
 					{
 						toSend = queue.Dequeue ();
 					}
+
+					if (log.IsDebugEnabled)
+						log.DebugFormat ("Dequeued {1} message {0} for send", toSend.MessageTypeCode, (toSend.Reliable) ? "reliable" : "unreliable");
 
 					IValueWriter iwriter = (!toSend.Reliable) ? writeUnreliable : writeReliable;
 					iwriter.WriteByte (0x2A);
@@ -283,8 +284,8 @@ namespace Gablarski.Network
 
 				if (mbuffer[0] != 0x2A)
 				{
-					Trace.WriteLine ("[Network] Failed reliable sanity check, disconnecting.");
-					this.Disconnect();
+					log.Error ("Failed reliable sanity check, disconnecting.");
+					Disconnect();
 					return;
 				}
 
@@ -294,6 +295,9 @@ namespace Gablarski.Network
 				if (MessageBase.GetMessage (type, out msg))
 				{
 					msg.ReadPayload (this.rreader);
+					
+					if (log.IsDebugEnabled)
+						log.DebugFormat ("Received message {0} from server", msg.MessageTypeCode);
 
 					OnMessageReceived (new MessageReceivedEventArgs (this, msg));
 
@@ -305,8 +309,8 @@ namespace Gablarski.Network
 			}
 			catch (Exception ex)
 			{
-				Trace.WriteLine ("[Network] Error reading payload, disconnecting: " + ex.Message);
-				this.Disconnect();
+				log.Error ("Error reading payload, disconnecting", ex);
+				Disconnect();
 				return;
 			}
 			finally
@@ -329,13 +333,13 @@ namespace Gablarski.Network
 			{
 				if (udp.EndReceiveFrom (result, ref endpoint) == 0)
 				{
-					Trace.WriteLineIf (VerboseTracing, "[Network] UDP EndReceiveFrom returned nothing.");
+					log.Debug ("UDP EndReceiveFrom returned nothing.");
 					return;
 				}
 
 				if (buffer[0] != 0x2A)
 				{
-					Trace.WriteLineIf (VerboseTracing, "[Network] Unreliable message failed sanity check.");
+					log.Warn ("Unreliable message failed sanity check.");
 					return;
 				}
 
@@ -345,22 +349,29 @@ namespace Gablarski.Network
 				MessageBase msg;
 				if (!MessageBase.GetMessage (mtype, out msg))
 				{
-					Trace.WriteLineIf (VerboseTracing, "[Network] Message type " + mtype + " not found from " + endpoint);
+					log.WarnFormat ("Message type {0} not found from {1}", mtype, endpoint);
 					return;
 				}
 				else
 				{
+					if (log.IsDebugEnabled)
+						log.DebugFormat ("Received message {0} from {1}", msg.MessageTypeCode, endpoint);
+				
 					msg.ReadPayload (reader);
-
-					OnMessageReceived (new MessageReceivedEventArgs (this, msg));
+					
+					if (msg.MessageTypeCode == (ushort)ClientMessageType.PunchThrough)
+						Send (new PunchThroughMessage (PunchThroughStatus.Bleeding));
+					else
+						OnMessageReceived (new MessageReceivedEventArgs (this, msg));
 				}
 			}
 			catch (SocketException sex)
 			{
-				Trace.WriteLine ("[Network] SocketException during unreliable receive: " + sex);
+				log.Warn ("Error during unreliable receive", sex);
 			}
 			catch (ObjectDisposedException odex)
 			{
+				log.Warn ("Error during unreliable receive", odex);
 			}
 			finally
 			{

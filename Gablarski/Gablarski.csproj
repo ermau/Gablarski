@@ -146,6 +146,8 @@
     <Compile Include="Messages\JoinResultMessage.cs" />
     <Compile Include="Messages\PermissionDeniedMessage.cs" />
     <Compile Include="Messages\PermissionsMessage.cs" />
+    <Compile Include="Messages\PunchThroughMessage.cs" />
+    <Compile Include="Messages\PunchThroughReceivedMessage.cs" />
     <Compile Include="Messages\QueryServerMessage.cs" />
     <Compile Include="Messages\QueryServerResultMessage.cs" />
     <Compile Include="Messages\RequestMuteMessage.cs" />
