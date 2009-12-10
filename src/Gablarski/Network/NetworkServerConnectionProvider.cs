@@ -206,7 +206,7 @@ namespace Gablarski.Network
 						}
 						else
 						{
-							if (msg.MessageTypeCode == (ushort)ServerMessageType.PunchThroughReceived)
+							if (msg.MessageTypeCode == (ushort)ClientMessageType.PunchThrough)
 							{
 								var punch = (PunchThroughMessage)msg;
 								if (punch.Status == PunchThroughStatus.Punch)
@@ -338,7 +338,12 @@ namespace Gablarski.Network
 			{
 				IValueWriter iwriter;
 				if (connection != null)
-					iwriter = (!message.Reliable && connection.bleeding) ? connection.UnreliableWriter : connection.ReliableWriter;
+				{
+					if (!message.Reliable && (connection.bleeding || message.MessageTypeCode == (ushort)ServerMessageType.PunchThroughReceived))
+						iwriter = connection.UnreliableWriter;
+					else
+						iwriter = connection.ReliableWriter;
+				}
 				else
 					iwriter = clWriter;
 

@@ -359,7 +359,7 @@ namespace Gablarski.Network
 				
 					msg.ReadPayload (reader);
 					
-					if (msg.MessageTypeCode == (ushort)ClientMessageType.PunchThrough)
+					if (msg.MessageTypeCode == (ushort)ServerMessageType.PunchThroughReceived)
 						Send (new PunchThroughMessage (PunchThroughStatus.Bleeding));
 					else
 						OnMessageReceived (new MessageReceivedEventArgs (this, msg));
