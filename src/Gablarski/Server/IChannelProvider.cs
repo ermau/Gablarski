@@ -94,7 +94,7 @@ namespace Gablarski.Server
 		/// Gets the default channel or the first channel if no default set.
 		/// </summary>
 		/// <param name="self">The <c>IChannelProvider</c> to retrieve the channels from.</param>
-		/// <returns>The default channel or the first channel if no default set.</returns>
+		/// <returns>The default channel, the first channel if no default set or <c>null</c> if no channels.</returns>
 		public static ChannelInfo GetDefaultOrFirst (this IChannelProvider self)
 		{
 			return (self.DefaultChannel ?? self.GetChannels ().FirstOrDefault ());

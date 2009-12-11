@@ -50,9 +50,24 @@ namespace Gablarski.WebServer
 	public class FileResourceModule
 		: HttpModule
 	{
-		static FileResourceModule()
+		static FileResourceModule ()
 		{
 			ResourceNames = new HashSet<string> (WebAssembly.GetManifestResourceNames());
+		}
+
+		public FileResourceModule ()
+		{
+		}
+
+		public FileResourceModule (string themePath)
+		{
+			try
+			{
+				this.theme = new DirectoryInfo (themePath);
+			}
+			catch
+			{
+			}
 		}
 
 		public override bool Process (IHttpRequest request, IHttpResponse response, IHttpSession session)
@@ -61,21 +76,19 @@ namespace Gablarski.WebServer
 				return false;
 
 			string file = request.UriParts[request.UriParts.Length - 1];
-			string resourceName = "Gablarski.WebServer.Html." + file;
+			
 			if (file.Contains ("."))
 			{
-				Stream resourceStream;
-				if (!ResourceNames.Contains (resourceName) || (resourceStream = WebAssembly.GetManifestResourceStream (resourceName)) == null)
+				response.ContentType = GetMimeType (file);
+
+				byte[] fileContents = GetFile (file);
+				if (fileContents == null)
 				{
 					response.Status = HttpStatusCode.NotFound;
 					return true;
 				}
 
-				response.ContentType = MimeType (file);
-
-				byte[] resourceBuffer = new byte[resourceStream.Length];
-				resourceStream.Read (resourceBuffer, 0, resourceBuffer.Length);
-				response.Body.Write (resourceBuffer, 0, resourceBuffer.Length);
+				response.Body.Write(fileContents, 0, fileContents.Length);
 				response.Body.Flush();
 
 				response.Send();
@@ -86,10 +99,51 @@ namespace Gablarski.WebServer
 			return false;
 		}
 
+		private readonly DirectoryInfo theme;
+
+		private byte[] GetFile (string filePath)
+		{
+			if (this.theme == null || !this.theme.Exists)
+			{
+				string resourceName = "Gablarski.WebServer.Html." + filePath;
+
+				Stream resourceStream;
+				if (!ResourceNames.Contains(resourceName) || (resourceStream = WebAssembly.GetManifestResourceStream(resourceName)) == null)
+				{
+					return null;
+				}
+
+				byte[] resourceBuffer = new byte[resourceStream.Length];
+				resourceStream.Read(resourceBuffer, 0, resourceBuffer.Length);
+
+				return resourceBuffer;
+			}
+			else
+			{
+				try
+				{
+					FileInfo file = new FileInfo (Path.Combine (theme.FullName, filePath));
+					if (!file.Exists)
+						return null;
+
+					var fs = file.OpenRead();
+					byte[] buffer = new byte[fs.Length];
+					fs.Read (buffer, 0, buffer.Length);
+					fs.Close();
+
+					return buffer;
+				}
+				catch
+				{
+					return null;
+				}
+			}
+		}
+
 		private readonly static HashSet<string> ResourceNames;
 		private readonly static Assembly WebAssembly = Assembly.GetAssembly (typeof (FileResourceModule));
 
-		private static string MimeType (string file) 
+		private static string GetMimeType (string file) 
 		{ 
 			switch(Path.GetExtension (file).ToLower()) 
 			{ 
