@@ -126,9 +126,11 @@
     <Compile Include="Config\WebServerConfiguration.cs" />
     <Compile Include="ConnectionManager.cs" />
     <Compile Include="FileResourceModule.cs" />
+    <Compile Include="LoginController.cs" />
     <Compile Include="LoginModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueryModule.cs" />
+    <Compile Include="ResourceTemplateLoader.cs" />
     <Compile Include="UserController.cs" />
     <Compile Include="WebServerConnection.cs" />
     <Compile Include="WebServerConnectionProvider.cs" />

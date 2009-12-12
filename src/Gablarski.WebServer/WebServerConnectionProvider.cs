@@ -41,9 +41,13 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using Gablarski.Messages;
+using Gablarski.Server;
 using Gablarski.WebServer.Config;
 using HttpServer;
+using HttpServer.Helpers;
 using HttpServer.HttpModules;
+using HttpServer.Rendering;
+using HttpServer.Rendering.Tiny;
 using HttpServer.Sessions;
 
 namespace Gablarski.WebServer
@@ -67,25 +71,31 @@ namespace Gablarski.WebServer
 			throw new NotSupportedException();
 		}
 
-		public void StartListening()
+		public void StartListening (IServerContext context)
 		{
 			WebServerConfiguration config = (WebServerConfiguration) ConfigurationManager.GetSection ("webserver");
 
 			var sstore = new MemorySessionStore();
 			server = new HttpServer.HttpServer (sstore);
 
+			TemplateManager templates = new TemplateManager (new ResourceTemplateLoader());
+			templates.AddType (typeof (WebHelper));
+			templates.Add ("tiny", new TinyGenerator());
+
 			ConnectionManager cmanager = new ConnectionManager();
 			cmanager.ConnectionProvider = this;
 			cmanager.Server = server;
 
 			ControllerModule controller = new ControllerModule();
-			controller.Add (new UserController (cmanager));
-			controller.Add (new ChannelController (cmanager));
+			controller.Add (new LoginController (templates, cmanager, context));
+			//controller.Add (new UserController (cmanager));
+			//controller.Add (new ChannelController (cmanager));
 
-			server.Add (new FileResourceModule(config.Theme.Path));
-			server.Add (new LoginModule(cmanager));
-			server.Add (new AdminModule(cmanager));
-			server.Add (new QueryModule(cmanager));
+			//server.Add (new QueryModule(cmanager));
+			//server.Add (new FileResourceModule (config.Theme.Path));
+			//server.Add (new LoginModule(cmanager));
+			//server.Add (new AdminModule(cmanager));
+			server.Add (controller);
 			
 			server.Start (IPAddress.Any, this.Port);
 		}

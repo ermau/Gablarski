@@ -65,6 +65,11 @@ namespace Gablarski.WebServer
 			return true;
 		}
 
+		public string Index()
+		{
+			return "monkeys";
+		}
+
 		#region Overrides of RequestController
 
 		/// <summary>
