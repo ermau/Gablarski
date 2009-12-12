@@ -16,6 +16,7 @@ namespace Gablarski.Tests
 		private const int UserId = 1;
 		private const int ChanId = 2;
 		private const bool Muted = true;
+		private const string Status = "There's a monkey in my barrel!";
 
 		[Test]
 		public void InvalidCtor()
@@ -62,6 +63,8 @@ namespace Gablarski.Tests
 			var reader = new StreamValueReader (stream);
 
 			var info = new UserInfo (Nickname, Phonetic, Username, UserId, ChanId, Muted);
+			info.Status = Status;
+
 			info.Serialize (writer);
 			long length = stream.Position;
 			stream.Position = 0;
@@ -71,11 +74,9 @@ namespace Gablarski.Tests
 			Assert.AreEqual (UserId, info.UserId);
 			Assert.AreEqual (ChanId, info.CurrentChannelId);
 			Assert.AreEqual (Nickname, info.Nickname);
-
-			if (Gablarski.Client.GablarskiClient.ProtocolVersion > 3) // HACK
-				Assert.AreEqual (Phonetic, info.Phonetic);
-
+			Assert.AreEqual (Phonetic, info.Phonetic);
 			Assert.AreEqual (Muted, info.IsMuted);
+			Assert.AreEqual (Status, info.Status);
 		}
 
 		[Test]

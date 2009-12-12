@@ -103,12 +103,7 @@ namespace Gablarski.Tests
 			
 			Assert.AreEqual (length, stream.Position);
 			Assert.AreEqual (nickname, msg.Nickname);
-
-			if (GablarskiClient.ProtocolVersion > 3) // TEMP HACK
-				Assert.AreEqual (phonetic, msg.Phonetic);
-			else
-				Assert.AreEqual (null, msg.Phonetic);
-
+			Assert.AreEqual (phonetic, msg.Phonetic);
 			Assert.AreEqual (password, msg.ServerPassword);
 		}
 

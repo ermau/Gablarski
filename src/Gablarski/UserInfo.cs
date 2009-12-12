@@ -60,6 +60,7 @@ namespace Gablarski
 			this.UserId = info.UserId;
 			this.CurrentChannelId = info.CurrentChannelId;
 			this.IsMuted = info.IsMuted;
+			this.Status = info.Status;
 		}
 		
 		internal UserInfo (string nickname, string username, int userId, int currentChannelId, bool muted)
@@ -109,39 +110,46 @@ namespace Gablarski
 			Deserialize (reader);
 		}
 
-		public virtual string Username
+		public int UserId
 		{
 			get;
 			protected set;
 		}
 
-		public virtual string Nickname
+		public int CurrentChannelId
+		{
+			get;
+			set;
+		}
+
+		public string Username
+		{
+			get;
+			protected set;
+		}
+
+		public string Nickname
 		{
 			get;
 			set;
 		}
 		
-		public virtual string Phonetic
+		public string Phonetic
 		{
 			get;
 			set;
 		}
 
-		public virtual int UserId
-		{
-			get;
-			protected set;
-		}
-
-		public virtual int CurrentChannelId
+		public bool IsMuted
 		{
 			get;
 			set;
 		}
 
-		public virtual bool IsMuted
+		public string Status
 		{
-			get; set;
+			get;
+			set;
 		}
 
 		internal void Serialize (IValueWriter writer)
@@ -150,11 +158,9 @@ namespace Gablarski
 			writer.WriteString (this.Username);
 			writer.WriteInt32 (this.CurrentChannelId);
 			writer.WriteString (this.Nickname);
-
-			if (GablarskiClient.ProtocolVersion > 3)
-				writer.WriteString (this.Phonetic);
-
+			writer.WriteString (this.Phonetic);
 			writer.WriteBool (this.IsMuted);
+			writer.WriteString (this.Status);
 		}
 
 		internal void Deserialize (IValueReader reader)
@@ -163,11 +169,9 @@ namespace Gablarski
 			this.Username = reader.ReadString();
 			this.CurrentChannelId = reader.ReadInt32();
 			this.Nickname = reader.ReadString();
-			
-			if (GablarskiClient.ProtocolVersion > 3)
-				this.Phonetic = reader.ReadString();
-
+			this.Phonetic = reader.ReadString();
 			this.IsMuted = reader.ReadBool();
+			this.Status = reader.ReadString();
 		}
 
 		public override bool Equals (object obj)

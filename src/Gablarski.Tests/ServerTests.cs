@@ -49,9 +49,7 @@ namespace Gablarski.Tests
 
 		private MockServerConnection Login (string username, string password)
 		{
-			var connection = provider.EstablishConnection ();
-			connection.Client.Send (new ConnectMessage (GablarskiServer.ProtocolVersion));
-			connection.Client.DequeueAndAssertMessage<ServerInfoMessage>();
+			MockServerConnection connection = Connect();
 
 			connection.Client.Send (new LoginMessage { Username = username, Password = password });
 			var loginResultMessage = connection.Client.DequeueAndAssertMessage<LoginResultMessage>();
@@ -59,6 +57,14 @@ namespace Gablarski.Tests
 
 			connection.Client.DequeueAndAssertMessage<PermissionsMessage>();
 
+			return connection;
+		}
+
+		private MockServerConnection Connect()
+		{
+			var connection = this.provider.EstablishConnection ();
+			connection.Client.Send (new ConnectMessage (GablarskiServer.ProtocolVersion));
+			connection.Client.DequeueAndAssertMessage<ServerInfoMessage>();
 			return connection;
 		}
 
@@ -215,6 +221,35 @@ namespace Gablarski.Tests
 
 			var msg = barc.Client.DequeueAndAssertMessage<UserDisconnectedMessage>();
 			Assert.AreEqual (foo.UserId, msg.UserId);
+		}
+
+		[Test]
+		public void RequestSource()
+		{
+			var c = Connect();
+			var u = Join (false, c, Nickname);
+
+			c.Client.Send (new RequestSourceMessage ("source", 1, 64000, 512));
+
+			var msg = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			Assert.AreEqual (SourceResult.Succeeded, msg.SourceResult);
+			Assert.AreEqual ("source", msg.Source.Name);
+			Assert.AreEqual (1, msg.Source.Channels);
+			Assert.AreEqual (64000, msg.Source.Bitrate);
+			Assert.AreEqual (512, msg.Source.FrameSize);
+			Assert.AreEqual (false, msg.Source.IsMuted);
+		}
+
+		[Test]
+		public void SourceStateChangeSelf()
+		{
+			var c = Connect();
+			var u = Join(false, c, Nickname);
+
+			c.Client.Send(new RequestSourceMessage("source", 1, 64000, 512));
+			c.Client.DequeueAndAssertMessage <SourceResultMessage>();
+
+			
 		}
 	}
 }

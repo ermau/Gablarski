@@ -83,22 +83,14 @@ namespace Gablarski.Messages
 		public override void WritePayload (IValueWriter writer)
 		{
 			writer.WriteString (this.Nickname);
-
-			// TEMP HACK
-			if (Gablarski.Client.GablarskiClient.ProtocolVersion > 3)
-				writer.WriteString (this.Phonetic);
-
+			writer.WriteString (this.Phonetic);
 			writer.WriteString (this.ServerPassword);
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
 			this.Nickname = reader.ReadString();
-			
-			// TEMP HACK
-			if (Gablarski.Client.GablarskiClient.ProtocolVersion > 3)
-				this.Phonetic = reader.ReadString();
-
+			this.Phonetic = reader.ReadString();
 			this.ServerPassword = reader.ReadString();
 		}
 
