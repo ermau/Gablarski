@@ -55,6 +55,11 @@ namespace Gablarski.Client
 		IClientConnection Connection { get; }
 
 		/// <summary>
+		/// Information about the current server. (<c>null</c> if not connected)
+		/// </summary>
+		ServerInfo ServerInfo { get; }
+
+		/// <summary>
 		/// Gets the channels in this context
 		/// </summary>
 		IIndexedEnumerable<int, ChannelInfo> Channels { get; }

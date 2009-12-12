@@ -46,8 +46,9 @@ using System.Diagnostics;
 namespace Gablarski.Server
 {
 	public partial class GablarskiServer
+		: IServerContext
 	{
-		public static readonly int ProtocolVersion = 3;
+		public static readonly int ProtocolVersion = 5;
 
 		/// <summary>
 		/// Initializes a new <c>GablarskiServer</c> instance.
@@ -109,6 +110,12 @@ namespace Gablarski.Server
 			get { return this.settings; }
 		}
 
+		public IServerUserManager Users
+		{
+			get;
+			private set;
+		}
+
 		#region Public Methods
 		/// <summary>
 		/// Adds and starts an <c>IConnectionProvider</c>.
@@ -123,7 +130,7 @@ namespace Gablarski.Server
 			{
 				provider.ConnectionMade += OnConnectionMade;
 				provider.ConnectionlessMessageReceived += OnMessageReceived;
-				provider.StartListening ();
+				provider.StartListening (this);
 		
 				this.availableConnections.Add (provider);
 			}

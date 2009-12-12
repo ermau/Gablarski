@@ -134,7 +134,6 @@
     <Compile Include="GenericResult.cs" />
     <Compile Include="IClientConnection.cs" />
     <Compile Include="IConnection.cs" />
-    <Compile Include="IConnectionProvider.cs" />
     <Compile Include="LoginResult.cs" />
     <Compile Include="Messages\AudioDataReceivedMessage.cs" />
     <Compile Include="Messages\ChannelChangeMessage.cs" />
@@ -161,6 +160,7 @@
     <Compile Include="Network\NetworkServerConnection.cs" />
     <Compile Include="Network\NetworkServerConnectionProvider.cs" />
     <Compile Include="Network\SocketValueWriter.cs" />
+    <Compile Include="Server\IConnectionProvider.cs" />
     <Compile Include="Server\IServerPersistance.cs" />
     <Compile Include="Server\ServerUserInfo.cs" />
     <Compile Include="UserInfo.cs" />

@@ -37,7 +37,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Gablarski.Messages;
 
 namespace Gablarski
@@ -113,6 +112,31 @@ namespace Gablarski
 				if (predicate (connection))
 					connection.Send (message);
 			}
+		}
+	}
+
+	/// <summary>
+	/// Provides data for the <see cref="IConnectionProvider.ConnectionMade"/> event.
+	/// </summary>
+	public class ConnectionEventArgs
+		: EventArgs
+	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ConnectionEventArgs"/> class.
+		/// </summary>
+		/// <param name="connection">The connection that was made.</param>
+		public ConnectionEventArgs(IConnection connection)
+		{
+			this.Connection = connection;
+		}
+
+		/// <summary>
+		/// Gets the connection made.
+		/// </summary>
+		public IConnection Connection
+		{
+			get;
+			private set;
 		}
 	}
 

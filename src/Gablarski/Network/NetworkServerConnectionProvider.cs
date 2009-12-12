@@ -42,6 +42,7 @@ using System.Net.Sockets;
 using System.Threading;
 using Gablarski.Messages;
 using Cadenza;
+using Gablarski.Server;
 
 namespace Gablarski.Network
 {
@@ -62,7 +63,7 @@ namespace Gablarski.Network
 			throw new NotImplementedException ();
 		}
 
-		public void StartListening ()
+		public void StartListening (IServerContext context)
 		{
 			this.listening = true;
 

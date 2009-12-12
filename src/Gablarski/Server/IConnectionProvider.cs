@@ -38,7 +38,7 @@ using System;
 using System.Net;
 using Gablarski.Messages;
 
-namespace Gablarski
+namespace Gablarski.Server
 {
 	public interface IConnectionProvider
 	{
@@ -67,7 +67,7 @@ namespace Gablarski
 		/// Starts listening for connections and connectionless messages.
 		/// </summary>
 		/// <seealso cref="StopListening"/>
-		void StartListening ();
+		void StartListening (IServerContext context);
 
 		/// <summary>
 		/// Stops listening for connections and connectionless messages.
@@ -76,36 +76,11 @@ namespace Gablarski
 		void StopListening ();
 	}
 
-	/// <summary>
-	/// Provides data for the <see cref="IConnectionProvider.ConnectionMade"/> event.
-	/// </summary>
-	public class ConnectionEventArgs
-		: EventArgs
-	{
-		/// <summary>
-		/// Initializes a new instance of the <see cref="ConnectionEventArgs"/> class.
-		/// </summary>
-		/// <param name="connection">The connection that was made.</param>
-		public ConnectionEventArgs (IConnection connection)
-		{
-			this.Connection = connection;
-		}
-
-		/// <summary>
-		/// Gets the connection made.
-		/// </summary>
-		public IConnection Connection
-		{
-			get;
-			private set;
-		}
-	}
-
 	public class ConnectionlessMessageReceivedEventArgs
 		: MessageReceivedEventArgs
 	{
-		public ConnectionlessMessageReceivedEventArgs (IConnectionProvider provider, MessageBase message, EndPoint endpoint)
-			: base (null, message)
+		public ConnectionlessMessageReceivedEventArgs(IConnectionProvider provider, MessageBase message, EndPoint endpoint)
+			: base(null, message)
 		{
 			this.EndPoint = endpoint;
 			this.Provider = provider;
