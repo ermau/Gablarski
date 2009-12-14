@@ -39,6 +39,8 @@ namespace Gablarski.Tests
 		/// </summary>
 		public CurrentUser CurrentUser { get; set; }
 
+		public ServerInfo ServerInfo { get; set; }
+
 		#endregion
 	}
 }
