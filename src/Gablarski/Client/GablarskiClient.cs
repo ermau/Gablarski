@@ -228,7 +228,7 @@ namespace Gablarski.Client
 				Connection.Disconnected += this.OnDisconnectedInternal;
 				Connection.MessageReceived += OnMessageReceived;
 				Connection.Connect (endPoint);
-				Connection.Send (new ConnectMessage (ProtocolVersion));
+				Connection.Send (new ConnectMessage { ProtocolVersion = ProtocolVersion, Host = host, Port = port });
 
 				this.Audio.Context = this;
 				this.Audio.AudioSender = this.Sources;

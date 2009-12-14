@@ -57,6 +57,8 @@ namespace Gablarski.Client
 			private set;
 		}
 
+		private int redirectLimit = 20;
+		private int redirectCount;
 		private volatile bool running;
 		private readonly AutoResetEvent incomingWait = new AutoResetEvent (false);
 		private readonly Queue<MessageReceivedEventArgs> mqueue = new Queue<MessageReceivedEventArgs> (100);
@@ -77,6 +79,7 @@ namespace Gablarski.Client
 			{
 				{ ServerMessageType.PermissionDenied, OnPermissionDeniedMessage },
 
+				{ ServerMessageType.Redirect, OnRedirectReceived },
 				{ ServerMessageType.ServerInfoReceived, OnServerInfoReceivedMessage },
 				{ ServerMessageType.UserListReceived, this.Users.OnUserListReceivedMessage },
 				{ ServerMessageType.SourceListReceived, this.Sources.OnSourceListReceivedMessage },
@@ -193,6 +196,20 @@ namespace Gablarski.Client
 			this.serverInfo = ((ServerInfoMessage)e.Message).ServerInfo;
 
 			OnConnected (this, EventArgs.Empty);
+		}
+
+		private void OnRedirectReceived (MessageReceivedEventArgs e)
+		{
+			var msg = (RedirectMessage) e.Message;
+
+			int count = Interlocked.Increment (ref this.redirectCount);
+
+			DisconnectCore (DisconnectHandling.None, this.Connection);
+			
+			if (count > redirectLimit)
+				return;
+
+			Connect (msg.Host, msg.Port);
 		}
 
 		private enum DisconnectHandling

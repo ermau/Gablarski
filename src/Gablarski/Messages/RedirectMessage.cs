@@ -34,49 +34,36 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 namespace Gablarski.Messages
 {
-	public class ConnectMessage
-		: ClientMessage
+	public class RedirectMessage
+		: ServerMessage
 	{
-		public ConnectMessage ()
-			: base (ClientMessageType.Connect)
+		public RedirectMessage ()
+			: base (ServerMessageType.Redirect)
 		{
-		}
-
-		public int ProtocolVersion
-		{
-			get;
-			set;
 		}
 
 		public string Host
 		{
 			get;
-			set;
+			private set;
 		}
 
 		public int Port
 		{
 			get;
-			set;
+			private set;
 		}
 
 		public override void WritePayload (IValueWriter writer)
 		{
-			writer.WriteInt32 (ProtocolVersion);
 			writer.WriteString (Host);
 			writer.WriteInt32 (Port);
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
-			ProtocolVersion = reader.ReadInt32 ();
 			Host = reader.ReadString();
 			Port = reader.ReadInt32();
 		}

@@ -63,7 +63,7 @@ namespace Gablarski.Tests
 		private MockServerConnection Connect()
 		{
 			var connection = this.provider.EstablishConnection ();
-			connection.Client.Send (new ConnectMessage (GablarskiServer.ProtocolVersion));
+			connection.Client.Send (new ConnectMessage { ProtocolVersion = GablarskiServer.ProtocolVersion, Host = "test", Port = 6112 });
 			connection.Client.DequeueAndAssertMessage<ServerInfoMessage>();
 			return connection;
 		}
@@ -106,7 +106,7 @@ namespace Gablarski.Tests
 		public void OldVersionReject ()
 		{
 			var connection = provider.EstablishConnection ();
-			connection.Client.Send (new ConnectMessage (0));
+			connection.Client.Send (new ConnectMessage { ProtocolVersion = 0 });
 
 			MessageBase message = connection.Client.DequeueMessage ();
 			Assert.IsInstanceOf<ConnectionRejectedMessage> (message);
@@ -119,7 +119,7 @@ namespace Gablarski.Tests
 		public void ServerInfo()
 		{
 			var connection = provider.EstablishConnection ();
-			connection.Client.Send (new ConnectMessage (GablarskiServer.ProtocolVersion));
+			connection.Client.Send (new ConnectMessage { ProtocolVersion = GablarskiServer.ProtocolVersion });
 
 			var msg = connection.Client.DequeueAndAssertMessage<ServerInfoMessage>();
 			Assert.AreEqual (this.settings.Name, msg.ServerInfo.Name);

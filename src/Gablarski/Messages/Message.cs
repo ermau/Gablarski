@@ -41,7 +41,7 @@ using System.Text;
 
 namespace Gablarski.Messages
 {
-	// Next: 41
+	// Next: 42
 
 	public enum ClientMessageType
 		: ushort
@@ -74,6 +74,7 @@ namespace Gablarski.Messages
 	{
 		ConnectionRejected = 2,
 		PunchThroughReceived = 40,
+		Redirect = 41,
 		
 		QueryServerResult = 36,
 		ServerInfoReceived = 12,

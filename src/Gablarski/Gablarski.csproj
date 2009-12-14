@@ -119,6 +119,7 @@
     <Compile Include="Messages\PermissionsMessage.cs" />
     <Compile Include="Messages\QueryServerMessage.cs" />
     <Compile Include="Messages\QueryServerResultMessage.cs" />
+    <Compile Include="Messages\RedirectMessage.cs" />
     <Compile Include="Messages\RequestMuteMessage.cs" />
     <Compile Include="Messages\MutedMessage.cs" />
     <Compile Include="ModuleSelectableAttribute.cs" />
