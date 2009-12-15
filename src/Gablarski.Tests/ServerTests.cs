@@ -143,6 +143,21 @@ namespace Gablarski.Tests
 		}
 
 		[Test]
+		public void RedirectNoMatch()
+		{
+			server.AddRedirector (new MockRedirector ("monkeys.com", new IPEndPoint (IPAddress.Any, 6113)));
+			
+			var connection = provider.EstablishConnection();
+			connection.Client.Send (new ConnectMessage { ProtocolVersion = GablarskiServer.ProtocolVersion,
+				Host = "monkeys2.com", Port = 6112 });
+
+			var msg = connection.Client.DequeueAndAssertMessage<ServerInfoMessage>();
+			Assert.AreEqual (this.settings.Name, msg.ServerInfo.Name);
+			Assert.AreEqual (this.settings.Description, msg.ServerInfo.Description);
+			Assert.AreEqual (String.Empty, msg.ServerInfo.Logo);
+		}
+
+		[Test]
 		public void RequestChannelList ()
 		{
 			var connection = provider.EstablishConnection ();
@@ -255,16 +270,20 @@ namespace Gablarski.Tests
 			Assert.AreEqual (false, msg.Source.IsMuted);
 		}
 
-		[Test]
-		public void SourceStateChangeSelf()
-		{
-			var c = Connect();
-			var u = Join(false, c, Nickname);
+		//[Test]
+		//public void SourceStateChangeSelf()
+		//{
+		//    var c = Connect();
+		//    var u = Join(false, c, Nickname);
 
-			c.Client.Send(new RequestSourceMessage("source", 1, 64000, 512));
-			c.Client.DequeueAndAssertMessage <SourceResultMessage>();
+		//    c.Client.Send(new RequestSourceMessage ("source", 1, 64000, 512));
+		//    c.Client.DequeueAndAssertMessage<SourceResultMessage>();
 
-			
-		}
+		//    c.Client.Send (new ClientAudioSourceStateChangeMessage { Starting = true, SourceId = 1 });
+
+		//    //var msg = c.Client.DequeueAndAssertMessage<AudioSourceStateChangeMessage>();
+		//    //Assert.AreEqual (true, msg.Starting);
+		//    //Assert.AreEqual (1, msg.SourceId);
+		//}
 	}
 }
