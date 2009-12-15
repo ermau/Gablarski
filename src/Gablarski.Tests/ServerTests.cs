@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Linq;
 using Gablarski.Messages;
 using Gablarski.Server;
 using NUnit.Framework;
+using System.Net;
 
 namespace Gablarski.Tests
 {
@@ -125,6 +126,20 @@ namespace Gablarski.Tests
 			Assert.AreEqual (this.settings.Name, msg.ServerInfo.Name);
 			Assert.AreEqual (this.settings.Description, msg.ServerInfo.Description);
 			Assert.AreEqual (String.Empty, msg.ServerInfo.Logo);
+		}
+		
+		[Test]
+		public void RedirectMatch()
+		{
+			server.AddRedirector (new MockRedirector ("monkeys.com", new IPEndPoint (IPAddress.Any, 6113)));
+			
+			var connection = provider.EstablishConnection();
+			connection.Client.Send (new ConnectMessage { ProtocolVersion = GablarskiServer.ProtocolVersion,
+				Host = "monkeys.com", Port = 6112 });
+				
+			var msg = connection.Client.DequeueAndAssertMessage<RedirectMessage>();
+			Assert.AreEqual (IPAddress.Any.ToString(), msg.Host);
+			Assert.AreEqual (6113, msg.Port);
 		}
 
 		[Test]
