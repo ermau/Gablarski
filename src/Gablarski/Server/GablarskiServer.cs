@@ -121,8 +121,12 @@ namespace Gablarski.Server
 		/// Adds and starts an <c>IConnectionProvider</c>.
 		/// </summary>
 		/// <param name="provider">The <c>IConnectionProvider</c> to add and start listening.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="provider"/> is <c>null</c>.</exception>
 		public void AddConnectionProvider (IConnectionProvider provider)
 		{
+			if (provider == null)
+				throw new ArgumentNullException ("provider");
+
 			Trace.WriteLine ("[Server] " + provider.GetType().Name + " added.");
 
 			// MUST provide a gaurantee of persona
@@ -139,10 +143,47 @@ namespace Gablarski.Server
 		/// <summary>
 		/// Stops and removes an <c>IConnectionProvider</c>.
 		/// </summary>
-		/// <param name="connection"></param>
-		public void RemoveConnectionProvider (IConnectionProvider connection)
+		/// <param name="provider">The connection provider to remove.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="provider"/> is <c>null</c>.</exception>
+		public void RemoveConnectionProvider (IConnectionProvider provider)
 		{
-			RemoveConnectionProvider (connection, true);
+			if (provider == null)
+				throw new ArgumentNullException ("provider");
+
+			RemoveConnectionProvider (provider, true);
+		}
+
+		/// <summary>
+		/// Adds <paramref name="redirector"/> to the list of redirectors.
+		/// </summary>
+		/// <param name="redirector">The redirector to add.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="redirector"/> is <c>null</c>.</exception>
+		public void AddRedirector (IRedirector redirector)
+		{
+			if (redirector == null)
+				throw new ArgumentNullException ("redirector");
+
+			lock (redirectors)
+			{
+				redirectors.Add (redirector);
+			}
+		}
+
+		/// <summary>
+		/// Removes <paramref name="redirector"/> from the list of redirectors.
+		/// </summary>
+		/// <param name="redirector">The redirector to remove.</param>
+		/// <returns><c>true</c> if <paramref name="redirector"/> was found</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="redirector"/> is <c>null</c>.</exception>
+		public bool RemoveRedirector (IRedirector redirector)
+		{
+			if (redirector == null)
+				throw new ArgumentNullException ("redirector");
+
+			lock (redirectors)
+			{
+				return redirectors.Remove (redirector);
+			}
 		}
 
 		/// <summary>
@@ -212,6 +253,7 @@ namespace Gablarski.Server
 
 		private readonly ServerSettings settings;
 
+		private readonly List<IRedirector> redirectors = new List<IRedirector>();
 		private readonly List<IConnectionProvider> availableConnections = new List<IConnectionProvider> ();
 
 		private readonly IBackendProvider backendProvider;

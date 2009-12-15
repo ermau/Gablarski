@@ -34,38 +34,23 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
-namespace Gablarski.Messages
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Text;
+
+namespace Gablarski.Server
 {
-	public class RedirectMessage
-		: ServerMessage
+	public interface IRedirector
 	{
-		public RedirectMessage ()
-			: base (ServerMessageType.Redirect)
-		{
-		}
-
-		public string Host
-		{
-			get;
-			set;
-		}
-
-		public int Port
-		{
-			get;
-			set;
-		}
-
-		public override void WritePayload (IValueWriter writer)
-		{
-			writer.WriteString (Host);
-			writer.WriteInt32 (Port);
-		}
-
-		public override void ReadPayload (IValueReader reader)
-		{
-			Host = reader.ReadString();
-			Port = reader.ReadInt32();
-		}
+		/// <summary>
+		/// Checks whether this redirect is redirecting <paramref name="host"/>.
+		/// </summary>
+		/// <param name="host">The host to check.</param>
+		/// <param name="port">The port to check.</param>
+		/// <returns>The host to redirect to if redirecting, <c>null</c> otherwise.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="host"/> is <c>null</c>.</exception>
+		IPEndPoint CheckRedirect (string host, int port);
 	}
 }

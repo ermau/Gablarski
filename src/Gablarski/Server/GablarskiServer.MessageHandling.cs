@@ -37,6 +37,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using Gablarski.Audio;
 using Gablarski.Messages;
@@ -135,6 +136,22 @@ namespace Gablarski.Server
 				e.Connection.Send (new ConnectionRejectedMessage (ConnectionRejectedReason.IncompatibleVersion));
 				//e.Connection.Disconnect ();
 				return;
+			}
+
+			if (redirectors.Count > 0 && !msg.Host.IsNullOrWhitespace())
+			{
+				lock (redirectors)
+				{
+					foreach (var r in redirectors)
+					{
+						var h = r.CheckRedirect (msg.Host, msg.Port);
+						if (h == null)
+							continue;
+
+						e.Connection.Send (new RedirectMessage { Host = h.Address.ToString(), Port = h.Port });
+						return;
+					}
+				}
 			}
 
 			e.Connection.Send (new ServerInfoMessage (GetServerInfo()));
