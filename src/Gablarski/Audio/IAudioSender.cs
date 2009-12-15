@@ -44,14 +44,12 @@ namespace Gablarski.Audio
 	public interface IAudioSender
 	{
 		/// <summary>
-		/// Sends notifications that you're begining to send audio from <paramref name="source"/> to <paramref name="channel"/>.
+		/// Sends notifications that you're begining to send audio from <paramref name="source"/>
 		/// </summary>
 		/// <param name="source">The source to send from.</param>
-		/// <param name="channel">The channel to send to.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
 		/// <exception cref="ArgumentException"><paramref name="source"/> does not belong to you.</exception>
-		/// <exception cref="ArgumentNullException"><paramref name="channel"/> is <c>null</c>.</exception>
-		void BeginSending (AudioSource source, ChannelInfo channel);
+		void BeginSending (AudioSource source);
 
 		/// <summary>
 		/// Sends a frame of audio data to the source
@@ -70,10 +68,8 @@ namespace Gablarski.Audio
 		/// Sends notifications that you're finished sending audio from <paramref name="source"/> to <paramref name="channel"/>.
 		/// </summary>
 		/// <param name="source">The source to send from.</param>
-		/// <param name="channel">The channel to send to.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
 		/// <exception cref="ArgumentException"><paramref name="source"/> does not belong to you.</exception>
-		/// <exception cref="ArgumentNullException"><paramref name="channel"/> is <c>null</c>.</exception>
-		void EndSending (AudioSource source, ChannelInfo channel);
+		void EndSending (AudioSource source);
 	}
 }

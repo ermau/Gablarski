@@ -49,14 +49,6 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public ClientAudioSourceStateChangeMessage (bool starting, int sourceId, int channelID)
-			: base (ClientMessageType.ClientAudioSourceStateChange)
-		{
-			this.Starting = starting;
-			this.SourceId = sourceId;
-			this.ChannelId = channelID;
-		}
-
 		public bool Starting
 		{
 			get; set;
@@ -67,25 +59,18 @@ namespace Gablarski.Messages
 			get; set;
 		}
 
-		public int ChannelId
-		{
-			get; set;
-		}
-
 		#region Overrides of MessageBase
 
 		public override void WritePayload(IValueWriter writer)
 		{
 			writer.WriteBool (this.Starting);
 			writer.WriteInt32 (this.SourceId);
-			writer.WriteInt32 (this.ChannelId);
 		}
 
 		public override void ReadPayload(IValueReader reader)
 		{
 			this.Starting = reader.ReadBool();
 			this.SourceId = reader.ReadInt32();
-			this.ChannelId = reader.ReadInt32();
 		}
 
 		#endregion

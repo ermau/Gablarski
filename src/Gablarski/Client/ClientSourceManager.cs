@@ -226,20 +226,16 @@ namespace Gablarski.Client
 		/// Sends notifications that you're begining to send audio from <paramref name="source"/> to <paramref name="channel"/>.
 		/// </summary>
 		/// <param name="source">The source to send from.</param>
-		/// <param name="channel">The channel to send to.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
 		/// <exception cref="ArgumentException"><paramref name="source"/> does not belong to you.</exception>
-		/// <exception cref="ArgumentNullException"><paramref name="channel"/> is <c>null</c>.</exception>
-		public void BeginSending (AudioSource source, ChannelInfo channel)
+		public void BeginSending (AudioSource source)
 		{
 			if (source == null)
 				throw new ArgumentNullException ("source");
 			if (source.OwnerId != this.context.CurrentUser.UserId)
 				throw new ArgumentException ("Can not send audio from a source you don't own", "source");
-			if (channel == null)
-				throw new ArgumentNullException ("channel");
 
-			this.context.Connection.Send (new ClientAudioSourceStateChangeMessage (true, source.Id, channel.ChannelId));
+			this.context.Connection.Send (new ClientAudioSourceStateChangeMessage { Starting = true, SourceId = source.Id });
 
 			OnAudioSourceStarted (new AudioSourceEventArgs (source));
 		}
@@ -277,20 +273,17 @@ namespace Gablarski.Client
 		/// Sends notifications that you're finished sending audio from <paramref name="source"/> to <paramref name="channel"/>.
 		/// </summary>
 		/// <param name="source">The source to send from.</param>
-		/// <param name="channel">The channel to send to.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
 		/// <exception cref="ArgumentException"><paramref name="source"/> does not belong to you.</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="channel"/> is <c>null</c>.</exception>
-		public void EndSending (AudioSource source, ChannelInfo channel)
+		public void EndSending (AudioSource source)
 		{
 			if (source == null)
 				throw new ArgumentNullException ("source");
 			if (source.OwnerId != this.context.CurrentUser.UserId)
 				throw new ArgumentException ("Can not send audio from a source you don't own", "source");
-			if (channel == null)
-				throw new ArgumentNullException ("channel");
 
-			this.context.Connection.Send (new ClientAudioSourceStateChangeMessage (false, source.Id, channel.ChannelId));
+			this.context.Connection.Send (new ClientAudioSourceStateChangeMessage { Starting = false, SourceId = source.Id });
 
 			OnAudioSourceStopped (new AudioSourceEventArgs (source));
 		}

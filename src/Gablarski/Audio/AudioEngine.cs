@@ -213,7 +213,7 @@ namespace Gablarski.Audio
 					return;
 
 				e.Talking = true;
-				AudioSender.BeginSending (source, channel);
+				AudioSender.BeginSending (source);
 				e.Capture.BeginCapture (AudioFormat.Mono16Bit);
 			}
 		}
@@ -234,7 +234,7 @@ namespace Gablarski.Audio
 					return;
 
 				e.Talking = false;
-				AudioSender.EndSending (source, channel);
+				AudioSender.EndSending (source);
 				e.Capture.EndCapture ();
 			}
 		}
@@ -373,7 +373,7 @@ namespace Gablarski.Audio
 						if (c.Value.Talking && c.Value.Muted)
 						{
 							c.Value.Talking = false;
-							AudioSender.EndSending (c.Key, Context.GetCurrentChannel ());
+							AudioSender.EndSending (c.Key);
 							continue;
 						}
 
@@ -391,7 +391,7 @@ namespace Gablarski.Audio
 
 								if (talking && !c.Value.Talking)
 								{
-									AudioSender.BeginSending (c.Key, channel);
+									AudioSender.BeginSending (c.Key);
 									
 									if (previousFrame != null)
 										AudioSender.SendAudioData (c.Key, channel, previousFrame);
@@ -403,7 +403,7 @@ namespace Gablarski.Audio
 							if (talking)
 								AudioSender.SendAudioData (c.Key, channel, samples);
 							else if (c.Value.Talking && c.Value.Options.Mode == AudioEngineCaptureMode.Activated)
-								AudioSender.EndSending (c.Key, channel);
+								AudioSender.EndSending (c.Key);
 
 							c.Value.Talking = talking;
 						}

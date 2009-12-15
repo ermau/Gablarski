@@ -524,14 +524,14 @@ namespace Gablarski.Server
 			if (speaker.IsMuted)
 				return;
 
-			PermissionName n = PermissionName.SendAudioToCurrentChannel;
-			if (speaker.CurrentChannelId != msg.ChannelId)
-				n = PermissionName.SendAudioToDifferentChannel;
+			//PermissionName n = PermissionName.SendAudioToCurrentChannel;
+			//if (speaker.CurrentChannelId != msg.ChannelId)
+			//    n = PermissionName.SendAudioToDifferentChannel;
 
-			if (!GetPermission (n, msg.ChannelId, speaker.UserId))
-				return;
+			//if (!GetPermission (n, msg.ChannelId, speaker.UserId))
+			//    return;
 
-			this.connections.Send (new AudioSourceStateChangeMessage (msg.Starting, msg.SourceId, msg.ChannelId), (con, user) => con != e.Connection);//, (con, user) => con != e.Connection && user.CurrentChannelId == msg.ChannelId);
+			this.connections.Send (new AudioSourceStateChangeMessage { Starting = msg.Starting, SourceId = msg.SourceId }, (con, user) => con != e.Connection);//, (con, user) => con != e.Connection && user.CurrentChannelId == msg.ChannelId);
 		}
 
 		protected void AudioDataReceived (MessageReceivedEventArgs e)
