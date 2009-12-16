@@ -48,8 +48,8 @@ namespace Gablarski.Server
 		{
 			this.adminPermissions = GetNamesAsPermissions (Permission.GetAllNames ()).ToList();
 			this.guestPermissions = GetNamesAsPermissions (PermissionName.Login, PermissionName.ChangeChannel, PermissionName.AddChannel,
-				                              PermissionName.EditChannel, PermissionName.DeleteChannel,
-				                              PermissionName.RequestChannelList, PermissionName.RequestSource, PermissionName.SendAudioToCurrentChannel).ToList();
+			                                  PermissionName.EditChannel, PermissionName.DeleteChannel,
+			                                  PermissionName.RequestChannelList, PermissionName.RequestSource, PermissionName.SendAudio).ToList();
 		}
 
 		public event EventHandler<PermissionsChangedEventArgs> PermissionsChanged;

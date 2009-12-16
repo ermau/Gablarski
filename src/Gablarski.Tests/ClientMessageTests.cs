@@ -156,10 +156,17 @@ namespace Gablarski.Tests
 		[Test]
 		public void SendAudioData()
 		{
-			var msg = new SendAudioDataMessage (1, 2, /*3,*/ new byte[] { 0x4, 0x8, 0xF, 0x10, 0x17, 0x2A });
-			Assert.AreEqual (1, msg.TargetChannelId);
-			Assert.AreEqual (2, msg.SourceId);
-			//Assert.AreEqual (3, msg.Sequence);
+			var msg = new SendAudioDataMessage
+			{
+				SourceId = 1,
+				TargetType = TargetType.Channel,
+				TargetIds = new[] { 2 },
+				Data = new byte[] { 0x4, 0x8, 0xF, 0x10, 0x17, 0x2A }
+			};
+
+			Assert.AreEqual (new[] { 2 }, msg.TargetIds);
+			Assert.AreEqual (TargetType.Channel, msg.TargetType);
+			Assert.AreEqual (1, msg.SourceId);
 			Assert.AreEqual (0x4, msg.Data[0]);
 			Assert.AreEqual (0x8, msg.Data[1]);
 			Assert.AreEqual (0xF, msg.Data[2]);
@@ -174,9 +181,9 @@ namespace Gablarski.Tests
 			msg = new SendAudioDataMessage();
 			msg.ReadPayload (reader);
 			Assert.AreEqual (length, stream.Position);
-			Assert.AreEqual (1, msg.TargetChannelId);
-			Assert.AreEqual (2, msg.SourceId);
-			//Assert.AreEqual (3, msg.Sequence);
+			Assert.AreEqual (new[] { 2 }, msg.TargetIds);
+			Assert.AreEqual (TargetType.Channel, msg.TargetType);
+			Assert.AreEqual (1, msg.SourceId);
 			Assert.AreEqual (0x4, msg.Data[0]);
 			Assert.AreEqual (0x8, msg.Data[1]);
 			Assert.AreEqual (0xF, msg.Data[2]);

@@ -266,7 +266,13 @@ namespace Gablarski.Client
 				throw new ArgumentException ("Audio frame can not be empty", "data");
 			#endif
 
-			this.context.Connection.Send (new SendAudioDataMessage (channel.ChannelId, source.Id, source.Encode (data)));
+			this.context.Connection.Send (new SendAudioDataMessage
+			{
+				TargetType = TargetType.Channel,
+				TargetIds = new [] { channel.ChannelId },
+				SourceId = source.Id, 
+				Data = source.Encode (data)
+			});
 		}
 
 		/// <summary>

@@ -41,6 +41,12 @@ using System.Text;
 
 namespace Gablarski.Messages
 {
+	public enum TargetType
+	{
+		Channel = 0,
+		User = 1,
+	}
+
 	public class SendAudioDataMessage
 		: ClientMessage
 	{
@@ -49,31 +55,13 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public SendAudioDataMessage (int targetChannelId, int sourceId, /*int sequence,*/ byte[] data)
-			: base (ClientMessageType.AudioData)
+		public TargetType TargetType
 		{
-			#if DEBUG
-			if (targetChannelId <= 0)
-				throw new ArgumentOutOfRangeException("targetChannelId");
-			if (sourceId <= 0)
-				throw new ArgumentOutOfRangeException("sourceId");
-			if (data == null)
-				throw new ArgumentNullException("data");
-			#endif
-
-			this.TargetChannelId = targetChannelId;
-			this.SourceId = sourceId;
-			this.Data = data;
-			//this.Sequence = sequence;
+			get;
+			set;
 		}
 
-		//public int Sequence
-		//{
-		//    get;
-		//    set;
-		//}
-
-		public int TargetChannelId
+		public int[] TargetIds
 		{
 			get;
 			set;
@@ -98,17 +86,24 @@ namespace Gablarski.Messages
 
 		public override void WritePayload (IValueWriter writer)
 		{
-			writer.WriteInt32 (this.TargetChannelId);
+			writer.WriteUInt16 ((ushort)TargetIds.Length);
+			for (int i = 0; i < TargetIds.Length; ++i)
+				writer.WriteInt32 (TargetIds[i]);
+
 			writer.WriteInt32 (this.SourceId);
-			//writer.WriteInt32 (this.Sequence);
 			writer.WriteBytes (this.Data);
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
-			this.TargetChannelId = reader.ReadInt32();
+			ushort numTargets = reader.ReadUInt16();
+			int[] targets = new int[numTargets];
+			for (int i = 0; i < targets.Length; ++i)
+				targets[i] = reader.ReadInt32();
+
+			TargetIds = targets;
+			
 			this.SourceId = reader.ReadInt32();
-			//this.Sequence = reader.ReadInt32();
 			this.Data = reader.ReadBytes();
 		}
 	}

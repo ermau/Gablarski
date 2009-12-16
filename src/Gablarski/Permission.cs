@@ -93,17 +93,12 @@ namespace Gablarski
 		/// <summary>
 		/// Broadcast audio to the current channel.
 		/// </summary>
-		SendAudioToCurrentChannel = 4,
+		SendAudio = 4,
 
 		/// <summary>
-		/// Broadcast audio to the entire server.
+		/// Broadcast audio to more than one target.
 		/// </summary>
-		SendAudioToAll = 5,
-
-		/// <summary>
-		/// Broadcast audio to a different channel then the player is in.
-		/// </summary>
-		SendAudioToDifferentChannel = 6,
+		SendAudioToMultipleTargets = 5,
 
 		/// <summary>
 		/// Request a channel list.

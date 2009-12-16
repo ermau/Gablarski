@@ -542,14 +542,32 @@ namespace Gablarski.Server
 			if (speaker.IsMuted)
 				return;
 
-			PermissionName n = PermissionName.SendAudioToCurrentChannel;
-			if (speaker.CurrentChannelId != msg.TargetChannelId)
-				n = PermissionName.SendAudioToDifferentChannel;
-
-			if (!GetPermission (n, msg.TargetChannelId, speaker.UserId))
+			if (!GetPermission (PermissionName.SendAudio, speaker))
 				return;
 
-			this.connections.Send (new AudioDataReceivedMessage (msg.SourceId, /*msg.Sequence,*/ msg.Data), (con, user) => con != e.Connection && user.CurrentChannelId.Equals (msg.TargetChannelId));
+			if (msg.TargetIds.Length > 1 && !GetPermission (PermissionName.SendAudioToMultipleTargets, speaker))
+				return;
+
+			var sendMessage = new AudioDataReceivedMessage { Data = msg.Data, SourceId = msg.SourceId };
+
+			if (msg.TargetType == TargetType.Channel)
+			{
+				for (int i = 0; i < msg.TargetIds.Length; ++i)
+					this.connections.Send (sendMessage, (con, user) => con != e.Connection && user.CurrentChannelId == msg.TargetIds[i]);
+			}
+			else if (msg.TargetType == TargetType.User)
+			{
+				this.connections.Send (sendMessage, (con, user) => con != e.Connection && msg.TargetIds.Contains (user.UserId));
+			}
+
+			//PermissionName n = PermissionName.SendAudioToCurrentChannel;
+			//if (speaker.CurrentChannelId != msg.TargetIds)
+			//    n = PermissionName.SendAudioToDifferentChannel;
+
+			//if (!GetPermission (n, msg.TargetIds, speaker.UserId))
+			//    return;
+
+			//this.connections.Send (new AudioDataReceivedMessage (msg.SourceId, /*msg.Sequence,*/ msg.Data), (con, user) => con != e.Connection && user.CurrentChannelId.Equals (msg.TargetIds));
 		}
 		#endregion
 	}

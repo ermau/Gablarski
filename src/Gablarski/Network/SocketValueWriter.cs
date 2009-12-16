@@ -128,26 +128,26 @@ namespace Gablarski.Network
 			this.buffer[this.size++] = value;
 		}
 
-		public void WriteUInt16(ushort value)
+		public void WriteUInt16 (ushort value)
 		{
 			EnsureCapacity (this.size + sizeof (Int16));
-			
+
 			Array.Copy (BitConverter.GetBytes (value), 0, this.buffer, this.size, sizeof (Int16));
 			this.size += sizeof (Int16);
 		}
 
-		public void WriteUInt32(uint value)
+		public void WriteUInt32 (uint value)
 		{
 			EnsureCapacity (this.size + sizeof (Int32));
-			
+
 			Array.Copy (BitConverter.GetBytes (value), 0, this.buffer, this.size, sizeof (Int32));
 			this.size += sizeof (Int32);
 		}
 
-		public void WriteUInt64(ulong value)
+		public void WriteUInt64 (ulong value)
 		{
 			EnsureCapacity (this.size + sizeof (Int64));
-			
+
 			Array.Copy (BitConverter.GetBytes (value), 0, this.buffer, this.size, sizeof (Int64));
 			this.size += sizeof (Int64);
 		}
