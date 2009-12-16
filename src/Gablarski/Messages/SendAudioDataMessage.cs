@@ -42,6 +42,7 @@ using System.Text;
 namespace Gablarski.Messages
 {
 	public enum TargetType
+		: byte
 	{
 		Channel = 0,
 		User = 1,
@@ -86,6 +87,8 @@ namespace Gablarski.Messages
 
 		public override void WritePayload (IValueWriter writer)
 		{
+			writer.WriteByte ((byte)TargetType);
+
 			writer.WriteUInt16 ((ushort)TargetIds.Length);
 			for (int i = 0; i < TargetIds.Length; ++i)
 				writer.WriteInt32 (TargetIds[i]);
@@ -96,6 +99,8 @@ namespace Gablarski.Messages
 
 		public override void ReadPayload (IValueReader reader)
 		{
+			this.TargetType = (TargetType)reader.ReadByte();
+
 			ushort numTargets = reader.ReadUInt16();
 			int[] targets = new int[numTargets];
 			for (int i = 0; i < targets.Length; ++i)
