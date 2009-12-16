@@ -65,6 +65,11 @@ namespace Gablarski.Network
 			get { return (this.tcp == null) ? false : this.tcp.Connected; }
 		}
 
+		public bool IsAsync
+		{
+			get { return true; }
+		}
+
 		/// <summary>
 		/// A message was received from the underlying transport.
 		/// </summary>
@@ -91,6 +96,11 @@ namespace Gablarski.Network
 			}
 
 			this.sendWait.Set ();
+		}
+
+		public IEnumerable<ReceivedMessage> Tick()
+		{
+			throw new NotSupportedException();
 		}
 
 		/// <summary>

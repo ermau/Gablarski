@@ -21,6 +21,11 @@ namespace Gablarski.Tests
 			this.writer = new StreamValueWriter (this.writeStream);
 		}
 
+		public bool IsAsync
+		{
+			get { return true; }
+		}
+
 		public void Receive (MessageBase message)
 		{
 			lock (this.buffer)
@@ -38,9 +43,17 @@ namespace Gablarski.Tests
 
 		public MessageBase DequeueMessage ()
 		{
+			return DequeueMessage (true);
+		}
+
+		public MessageBase DequeueMessage (bool wait)
+		{
 			UInt16 tick = 0;
-			while (this.waiting == 0 && tick++ < (UInt16.MaxValue - 1))
+			while (wait && this.waiting == 0 && tick++ < (UInt16.MaxValue - 1))
 				Thread.Sleep (1);
+
+			if (this.waiting == 0)
+				return null;
 
 			if (tick == UInt16.MaxValue)
 				Assert.Fail ("[" + Name + "] Message never arrived.");
@@ -62,6 +75,14 @@ namespace Gablarski.Tests
 			}
 
 			return msg;
+		}
+
+		public IEnumerable<ReceivedMessage> Tick()
+		{
+			while (this.waiting > 0)
+			{
+				yield return new ReceivedMessage (DequeueMessage (false));
+			}
 		}
 
 		public T DequeueAndAssertMessage<T> ()

@@ -61,7 +61,9 @@ namespace Gablarski.WebServer
 		/// </summary>
 		public bool IsConnected { get; private set; }
 
-		/// <summary>
+		public bool IsAsync { get { return true; } }
+
+			/// <summary>
 		/// Sends <paramref name="message"/> to the other end of the connection.
 		/// </summary>
 		/// <param name="message">The message to send.</param>
@@ -69,6 +71,11 @@ namespace Gablarski.WebServer
 		public void Send (MessageBase message)
 		{
 			((List<MessageBase>)session["mqueue"]).Add (message);
+		}
+
+		public IEnumerable<ReceivedMessage> Tick()
+		{
+			throw new NotSupportedException();
 		}
 
 		/// <summary>

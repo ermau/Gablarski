@@ -52,8 +52,14 @@ namespace Gablarski
 		bool IsConnected { get; }
 
 		/// <summary>
+		/// Gets whether the connection is asynchronous.
+		/// </summary>
+		bool IsAsync { get; }
+
+		/// <summary>
 		/// A message was received from the underlying transport.
 		/// </summary>
+		/// <exception cref="NotSupportedException"><see cref="IsAsync"/> is <c>false</c>.</exception>
 		event EventHandler<MessageReceivedEventArgs> MessageReceived;
 
 		/// <summary>
@@ -69,9 +75,29 @@ namespace Gablarski
 		void Send (MessageBase message);
 
 		/// <summary>
+		/// Sends and receives all pending messages.
+		/// </summary>
+		/// <returns>An enumerable of received messages, empty if none.</returns>
+		/// <exception cref="NotSupportedException"><see cref="IsAsync"/> is <c>true</c>.</exception>
+		IEnumerable<ReceivedMessage> Tick();
+
+		/// <summary>
 		/// Closes the connection.
 		/// </summary>
 		void Disconnect ();
+	}
+
+	public class ReceivedMessage
+	{
+		public ReceivedMessage (MessageBase message)
+		{
+			this.Message = message;
+		}
+
+		public MessageBase Message
+		{
+			get; private set;
+		}
 	}
 
 	public static class ConnectionExtensions

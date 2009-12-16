@@ -38,6 +38,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Collections.Generic;
 using Gablarski.Messages;
 
 namespace Gablarski.Network
@@ -65,9 +66,19 @@ namespace Gablarski.Network
 			get { return this.Tcp.Connected; }
 		}
 
+		public bool IsAsync
+		{
+			get { return true; }
+		}
+
 		public void Send (MessageBase message)
 		{
 			provider.EnqueueToSend (this, message);
+		}
+
+		public IEnumerable<ReceivedMessage> Tick()
+		{
+			throw new NotSupportedException();
 		}
 
 		public void Disconnect ()

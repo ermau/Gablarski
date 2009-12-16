@@ -48,6 +48,7 @@ using HttpServer.Helpers;
 using HttpServer.HttpModules;
 using HttpServer.Rendering;
 using HttpServer.Rendering.Tiny;
+using HttpServer.Rules;
 using HttpServer.Sessions;
 
 namespace Gablarski.WebServer
