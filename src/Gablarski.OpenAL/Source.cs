@@ -160,7 +160,7 @@ namespace Gablarski.OpenAL
 			for (int i = 0; i < bufferIDs.Length; ++i)
 			{
 				OpenAL.Log.DebugFormat ("Dequeued source buffer {0} for source {1}", bufferIDs[i], this.sourceID);
-				dequeued[i] = SourceBuffer.GetBuffer(bufferIDs[i]);
+				dequeued[i] = SourceBuffer.GetBuffer (bufferIDs[i]);
 			}
 
 			return dequeued;

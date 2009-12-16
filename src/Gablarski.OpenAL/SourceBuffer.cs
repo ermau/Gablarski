@@ -45,7 +45,7 @@ namespace Gablarski.OpenAL
 {
 	[SuppressUnmanagedCodeSecurity]
 	public class SourceBuffer
-		: IDisposable
+		: IDisposable, IEquatable<SourceBuffer>
 	{
 		internal SourceBuffer (uint bufferID)
 		{
@@ -56,6 +56,40 @@ namespace Gablarski.OpenAL
 		{
 			alBufferData (this.bufferID, format, data, data.Length, frequency);
 			OpenAL.ErrorCheck ();
+		}
+
+		bool IEquatable<SourceBuffer>.Equals (SourceBuffer other)
+		{
+			return other.bufferID == this.bufferID;
+		}
+
+		public override bool Equals (object obj)
+		{
+			var b = (obj as SourceBuffer);
+			if (b == null)
+				return false;
+			else
+				return (this == b);
+		}
+
+		public override int GetHashCode()
+		{
+			return this.bufferID.GetHashCode();
+		}
+
+		public static bool operator ==(SourceBuffer buffer1, SourceBuffer buffer2)
+		{
+			if (Object.ReferenceEquals (buffer1, null) && Object.ReferenceEquals (buffer2, null))
+				return true;
+			else if (Object.ReferenceEquals (buffer1, null))
+				return false;
+			else
+				return (buffer1.bufferID == buffer2.bufferID);
+		}
+
+		public static bool operator !=(SourceBuffer buffer1, SourceBuffer buffer2)
+		{
+			return !(buffer1 == buffer2);
 		}
 
 		#region IDisposable Members
