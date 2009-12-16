@@ -1,6 +1,6 @@
-
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.Clients.WinForms", "Gablarski.Clients.WinForms.csproj", "{043E20A2-310D-41C0-94BC-766E3BAACAFB}"
 	ProjectSection(ProjectDependencies) = postProject
 		{B3605103-A797-4F0F-9C3A-8566DD13700A} = {B3605103-A797-4F0F-9C3A-8566DD13700A}

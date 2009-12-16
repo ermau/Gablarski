@@ -162,7 +162,7 @@ namespace Gablarski.Clients.Windows
 			try
 			{
 				foreach (var source in gablarski.Sources.Where (s => s.OwnerId == gablarski.CurrentUser.UserId))
-					gablarski.Sources.EndSending (source, gablarski.CurrentChannel);
+					gablarski.Sources.EndSending (source);
 
 				if (this.voiceCapture != null)
 				{
