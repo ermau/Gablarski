@@ -588,7 +588,7 @@ namespace Gablarski.Clients.Windows
 					serverpassword = RequireServerPassword();
 
 				if (this.gablarski.IsConnected)
-					this.gablarski.CurrentUser.Join (this.server.UserNickname, serverpassword);
+					this.gablarski.CurrentUser.Join (this.server.UserNickname, this.server.UserPhonetic, serverpassword);
 			}
 			else
 				this.gablarski.CurrentUser.Login (this.server.UserName, userpassword);

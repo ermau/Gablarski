@@ -136,6 +136,7 @@ namespace Gablarski.Clients.Windows
 			this.inPort.Text = this.Entry.Port.ToString();
 			this.inServerPassword.Text = this.Entry.ServerPassword;
 			this.inNickname.Text = this.Entry.UserNickname;
+			this.inPhonetic.Text = this.Entry.UserPhonetic;
 			this.inUsername.Text = this.Entry.UserName;
 			this.inPassword.Text = this.Entry.UserPassword;
 			this.pnlModServer.Visible = true;
@@ -188,10 +189,10 @@ namespace Gablarski.Clients.Windows
 			this.Entry.Port = Int32.Parse (this.inPort.Text.Trim());
 			this.Entry.ServerPassword = this.inServerPassword.Text.Trim();
 			this.Entry.UserNickname = this.inNickname.Text.Trim();
+			this.Entry.UserPhonetic = this.inPhonetic.Text.Trim();
 			this.Entry.UserName = this.inUsername.Text.Trim();
 			this.Entry.UserPassword = this.inPassword.Text.Trim();
-			Persistance.CurrentSession.SaveOrUpdate (this.Entry);
-			Persistance.CurrentSession.Flush();
+			Servers.SaveServer (Entry);
 
 			this.ClearEdit();
 			this.LoadServerEntries();

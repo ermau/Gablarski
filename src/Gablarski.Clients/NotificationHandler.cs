@@ -87,6 +87,20 @@ namespace Gablarski.Clients
 			}
 		}
 
+		public void Notify (NotificationType type, string notification, string nickname, string phonetic)
+		{
+			Notify (type, notification, nickname, phonetic, NotifyPriority.Info);
+		}
+
+		public void Notify (NotificationType type, string notification, string nickname, string phonetic, NotifyPriority priority)
+		{
+			lock (notifiers)
+			{
+				foreach (var n in notifiers)
+					n.Notify (type, notification, nickname, phonetic, priority);
+			}
+		}
+
 		public void Close ()
 		{
 			Clear ();
@@ -114,13 +128,13 @@ namespace Gablarski.Clients
 		private void OnUserDisconnected (object sender, UserEventArgs e)
 		{
 			if (!e.User.Equals (client.CurrentChannel))
-				Notify (NotificationType.UserLeftServer, e.User.Nickname + " has left the server.");
+				Notify (NotificationType.UserLeftServer, "{0} has left the server.", e.User.Nickname, e.User.Phonetic);
 		}
 
 		private void OnUserJoined (object sender, UserEventArgs e)
 		{
 			if (!e.User.Equals (client.CurrentUser))
-				Notify (NotificationType.UserJoinedServer, e.User.Nickname + " has joined the server.");
+				Notify (NotificationType.UserJoinedServer, "{0} has joined the server.", e.User.Nickname, e.User.Phonetic);
 		}
 
 		void OnUserChangedChannel (object sender, ChannelChangedEventArgs e)
@@ -128,9 +142,9 @@ namespace Gablarski.Clients
 			if (e.User.Equals (client.CurrentUser))
 				Notify (NotificationType.SwitchedChannel, "Switched to channel " + e.TargetChannel.Name);
 			else if (e.TargetChannel.Equals (client.CurrentChannel))
-				Notify (NotificationType.UserJoinedChannel, e.User.Nickname + " joined the channel.");
+				Notify (NotificationType.UserJoinedChannel, "{0} joined the channel.", e.User.Nickname, e.User.Phonetic);
 			else if (e.PreviousChannel.Equals (client.CurrentChannel))
-				Notify (NotificationType.UserLeftChannel, e.User.Nickname + " left the channel.");
+				Notify (NotificationType.UserLeftChannel, "{0} left the channel.", e.User.Nickname, e.User.Phonetic);
 		}
 
 		private void Attach (INotifier notifier)

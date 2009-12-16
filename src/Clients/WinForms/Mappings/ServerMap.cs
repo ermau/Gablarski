@@ -19,6 +19,7 @@ namespace Gablarski.Clients.Windows.Mappings
 			Map (x => x.ServerPassword);
 			
 			Map (x => x.UserNickname);
+			Map (x => x.UserPhonetic);
 			Map (x => x.UserName);
 			Map (x => x.UserPassword);
 		}

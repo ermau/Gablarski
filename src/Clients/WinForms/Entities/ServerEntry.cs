@@ -43,6 +43,12 @@ namespace Gablarski.Clients.Windows.Entities
 			set;
 		}
 
+		public virtual string UserPhonetic
+		{
+			get;
+			set;
+		}
+
 		public virtual string UserName
 		{
 			get;
