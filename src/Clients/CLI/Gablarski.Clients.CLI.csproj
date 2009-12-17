@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
@@ -65,9 +65,6 @@
     <Optimize>false</Optimize>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Cadenza">
-      <HintPath>..\..\..\lib\Cadenza.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -83,6 +80,9 @@
     <Reference Include="WindowsBase">
       <RequiredTargetFramework>3.0</RequiredTargetFramework>
     </Reference>
+    <Reference Include="Cadenza, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\..\lib\Cadenza.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ChannelModule.cs" />
@@ -94,6 +94,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServerModule.cs" />
+    <Compile Include="SourceModule.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Gablarski.OpenAL\Gablarski.OpenAL.csproj">
@@ -143,9 +144,4 @@ xcopy /Y "$(SolutionDir)src\Gablarski.WebServer\bin\Debug\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)src\Gablarski.WebServer\bin\Debug\*.pdb" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)lib\HttpServer.License.txt" "$(TargetDir)"</PostBuildEvent>
   </PropertyGroup>
-  <ProjectExtensions>
-    <MonoDevelop>
-      <Properties InternalTargetFrameworkVersion="3.5" />
-    </MonoDevelop>
-  </ProjectExtensions>
 </Project>
