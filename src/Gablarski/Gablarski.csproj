@@ -108,10 +108,7 @@
     <Compile Include="ByteArrayValueReader.cs" />
     <Compile Include="Audio\AudioEngine.cs" />
     <Compile Include="Audio\IAudioSender.cs" />
-    <Compile Include="Client\AsyncClientRunner.cs" />
-    <Compile Include="Client\ClientRunner.cs" />
     <Compile Include="Client\IClientUserHandler.cs" />
-    <Compile Include="Client\InlineClientRunner.cs" />
     <Compile Include="IIndexedEnumerable.cs" />
     <Compile Include="Client\IClientUserManager.cs" />
     <Compile Include="Messages\AudioSourceStateChangeMessage.cs" />
