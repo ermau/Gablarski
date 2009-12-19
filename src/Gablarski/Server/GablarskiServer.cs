@@ -112,7 +112,7 @@ namespace Gablarski.Server
 			get { return this.settings; }
 		}
 
-		public IConnectionManager Users
+		public IServerUserManager Users
 		{
 			get;
 			private set;
