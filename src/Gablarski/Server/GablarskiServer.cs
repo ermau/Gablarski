@@ -48,7 +48,9 @@ namespace Gablarski.Server
 	public partial class GablarskiServer
 		: IServerContext
 	{
+		// ReSharper disable ConvertToConstant.Global
 		public static readonly int ProtocolVersion = 5;
+		// ReSharper restore ConvertToConstant.Global
 
 		/// <summary>
 		/// Initializes a new <c>GablarskiServer</c> instance.
@@ -110,7 +112,7 @@ namespace Gablarski.Server
 			get { return this.settings; }
 		}
 
-		public IServerUserManager Users
+		public IConnectionManager Users
 		{
 			get;
 			private set;

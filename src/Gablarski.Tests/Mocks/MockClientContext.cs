@@ -32,7 +32,7 @@ namespace Gablarski.Tests
 		/// <summary>
 		/// Gets the user associated with this context
 		/// </summary>
-		public IClientUserManager Users { get; set; }
+		public IClientUserHandler Users { get; set; }
 
 		/// <summary>
 		/// Gets the current logged in user.

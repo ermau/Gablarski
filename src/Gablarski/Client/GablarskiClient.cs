@@ -54,27 +54,14 @@ namespace Gablarski.Client
 		public static readonly int ProtocolVersion = 5;
 
 		public GablarskiClient (IClientConnection connection)
-			: this (connection, true)
+			: this (connection, new AudioEngine())
 		{
 		}
 
-		public GablarskiClient (IClientConnection connection, ClientUserManager userMananger, ClientChannelManager channelManager, ClientSourceManager sourceManager, CurrentUser currentUser)
-			: this(connection, userMananger, channelManager, sourceManager, currentUser, new AudioEngine())
-		{
-		}
-
-		public GablarskiClient (IClientConnection connection, ClientUserManager userMananger, ClientChannelManager channelManager, ClientSourceManager sourceManager, CurrentUser currentUser, IAudioEngine audioEngine)
-			: this (connection, false)
-		{
-			Setup (userMananger, channelManager, sourceManager, currentUser, audioEngine);
-		}
-
-		private GablarskiClient (IClientConnection connection, bool setupDefaults)
+		public GablarskiClient (IClientConnection connection, IAudioEngine audioEngine)
 		{
 			this.Connection = connection;
-
-			if (setupDefaults)
-				Setup (new ClientUserManager (this), new ClientChannelManager (this), new ClientSourceManager (this), new CurrentUser (this), new AudioEngine());
+			Setup (new ClientUserHandler (this), new ClientChannelManager (this), new ClientSourceManager (this), new CurrentUser (this), audioEngine);
 		}
 
 		#region Events
@@ -121,10 +108,9 @@ namespace Gablarski.Client
 		/// <summary>
 		/// Gets the user manager for this client.
 		/// </summary>
-		public ClientUserManager Users
+		public IClientUserHandler Users
 		{
-			get; 
-			private set;
+			get { return users; }
 		}
 
 		/// <summary>
@@ -297,7 +283,7 @@ namespace Gablarski.Client
 			get { return this.Sources; }
 		}
 
-		IClientUserManager IClientContext.Users
+		IClientUserHandler IClientContext.Users
 		{
 			get { return this.Users; }
 		}

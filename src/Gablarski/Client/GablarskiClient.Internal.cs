@@ -64,14 +64,16 @@ namespace Gablarski.Client
 		private readonly Queue<MessageReceivedEventArgs> mqueue = new Queue<MessageReceivedEventArgs> (100);
 		private Thread messageRunnerThread;
 
-		protected void Setup (ClientUserManager userMananger, ClientChannelManager channelManager, ClientSourceManager sourceManager, CurrentUser currentUser, IAudioEngine audioEngine)
+		private ClientUserHandler users;
+
+		protected void Setup (ClientUserHandler userMananger, ClientChannelManager channelManager, ClientSourceManager sourceManager, CurrentUser currentUser, IAudioEngine audioEngine)
 		{
 			if (this.handlers != null)
 				return;
 
 			this.Audio = audioEngine;
 			this.CurrentUser = currentUser;
-			this.Users = userMananger;
+			this.users = userMananger;
 			this.Channels = channelManager;
 			this.Sources = sourceManager;
 
@@ -81,21 +83,21 @@ namespace Gablarski.Client
 
 				{ ServerMessageType.Redirect, OnRedirectReceived },
 				{ ServerMessageType.ServerInfoReceived, OnServerInfoReceivedMessage },
-				{ ServerMessageType.UserListReceived, this.Users.OnUserListReceivedMessage },
+				{ ServerMessageType.UserListReceived, this.users.OnUserListReceivedMessage },
 				{ ServerMessageType.SourceListReceived, this.Sources.OnSourceListReceivedMessage },
 				{ ServerMessageType.SourcesRemoved, this.Sources.OnSourcesRemovedMessage },
 				
 				{ ServerMessageType.ChannelListReceived, this.Channels.OnChannelListReceivedMessage },
-				{ ServerMessageType.UserChangedChannel, this.Users.OnUserChangedChannelMessage },
+				{ ServerMessageType.UserChangedChannel, this.users.OnUserChangedChannelMessage },
 				{ ServerMessageType.ChannelEditResult, this.Channels.OnChannelEditResultMessage },
-				{ ServerMessageType.ChangeChannelResult, this.Users.OnChannelChangeResultMessage },
+				{ ServerMessageType.ChangeChannelResult, this.users.OnChannelChangeResultMessage },
 
 				{ ServerMessageType.ConnectionRejected, OnConnectionRejectedMessage },
 				{ ServerMessageType.LoginResult, this.CurrentUser.OnLoginResultMessage },
 				{ ServerMessageType.JoinResult, this.CurrentUser.OnJoinResultMessage },
 				{ ServerMessageType.Permissions, this.CurrentUser.OnPermissionsMessage },
-				{ ServerMessageType.UserLoggedIn, this.Users.OnUserJoinedMessage },
-				{ ServerMessageType.UserDisconnected, this.Users.OnUserDisconnectedMessage },
+				{ ServerMessageType.UserLoggedIn, this.users.OnUserJoinedMessage },
+				{ ServerMessageType.UserDisconnected, this.users.OnUserDisconnectedMessage },
 				{ ServerMessageType.Muted, OnMuted },
 				
 				{ ServerMessageType.SourceResult, this.Sources.OnSourceResultMessage },
@@ -147,31 +149,12 @@ namespace Gablarski.Client
 
 		private void OnMessageReceived (object sender, MessageReceivedEventArgs e)
 		{
-			//if (!e.Message.Reliable)
-			//{
-			//    var msg = (e.Message as ServerMessage);
-			//    if (msg == null)
-			//    {
-			//        log.Error ("Non ServerMessage received (" + e.Message.MessageTypeCode + "), disconnecting.");
-			//        Connection.Disconnect ();
-			//        return;
-			//    }
+			lock (mqueue)
+			{
+				mqueue.Enqueue (e);
+			}
 
-			//    if (log.IsDebugEnabled)
-			//        log.Debug ("Message Received: " + msg.MessageType);
-
-			//    if (this.running)
-			//        this.handlers[msg.MessageType] (e);
-			//}
-			//else
-			//{
-				lock (mqueue)
-				{
-					mqueue.Enqueue (e);
-				}
-
-				incomingWait.Set ();
-			//}
+			incomingWait.Set ();
 		}
 
 		private void OnMuted (MessageReceivedEventArgs obj)
@@ -179,7 +162,7 @@ namespace Gablarski.Client
 			var msg = (MutedMessage)obj.Message;
 
 			if (msg.Type == MuteType.User)
-				this.Users.OnMutedMessage ((string)msg.Target, msg.Unmuted);
+				this.users.OnMutedMessage ((string)msg.Target, msg.Unmuted);
 			else if (msg.Type == MuteType.AudioSource)
 				this.Sources.OnMutedMessage ((int)msg.Target, msg.Unmuted);
 		}
@@ -241,7 +224,7 @@ namespace Gablarski.Client
 			connection.MessageReceived -= this.OnMessageReceived;
 			connection.Disconnect();
 
-			this.Users.Clear();
+			this.Users.Reset();
 			this.Channels.Clear();
 			this.Sources.Clear();
 

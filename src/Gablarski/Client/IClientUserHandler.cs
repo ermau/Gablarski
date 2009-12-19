@@ -1,4 +1,4 @@
-// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -39,51 +39,54 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Gablarski
+namespace Gablarski.Client
 {
-	public interface IUserManager
+	public interface IClientUserHandler
 		: IIndexedEnumerable<int, UserInfo>
 	{
 		/// <summary>
-		/// Joins <paramref name="user"/>.
+		/// An new or updated user list has been received.
 		/// </summary>
-		/// <param name="user">
-		/// A <see cref="UserInfo"/>
-		/// </param>
-		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
-		void Join (UserInfo user);
+		event EventHandler<ReceivedListEventArgs<UserInfo>> ReceivedUserList;
 		
 		/// <summary>
-		/// Departs a user.
+		/// A new user has joined.
 		/// </summary>
-		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c></exception>
-		bool Depart (UserInfo user);
+		event EventHandler<UserEventArgs> UserJoined;
 		
 		/// <summary>
-		/// Updates the manager using <paramref name="users"/> as the new list of users.
+		/// A user has disconnected.
 		/// </summary>
-		/// <param name="users">The new list of users.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="users"/> is <c>null</c></exception>
-		void Update (IEnumerable<UserInfo> users);
+		event EventHandler<UserEventArgs> UserDisconnected;
 		
 		/// <summary>
-		/// Updates the user internally to match the properties of <paramref name="user"/>.
+		/// A user was muted or ignored.
 		/// </summary>
-		/// <param name="user">The new set of properties for the user.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
-		void Update (UserInfo user);
-		
-		/// <summary>
-		/// Gets whether or not <paramref name="user"/> is currently in the manager.
-		/// </summary>
-		/// <param name="user">The user to check for.</param>
-		/// <returns><c>true</c> if <paramref name="user"/> is in the manager, <c>false</c> otherwise.</returns>
-		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
-		bool IsJoined (UserInfo user);
+		event EventHandler<UserMutedEventArgs> UserMuted;
 
-		bool IsJoined (int userId);
-		
-		bool IsJoined (string username);
+		/// <summary>
+		/// A user has changed channels.
+		/// </summary>
+		event EventHandler<ChannelChangedEventArgs> UserChangedChannel;
+
+		/// <summary>
+		/// Gets the current user.
+		/// </summary>
+		CurrentUser Current { get; }
+
+		/// <summary>
+		/// Gets whether the user has been ignored by the current user.
+		/// </summary>
+		/// <param name="user">The user to check.</param>
+		/// <returns><c>true</c> if the user is ignored, <c>false</c> if not.</returns>
+		bool GetIsIgnored (UserInfo user);
+
+		/// <summary>
+		/// Toggles ignore on <paramref name="user"/>.
+		/// </summary>
+		/// <param name="user">The user to ignore or unignore.</param>
+		/// <returns><c>true</c> if the user is now ignored, <c>false</c> if the user is now unignored.</returns>
+		bool ToggleIgnore (UserInfo user);
 		
 		/// <summary>
 		/// Tries to get <parmref name="user"/> from <paramref name="userId"/>.
@@ -98,15 +101,35 @@ namespace Gablarski
 		/// </summary>
 		/// <param name="channelId">The id of the channel.</param>
 		/// <returns>
-		/// A <see cref="IEnumerable<UserInfo>"/> of the users in the channel. <c>null</c> if the channel was not found.
+		/// A <see cref="IEnumerable{UserInfo}"/> of the users in the channel. <c>null</c> if the channel was not found.
 		/// </returns>
 		IEnumerable<UserInfo> GetUsersInChannel (int channelId);
 
 		/// <summary>
-		/// Toggles mute on <paramref name="user"/>.
+		/// Requests to move <paramref name="user"/> to <paramref name="targetChannel"/>.
 		/// </summary>
-		/// <param name="user"></param>
+		/// <param name="user">The user to move.</param>
+		/// <param name="targetChannel">The target channel to move the user to.</param>
+		void Move (UserInfo user, ChannelInfo targetChannel);
+
+		/// <summary>
+		/// Attempts to toggle mute on <paramref name="user"/>.
+		/// </summary>
+		/// <param name="user">The user to attempt to mute.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
+		/// <remarks>
+		/// Since muting is server-side and permissions restricted, this will return immediately without
+		/// new state information, that'll come later.
+		/// </remarks>
 		void ToggleMute (UserInfo user);
+
+		/// <summary>
+		/// Resets the handler to it's initial state.
+		/// </summary>
+		/// <remarks>
+		/// Integraters shouldn't invoke this directly, it's for the <see cref="GablarskiClient"/> to do
+		/// when disconnecting.
+		/// </remarks>
+		void Reset();
 	}
 }

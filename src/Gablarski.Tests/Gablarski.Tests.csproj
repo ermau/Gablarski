@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -84,7 +84,7 @@
     <Compile Include="AudioSourceTests.cs" />
     <Compile Include="ClientChannelManagerTests.cs" />
     <Compile Include="ClientSourceManagerTests.cs" />
-    <Compile Include="ClientUserManagerTests.cs" />
+    <Compile Include="ClientUserHandlerTests.cs" />
     <Compile Include="ExtensionTests.cs" />
     <Compile Include="ClientMessageTests.cs" />
     <Compile Include="Mocks\Audio\MockAudioDevice.cs" />
@@ -99,8 +99,9 @@
     <Compile Include="ServerInfoTests.cs" />
     <Compile Include="ServerMessageTests.cs" />
     <Compile Include="ServerTests.cs" />
+    <Compile Include="ServerUserManagerTests.cs" />
     <Compile Include="UserInfoTests.cs" />
-    <Compile Include="UserManagerTests.cs" />
+    <Compile Include="ClientUserManagerTests.cs" />
     <Compile Include="Mocks\MockRedirector.cs" />
   </ItemGroup>
   <ItemGroup>

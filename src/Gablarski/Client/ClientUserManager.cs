@@ -35,387 +35,151 @@
 // DAMAGE.
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
-using Gablarski.Messages;
-using System.Threading;
+using Cadenza;
 
 namespace Gablarski.Client
 {
-	public class ClientUserManager
-		: UserManager, IClientUserManager
+	internal class ClientUserManager
+		: IClientUserManager
 	{
-		protected internal ClientUserManager (IClientContext context)
-		{
-			if (context == null)
-				throw new ArgumentNullException ("context");
-
-			this.context = context;
-		}
-
-		#region Events
-		/// <summary>
-		/// An new or updated user list has been received.
-		/// </summary>
-		public event EventHandler<ReceivedListEventArgs<UserInfo>> ReceivedUserList;
-
-		/// <summary>
-		/// A new user has joined.
-		/// </summary>
-		public event EventHandler<UserEventArgs> UserJoined;
-
-		/// <summary>
-		/// A user has disconnected.
-		/// </summary>
-		public event EventHandler<UserEventArgs> UserDisconnected;
-
-		/// <summary>
-		/// A user was muted or ignored.
-		/// </summary>
-		public event EventHandler<UserMutedEventArgs> UserMuted;
-
-		/// <summary>
-		/// A user has changed channels.
-		/// </summary>
-		public event EventHandler<ChannelChangedEventArgs> UserChangedChannel;
-
-		/// <summary>
-		/// Received an unsucessful result of a change channel request.
-		/// </summary>
-		public event EventHandler<ReceivedChannelChannelResultEventArgs> ReceivedChannelChangeResult;
-		#endregion
-
-		/// <summary>
-		/// Gets the current user.
-		/// </summary>
-		public CurrentUser Current
-		{
-			get { return this.context.CurrentUser; }
-		}
-
-		/// <summary>
-		/// Requests to move <paramref name="user"/> to <paramref name="targetChannel"/>.
-		/// </summary>
-		/// <param name="user">The user to move.</param>
-		/// <param name="targetChannel">The target channel to move the user to.</param>
-		public void Move (UserInfo user, ChannelInfo targetChannel)
-		{
-			if (user == null)
-				throw new ArgumentNullException ("user");
-			if (targetChannel == null)
-				throw new ArgumentNullException ("targetChannel");
-
-			this.context.Connection.Send (new ChannelChangeMessage (user.UserId, targetChannel.ChannelId));
-		}
-
-		/// <summary>
-		/// Gets whether or not <paramref name="user"/> is currently ignored.
-		/// </summary>
-		/// <param name="user">The user to check.</param>
-		/// <returns><c>true</c> if ignored, <c>false</c> if not.</returns>
-		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
-		public bool GetIsIgnored (UserInfo user)
+		public void Join (UserInfo user)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
 
 			lock (SyncRoot)
 			{
-				return ignores.Contains (user.UserId);
+				users.Add (user.UserId, user);
+				channels.Add (user.CurrentChannelId, user);
 			}
 		}
 
-		/// <summary>
-		/// Toggles <paramref name="user"/>'s ignored status.
-		/// </summary>
-		/// <param name="user">The user to toggle ignored status.</param>
-		/// <returns><c>true</c> if the user is now ignored, <c>false</c> if now unignored.</returns>
-		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
-		public bool ToggleIgnore (UserInfo user)
+		public bool GetIsJoined (UserInfo user)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
 
-			bool ignored;
 			lock (SyncRoot)
 			{
-				ignored = ignores.Contains (user.UserId);
-
-				if (ignored)
-					ignores.Remove (user.UserId);
-				else
-					ignores.Add (user.UserId);
+				return users.ContainsValue (user);
 			}
-
-			return !ignored;
 		}
 
-		/// <summary>
-		/// Requests a mute toggle for <paramref name="user"/>.
-		/// </summary>
-		/// <param name="user">The user to attempt to mute or unmute.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
+		public bool Depart (UserInfo user)
+		{
+			if (user == null)
+				throw new ArgumentNullException ("user");
+
+			lock (SyncRoot)
+			{
+				users.Remove (user.UserId);
+				return channels.Remove (user.CurrentChannelId, user);
+			}
+		}
+		
+		public void Update (IEnumerable<UserInfo> userUpdate)
+		{
+			if (userUpdate == null)
+				throw new ArgumentNullException ("users");
+				
+			lock (SyncRoot)
+			{
+				users = userUpdate.ToDictionary (u => u.UserId);
+				channels = new MutableLookup<int, UserInfo> (userUpdate.ToLookup (u => u.CurrentChannelId));
+			}
+		}
+		
+		public void Update (UserInfo user)
+		{
+			if (user == null)
+				throw new ArgumentNullException ("user");
+				
+			lock (SyncRoot)
+			{
+				UserInfo oldUser;
+				if (users.TryGetValue (user.UserId, out oldUser))
+					channels.Remove (oldUser.CurrentChannelId, oldUser);
+					
+				channels.Add (user.CurrentChannelId, users[user.UserId] = new UserInfo (user));
+			}
+		}
+
+		public void Clear ()
+		{
+			lock (SyncRoot)
+			{
+				users.Clear();
+				channels.Clear();
+			}
+		}
+
+		public IEnumerable<UserInfo> GetUsersInChannel (int channelId)
+		{
+			lock (SyncRoot)
+			{
+				return this.channels[channelId].ToList();
+			}
+		}
+
 		public void ToggleMute (UserInfo user)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
 
-			context.Connection.Send (new RequestMuteMessage { Target = user.Username, Type = MuteType.User, Unmute = user.IsMuted });
-		}
-
-		private readonly HashSet<int> ignores = new HashSet<int> ();
-		private readonly IClientContext context;
-
-		#region Message handlers
-		internal void OnUserListReceivedMessage (MessageReceivedEventArgs e)
-		{
-			var msg = (UserListMessage)e.Message;
-
-			IEnumerable<UserInfo> userlist;
 			lock (SyncRoot)
 			{
-				Update (msg.Users);
-				userlist = msg.Users.ToList();
-
-				foreach (int ignoredId in this.ignores.ToList ().Where (id => !IsJoined (id)))
-					this.ignores.Remove (ignoredId);
-			}
-
-			OnReceivedUserList (new ReceivedListEventArgs<UserInfo> (userlist));
-		}
-
-		internal void OnMutedMessage (string username, bool unmuted)
-		{
-			lock (SyncRoot)
-			{
-		        var user = this.SingleOrDefault (u => u.Username == username);
-		        if (user == null)
-		            return;
-
-		        user.IsMuted = true;
-
-			    OnUserMuted (new UserMutedEventArgs (user, unmuted));
-			}
-		}
-
-		internal void OnUserDisconnectedMessage (MessageReceivedEventArgs e)
-		{
-			var msg = (UserDisconnectedMessage) e.Message;
-
-			UserInfo user;
-			lock (SyncRoot)
-			{
-				if (!this.TryGetUser (msg.UserId, out user))
-					return;
-
-				Depart (user);
-				ignores.Remove (msg.UserId);
-			}
-
-			OnUserDisconnected (new UserEventArgs (user));
-		}
-
-		internal void OnUserJoinedMessage (MessageReceivedEventArgs e)
-		{
-			var msg = (UserJoinedMessage)e.Message;
-
-			UserInfo user = new UserInfo (msg.UserInfo);
-			
-			Join (user);
-
-			OnUserJoined (new UserEventArgs (user));
-		}
-
-		internal void OnUserChangedChannelMessage (MessageReceivedEventArgs e)
-		{
-			var msg = (UserChangedChannelMessage)e.Message;
-
-			var channel = this.context.Channels[msg.ChangeInfo.TargetChannelId];
-			if (channel == null)
-				return;
-
-			var previous = this.context.Channels[msg.ChangeInfo.PreviousChannelId];
-
-			UserInfo old;
-			UserInfo user;
-			UserInfo movedBy = null;
-			lock (SyncRoot)
-			{
-				if (!TryGetUser (msg.ChangeInfo.TargetUserId, out old))
-					return;
-
-				user = new UserInfo (old.Nickname, old.Phonetic, old.Username, old.UserId, msg.ChangeInfo.TargetChannelId, old.IsMuted);
-				Update (user);
+				UserInfo oldUser;
+				if (!users.TryGetValue (user.UserId, out oldUser))
+					oldUser = user;
 				
-				if (user.Equals (context.CurrentUser))
-					context.CurrentUser.CurrentChannelId = msg.ChangeInfo.TargetChannelId;
+				UserInfo newUser = new UserInfo (oldUser.Nickname, user.Phonetic, user.Username, user.UserId, user.CurrentChannelId, !user.IsMuted);
+			}
+		}
+		
+		public bool TryGetUser (int userId, out UserInfo user)
+		{
+			lock (SyncRoot)
+			{
+				return users.TryGetValue (userId, out user);
+			}
+		}
 
-				if (msg.ChangeInfo.RequestingUserId != 0)
-					TryGetUser (msg.ChangeInfo.RequestingUserId, out movedBy);
+		public UserInfo this[int key]
+		{
+			get
+			{
+				UserInfo user;
+				lock (SyncRoot)
+				{
+					this.users.TryGetValue (key, out user);
+				}
+
+				return user;
+			}
+		}
+
+		public IEnumerator<UserInfo> GetEnumerator ()
+		{
+			IEnumerable<UserInfo> returnUsers;
+			lock (SyncRoot)
+			{
+				 returnUsers = this.users.Values.ToList();
 			}
 
-			OnUserChangedChannnel (new ChannelChangedEventArgs (user, channel, previous, movedBy));
+			return returnUsers.GetEnumerator ();
 		}
 
-		internal void OnChannelChangeResultMessage (MessageReceivedEventArgs e)
+		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator ()
 		{
-			var msg = (ChannelChangeResultMessage)e.Message;
-
-			OnReceivedChannelChangeResult (new ReceivedChannelChannelResultEventArgs (msg.MoveInfo, msg.Result));
-		}
-		#endregion
-
-		#region Event Invokers
-		protected virtual void OnUserMuted (UserMutedEventArgs e)
-		{
-			var muted = this.UserMuted;
-			if (muted != null)
-				muted (this, e);
+			return GetEnumerator ();
 		}
 
-		protected virtual void OnUserDisconnected (UserEventArgs e)
-		{
-			var disconnected = this.UserDisconnected;
-			if (disconnected != null)
-				disconnected (this, e);
-		}
+		protected readonly object SyncRoot = new object ();
 
-		protected virtual void OnReceivedUserList (ReceivedListEventArgs<UserInfo> e)
-		{
-			var received = this.ReceivedUserList;
-			if (received != null)
-				received (this, e);
-		}
-
-		protected virtual void OnUserJoined (UserEventArgs e)
-		{
-			var result = this.UserJoined;
-			if (result != null)
-				result (this, e);
-		}
-
-		protected virtual void OnUserChangedChannnel (ChannelChangedEventArgs e)
-		{
-			var result = this.UserChangedChannel;
-			if (result != null)
-				result (this, e);
-		}
-
-		protected virtual void OnReceivedChannelChangeResult (ReceivedChannelChannelResultEventArgs e)
-		{
-			var result = this.ReceivedChannelChangeResult;
-			if (result != null)
-				result (this, e);
-		}
-		#endregion
+		private Dictionary<int, UserInfo> users = new Dictionary<int, UserInfo> ();
+		private MutableLookup<int, UserInfo> channels = new MutableLookup<int, UserInfo> ();
 	}
-
-	#region Event Args
-	public class UserMutedEventArgs
-		: UserEventArgs
-	{
-		public UserMutedEventArgs (UserInfo userInfo, bool unmuted)
-			: base (userInfo)
-		{
-			this.Unmuted = unmuted;
-		}
-
-		public bool Unmuted { get; set; }
-	}
-
-	public class UserEventArgs
-		: EventArgs
-	{
-		public UserEventArgs (UserInfo userInfo)
-		{
-			if (userInfo == null)
-				throw new ArgumentNullException ("userInfo");
-
-			this.User = userInfo;
-		}
-
-		/// <summary>
-		/// Gets the user target of the event.
-		/// </summary>
-		public UserInfo User
-		{
-			get;
-			private set;
-		}
-	}
-
-	public class ChannelChangedEventArgs
-		: UserEventArgs
-	{
-		public ChannelChangedEventArgs (UserInfo target, ChannelInfo targetChannel, ChannelInfo previousChannel, UserInfo movedBy)
-			: base (target)
-		{
-			if (targetChannel == null)
-				throw new ArgumentNullException ("targetChannel");
-
-			this.TargetChannel = targetChannel;
-			this.MovedBy = movedBy;
-			this.PreviousChannel = previousChannel;
-		}
-
-		/// <summary>
-		/// Gets the channel the user is being moved to.
-		/// </summary>
-		public ChannelInfo TargetChannel
-		{
-			get; private set;
-		}
-
-		/// <summary>
-		/// Gets the channel the user is being moved from.
-		/// </summary>
-		public ChannelInfo PreviousChannel
-		{
-			get;
-			private set;
-		}
-
-		/// <summary>
-		/// Gets the user the target user was moved by
-		/// </summary>
-		public UserInfo MovedBy
-		{
-			get; private set;
-		}
-	}
-
-	public class ReceivedChannelChannelResultEventArgs
-		: EventArgs
-	{
-		public ReceivedChannelChannelResultEventArgs (ChannelChangeInfo moveInfo, ChannelChangeResult result)
-		{
-			if (moveInfo == null)
-				throw new ArgumentNullException ("moveInfo");
-
-			this.MoveInfo = moveInfo;
-			this.Result = result;
-		}
-
-		/// <summary>
-		/// Gets information about the move this result is for.
-		/// </summary>
-		public ChannelChangeInfo MoveInfo
-		{
-			get;
-			private set;
-		}
-
-		/// <summary>
-		/// Gets the result of the change channel request.
-		/// </summary>
-		public ChannelChangeResult Result
-		{
-			get;
-			private set;
-		}
-	}
-	#endregion
 }

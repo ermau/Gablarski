@@ -72,7 +72,7 @@ namespace Gablarski.Client
 		/// <summary>
 		/// Gets the user manager associated with this context.
 		/// </summary>
-		IClientUserManager Users { get; }
+		IClientUserHandler Users { get; }
 
 		/// <summary>
 		/// Gets the current logged in user.
