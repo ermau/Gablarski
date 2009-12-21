@@ -1,4 +1,4 @@
-﻿// Copyright (client) 2009, Eric Maupin
+// Copyright (client) 2009, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -341,7 +341,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void GetConnectionNotFound()
 		{
-			Assert.IsNull (manager.GetConnection (new UserInfo()));
+			Assert.IsNull (manager.GetConnection (new UserInfo ("Username", 1, 2, true)));
 		}
 
 		[Test]

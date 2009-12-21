@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -54,7 +54,7 @@ namespace Gablarski.Tests
 		[SetUp]
 		public void Setup()
 		{
-			handler = new ServerUserHandler (new MockServerContext(), new ServerUserManager());
+			handler = new ServerUserHandler (new MockServerContext { Settings = new ServerSettings() }, new ServerUserManager());
 			server = new MockServerConnection();
 		}
 
@@ -68,6 +68,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void Connect()
 		{
+			
 			handler.ConnectMessage (new MessageReceivedEventArgs (server.Client, 
 				new ConnectMessage { ProtocolVersion = GablarskiServer.ProtocolVersion }));
 

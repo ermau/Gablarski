@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -39,6 +39,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Gablarski.Messages;
+using System.Net;
+using Cadenza;
 
 namespace Gablarski.Server
 {
@@ -85,6 +87,19 @@ namespace Gablarski.Server
 			{
 				e.Connection.Send (new ConnectionRejectedMessage (ConnectionRejectedReason.IncompatibleVersion));
 				return;
+			}
+			
+			if (!msg.Host.IsNullOrWhitespace() && msg.Port != 0)
+			{
+				foreach (var r in serverContext.Redirectors)
+				{
+					IPEndPoint redirect = r.CheckRedirect (msg.Host, msg.Port);
+					if (redirect == null)
+						continue;
+					
+					e.Connection.Send (new RedirectMessage { Host = redirect.Address.ToString(), Port = redirect.Port });
+					return;
+				}
 			}
 
 			Manager.Connect (e.Connection);
