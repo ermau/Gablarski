@@ -50,11 +50,19 @@ namespace Gablarski.Server
 {
 	public partial class GablarskiServer
 	{
+		int IServerContext.ProtocolVersion
+		{
+			get { return GablarskiServer.ProtocolVersion; }
+		}
+
 		protected GablarskiServer ()
 		{
+			var userHandler = new ServerUserHandler (this, new ServerUserManager());
+			Users = userHandler;
+
 			this.Handlers = new Dictionary<ClientMessageType, Action<MessageReceivedEventArgs>>
 			{
-				{ ClientMessageType.Connect, ClientConnected },
+				{ ClientMessageType.Connect, userHandler.ConnectMessage },
 				{ ClientMessageType.Disconnect, ClientDisconnected },
 				{ ClientMessageType.Login, UserLoginAttempt },
 				{ ClientMessageType.Join, UserJoinAttempt },

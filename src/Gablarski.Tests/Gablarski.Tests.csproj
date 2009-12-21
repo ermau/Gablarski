@@ -89,6 +89,7 @@
     <Compile Include="ClientMessageTests.cs" />
     <Compile Include="Mocks\Audio\MockAudioDevice.cs" />
     <Compile Include="Mocks\Audio\MockCaptureProvider.cs" />
+    <Compile Include="Mocks\MockServerContext.cs" />
     <Compile Include="Mocks\Network\MockClientConnection.cs" />
     <Compile Include="Mocks\MockClientContext.cs" />
     <Compile Include="Mocks\Network\MockConnectionBase.cs" />
@@ -99,6 +100,7 @@
     <Compile Include="ServerInfoTests.cs" />
     <Compile Include="ServerMessageTests.cs" />
     <Compile Include="ServerTests.cs" />
+    <Compile Include="ServerUserHandlerTests.cs" />
     <Compile Include="ServerUserManagerTests.cs" />
     <Compile Include="UserInfoTests.cs" />
     <Compile Include="ClientUserManagerTests.cs" />

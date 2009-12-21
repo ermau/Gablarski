@@ -1,4 +1,4 @@
-// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -34,24 +34,61 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Gablarski.Messages;
 
 namespace Gablarski.Server
 {
-	public interface IServerContext
+	public class ServerUserHandler
+		: IServerUserHandler
 	{
-		/// <summary>
-		/// Gets the protocol version of the server.
-		/// </summary>
-		int ProtocolVersion { get; }
+		public ServerUserHandler (IServerContext context, IServerUserManager manager)
+		{
+			this.serverContext = context;
+			this.Manager = manager;
+		}
 
-		IServerUserHandler Users { get; }
+		#region IIndexedEnumerable<int,UserInfo> Members
 
-		/// <summary>
-		/// Gets the redirectors for this server.
-		/// </summary>
-		IEnumerable<IRedirector> Redirectors { get; }
+		public UserInfo this[int key]
+		{
+			get { return Manager[key]; }
+		}
 
-		ServerSettings Settings { get; }
+		#endregion
+
+		#region IEnumerable<UserInfo> Members
+
+		public IEnumerator<UserInfo> GetEnumerator()
+		{
+			return Manager.GetEnumerator();
+		}
+
+		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
+		}
+
+		#endregion
+
+		internal readonly IServerUserManager Manager;
+		private readonly IServerContext serverContext;
+
+		internal void ConnectMessage (MessageReceivedEventArgs e)
+		{
+			var msg = (ConnectMessage)e.Message;
+
+			if (msg.ProtocolVersion < serverContext.ProtocolVersion)
+			{
+				e.Connection.Send (new ConnectionRejectedMessage (ConnectionRejectedReason.IncompatibleVersion));
+				return;
+			}
+
+			Manager.Connect (e.Connection);
+			e.Connection.Send (new ServerInfoMessage { ServerInfo = new ServerInfo (serverContext.Settings) });
+		}
 	}
 }

@@ -1,4 +1,4 @@
-// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -34,24 +34,15 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace Gablarski.Server
 {
-	public interface IServerContext
+	public interface IServerUserHandler
+		: IIndexedEnumerable<int, UserInfo>
 	{
-		/// <summary>
-		/// Gets the protocol version of the server.
-		/// </summary>
-		int ProtocolVersion { get; }
-
-		IServerUserHandler Users { get; }
-
-		/// <summary>
-		/// Gets the redirectors for this server.
-		/// </summary>
-		IEnumerable<IRedirector> Redirectors { get; }
-
-		ServerSettings Settings { get; }
 	}
 }

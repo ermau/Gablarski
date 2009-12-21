@@ -1,4 +1,4 @@
-// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -34,24 +34,56 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Gablarski.Messages;
+using Gablarski.Server;
+using Gablarski.Tests.Mocks;
+using NUnit.Framework;
 
-namespace Gablarski.Server
+namespace Gablarski.Tests
 {
-	public interface IServerContext
+	[TestFixture]
+	public class ServerUserHandlerTests
 	{
-		/// <summary>
-		/// Gets the protocol version of the server.
-		/// </summary>
-		int ProtocolVersion { get; }
+		private ServerUserHandler handler;
+		private MockServerConnection server;
 
-		IServerUserHandler Users { get; }
+		[SetUp]
+		public void Setup()
+		{
+			handler = new ServerUserHandler (new MockServerContext(), new ServerUserManager());
+			server = new MockServerConnection();
+		}
 
-		/// <summary>
-		/// Gets the redirectors for this server.
-		/// </summary>
-		IEnumerable<IRedirector> Redirectors { get; }
+		[TearDown]
+		public void Teardown()
+		{
+			handler = null;
+			server = null;
+		}
 
-		ServerSettings Settings { get; }
+		[Test]
+		public void Connect()
+		{
+			handler.ConnectMessage (new MessageReceivedEventArgs (server.Client, 
+				new ConnectMessage { ProtocolVersion = GablarskiServer.ProtocolVersion }));
+
+			Assert.IsTrue (handler.Manager.GetIsConnected (server.Client));
+		}
+
+		[Test]
+		public void ConnectInvalidVersion()
+		{
+			handler.ConnectMessage (new MessageReceivedEventArgs (server, 
+				new ConnectMessage { ProtocolVersion = 1 }));
+
+			Assert.IsFalse (handler.Manager.GetIsConnected (server.Client));
+
+			var rejected = server.Client.DequeueAndAssertMessage<ConnectionRejectedMessage>();
+			Assert.AreEqual (ConnectionRejectedReason.IncompatibleVersion, rejected.Reason);
+		}
 	}
 }

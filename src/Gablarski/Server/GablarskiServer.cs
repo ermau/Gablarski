@@ -112,10 +112,21 @@ namespace Gablarski.Server
 			get { return this.settings; }
 		}
 
-		public IServerUserManager Users
+		public IServerUserHandler Users
 		{
 			get;
 			private set;
+		}
+
+		public IEnumerable<IRedirector> Redirectors
+		{
+			get
+			{
+				lock (redirectors)
+				{
+					return redirectors.ToList();
+				}
+			}
 		}
 
 		#region Public Methods

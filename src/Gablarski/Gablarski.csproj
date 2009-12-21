@@ -165,7 +165,9 @@
     <Compile Include="Server\IRedirector.cs" />
     <Compile Include="Server\IServerPersistance.cs" />
     <Compile Include="Server\IConnectionManager.cs" />
+    <Compile Include="Server\IServerUserHandler.cs" />
     <Compile Include="Server\IServerUserManager.cs" />
+    <Compile Include="Server\ServerUserHandler.cs" />
     <Compile Include="Server\ServerUserInfo.cs" />
     <Compile Include="Server\ServerUserManager.cs" />
     <Compile Include="UserInfo.cs" />

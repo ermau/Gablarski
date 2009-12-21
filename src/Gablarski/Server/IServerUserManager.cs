@@ -7,7 +7,7 @@ using Gablarski.Messages;
 namespace Gablarski.Server
 {
 	public interface IServerUserManager
-		: IConnectionManager
+		: IConnectionManager, IIndexedEnumerable<int, UserInfo>
 	{
 		void Login (IConnection connection, UserInfo user);
 		bool GetIsLoggedIn (UserInfo user);

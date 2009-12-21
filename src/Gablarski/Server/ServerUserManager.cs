@@ -46,6 +46,21 @@ namespace Gablarski.Server
 	public class ServerUserManager
 		: IServerUserManager
 	{
+		public UserInfo	this [int userId]
+		{
+			get
+			{
+				UserInfo user;
+
+				lock (SyncRoot)
+				{
+					user = connectedUsers.Keys.FirstOrDefault (u => u.UserId == userId);
+				}
+
+				return user;
+			}
+		}
+
 		#region IConnectionManager Members
 
 		public void Connect (IConnection connection)
@@ -269,7 +284,18 @@ namespace Gablarski.Server
 
 		#region IEnumerable Members
 
-		public new IEnumerator GetEnumerator()
+		public IEnumerator<UserInfo> GetEnumerator()
+		{
+			IEnumerable<UserInfo> e;
+			lock (SyncRoot)
+			{
+				e = connectedUsers.Keys.ToList();
+			}
+
+			return e.GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return GetEnumerator();
 		}
