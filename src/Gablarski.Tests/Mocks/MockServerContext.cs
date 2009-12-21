@@ -20,6 +20,12 @@ namespace Gablarski.Tests.Mocks
 			set;
 		}
 
+		public IEnumerable<IRedirector> Redirectors
+		{
+			get;
+			set;
+		}
+
 		public ServerSettings Settings
 		{
 			get;
