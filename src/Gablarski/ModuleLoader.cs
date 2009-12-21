@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -103,6 +103,9 @@ namespace Gablarski
 		internal static IEnumerable<Type> SearchPath (DirectoryInfo dir, Type contract, bool recursive)
 		{
 			IEnumerable<Type> implementers = Enumerable.Empty<Type>();
+			
+			if (!dir.Exists)
+				return implementers;
 
 			try
 			{
