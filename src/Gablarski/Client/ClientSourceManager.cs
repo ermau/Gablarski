@@ -222,78 +222,6 @@ namespace Gablarski.Client
 			}
 		}
 
-		/// <summary>
-		/// Sends notifications that you're begining to send audio from <paramref name="source"/> to <paramref name="channel"/>.
-		/// </summary>
-		/// <param name="source">The source to send from.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
-		/// <exception cref="ArgumentException"><paramref name="source"/> does not belong to you.</exception>
-		public void BeginSending (AudioSource source)
-		{
-			if (source == null)
-				throw new ArgumentNullException ("source");
-			if (source.OwnerId != this.context.CurrentUser.UserId)
-				throw new ArgumentException ("Can not send audio from a source you don't own", "source");
-
-			this.context.Connection.Send (new ClientAudioSourceStateChangeMessage { Starting = true, SourceId = source.Id });
-
-			OnAudioSourceStarted (new AudioSourceEventArgs (source));
-		}
-
-		/// <summary>
-		/// Sends a frame of audio data to the source
-		/// </summary>
-		/// <param name="source">The source to send from.</param>
-		/// <param name="channel">The channel to send to.</param>
-		/// <param name="data"></param>
-		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
-		/// <exception cref="ArgumentException"><paramref name="source"/> does not belong to you.</exception>
-		/// <exception cref="ArgumentNullException"><paramref name="channel"/> is <c>null</c>.</exception>
-		/// <exception cref="ArgumentNullException"><paramref name="data"/> is <c>null</c>.</exception>
-		/// <exception cref="ArgumentException"><paramref name="data"/> is empty.</exception>
-		public void SendAudioData (AudioSource source, ChannelInfo channel, byte[] data)
-		{
-			#if DEBUG
-			if (source == null)
-				throw new ArgumentNullException ("source");
-			if (source.OwnerId != this.context.CurrentUser.UserId)
-				throw new ArgumentException ("Can not send audio from a source you don't own", "source");
-			if (channel == null)
-				throw new ArgumentNullException ("channel");
-			if (data == null)
-				throw new ArgumentNullException ("data");
-			if (data.Length == 0)
-				throw new ArgumentException ("Audio frame can not be empty", "data");
-			#endif
-
-			this.context.Connection.Send (new SendAudioDataMessage
-			{
-				TargetType = TargetType.Channel,
-				TargetIds = new [] { channel.ChannelId },
-				SourceId = source.Id, 
-				Data = source.Encode (data)
-			});
-		}
-
-		/// <summary>
-		/// Sends notifications that you're finished sending audio from <paramref name="source"/> to <paramref name="channel"/>.
-		/// </summary>
-		/// <param name="source">The source to send from.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
-		/// <exception cref="ArgumentException"><paramref name="source"/> does not belong to you.</exception>
-		/// <exception cref="ArgumentNullException"><paramref name="channel"/> is <c>null</c>.</exception>
-		public void EndSending (AudioSource source)
-		{
-			if (source == null)
-				throw new ArgumentNullException ("source");
-			if (source.OwnerId != this.context.CurrentUser.UserId)
-				throw new ArgumentException ("Can not send audio from a source you don't own", "source");
-
-			this.context.Connection.Send (new ClientAudioSourceStateChangeMessage { Starting = false, SourceId = source.Id });
-
-			OnAudioSourceStopped (new AudioSourceEventArgs (source));
-		}
-
 		public void ToggleMute (AudioSource source)
 		{
 			context.Connection.Send (new RequestMuteMessage { Target = source.Id, Type = MuteType.AudioSource, Unmute = source.IsMuted });
@@ -326,6 +254,76 @@ namespace Gablarski.Client
 		private readonly IClientContext context;
 		private readonly Dictionary<int, AudioSource> sources = new Dictionary<int, AudioSource>();
 		private readonly HashSet<AudioSource> ignoredSources = new HashSet<AudioSource>();
+
+		/// <summary>
+		/// Sends notifications that you're begining to send audio from <paramref name="source"/> to <paramref name="channel"/>.
+		/// </summary>
+		/// <param name="source">The source to send from.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
+		/// <exception cref="ArgumentException"><paramref name="source"/> does not belong to you.</exception>
+		void IAudioSender.BeginSending (AudioSource source)
+		{
+			if (source == null)
+				throw new ArgumentNullException ("source");
+			if (source.OwnerId != this.context.CurrentUser.UserId)
+				throw new ArgumentException ("Can not send audio from a source you don't own", "source");
+
+			this.context.Connection.Send (new ClientAudioSourceStateChangeMessage { Starting = true, SourceId = source.Id });
+
+			OnAudioSourceStarted (new AudioSourceEventArgs (source));
+		}
+
+		/// <summary>
+		/// Sends a frame of audio data to the source
+		/// </summary>
+		/// <param name="source">The source to send from.</param>
+		/// <param name="data"></param>
+		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
+		/// <exception cref="ArgumentException"><paramref name="source"/> does not belong to you.</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="data"/> is <c>null</c>.</exception>
+		/// <exception cref="ArgumentException"><paramref name="data"/> is empty.</exception>
+		void IAudioSender.SendAudioData (AudioSource source, TargetType type,  int[] targets, byte[] data)
+		{
+			#if DEBUG
+			if (source == null)
+				throw new ArgumentNullException ("source");
+			if (source.OwnerId != this.context.CurrentUser.UserId)
+				throw new ArgumentException ("Can not send audio from a source you don't own", "source");
+			if (targets == null)
+				throw new ArgumentNullException ("targets");
+			if (data == null)
+				throw new ArgumentNullException ("data");
+			if (data.Length == 0)
+				throw new ArgumentException ("Audio frame can not be empty", "data");
+			#endif
+
+			this.context.Connection.Send (new SendAudioDataMessage
+			{
+				TargetType = type,
+				TargetIds = targets,
+				SourceId = source.Id, 
+				Data = source.Encode (data)
+			});
+		}
+
+		/// <summary>
+		/// Sends notifications that you're finished sending audio from <paramref name="source"/> to <paramref name="channel"/>.
+		/// </summary>
+		/// <param name="source">The source to send from.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
+		/// <exception cref="ArgumentException"><paramref name="source"/> does not belong to you.</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="channel"/> is <c>null</c>.</exception>
+		void IAudioSender.EndSending (AudioSource source)
+		{
+			if (source == null)
+				throw new ArgumentNullException ("source");
+			if (source.OwnerId != this.context.CurrentUser.UserId)
+				throw new ArgumentException ("Can not send audio from a source you don't own", "source");
+
+			this.context.Connection.Send (new ClientAudioSourceStateChangeMessage { Starting = false, SourceId = source.Id });
+
+			OnAudioSourceStopped (new AudioSourceEventArgs (source));
+		}
 
 		// We'll end up with new instances from the outside world, we can update our
 		// own instances no problem.
