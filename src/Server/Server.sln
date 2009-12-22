@@ -1,4 +1,3 @@
-
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski", "..\Gablarski\Gablarski.csproj", "{7347052B-DA5B-4CCA-AB28-3963766E3CDB}"
@@ -34,8 +33,8 @@ Global
 		{7347052B-DA5B-4CCA-AB28-3963766E3CDB}.Release|x86.Build.0 = Release|x86
 		{30C9010C-4948-4E83-B73B-04EB92A134FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{30C9010C-4948-4E83-B73B-04EB92A134FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{30C9010C-4948-4E83-B73B-04EB92A134FC}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{30C9010C-4948-4E83-B73B-04EB92A134FC}.Debug|x86.Build.0 = Debug|Any CPU
+		{30C9010C-4948-4E83-B73B-04EB92A134FC}.Debug|x86.ActiveCfg = Debug|x86
+		{30C9010C-4948-4E83-B73B-04EB92A134FC}.Debug|x86.Build.0 = Debug|x86
 		{30C9010C-4948-4E83-B73B-04EB92A134FC}.Mono Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{30C9010C-4948-4E83-B73B-04EB92A134FC}.Mono Debug|Any CPU.Build.0 = Debug|Any CPU
 		{30C9010C-4948-4E83-B73B-04EB92A134FC}.Mono Debug|x86.ActiveCfg = Debug|Any CPU
