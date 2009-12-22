@@ -50,6 +50,11 @@ namespace Gablarski.OpenAL.Providers
 		{
 			this.pool.SourceFinished += PoolSourceFinished;
 		}
+		
+		public OpenALPlaybackProvider (Context context)
+		{
+			this.context = context;
+		}
 
 		#region IPlaybackProvider Members
 		public event EventHandler<SourceFinishedEventArgs> SourceFinished;
