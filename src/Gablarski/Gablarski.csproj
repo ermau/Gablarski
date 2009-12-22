@@ -266,7 +266,7 @@
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
-    <PostBuildEvent>xcopy /Y "$(SolutionDir)Gablarski.License.txt" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)lib\NAudio.License.txt" "$(TargetDir)"</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>

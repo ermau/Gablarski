@@ -17,7 +17,8 @@
 				<include name="*.dll" />
 				<include name="*.xml" />
 				<include name="*.pdb" />
-				<include name="*.txt" />
+				<include name="Gablarski.License.txt" />
+				<include name="NAudio.License.txt" />
 			</fileset>
 		</zip>
 
