@@ -41,6 +41,7 @@ using System.Text;
 using System.Threading;
 using Gablarski.Audio.Speex;
 using Gablarski.Client;
+using Gablarski.Messages;
 
 namespace Gablarski.Audio
 {
@@ -195,13 +196,13 @@ namespace Gablarski.Audio
 			return removed;
 		}
 
-		public void BeginCapture (AudioSource source, ChannelInfo channel)
+		public void BeginCapture (AudioSource source, IEnumerable<ChannelInfo> channels)
 		{
 			#if DEBUG
 			if (source == null)
 				throw new ArgumentNullException ("source");
-			if (channel == null)
-				throw new ArgumentNullException ("channel");
+			if (channels == null)
+				throw new ArgumentNullException ("channels");
 			if (AudioSender == null)
 				throw new InvalidOperationException ("AudioSender not set.");
 			#endif
@@ -212,19 +213,44 @@ namespace Gablarski.Audio
 				if (!captures.TryGetValue (source, out e))
 					return;
 
+				e.TargetType = TargetType.Channel;
+				e.CurrentTargets = channels.Select (c => c.ChannelId).ToArray();
 				e.Talking = true;
 				AudioSender.BeginSending (source);
 				e.Capture.BeginCapture (AudioFormat.Mono16Bit);
 			}
 		}
 
-		public void EndCapture (AudioSource source, ChannelInfo channel)
+		public void BeginCapture (AudioSource source, IEnumerable<UserInfo> users)
 		{
 			#if DEBUG
 			if (source == null)
 				throw new ArgumentNullException ("source");
-			if (channel == null)
-				throw new ArgumentNullException ("channel");
+			if (users == null)
+				throw new ArgumentNullException ("users");
+			if (AudioSender == null)
+				throw new InvalidOperationException ("AudioSender not set.");
+			#endif
+
+			lock (captures)
+			{
+				AudioCaptureEntity e;
+				if (!captures.TryGetValue (source, out e))
+					return;
+
+				e.TargetType = TargetType.User;
+				e.CurrentTargets = users.Select (c => c.UserId).ToArray();
+				e.Talking = true;
+				AudioSender.BeginSending (source);
+				e.Capture.BeginCapture (AudioFormat.Mono16Bit);
+			}
+		}
+
+		public void EndCapture (AudioSource source)
+		{
+			#if DEBUG
+			if (source == null)
+				throw new ArgumentNullException ("source");
 			#endif
 
 			lock (captures)
@@ -381,7 +407,7 @@ namespace Gablarski.Audio
 						{
 							bool talking = c.Value.Talking;
 							ChannelInfo channel = Context.GetCurrentChannel ();
-							if (channel == null)
+							if (c.Value.CurrentTargets == null || c.Value.CurrentTargets.Length == 0)
 								break;
 
 							byte[] samples = c.Value.Capture.ReadSamples (c.Key.FrameSize);
@@ -394,14 +420,14 @@ namespace Gablarski.Audio
 									AudioSender.BeginSending (c.Key);
 									
 									if (previousFrame != null)
-										AudioSender.SendAudioData (c.Key, channel, previousFrame);
+										AudioSender.SendAudioData (c.Key, c.Value.TargetType, c.Value.CurrentTargets, previousFrame);
 								}
 
 								previousFrame = samples;
 							}
 
 							if (talking)
-								AudioSender.SendAudioData (c.Key, channel, samples);
+								AudioSender.SendAudioData (c.Key, c.Value.TargetType, c.Value.CurrentTargets, samples);
 							else if (c.Value.Talking && c.Value.Options.Mode == AudioEngineCaptureMode.Activated)
 								AudioSender.EndSending (c.Key);
 

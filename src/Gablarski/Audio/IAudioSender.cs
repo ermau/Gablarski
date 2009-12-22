@@ -38,6 +38,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Gablarski.Messages;
 
 namespace Gablarski.Audio
 {
@@ -55,14 +56,12 @@ namespace Gablarski.Audio
 		/// Sends a frame of audio data to the source
 		/// </summary>
 		/// <param name="source">The source to send from.</param>
-		/// <param name="channel">The channel to send to.</param>
-		/// <param name="data"></param>
+		/// <param name="frame"></param>
 		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
 		/// <exception cref="ArgumentException"><paramref name="source"/> does not belong to you.</exception>
-		/// <exception cref="ArgumentNullException"><paramref name="channel"/> is <c>null</c>.</exception>
-		/// <exception cref="ArgumentNullException"><paramref name="data"/> is <c>null</c>.</exception>
-		/// <exception cref="ArgumentException"><paramref name="data"/> is empty.</exception>
-		void SendAudioData (AudioSource source, ChannelInfo channel, byte[] frame);
+		/// <exception cref="ArgumentNullException"><paramref name="frame"/> is <c>null</c>.</exception>
+		/// <exception cref="ArgumentException"><paramref name="frame"/> is empty.</exception>
+		void SendAudioData (AudioSource source, TargetType targetType, int[] targetIds, byte[] frame);
 
 		/// <summary>
 		/// Sends notifications that you're finished sending audio from <paramref name="source"/> to <paramref name="channel"/>.

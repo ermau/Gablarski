@@ -166,10 +166,31 @@ namespace Gablarski.Audio
 		/// Begins an explicit capture for <paramref name="source"/>.
 		/// </summary>
 		/// <param name="source"></param>
-		/// <param name="channel"></param>
+		/// <param name="channels"></param>
 		/// <exception cref="ArgumentNullException"><paramref name="source"/> or <paramref name="channel"/> are <c>null</c>.</exception>
 		/// <exception cref="InvalidOperationException"><see cref="AudioSender"/> is not set or <paramref name="source"/> is configured for <see cref="AudioEngineCaptureMode.Activated"/>.</exception>
-		void BeginCapture (AudioSource source, ChannelInfo channel);
-		void EndCapture (AudioSource source, ChannelInfo channel);
+		void BeginCapture (AudioSource source, IEnumerable<ChannelInfo> channels);
+		void BeginCapture (AudioSource source, IEnumerable<UserInfo> users);
+		
+		void EndCapture (AudioSource source);
+	}
+
+	public static class AudioEngineExtensions
+	{
+		public static void BeginCapture (this IAudioEngine self, AudioSource source, ChannelInfo channel)
+		{
+			if (self == null)
+				throw new ArgumentNullException ("self");
+
+			self.BeginCapture (source, new[] { channel });
+		}
+
+		public static void BeginCapture (this IAudioEngine self, AudioSource source, UserInfo user)
+		{
+			if (self == null)
+				throw new ArgumentNullException ("self");
+
+			self.BeginCapture (source, new[] { user });
+		}
 	}
 }

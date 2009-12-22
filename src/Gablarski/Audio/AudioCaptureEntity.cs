@@ -40,6 +40,7 @@ using System.Linq;
 using System.Text;
 using Gablarski.Audio.Speex;
 using Gablarski.Client;
+using Gablarski.Messages;
 
 namespace Gablarski.Audio
 {
@@ -100,11 +101,6 @@ namespace Gablarski.Audio
 			get { return this.preprocessor; }
 		}
 
-		public ChannelInfo CurrentTargetChannel
-		{
-			get { return this.channel; }
-		}
-
 		public VoiceActivation VoiceActivation
 		{
 			get { return this.activation; }
@@ -123,6 +119,17 @@ namespace Gablarski.Audio
 		private readonly ICaptureProvider capture;
 		private readonly AudioSource source;
 		private readonly AudioEngineCaptureOptions options;
-		private ChannelInfo channel;
+
+		internal int[] CurrentTargets
+		{
+			get;
+			set;
+		}
+
+		internal TargetType TargetType
+		{
+			get;
+			set;
+		}
 	}
 }

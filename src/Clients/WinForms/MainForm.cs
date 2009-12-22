@@ -162,7 +162,7 @@ namespace Gablarski.Clients.Windows
 			try
 			{
 				foreach (var source in gablarski.Sources.Where (s => s.OwnerId == gablarski.CurrentUser.UserId))
-					gablarski.Sources.EndSending (source);
+					gablarski.Audio.EndCapture (source);
 
 				if (this.voiceCapture != null)
 				{
@@ -352,7 +352,7 @@ namespace Gablarski.Clients.Windows
 			else
 			{
 				this.users.MarkSilent (this.gablarski.CurrentUser);
-				this.gablarski.Audio.EndCapture (voiceSource, this.gablarski.CurrentChannel);
+				this.gablarski.Audio.EndCapture (voiceSource);
 			}
 		}
 
@@ -429,7 +429,7 @@ namespace Gablarski.Clients.Windows
 		{
 			if (e.User.Equals (gablarski.CurrentUser) && musicSource != null)
 			{
-				gablarski.Audio.EndCapture (musicSource, e.TargetChannel);
+				gablarski.Audio.EndCapture (musicSource);
 				gablarski.Audio.BeginCapture (musicSource, e.TargetChannel);
 			}
 
