@@ -103,7 +103,7 @@ namespace Gablarski.Audio
 
 			playbackLock.EnterWriteLock();
 			{
-				playbacks[source] = new AudioPlaybackEntity (playback, source, options));
+				playbacks[source] = new AudioPlaybackEntity (playback, source, options);
 			}
 			playbackLock.ExitWriteLock();
 		}
