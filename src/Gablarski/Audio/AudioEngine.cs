@@ -87,7 +87,7 @@ namespace Gablarski.Audio
 			playbackLock.EnterWriteLock();
 			{
 				foreach (var s in sources.Where (s => !playbacks.ContainsKey (s) && s.OwnerId != Context.CurrentUser.UserId))
-					playbacks.Add (s, new AudioPlaybackEntity (playback, s, options));
+					playbacks[s] = new AudioPlaybackEntity (playback, s, options);
 			}
 			playbackLock.ExitWriteLock();
 		}
@@ -103,7 +103,7 @@ namespace Gablarski.Audio
 
 			playbackLock.EnterWriteLock();
 			{
-				playbacks.Add (source, new AudioPlaybackEntity (playback, source, options));
+				playbacks[source] = new AudioPlaybackEntity (playback, source, options));
 			}
 			playbackLock.ExitWriteLock();
 		}
@@ -125,7 +125,7 @@ namespace Gablarski.Audio
 				if (options.Mode == AudioEngineCaptureMode.Activated)
 					capture.BeginCapture (format);
 
-				captures.Add (source, new AudioCaptureEntity (capture, format, source, options));
+				captures[source] = new AudioCaptureEntity (capture, format, source, options);
 			}
 		}
 
