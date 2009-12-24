@@ -66,6 +66,11 @@ namespace Gablarski.CoreAudio
 			set { throw new NotImplementedException(); }
 		}
 
+		public void Open()
+		{
+			throw new NotImplementedException();
+		}
+
 		public void QueuePlayback (AudioSource source, byte[] data)
 		{
 			throw new NotImplementedException ();

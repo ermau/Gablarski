@@ -58,24 +58,51 @@ namespace Gablarski.Audio
 		/// Overall gain.
 		/// </summary>
 		float Gain { get; set; }
+
+		/// <summary>
+		/// Opens the playback provider doing any one time initialization required.
+		/// </summary>
+		/// <exception cref="InvalidOperationException"><see cref="Device"/> is not set.</exception>
+		void Open();
 		
 		/// <summary>
 		/// Queues PCM <paramref name="data"/> to be played back, owned by <paramref name="source"/>.
 		/// </summary>
 		/// <param name="source">The <see cref="AudioSource"/> the audio came from.</param>
 		/// <param name="data">PCM data.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
 		void QueuePlayback (AudioSource source, byte[] data);
 
 		/// <summary>
 		/// Frees any internal resources associated with the <paramref name="source"/>.
 		/// </summary>
 		/// <param name="source">The source to free any resources for.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
 		void FreeSource (AudioSource source);
 
 		/// <summary>
 		/// Called each tick of the audio engine.
 		/// </summary>
 		void Tick();
+	}
+
+	public static class PlaybackProviderExtensions
+	{
+		/// <summary>
+		/// Opens the provider with <paramref name="device"/>.
+		/// </summary>
+		/// <param name="device">The device to play audio on.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="device"/> is <c>null</c>.</exception>
+		public static void Open (this IPlaybackProvider self, IAudioDevice device)
+		{
+			if (self == null)
+				throw new ArgumentNullException ("self");
+			if (device == null)
+				throw new ArgumentNullException ("device");
+
+			self.Device = device;
+			self.Open();
+		}
 	}
 
 	public class SourceFinishedEventArgs

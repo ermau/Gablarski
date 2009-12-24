@@ -155,6 +155,8 @@ namespace Gablarski.Clients.Windows
 				this.playback.Device = this.playback.GetDevices ().FirstOrDefault (d => d.Name == Settings.PlaybackDevice) ??
 										this.playback.DefaultDevice;
 			}
+
+			this.playback.Open();
 		}
 
 		private void SetupVoiceCapture ()

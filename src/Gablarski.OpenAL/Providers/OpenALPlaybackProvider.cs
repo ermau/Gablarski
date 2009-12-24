@@ -50,11 +50,6 @@ namespace Gablarski.OpenAL.Providers
 		{
 			this.pool.SourceFinished += PoolSourceFinished;
 		}
-		
-		public OpenALPlaybackProvider (Context context)
-		{
-			this.context = context;
-		}
 
 		#region IPlaybackProvider Members
 		public event EventHandler<SourceFinishedEventArgs> SourceFinished;
@@ -76,13 +71,22 @@ namespace Gablarski.OpenAL.Providers
 			}
 		}
 
-		public void QueuePlayback (AudioSource audioSource, byte[] data)
+		public void Open()
 		{
+			if (this.device == null)
+				throw new InvalidOperationException ("Device is not set");
+
 			if (!this.device.IsOpen)
 				this.device.Open();
 
-			if (this.context == null)
-				this.context = this.device.CreateAndActivateContext();
+			if (Context.CurrentContext != null)
+				Context.CreateAndActivate (this.device);
+		}
+
+		public void QueuePlayback (AudioSource audioSource, byte[] data)
+		{
+			if (audioSource == null)
+				throw new ArgumentNullException ("audioSource");
 
 			Stack<SourceBuffer> bufferStack;
 			if (!this.buffers.TryGetValue (audioSource, out bufferStack))
@@ -125,6 +129,9 @@ namespace Gablarski.OpenAL.Providers
 
 		public void FreeSource (AudioSource source)
 		{
+			if (source == null)
+				throw new ArgumentNullException ("source");
+
 			if (OpenAL.Log.IsDebugEnabled)
 				OpenAL.Log.DebugFormat ("Freeing source {0}", source);
 
