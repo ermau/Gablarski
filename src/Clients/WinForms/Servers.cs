@@ -10,17 +10,17 @@ namespace Gablarski.Clients.Windows
 	{
 		public static IEnumerable<ServerEntry> GetEntries()
 		{
-			return Persistance.CurrentSession.CreateQuery ("from ServerEntry").Enumerable().Cast<ServerEntry>();
+			return Persistance.GetServers();
 		}
 
 		public static void SaveServer (ServerEntry entry)
 		{
-			Persistance.CurrentSession.SaveOrUpdate (entry);
+			Persistance.SaveOrUpdate (entry);
 		}
 
 		public static void DeleteServer (ServerEntry entry)
 		{
-			Persistance.CurrentSession.Delete (entry);
+			Persistance.Delete (entry);
 		}
 	}
 }

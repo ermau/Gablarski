@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -44,6 +45,18 @@ namespace Gablarski.Clients.Windows
 		public static DialogResult ShowDialogOnFormThread (this Form self, Form formForThread)
 		{
 			return (DialogResult)formForThread.Invoke ((Func<IWin32Window, DialogResult>)self.ShowDialog, formForThread);
+		}
+
+		public static DbCommand CreateCommand (this DbConnection self, string text)
+		{
+			if (self == null)
+				throw new ArgumentNullException ("self");
+			if (text == null)
+				throw new ArgumentNullException ("text");
+
+			var cmd = self.CreateCommand();
+			cmd.CommandText = text;
+			return cmd;
 		}
 	}
 }

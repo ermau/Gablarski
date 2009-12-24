@@ -7,6 +7,11 @@ namespace Gablarski.Clients.Windows.Entities
 {
 	public class ServerEntry
 	{
+		public ServerEntry (int id)
+		{
+			this.Id = id;
+		}
+
 		public virtual int Id
 		{
 			get;

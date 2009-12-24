@@ -68,7 +68,7 @@ namespace Gablarski.Clients.Windows
 				else
 					li = servers.Items.Add (key, info.Name, 0);
 
-				li.Tag = new ServerEntry { Name = info.Name, Host = endpoint.Address.ToString(), Port = endpoint.Port };
+				li.Tag = new ServerEntry (0) { Name = info.Name, Host = endpoint.Address.ToString(), Port = endpoint.Port };
 				group.Items.Add (li);
 			}
 
@@ -182,7 +182,7 @@ namespace Gablarski.Clients.Windows
 				return;
 
 			if (this.Entry == null)
-				this.Entry = new ServerEntry();
+				this.Entry = new ServerEntry(0);
 
 			this.Entry.Name = this.inName.Text.Trim();
 			this.Entry.Host = this.inServer.Text.Trim();
@@ -255,7 +255,7 @@ namespace Gablarski.Clients.Windows
 			LocalServer.Start();
 
 			this.DialogResult = DialogResult.OK;
-			this.Entry = new ServerEntry
+			this.Entry = new ServerEntry (0)
 			{
 				Host = "localhost",
 				Port = 6112,
@@ -287,8 +287,6 @@ namespace Gablarski.Clients.Windows
 				Servers.DeleteServer (s);
 				this.servers.Items.Remove (li);
 			}
-
-			Persistance.CurrentSession.Flush ();
 		}
 	}
 }

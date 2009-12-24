@@ -554,7 +554,7 @@ namespace Gablarski.Clients.Windows
 			});
 
 			if (this.server == null)
-				this.server = new ServerEntry ();
+				this.server = new ServerEntry (0);
 
 			string userpassword = this.server.UserPassword;
 

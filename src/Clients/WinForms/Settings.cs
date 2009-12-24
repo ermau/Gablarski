@@ -244,13 +244,10 @@ namespace Gablarski.Clients.Windows
 
 			lock (SettingLock)
 			{
-				using (var trans = Persistance.CurrentSession.BeginTransaction())
-				{
-					foreach (var entry in settings.Values)
-						Persistance.CurrentSession.SaveOrUpdate (entry);
+				foreach (var entry in settings.Values)
+					Persistance.SaveOrUpdate (entry);
 
-					trans.Commit();
-				}
+				settings = null;
 			}
 		}
 
@@ -264,7 +261,7 @@ namespace Gablarski.Clients.Windows
 				if (settings != null)
 					return;
 
-				settings = Persistance.CurrentSession.CreateQuery ("from SettingEntry").Enumerable().Cast<SettingEntry>().ToDictionary (e => e.Name);
+				settings = Persistance.GetSettings().ToDictionary (s => s.Name);
 			}
 		}
 
@@ -275,7 +272,7 @@ namespace Gablarski.Clients.Windows
 			lock (SettingLock)
 			{
 				if (!settings.ContainsKey (settingName))
-					settings[settingName] = new SettingEntry { Name = settingName, Value = defaultValue };
+					settings[settingName] = new SettingEntry (0) { Name = settingName, Value = defaultValue };
 
 				return settings[settingName].Value;
 			}
@@ -308,7 +305,7 @@ namespace Gablarski.Clients.Windows
 				}
 				else
 				{
-					settings[settingName] = new SettingEntry { Name = settingName, Value = value };
+					settings[settingName] = new SettingEntry (0) { Name = settingName, Value = value };
 					return true;
 				}
 			}

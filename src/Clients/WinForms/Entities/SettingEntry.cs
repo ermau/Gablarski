@@ -1,13 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
 namespace Gablarski.Clients.Windows.Entities
 {
+	[DebuggerDisplay ("{Name} = {Value}")]
 	public class SettingEntry
 	{
-		public virtual int ID
+		public SettingEntry (int settingId)
+		{
+			this.Id = settingId;
+		}
+
+		public virtual int Id
 		{
 			get; private set;
 		}

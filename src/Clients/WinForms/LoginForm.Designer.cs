@@ -30,6 +30,7 @@
 		{
 			this.servers = new System.Windows.Forms.ListView();
 			this.pnlModServer = new System.Windows.Forms.Panel();
+			this.inPhonetic = new System.Windows.Forms.TextBox();
 			this.inServerPassword = new System.Windows.Forms.TextBox();
 			this.lblServerPassword = new System.Windows.Forms.Label();
 			this.labelPassword = new System.Windows.Forms.Label();
@@ -51,7 +52,6 @@
 			this.btnSaveServer = new System.Windows.Forms.Button();
 			this.btnEditServer = new System.Windows.Forms.Button();
 			this.btnAddServer = new System.Windows.Forms.Button();
-			this.inPhonetic = new System.Windows.Forms.TextBox();
 			this.pnlModServer.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -95,9 +95,18 @@
 			this.pnlModServer.TabIndex = 3;
 			this.pnlModServer.Visible = false;
 			// 
+			// inPhonetic
+			// 
+			this.inPhonetic.Location = new System.Drawing.Point(206, 143);
+			this.inPhonetic.MaxLength = 255;
+			this.inPhonetic.Name = "inPhonetic";
+			this.inPhonetic.Size = new System.Drawing.Size(97, 20);
+			this.inPhonetic.TabIndex = 13;
+			// 
 			// inServerPassword
 			// 
 			this.inServerPassword.Location = new System.Drawing.Point(102, 108);
+			this.inServerPassword.MaxLength = 255;
 			this.inServerPassword.Name = "inServerPassword";
 			this.inServerPassword.Size = new System.Drawing.Size(201, 20);
 			this.inServerPassword.TabIndex = 3;
@@ -134,6 +143,7 @@
 			this.inPassword.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
 						| System.Windows.Forms.AnchorStyles.Right)));
 			this.inPassword.Location = new System.Drawing.Point(102, 213);
+			this.inPassword.MaxLength = 255;
 			this.inPassword.Name = "inPassword";
 			this.inPassword.Size = new System.Drawing.Size(201, 20);
 			this.inPassword.TabIndex = 6;
@@ -190,6 +200,7 @@
 			this.inUsername.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
 						| System.Windows.Forms.AnchorStyles.Right)));
 			this.inUsername.Location = new System.Drawing.Point(102, 178);
+			this.inUsername.MaxLength = 255;
 			this.inUsername.Name = "inUsername";
 			this.inUsername.Size = new System.Drawing.Size(201, 20);
 			this.inUsername.TabIndex = 5;
@@ -199,6 +210,7 @@
 			this.inNickname.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
 						| System.Windows.Forms.AnchorStyles.Right)));
 			this.inNickname.Location = new System.Drawing.Point(102, 143);
+			this.inNickname.MaxLength = 255;
 			this.inNickname.Name = "inNickname";
 			this.inNickname.Size = new System.Drawing.Size(98, 20);
 			this.inNickname.TabIndex = 4;
@@ -208,6 +220,7 @@
 			this.inServer.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
 						| System.Windows.Forms.AnchorStyles.Right)));
 			this.inServer.Location = new System.Drawing.Point(102, 38);
+			this.inServer.MaxLength = 255;
 			this.inServer.Name = "inServer";
 			this.inServer.Size = new System.Drawing.Size(201, 20);
 			this.inServer.TabIndex = 1;
@@ -217,6 +230,7 @@
 			this.inName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
 						| System.Windows.Forms.AnchorStyles.Right)));
 			this.inName.Location = new System.Drawing.Point(102, 3);
+			this.inName.MaxLength = 255;
 			this.inName.Name = "inName";
 			this.inName.Size = new System.Drawing.Size(201, 20);
 			this.inName.TabIndex = 0;
@@ -314,13 +328,6 @@
 			this.btnAddServer.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
 			this.btnAddServer.UseVisualStyleBackColor = true;
 			this.btnAddServer.Click += new System.EventHandler(this.btnAddServer_Click);
-			// 
-			// inPhonetic
-			// 
-			this.inPhonetic.Location = new System.Drawing.Point(206, 143);
-			this.inPhonetic.Name = "inPhonetic";
-			this.inPhonetic.Size = new System.Drawing.Size(97, 20);
-			this.inPhonetic.TabIndex = 13;
 			// 
 			// LoginForm
 			// 
