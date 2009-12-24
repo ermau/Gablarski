@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using Gablarski.Barrel.Config;
+using Gablarski.Network;
 using Gablarski.Server;
 using log4net;
 
@@ -61,6 +62,7 @@ namespace Gablarski.Barrel
 				}
 
 				GablarskiServer server = new GablarskiServer (new ServerSettings(), auth, permissions, channels);
+				server.AddConnectionProvider (new NetworkServerConnectionProvider { Port = serverConfig.Port });
 
 				foreach (IConnectionProvider provider in connectionProviders)
 					server.AddConnectionProvider (provider);
@@ -73,6 +75,9 @@ namespace Gablarski.Barrel
 		{
 			List<Type> cproviders = new List<Type>();
 			providers = cproviders;
+
+			if (serverConfig.ConnectionProviders == null)
+				return;
 
 			foreach (ConnectionProviderElement cproviderElement in serverConfig.ConnectionProviders)
 			{
