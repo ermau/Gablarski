@@ -79,7 +79,7 @@ namespace Gablarski.OpenAL.Providers
 			if (!this.device.IsOpen)
 				this.device.Open();
 
-			if (Context.CurrentContext != null)
+			if (Context.CurrentContext == null)
 				Context.CreateAndActivate (this.device);
 		}
 
@@ -158,6 +158,9 @@ namespace Gablarski.OpenAL.Providers
 
 		public void Dispose ()
 		{
+			if (OpenAL.Log.IsDebugEnabled)
+				OpenAL.Log.Debug ("Freeing OpenALPlaybackProvider");
+
 			if (this.device != null)
 			{
 				this.device.Dispose ();
@@ -167,13 +170,12 @@ namespace Gablarski.OpenAL.Providers
 
 		#endregion
 
-		private Context context;
 		private PlaybackDevice device;
 		private readonly SourcePool<AudioSource> pool = new SourcePool<AudioSource>();
 		private readonly object bufferLock = new object ();
 		private readonly Dictionary<AudioSource, Stack<SourceBuffer>> buffers = new Dictionary<AudioSource, Stack<SourceBuffer>> ();
 
-		private void RequireBuffers (Stack<SourceBuffer> bufferStack, Source source, int num)
+		private static void RequireBuffers (Stack<SourceBuffer> bufferStack, Source source, int num)
 		{
 			if (source.ProcessedBuffers > 0)
 			{
