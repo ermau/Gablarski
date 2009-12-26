@@ -205,6 +205,9 @@ namespace Gablarski.Client
 		{
 			this.running = false;
 
+			connection.Disconnected -= this.OnDisconnectedInternal;
+			connection.MessageReceived -= this.OnMessageReceived;
+
 			this.incomingWait.Set ();
 
 			lock (this.mqueue)
@@ -220,15 +223,13 @@ namespace Gablarski.Client
 
 			OnDisconnected (this, EventArgs.Empty);
 			
-			connection.Disconnected -= this.OnDisconnectedInternal;
-			connection.MessageReceived -= this.OnMessageReceived;
-			connection.Disconnect();
-
 			this.Users.Reset();
 			this.Channels.Clear();
 			this.Sources.Clear();
 
 			this.Audio.Stop();
+
+			connection.Disconnect();
 		}
 
 		private void OnDisconnectedInternal (object sender, ConnectionEventArgs e)

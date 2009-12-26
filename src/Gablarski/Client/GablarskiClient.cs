@@ -232,7 +232,7 @@ namespace Gablarski.Client
 		/// </summary>
 		public void Disconnect()
 		{
-			DisconnectCore (DisconnectHandling.None, this.Connection);
+			ThreadPool.QueueUserWorkItem (s => DisconnectCore (DisconnectHandling.None, this.Connection));
 		}
 		#endregion
 
