@@ -519,8 +519,14 @@ namespace Gablarski.Clients.Windows
 
 		void GablarskiDisconnected (object sender, EventArgs e)
 		{
+			if (this.IsDisposed || this.Disposing || this.shuttingDown)
+				return;
+
 			this.Invoke ((Action)delegate
 			{
+				if (this.IsDisposed || this.Disposing)
+					return;
+
 				if (TaskbarManager.IsPlatformSupported)
 				{
 					TaskbarManager.Instance.SetOverlayIcon (this.Handle, Resources.DisconnectImage.ToIcon (), "Disconnected");
@@ -618,10 +624,15 @@ namespace Gablarski.Clients.Windows
 			switch (e.Reason)
 			{
 				case ConnectionRejectedReason.CouldNotConnect:
-					if (MessageBox.Show (this, "Could not connect to the server", "Connecting", MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning) == DialogResult.Retry)
-						Connect();
-					else
-						ShowConnect (true);
+					BeginInvoke ((Action)(() =>
+					{
+						if (
+							MessageBox.Show (this, "Could not connect to the server", "Connecting", MessageBoxButtons.RetryCancel,
+							                 MessageBoxIcon.Warning) == DialogResult.Retry)
+							Connect();
+						else
+							ShowConnect (true);
+					}));
 
 					break;
 
@@ -639,9 +650,12 @@ namespace Gablarski.Clients.Windows
 
 		private readonly GablarskiClient gablarski;
 		private ServerEntry server;
+		private bool shuttingDown;
 
 		private void MainForm_FormClosing (object sender, FormClosingEventArgs e)
 		{
+			this.shuttingDown = true;
+
 			this.notifications.Close ();
 
 			this.gablarski.Disconnect();
