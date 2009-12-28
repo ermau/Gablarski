@@ -126,7 +126,7 @@ namespace Gablarski.Clients.Windows
 
 			using (var cmd = db.CreateCommand ("DELETE FROM servers WHERE (serverId=?)"))
 			{
-				cmd.Parameters.Add (server.Id);
+				cmd.Parameters.Add (new SQLiteParameter ("id", server.Id));
 				cmd.ExecuteNonQuery();
 			}
 		}
