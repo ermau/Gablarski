@@ -28,34 +28,34 @@
 		/// </summary>
 		private void InitializeComponent ()
 		{
-			this.components = new System.ComponentModel.Container ();
-			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator ();
-			this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator ();
-			this.tools = new System.Windows.Forms.ToolStrip ();
-			this.btnConnect = new System.Windows.Forms.ToolStripButton ();
-			this.btnRegister = new System.Windows.Forms.ToolStripButton ();
-			this.btnMute = new System.Windows.Forms.ToolStripButton ();
-			this.btnMuteMic = new System.Windows.Forms.ToolStripButton ();
-			this.musicButton = new System.Windows.Forms.ToolStripButton ();
-			this.btnSettings = new System.Windows.Forms.ToolStripButton ();
-			this.users = new Gablarski.Clients.Windows.UserTreeView ();
-			this.tools.SuspendLayout ();
-			this.SuspendLayout ();
+			this.components = new System.ComponentModel.Container();
+			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+			this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+			this.tools = new System.Windows.Forms.ToolStrip();
+			this.btnConnect = new System.Windows.Forms.ToolStripButton();
+			this.btnRegister = new System.Windows.Forms.ToolStripButton();
+			this.btnMute = new System.Windows.Forms.ToolStripButton();
+			this.btnMuteMic = new System.Windows.Forms.ToolStripButton();
+			this.musicButton = new System.Windows.Forms.ToolStripButton();
+			this.btnSettings = new System.Windows.Forms.ToolStripButton();
+			this.users = new Gablarski.Clients.Windows.UserTreeView();
+			this.tools.SuspendLayout();
+			this.SuspendLayout();
 			// 
 			// toolStripSeparator1
 			// 
 			this.toolStripSeparator1.Name = "toolStripSeparator1";
-			this.toolStripSeparator1.Size = new System.Drawing.Size (6, 25);
+			this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
 			// 
 			// toolStripSeparator2
 			// 
 			this.toolStripSeparator2.Name = "toolStripSeparator2";
-			this.toolStripSeparator2.Size = new System.Drawing.Size (6, 25);
+			this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
 			// 
 			// tools
 			// 
 			this.tools.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
-			this.tools.Items.AddRange (new System.Windows.Forms.ToolStripItem[] {
+			this.tools.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.btnConnect,
             this.btnRegister,
             this.toolStripSeparator1,
@@ -65,10 +65,10 @@
             this.toolStripSeparator2,
             this.btnSettings});
 			this.tools.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.HorizontalStackWithOverflow;
-			this.tools.Location = new System.Drawing.Point (0, 0);
+			this.tools.Location = new System.Drawing.Point(0, 0);
 			this.tools.Name = "tools";
 			this.tools.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-			this.tools.Size = new System.Drawing.Size (229, 25);
+			this.tools.Size = new System.Drawing.Size(229, 25);
 			this.tools.TabIndex = 0;
 			// 
 			// btnConnect
@@ -78,16 +78,16 @@
 			this.btnConnect.Image = global::Gablarski.Clients.Windows.Properties.Resources.DisconnectImage;
 			this.btnConnect.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.btnConnect.Name = "btnConnect";
-			this.btnConnect.Size = new System.Drawing.Size (23, 22);
+			this.btnConnect.Size = new System.Drawing.Size(23, 22);
 			this.btnConnect.Text = "Disconnect";
-			this.btnConnect.Click += new System.EventHandler (this.btnConnect_Click);
+			this.btnConnect.Click += new System.EventHandler(this.btnConnect_Click);
 			// 
 			// btnRegister
 			// 
 			this.btnRegister.Image = global::Gablarski.Clients.Windows.Properties.Resources.ChannelAddImage;
 			this.btnRegister.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.btnRegister.Name = "btnRegister";
-			this.btnRegister.Size = new System.Drawing.Size (69, 22);
+			this.btnRegister.Size = new System.Drawing.Size(69, 22);
 			this.btnRegister.Text = "Register";
 			this.btnRegister.Visible = false;
 			// 
@@ -98,20 +98,20 @@
 			this.btnMute.Image = global::Gablarski.Clients.Windows.Properties.Resources.SoundMuteImage;
 			this.btnMute.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.btnMute.Name = "btnMute";
-			this.btnMute.Size = new System.Drawing.Size (23, 22);
+			this.btnMute.Size = new System.Drawing.Size(23, 22);
 			this.btnMute.Text = "Mute Sound";
-			this.btnMute.Click += new System.EventHandler (this.btnMute_Click);
+			this.btnMute.Click += new System.EventHandler(this.btnMute_Click);
 			// 
 			// btnMuteMic
 			// 
 			this.btnMuteMic.CheckOnClick = true;
 			this.btnMuteMic.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.btnMuteMic.Image = global::Gablarski.Clients.Windows.Properties.Resources.SoundDeleteImage;
+			this.btnMuteMic.Image = global::Gablarski.Clients.Windows.Properties.Resources.CaptureMuteImage;
 			this.btnMuteMic.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.btnMuteMic.Name = "btnMuteMic";
-			this.btnMuteMic.Size = new System.Drawing.Size (23, 22);
+			this.btnMuteMic.Size = new System.Drawing.Size(23, 22);
 			this.btnMuteMic.Text = "Mute Microphone";
-			this.btnMuteMic.Click += new System.EventHandler (this.btnMuteMic_Click);
+			this.btnMuteMic.Click += new System.EventHandler(this.btnMuteMic_Click);
 			// 
 			// musicButton
 			// 
@@ -119,10 +119,10 @@
 			this.musicButton.Image = global::Gablarski.Clients.Windows.Properties.Resources.MusicImage;
 			this.musicButton.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.musicButton.Name = "musicButton";
-			this.musicButton.Size = new System.Drawing.Size (23, 22);
+			this.musicButton.Size = new System.Drawing.Size(23, 22);
 			this.musicButton.Text = "Play Music";
 			this.musicButton.Visible = false;
-			this.musicButton.Click += new System.EventHandler (this.musicButton_Click);
+			this.musicButton.Click += new System.EventHandler(this.musicButton_Click);
 			// 
 			// btnSettings
 			// 
@@ -130,9 +130,9 @@
 			this.btnSettings.Image = global::Gablarski.Clients.Windows.Properties.Resources.SettingsImage;
 			this.btnSettings.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.btnSettings.Name = "btnSettings";
-			this.btnSettings.Size = new System.Drawing.Size (23, 22);
+			this.btnSettings.Size = new System.Drawing.Size(23, 22);
 			this.btnSettings.Text = "Settings";
-			this.btnSettings.Click += new System.EventHandler (this.btnSettings_Click);
+			this.btnSettings.Click += new System.EventHandler(this.btnSettings_Click);
 			// 
 			// users
 			// 
@@ -141,27 +141,27 @@
 						| System.Windows.Forms.AnchorStyles.Left)
 						| System.Windows.Forms.AnchorStyles.Right)));
 			this.users.ImageIndex = 0;
-			this.users.Location = new System.Drawing.Point (-1, 25);
+			this.users.Location = new System.Drawing.Point(-1, 25);
 			this.users.Name = "users";
 			this.users.SelectedImageIndex = 0;
-			this.users.Size = new System.Drawing.Size (231, 358);
+			this.users.Size = new System.Drawing.Size(231, 358);
 			this.users.TabIndex = 1;
 			// 
 			// MainForm
 			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF (6F, 13F);
+			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size (229, 382);
-			this.Controls.Add (this.tools);
-			this.Controls.Add (this.users);
-			this.MinimumSize = new System.Drawing.Size (192, 161);
+			this.ClientSize = new System.Drawing.Size(229, 382);
+			this.Controls.Add(this.tools);
+			this.Controls.Add(this.users);
+			this.MinimumSize = new System.Drawing.Size(192, 161);
 			this.Name = "MainForm";
 			this.Text = "Gablarski";
-			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler (this.MainForm_FormClosing);
-			this.tools.ResumeLayout (false);
-			this.tools.PerformLayout ();
-			this.ResumeLayout (false);
-			this.PerformLayout ();
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
+			this.tools.ResumeLayout(false);
+			this.tools.PerformLayout();
+			this.ResumeLayout(false);
+			this.PerformLayout();
 
 		}
 
