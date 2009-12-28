@@ -197,34 +197,7 @@ namespace Gablarski.Client
 		/// <exception cref="System.Net.Sockets.SocketException">Hostname could not be resolved.</exception>
 		public void Connect (string host, int port)
 		{
-			if (host.IsNullOrWhitespace ())
-				throw new ArgumentException ("host must not be null or empty", "host");
-
-			try
-			{
-				IPEndPoint endPoint = new IPEndPoint (Dns.GetHostAddresses (host).Where (ip => ip.AddressFamily == AddressFamily.InterNetwork).First(), port);
-
-				this.running = true;
-
-				this.messageRunnerThread = new Thread (this.MessageRunner) { Name = "Gablarski Client Message Runner" };
-				this.messageRunnerThread.SetApartmentState (ApartmentState.STA);
-				this.messageRunnerThread.Priority = ThreadPriority.Highest;
-				this.messageRunnerThread.Start ();
-
-				Connection.Disconnected += this.OnDisconnectedInternal;
-				Connection.MessageReceived += OnMessageReceived;
-				Connection.Connect (endPoint);
-				Connection.Send (new ConnectMessage { ProtocolVersion = ProtocolVersion, Host = host, Port = port });
-
-				this.Audio.Context = this;
-				this.Audio.AudioSender = this.Sources;
-				this.Audio.AudioReceiver = this.Sources;
-				this.Audio.Start();
-			}
-			catch (SocketException)
-			{
-				OnConnectionRejected (new RejectedConnectionEventArgs (ConnectionRejectedReason.CouldNotConnect));
-			}
+			ThreadPool.QueueUserWorkItem (o => ConnectCore (((Tuple<string, int>)o)._1, ((Tuple<string, int>)o)._2), new Tuple<string, int> (host, port));
 		}
 
 		/// <summary>
@@ -237,28 +210,30 @@ namespace Gablarski.Client
 		#endregion
 
 		#region Event Invokers
-		protected virtual void OnConnected (object sender, EventArgs e)
+		protected void OnConnected (object sender, EventArgs e)
 		{
 			var connected = this.Connected;
 			if (connected != null)
 				connected (this, e);
 		}
 
-		protected virtual void OnDisconnected (object sender, EventArgs e)
+		protected void OnDisconnected (object sender, EventArgs e)
 		{
 			var disconnected = this.Disconnected;
 			if (disconnected != null)
 				disconnected (this, e);
 		}
 
-		protected virtual void OnConnectionRejected (RejectedConnectionEventArgs e)
+		protected void OnConnectionRejected (RejectedConnectionEventArgs e)
 		{
+			DisconnectCore (DisconnectHandling.None, this.Connection, false);
+
 			var rejected = this.ConnectionRejected;
 			if (rejected != null)
 				rejected (this, e);
 		}
 
-		protected virtual void OnPermissionDenied (PermissionDeniedEventArgs e)
+		protected void OnPermissionDenied (PermissionDeniedEventArgs e)
 		{
 			var denied = this.PermissionDenied;
 			if (denied != null)

@@ -38,6 +38,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
+using Cadenza;
 using Gablarski.Audio;
 using Gablarski.Messages;
 using System.Threading;
@@ -203,6 +206,11 @@ namespace Gablarski.Client
 
 		private void DisconnectCore (DisconnectHandling handling, IConnection connection)
 		{
+			DisconnectCore (handling, connection, true);
+		}
+
+		private void DisconnectCore (DisconnectHandling handling, IConnection connection, bool fireEvent)
+		{
 			this.running = false;
 
 			connection.Disconnected -= this.OnDisconnectedInternal;
@@ -221,7 +229,8 @@ namespace Gablarski.Client
 				this.messageRunnerThread = null;
 			}
 
-			OnDisconnected (this, EventArgs.Empty);
+			if (fireEvent)
+				OnDisconnected (this, EventArgs.Empty);
 			
 			this.Users.Reset();
 			this.Channels.Clear();
@@ -235,6 +244,38 @@ namespace Gablarski.Client
 		private void OnDisconnectedInternal (object sender, ConnectionEventArgs e)
 		{
 			DisconnectCore ((ReconnectAutomatically) ? DisconnectHandling.Reconnect : DisconnectHandling.None, e.Connection);
+		}
+
+		private void ConnectCore(string host, int port)
+		{
+			if (host.IsNullOrWhitespace ())
+				throw new ArgumentException ("host must not be null or empty", "host");
+
+			try
+			{
+				IPEndPoint endPoint = new IPEndPoint (Dns.GetHostAddresses (host).Where (ip => ip.AddressFamily == AddressFamily.InterNetwork).First(), port);
+
+				this.running = true;
+
+				this.messageRunnerThread = new Thread (this.MessageRunner) { Name = "Gablarski Client Message Runner" };
+				this.messageRunnerThread.SetApartmentState (ApartmentState.STA);
+				this.messageRunnerThread.Priority = ThreadPriority.Highest;
+				this.messageRunnerThread.Start ();
+
+				this.Connection.Disconnected += this.OnDisconnectedInternal;
+				this.Connection.MessageReceived += OnMessageReceived;
+				this.Connection.Connect (endPoint);
+				this.Connection.Send (new ConnectMessage { ProtocolVersion = ProtocolVersion, Host = host, Port = port });
+
+				this.Audio.Context = this;
+				this.Audio.AudioSender = this.Sources;
+				this.Audio.AudioReceiver = this.Sources;
+				this.Audio.Start();
+			}
+			catch (SocketException)
+			{
+				OnConnectionRejected (new RejectedConnectionEventArgs (ConnectionRejectedReason.CouldNotConnect));
+			}
 		}
 	}
 }
