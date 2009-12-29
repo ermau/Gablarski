@@ -63,11 +63,6 @@ namespace Gablarski.OpenAL
 			
 			alcMakeContextCurrent (this.Handle);
 			OpenAL.ErrorCheck (this.Device);
-			
-			lock (lck)
-			{
-				CurrentContext = this;
-			}
 		}
 
 		internal readonly IntPtr Handle;
@@ -107,8 +102,17 @@ namespace Gablarski.OpenAL
 
 		public static Context CurrentContext
 		{
-			get;
-			private set;
+			get
+			{
+				IntPtr handle = alcGetCurrentContext();
+
+				Context c = null;
+				
+				if (handle != IntPtr.Zero)
+					contexts.TryGetValue (handle, out c);
+
+				return c;
+			}
 		}
 
 		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]

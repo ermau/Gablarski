@@ -79,7 +79,7 @@ namespace Gablarski.OpenAL.Providers
 			if (!this.device.IsOpen)
 				this.device.Open();
 
-			if (Context.CurrentContext == null)
+			if (Context.CurrentContext == null || Context.CurrentContext.Device != this.device)
 				Context.CreateAndActivate (this.device);
 		}
 

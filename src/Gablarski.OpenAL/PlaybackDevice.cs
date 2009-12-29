@@ -62,10 +62,11 @@ namespace Gablarski.OpenAL
 			OpenAL.Log.DebugFormat ("Opening playback device {0}", Name);
 			
 			this.Handle = alcOpenDevice (this.Name);
-			OpenAL.ErrorCheck (this);
-
+			
 			if (this.Handle == IntPtr.Zero)
 				throw new Exception ("Device failed to open for an unknown reason.");
+			else
+				OpenAL.ErrorCheck (this);
 
 			return this;
 		}
