@@ -295,6 +295,11 @@ namespace Gablarski.Client
 		private static void FindLocalServersCore (object o)
 		{
 			var found = (Tuple<int, Action<IEnumerable<Tuple<ServerInfo, IPEndPoint>>>, Func<bool>>)o;
+			
+			Socket s = new Socket (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+			s.EnableBroadcast = true;
+			s.Bind (new IPEndPoint (IPAddress.Any, 0));
+			s.ReceiveTimeout = 1500;
 
 			do
 			{
@@ -302,11 +307,6 @@ namespace Gablarski.Client
 
 				try
 				{
-					Socket s = new Socket (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-					s.EnableBroadcast = true;
-					s.Bind (new IPEndPoint (IPAddress.Any, 0));
-					s.ReceiveTimeout = 1500;
-
 					var msg = new QueryServerMessage { ServerInfoOnly = true };
 
 					SocketValueWriter writer = new SocketValueWriter (s, new IPEndPoint (IPAddress.Broadcast, 6112));
