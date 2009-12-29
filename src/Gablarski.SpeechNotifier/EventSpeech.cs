@@ -55,10 +55,22 @@ namespace Gablarski.SpeechNotifier
 
 		public IMediaController Media
 		{
-			get;
-			set;
+			get
+			{
+				return media;
+			}
+
+			set
+			{
+				lock (sync)
+				{
+					media = value;
+				}
+			}
 		}
 
+		private readonly object sync = new object();
+		private IMediaController media;
 		private static readonly SpeechSynthesizer speech = new SpeechSynthesizer ();
 
 		public void Notify (NotificationType type, string say, NotifyPriority priority)
@@ -68,13 +80,16 @@ namespace Gablarski.SpeechNotifier
 
 			ThreadPool.QueueUserWorkItem (o =>
 			{
-				if (Media == null)
-					return;
+				lock (sync)
+				{
+					if (media == null)
+						return;
 
-				Media.AddTalker ();
-				lock (speech)
-					speech.Speak ((string)o);
-				Media.RemoveTalker ();
+					media.AddTalker();
+					lock (speech)
+						speech.Speak ((string)o);
+					media.RemoveTalker();
+				}
 			}, say);
 		}
 		
