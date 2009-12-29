@@ -300,12 +300,12 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /Y "$(SolutionDir)..\..\Gablarski\Audio\CELT\libcelt.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)..\..\Gablarski\Audio\CELT\libcelt.license.txt" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)..\..\Gablarski\Audio\Speex\libspeexdsp.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)..\..\Gablarski\Audio\Speex\libspeexdsp.license.txt" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)..\..\Gablarski.OpenAL\OpenAL32.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)..\..\Gablarski.OpenAL\OpenALSoft.License.txt" "$(TargetDir)"
+    <PostBuildEvent>xcopy /Y "$(SolutionDir)..\..\..\lib\libcelt.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)..\..\..\lib\libcelt.license.txt" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)..\..\..\lib\libspeexdsp.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)..\..\..\lib\libspeexdsp.license.txt" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)..\..\..\lib\OpenAL32.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)..\..\..\lib\OpenALSoft.License.txt" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)..\..\Gablarski.OpenAL\bin\$(ConfigurationName)\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)..\..\Gablarski.OpenAL\bin\$(ConfigurationName)\*.pdb" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)..\..\Gablarski.Input.DirectInput\bin\$(ConfigurationName)\*.dll" "$(TargetDir)"
