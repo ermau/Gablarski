@@ -49,6 +49,12 @@ namespace Gablarski.Network
 	public class NetworkServerConnectionProvider
 		: IConnectionProvider
 	{
+		public NetworkServerConnectionProvider()
+		{
+			log = log4net.LogManager.GetLogger ("Network");
+			debugLogging = log.IsDebugEnabled;
+		}
+
 		public event EventHandler<ConnectionlessMessageReceivedEventArgs> ConnectionlessMessageReceived;
 		public event EventHandler<ConnectionEventArgs> ConnectionMade;
 
@@ -60,7 +66,12 @@ namespace Gablarski.Network
 
 		public void SendConnectionlessMessage (MessageBase message, EndPoint endpoint)
 		{
-			throw new NotImplementedException ();
+			lock (outgoingConnectionless)
+			{
+				outgoingConnectionless.Enqueue (new ConnectionlessMessageReceivedEventArgs (this, message, endpoint));
+			}
+
+			this.outgoingWait.Set();
 		}
 
 		public void StartListening (IServerContext context)
@@ -72,6 +83,8 @@ namespace Gablarski.Network
 			udp = new Socket (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 			udp.EnableBroadcast = true;
 			udp.Bind (localEp);
+
+			this.clWriter = new SocketValueWriter (udp);
 
 			tcpListener = new TcpListener (localEp);
 			tcpListener.Start ();
@@ -139,15 +152,19 @@ namespace Gablarski.Network
 		private volatile bool listening;
 		private int port = 6112;
 		private Socket udp;
-		private SocketValueWriter clWriter;
 		private TcpListener tcpListener;
 		private readonly Dictionary<uint, NetworkServerConnection> connections = new Dictionary<uint, NetworkServerConnection> (20);
+		private readonly log4net.ILog log;
+		private readonly bool debugLogging;
 
 		private readonly AutoResetEvent outgoingWait = new AutoResetEvent (false);
-		private readonly Queue<KeyValuePair<NetworkServerConnection, MessageBase>> outgoing = new Queue<KeyValuePair<NetworkServerConnection, MessageBase>> (100);
+		private readonly Queue<KeyValuePair<NetworkServerConnection, MessageBase>> outgoing = new Queue<KeyValuePair<NetworkServerConnection, MessageBase>> (100);		
+		
+		private SocketValueWriter clWriter;
+		private readonly Queue<ConnectionlessMessageReceivedEventArgs> outgoingConnectionless = new Queue<ConnectionlessMessageReceivedEventArgs>();
 
 		private Thread outgoingThread;
-		private Thread incomingThread;		
+		private Thread incomingThread;
 
 		private void Incoming ()
 		{
@@ -166,7 +183,7 @@ namespace Gablarski.Network
 				{
 					if (udp == null || udp.ReceiveFrom (buffer, ref tendpoint) == 0)
 					{
-						Trace.WriteLine ("[Network] UDP ReceiveFrom returned nothing");
+						log.Warn ("UDP ReceiveFrom returned nothing");
 						return;
 					}
 
@@ -193,7 +210,7 @@ namespace Gablarski.Network
 					MessageBase msg;
 					if (!MessageBase.GetMessage (mtype, out msg))
 					{
-						Trace.WriteLine ("[Network] Message type " + mtype + " not found from " + connection);
+						log.WarnFormat ("Message type {0} not found from {1}", mtype, connection);
 						return;
 					}
 					else
@@ -202,8 +219,8 @@ namespace Gablarski.Network
 
 						if (connection == null)
 						{
-							//Trace.WriteLineIf (VerboseTracing, "[Network] Connectionless message received: " + msg.MessageTypeCode);
-							//OnConnectionlessMessageReceived (new ConnectionlessMessageReceivedEventArgs (this, msg, endpoint));
+							if (debugLogging) log.DebugFormat ("Connectionless message received {0}", msg.MessageTypeCode);
+							OnConnectionlessMessageReceived (new ConnectionlessMessageReceivedEventArgs (this, msg, tendpoint));
 						}
 						else
 						{
@@ -229,14 +246,22 @@ namespace Gablarski.Network
 			}
 		}
 
+		private void OnConnectionlessMessageReceived (ConnectionlessMessageReceivedEventArgs e)
+		{
+			var received = this.ConnectionlessMessageReceived;
+			if (received != null)
+				received (this, e);
+		}
+
 		private void Outgoing ()
 		{
 			var o = this.outgoing;
+			var ocl = this.outgoingConnectionless;
 			var ow = this.outgoingWait;
 
 			while (this.listening)
 			{
-				if (o.Count == 0)
+				if (o.Count == 0 || ocl.Count == 0)
 					ow.WaitOne ();
 
 				while (o.Count > 0)
@@ -248,6 +273,17 @@ namespace Gablarski.Network
 					}
 
 					Send (m.Key, m.Value);
+				}
+
+				while (ocl.Count > 0)
+				{
+					ConnectionlessMessageReceivedEventArgs e;
+					lock (ocl)
+					{
+						e = ocl.Dequeue();
+					}
+
+					Send (e.EndPoint, e.Message);
 				}
 			}
 		}
@@ -333,20 +369,32 @@ namespace Gablarski.Network
 			}
 		}
 
+		private void Send (EndPoint endpoint, MessageBase message)
+		{
+			try
+			{
+				clWriter.EndPoint = endpoint;
+
+				clWriter.WriteByte (42);
+				clWriter.WriteUInt16 (message.MessageTypeCode);
+
+				message.WritePayload (clWriter);
+				clWriter.Flush ();
+			}
+			catch
+			{
+			}
+		}
+
 		private void Send (NetworkServerConnection connection, MessageBase message)
 		{
 			try
 			{
 				IValueWriter iwriter;
-				if (connection != null)
-				{
-					if (!message.Reliable && (connection.bleeding || message.MessageTypeCode == (ushort)ServerMessageType.PunchThroughReceived))
-						iwriter = connection.UnreliableWriter;
-					else
-						iwriter = connection.ReliableWriter;
-				}
+				if (!message.Reliable && (connection.bleeding || message.MessageTypeCode == (ushort)ServerMessageType.PunchThroughReceived))
+					iwriter = connection.UnreliableWriter;
 				else
-					iwriter = clWriter;
+					iwriter = connection.ReliableWriter;
 
 				iwriter.WriteByte (42);
 				iwriter.WriteUInt16 (message.MessageTypeCode);
@@ -354,7 +402,7 @@ namespace Gablarski.Network
 				message.WritePayload (iwriter);
 				iwriter.Flush ();
 			}
-			catch (Exception)
+			catch
 			{
 				connection.Disconnect ();
 			}
