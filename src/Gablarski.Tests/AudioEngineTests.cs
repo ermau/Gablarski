@@ -66,29 +66,69 @@ namespace Gablarski.Tests
 			Assert.Throws<InvalidOperationException> (engine.Start);
 		}
 
-		//[Test]
-		//public void AttachDetatchSource()
-		//{
-		//    var engine = new AudioEngine();
+		[Test]
+		public void Start()
+		{
+			var engine = new AudioEngine();
+			engine.AudioReceiver = receiver;
+			engine.Start();
 
-		//    engine.Attach (this.provider, this.source, new AudioEngineCaptureOptions());
-		//    Assert.IsTrue (engine.Detach (this.source));
-		//}
+			Assert.IsTrue (engine.IsRunning);
 
-		//[Test]
-		//public void AttachDetatchProvider()
-		//{
-		//    var engine = new AudioEngine();
+			engine.Stop();
+		}
 
-		//    engine.Attach (this.provider, this.source, new AudioEngineCaptureOptions());
-		//    Assert.IsTrue (engine.Detach (this.provider));
-		//}
+		[Test]
+		public void Stop()
+		{
+			var engine = new AudioEngine();
+			engine.AudioReceiver = receiver;
+			engine.Start();
+
+			engine.Stop();
+
+			Assert.IsFalse (engine.IsRunning);
+		}
+
+		[Test]
+		public void AttachDetatchSource()
+		{
+		    var engine = new AudioEngine();
+
+		    engine.Attach (this.provider, AudioFormat.Mono16Bit, this.source, new AudioEngineCaptureOptions());
+		    Assert.IsTrue (engine.Detach (this.source));
+		}
+
+		[Test]
+		public void AttachDetatchProvider()
+		{
+		    var engine = new AudioEngine();
+
+		    engine.Attach (this.provider, AudioFormat.Mono16Bit, this.source, new AudioEngineCaptureOptions());
+		    Assert.IsTrue (engine.Detach (this.provider));
+		}
+
+		[Test]
+		public void InvalidMute()
+		{
+			var engine = new AudioEngine();
+			Assert.Throws<ArgumentNullException> (() => engine.Mute ((IPlaybackProvider)null));
+			Assert.Throws<ArgumentNullException> (() => engine.Mute ((ICaptureProvider)null));
+		}
+
+		[Test]
+		public void InvalidUnmute()
+		{
+			var engine = new AudioEngine();
+			Assert.Throws<ArgumentNullException> (() => engine.Unmute ((IPlaybackProvider)null));
+			Assert.Throws<ArgumentNullException> (() => engine.Unmute ((ICaptureProvider)null));
+		}
 
 		//[Test]
 		//public void InvalidBeginCapture()
 		//{
 		//    var engine = new AudioEngine();
-		//    engine.Attach (this.provider, this.source, new AudioEngineCaptureOptions());
+		//    engine.Attach (this.provider, AudioFormat.Mono16Bit, this.source, new AudioEngineCaptureOptions());
 		//    Assert.Throws<ArgumentNullException> (() => engine.BeginCapture (null));
 		//}
 
@@ -96,7 +136,7 @@ namespace Gablarski.Tests
 		//public void InvalidEndCapture()
 		//{
 		//    var engine = new AudioEngine();
-		//    engine.Attach (this.provider, this.source, new AudioEngineCaptureOptions());
+		//    engine.Attach (this.provider, AudioFormat.Mono16Bit, this.source, new AudioEngineCaptureOptions());
 		//    Assert.Throws<ArgumentNullException> (() => engine.EndCapture (null));
 		//}
 	}

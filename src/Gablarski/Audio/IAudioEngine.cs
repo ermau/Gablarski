@@ -89,6 +89,8 @@ namespace Gablarski.Audio
 
 	public interface IAudioEngine
 	{
+		bool IsRunning { get; }
+
 		IClientContext Context { get; set; }
 
 		/// <summary>

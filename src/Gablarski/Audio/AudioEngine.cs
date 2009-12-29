@@ -37,9 +37,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using Gablarski.Audio.Speex;
 using Gablarski.Client;
 using Gablarski.Messages;
 
@@ -68,6 +66,11 @@ namespace Gablarski.Audio
 				this.audioReceiver = value;
 			}
 		}
+
+		public bool IsRunning
+		{
+			get { return this.running; }
+		}
 		
 		public IAudioSender AudioSender
 		{
@@ -84,12 +87,16 @@ namespace Gablarski.Audio
 			if (options == null)
 				throw new ArgumentNullException ("options");
 
-			playbackLock.EnterWriteLock();
+			lock (playbacks)
 			{
 				foreach (var s in sources.Where (s => !playbacks.ContainsKey (s) && s.OwnerId != Context.CurrentUser.UserId))
+				{
 					playbacks[s] = new AudioPlaybackEntity (playback, s, options);
+
+					if (mutedPlayers.Contains (playback))
+						playbacks[s].Muted = true;
+				}
 			}
-			playbackLock.ExitWriteLock();
 		}
 
 		public void Attach (IPlaybackProvider playback, AudioSource source, AudioEnginePlaybackOptions options)
@@ -101,11 +108,13 @@ namespace Gablarski.Audio
 			if (options == null)
 				throw new ArgumentNullException ("options");
 
-			playbackLock.EnterWriteLock();
+			lock (playbacks)
 			{
 				playbacks[source] = new AudioPlaybackEntity (playback, source, options);
+
+				if (mutedPlayers.Contains (playback))
+					playbacks[source].Muted = true;
 			}
-			playbackLock.ExitWriteLock();
 		}
 
 		public void Attach (ICaptureProvider capture, AudioFormat format, AudioSource source, AudioEngineCaptureOptions options)
@@ -136,15 +145,16 @@ namespace Gablarski.Audio
 
 			bool removed = false;
 
-			playbackLock.EnterWriteLock();
+			lock (playbacks)
 			{
 				foreach (var entity in playbacks.Values.Where (e => e.Playback == provider).ToList())
 				{
 					playbacks.Remove (entity.Source);
 					removed = true;
 				}
+
+				mutedPlayers.Remove (provider);
 			}
-			playbackLock.ExitWriteLock();
 
 			return removed;
 		}
@@ -163,6 +173,8 @@ namespace Gablarski.Audio
 					captures.Remove (entity.Source);
 					removed = true;
 				}
+
+				mutedCaptures.Remove (provider);
 			}
 			
 			return removed;
@@ -181,7 +193,7 @@ namespace Gablarski.Audio
 
 			if (!removed)
 			{
-				playbackLock.EnterWriteLock();
+				lock (playbacks)
 				{
 					AudioPlaybackEntity p;
 					if (playbacks.TryGetValue (source, out p))
@@ -190,7 +202,6 @@ namespace Gablarski.Audio
 						removed = playbacks.Remove (source);
 					}
 				}
-				playbackLock.ExitWriteLock();
 			}
 
 			return removed;
@@ -314,13 +325,15 @@ namespace Gablarski.Audio
 			lock (captures)
 			{
 				captures.Clear();
+				mutedCaptures.Clear();
 			}
 
-			playbackLock.EnterWriteLock();
+			lock (playbacks)
 			{
 				playbacks.Clear();
+				playbackProviders.Clear();
+				mutedPlayers.Clear();
 			}
-			playbackLock.ExitWriteLock();
 		}
 
 		private volatile bool running;
@@ -328,7 +341,9 @@ namespace Gablarski.Audio
 		private readonly Dictionary<AudioSource, AudioCaptureEntity> captures = new Dictionary<AudioSource, AudioCaptureEntity>();
 		private readonly Dictionary<AudioSource, AudioPlaybackEntity> playbacks = new Dictionary<AudioSource, AudioPlaybackEntity>();
 		private readonly List<IPlaybackProvider> playbackProviders = new List<IPlaybackProvider>();
-		private readonly ReaderWriterLockSlim playbackLock = new ReaderWriterLockSlim();
+
+		private readonly HashSet<IPlaybackProvider> mutedPlayers = new HashSet<IPlaybackProvider>();
+		private readonly HashSet<ICaptureProvider> mutedCaptures = new HashSet<ICaptureProvider>();
 
 		private Thread engineThread;
 
@@ -338,13 +353,12 @@ namespace Gablarski.Audio
 		{
 			byte[] decoded = e.Source.Decode (e.AudioData);
 
-			playbackLock.EnterReadLock();
+			lock (playbacks)
 			{
 				AudioPlaybackEntity entity;
 				if (playbacks.TryGetValue (e.Source, out entity) && !entity.Muted)
 					entity.Playback.QueuePlayback (e.Source, decoded);
 			}
-			playbackLock.ExitReadLock();
 		}
 
 		private void MuteCore (ICaptureProvider capture, bool mute)
@@ -354,6 +368,11 @@ namespace Gablarski.Audio
 
 			lock (captures)
 			{
+				if (mute)
+					mutedCaptures.Add (capture);
+				else
+					mutedCaptures.Add (capture);
+
 				var ps = captures.Values.Where (e => e.Capture == capture);
 
 				foreach (var e in ps)
@@ -368,6 +387,11 @@ namespace Gablarski.Audio
 
 			lock (playbacks)
 			{
+				if (mute)
+					mutedPlayers.Add (playback);
+				else
+					mutedPlayers.Remove (playback);
+
 				var ps = playbacks.Values.Where (e => e.Playback == playback);
 
 				foreach (var e in ps)
@@ -393,10 +417,12 @@ namespace Gablarski.Audio
 				{
 					foreach (var c in captures)
 					{
-						if ((!c.Value.Talking && c.Value.Muted) || (!c.Value.Capture.IsCapturing && c.Value.Options.Mode == AudioEngineCaptureMode.Explicit))
+						bool muted = c.Value.Muted;
+
+						if ((!c.Value.Talking && muted) || (!c.Value.Capture.IsCapturing && c.Value.Options.Mode == AudioEngineCaptureMode.Explicit))
 							continue;
 
-						if (c.Value.Talking && c.Value.Muted)
+						if (c.Value.Talking && muted)
 						{
 							c.Value.Talking = false;
 							AudioSender.EndSending (c.Key);
@@ -406,7 +432,6 @@ namespace Gablarski.Audio
 						if (c.Value.Capture.AvailableSampleCount > c.Key.FrameSize)
 						{
 							bool talking = c.Value.Talking;
-							ChannelInfo channel = Context.GetCurrentChannel ();
 							if (c.Value.CurrentTargets == null || c.Value.CurrentTargets.Length == 0)
 								break;
 
