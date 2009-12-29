@@ -105,6 +105,8 @@ namespace Gablarski.Clients
 		{
 			Clear ();
 
+			MediaController.Reset();
+
 			this.client.Connected -= OnClientConnected;
 			this.client.Disconnected -= OnClientDisconnected;
 			this.client.Users.UserJoined -= OnUserJoined;

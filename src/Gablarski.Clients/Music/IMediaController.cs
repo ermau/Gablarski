@@ -43,7 +43,19 @@ namespace Gablarski.Clients.Media
 {
 	public interface IMediaController
 	{
+		/// <summary>
+		/// Adds one to the talker count.
+		/// </summary>
 		void AddTalker ();
+
+		/// <summary>
+		/// Removes one from the talker count.
+		/// </summary>
 		void RemoveTalker ();
+
+		/// <summary>
+		/// Resets the talker count to none.
+		/// </summary>
+		void Reset();
 	}
 }

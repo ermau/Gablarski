@@ -118,6 +118,12 @@ namespace Gablarski.Clients.Media
 			SetVolume (NormalVolume);
 		}
 
+		public void Reset()
+		{
+			Interlocked.Exchange (ref this.playing, 0);
+			SetVolume (NormalVolume);
+		}
+
 		private int talkingVolume = 30;
 		private int normalVolume = 100;
 		private IEnumerable<IMediaPlayer> mediaPlayers;
