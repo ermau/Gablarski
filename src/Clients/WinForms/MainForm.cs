@@ -157,6 +157,7 @@ namespace Gablarski.Clients.Windows
 			}
 
 			this.playback.Open();
+			this.gablarski.Audio.Attach (this.playback, this.gablarski.Sources, new AudioEnginePlaybackOptions());
 		}
 
 		private void SetupVoiceCapture ()
@@ -542,6 +543,9 @@ namespace Gablarski.Clients.Windows
 
 		private void GablarskiConnected (object sender, EventArgs e)
 		{
+			if (this.IsDisposed || this.Disposing)
+				return;
+
 			this.Invoke ((Action)delegate
 			{
 				if (TaskbarManager.IsPlatformSupported)
