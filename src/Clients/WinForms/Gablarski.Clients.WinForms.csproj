@@ -300,7 +300,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /Y "$(SolutionDir)..\..\..\lib\libcelt.dll" "$(TargetDir)"
+    <PostBuildEvent>xcopy /Y "$(SolutionDir)..\..\..\Gablarski.License.txt" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)..\..\..\lib\libcelt.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)..\..\..\lib\libcelt.license.txt" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)..\..\..\lib\libspeexdsp.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)..\..\..\lib\libspeexdsp.license.txt" "$(TargetDir)"
