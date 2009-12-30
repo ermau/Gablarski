@@ -104,9 +104,9 @@ Section -Main SEC0000
     SetOutPath $TEMP
     SetOverwrite on
     File ..\..\..\tools\dxwebsetup.exe
-    Exec "dxwebsetup.exe /Q"
+    ExecWait "dxwebsetup.exe /Q"
     File ..\..\..\tools\dotNetFx35setup.exe
-    Exec "dotNetFx36setup.exe /Q"
+    ExecWait "dotNetFx36setup.exe /Q"
 SectionEnd
 
 Section -post SEC0001
