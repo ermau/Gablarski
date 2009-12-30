@@ -106,7 +106,7 @@ Section -Main SEC0000
     File ..\..\..\tools\dxwebsetup.exe
     ExecWait "dxwebsetup.exe /Q"
     File ..\..\..\tools\dotNetFx35setup.exe
-    ExecWait "dotNetFx36setup.exe /Q"
+    ExecWait "dotNetFx35setup.exe /Q"
 SectionEnd
 
 Section -post SEC0001
