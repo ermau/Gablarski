@@ -72,7 +72,7 @@ Section -Main SEC0000
     File ..\..\..\lib\OpenALSoft.License.txt
     File ..\..\..\lib\System.Data.SQLite.DLL
     File ..\..\Gablarski\bin\{config}\Gablarski.dll
-    File ..\..\Gablarski\bin\{config}\Gablarski.License.txt
+    File ..\..\..\Gablarski.License.txt
     File ..\..\Gablarski\bin\{config}\Gablarski.pdb
     File ..\..\Gablarski\bin\{config}\Gablarski.XML
     File ..\..\Gablarski.Clients\bin\{config}\Gablarski.Clients.dll
