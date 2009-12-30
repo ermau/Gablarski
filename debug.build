@@ -111,7 +111,7 @@
 			<arg value='-t="src\Clients\WinForms\setup.nsi"' />
 			<arg value='-f=0.0.0.0' />
 			<arg value='-r=${gablarski.version}' />
-			<arg value='-e=3' />
+			<arg value='-e=2' />
 		</exec>
 
 		<exec program="tools/replace.exe">
