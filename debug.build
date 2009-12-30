@@ -2,6 +2,7 @@
 <project name="Gablarski" default="everything" basedir=".">
 	<property name="nant.settings.currentframework" value="net-3.5" />
 	<property name="gablarski.version" value="${teamcity.buildConfName}.${build.vcs.number}" />
+	<property name="gablarski.config" value="Debug" />
 
 	<target name="updatelibraryversion">
 		<exec program="tools/replace.exe">
@@ -28,7 +29,7 @@
 	
 	<target name="library" depends="updatelibraryversion">
 		<exec program="${DotNetFramework3.5_x86_Path}\msbuild.exe">
-			<arg value='/property:Configuration="Debug";Platform="x86"' />
+			<arg value='/property:Configuration="${gablarski.config}";Platform="x86"' />
 			<arg value="Gablarski.sln" />
 		</exec>
 
@@ -105,7 +106,21 @@
 			<arg value='-r=${gablarski.version}' />
 			<arg value='e=2' />
 		</exec>
-	
+
+		<exec program="tools/replace.exe">
+			<arg value='-t="src\Clients\WinForms\setup.nsi"' />
+			<arg value='-f=0.0.0.0' />
+			<arg value='-r=${gablarski.version}' />
+			<arg value='e=2' />
+		</exec>
+
+		<exec program="tools/replace.exe">
+			<arg value='-t="src\Clients\WinForms\setup.nsi"' />
+			<arg value='-f=\{config}\' />
+			<arg value='-r=${gablarski.config}' />
+			<arg value='e=2' />
+		</exec>
+
 		<exec program="${DotNetFramework3.5_x86_Path}\msbuild.exe">
 			<arg value='/property:Configuration="Debug";Platform="x86"' />
 			<arg value="src\Clients\WinForms\Gablarski-WinForms.sln" />
@@ -121,6 +136,10 @@
 				<include name="*.txt" />
 			</fileset>
 		</zip>
+
+		<exec program="C:\Program Files (x86)\NSIS\makensis.exe">
+			<arg value="src\Clients\WinForms\setup.nsi" />
+		</exec>
 	</target>
 
 	<target name="gtk" depends="library">
