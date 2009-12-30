@@ -71,26 +71,26 @@ Section -Main SEC0000
     File ..\..\..\lib\OpenAL32.dll
     File ..\..\..\lib\OpenALSoft.License.txt
     File ..\..\..\lib\System.Data.SQLite.DLL
-    File ..\..\Gablarski\bin\Debug\Gablarski.dll
-    File ..\..\Gablarski\bin\Debug\Gablarski.License.txt
-    File ..\..\Gablarski\bin\Debug\Gablarski.pdb
-    File ..\..\Gablarski\bin\Debug\Gablarski.XML
-    File ..\..\Gablarski.Clients\bin\Debug\Gablarski.Clients.dll
-    File ..\..\Gablarski.Clients\bin\Debug\Gablarski.Clients.pdb
-    File ..\..\Gablarski.Clients\bin\Debug\Gablarski.Clients.XML
-    File ..\..\Gablarski.Growl\bin\Debug\Gablarski.Growl.dll
-    File ..\..\Gablarski.Growl\bin\Debug\Gablarski.Growl.pdb
-    File ..\..\Gablarski.Input.DirectInput\bin\Debug\Gablarski.Input.DirectInput.dll
-    File ..\..\Gablarski.Input.DirectInput\bin\Debug\Gablarski.Input.DirectInput.pdb
-    File ..\..\Gablarski.iTunes\bin\Debug\Gablarski.iTunes.dll
-    File ..\..\Gablarski.iTunes\bin\Debug\Gablarski.iTunes.pdb
+    File ..\..\Gablarski\bin\{config}\Gablarski.dll
+    File ..\..\Gablarski\bin\{config}\Gablarski.License.txt
+    File ..\..\Gablarski\bin\{config}\Gablarski.pdb
+    File ..\..\Gablarski\bin\{config}\Gablarski.XML
+    File ..\..\Gablarski.Clients\bin\{config}\Gablarski.Clients.dll
+    File ..\..\Gablarski.Clients\bin\{config}\Gablarski.Clients.pdb
+    File ..\..\Gablarski.Clients\bin\{config}\Gablarski.Clients.XML
+    File ..\..\Gablarski.Growl\bin\{config}\Gablarski.Growl.dll
+    File ..\..\Gablarski.Growl\bin\{config}\Gablarski.Growl.pdb
+    File ..\..\Gablarski.Input.DirectInput\bin\{config}\Gablarski.Input.DirectInput.dll
+    File ..\..\Gablarski.Input.DirectInput\bin\{config}\Gablarski.Input.DirectInput.pdb
+    File ..\..\Gablarski.iTunes\bin\{config}\Gablarski.iTunes.dll
+    File ..\..\Gablarski.iTunes\bin\{config}\Gablarski.iTunes.pdb
     File ..\..\..\lib\Interop.iTunesLib.dll
-    File ..\..\Gablarski.OpenAL\bin\Debug\Gablarski.OpenAL.dll
-    File ..\..\Gablarski.OpenAL\bin\Debug\Gablarski.OpenAL.pdb
-    File ..\..\Gablarski.SpeechNotifier\bin\Debug\Gablarski.SpeechNotifier.dll
-    File ..\..\Gablarski.SpeechNotifier\bin\Debug\Gablarski.SpeechNotifier.pdb
-    File ..\..\Gablarski.Winamp\bin\Debug\Gablarski.Winamp.dll
-    File ..\..\Gablarski.Winamp\bin\Debug\Gablarski.Winamp.pdb
+    File ..\..\Gablarski.OpenAL\bin\{config}\Gablarski.OpenAL.dll
+    File ..\..\Gablarski.OpenAL\bin\{config}\Gablarski.OpenAL.pdb
+    File ..\..\Gablarski.SpeechNotifier\bin\{config}\Gablarski.SpeechNotifier.dll
+    File ..\..\Gablarski.SpeechNotifier\bin\{config}\Gablarski.SpeechNotifier.pdb
+    File ..\..\Gablarski.Winamp\bin\{config}\Gablarski.Winamp.dll
+    File ..\..\Gablarski.Winamp\bin\{config}\Gablarski.Winamp.pdb
     File bin\x86\{config}\GablarskiClient.exe
     File bin\x86\{config}\GablarskiClient.exe.config
     File bin\x86\{config}\GablarskiClient.pdb
