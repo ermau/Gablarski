@@ -117,7 +117,7 @@
 		<exec program="tools/replace.exe">
 			<arg value='-t="src\Clients\WinForms\setup.nsi"' />
 			<arg value='-f=\{config}\' />
-			<arg value='-r=${gablarski.config}' />
+			<arg value='-r=\${gablarski.config}\' />
 		</exec>
 
 		<exec program="${DotNetFramework3.5_x86_Path}\msbuild.exe">
