@@ -39,7 +39,7 @@ Var StartMenuGroup
 !insertmacro MUI_LANGUAGE English
 
 # Installer attributes
-OutFile setup.exe
+OutFile GablarskiSetup.exe
 InstallDir $PROGRAMFILES\Gablarski
 CRCCheck on
 XPStyle on

@@ -76,42 +76,42 @@
 			<arg value='-t="src\Gablarski.Growl\Properties\AssemblyInfo.cs"' />
 			<arg value='-f=0.0.0.0' />
 			<arg value='-r=${gablarski.version}' />
-			<arg value='e=2' />
+			<arg value='-e=2' />
 		</exec>
 
 		<exec program="tools/replace.exe">
 			<arg value='-t="src\Gablarski.iTunes\Properties\AssemblyInfo.cs"' />
 			<arg value='-f=0.0.0.0' />
 			<arg value='-r=${gablarski.version}' />
-			<arg value='e=2' />
+			<arg value='-e=2' />
 		</exec>
 
 		<exec program="tools/replace.exe">
 			<arg value='-t="src\Gablarski.Winamp\Properties\AssemblyInfo.cs"' />
 			<arg value='-f=0.0.0.0' />
 			<arg value='-r=${gablarski.version}' />
-			<arg value='e=2' />
+			<arg value='-e=2' />
 		</exec>
 
 		<exec program="tools/replace.exe">
 			<arg value='-t="src\Gablarski.SpeechNotifier\Properties\AssemblyInfo.cs"' />
 			<arg value='-f=0.0.0.0' />
 			<arg value='-r=${gablarski.version}' />
-			<arg value='e=2' />
+			<arg value='-e=2' />
 		</exec>
 
 		<exec program="tools/replace.exe">
 			<arg value='-t="src\Gablarski.Input.DirectInput\Properties\AssemblyInfo.cs"' />
 			<arg value='-f=0.0.0.0' />
 			<arg value='-r=${gablarski.version}' />
-			<arg value='e=2' />
+			<arg value='-e=2' />
 		</exec>
 
 		<exec program="tools/replace.exe">
 			<arg value='-t="src\Clients\WinForms\setup.nsi"' />
 			<arg value='-f=0.0.0.0' />
 			<arg value='-r=${gablarski.version}' />
-			<arg value='e=2' />
+			<arg value='-e=3' />
 		</exec>
 
 		<exec program="tools/replace.exe">
