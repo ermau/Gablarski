@@ -91,14 +91,14 @@ Section -Main SEC0000
     File ..\..\Gablarski.SpeechNotifier\bin\Debug\Gablarski.SpeechNotifier.pdb
     File ..\..\Gablarski.Winamp\bin\Debug\Gablarski.Winamp.dll
     File ..\..\Gablarski.Winamp\bin\Debug\Gablarski.Winamp.pdb
-    File bin\x86\Debug\GablarskiClient.exe
-    File bin\x86\Debug\GablarskiClient.exe.config
-    File bin\x86\Debug\GablarskiClient.pdb
-    File bin\x86\Debug\Headphones.ico
-    File bin\x86\Debug\Microsoft.WindowsAPICodePack.dll
-    File bin\x86\Debug\Microsoft.WindowsAPICodePack.pdb
-    File bin\x86\Debug\Microsoft.WindowsAPICodePack.Shell.dll
-    File bin\x86\Debug\Microsoft.WindowsAPICodePack.Shell.pdb
+    File bin\x86\{config}\GablarskiClient.exe
+    File bin\x86\{config}\GablarskiClient.exe.config
+    File bin\x86\{config}\GablarskiClient.pdb
+    File bin\x86\{config}\Headphones.ico
+    File bin\x86\{config}\Microsoft.WindowsAPICodePack.dll
+    File bin\x86\{config}\Microsoft.WindowsAPICodePack.pdb
+    File bin\x86\{config}\Microsoft.WindowsAPICodePack.Shell.dll
+    File bin\x86\{config}\Microsoft.WindowsAPICodePack.Shell.pdb
     WriteRegStr HKLM "${REGKEY}\Components" Main 1
     
     SetOutPath $TEMP

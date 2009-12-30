@@ -118,7 +118,6 @@
 			<arg value='-t="src\Clients\WinForms\setup.nsi"' />
 			<arg value='-f=\{config}\' />
 			<arg value='-r=${gablarski.config}' />
-			<arg value='e=2' />
 		</exec>
 
 		<exec program="${DotNetFramework3.5_x86_Path}\msbuild.exe">
