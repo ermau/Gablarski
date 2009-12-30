@@ -2,7 +2,30 @@
 <project name="Gablarski" default="everything" basedir=".">
 	<property name="nant.settings.currentframework" value="net-3.5" />
 
-	<target name="library">
+	<target name="updatelibraryversion">
+		<exec program="tools/replace.exe">
+			<arg value='-t="src\Gablarski\Properties\AssemblyInfo.cs"' />
+			<arg value='-f=0.0.0.0' />
+			<arg value='-r=${teamcity.buildConfName}' />
+			<arg value='e=2' />
+		</exec>
+
+		<exec program="tools/replace.exe">
+			<arg value='-t="src\Gablarski.Clients\Properties\AssemblyInfo.cs"' />
+			<arg value='-f=0.0.0.0' />
+			<arg value='-r=${teamcity.buildConfName}' />
+			<arg value='e=2' />
+		</exec>
+
+		<exec program="tools/replace.exe">
+			<arg value='-t="src\Gablarski.OpenAL\Properties\AssemblyInfo.cs"' />
+			<arg value='-f=0.0.0.0' />
+			<arg value='-r=${teamcity.buildConfName}' />
+			<arg value='e=2' />
+		</exec>
+	</target>
+	
+	<target name="library,updatelibraryversion">
 		<exec program="${DotNetFramework3.5_x86_Path}\msbuild.exe">
 			<arg value='/property:Configuration="Debug";Platform="x86"' />
 			<arg value="Gablarski.sln" />
@@ -36,10 +59,52 @@
 	<target name="everything" depends="clients,barrelserver">
 	</target>
 	
-	<target name="clients" depends="winforms,gtk">
+	<target name="clients" depends="winforms">
 	</target>
 
-	<target name="winforms" depends="library">
+	<target name="winforms" depends="library,updatelibraryversion">
+		<exec program="tools\replace.exe">
+			<arg value='-t="src\Clients\WinForms\Properties\AssemblyInfo.cs"' />
+			<arg value='-f="0.0.0.0"' />
+			<arg value='-r=${teamcity.buildConfName}' />
+			<arg value='-e=2' />
+		</exec>
+
+		<exec program="tools/replace.exe">
+			<arg value='-t="src\Gablarski.Growl\Properties\AssemblyInfo.cs"' />
+			<arg value='-f=0.0.0.0' />
+			<arg value='-r=${teamcity.buildConfName}' />
+			<arg value='e=2' />
+		</exec>
+
+		<exec program="tools/replace.exe">
+			<arg value='-t="src\Gablarski.iTunes\Properties\AssemblyInfo.cs"' />
+			<arg value='-f=0.0.0.0' />
+			<arg value='-r=${teamcity.buildConfName}' />
+			<arg value='e=2' />
+		</exec>
+
+		<exec program="tools/replace.exe">
+			<arg value='-t="src\Gablarski.Winamp\Properties\AssemblyInfo.cs"' />
+			<arg value='-f=0.0.0.0' />
+			<arg value='-r=${teamcity.buildConfName}' />
+			<arg value='e=2' />
+		</exec>
+
+		<exec program="tools/replace.exe">
+			<arg value='-t="src\Gablarski.SpeechNotifier\Properties\AssemblyInfo.cs"' />
+			<arg value='-f=0.0.0.0' />
+			<arg value='-r=${teamcity.buildConfName}' />
+			<arg value='e=2' />
+		</exec>
+
+		<exec program="tools/replace.exe">
+			<arg value='-t="src\Gablarski.Input.DirectInput\Properties\AssemblyInfo.cs"' />
+			<arg value='-f=0.0.0.0' />
+			<arg value='-r=${teamcity.buildConfName}' />
+			<arg value='e=2' />
+		</exec>
+	
 		<exec program="${DotNetFramework3.5_x86_Path}\msbuild.exe">
 			<arg value='/property:Configuration="Debug";Platform="x86"' />
 			<arg value="src\Clients\WinForms\Gablarski-WinForms.sln" />
@@ -52,7 +117,6 @@
 				<include name="Headphones.ico" />
 				<include name="*.dll" />
 				<include name="*.pdb" />
-				<include name="*.xsd" />
 				<include name="*.txt" />
 			</fileset>
 		</zip>
