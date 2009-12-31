@@ -79,32 +79,32 @@ Section -Main SEC0000
     File ..\..\..\lib\System.Data.SQLite.DLL
     File ..\..\Gablarski\bin\Debug\Gablarski.dll
     File ..\..\..\Gablarski.License.txt
-    File ..\..\Gablarski\bin\{config}\Gablarski.pdb
-    File ..\..\Gablarski\bin\{config}\Gablarski.XML
-    File ..\..\Gablarski.Clients\bin\{config}\Gablarski.Clients.dll
-    File ..\..\Gablarski.Clients\bin\{config}\Gablarski.Clients.pdb
-    File ..\..\Gablarski.Clients\bin\{config}\Gablarski.Clients.XML
-    File ..\..\Gablarski.Growl\bin\{config}\Gablarski.Growl.dll
-    File ..\..\Gablarski.Growl\bin\{config}\Gablarski.Growl.pdb
-    File ..\..\Gablarski.Input.DirectInput\bin\{config}\Gablarski.Input.DirectInput.dll
-    File ..\..\Gablarski.Input.DirectInput\bin\{config}\Gablarski.Input.DirectInput.pdb
-    File ..\..\Gablarski.iTunes\bin\{config}\Gablarski.iTunes.dll
-    File ..\..\Gablarski.iTunes\bin\{config}\Gablarski.iTunes.pdb
+    File ..\..\Gablarski\bin\Debug\Gablarski.pdb
+    File ..\..\Gablarski\bin\Debug\Gablarski.XML
+    File ..\..\Gablarski.Clients\bin\Debug\Gablarski.Clients.dll
+    File ..\..\Gablarski.Clients\bin\Debug\Gablarski.Clients.pdb
+    File ..\..\Gablarski.Clients\bin\Debug\Gablarski.Clients.XML
+    File ..\..\Gablarski.Growl\bin\Debug\Gablarski.Growl.dll
+    File ..\..\Gablarski.Growl\bin\Debug\Gablarski.Growl.pdb
+    File ..\..\Gablarski.Input.DirectInput\bin\Debug\Gablarski.Input.DirectInput.dll
+    File ..\..\Gablarski.Input.DirectInput\bin\Debug\Gablarski.Input.DirectInput.pdb
+    File ..\..\Gablarski.iTunes\bin\Debug\Gablarski.iTunes.dll
+    File ..\..\Gablarski.iTunes\bin\Debug\Gablarski.iTunes.pdb
     File ..\..\..\lib\Interop.iTunesLib.dll
-    File ..\..\Gablarski.OpenAL\bin\{config}\Gablarski.OpenAL.dll
-    File ..\..\Gablarski.OpenAL\bin\{config}\Gablarski.OpenAL.pdb
-    File ..\..\Gablarski.SpeechNotifier\bin\{config}\Gablarski.SpeechNotifier.dll
-    File ..\..\Gablarski.SpeechNotifier\bin\{config}\Gablarski.SpeechNotifier.pdb
-    File ..\..\Gablarski.Winamp\bin\{config}\Gablarski.Winamp.dll
-    File ..\..\Gablarski.Winamp\bin\{config}\Gablarski.Winamp.pdb
-    File bin\x86\{config}\GablarskiClient.exe
-    File bin\x86\{config}\GablarskiClient.exe.config
-    File bin\x86\{config}\GablarskiClient.pdb
-    File bin\x86\{config}\Headphones.ico
-    File bin\x86\{config}\Microsoft.WindowsAPICodePack.dll
-    File bin\x86\{config}\Microsoft.WindowsAPICodePack.pdb
-    File bin\x86\{config}\Microsoft.WindowsAPICodePack.Shell.dll
-    File bin\x86\{config}\Microsoft.WindowsAPICodePack.Shell.pdb
+    File ..\..\Gablarski.OpenAL\bin\Debug\Gablarski.OpenAL.dll
+    File ..\..\Gablarski.OpenAL\bin\Debug\Gablarski.OpenAL.pdb
+    File ..\..\Gablarski.SpeechNotifier\bin\Debug\Gablarski.SpeechNotifier.dll
+    File ..\..\Gablarski.SpeechNotifier\bin\Debug\Gablarski.SpeechNotifier.pdb
+    File ..\..\Gablarski.Winamp\bin\Debug\Gablarski.Winamp.dll
+    File ..\..\Gablarski.Winamp\bin\Debug\Gablarski.Winamp.pdb
+    File bin\x86\Debug\GablarskiClient.exe
+    File bin\x86\Debug\GablarskiClient.exe.config
+    File bin\x86\Debug\GablarskiClient.pdb
+    File bin\x86\Debug\Headphones.ico
+    File bin\x86\Debug\Microsoft.WindowsAPICodePack.dll
+    File bin\x86\Debug\Microsoft.WindowsAPICodePack.pdb
+    File bin\x86\Debug\Microsoft.WindowsAPICodePack.Shell.dll
+    File bin\x86\Debug\Microsoft.WindowsAPICodePack.Shell.pdb
     WriteRegStr HKLM "${REGKEY}\Components" Main 1
     
     SetOutPath $TEMP
@@ -114,7 +114,7 @@ Section -Main SEC0000
     File ..\..\..\tools\dotNetFx35setup.exe
     #!insertmacro CheckDotNET "3.5"
     ${If} $InstallDotNET == "Yes"
-        ExecWait "dotNetFx35setup.exe"
+        ExecWait "dotNetFx35setup.exe /norestart /passive"
     ${EndIf}
 SectionEnd
 
@@ -212,38 +212,26 @@ no_smgroup:
 SectionEnd
 
 # Installer functions
-
 Function .onInit
     InitPluginsDir
     
-    StrCpy $InstallDotNet "No"
     Call GetDotNETVersion
-    Pop $0
-    
-    ${If} $0 == "not found"
-        StrCpy $InstallDotNet "Yes"
-        Return
-    ${EndIf}
-    
-    StrCpy $0 $0 "" 1 # skip "v"
-    
-    ${VersionCompare} $0 "3.5" $1
-    ${If} $1 == 2
-        StrCpy $InstallDotNET "Yes"
-        Return
-    ${EndIf}
 FunctionEnd
 
 Function GetDotNETVersion
-    Push $0
-    Push $1
+    ClearErrors
+    ReadRegStr $0 HKLM "SOFTWARE\Microsoft\NET Framework Setup\NDP\v3.5" "Version"
+    IfErrors notinstalled
     
-    System::Call "mscoree::GetCORVersion(w .r0, i ${NSIS_MAX_STRLEN}, *i) i .r1"
-    StrCmp $1 "error" 0 +2
-    StrCpy $0 "not found"
+    ${VersionCompare} $0 "3.5.30729.4926" $1
+    IntCmp $1 2 notinstalled installed
     
-    Pop $1
-    Exch $0
+    installed:
+        StrCpy $InstallDotNET "No"
+        Return
+    notinstalled:
+        StrCpy $InstallDotNET "Yes"
+        Return
 FunctionEnd
 
 # Uninstaller functions
