@@ -333,7 +333,7 @@ namespace Gablarski.Clients.Windows
 			}
 
 			if (providerType == null)
-				MessageBox.Show ("No input provider could be found.");
+				Settings.UsePushToTalk = false;
 			else
 			{
 				this.inputProvider = (IInputProvider)Activator.CreateInstance (providerType);

@@ -37,7 +37,7 @@ namespace Gablarski.Clients.Windows
 		public const string VoiceActivationLevelSettingName = "VoiceActivationLevel";
 		public static int VoiceActivationLevel
 		{
-			get { return GetSetting (VoiceActivationLevelSettingName, 2200); }
+			get { return GetSetting (VoiceActivationLevelSettingName, 4000); }
 			set
 			{
 				if (SetSetting (VoiceActivationLevelSettingName, value))
