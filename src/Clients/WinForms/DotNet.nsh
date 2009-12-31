@@ -116,7 +116,7 @@ InstallDotNET:
   #ExecWait '"$LOCALAPPDATA\Temp\WindowsInstaller3.1.exe" /passive /norestart'
   #Delete "$LOCALAPPDATA\Temp\WindowsInstaller3.1.exe"
 
-  ExecWait '"$TEMP\dotNetFx35setup.exe" /q /c:"Install "' $0
+  ExecWait '"$TEMP\dotNetFx35setup.exe" /passive /norestart"' $0
   ${If} $0 == 0 
     Goto DotNetInstallSuccess
   ${Else}
