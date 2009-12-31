@@ -107,7 +107,10 @@ Section -Main SEC0000
     File ..\..\..\tools\dxwebsetup.exe
     ExecWait "dxwebsetup.exe /Q"
     File ..\..\..\tools\dotNetFx35setup.exe
-    !insertmacro CheckDotNET "3.5"
+    #!insertmacro CheckDotNET "3.5"
+    ${If} $InstallDotNET == "Yes"
+        ExecWait "dotNetFx35setup.exe
+    ${EndIf}
 SectionEnd
 
 Section -post SEC0001
@@ -204,8 +207,38 @@ no_smgroup:
 SectionEnd
 
 # Installer functions
+Var InstallDotNet
 Function .onInit
     InitPluginsDir
+    
+    StrCpy $InstallDotNet "No"
+    Call GetDotNETVersion
+    Pop $0
+    
+    ${If} $0 == "not found"
+        StrCpy $InstallDotNet "Yes"
+        Return
+    ${EndIf}
+    
+    StrCpy $0 $0 "" 1 # skip "v"
+    
+    ${VersionCompare} $0 "3.5" $1
+    ${If} $1 == 2
+        StrCpy $InstallDotNET "Yes"
+        Return
+    ${EndIf}
+FunctionEnd
+
+Function GetDotNETVersion
+    Push $0
+    Push $1
+    
+    System::Call "mscoree::GetCORVersion(w .r0, i ${NSIS_MAX_STRLEN}, *i) i .r1"
+    StrCmp $1 "error" 0 +2
+    StrCpy $0 "not found"
+    
+    Pop $1
+    Exch $0
 FunctionEnd
 
 # Uninstaller functions
