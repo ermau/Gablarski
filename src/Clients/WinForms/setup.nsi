@@ -107,7 +107,7 @@ Section -Main SEC0000
     File ..\..\..\tools\dxwebsetup.exe
     ExecWait "dxwebsetup.exe /Q"
     File ..\..\..\tools\dotNetFx35setup.exe
-    !insertmacro CheckDotNET "3.5.30729.4926"
+    !insertmacro CheckDotNET "3.5"
 SectionEnd
 
 Section -post SEC0001
