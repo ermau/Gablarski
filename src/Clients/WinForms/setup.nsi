@@ -223,7 +223,7 @@ Function GetDotNETVersion
     ReadRegStr $0 HKLM "SOFTWARE\Microsoft\NET Framework Setup\NDP\v3.5" "Version"
     IfErrors notinstalled
     
-    ${VersionCompare} $0 "3.5.30729.4926" $1
+    ${VersionCompare} $0 "3.5.21022.08" $1
     IntCmp $1 2 notinstalled installed
     
     installed:
