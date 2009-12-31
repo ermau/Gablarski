@@ -109,7 +109,7 @@ Section -Main SEC0000
     File ..\..\..\tools\dotNetFx35setup.exe
     #!insertmacro CheckDotNET "3.5"
     ${If} $InstallDotNET == "Yes"
-        ExecWait "dotNetFx35setup.exe
+        ExecWait "dotNetFx35setup.exe"
     ${EndIf}
 SectionEnd
 
