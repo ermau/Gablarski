@@ -106,7 +106,7 @@ NoDotNet:
   DetailPrint ".NET Framework Version found: $2, required version: 2.0"
 
     MessageBox MB_YESNO|MB_ICONEXCLAMATION \
-    ".NET Framework not installed.$\nRequired Version: $7 or greater.$\nInstall .NET Framework 2.0?" \
+    ".NET Framework not installed.$\nRequired Version: $7 or greater.$\nInstall .NET Framework 3.5?" \
     /SD IDYES IDYES InstallDotNET IDNO GiveUpDotNET
   
 InstallDotNET:
@@ -125,11 +125,11 @@ InstallDotNET:
         DetailPrint "Installation aborted due to user rights."
         Goto GiveUpDotNET
     ${ElseIf} $0 == -2147023829
-        DetailPrint "Error copying files for .NET 2.0 installation."
+        DetailPrint "Error copying files for .NET 3.5 installation."
     ${ElseIf} $0 == 1602
-        DetailPrint "User aborted .NET 2.0 installation." 
+        DetailPrint "User aborted .NET 3.5 installation." 
     ${EndIf}
-    MessageBox MB_OK ".NET 2.0 failed to install.$\nInstallation aborted."
+    MessageBox MB_OK ".NET 3.5 failed to install.$\nInstallation aborted."
     Goto GiveUpDotNET 
   ${EndIf}
  
