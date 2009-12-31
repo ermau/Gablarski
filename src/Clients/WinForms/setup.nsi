@@ -26,6 +26,9 @@ RequestExecutionLevel admin
 # Variables
 Var StartMenuGroup
 
+!include WordFunc.nsh
+!insertmacro VersionCompare
+
 # Installer pages
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_LICENSE ..\..\..\Gablarski.License.txt
@@ -56,6 +59,8 @@ VIAddVersionKey LegalCopyright ""
 InstallDirRegKey HKLM "${REGKEY}" Path
 ShowUninstDetails show
 
+Var InstallDotNet
+
 # Installer sections
 Section -Main SEC0000
     SetOutPath $INSTDIR
@@ -72,7 +77,7 @@ Section -Main SEC0000
     File ..\..\..\lib\OpenAL32.dll
     File ..\..\..\lib\OpenALSoft.License.txt
     File ..\..\..\lib\System.Data.SQLite.DLL
-    File ..\..\Gablarski\bin\{config}\Gablarski.dll
+    File ..\..\Gablarski\bin\Debug\Gablarski.dll
     File ..\..\..\Gablarski.License.txt
     File ..\..\Gablarski\bin\{config}\Gablarski.pdb
     File ..\..\Gablarski\bin\{config}\Gablarski.XML
@@ -207,7 +212,7 @@ no_smgroup:
 SectionEnd
 
 # Installer functions
-Var InstallDotNet
+
 Function .onInit
     InitPluginsDir
     
