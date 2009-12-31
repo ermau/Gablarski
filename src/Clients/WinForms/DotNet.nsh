@@ -103,7 +103,7 @@
  
 NoDotNet:
 
-  DetailPrint ".NET Framework Version found: $2, required version: 2.0"
+  DetailPrint ".NET Framework Version found: $2, required version: 3.5"
 
     MessageBox MB_YESNO|MB_ICONEXCLAMATION \
     ".NET Framework not installed.$\nRequired Version: $7 or greater.$\nInstall .NET Framework 3.5?" \
