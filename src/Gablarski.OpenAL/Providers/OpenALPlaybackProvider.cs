@@ -75,18 +75,18 @@ namespace Gablarski.OpenAL.Providers
 		{
 			if (this.device == null)
 				throw new InvalidOperationException ("Device is not set");
-
-			if (!this.device.IsOpen)
-				this.device.Open();
-
-			if (Context.CurrentContext == null || Context.CurrentContext.Device != this.device)
-				Context.CreateAndActivate (this.device);
 		}
 
 		public void QueuePlayback (AudioSource audioSource, byte[] data)
 		{
 			if (audioSource == null)
 				throw new ArgumentNullException ("audioSource");
+			
+			if (!this.device.IsOpen)
+				this.device.Open();
+
+			if (Context.CurrentContext == null || Context.CurrentContext.Device != this.device)
+				Context.CreateAndActivate (this.device);
 
 			Stack<SourceBuffer> bufferStack;
 			if (!this.buffers.TryGetValue (audioSource, out bufferStack))
