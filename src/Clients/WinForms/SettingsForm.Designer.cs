@@ -166,6 +166,7 @@
 			// inDisplaySources
 			// 
 			this.inDisplaySources.AutoSize = true;
+			this.inDisplaySources.Enabled = false;
 			this.inDisplaySources.Location = new System.Drawing.Point(8, 6);
 			this.inDisplaySources.Name = "inDisplaySources";
 			this.inDisplaySources.Size = new System.Drawing.Size(129, 17);
