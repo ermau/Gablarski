@@ -52,6 +52,7 @@
 			this.btnSaveServer = new System.Windows.Forms.Button();
 			this.btnEditServer = new System.Windows.Forms.Button();
 			this.btnAddServer = new System.Windows.Forms.Button();
+			this.lblPhonetic = new System.Windows.Forms.Label();
 			this.pnlModServer.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -62,7 +63,7 @@
 						| System.Windows.Forms.AnchorStyles.Right)));
 			this.servers.Location = new System.Drawing.Point(12, 35);
 			this.servers.Name = "servers";
-			this.servers.Size = new System.Drawing.Size(306, 239);
+			this.servers.Size = new System.Drawing.Size(250, 272);
 			this.servers.TabIndex = 0;
 			this.servers.UseCompatibleStateImageBehavior = false;
 			this.servers.ItemActivate += new System.EventHandler(this.servers_ItemActivate);
@@ -74,6 +75,7 @@
 			this.pnlModServer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
 						| System.Windows.Forms.AnchorStyles.Left)
 						| System.Windows.Forms.AnchorStyles.Right)));
+			this.pnlModServer.Controls.Add(this.lblPhonetic);
 			this.pnlModServer.Controls.Add(this.inPhonetic);
 			this.pnlModServer.Controls.Add(this.inServerPassword);
 			this.pnlModServer.Controls.Add(this.lblServerPassword);
@@ -91,24 +93,26 @@
 			this.pnlModServer.Controls.Add(this.inName);
 			this.pnlModServer.Location = new System.Drawing.Point(12, 35);
 			this.pnlModServer.Name = "pnlModServer";
-			this.pnlModServer.Size = new System.Drawing.Size(306, 239);
+			this.pnlModServer.Size = new System.Drawing.Size(250, 272);
 			this.pnlModServer.TabIndex = 3;
 			this.pnlModServer.Visible = false;
 			// 
 			// inPhonetic
 			// 
-			this.inPhonetic.Location = new System.Drawing.Point(206, 143);
+			this.inPhonetic.Location = new System.Drawing.Point(102, 178);
 			this.inPhonetic.MaxLength = 255;
 			this.inPhonetic.Name = "inPhonetic";
-			this.inPhonetic.Size = new System.Drawing.Size(97, 20);
+			this.inPhonetic.Size = new System.Drawing.Size(145, 20);
 			this.inPhonetic.TabIndex = 13;
 			// 
 			// inServerPassword
 			// 
+			this.inServerPassword.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+						| System.Windows.Forms.AnchorStyles.Right)));
 			this.inServerPassword.Location = new System.Drawing.Point(102, 108);
 			this.inServerPassword.MaxLength = 255;
 			this.inServerPassword.Name = "inServerPassword";
-			this.inServerPassword.Size = new System.Drawing.Size(201, 20);
+			this.inServerPassword.Size = new System.Drawing.Size(145, 20);
 			this.inServerPassword.TabIndex = 3;
 			// 
 			// lblServerPassword
@@ -123,7 +127,7 @@
 			// labelPassword
 			// 
 			this.labelPassword.AutoSize = true;
-			this.labelPassword.Location = new System.Drawing.Point(8, 216);
+			this.labelPassword.Location = new System.Drawing.Point(6, 248);
 			this.labelPassword.Name = "labelPassword";
 			this.labelPassword.Size = new System.Drawing.Size(56, 13);
 			this.labelPassword.TabIndex = 11;
@@ -132,7 +136,7 @@
 			// labelUsername
 			// 
 			this.labelUsername.AutoSize = true;
-			this.labelUsername.Location = new System.Drawing.Point(6, 181);
+			this.labelUsername.Location = new System.Drawing.Point(6, 213);
 			this.labelUsername.Name = "labelUsername";
 			this.labelUsername.Size = new System.Drawing.Size(58, 13);
 			this.labelUsername.TabIndex = 10;
@@ -142,10 +146,10 @@
 			// 
 			this.inPassword.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
 						| System.Windows.Forms.AnchorStyles.Right)));
-			this.inPassword.Location = new System.Drawing.Point(102, 213);
+			this.inPassword.Location = new System.Drawing.Point(102, 245);
 			this.inPassword.MaxLength = 255;
 			this.inPassword.Name = "inPassword";
-			this.inPassword.Size = new System.Drawing.Size(201, 20);
+			this.inPassword.Size = new System.Drawing.Size(145, 20);
 			this.inPassword.TabIndex = 6;
 			this.inPassword.UseSystemPasswordChar = true;
 			// 
@@ -155,7 +159,7 @@
 						| System.Windows.Forms.AnchorStyles.Right)));
 			this.inPort.Location = new System.Drawing.Point(102, 73);
 			this.inPort.Name = "inPort";
-			this.inPort.Size = new System.Drawing.Size(201, 20);
+			this.inPort.Size = new System.Drawing.Size(145, 20);
 			this.inPort.TabIndex = 2;
 			this.inPort.Text = "6112";
 			// 
@@ -199,20 +203,18 @@
 			// 
 			this.inUsername.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
 						| System.Windows.Forms.AnchorStyles.Right)));
-			this.inUsername.Location = new System.Drawing.Point(102, 178);
+			this.inUsername.Location = new System.Drawing.Point(102, 210);
 			this.inUsername.MaxLength = 255;
 			this.inUsername.Name = "inUsername";
-			this.inUsername.Size = new System.Drawing.Size(201, 20);
+			this.inUsername.Size = new System.Drawing.Size(145, 20);
 			this.inUsername.TabIndex = 5;
 			// 
 			// inNickname
 			// 
-			this.inNickname.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-						| System.Windows.Forms.AnchorStyles.Right)));
 			this.inNickname.Location = new System.Drawing.Point(102, 143);
 			this.inNickname.MaxLength = 255;
 			this.inNickname.Name = "inNickname";
-			this.inNickname.Size = new System.Drawing.Size(98, 20);
+			this.inNickname.Size = new System.Drawing.Size(145, 20);
 			this.inNickname.TabIndex = 4;
 			// 
 			// inServer
@@ -222,7 +224,7 @@
 			this.inServer.Location = new System.Drawing.Point(102, 38);
 			this.inServer.MaxLength = 255;
 			this.inServer.Name = "inServer";
-			this.inServer.Size = new System.Drawing.Size(201, 20);
+			this.inServer.Size = new System.Drawing.Size(145, 20);
 			this.inServer.TabIndex = 1;
 			// 
 			// inName
@@ -232,13 +234,13 @@
 			this.inName.Location = new System.Drawing.Point(102, 3);
 			this.inName.MaxLength = 255;
 			this.inName.Name = "inName";
-			this.inName.Size = new System.Drawing.Size(201, 20);
+			this.inName.Size = new System.Drawing.Size(145, 20);
 			this.inName.TabIndex = 0;
 			// 
 			// btnCancel
 			// 
 			this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnCancel.Location = new System.Drawing.Point(249, 280);
+			this.btnCancel.Location = new System.Drawing.Point(193, 313);
 			this.btnCancel.Name = "btnCancel";
 			this.btnCancel.Size = new System.Drawing.Size(66, 24);
 			this.btnCancel.TabIndex = 8;
@@ -252,7 +254,7 @@
 			this.btnConnect.DialogResult = System.Windows.Forms.DialogResult.OK;
 			this.btnConnect.Enabled = false;
 			this.btnConnect.Image = global::Gablarski.Clients.Windows.Properties.Resources.ServerConnectImage;
-			this.btnConnect.Location = new System.Drawing.Point(12, 280);
+			this.btnConnect.Location = new System.Drawing.Point(12, 313);
 			this.btnConnect.Name = "btnConnect";
 			this.btnConnect.Size = new System.Drawing.Size(75, 24);
 			this.btnConnect.TabIndex = 1;
@@ -264,7 +266,7 @@
 			// 
 			this.settingsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.settingsButton.Image = global::Gablarski.Clients.Windows.Properties.Resources.SettingsImage;
-			this.settingsButton.Location = new System.Drawing.Point(243, 6);
+			this.settingsButton.Location = new System.Drawing.Point(187, 6);
 			this.settingsButton.Name = "settingsButton";
 			this.settingsButton.Size = new System.Drawing.Size(75, 24);
 			this.settingsButton.TabIndex = 12;
@@ -291,7 +293,7 @@
 			// 
 			this.btnSaveServer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.btnSaveServer.Image = global::Gablarski.Clients.Windows.Properties.Resources.SaveImage;
-			this.btnSaveServer.Location = new System.Drawing.Point(150, 280);
+			this.btnSaveServer.Location = new System.Drawing.Point(94, 313);
 			this.btnSaveServer.Name = "btnSaveServer";
 			this.btnSaveServer.Size = new System.Drawing.Size(93, 24);
 			this.btnSaveServer.TabIndex = 7;
@@ -306,7 +308,7 @@
 			// 
 			this.btnEditServer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.btnEditServer.Image = global::Gablarski.Clients.Windows.Properties.Resources.ServerEditImage;
-			this.btnEditServer.Location = new System.Drawing.Point(150, 280);
+			this.btnEditServer.Location = new System.Drawing.Point(94, 313);
 			this.btnEditServer.Name = "btnEditServer";
 			this.btnEditServer.Size = new System.Drawing.Size(93, 24);
 			this.btnEditServer.TabIndex = 4;
@@ -320,7 +322,7 @@
 			// 
 			this.btnAddServer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.btnAddServer.Image = global::Gablarski.Clients.Windows.Properties.Resources.ServerAddImage;
-			this.btnAddServer.Location = new System.Drawing.Point(150, 280);
+			this.btnAddServer.Location = new System.Drawing.Point(94, 313);
 			this.btnAddServer.Name = "btnAddServer";
 			this.btnAddServer.Size = new System.Drawing.Size(93, 24);
 			this.btnAddServer.TabIndex = 2;
@@ -329,13 +331,22 @@
 			this.btnAddServer.UseVisualStyleBackColor = true;
 			this.btnAddServer.Click += new System.EventHandler(this.btnAddServer_Click);
 			// 
+			// lblPhonetic
+			// 
+			this.lblPhonetic.AutoSize = true;
+			this.lblPhonetic.Location = new System.Drawing.Point(6, 181);
+			this.lblPhonetic.Name = "lblPhonetic";
+			this.lblPhonetic.Size = new System.Drawing.Size(52, 13);
+			this.lblPhonetic.TabIndex = 14;
+			this.lblPhonetic.Text = "Phonetic:";
+			// 
 			// LoginForm
 			// 
 			this.AcceptButton = this.btnConnect;
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.AutoValidate = System.Windows.Forms.AutoValidate.EnableAllowFocusChange;
-			this.ClientSize = new System.Drawing.Size(330, 311);
+			this.ClientSize = new System.Drawing.Size(274, 344);
 			this.Controls.Add(this.settingsButton);
 			this.Controls.Add(this.startLocal);
 			this.Controls.Add(this.btnCancel);
@@ -383,5 +394,6 @@
 		private System.Windows.Forms.Button startLocal;
 		private System.Windows.Forms.Button settingsButton;
 		private System.Windows.Forms.TextBox inPhonetic;
+		private System.Windows.Forms.Label lblPhonetic;
 	}
 }
