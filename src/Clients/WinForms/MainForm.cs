@@ -76,10 +76,7 @@ namespace Gablarski.Clients.Windows
 
 		private void SourcesOnReceivedSourceList(object sender, ReceivedListEventArgs<AudioSource> args)
 		{
-			foreach (var s in args.Data.Where (s => s.OwnerId != this.gablarski.CurrentUser.UserId))
-			{
-				gablarski.Audio.Attach (playback, s, new AudioEnginePlaybackOptions());
-			}
+			gablarski.Audio.Attach (playback, args.Data.Where (s => s.OwnerId != this.gablarski.CurrentUser.UserId), new AudioEnginePlaybackOptions());
 		}
 
 		public void Connect (string host, int port)
@@ -87,19 +84,19 @@ namespace Gablarski.Clients.Windows
 			this.gablarski.Connect (host, port);
 		}
 
-		public void Connect (ServerEntry server)
+		public void Connect (ServerEntry connectTo)
 		{
-			if (String.IsNullOrEmpty (server.UserNickname))
+			if (String.IsNullOrEmpty (connectTo.UserNickname))
 			{
 				InputForm nickname = new InputForm();
 				if (nickname.ShowDialog () == DialogResult.Cancel)
 					return;
 
 				string nick = nickname.Input.Text.Trim();
-				server.UserNickname = nick;
+				connectTo.UserNickname = nick;
 			}
 
-			this.server = server;
+			this.server = connectTo;
 			Connect ();
 		}
 
@@ -399,7 +396,7 @@ namespace Gablarski.Clients.Windows
 					gablarski.Audio.BeginCapture (musicSource, gablarski.CurrentChannel);
 				}
 
-				users.Update (gablarski.Channels, gablarski.Users.Cast<UserInfo>(), gablarski.Sources);
+				users.Update (gablarski.Channels, gablarski.Users, gablarski.Sources);
 			}
 			else if (e.Result == SourceResult.NewSource)
 			{

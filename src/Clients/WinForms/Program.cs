@@ -26,7 +26,11 @@ namespace Gablarski.Clients.Windows
 			};
 
 			log4net.Config.XmlConfigurator.Configure ();
+
 			log4net.LogManager.GetLogger ("Gablarski WinForms").Info ("Program Start");
+
+			FileInfo program = new FileInfo (Process.GetCurrentProcess().MainModule.FileName);
+			Environment.CurrentDirectory = program.Directory.FullName;
 
 			if (Settings.FirstRun)
 			{
