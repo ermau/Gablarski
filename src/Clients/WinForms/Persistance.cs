@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.Common;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -15,10 +16,14 @@ namespace Gablarski.Clients.Windows
 	{
 		static Persistance()
 		{
+			DirectoryInfo gablarskiData = new DirectoryInfo (Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.ApplicationData), "Gablarski"));
+			if (!gablarskiData.Exists)
+				gablarskiData.Create();
+
 			if (Boolean.Parse (ConfigurationManager.AppSettings["useLocalDatabase"]))
 				DbFile = new FileInfo ("gablarski.db");
 			else
-				DbFile = new FileInfo (Path.Combine (System.Environment.GetFolderPath (System.Environment.SpecialFolder.ApplicationData), "Gablarski\\gablarski.db"));
+				DbFile = new FileInfo (Path.Combine (gablarskiData.FullName, "gablarski.db"));
 
 			var builder = new SQLiteConnectionStringBuilder();
 			builder.DataSource = DbFile.FullName;
