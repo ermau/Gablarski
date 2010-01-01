@@ -21,7 +21,6 @@ RequestExecutionLevel admin
 # Included files
 !include Sections.nsh
 !include MUI2.nsh
-!include DotNet.nsh
 
 # Variables
 Var StartMenuGroup
@@ -77,34 +76,34 @@ Section -Main SEC0000
     File ..\..\..\lib\OpenAL32.dll
     File ..\..\..\lib\OpenALSoft.License.txt
     File ..\..\..\lib\System.Data.SQLite.DLL
-    File ..\..\Gablarski\bin\Debug\Gablarski.dll
+    File ..\..\Gablarski\bin\{config}\Gablarski.dll
     File ..\..\..\Gablarski.License.txt
-    File ..\..\Gablarski\bin\Debug\Gablarski.pdb
-    File ..\..\Gablarski\bin\Debug\Gablarski.XML
-    File ..\..\Gablarski.Clients\bin\Debug\Gablarski.Clients.dll
-    File ..\..\Gablarski.Clients\bin\Debug\Gablarski.Clients.pdb
-    File ..\..\Gablarski.Clients\bin\Debug\Gablarski.Clients.XML
-    File ..\..\Gablarski.Growl\bin\Debug\Gablarski.Growl.dll
-    File ..\..\Gablarski.Growl\bin\Debug\Gablarski.Growl.pdb
-    File ..\..\Gablarski.Input.DirectInput\bin\Debug\Gablarski.Input.DirectInput.dll
-    File ..\..\Gablarski.Input.DirectInput\bin\Debug\Gablarski.Input.DirectInput.pdb
-    File ..\..\Gablarski.iTunes\bin\Debug\Gablarski.iTunes.dll
-    File ..\..\Gablarski.iTunes\bin\Debug\Gablarski.iTunes.pdb
+    File ..\..\Gablarski\bin\{config}\Gablarski.pdb
+    File ..\..\Gablarski\bin\{config}\Gablarski.XML
+    File ..\..\Gablarski.Clients\bin\{config}\Gablarski.Clients.dll
+    File ..\..\Gablarski.Clients\bin\{config}\Gablarski.Clients.pdb
+    File ..\..\Gablarski.Clients\bin\{config}\Gablarski.Clients.XML
+    File ..\..\Gablarski.Growl\bin\{config}\Gablarski.Growl.dll
+    File ..\..\Gablarski.Growl\bin\{config}\Gablarski.Growl.pdb
+    File ..\..\Gablarski.Input.DirectInput\bin\{config}\Gablarski.Input.DirectInput.dll
+    File ..\..\Gablarski.Input.DirectInput\bin\{config}\Gablarski.Input.DirectInput.pdb
+    File ..\..\Gablarski.iTunes\bin\{config}\Gablarski.iTunes.dll
+    File ..\..\Gablarski.iTunes\bin\{config}\Gablarski.iTunes.pdb
     File ..\..\..\lib\Interop.iTunesLib.dll
-    File ..\..\Gablarski.OpenAL\bin\Debug\Gablarski.OpenAL.dll
-    File ..\..\Gablarski.OpenAL\bin\Debug\Gablarski.OpenAL.pdb
-    File ..\..\Gablarski.SpeechNotifier\bin\Debug\Gablarski.SpeechNotifier.dll
-    File ..\..\Gablarski.SpeechNotifier\bin\Debug\Gablarski.SpeechNotifier.pdb
-    File ..\..\Gablarski.Winamp\bin\Debug\Gablarski.Winamp.dll
-    File ..\..\Gablarski.Winamp\bin\Debug\Gablarski.Winamp.pdb
-    File bin\x86\Debug\GablarskiClient.exe
-    File bin\x86\Debug\GablarskiClient.exe.config
-    File bin\x86\Debug\GablarskiClient.pdb
-    File bin\x86\Debug\Headphones.ico
-    File bin\x86\Debug\Microsoft.WindowsAPICodePack.dll
-    File bin\x86\Debug\Microsoft.WindowsAPICodePack.pdb
-    File bin\x86\Debug\Microsoft.WindowsAPICodePack.Shell.dll
-    File bin\x86\Debug\Microsoft.WindowsAPICodePack.Shell.pdb
+    File ..\..\Gablarski.OpenAL\bin\{config}\Gablarski.OpenAL.dll
+    File ..\..\Gablarski.OpenAL\bin\{config}\Gablarski.OpenAL.pdb
+    File ..\..\Gablarski.SpeechNotifier\bin\{config}\Gablarski.SpeechNotifier.dll
+    File ..\..\Gablarski.SpeechNotifier\bin\{config}\Gablarski.SpeechNotifier.pdb
+    File ..\..\Gablarski.Winamp\bin\{config}\Gablarski.Winamp.dll
+    File ..\..\Gablarski.Winamp\bin\{config}\Gablarski.Winamp.pdb
+    File bin\x86\{config}\GablarskiClient.exe
+    File bin\x86\{config}\GablarskiClient.exe.config
+    File bin\x86\{config}\GablarskiClient.pdb
+    File bin\x86\{config}\Headphones.ico
+    File bin\x86\{config}\Microsoft.WindowsAPICodePack.dll
+    File bin\x86\{config}\Microsoft.WindowsAPICodePack.pdb
+    File bin\x86\{config}\Microsoft.WindowsAPICodePack.Shell.dll
+    File bin\x86\{config}\Microsoft.WindowsAPICodePack.Shell.pdb
     WriteRegStr HKLM "${REGKEY}\Components" Main 1
     
     SetOutPath $TEMP
