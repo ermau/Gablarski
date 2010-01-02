@@ -82,12 +82,19 @@ namespace Gablarski.OpenAL.Providers
 			private set;
 		}
 
+		private bool isOpened;
 		public void BeginCapture (Audio.AudioFormat format)
 		{
 			CheckDevice();
 
-			if (!this.device.IsOpen)
+			if (!this.isOpened)
+			{
 				this.device.Open (44100, GetOpenALFormat (format));
+				this.isOpened = true;
+			}
+
+			if (!this.device.IsOpen)
+				return;
 
 			this.IsCapturing = true;
 			this.device.StartCapture();
@@ -96,6 +103,12 @@ namespace Gablarski.OpenAL.Providers
 		public void EndCapture ()
 		{
 			CheckDevice();
+
+			if (!this.isOpened)
+				return;
+
+			if (!this.device.IsOpen)
+				return;
 
 			this.IsCapturing = false;
 			this.device.StopCapture();
