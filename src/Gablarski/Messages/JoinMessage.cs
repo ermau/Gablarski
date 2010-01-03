@@ -48,7 +48,7 @@ namespace Gablarski.Messages
 		}
 		
 		public JoinMessage (string nickname, string serverPassword)
-			: this (nickname, null, serverPassword)
+			: this (nickname, nickname, serverPassword)
 		{
 		}
 

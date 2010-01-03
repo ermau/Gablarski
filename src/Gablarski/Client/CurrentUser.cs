@@ -134,6 +134,9 @@ namespace Gablarski.Client
 			if (nickname.IsNullOrWhitespace())
 				throw new ArgumentNullException ("nickname");
 
+			if (phonetic.IsNullOrWhitespace())
+				phonetic = nickname;
+
 			this.context.Connection.Send (new JoinMessage (nickname, phonetic, serverPassword));
 		}
 
