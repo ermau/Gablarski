@@ -468,8 +468,17 @@ namespace Gablarski.Clients.Windows
 		private void ContextAddChannelClick (object sender, EventArgs e)
 		{
 			ChannelForm addChannel = new ChannelForm ();
-			if (addChannel.ShowDialog() == DialogResult.OK)
-				Client.Channels.Create (addChannel.Channel);
+			if (addChannel.ShowDialog() != DialogResult.OK)
+				return;
+
+			if (this.SelectedNode != null)
+			{
+				var parent = (this.SelectedNode.Tag as ChannelInfo);
+				if (parent != null)
+					addChannel.Channel.ParentChannelId = parent.ChannelId;
+			}
+
+			this.Client.Channels.Create (addChannel.Channel);
 		}
 
 		private void ContextIgnoreUserClick (object sender, EventArgs e)
