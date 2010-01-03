@@ -657,7 +657,8 @@ namespace Gablarski.Clients.Windows
 		{
 			this.shuttingDown = true;
 
-			this.notifications.Close ();
+			if (this.notifications != null)
+				this.notifications.Close ();
 
 			this.gablarski.Disconnect();
 			LocalServer.Shutdown();
