@@ -491,7 +491,7 @@ namespace Gablarski.Clients.Windows
 						break;
 
 					case LoginResultState.FailedUsername:
-						reason = "The username supplied was not found or is invalid.";
+						reason = "This server requires a user login.";
 						break;
 
 					case LoginResultState.FailedServerPassword:
@@ -657,7 +657,8 @@ namespace Gablarski.Clients.Windows
 		{
 			this.shuttingDown = true;
 
-			this.notifications.Close ();
+			if (this.notifications != null)
+				this.notifications.Close ();
 
 			this.gablarski.Disconnect();
 			LocalServer.Shutdown();
