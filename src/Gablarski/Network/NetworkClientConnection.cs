@@ -112,6 +112,8 @@ namespace Gablarski.Network
 			
 			this.running = false;
 
+			this.pinger.Dispose();
+
 			try
 			{
 				if (this.tcp != null)
