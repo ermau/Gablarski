@@ -197,7 +197,7 @@ namespace Gablarski.Client
 		/// <exception cref="System.Net.Sockets.SocketException">Hostname could not be resolved.</exception>
 		public void Connect (string host, int port)
 		{
-			ThreadPool.QueueUserWorkItem (o => ConnectCore (((Tuple<string, int>)o)._1, ((Tuple<string, int>)o)._2), new Tuple<string, int> (host, port));
+			ThreadPool.QueueUserWorkItem (o => ConnectCore (((Tuple<string, int>)o).Item1, ((Tuple<string, int>)o).Item2), new Tuple<string, int> (host, port));
 		}
 
 		/// <summary>
@@ -356,10 +356,10 @@ namespace Gablarski.Client
 					#endif
 				}
 
-				found._2 (results.Select (r => new Tuple<ServerInfo, IPEndPoint> (r._1.ServerInfo, r._2)));
+				found.Item2 (results.Select (r => new Tuple<ServerInfo, IPEndPoint> (r.Item1.ServerInfo, r.Item2)));
 
-				Thread.Sleep (found._1);
-			} while (found._3());
+				Thread.Sleep (found.Item1);
+			} while (found.Item3());
 		}
 		#endregion
 	}
