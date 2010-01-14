@@ -32,14 +32,14 @@ namespace Gablarski.Clients.Windows
 		}
 
 		private HashSet<IPEndPoint> localServers = new HashSet<IPEndPoint>();
-		private void DisplayLocalServer (IEnumerable<Tuple<ServerInfo, IPEndPoint>> foundServers)
+		private void DisplayLocalServer (IEnumerable<Cadenza.Tuple<ServerInfo, IPEndPoint>> foundServers)
 		{
 			if (this.Disposing || this.IsDisposed)
 				return;
 
 			if (this.InvokeRequired)
 			{
-			    BeginInvoke ((Action<IEnumerable<Tuple<ServerInfo, IPEndPoint>>>)DisplayLocalServer, foundServers);
+			    BeginInvoke ((Action<IEnumerable<Cadenza.Tuple<ServerInfo, IPEndPoint>>>)DisplayLocalServer, foundServers);
 			    return;
 			}
 
@@ -47,15 +47,15 @@ namespace Gablarski.Clients.Windows
 
 			servers.BeginUpdate();
 
-			var found = foundServers.ToDictionary (t => t._2);
+			var found = foundServers.ToDictionary (t => t.Item2);
 			var updated = localServers.Intersect (found.Keys).Select (e => found[e]);
 			var deleted = localServers.Where (s => !found.ContainsKey (s));
-			var newly = foundServers.Where (s => !localServers.Contains (s._2));
+			var newly = foundServers.Where (s => !localServers.Contains (s.Item2));
 
 			foreach (var server in updated.Concat (newly))
 			{
-				var info = server._1;
-				var endpoint = server._2;
+				var info = server.Item1;
+				var endpoint = server.Item2;
 
 				string key = endpoint.Address + ":" + endpoint.Port;
 
@@ -63,7 +63,7 @@ namespace Gablarski.Clients.Windows
 				if (servers.Items.ContainsKey (key))
 				{
 					li = servers.Items[key];
-					li.Text = server._1.Name;
+					li.Text = server.Item1.Name;
 				}
 				else
 					li = servers.Items.Add (key, info.Name, 0);
@@ -81,7 +81,7 @@ namespace Gablarski.Clients.Windows
 			}
 			servers.EndUpdate();
 
-			this.localServers = new HashSet<IPEndPoint> (foundServers.Select (s => s._2));
+			this.localServers = new HashSet<IPEndPoint> (foundServers.Select (s => s.Item2));
 		}
 
 		private void servers_SelectedIndexChanged (object sender, EventArgs e)

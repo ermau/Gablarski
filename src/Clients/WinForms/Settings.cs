@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Cadenza.Collections;
 using Gablarski.Clients.Windows.Entities;
 using Cadenza;
 
