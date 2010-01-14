@@ -41,6 +41,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 using System.Security;
 using Cadenza;
+using Cadenza.Collections;
 
 namespace Gablarski.OpenAL
 {
