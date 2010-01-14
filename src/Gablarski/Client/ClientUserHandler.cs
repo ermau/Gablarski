@@ -40,7 +40,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
-using Cadenza;
+using Cadenza.Collections;
 using Gablarski.Messages;
 using System.Threading;
 
