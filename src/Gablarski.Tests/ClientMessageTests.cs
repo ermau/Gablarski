@@ -249,5 +249,41 @@ namespace Gablarski.Tests
 			Assert.AreEqual (length, stream.Position);
 			Assert.AreEqual (true, msg.ServerInfoOnly);
 		}
+
+		[Test]
+		public void RegisterInvalid()
+		{
+			Assert.Throws<ArgumentNullException> (() => new RegisterMessage (null, "Password"));
+			Assert.Throws<ArgumentException> (() => new RegisterMessage (String.Empty, "Password"));
+
+			Assert.Throws<ArgumentNullException> (() => new RegisterMessage ("Username", null));
+			Assert.Throws<ArgumentException> (() => new RegisterMessage ("Username", String.Empty));
+		}
+
+		[Test]
+		public void Register()
+		{
+			var msg = new RegisterMessage ("Username", "Password");
+			Assert.AreEqual ("Username", msg.Username);
+			Assert.AreEqual ("Password", msg.Password);
+
+			msg = AssertLengthMatches (msg, () => new RegisterMessage());
+			Assert.AreEqual ("Username", msg.Username);
+			Assert.AreEqual ("Password", msg.Password);
+		}
+
+		private T AssertLengthMatches<T> (T msg, Func<T> newMessage)
+			where T : MessageBase
+		{
+			msg.WritePayload (writer);
+			long len = stream.Position;
+			stream.Position = 0;
+
+			msg = newMessage();
+			msg.ReadPayload (reader);
+			Assert.AreEqual (len, stream.Position);
+
+			return msg;
+		}
 	}
 }

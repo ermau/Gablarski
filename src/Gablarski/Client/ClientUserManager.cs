@@ -83,7 +83,7 @@ namespace Gablarski.Client
 		public void Update (IEnumerable<UserInfo> userUpdate)
 		{
 			if (userUpdate == null)
-				throw new ArgumentNullException ("users");
+				throw new ArgumentNullException ("userUpdate");
 				
 			lock (SyncRoot)
 			{
@@ -135,7 +135,7 @@ namespace Gablarski.Client
 				if (!users.TryGetValue (user.UserId, out oldUser))
 					oldUser = user;
 				
-				UserInfo newUser = new UserInfo (oldUser.Nickname, user.Phonetic, user.Username, user.UserId, user.CurrentChannelId, !user.IsMuted);
+				users[user.UserId] = new UserInfo (oldUser.Nickname, user.Phonetic, user.Username, user.UserId, user.CurrentChannelId, !user.IsMuted);
 			}
 		}
 		

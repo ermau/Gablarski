@@ -56,11 +56,6 @@ namespace Gablarski.Server
 		bool UserExists (string username);
 
 		/// <summary>
-		/// Gets the type used to identify users.
-		/// </summary>
-		Type IdentifyingType { get; }
-
-		/// <summary>
 		/// Attempts to login a user using the supplied <paramref name="username"/> and <paramref name="password"/>.
 		/// </summary>
 		/// <param name="username">The username to login with.</param>
