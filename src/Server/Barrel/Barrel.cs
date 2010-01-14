@@ -28,8 +28,8 @@ namespace Gablarski.Barrel
 
 				log.Info ("Checking configuration");
 
-				Type channelProviderType, authProviderType, permissionProviderType;
-				if (!LoadProviderTypes (serverConfig, log, out channelProviderType, out authProviderType, out permissionProviderType))
+				Type channelProviderType, authProviderType, permissionProviderType, backendProviderType;
+				if (!LoadProviderTypes (serverConfig, log, out backendProviderType, out channelProviderType, out authProviderType, out permissionProviderType))
 					continue;
 
 				IEnumerable<Type> connectionProviderTypes;
@@ -42,6 +42,7 @@ namespace Gablarski.Barrel
 
 				log.Info ("Setting up");
 
+				IBackendProvider backend;
 				IChannelProvider channels;
 				IAuthenticationProvider auth;
 				IPermissionsProvider permissions;
@@ -92,15 +93,36 @@ namespace Gablarski.Barrel
 			}
 		}
 
-		static bool LoadProviderTypes (ServerElement server, ILog log, out Type channelProvider, out Type authProvider, out Type permissionProvider)
+		static bool LoadProviderTypes (ServerElement server, ILog log, out Type backendProvider, out Type channelProvider, out Type authProvider, out Type permissionProvider)
 		{
 			bool errors = false;
 
-			channelProvider = Type.GetType (server.ChannelProvider);
-			if (channelProvider == null)
+			bool backendFound = false;
+
+			backendProvider = null;
+			if (server.BackendProvider != null)
 			{
-				log.WarnFormat ("Channel provider {0} not found", server.ChannelProvider);
-				errors = true;
+				backendProvider = Type.GetType (server.BackendProvider);
+				if (backendProvider == null)
+                    log.Info ("No backend provider found, looking for individual providers.");
+				else
+					backendFound = true;
+			}
+
+			channelProvider = null;
+			if (server.ChannelProvider != null)
+			{
+				if (backendFound)
+					log.Warn ("Channel provider found, but ignored.");
+				else
+				{
+					channelProvider = Type.GetType (server.ChannelProvider);
+					if (channelProvider == null)
+					{
+						log.WarnFormat ("Channel provider {0} not found", server.ChannelProvider);
+						errors = true;
+					}
+				}
 			}
 
 			authProvider = Type.GetType (server.AuthenticationProvider);

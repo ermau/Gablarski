@@ -27,21 +27,28 @@ namespace Gablarski.Barrel.Config
 			set { this["port"] = value; }
 		}
 
-		[ConfigurationProperty ("channels", IsRequired = true)]
+		[ConfigurationProperty ("backend", IsRequired=false)]
+		public string BackendProvider
+		{
+			get { return (string)this["backend"]; }
+			set { this["backend"] = value; }
+		}
+
+		[ConfigurationProperty ("channels", IsRequired = false)]
 		public string ChannelProvider
 		{
 			get { return (string) this["channels"]; }
 			set { this["channels"] = value; }
 		}
 
-		[ConfigurationProperty ("authentication", IsRequired = true)]
+		[ConfigurationProperty ("authentication", IsRequired = false)]
 		public string AuthenticationProvider
 		{
 			get { return (string)this["authentication"]; }
 			set { this["authentication"] = value; }
 		}
 
-		[ConfigurationProperty ("permissions", IsRequired = true)]
+		[ConfigurationProperty ("permissions", IsRequired = false)]
 		public string PermissionsProvider
 		{
 			get { return (string)this["permissions"]; }
