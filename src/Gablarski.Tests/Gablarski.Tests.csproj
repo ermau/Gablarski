@@ -138,8 +138,7 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>xcopy /y "$(SolutionDir)lib\libcelt.dll" "$(TargetDir)"
-xcopy /y "$(SolutionDir)lib\libspeexdsp.dll" "$(TargetDir)"
-xcopy /y "$(SolutionDir)lib\OpenAL32.dll" "$(TargetDir)"</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>
