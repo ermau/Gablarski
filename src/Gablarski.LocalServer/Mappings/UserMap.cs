@@ -12,8 +12,9 @@ namespace Gablarski.LocalServer.Mappings
 	{
 		public UserMap()
 		{
-			Id (x => x.UserId, "userID");
-			Map (x => x.UserId, "userName");
+			Id (x => x.Id, "userID");
+			Map (x => x.UserName, "userName");
+			Map (x => x.EncryptedPassword, "userPassword");
 		}
 	}
 }

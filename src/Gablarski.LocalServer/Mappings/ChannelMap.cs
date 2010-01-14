@@ -15,7 +15,7 @@ namespace Gablarski.LocalServer.Mappings
 			Map (x => x.ParentChannelId, "channelParentID");
 			Map (x => x.Name, "channelName");
 			Map (x => x.Description, "channelDescription");
-			Map (x => x.PlayerLimit, "channelLimit");
+			Map (x => x.UserLimit, "channelLimit");
 		}
 	}
 }
