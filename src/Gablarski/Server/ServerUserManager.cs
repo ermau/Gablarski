@@ -39,6 +39,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cadenza.Collections;
 using Gablarski.Messages;
 
 namespace Gablarski.Server
@@ -197,10 +198,7 @@ namespace Gablarski.Server
 					return;
 				
 				loggedIn.Remove (connection);
-				
-				var c = GetUser (connection);
-				if (c != null)
-					connectedUsers.Remove (c);
+				connectedUsers.Inverse.Remove (connection);
 			}
 		}
 
@@ -250,11 +248,12 @@ namespace Gablarski.Server
 			if (connection == null)
 				throw new ArgumentNullException ("connection");
 
-			UserInfo user = null;
+			UserInfo user;// = null;
 			lock (SyncRoot)
 			{
-				if (connectedUsers.ContainsValue (connection))
-					user = connectedUsers.FirstOrDefault (kvp => kvp.Value == connection).Key;
+				connectedUsers.TryGetKey (connection, out user);
+				//if (connectedUsers.ContainsValue (connection))
+				//    user = connectedUsers.FirstOrDefault (kvp => kvp.Value == connection).Key;
 			}
 
 			return user;
@@ -280,7 +279,7 @@ namespace Gablarski.Server
 		private readonly HashSet<IConnection> joined = new HashSet<IConnection>();
 		private readonly HashSet<IConnection> loggedIn = new HashSet<IConnection>();
 		private readonly HashSet<IConnection> connections = new HashSet<IConnection>();
-		private readonly Dictionary<UserInfo, IConnection> connectedUsers = new Dictionary<UserInfo, IConnection>();
+		private readonly BidirectionalDictionary<UserInfo, IConnection> connectedUsers = new BidirectionalDictionary<UserInfo, IConnection>();
 
 		#region IEnumerable Members
 
