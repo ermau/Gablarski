@@ -42,12 +42,30 @@ using Gablarski.Client;
 
 namespace Gablarski.Audio
 {
+	/// <summary>
+	/// Contract for receiving audio and audio sources.
+	/// </summary>
 	public interface IAudioReceiver
 	{
+		/// <summary>
+		/// An audio source was muted or unmuted.
+		/// </summary>
+		event EventHandler<AudioSourceMutedEventArgs> AudioSourceMuted;
+
+		/// <summary>
+		/// An audio source started playing.
+		/// </summary>
 		event EventHandler<AudioSourceEventArgs> AudioSourceStarted;
+
+		/// <summary>
+		/// An audio source stopped playing.
+		/// </summary>
 		event EventHandler<AudioSourceEventArgs> AudioSourceStopped;
+
+		/// <summary>
+		/// Audio data was received.
+		/// </summary>
 		event EventHandler<ReceivedAudioEventArgs> ReceivedAudio;
-		event EventHandler<ReceivedListEventArgs<AudioSource>> AudioSourcesRemoved;
 	}
 
 	public class AudioSourceEventArgs
