@@ -92,8 +92,9 @@ namespace Gablarski.Tests
 			engine.AudioReceiver = receiver;
 			engine.AudioSender = sender;
 			engine.Context = context;
+
 			engine.Start();
-			Assert.Throws<InvalidOperationException> (engine.Start);
+			Assert.DoesNotThrow (engine.Start);
 		}
 
 		[Test]

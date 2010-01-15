@@ -311,14 +311,15 @@ namespace Gablarski.Audio
 
 		public void Start()
 		{
+			if (IsRunning)
+				return;
+
 			if (this.AudioReceiver == null)
 				throw new InvalidOperationException ("AudioReceiver is not set.");
 			if (this.AudioSender == null)
 				throw new InvalidOperationException ("AudioSender is not set.");
 			if (this.Context == null)
 				throw new InvalidOperationException ("Context is not set.");
-			if (this.running)
-				throw new InvalidOperationException ("Engine is already running.");
 
 			this.running = true;
 
@@ -331,6 +332,9 @@ namespace Gablarski.Audio
 
 		public void Stop ()
 		{
+			if (!IsRunning)
+				return;
+
 			this.running = false;
 
 			if (this.AudioReceiver != null)
