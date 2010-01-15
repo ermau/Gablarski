@@ -271,7 +271,7 @@ namespace Gablarski.Client
 		}
 
 		/// <summary>
-		/// Searches for local servers and calls <paramref name="serverFound"/> for each server found.
+		/// Searches for local servers and calls <paramref name="serversFound"/> for each server found.
 		/// </summary>
 		/// <param name="serversFound">Called each <paramref name="frequency"/> when servers return.</param>
 		/// <param name="frequency">How many milliseconds between arrival of servers and the next query.</param>

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -35,9 +35,7 @@
 // DAMAGE.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Gablarski.Messages;
 
 namespace Gablarski.Audio
@@ -53,10 +51,12 @@ namespace Gablarski.Audio
 		void BeginSending (AudioSource source);
 
 		/// <summary>
-		/// Sends a frame of audio data to the source
+		/// Sends a frame of audio data to the source.
 		/// </summary>
 		/// <param name="source">The source to send from.</param>
-		/// <param name="frame"></param>
+		/// <param name="targetType">The type that the <paramref name="targetIds"/> belong to.</param>
+		/// <param name="targetIds">The ids of the targets to send audio to.</param>
+		/// <param name="frame">The unencoded PCM matching <paramref name="source"/>'s attributes.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
 		/// <exception cref="ArgumentException"><paramref name="source"/> does not belong to you.</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="frame"/> is <c>null</c>.</exception>
@@ -64,7 +64,7 @@ namespace Gablarski.Audio
 		void SendAudioData (AudioSource source, TargetType targetType, int[] targetIds, byte[] frame);
 
 		/// <summary>
-		/// Sends notifications that you're finished sending audio from <paramref name="source"/> to <paramref name="channel"/>.
+		/// Sends notifications that you're finished sending audio from <paramref name="source"/>.
 		/// </summary>
 		/// <param name="source">The source to send from.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>

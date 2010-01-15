@@ -1,4 +1,4 @@
-// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -37,10 +37,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using Gablarski.Audio;
 using Gablarski.Messages;
 
@@ -255,12 +252,6 @@ namespace Gablarski.Client
 		private readonly Dictionary<int, AudioSource> sources = new Dictionary<int, AudioSource>();
 		private readonly HashSet<AudioSource> ignoredSources = new HashSet<AudioSource>();
 
-		/// <summary>
-		/// Sends notifications that you're begining to send audio from <paramref name="source"/> to <paramref name="channel"/>.
-		/// </summary>
-		/// <param name="source">The source to send from.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
-		/// <exception cref="ArgumentException"><paramref name="source"/> does not belong to you.</exception>
 		void IAudioSender.BeginSending (AudioSource source)
 		{
 			if (source == null)
@@ -273,15 +264,6 @@ namespace Gablarski.Client
 			OnAudioSourceStarted (new AudioSourceEventArgs (source));
 		}
 
-		/// <summary>
-		/// Sends a frame of audio data to the source
-		/// </summary>
-		/// <param name="source">The source to send from.</param>
-		/// <param name="data"></param>
-		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
-		/// <exception cref="ArgumentException"><paramref name="source"/> does not belong to you.</exception>
-		/// <exception cref="ArgumentNullException"><paramref name="data"/> is <c>null</c>.</exception>
-		/// <exception cref="ArgumentException"><paramref name="data"/> is empty.</exception>
 		void IAudioSender.SendAudioData (AudioSource source, TargetType type,  int[] targets, byte[] data)
 		{
 			#if DEBUG
@@ -306,13 +288,6 @@ namespace Gablarski.Client
 			});
 		}
 
-		/// <summary>
-		/// Sends notifications that you're finished sending audio from <paramref name="source"/> to <paramref name="channel"/>.
-		/// </summary>
-		/// <param name="source">The source to send from.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
-		/// <exception cref="ArgumentException"><paramref name="source"/> does not belong to you.</exception>
-		/// <exception cref="ArgumentNullException"><paramref name="channel"/> is <c>null</c>.</exception>
 		void IAudioSender.EndSending (AudioSource source)
 		{
 			if (source == null)
@@ -333,13 +308,9 @@ namespace Gablarski.Client
 			{
 				AudioSource source;
 				if (!sources.TryGetValue (updatedSource.Id, out source))
-				{
-					sources[updatedSource.Id] = source = updatedSource;
-				}
+					sources[updatedSource.Id] = updatedSource;
 				else
-				{
 					CopySource (source, updatedSource);
-				}
 			}
 		}
 
@@ -367,22 +338,9 @@ namespace Gablarski.Client
 			}
 		}
 
-		private void CopySource (AudioSource target, AudioSource updatedSource)
-		{
-			target.Name = updatedSource.Name;
-			target.Id = updatedSource.Id;
-			target.OwnerId = updatedSource.OwnerId;
-			target.Bitrate = updatedSource.Bitrate;
-			target.IsMuted = updatedSource.IsMuted;
-
-			target.Channels = updatedSource.Channels;
-			target.Frequency = updatedSource.Frequency;
-			target.FrameSize = updatedSource.FrameSize;
-		}
-
 		internal void OnSourceListReceivedMessage (MessageReceivedEventArgs e)
 		{
-		    var msg = (SourceListMessage)e.Message;
+			var msg = (SourceListMessage)e.Message;
 
 			lock (sources)
 			{
@@ -394,14 +352,14 @@ namespace Gablarski.Client
 
 		internal void OnSourceResultMessage (MessageReceivedEventArgs e)
 		{
-		    var msg = (SourceResultMessage)e.Message;
+			var msg = (SourceResultMessage)e.Message;
 
 			var source = new AudioSource (msg.Source);
 
 			if (msg.SourceResult == SourceResult.Succeeded || msg.SourceResult == SourceResult.NewSource)
 				UpdateSourceFromExternal (source);
 
-		    OnReceivedSource (new ReceivedAudioSourceEventArgs (msg.SourceName, source, msg.SourceResult));
+			OnReceivedSource (new ReceivedAudioSourceEventArgs (msg.SourceName, source, msg.SourceResult));
 		}
 
 		internal void OnSourcesRemovedMessage (MessageReceivedEventArgs e)
@@ -469,6 +427,7 @@ namespace Gablarski.Client
 		}
 
 		#region Event Invokers
+
 		protected virtual void OnAudioSourceStarted (AudioSourceEventArgs e)
 		{
 			var started = this.AudioSourceStarted;
@@ -517,10 +476,25 @@ namespace Gablarski.Client
 			if (muted != null)
 				muted (this, e);
 		}
+
 		#endregion
+
+		private static void CopySource (AudioSource target, AudioSource updatedSource)
+		{
+			target.Name = updatedSource.Name;
+			target.Id = updatedSource.Id;
+			target.OwnerId = updatedSource.OwnerId;
+			target.Bitrate = updatedSource.Bitrate;
+			target.IsMuted = updatedSource.IsMuted;
+
+			target.Channels = updatedSource.Channels;
+			target.Frequency = updatedSource.Frequency;
+			target.FrameSize = updatedSource.FrameSize;
+		}
 	}
 
 	#region Event Args
+
 	public class AudioSourceMutedEventArgs
 		: AudioSourceEventArgs
 	{
@@ -570,5 +544,6 @@ namespace Gablarski.Client
 			private set;
 		}
 	}
+
 	#endregion
 }

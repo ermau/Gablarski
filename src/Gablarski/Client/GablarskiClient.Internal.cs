@@ -1,4 +1,4 @@
-// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -36,7 +36,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -51,9 +50,9 @@ namespace Gablarski.Client
 	{
 		protected ServerInfo serverInfo;
 
-		protected log4net.ILog log = log4net.LogManager.GetLogger ("GablarskiClient");
+		protected readonly log4net.ILog Log = log4net.LogManager.GetLogger ("GablarskiClient");
 
-		protected Dictionary<ServerMessageType, Action<MessageReceivedEventArgs>> handlers;
+		protected Dictionary<ServerMessageType, Action<MessageReceivedEventArgs>> Handlers;
 		protected internal IClientConnection Connection
 		{
 			get;
@@ -71,7 +70,7 @@ namespace Gablarski.Client
 
 		protected void Setup (ClientUserHandler userMananger, ClientChannelManager channelManager, ClientSourceManager sourceManager, CurrentUser currentUser, IAudioEngine audioEngine)
 		{
-			if (this.handlers != null)
+			if (this.Handlers != null)
 				return;
 
 			this.Audio = audioEngine;
@@ -80,7 +79,7 @@ namespace Gablarski.Client
 			this.Channels = channelManager;
 			this.Sources = sourceManager;
 
-			this.handlers = new Dictionary<ServerMessageType, Action<MessageReceivedEventArgs>>
+			this.Handlers = new Dictionary<ServerMessageType, Action<MessageReceivedEventArgs>>
 			{
 				{ ServerMessageType.PermissionDenied, OnPermissionDeniedMessage },
 
@@ -129,18 +128,18 @@ namespace Gablarski.Client
 					var msg = (e.Message as ServerMessage);
 					if (msg == null)
 					{
-						log.Error ("Non ServerMessage received (" + e.Message.MessageTypeCode + "), disconnecting.");
+						this.Log.Error ("Non ServerMessage received (" + e.Message.MessageTypeCode + "), disconnecting.");
 						Connection.Disconnect ();
 						return;
 					}
 
-					if (log.IsDebugEnabled)
-						log.Debug ("Message Received: " + msg.MessageType);
+					if (this.Log.IsDebugEnabled)
+						this.Log.Debug ("Message Received: " + msg.MessageType);
 
 					if (this.running)
 					{
 						Action<MessageReceivedEventArgs> handler;
-						if (this.handlers.TryGetValue (msg.MessageType, out handler))
+						if (this.Handlers.TryGetValue (msg.MessageType, out handler))
 							handler (e);
 					}
 				}
