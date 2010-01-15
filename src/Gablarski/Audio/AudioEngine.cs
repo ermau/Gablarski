@@ -46,22 +46,31 @@ namespace Gablarski.Audio
 	public class AudioEngine
 		: IAudioEngine
 	{
+		/// <summary>
+		/// Gets or sets the client context.
+		/// </summary>
 		public IClientContext Context
 		{
-			get;
-			set;
+			get { return this.context; }
+			set
+			{
+				if (IsRunning)
+					throw new InvalidOperationException ("Can not change context while the engine is running.");
+
+				this.context = value;
+			}
 		}
 
 		/// <summary>
-		/// Gets or sets the audio receiver
+		/// Gets or sets the audio receiver.
 		/// </summary>
 		public IAudioReceiver AudioReceiver
 		{
 			get { return this.audioReceiver; }
 			set
 			{
-				if (this.running)
-					throw new InvalidOperationException ("Can not change audio receivers while running.");
+				if (IsRunning)
+					throw new InvalidOperationException ("Can not change audio receivers while the engine is running.");
 
 				this.audioReceiver = value;
 			}
@@ -71,11 +80,17 @@ namespace Gablarski.Audio
 		{
 			get { return this.running; }
 		}
-		
+
 		public IAudioSender AudioSender
 		{
-			get;
-			set;
+			get { return this.audioSender; }
+			set
+			{
+				if (IsRunning)
+					throw new InvalidOperationException ("Can not change AudioSender while the engine is running.");
+
+				this.audioSender = value;
+			}
 		}
 
 		public void Attach (IPlaybackProvider playback, IEnumerable<AudioSource> sources, AudioEnginePlaybackOptions options)
@@ -214,8 +229,6 @@ namespace Gablarski.Audio
 				throw new ArgumentNullException ("source");
 			if (channels == null)
 				throw new ArgumentNullException ("channels");
-			if (AudioSender == null)
-				throw new InvalidOperationException ("AudioSender not set.");
 			#endif
 
 			lock (captures)
@@ -299,7 +312,11 @@ namespace Gablarski.Audio
 		public void Start()
 		{
 			if (this.AudioReceiver == null)
-				throw new InvalidOperationException ("AudioReceive not set.");
+				throw new InvalidOperationException ("AudioReceiver is not set.");
+			if (this.AudioSender == null)
+				throw new InvalidOperationException ("AudioSender is not set.");
+			if (this.Context == null)
+				throw new InvalidOperationException ("Context is not set.");
 			if (this.running)
 				throw new InvalidOperationException ("Engine is already running.");
 
@@ -347,6 +364,8 @@ namespace Gablarski.Audio
 
 		private Thread engineThread;
 
+		private IClientContext context;
+		private IAudioSender audioSender;
 		private IAudioReceiver audioReceiver;
 
 		private void OnReceivedAudio (object sender, ReceivedAudioEventArgs e)

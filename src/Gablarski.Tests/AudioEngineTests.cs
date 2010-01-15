@@ -12,7 +12,9 @@ namespace Gablarski.Tests
 	[TestFixture]
 	public class AudioEngineTests
 	{
+		private IClientContext context;
 		private IAudioReceiver receiver;
+		private IAudioSender sender;
 		private ICaptureProvider provider;
 		private AudioSource source;
 
@@ -21,7 +23,11 @@ namespace Gablarski.Tests
 		{
 			this.provider = new MockCaptureProvider();
 			this.source = new AudioSource ("mockSource", 1, 1, 1, 64000, 44100, 256, 10, false);
-			this.receiver = new GablarskiClient (new MockClientConnection (new MockConnectionProvider().EstablishConnection())).Sources;
+
+			var client = new GablarskiClient (new MockClientConnection (new MockConnectionProvider().EstablishConnection()));
+			this.context = client;
+			this.sender = client.Sources;
+			this.receiver = client.Sources;
 		}
 
 		[TearDown]
@@ -30,6 +36,8 @@ namespace Gablarski.Tests
 			this.provider = null;
 			this.source = null;
 			this.receiver = null;
+			this.sender = null;
+			this.context = null;
 		}
 
 		[Test]
@@ -54,6 +62,26 @@ namespace Gablarski.Tests
 		public void StartWithoutReceiver()
 		{
 			var engine = new AudioEngine();
+			engine.AudioSender = new ClientSourceManager (context);
+			engine.Context = context;
+			Assert.Throws<InvalidOperationException> (engine.Start);
+		}
+
+		[Test]
+		public void StartWithoutSender()
+		{
+			var engine = new AudioEngine();
+			engine.AudioReceiver = receiver;
+			engine.Context = context;
+			Assert.Throws<InvalidOperationException> (engine.Start);
+		}
+
+		[Test]
+		public void StartWithoutContext()
+		{
+			var engine = new AudioEngine();
+			engine.AudioReceiver = receiver;
+			engine.AudioSender = sender;
 			Assert.Throws<InvalidOperationException> (engine.Start);
 		}
 
@@ -62,6 +90,8 @@ namespace Gablarski.Tests
 		{
 			var engine = new AudioEngine();
 			engine.AudioReceiver = receiver;
+			engine.AudioSender = sender;
+			engine.Context = context;
 			engine.Start();
 			Assert.Throws<InvalidOperationException> (engine.Start);
 		}
@@ -71,6 +101,8 @@ namespace Gablarski.Tests
 		{
 			var engine = new AudioEngine();
 			engine.AudioReceiver = receiver;
+			engine.AudioSender = sender;
+			engine.Context = context;
 			engine.Start();
 
 			Assert.IsTrue (engine.IsRunning);
@@ -83,6 +115,8 @@ namespace Gablarski.Tests
 		{
 			var engine = new AudioEngine();
 			engine.AudioReceiver = receiver;
+			engine.AudioSender = sender;
+			engine.Context = context;
 			engine.Start();
 
 			engine.Stop();

@@ -89,18 +89,27 @@ namespace Gablarski.Audio
 
 	public interface IAudioEngine
 	{
+		/// <summary>
+		/// Gets whether the engine is currently running or not.
+		/// </summary>
 		bool IsRunning { get; }
 
+		/// <summary>
+		/// Gets or sets the client context for the engine.
+		/// </summary>
+		/// <exception cref="InvalidOperationException"><see cref="IsRunning"/> is <c>true</c>.</exception>
 		IClientContext Context { get; set; }
 
 		/// <summary>
 		/// Gets or sets the audio receiver.
 		/// </summary>
+		/// <exception cref="InvalidOperationException"><see cref="IsRunning"/> is <c>true</c>.</exception>
 		IAudioReceiver AudioReceiver { get; set; }
 
 		/// <summary>
 		/// Gets or sets the audio sender.
 		/// </summary>
+		/// <exception cref="InvalidOperationException"><see cref="IsRunning"/> is <c>true</c>.</exception>
 		IAudioSender AudioSender { get; set; }
 
 		/// <summary>
@@ -148,15 +157,18 @@ namespace Gablarski.Audio
 
 		/// <exception cref="ArgumentNullException"><paramref name="capture"/> is <c>null</c>.</exception>
 		void Mute (ICaptureProvider capture);
+		/// <exception cref="ArgumentNullException"><paramref name="capture"/> is <c>null</c>.</exception>
 		void Unmute (ICaptureProvider capture);
 
 		/// <exception cref="ArgumentNullException"><paramref name="playback"/> is <c>null</c>.</exception>
 		void Mute (IPlaybackProvider playback);
+		/// <exception cref="ArgumentNullException"><paramref name="playback"/> is <c>null</c>.</exception>
 		void Unmute (IPlaybackProvider playback);
 
 		/// <summary>
 		/// Starts the audio engine.
 		/// </summary>
+		/// <exception cref="System.InvalidOperationException"><see cref="AudioSender"/>, <see cref="AudioReceiver"/> or <see cref="Context"/> are not set.</exception>
 		void Start();
 
 		/// <summary>
@@ -169,9 +181,9 @@ namespace Gablarski.Audio
 		/// </summary>
 		/// <param name="source"></param>
 		/// <param name="channels"></param>
-		/// <exception cref="ArgumentNullException"><paramref name="source"/> or <paramref name="channel"/> are <c>null</c>.</exception>
-		/// <exception cref="InvalidOperationException"><see cref="AudioSender"/> is not set or <paramref name="source"/> is configured for <see cref="AudioEngineCaptureMode.Activated"/>.</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="source"/> or <paramref name="channels"/> are <c>null</c>.</exception>
 		void BeginCapture (AudioSource source, IEnumerable<ChannelInfo> channels);
+		/// <exception cref="ArgumentNullException"><paramref name="source"/> or <paramref name="users"/> are <c>null</c>.</exception>
 		void BeginCapture (AudioSource source, IEnumerable<UserInfo> users);
 		
 		void EndCapture (AudioSource source);
