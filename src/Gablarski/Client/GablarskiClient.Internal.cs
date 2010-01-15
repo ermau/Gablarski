@@ -246,7 +246,7 @@ namespace Gablarski.Client
 			DisconnectCore ((ReconnectAutomatically) ? DisconnectHandling.Reconnect : DisconnectHandling.None, e.Connection);
 		}
 
-		private void ConnectCore(string host, int port)
+		private void ConnectCore (string host, int port)
 		{
 			if (host.IsNullOrWhitespace ())
 				throw new ArgumentException ("host must not be null or empty", "host");
@@ -267,9 +267,10 @@ namespace Gablarski.Client
 				this.Connection.Connect (endPoint);
 				this.Connection.Send (new ConnectMessage { ProtocolVersion = ProtocolVersion, Host = host, Port = port });
 
+				if (this.Audio == null)
+					this.Audio = new AudioEngine { AudioSender = this.Sources, AudioReceiver = this.Sources };
+
 				this.Audio.Context = this;
-				this.Audio.AudioSender = this.Sources;
-				this.Audio.AudioReceiver = this.Sources;
 				this.Audio.Start();
 			}
 			catch (SocketException)

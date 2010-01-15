@@ -54,7 +54,7 @@ namespace Gablarski.Client
 		public static readonly int ProtocolVersion = 5;
 
 		public GablarskiClient (IClientConnection connection)
-			: this (connection, new AudioEngine())
+			: this (connection, null)
 		{
 		}
 
