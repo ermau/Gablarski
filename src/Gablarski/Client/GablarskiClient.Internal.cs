@@ -253,7 +253,7 @@ namespace Gablarski.Client
 
 			try
 			{
-				IPEndPoint endPoint = new IPEndPoint (Dns.GetHostAddresses (host).Where (ip => ip.AddressFamily == AddressFamily.InterNetwork).First(), port);
+				IPEndPoint endPoint = new IPEndPoint (Dns.GetHostAddresses (host).First (ip => ip.AddressFamily == AddressFamily.InterNetwork), port);
 
 				this.running = true;
 
@@ -267,8 +267,12 @@ namespace Gablarski.Client
 				this.Connection.Connect (endPoint);
 				this.Connection.Send (new ConnectMessage { ProtocolVersion = ProtocolVersion, Host = host, Port = port });
 
-				if (this.Audio == null)
-					this.Audio = new AudioEngine { AudioSender = this.Sources, AudioReceiver = this.Sources };
+				if (Audio == null)
+					Audio = new AudioEngine();
+				if (Audio.AudioSender == null)
+					Audio.AudioSender = Sources;
+				if (Audio.AudioReceiver == null)
+					Audio.AudioReceiver = Sources;
 
 				this.Audio.Context = this;
 				this.Audio.Start();
