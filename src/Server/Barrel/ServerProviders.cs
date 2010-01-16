@@ -1,4 +1,4 @@
-// Copyright (c) 2010, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -34,18 +34,75 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
-using System.Configuration;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Gablarski.Server;
 
-namespace Gablarski.Barrel.Config
+namespace Gablarski.Barrel
 {
-	public class BarrelConfiguration
-		: ConfigurationSection
+	public class ServerProviders
 	{
-		[ConfigurationProperty ("servers", IsDefaultCollection = true)]
-		[ConfigurationCollection (typeof (ServerElementCollection), AddItemName = "server")]
-		public ServerElementCollection Servers
+		public ServerProviders (IBackendProvider backend, IEnumerable<IConnectionProvider> cproviders)
+			: this (cproviders)
 		{
-			get { return (ServerElementCollection) base["servers"]; }
+			if (backend == null)
+				throw new ArgumentNullException ("backend");
+
+			Backend = backend;
+		}
+
+		public ServerProviders (IChannelProvider channels, IAuthenticationProvider auth, IPermissionsProvider permissions, IEnumerable<IConnectionProvider> cproviders)
+			: this (cproviders)
+		{
+			if (channels == null)
+				throw new ArgumentNullException ("channels");
+			if (auth == null)
+				throw new ArgumentNullException ("auth");
+			if (permissions == null)
+				throw new ArgumentNullException ("permissions");
+
+			Channels = channels;
+			Authentication = auth;
+			Permissions = permissions;
+		}
+
+		private ServerProviders (IEnumerable<IConnectionProvider> cproviders)
+		{
+			if (cproviders == null)
+				throw new ArgumentNullException ("cproviders");
+
+			ConnectionProviders = cproviders;
+		}
+
+		public IEnumerable<IConnectionProvider> ConnectionProviders
+		{
+			get;
+			private set;
+		}
+
+		public IBackendProvider Backend
+		{
+			get;
+			private set;
+		}
+
+		public IChannelProvider Channels
+		{
+			get;
+			private set;
+		}
+
+		public IAuthenticationProvider Authentication
+		{
+			get;
+			private set;
+		}
+
+		public IPermissionsProvider Permissions
+		{
+			get;
+			private set;
 		}
 	}
 }

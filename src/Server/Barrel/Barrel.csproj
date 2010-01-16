@@ -70,15 +70,18 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Barrel.cs" />
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Config\BarrelConfiguration.cs" />
     <Compile Include="Config\ConnectionProviderElement.cs" />
-    <Compile Include="Config\ConnectionProviderElementCollection.cs" />
+    <Compile Include="Config\ProviderElementCollection.cs" />
     <Compile Include="Config\ServerElement.cs" />
     <Compile Include="Config\ServerElementCollection.cs" />
+    <Compile Include="ServerProviders.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Barrel.exe.config">

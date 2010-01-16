@@ -1,6 +1,43 @@
+// Copyright (c) 2010, Eric Maupin
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with
+// or without modification, are permitted provided that
+// the following conditions are met:
+//
+// - Redistributions of source code must retain the above 
+//   copyright notice, this list of conditions and the
+//   following disclaimer.
+//
+// - Redistributions in binary form must reproduce the above
+//   copyright notice, this list of conditions and the
+//   following disclaimer in the documentation and/or other
+//   materials provided with the distribution.
+//
+// - Neither the name of Gablarski nor the names of its
+//   contributors may be used to endorse or promote products
+//   or services derived from this software without specific
+//   prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS
+// AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+// WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+// PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+// HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+// INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+// GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+// THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+// DAMAGE.
+
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.Linq;
 using Gablarski.Barrel.Config;
 using Gablarski.Network;
@@ -11,8 +48,10 @@ namespace Gablarski.Barrel
 {
 	public class Barrel
 	{
-		public static void Main (string[] args)
+		public static void Main ()
 		{
+			Trace.Listeners.Add (new ConsoleTraceListener());
+
 			log4net.Config.XmlConfigurator.Configure ();
 			
 			var config = (BarrelConfiguration)ConfigurationManager.GetSection ("barrel");
@@ -27,119 +66,36 @@ namespace Gablarski.Barrel
 				var log = LogManager.GetLogger (serverConfig.Name);
 
 				log.Info ("Checking configuration");
-
-				Type channelProviderType, authProviderType, permissionProviderType, backendProviderType;
-				if (!LoadProviderTypes (serverConfig, log, out backendProviderType, out channelProviderType, out authProviderType, out permissionProviderType))
-					continue;
-
-				IEnumerable<Type> connectionProviderTypes;
-				LoadConnectionProviders (serverConfig, log, out connectionProviderTypes);
-				if (connectionProviderTypes.Count() <= 0)
+				if (!serverConfig.CheckConfiguration (log))
 				{
-					log.WarnFormat ("No connection providers found");
+					log.Warn ("Errors found in configuration, skipping server");
+					continue;
+				}
+
+				ServerProviders providers = serverConfig.GetProviders (log);
+				if (providers == null)
+				{
+					log.Warn ("Errors loading server configuration, skipping server");
 					continue;
 				}
 
 				log.Info ("Setting up");
 
-				IBackendProvider backend;
-				IChannelProvider channels;
-				IAuthenticationProvider auth;
-				IPermissionsProvider permissions;
-				IEnumerable<IConnectionProvider> connectionProviders;
+				GablarskiServer server;
+				if (providers.Backend != null)
+					server = new GablarskiServer (new ServerSettings(), providers.Backend);
+				else
+					server = new GablarskiServer (new ServerSettings(), providers.Authentication, providers.Permissions, providers.Channels);
 
-				try
-				{
-					channels = (IChannelProvider) Activator.CreateInstance (channelProviderType);
-					auth = (IAuthenticationProvider) Activator.CreateInstance (authProviderType);
-					permissions = (IPermissionsProvider) Activator.CreateInstance (permissionProviderType);
-
-					connectionProviders = connectionProviderTypes.Select (ptype => (IConnectionProvider) Activator.CreateInstance (ptype)).ToList();
-				}
-				catch (Exception ex)
-				{
-					log.Warn ("Error while setting up", ex);
-					continue;
-				}
-
-				GablarskiServer server = new GablarskiServer (new ServerSettings(), auth, permissions, channels);
 				server.AddConnectionProvider (new NetworkServerConnectionProvider { Port = serverConfig.Port });
 
-				foreach (IConnectionProvider provider in connectionProviders)
-					server.AddConnectionProvider (provider);
+				foreach (IConnectionProvider provider in providers.ConnectionProviders)
+				    server.AddConnectionProvider (provider);
+
+				log.Info ("Starting server");
 
 				server.Start();
 			}
-		}
-
-		static void LoadConnectionProviders (ServerElement serverConfig, ILog log, out IEnumerable<Type> providers)
-		{
-			List<Type> cproviders = new List<Type>();
-			providers = cproviders;
-
-			if (serverConfig.ConnectionProviders == null)
-				return;
-
-			foreach (ConnectionProviderElement cproviderElement in serverConfig.ConnectionProviders)
-			{
-				Type provider = Type.GetType (cproviderElement.Type);
-				if (provider == null)
-				{
-					log.WarnFormat ("Connection provider {0} not found", cproviderElement.Type);
-					continue;
-				}
-
-				cproviders.Add (provider);
-			}
-		}
-
-		static bool LoadProviderTypes (ServerElement server, ILog log, out Type backendProvider, out Type channelProvider, out Type authProvider, out Type permissionProvider)
-		{
-			bool errors = false;
-
-			bool backendFound = false;
-
-			backendProvider = null;
-			if (server.BackendProvider != null)
-			{
-				backendProvider = Type.GetType (server.BackendProvider);
-				if (backendProvider == null)
-                    log.Info ("No backend provider found, looking for individual providers.");
-				else
-					backendFound = true;
-			}
-
-			channelProvider = null;
-			if (server.ChannelProvider != null)
-			{
-				if (backendFound)
-					log.Warn ("Channel provider found, but ignored.");
-				else
-				{
-					channelProvider = Type.GetType (server.ChannelProvider);
-					if (channelProvider == null)
-					{
-						log.WarnFormat ("Channel provider {0} not found", server.ChannelProvider);
-						errors = true;
-					}
-				}
-			}
-
-			authProvider = Type.GetType (server.AuthenticationProvider);
-			if (authProvider == null)
-			{
-				log.WarnFormat ("Authorization provider {0} not found", server.AuthenticationProvider);
-				errors = true;
-			}
-
-			permissionProvider = Type.GetType (server.PermissionsProvider);
-			if (permissionProvider == null)
-			{
-				log.WarnFormat ("Permissions provider {0} not found", server.PermissionsProvider);
-				errors = true;
-			}
-
-			return !errors;
 		}
 	}
 }

@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Gablarski.Barrel.Config
 {
-	public class ConnectionProviderElementCollection
+	public class ProviderElementCollection
 		: ConfigurationElementCollection, IEnumerable<ConnectionProviderElement>
 	{
 		protected override ConfigurationElement CreateNewElement()
