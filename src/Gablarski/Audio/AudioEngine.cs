@@ -272,7 +272,9 @@ namespace Gablarski.Audio
 
 				e.Talking = false;
 				AudioSender.EndSending (source);
-				e.Capture.EndCapture ();
+
+				if (e.Capture.IsCapturing)
+					e.Capture.EndCapture ();
 			}
 		}
 
@@ -433,7 +435,10 @@ namespace Gablarski.Audio
 						{
 							bool talking = c.Value.Talking;
 							if (c.Value.CurrentTargets == null || c.Value.CurrentTargets.Length == 0)
-								break;
+							{
+								c.Value.TargetType = TargetType.Channel;
+								c.Value.CurrentTargets = new[] { Context.GetCurrentChannel().ChannelId };
+							}
 
 							byte[] samples = c.Value.Capture.ReadSamples (c.Key.FrameSize);
 							if (c.Value.Options.Mode == AudioEngineCaptureMode.Activated)
