@@ -130,7 +130,7 @@ namespace Gablarski.OpenAL
 		/// </summary>
 		public void StartCapture ()
 		{
-			if (this.Handle == IntPtr.Zero)
+			if (!IsOpen)
 				throw new InvalidOperationException ("Device not open");
 
 			ThrowIfDisposed();
@@ -147,7 +147,7 @@ namespace Gablarski.OpenAL
 		/// </summary>
 		public void StopCapture ()
 		{
-			if (this.Handle == IntPtr.Zero)
+			if (!IsOpen)
 				throw new InvalidOperationException ("Device not open");
 
 			ThrowIfDisposed();
