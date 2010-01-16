@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -131,6 +131,42 @@ namespace Gablarski.Audio
 		/// <param name="options">Capturing options.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="capture"/> or <paramref name="source"/> or <paramref name="options"/> are <c>null</c>.</exception>
 		void Attach (ICaptureProvider capture, AudioFormat format, AudioSource source, AudioEngineCaptureOptions options);
+
+		/// <summary>
+		/// Updates <paramref name="source"/> with <paramref name="options"/>.
+		/// </summary>
+		/// <param name="source">The source to update.</param>
+		/// <param name="options">The new options to set for <paramref name="source"/>.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="source"/> or <paramref name="options"/> are <c>null</c>.</exception>
+		/// <exception cref="ArgumentException"><paramref name="source"/> is not attached.</exception>
+		void Update (AudioSource source, AudioEngineCaptureOptions options);
+
+		/// <summary>
+		/// Updates <paramref name="source"/> with new capture targets.
+		/// </summary>
+		/// <param name="source">The source to update.</param>
+		/// <param name="channels">The new target channels.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="source"/> or <paramref name="channels"/> are <c>null</c>.</exception>
+		/// <exception cref="ArgumentException"><paramref name="source"/> is not attached.</exception>
+		void Update (AudioSource source, IEnumerable<ChannelInfo> channels);
+
+		/// <summary>
+		/// Updates <paramref name="source"/> with new capture targets.
+		/// </summary>
+		/// <param name="source">The source to update.</param>
+		/// <param name="users">The new target users.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="source"/> or <paramref name="users"/> are <c>null</c>.</exception>
+		/// <exception cref="ArgumentException"><paramref name="source"/> is not attached.</exception>
+		void Update (AudioSource source, IEnumerable<UserInfo> users);
+
+		/// <summary>
+		/// Updates <paramref name="source"/> with <paramref name="options"/>.
+		/// </summary>
+		/// <param name="source">The source to update.</param>
+		/// <param name="options">The new options to set for <paramref name="source"/>.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="source"/> or <paramref name="options"/> are <c>null</c>.</exception>
+		/// <exception cref="ArgumentException"><paramref name="source"/> is not attached.</exception>
+		void Update (AudioSource source, AudioEnginePlaybackOptions options);
 
 		/// <summary>
 		/// Stops any captures on the given provider.

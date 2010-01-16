@@ -153,6 +153,83 @@ namespace Gablarski.Audio
 			}
 		}
 
+		public void Update (AudioSource source, AudioEngineCaptureOptions options)
+		{
+			if (source == null)
+				throw new ArgumentNullException ("source");
+			if (options == null)
+				throw new ArgumentNullException ("options");
+
+			lock (captures)
+			{
+				AudioCaptureEntity c;
+				if (!captures.TryGetValue (source, out c))
+					throw new ArgumentException ("source is not attached", "source");
+
+				if (c.Talking && c.Options.Mode != options.Mode)
+					AudioSender.EndSending (source);
+				
+				var newc = new AudioCaptureEntity (c.Capture, c.Format, source, options);
+				newc.TargetType = c.TargetType;
+				newc.CurrentTargets = c.CurrentTargets;
+
+				captures[source] = newc;
+			}
+		}
+
+		public void Update (AudioSource source, AudioEnginePlaybackOptions options)
+		{
+			if (source == null)
+				throw new ArgumentNullException ("source");
+			if (options == null)
+				throw new ArgumentNullException ("options");
+
+			lock (playbacks)
+			{
+				AudioPlaybackEntity p;
+				if (!playbacks.TryGetValue (source, out p))
+					throw new ArgumentException ("source is not attached", "source");
+
+				playbacks[source] = new AudioPlaybackEntity (p.Playback, source, options);
+			}
+		}
+
+		public void Update (AudioSource source, IEnumerable<ChannelInfo> channels)
+		{
+			if (source == null)
+				throw new ArgumentNullException ("source");
+			if (channels == null)
+				throw new ArgumentNullException ("channels");
+
+			lock (captures)
+			{
+				AudioCaptureEntity ce;
+				if (!captures.TryGetValue (source, out ce))
+					throw new ArgumentException ("source is not attached", "source");
+
+				ce.TargetType = TargetType.Channel;
+				ce.CurrentTargets = channels.Select (c => c.ChannelId).ToArray();
+			}
+		}
+
+		public void Update (AudioSource source, IEnumerable<UserInfo> users)
+		{
+			if (source == null)
+				throw new ArgumentNullException ("source");
+			if (users == null)
+				throw new ArgumentNullException ("users");
+
+			lock (captures)
+			{
+				AudioCaptureEntity ce;
+				if (!captures.TryGetValue (source, out ce))
+					throw new ArgumentException ("source is not attached", "source");
+
+				ce.TargetType = TargetType.User;
+				ce.CurrentTargets = users.Select (c => c.UserId).ToArray();
+			}
+		}
+
 		public bool Detach (IPlaybackProvider provider)
 		{
 			if (provider == null)
