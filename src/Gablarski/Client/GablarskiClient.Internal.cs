@@ -73,7 +73,7 @@ namespace Gablarski.Client
 			if (this.Handlers != null)
 				return;
 
-			this.Audio = audioEngine;
+			this.Audio = (audioEngine ?? new AudioEngine());
 			this.CurrentUser = currentUser;
 			this.users = userMananger;
 			this.Channels = channelManager;
@@ -266,8 +266,6 @@ namespace Gablarski.Client
 				this.Connection.Connect (endPoint);
 				this.Connection.Send (new ConnectMessage { ProtocolVersion = ProtocolVersion, Host = host, Port = port });
 
-				if (Audio == null)
-					Audio = new AudioEngine();
 				if (Audio.AudioSender == null)
 					Audio.AudioSender = Sources;
 				if (Audio.AudioReceiver == null)
