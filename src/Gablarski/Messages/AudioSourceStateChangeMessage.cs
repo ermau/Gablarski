@@ -56,6 +56,11 @@ namespace Gablarski.Messages
 
 		#region Overrides of MessageBase
 
+		public override bool Reliable
+		{
+			get { return false; }
+		}
+
 		public override void WritePayload(IValueWriter writer)
 		{
 			writer.WriteBool (this.Starting);
