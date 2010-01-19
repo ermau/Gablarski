@@ -53,6 +53,7 @@ namespace Gablarski.Network
 		public NetworkClientConnection()
 		{
 			this.log = log4net.LogManager.GetLogger ("CNetwork");
+			debugLogging = this.log.IsDebugEnabled;
 		}
 	
 		#region Implementation of IConnection
@@ -87,7 +88,7 @@ namespace Gablarski.Network
 		/// <exception cref="System.ArgumentNullException"><paramref name="message"/> is <c>null</c>.</exception>
 		public void Send (MessageBase message)
 		{
-			if (log.IsDebugEnabled)
+			if (debugLogging)
 				log.DebugFormat ("Enqueuing {1} message {0} for send", message.MessageTypeCode, (message.Reliable) ? "reliable" : "unreliable");
 
 			lock (sendQueue)
@@ -213,6 +214,8 @@ namespace Gablarski.Network
 
 		#endregion
 
+		private readonly bool debugLogging;
+
 		private volatile bool running;
 		private Thread runnerThread;
 
@@ -251,7 +254,7 @@ namespace Gablarski.Network
 						toSend = queue.Dequeue ();
 					}
 
-					if (log.IsDebugEnabled)
+					if (debugLogging)
 						log.DebugFormat ("Dequeued {1} message {0} for send", toSend.MessageTypeCode, (toSend.Reliable) ? "reliable" : "unreliable");
 
 					IValueWriter iwriter = (!toSend.Reliable) ? writeUnreliable : writeReliable;
@@ -306,7 +309,7 @@ namespace Gablarski.Network
 				{
 					msg.ReadPayload (this.rreader);
 					
-					if (log.IsDebugEnabled)
+					if (debugLogging)
 						log.DebugFormat ("Received message {0} from server", msg.MessageTypeCode);
 
 					OnMessageReceived (new MessageReceivedEventArgs (this, msg));
@@ -364,7 +367,7 @@ namespace Gablarski.Network
 				}
 				else
 				{
-					if (log.IsDebugEnabled)
+					if (debugLogging)
 						log.DebugFormat ("Received message {0} from {1}", msg.MessageTypeCode, endpoint);
 				
 					msg.ReadPayload (reader);
