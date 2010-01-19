@@ -50,8 +50,7 @@ namespace Gablarski.OpenAL
 
 		public Source RequestSource (T owner)
 		{
-			if (OpenAL.Log.IsDebugEnabled)
-				OpenAL.Log.DebugFormat ("SourcePool: Requesting source for {0}", owner);
+			OpenAL.DebugFormat ("SourcePool: Requesting source for {0}", owner);
 
 			Source free;
 
@@ -59,8 +58,7 @@ namespace Gablarski.OpenAL
 			{
 				if (owner == lastOwner && lastSource != null)
 				{
-					if (OpenAL.Log.IsDebugEnabled)
-						OpenAL.Log.DebugFormat ("SourcePool: Returning last source for {0}", owner);
+					OpenAL.DebugFormat ("SourcePool: Returning last source for {0}", owner);
 
 					return lastSource;
 				}
@@ -74,15 +72,15 @@ namespace Gablarski.OpenAL
 					if (free == null)
 					{
 						free = Source.Generate ();
-						OpenAL.Log.DebugFormat ("SourcePool: Couldn't find a free source for {0}, created {1}", owner, free);
+						OpenAL.DebugFormat ("SourcePool: Couldn't find a free source for {0}, created {1}", owner, free);
 					}
-					else if (OpenAL.Log.IsDebugEnabled)
-						OpenAL.Log.DebugFormat ("SourcePool: Found free source {0} for {1}", free, owner);
+					else
+						OpenAL.DebugFormat ("SourcePool: Found free source {0} for {1}", free, owner);
 	
 					owners[free] = owner;
 				}
-				else if (OpenAL.Log.IsDebugEnabled)
-					OpenAL.Log.DebugFormat ("SourcePool: Found owned source {0} for {1}", free, owner);
+				else
+					OpenAL.DebugFormat ("SourcePool: Found owned source {0} for {1}", free, owner);
 
 				lastOwner = owner;
 				lastSource = free;
@@ -133,8 +131,7 @@ namespace Gablarski.OpenAL
 
 		public void Tick()
 		{
-			if (OpenAL.Log.IsDebugEnabled)
-				OpenAL.Log.Debug ("SourcePool: Tick");
+			OpenAL.Debug ("SourcePool: Tick");
 		
 			Source[] tofree = new Source[owners.Count];
 			int i = 0;
@@ -145,9 +142,8 @@ namespace Gablarski.OpenAL
 				{
 					if (!s.IsStopped)
 						continue;
-	
-					if (OpenAL.Log.IsDebugEnabled)
-						OpenAL.Log.DebugFormat ("SourcePool: {0} is stopped, freeing", s);
+
+					OpenAL.DebugFormat ("SourcePool: {0} is stopped, freeing", s);
 					
 					tofree[i++] = s;
 	

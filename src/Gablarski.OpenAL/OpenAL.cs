@@ -55,12 +55,9 @@ namespace Gablarski.OpenAL
 			#endif
 
 			Log = log4net.LogManager.GetLogger ("OpenAL");
+			DebugLogging = Log.IsDebugEnabled;
+
 			IsCaptureSupported = GetIsExtensionPresent ("ALC_EXT_CAPTURE");
-		}
-		
-		public static log4net.ILog Log
-		{
-			get; private set;
 		}
 
 		/// <summary>
@@ -142,7 +139,7 @@ namespace Gablarski.OpenAL
 		{
 			defaultDevice = null;
 			
-			OpenAL.Log.Debug ("Getting playback devices");
+			OpenAL.Debug ("Getting playback devices");
 
 			string defaultName = null;
 			string[] strings = new string[0];
@@ -166,7 +163,7 @@ namespace Gablarski.OpenAL
 				if (s == defaultName)
 					defaultDevice = devices[i];
 				
-				OpenAL.Log.DebugFormat ("Found playback device {0}{1}", s, (s == defaultName) ? " (Default)" : String.Empty);
+				OpenAL.DebugFormat ("Found playback device {0}{1}", s, (s == defaultName) ? " (Default)" : String.Empty);
 			}
 
 			return devices;
@@ -193,7 +190,7 @@ namespace Gablarski.OpenAL
 			if (!IsCaptureSupported)
 				throw new NotSupportedException();
 			
-			OpenAL.Log.Debug ("Getting capture devices");
+			OpenAL.Debug ("Getting capture devices");
 
 			defaultDevice = null;
 
@@ -209,7 +206,7 @@ namespace Gablarski.OpenAL
 				if (s == defaultName)
 					defaultDevice = devices[i];
 				
-				OpenAL.Log.DebugFormat ("Found capture device {0}{1}", s, (s == defaultName) ? " (Default)" : String.Empty);
+				OpenAL.DebugFormat ("Found capture device {0}{1}", s, (s == defaultName) ? " (Default)" : String.Empty);
 			}
 
 			return devices;
@@ -289,6 +286,29 @@ namespace Gablarski.OpenAL
 		internal static extern void alDistanceModel (DistanceModel model);
 		// ReSharper restore InconsistentNaming
 		#endregion
+
+		internal static bool DebugLogging
+		{
+			get;
+			private set;
+		}
+		
+		internal static log4net.ILog Log
+		{
+			get; private set;
+		}
+
+		internal static void Debug (string message)
+		{
+			if (DebugLogging)
+				Log.Debug (message);
+		}
+
+		internal static void DebugFormat (string format, params object[] args)
+		{
+			if (DebugLogging)
+				Log.DebugFormat (format, args);
+		}
 
 		internal static bool GetIsExtensionPresent (string extension)
 		{

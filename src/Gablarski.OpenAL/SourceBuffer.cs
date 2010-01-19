@@ -108,7 +108,7 @@ namespace Gablarski.OpenAL
 				if (this.disposed)
 					return;
 					
-				OpenAL.Log.DebugFormat ("Destroying source buffer {0}", this.bufferID);
+				OpenAL.DebugFormat ("Destroying source buffer {0}", this.bufferID);
 
 				alDeleteBuffers (1, new[] { this.bufferID });
 				Buffers.Remove (this.bufferID);
@@ -133,7 +133,7 @@ namespace Gablarski.OpenAL
 
 		public static SourceBuffer[] Generate (int count)
 		{
-			OpenAL.Log.DebugFormat ("Generating {0} source buffers", count);
+			OpenAL.DebugFormat ("Generating {0} source buffers", count);
 			
 			lock (lck)
 			{
@@ -148,7 +148,8 @@ namespace Gablarski.OpenAL
 
 				for (int i = 0; i < count; ++i)
 				{
-					OpenAL.Log.DebugFormat ("Generated source buffer {0}", bufferIDs[i]);
+					OpenAL.DebugFormat ("Generated source buffer {0}", bufferIDs[i]);
+
 					buffers[i] = new SourceBuffer (bufferIDs[i]);
 					Buffers.Add (buffers[i].bufferID, buffers[i]);
 				}

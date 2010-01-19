@@ -59,7 +59,7 @@ namespace Gablarski.OpenAL
 
 		public void Activate ()
 		{
-			OpenAL.Log.DebugFormat ("Activating context for device {0}", this.Device.Name);
+			OpenAL.DebugFormat ("Activating context for device {0}", this.Device.Name);
 			
 			alcMakeContextCurrent (this.Handle);
 			OpenAL.ErrorCheck (this.Device);
@@ -88,7 +88,7 @@ namespace Gablarski.OpenAL
 				contexts.Remove (this.Handle);
 			}
 			
-			OpenAL.Log.DebugFormat ("Destroying context for {0}", Device.Name);
+			OpenAL.DebugFormat ("Destroying context for {0}", Device.Name);
 			
 			this.disposed = true;
 		}
@@ -135,7 +135,7 @@ namespace Gablarski.OpenAL
 
 		internal static Context Create (PlaybackDevice device)
 		{
-			OpenAL.Log.DebugFormat ("Creating context for {0}", device.Name);
+			OpenAL.DebugFormat ("Creating context for {0}", device.Name);
 			
 			Context c = null;
 			lock (lck)

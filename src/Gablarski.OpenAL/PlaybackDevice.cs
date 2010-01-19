@@ -59,7 +59,7 @@ namespace Gablarski.OpenAL
 		{
 			ThrowIfDisposed();
 
-			OpenAL.Log.DebugFormat ("Opening playback device {0}", Name);
+			OpenAL.DebugFormat ("Opening playback device {0}", Name);
 			
 			this.Handle = alcOpenDevice (this.Name);
 
@@ -98,7 +98,7 @@ namespace Gablarski.OpenAL
 			if (this.Handle == IntPtr.Zero)
 				return;
 
-			OpenAL.Log.DebugFormat ("Destroying playback device {0}", Name);
+			OpenAL.DebugFormat ("Destroying playback device {0}", Name);
 
 			alcCloseDevice (this.Handle);
 			this.Handle = IntPtr.Zero;

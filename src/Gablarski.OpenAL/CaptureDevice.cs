@@ -103,7 +103,7 @@ namespace Gablarski.OpenAL
 		{
 			ThrowIfDisposed();
 			
-			OpenAL.Log.DebugFormat ("Opening capture device {0} at {1} {2}", Name, frequency, format);
+			OpenAL.DebugFormat ("Opening capture device {0} at {1} {2}", Name, frequency, format);
 
 			this.Format = format;
 			this.Frequency = frequency;
@@ -135,7 +135,7 @@ namespace Gablarski.OpenAL
 
 			ThrowIfDisposed();
 			
-			OpenAL.Log.DebugFormat ("Starting capture for {0}", Name);
+			OpenAL.DebugFormat ("Starting capture for {0}", Name);
 			
 			this.capturing = true;
 			alcCaptureStart (this.Handle);
@@ -152,7 +152,7 @@ namespace Gablarski.OpenAL
 
 			ThrowIfDisposed();
 			
-			OpenAL.Log.DebugFormat ("Stopping capture for {0}", Name);
+			OpenAL.DebugFormat ("Stopping capture for {0}", Name);
 			
 			this.capturing = false;
 			alcCaptureStop (this.Handle);
@@ -200,7 +200,7 @@ namespace Gablarski.OpenAL
 			
 			this.disposed = true;
 			
-			OpenAL.Log.DebugFormat ("Destroying capture device {0}", Name);		
+			OpenAL.DebugFormat ("Destroying capture device {0}", Name);		
 		}
 
 		#region Imports
