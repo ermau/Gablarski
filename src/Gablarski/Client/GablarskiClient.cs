@@ -60,6 +60,8 @@ namespace Gablarski.Client
 
 		public GablarskiClient (IClientConnection connection, IAudioEngine audioEngine)
 		{
+			DebugLogging = Log.IsDebugEnabled;
+
 			this.Connection = connection;
 			Setup (new ClientUserHandler (this), new ClientChannelManager (this), new ClientSourceManager (this), new CurrentUser (this), audioEngine);
 		}

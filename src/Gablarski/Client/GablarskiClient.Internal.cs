@@ -51,6 +51,7 @@ namespace Gablarski.Client
 		protected ServerInfo serverInfo;
 
 		protected readonly log4net.ILog Log = log4net.LogManager.GetLogger ("GablarskiClient");
+		protected readonly bool DebugLogging;
 
 		protected Dictionary<ServerMessageType, Action<MessageReceivedEventArgs>> Handlers;
 		protected internal IClientConnection Connection
@@ -133,7 +134,7 @@ namespace Gablarski.Client
 						return;
 					}
 
-					if (this.Log.IsDebugEnabled)
+					if (DebugLogging)
 						this.Log.Debug ("Message Received: " + msg.MessageType);
 
 					if (this.running)
