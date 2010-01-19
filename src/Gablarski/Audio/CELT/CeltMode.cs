@@ -49,6 +49,10 @@ namespace Gablarski.CELT
 		{
 			this.mode = mode;
 			this.SampleRate = sampleRate;
+
+			NumberOfChannels = GetValue (Request.GET_NB_CHANNELS);
+			FrameSize = GetValue (Request.GET_FRAME_SIZE);
+			LookAhead = GetValue (Request.GET_LOOKAHEAD);
 		}
 
 		public bool IsDisposed
@@ -70,7 +74,8 @@ namespace Gablarski.CELT
 		/// </summary>
 		public int NumberOfChannels
 		{
-			get { return GetValue (Request.GET_NB_CHANNELS); }
+			get;
+			private set;
 		}
 
 		/// <summary>
@@ -78,7 +83,8 @@ namespace Gablarski.CELT
 		/// </summary>
 		public int LookAhead
 		{
-			get { return GetValue (Request.GET_LOOKAHEAD); }
+			get;
+			private set;
 		}
 
 		/// <summary>
@@ -86,7 +92,8 @@ namespace Gablarski.CELT
 		/// </summary>
 		public int FrameSize
 		{
-			get { return GetValue (Request.GET_FRAME_SIZE); }
+			get;
+			private set;
 		}
 
 		private IntPtr mode;
