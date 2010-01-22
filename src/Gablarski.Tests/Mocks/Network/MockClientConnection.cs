@@ -38,6 +38,13 @@ namespace Gablarski.Tests
 			this.server.Receive (message);
 		}
 
+		public override void Disconnect()
+		{
+			server.Disconnect();
+
+			base.Disconnect();
+		}
+
 		private readonly MockServerConnection server;
 
 		protected override string Name

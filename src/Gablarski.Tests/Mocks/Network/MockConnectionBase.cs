@@ -105,7 +105,7 @@ namespace Gablarski.Tests
 
 		public abstract void Send (MessageBase message);
 
-		public void Disconnect ()
+		public virtual void Disconnect ()
 		{
 			this.connected = false;
 			var dced = this.Disconnected;
