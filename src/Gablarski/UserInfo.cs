@@ -1,4 +1,4 @@
-// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -65,6 +65,11 @@ namespace Gablarski
 		
 		internal UserInfo (string nickname, string username, int userId, int currentChannelId, bool muted)
 			: this (nickname, null, username, userId, currentChannelId, muted)
+		{
+		}
+
+		internal UserInfo (string nickname, string phonetic, UserInfo info)
+			: this (nickname, phonetic, info.Username, info.UserId, info.CurrentChannelId, info.IsMuted)
 		{
 		}
 

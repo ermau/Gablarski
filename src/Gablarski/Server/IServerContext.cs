@@ -1,4 +1,4 @@
-// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -34,18 +34,64 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
+using System;
 using System.Collections.Generic;
 
 namespace Gablarski.Server
 {
 	public interface IServerContext
 	{
+		object SyncRoot { get; }
+
+		/// <summary>
+		/// Gets the backend provider for the server (<c>null</c> if not specified).
+		/// </summary>
+		IBackendProvider BackendProvider { get; }
+
+		/// <summary>
+		/// Gets the authentication provider for the server.
+		/// </summary>
+		IAuthenticationProvider AuthenticationProvider { get; }
+
+		/// <summary>
+		/// Gets the permissions provider for the server.
+		/// </summary>
+		IPermissionsProvider PermissionsProvider { get; }
+
+		/// <summary>
+		/// Gets the channel provider for the server.
+		/// </summary>
+		IChannelProvider ChannelsProvider { get; }
+
 		/// <summary>
 		/// Gets the protocol version of the server.
 		/// </summary>
 		int ProtocolVersion { get; }
 
+		/// <summary>
+		/// Gets the connection handler for the server.
+		/// </summary>
+		IConnectionHandler Connections { get; }
+
+		/// <summary>
+		/// Gets the user handler for the server.
+		/// </summary>
 		IServerUserHandler Users { get; }
+
+		/// <summary>
+		/// Gets the user manager for the server.
+		/// </summary>
+		IServerUserManager UserManager { get; }
+
+		/// <summary>
+		/// Gets the source handler for the server.
+		/// </summary>
+		IServerSourceHandler Sources { get; }
+
+		/// <summary>
+		/// Gets the channel handler for the server.
+		/// </summary>
+		IServerChannelHandler Channels { get; }
 
 		/// <summary>
 		/// Gets the redirectors for this server.
@@ -53,5 +99,67 @@ namespace Gablarski.Server
 		IEnumerable<IRedirector> Redirectors { get; }
 
 		ServerSettings Settings { get; }
+	}
+
+	public static class ServerContextExtensions
+	{
+		public static bool GetPermission (this IServerContext self, PermissionName name, IConnection connection)
+		{
+			if (self == null)
+				throw new ArgumentNullException ("self");
+			if (connection == null)
+				throw new ArgumentNullException ("connection");
+
+			UserInfo user = self.UserManager.GetUser (connection);
+			if (user == null)
+				return false;
+
+			return self.GetPermission (name, user.CurrentChannelId, user.UserId);
+		}
+
+		public static bool GetPermission (this IServerContext self, PermissionName name, UserInfo user)
+		{
+			if (user == null)
+				throw new ArgumentNullException ("user");
+
+			return GetPermission (self, name, user.CurrentChannelId, user.UserId);
+		}
+
+		public static bool GetPermission (this IServerContext self, PermissionName name, ChannelInfo channel, IConnection connection)
+		{
+			if (self == null)
+				throw new ArgumentNullException ("self");
+			if (channel == null)
+				throw new ArgumentNullException ("channel");
+			if (connection == null)
+				throw new ArgumentNullException ("connection");
+
+			UserInfo user = self.UserManager.GetUser (connection);
+			if (user == null)
+				return false;
+
+			return GetPermission (self, name, channel.ChannelId, user.UserId);
+		}
+
+		public static bool GetPermission (this IServerContext self, PermissionName name, ChannelInfo channel, UserInfo user)
+		{
+			if (channel == null)
+				throw new ArgumentNullException ("channel");
+			if (user == null)
+				throw new ArgumentNullException ("user");
+
+			return GetPermission (self, name, channel.ChannelId, user.UserId);
+		}
+
+		public static bool GetPermission (this IServerContext self, PermissionName name, int channelid, int userId)
+		{
+			if (self == null)
+				throw new ArgumentNullException ("self");
+
+			if (self.BackendProvider != null)
+				return self.BackendProvider.GetPermissions (channelid, userId).CheckPermission (name);
+			else
+				return self.PermissionsProvider.GetPermissions (userId).CheckPermission (name);
+		}
 	}
 }

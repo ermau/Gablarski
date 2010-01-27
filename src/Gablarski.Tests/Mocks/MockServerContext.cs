@@ -9,12 +9,64 @@ namespace Gablarski.Tests.Mocks
 	public class MockServerContext
 		: IServerContext
 	{
+		public object SyncRoot
+		{
+			get { return syncRoot; }
+		}
+
+		public IBackendProvider BackendProvider
+		{
+			get;
+			set;
+		}
+
+		public IAuthenticationProvider AuthenticationProvider
+		{
+			get;
+			set;
+		}
+
+		public IPermissionsProvider PermissionsProvider
+		{
+			get;
+			set;
+		}
+
+		public IChannelProvider ChannelsProvider
+		{
+			get;
+			set;
+		}
+
 		public int ProtocolVersion
 		{
 			get { return GablarskiServer.ProtocolVersion; }
 		}
 
+		public IConnectionHandler Connections
+		{
+			get { return Users; }
+		}
+
 		public IServerUserHandler Users
+		{
+			get;
+			set;
+		}
+
+		public IServerUserManager UserManager
+		{
+			get;
+			set;
+		}
+
+		public IServerSourceHandler Sources
+		{
+			get;
+			set;
+		}
+
+		public IServerChannelHandler Channels
 		{
 			get;
 			set;
@@ -31,5 +83,7 @@ namespace Gablarski.Tests.Mocks
 			get;
 			set;
 		}
+
+		private readonly object syncRoot = new object();
 	}
 }

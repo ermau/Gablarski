@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -38,11 +38,38 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Gablarski.Messages;
 
 namespace Gablarski.Server
 {
 	public interface IServerUserHandler
-		: IIndexedEnumerable<int, UserInfo>
+		: IConnectionHandler, IIndexedEnumerable<int, UserInfo>
 	{
+		/// <summary>
+		/// Moves <paramref name="user"/> to the <paramref name="targetChannel"/>.
+		/// </summary>
+		/// <param name="user">The user to move.</param>
+		/// <param name="targetChannel">The channel to move the user to.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="user" /> or <paramref name="targetChannel"/> is <c>null</c>.</exception>
+		/// <returns><c>true</c> if the move succeeded, <c>false</c> if it failed.</returns>
+		/// <remarks>
+		/// The main reasons for a failed move are that the user or channel no longer exists.
+		/// </remarks>
+		bool Move (UserInfo user, ChannelInfo targetChannel);
+
+		void Send (MessageBase message, Func<IConnection, UserInfo, bool> predicate);
+	}
+
+	public static class ServerUserHandlerExtensions
+	{
+		public static void Send (this IServerUserHandler self, MessageBase message, Func<UserInfo, bool> predicate)
+		{
+			if (self == null)
+				throw new ArgumentNullException ("self");
+			if (predicate == null)
+				throw new ArgumentNullException ("predicate");
+
+			self.Send (message, (c, u) => predicate (u));
+		}
 	}
 }

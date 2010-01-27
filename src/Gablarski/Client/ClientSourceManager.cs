@@ -205,7 +205,7 @@ namespace Gablarski.Client
 		/// </remarks>
 		public void Request (string name, int channels, int targetBitrate, short frameSize)
 		{
-			this.context.Connection.Send (new RequestSourceMessage (name, channels, targetBitrate, frameSize));
+			this.context.Connection.Send (new RequestSourceMessage (name, new AudioCodecArgs ((byte)channels, targetBitrate, 44100, frameSize, 10)));
 		}
 
 		/// <summary>
@@ -221,7 +221,7 @@ namespace Gablarski.Client
 
 		public void ToggleMute (AudioSource source)
 		{
-			context.Connection.Send (new RequestMuteMessage { Target = source.Id, Type = MuteType.AudioSource, Unmute = source.IsMuted });
+			context.Connection.Send (new RequestMuteSourceMessage (source, !source.IsMuted));
 		}
 
 		public bool GetIsIgnored (AudioSource source)

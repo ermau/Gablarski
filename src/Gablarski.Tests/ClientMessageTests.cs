@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Gablarski.Audio;
 using Gablarski.Messages;
 using NUnit.Framework;
 using Gablarski.Client;
@@ -130,16 +131,15 @@ namespace Gablarski.Tests
 		[Test]
 		public void RequestSource()
 		{
-			string name = "Voice";
-			int bitrate = 64000;
-			short frameSize = 512;
-			int channels = 1;
+			const string name = "Voice";
+			const int bitrate = 64000;
+			const short frameSize = 512;
+			const byte channels = 1;
+			const int frequency = 44100;
+			const byte complexity = 10;
 
-			var msg = new RequestSourceMessage (name, channels, bitrate, frameSize);
+			var msg = new RequestSourceMessage (name, new AudioCodecArgs (channels, bitrate, frequency, frameSize, complexity));
 			Assert.AreEqual (name, msg.Name);
-			Assert.AreEqual (bitrate, msg.TargetBitrate);
-			Assert.AreEqual (frameSize, msg.FrameSize);
-			Assert.AreEqual (channels, msg.Channels);
 			msg.WritePayload (writer);
 			long length = stream.Position;
 			stream.Position = 0;
@@ -148,9 +148,6 @@ namespace Gablarski.Tests
 			msg.ReadPayload (reader);
 			Assert.AreEqual (length, stream.Position);
 			Assert.AreEqual (name, msg.Name);
-			Assert.AreEqual (bitrate, msg.TargetBitrate);
-			Assert.AreEqual (frameSize, msg.FrameSize);
-			Assert.AreEqual (channels, msg.Channels);
 		}
 
 		[Test]
@@ -195,44 +192,37 @@ namespace Gablarski.Tests
 		[Test]
 		public void RequestMuteUser()
 		{
-			var msg = new RequestMuteMessage
-			{
-				Target = "foo",
-				Type = MuteType.User,
-				Unmute = true
-			};
+			Assert.Throws<ArgumentNullException> (() => new RequestMuteUserMessage (null, true));
+
+			var user = new UserInfo ("Nick", 1, 2, true);
+
+			var msg = new RequestMuteUserMessage (user, true);
 
 			msg.WritePayload (writer);
 			long length = stream.Position;
 			stream.Position = 0;
 
-			msg = new RequestMuteMessage();
+			msg = new RequestMuteUserMessage();
 			msg.ReadPayload (reader);
 			Assert.AreEqual (length, stream.Position);
-			Assert.AreEqual ("foo", msg.Target);
-			Assert.AreEqual (MuteType.User, msg.Type);
+			Assert.AreEqual (user.UserId, msg.TargetId);
 			Assert.AreEqual (true, msg.Unmute);
 		}
 
 		[Test]
 		public void RequestMuteSource()
 		{
-			var msg = new RequestMuteMessage
-			{
-				Target = 5,
-				Type = MuteType.AudioSource,
-				Unmute = true
-			};
+			Assert.Throws<ArgumentNullException> (() => new RequestMuteSourceMessage (null, true));
 
+			var msg = new RequestMuteSourceMessage (new AudioSource ("Name", 5, 2, 1, 64000, 44100, 512, 10, false), true);
 			msg.WritePayload (writer);
 			long length = stream.Position;
 			stream.Position = 0;
 
-			msg = new RequestMuteMessage();
+			msg = new RequestMuteSourceMessage();
 			msg.ReadPayload (reader);
 			Assert.AreEqual (length, stream.Position);
-			Assert.AreEqual (5, msg.Target);
-			Assert.AreEqual (MuteType.AudioSource, msg.Type);
+			Assert.AreEqual (5, msg.TargetId);
 			Assert.AreEqual (true, msg.Unmute);
 		}
 

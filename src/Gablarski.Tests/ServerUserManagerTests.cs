@@ -1,4 +1,4 @@
-// Copyright (client) 2009, Eric Maupin
+// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -163,6 +163,14 @@ namespace Gablarski.Tests
 
 			Assert.IsTrue (manager.GetIsJoined (client));
 			Assert.IsTrue (manager.GetIsJoined (user));
+
+			UserInfo joinedUser = manager.GetUser (client);
+			Assert.AreEqual (user.UserId, joinedUser.UserId);
+			Assert.AreEqual (user.Username, joinedUser.Username);
+			Assert.AreEqual (user.Nickname, joinedUser.Nickname);
+			Assert.AreEqual (user.Phonetic, joinedUser.Phonetic);
+			Assert.AreEqual (user.Status, joinedUser.Status);
+			Assert.AreEqual (user.IsMuted, joinedUser.IsMuted);
 		}
 
 		[Test]
@@ -220,6 +228,100 @@ namespace Gablarski.Tests
 		}
 
 		[Test]
+		public void MoveNull()
+		{
+			Assert.Throws<ArgumentNullException> (() => manager.Move (null, new ChannelInfo()));
+			Assert.Throws<ArgumentNullException> (() => manager.Move (user, null));
+		}
+
+		[Test]
+		public void MoveSameChannel()
+		{
+			var c = new ChannelInfo(2);
+
+			manager.Connect (client);
+			manager.Join (client, user);
+
+			manager.Move (user, c);
+
+			user = manager.GetUser (client);
+
+			Assert.AreEqual (c.ChannelId, user.CurrentChannelId);
+		}
+
+		[Test]
+		public void MoveNotJoined()
+		{
+			var c = new ChannelInfo (3);
+			
+			manager.Connect (client);
+			manager.Move (user, c);
+
+			user = manager.GetUser (client);
+
+			Assert.IsNull (user);
+		}
+
+		[Test]
+		public void MoveChannel()
+		{
+			var c = new ChannelInfo(3);
+
+			manager.Connect (client);
+			manager.Join (client, user);
+
+			manager.Move (user, c);
+
+			user = manager.GetUser (client);
+
+			Assert.AreEqual (c.ChannelId, user.CurrentChannelId);
+		}
+
+		[Test]
+		public void ToggleMuteNull()
+		{
+			Assert.Throws<ArgumentNullException> (() => manager.ToggleMute (null));
+		}
+
+		[Test]
+		public void ToggleMuteUnmuted()
+		{
+			user.IsMuted = false;
+			Assert.IsFalse (user.IsMuted);
+
+			manager.Connect (client);
+			manager.Join (client, user);
+			user = manager.GetUser (client);
+			Assert.IsNotNull (user);
+			Assert.IsFalse (user.IsMuted);
+
+			Assert.IsTrue (manager.ToggleMute (user));
+
+			user = manager.GetUser (client);
+			Assert.IsNotNull (user);
+			Assert.IsTrue (user.IsMuted);
+		}
+
+		[Test]
+		public void ToggleMuteMuted()
+		{
+			user.IsMuted = true;
+			Assert.IsTrue (user.IsMuted);
+
+			manager.Connect (client);
+			manager.Join (client, user);
+			user = manager.GetUser (client);
+			Assert.IsNotNull (user);
+			Assert.IsTrue (user.IsMuted);
+
+			Assert.IsFalse (manager.ToggleMute (user));
+
+			user = manager.GetUser (client);
+			Assert.IsNotNull (user);
+			Assert.IsFalse (user.IsMuted);
+		}
+
+		[Test]
 		public void ConnectNull()
 		{
 			Assert.Throws<ArgumentNullException> (() => manager.Connect (null));
@@ -259,7 +361,8 @@ namespace Gablarski.Tests
 		[Test]
 		public void DisconnectNull()
 		{
-			Assert.Throws<ArgumentNullException> (() => new ServerUserManager().Disconnect (null));
+			Assert.Throws<ArgumentNullException> (() => new ServerUserManager().Disconnect ((IConnection)null));
+			Assert.Throws<ArgumentNullException> (() => new ServerUserManager().Disconnect ((Func<IConnection, bool>)null));
 		}
 
 		[Test]
@@ -283,6 +386,7 @@ namespace Gablarski.Tests
 
 			Assert.IsNull (manager.GetConnection (user));
 			Assert.IsNull (manager.GetUser (client));
+			Assert.IsFalse (manager.GetIsJoined (client));
 			Assert.IsFalse (manager.GetIsJoined (user));
 			Assert.IsFalse (manager.GetIsConnected (client));
 		}
@@ -299,6 +403,20 @@ namespace Gablarski.Tests
 			Assert.IsNull (manager.GetUser (client));
 			Assert.IsFalse (manager.GetIsJoined (user));
 			Assert.IsFalse (manager.GetIsLoggedIn (user));
+			Assert.IsFalse (manager.GetIsConnected (client));
+		}
+
+		[Test]
+		public void DisconnectPredicate()
+		{
+			manager.Connect (client);
+			manager.Join (client, user);
+
+			manager.Disconnect (c => c == client);
+
+			Assert.IsNull (manager.GetConnection (user));
+			Assert.IsNull (manager.GetUser (client));
+			Assert.IsFalse (manager.GetIsJoined (user));
 			Assert.IsFalse (manager.GetIsConnected (client));
 		}
 
@@ -345,33 +463,35 @@ namespace Gablarski.Tests
 		}
 
 		[Test]
-		public void SendNull()
+		public void GetIsNicknameInUseNull ()
 		{
-			Assert.Throws<ArgumentNullException> (() => manager.Send (new ConnectMessage(), (Func<IConnection, bool>)null));
-			Assert.Throws<ArgumentNullException> (() => manager.Send (null, c => false));
-			Assert.Throws<ArgumentNullException> (() => manager.Send (new ConnectMessage(), (Func<IConnection, UserInfo, bool>)null));
-			Assert.Throws<ArgumentNullException> (() => manager.Send (null, (c, u) => false));
+			Assert.Throws<ArgumentNullException> (() => manager.GetIsNicknameInUse (null));
 		}
 
 		[Test]
-		public void SendConnection()
+		public void GetIsNicknameInUse()
 		{
 			manager.Connect (client);
 
-			var msg = new ConnectMessage { ProtocolVersion = 42 };
-			manager.Send (msg, cc => cc == client);
+			Assert.IsFalse (manager.GetIsNicknameInUse (user.Nickname));
 
-			server.DequeueAndAssertMessage<ConnectMessage>();
-		}
-
-		[Test]
-		public void SendJoinedUser()
-		{
-			manager.Connect (client);
 			manager.Join (client, user);
 
-			var msg = new ConnectMessage { ProtocolVersion = 42 };
-			manager.Send (msg, (cc, u) => cc == client && u == user);
+			Assert.IsTrue (manager.GetIsNicknameInUse (user.Nickname));
+			Assert.IsTrue (manager.GetIsNicknameInUse (user.Nickname + " "));
+			Assert.IsTrue (manager.GetIsNicknameInUse (user.Nickname.ToUpper()));
+			Assert.IsFalse (manager.GetIsNicknameInUse ("asdf"));
+		}
+
+		[Test]
+		public void GetIsNicknameInUseNoNickname()
+		{
+			user = new UserInfo ("Username", 1, 2, true);
+
+			manager.Connect (client);
+			manager.Login (client, user);
+
+			Assert.IsFalse (manager.GetIsNicknameInUse (user.Username));
 		}
 	}
 }

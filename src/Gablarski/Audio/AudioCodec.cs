@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2010, Eric Maupin
+// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -35,61 +35,89 @@
 // DAMAGE.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using Gablarski.CELT;
 
-namespace Gablarski.Messages
+namespace Gablarski.Audio
 {
-	public enum MuteType
-		: byte
+	public class AudioCodec
+		: AudioCodecArgs
 	{
-		User = 1,
-		AudioSource = 2,
-	}
+		private readonly object codecLock = new object();
+		private CeltEncoder encoder;
+		private CeltDecoder decoder;
+		private CeltMode mode;
 
-	public class MutedMessage
-		: ServerMessage
-	{
-		public MutedMessage()
-			: base (ServerMessageType.Muted)
+		public AudioCodec (AudioCodecArgs args)
+			: base (args)
 		{
 		}
 
-		public bool Unmuted
+		public AudioCodec (byte channels, int bitrate, int frequency, short frameSize, byte complexity)
+			: base (channels, bitrate, frequency, frameSize, complexity)
 		{
-			get; set;
 		}
 
-		public object Target
+		protected AudioCodec()
 		{
-			get; set;
 		}
 
-		public MuteType Type
+		internal AudioCodec (IValueReader reader)
+			: base (reader)
 		{
-			get; set;
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public byte[] Encode (byte[] data)
 		{
-			writer.WriteByte ((byte)this.Type);
-			writer.WriteBool (this.Unmuted);
+#if DEBUG
+			if (data == null)
+				throw new ArgumentNullException("data");
+#endif
+
+			if (this.encoder == null)
+			{
+				lock (this.codecLock)
+				{
+					if (this.mode == null)
+						this.mode = CeltMode.Create (this.Frequency, this.Channels, this.FrameSize);
+
+					if (this.encoder == null)
+						this.encoder = CeltEncoder.Create (this.mode);
+				}
+			}
+
+			int len;
+			byte[] encoded = this.encoder.Encode (data, this.Bitrate, out len);
+			if (encoded.Length != len)
+			{
+				byte[] final = new byte[len];
+				Array.Copy (encoded, final, len);
+				encoded = final;
+			}
+
+			return encoded;
+		}
+
+		public byte[] Decode (byte[] data)
+		{
+#if DEBUG
+			if (data == null)
+				throw new ArgumentNullException("data");
+#endif
 			
-			if (Type == MuteType.User)
-				writer.WriteString ((string)this.Target);
-			else
-				writer.WriteInt32 ((int)this.Target);
-		}
+			if (this.decoder == null)
+			{
+				lock (this.codecLock)
+				{
+					if (this.mode == null)
+						this.mode = CeltMode.Create (this.Frequency, this.Channels, this.FrameSize);
 
-		public override void ReadPayload (IValueReader reader)
-		{
-			this.Type = (MuteType)reader.ReadByte();
-			this.Unmuted = reader.ReadBool();
+					if (this.decoder == null)
+						this.decoder = CeltDecoder.Create (this.mode);
+				}
+			}
 
-			if (Type == MuteType.User)
-				this.Target = reader.ReadString();
-			else
-				this.Target = reader.ReadInt32();
+			return this.decoder.Decode (data);
 		}
 	}
 }

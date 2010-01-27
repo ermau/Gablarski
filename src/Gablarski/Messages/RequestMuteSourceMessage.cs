@@ -36,14 +36,27 @@
 
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
-using System.Text;
+using Gablarski.Audio;
 
-namespace Gablarski.LocalServer.Config
+namespace Gablarski.Messages
 {
-	public class LocalServerConfiguration
-		: ConfigurationSection
+	public class RequestMuteSourceMessage
+		: RequestMuteMessage
 	{
+		internal RequestMuteSourceMessage ()
+			: base (ClientMessageType.RequestMuteSource)
+		{
+		}
+
+		public RequestMuteSourceMessage (AudioSource source, bool mute)
+			: this()
+		{
+			if (source == null)
+				throw new ArgumentNullException ("source");
+
+			TargetId = source.Id;
+			Unmute = !mute;
+		}
 	}
 }

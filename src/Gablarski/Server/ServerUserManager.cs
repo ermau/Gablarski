@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -38,9 +38,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Cadenza.Collections;
-using Gablarski.Messages;
 
 namespace Gablarski.Server
 {
@@ -51,28 +49,23 @@ namespace Gablarski.Server
 		{
 			get
 			{
-				UserInfo user;
-
-				lock (SyncRoot)
-				{
-					user = connectedUsers.Keys.FirstOrDefault (u => u.UserId == userId);
-				}
-
-				return user;
+				return this.connectedUsers.Keys.FirstOrDefault (u => u.UserId == userId);
 			}
 		}
 
 		#region IConnectionManager Members
+
+		public IEnumerable<IConnection> GetConnections()
+		{
+			return connections.ToList();
+		}
 
 		public void Connect (IConnection connection)
 		{
 			if (connection == null)
 				throw new ArgumentNullException ("connection");
 
-			lock (SyncRoot)
-			{
-				connections.Add (connection);
-			}
+			connections.Add (connection);
 		}
 
 		public bool GetIsConnected (IConnection connection)
@@ -80,10 +73,7 @@ namespace Gablarski.Server
 			if (connection == null)
 				throw new ArgumentNullException ("connection");
 
-			lock (SyncRoot)
-			{
-				return connections.Contains (connection);
-			}
+			return connections.Contains (connection);
 		}
 
 		public bool GetIsConnected (UserInfo user)
@@ -91,12 +81,9 @@ namespace Gablarski.Server
 			if (user == null)
 				throw new ArgumentNullException ("user");
 
-			lock (SyncRoot)
-			{
-				var c = GetConnection (user);
-				if (c != null)
-					return connections.Contains (c);
-			}
+			var c = GetConnection (user);
+			if (c != null)
+				return connections.Contains (c);
 
 			return false;
 		}
@@ -108,14 +95,11 @@ namespace Gablarski.Server
 			if (user == null)
 				throw new ArgumentNullException ("user");
 
-			lock (SyncRoot)
-			{
-				if (!connections.Contains (connection) || joined.Contains (connection))
-					return;
+			if (!connections.Contains (connection) || joined.Contains (connection))
+				return;
 
-				connectedUsers[user] = connection;
-				joined.Add (connection);
-			}
+			connectedUsers[user] = connection;
+			joined.Add (connection);
 		}
 
 		public bool GetIsJoined (IConnection connection)
@@ -123,10 +107,7 @@ namespace Gablarski.Server
 			if (connection == null)
 				throw new ArgumentNullException ("connection");
 
-			lock (SyncRoot)
-			{
-				return joined.Contains (connection);
-			}
+			return joined.Contains (connection);
 		}
 
 		public bool GetIsJoined (UserInfo user)
@@ -134,14 +115,51 @@ namespace Gablarski.Server
 			if (user == null)
 				throw new ArgumentNullException ("user");
 
-			lock (SyncRoot)
-			{
-				var c = GetConnection (user);
-				if (c != null)
-					return joined.Contains (c);
-			}
+			var c = GetConnection (user);
+			if (c != null)
+				return joined.Contains (c);
 
 			return false;
+		}
+
+		public void Move (UserInfo user, ChannelInfo channel)
+		{
+			if (user == null)
+				throw new ArgumentNullException ("user");
+			if (channel == null)
+				throw new ArgumentNullException ("channel");
+
+			IConnection connection = GetConnection (user);
+			if (connection == null)
+				return;
+
+			UserInfo old;
+			if (!connectedUsers.TryGetKey (connection, out old))
+				return;
+
+			UserInfo newUser = new UserInfo (old);
+			newUser.CurrentChannelId = channel.ChannelId;
+
+			connectedUsers.Inverse[connection] = newUser;
+		}
+
+		public bool ToggleMute (UserInfo user)
+		{
+			if (user == null)
+				throw new ArgumentNullException ("user");
+
+			IConnection connection = GetConnection (user);
+
+			UserInfo old;
+			if (!connectedUsers.TryGetKey (connection, out old))
+				return false;
+
+			UserInfo newUser = new UserInfo (old);
+			newUser.IsMuted = !old.IsMuted;
+
+			connectedUsers.Inverse[connection] = newUser;
+
+			return newUser.IsMuted;
 		}
 
 		public void Login (IConnection connection, UserInfo user)
@@ -150,15 +168,12 @@ namespace Gablarski.Server
 				throw new ArgumentNullException ("connection");
 			if (user == null)
 				throw new ArgumentNullException ("user");
+			
+			if (!connections.Contains (connection))
+				return;
 
-			lock (SyncRoot)
-			{
-				if (!connections.Contains (connection))
-					return;
-
-				connectedUsers.Add (user, connection);
-				loggedIn.Add (connection);
-			}
+			connectedUsers.Add (user, connection);
+			loggedIn.Add (connection);
 		}
 
 		public bool GetIsLoggedIn (IConnection connection)
@@ -166,10 +181,7 @@ namespace Gablarski.Server
 			if (connection == null)
 				throw new ArgumentNullException ("connection");
 
-			lock (SyncRoot)
-			{
-				return loggedIn.Contains (connection);
-			}
+			return loggedIn.Contains (connection);
 		}
 
 		public bool GetIsLoggedIn (UserInfo user)
@@ -177,14 +189,22 @@ namespace Gablarski.Server
 			if (user == null)
 				throw new ArgumentNullException ("user");
 
-			lock (SyncRoot)
-			{
-				var c = GetConnection (user);
-				if (c != null)
-					return loggedIn.Contains (c);
-			}
+			var c = GetConnection (user);
+			if (c != null)
+				return loggedIn.Contains (c);
 
 			return false;
+		}
+
+		public bool GetIsNicknameInUse (string nickname)
+		{
+			if (nickname == null)
+				throw new ArgumentNullException ("nickname");
+
+			nickname = nickname.ToLower().Trim();
+
+			return connectedUsers.Keys.Where (u => u.Nickname != null)
+				.Any (u => u.Nickname.ToLower().Trim() == nickname);
 		}
 
 		public void Disconnect (IConnection connection)
@@ -192,54 +212,25 @@ namespace Gablarski.Server
 			if (connection == null)
 				throw new ArgumentNullException ("connection");
 
-			lock (SyncRoot)
-			{
-				if (!connections.Remove (connection))
-					return;
-				
-				loggedIn.Remove (connection);
-				connectedUsers.Inverse.Remove (connection);
-			}
+			if (!connections.Remove (connection))
+				return;
+			
+			loggedIn.Remove (connection);
+			joined.Remove (connection);
+			connectedUsers.Inverse.Remove (connection);
 		}
 
-		public void Associate (IConnection connection, UserInfo user)
+		public void Disconnect (Func<IConnection, bool> predicate)
 		{
-			if (connection == null)
-				throw new ArgumentNullException ("connection");
-			if (user == null)
-				throw new ArgumentNullException ("user");
-
-			lock (SyncRoot)
-			{
-				connectedUsers.Add (user, connection);
-			}
-		}
-
-		public void Send (MessageBase message, Func<IConnection, bool> predicate)
-		{
-			if (message == null)
-				throw new ArgumentNullException ("message");
 			if (predicate == null)
 				throw new ArgumentNullException ("predicate");
 
-			lock (SyncRoot)
+			foreach (IConnection c in this.connections.Where (predicate).ToList())
 			{
-				foreach (var c in connections.Where (predicate))
-					c.Send (message);
-			}
-		}
-
-		public void Send (MessageBase message, Func<IConnection, UserInfo, bool> predicate)
-		{
-			if (message == null)
-				throw new ArgumentNullException ("message");
-			if (predicate == null)
-				throw new ArgumentNullException ("predicate");
-
-			lock (SyncRoot)
-			{
-				foreach (var kvp in connectedUsers.Where (kvp => predicate (kvp.Value, kvp.Key)))
-					kvp.Value.Send (message);
+				connections.Remove (c);
+				loggedIn.Remove (c);
+				joined.Remove (c);
+				connectedUsers.Inverse.Remove (c);
 			}
 		}
 
@@ -248,13 +239,8 @@ namespace Gablarski.Server
 			if (connection == null)
 				throw new ArgumentNullException ("connection");
 
-			UserInfo user;// = null;
-			lock (SyncRoot)
-			{
-				connectedUsers.TryGetKey (connection, out user);
-				//if (connectedUsers.ContainsValue (connection))
-				//    user = connectedUsers.FirstOrDefault (kvp => kvp.Value == connection).Key;
-			}
+			UserInfo user;
+			connectedUsers.TryGetKey (connection, out user);
 
 			return user;
 		}
@@ -265,17 +251,13 @@ namespace Gablarski.Server
 				throw new ArgumentNullException ("user");
 
 			IConnection connection;
-			lock (SyncRoot)
-			{
-				connectedUsers.TryGetValue (user, out connection);
-			}
+			connectedUsers.TryGetValue (user, out connection);
 
 			return connection;
 		}
 
 		#endregion
 
-		protected readonly object SyncRoot = new object();
 		private readonly HashSet<IConnection> joined = new HashSet<IConnection>();
 		private readonly HashSet<IConnection> loggedIn = new HashSet<IConnection>();
 		private readonly HashSet<IConnection> connections = new HashSet<IConnection>();
@@ -285,13 +267,7 @@ namespace Gablarski.Server
 
 		public IEnumerator<UserInfo> GetEnumerator()
 		{
-			IEnumerable<UserInfo> e;
-			lock (SyncRoot)
-			{
-				e = connectedUsers.Keys.ToList();
-			}
-
-			return e.GetEnumerator();
+			return connectedUsers.Keys.ToList().GetEnumerator();
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()

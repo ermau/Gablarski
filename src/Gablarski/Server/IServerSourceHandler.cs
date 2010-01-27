@@ -35,7 +35,6 @@
 // DAMAGE.
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Gablarski.Audio;
@@ -53,5 +52,12 @@ namespace Gablarski.Server
 		/// <param name="source">The source to remove.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
 		void Remove (AudioSource source);
+
+		/// <summary>
+		/// Removes all audio sources owned by <paramref name="user"/> and notifies clients.
+		/// </summary>
+		/// <param name="user">The user to remove all sources for.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
+		void Remove (UserInfo user);
 	}
 }

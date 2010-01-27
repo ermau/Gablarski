@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Gablarski.Audio;
 using Gablarski.Messages;
 using Gablarski.Server;
 using NUnit.Framework;
@@ -259,7 +260,7 @@ namespace Gablarski.Tests
 			var c = Connect();
 			var u = Join (false, c, Nickname);
 
-			c.Client.Send (new RequestSourceMessage ("source", 1, 64000, 512));
+			c.Client.Send (new RequestSourceMessage ("source", new AudioCodecArgs (1, 64000, 44100, 512, 10)));
 
 			var msg = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.Succeeded, msg.SourceResult);
@@ -285,5 +286,21 @@ namespace Gablarski.Tests
 		//    //Assert.AreEqual (true, msg.Starting);
 		//    //Assert.AreEqual (1, msg.SourceId);
 		//}
+
+		[Test]
+		public void SourceStateChangeSameChannel()
+		{
+		    var c = Connect();
+		    var u = Join (false, c, Nickname);
+
+		    c.Client.Send (new RequestSourceMessage ("source", new AudioCodecArgs (1, 64000, 44100, 512, 10)));
+		    c.Client.DequeueAndAssertMessage<SourceResultMessage>();
+
+		    c.Client.Send (new ClientAudioSourceStateChangeMessage { Starting = true, SourceId = 1 });
+
+		    //var msg = c.Client.DequeueAndAssertMessage<AudioSourceStateChangeMessage>();
+		    //Assert.AreEqual (true, msg.Starting);
+		    //Assert.AreEqual (1, msg.SourceId);
+		}
 	}
 }

@@ -36,14 +36,26 @@
 
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
-using System.Text;
 
-namespace Gablarski.LocalServer.Config
+namespace Gablarski.Messages
 {
-	public class LocalServerConfiguration
-		: ConfigurationSection
+	public class RequestMuteUserMessage
+		: RequestMuteMessage
 	{
+		internal RequestMuteUserMessage ()
+			: base (ClientMessageType.RequestMuteUser)
+		{
+		}
+
+		public RequestMuteUserMessage (UserInfo user, bool mute)
+			: this()
+		{
+			if (user == null)
+				throw new ArgumentNullException ("user");
+
+			TargetId = user.UserId;
+			Unmute = !mute;
+		}
 	}
 }

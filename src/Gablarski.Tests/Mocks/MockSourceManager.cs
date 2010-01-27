@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -37,33 +37,22 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using Gablarski.Audio;
 
-namespace Gablarski.Server
+namespace Gablarski.Tests.Mocks
 {
-	public class ServerUserInfo
-		: UserInfo
+	public class MockSourceManager
+		: SourceManager
 	{
-		public ServerUserInfo (UserInfo user)
-			: base (user)
+		public void Add (AudioSource source)
 		{
-		}
+			if (source == null)
+				throw new ArgumentNullException ("source");
 
-		public ServerUserInfo (ServerUserInfo user)
-			: base (user)
-		{
-			this.IsLoggedIn = user.IsLoggedIn;
-		}
+			var nsource = new AudioSource (source);
 
-		public ServerUserInfo (UserInfo user, bool loggedIn)
-			: base (user)
-		{
-			this.IsLoggedIn = loggedIn;
-		}
-
-		public bool IsLoggedIn
-		{
-			get; set;
+			OwnedSources.Add (source.OwnerId, nsource);
+			Sources.Add (source.Id, nsource);
 		}
 	}
 }

@@ -70,12 +70,62 @@ namespace Gablarski.Server
 
 		private void ChannelsProviderOnChannelsUpdated (object sender, EventArgs args)
 		{
-			var channelIds = new HashSet<int> (context.ChannelsProvider.GetChannels().Select (c => c.ChannelId));
+			var channels = context.ChannelsProvider.GetChannels();
+			var channelIds = new HashSet<int> (channels.Select (c => c.ChannelId));
 
 			foreach (UserInfo user in context.Users.Where (u => !channelIds.Contains (u.CurrentChannelId)))
 				context.Users.Move (user, context.ChannelsProvider.DefaultChannel);
 
-			this.connections.Send (new ChannelListMessage (this.channels.Values));
+			context.Connections.Send (new ChannelListMessage (channels));
+		}
+
+		internal void ChanneListMessage (MessageReceivedEventArgs e)
+		{			
+			if (!context.GetPermission (PermissionName.RequestChannelList, e.Connection))
+				e.Connection.Send (new ChannelListMessage (GenericResult.FailedPermissions));
+			else
+			{
+				IEnumerable<ChannelInfo> channels = this.context.ChannelsProvider.GetChannels();
+				e.Connection.Send (new ChannelListMessage (channels));
+			}
+		}
+
+		internal void ChannelEditMessage (MessageReceivedEventArgs e)
+		{
+			var msg = (ChannelEditMessage)e.Message;
+
+			ChannelEditResult result = ChannelEditResult.FailedUnknown;
+
+			List<ChannelInfo> channels = context.ChannelsProvider.GetChannels().ToList();
+
+			ChannelInfo realChannel = channels.FirstOrDefault (c => c.ChannelId == msg.Channel.ChannelId);
+			if (realChannel == null)
+				result = ChannelEditResult.FailedChannelDoesntExist;
+			else if (msg.Delete && channels.Count == 1)
+				result = ChannelEditResult.FailedLastChannel;
+			else if (!this.context.ChannelsProvider.UpdateSupported)
+				result = ChannelEditResult.FailedChannelsReadOnly;
+			else if (realChannel.ReadOnly)
+				result = ChannelEditResult.FailedChannelReadOnly;
+			else if (msg.Channel.ChannelId != 0)
+			{
+				if (msg.Delete && !context.GetPermission (PermissionName.DeleteChannel, msg.Channel, e.Connection))
+					result = ChannelEditResult.FailedPermissions;
+				else if (!msg.Delete && !context.GetPermission (PermissionName.EditChannel, msg.Channel, e.Connection))
+					result = ChannelEditResult.FailedPermissions;
+			}
+			else if (!context.GetPermission (PermissionName.AddChannel, e.Connection))
+				result = ChannelEditResult.FailedPermissions;
+
+			if (result == ChannelEditResult.FailedUnknown)
+			{
+				if (!msg.Delete)
+					result = this.context.ChannelsProvider.SaveChannel (msg.Channel);
+				else
+					result = this.context.ChannelsProvider.DeleteChannel (msg.Channel);
+			}
+
+			e.Connection.Send (new ChannelEditResultMessage (msg.Channel, result));
 		}
 	}
 }

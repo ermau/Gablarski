@@ -36,14 +36,32 @@
 
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
-using System.Text;
+using Gablarski.Audio;
 
-namespace Gablarski.LocalServer.Config
+namespace Gablarski.Server
 {
-	public class LocalServerConfiguration
-		: ConfigurationSection
+	public interface IServerSourceManager
+		: ISourceManager
 	{
+		/// <summary>
+		/// Creates a new audio source 
+		/// </summary>
+		/// <param name="name">The name of the source as requested by the user.</param>
+		/// <param name="owner">The user id that owns the audio source.</param>
+		/// <param name="audioArgs">The audio properties of the source to create.</param>
+		/// <returns>The newly created audio source.</returns>
+		/// <exception cref="ArgumentException"><paramref name="name"/> is in use by the user already.</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="name"/>, <paramref name="user"/> or <paramref name="audioArgs"/> is <c>null</c>.</exception>
+		AudioSource Create (string name, UserInfo owner, AudioCodecArgs audioArgs);
+
+		/// <summary>
+		/// Gets whether the <paramref name="sourceName"/> is in use by <paramref name="user"/>.
+		/// </summary>
+		/// <param name="user">The user to check the sources of.</param>
+		/// <param name="sourceName">The name to check for.</param>
+		/// <returns><c>true</c> if the source name is in use, <c>false</c> if not or <paramref name="user"/> wasn't found.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="user"/> or <paramref name="sourceName"/> is <c>null</c>.</exception>
+		bool IsSourceNameTaken (UserInfo user, string sourceName);
 	}
 }

@@ -58,8 +58,8 @@ namespace Gablarski.Tests
 			this.manager.Request ("voice", 1);
 
 			var msg = this.server.DequeueAndAssertMessage<RequestSourceMessage>();
-			Assert.AreEqual (1, msg.Channels);
-			Assert.AreEqual (0, msg.TargetBitrate);
+			Assert.AreEqual (1, msg.AudioSettings.Channels);
+			Assert.AreEqual (0, msg.AudioSettings.Bitrate);
 		}
 
 		[Test]
@@ -68,8 +68,8 @@ namespace Gablarski.Tests
 			this.manager.Request ("voice", 2, 64000);
 
 			var msg = this.server.DequeueAndAssertMessage<RequestSourceMessage>();
-			Assert.AreEqual (2, msg.Channels);
-			Assert.AreEqual (64000, msg.TargetBitrate);
+			Assert.AreEqual (2, msg.AudioSettings.Channels);
+			Assert.AreEqual (64000, msg.AudioSettings.Bitrate);
 		}
 
 		[Test]

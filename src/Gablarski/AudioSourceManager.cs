@@ -35,42 +35,87 @@
 // DAMAGE.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Cadenza.Collections;
 using Gablarski.Audio;
 
-namespace Gablarski.Server
+namespace Gablarski
 {
-	public class ServerSourceManager
-		: SourceManager, IServerSourceManager
+	public class SourceManager
+		: ISourceManager
 	{
-		private readonly IServerContext context;
-
-		public ServerSourceManager (IServerContext serverContext)
+		public IEnumerator<AudioSource> GetEnumerator()
 		{
-			this.context = serverContext;
+			return this.Sources.Values.ToList().GetEnumerator();
 		}
 
-		public AudioSource Create (string name, UserInfo owner, AudioCodecArgs audioArgs)
+		IEnumerator IEnumerable.GetEnumerator()
 		{
-			if (name == null)
-				throw new ArgumentNullException ("name");
-			if (owner == null)
-				throw new ArgumentNullException ("owner");
-			if (audioArgs == null)
-				throw new ArgumentNullException ("audioArgs");
-
-			throw new NotImplementedException();
+			return GetEnumerator();
 		}
 
-		public bool IsSourceNameTaken (UserInfo user, string sourceName)
+		public AudioSource this [int key]
+		{
+			get
+			{
+				AudioSource source;
+				Sources.TryGetValue (key, out source);
+
+				return source;
+			}
+		}
+
+		public IEnumerable<AudioSource> this [UserInfo user]
+		{
+			get
+			{
+				return OwnedSources[user.UserId];
+			}
+		}
+
+
+		public bool ToggleMute (AudioSource source)
+		{
+			if (source == null)
+				throw new ArgumentNullException ("source");
+
+			AudioSource actual;
+			if (!Sources.TryGetValue (source.Id, out actual))
+				return false;
+
+			AudioSource newSource = new AudioSource (actual);
+			newSource.IsMuted = !actual.IsMuted;
+
+			OwnedSources.Remove (source.OwnerId, source);
+			Sources[newSource.Id] = newSource;
+			OwnedSources.Add (source.OwnerId, source);
+
+			return newSource.IsMuted;
+		}
+
+		public void Remove (AudioSource source)
+		{
+			if (source == null)
+				throw new ArgumentNullException ("source");
+
+			OwnedSources.Remove (source.OwnerId, source);
+			Sources.Remove (source.Id);
+		}
+
+		public void Remove (UserInfo user)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
-			if (sourceName == null)
-				throw new ArgumentNullException ("sourceName");
 
-			throw new NotImplementedException();
+			foreach (AudioSource source in OwnedSources[user.UserId])
+				Sources.Remove (source.Id);
+
+			OwnedSources.Remove (user.UserId);
 		}
+
+		protected readonly MutableLookup<int, AudioSource> OwnedSources = new MutableLookup<int, AudioSource>();
+		protected readonly Dictionary<int, AudioSource> Sources = new Dictionary<int, AudioSource>();
 	}
 }

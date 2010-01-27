@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -72,6 +72,9 @@ namespace Gablarski
 		/// </summary>
 		/// <param name="message">The message to send.</param>
 		/// <exception cref="System.ArgumentNullException"><paramref name="message"/> is <c>null</c>.</exception>
+		/// <remarks>
+		/// This should be thread safe.
+		/// </remarks>
 		void Send (MessageBase message);
 
 		/// <summary>

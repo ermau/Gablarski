@@ -1,4 +1,4 @@
-// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 
 // Redistribution and use in source and binary forms, with
@@ -213,28 +213,26 @@ namespace Gablarski.Network
 						log.WarnFormat ("Message type {0} not found from {1}", mtype, connection);
 						return;
 					}
+					
+					msg.ReadPayload (reader);
+
+					if (connection == null)
+					{
+						if (this.debugLogging) this.log.DebugFormat ("Connectionless message received {0}", msg.MessageTypeCode);
+						OnConnectionlessMessageReceived (new ConnectionlessMessageReceivedEventArgs (this, msg, tendpoint));
+					}
 					else
 					{
-						msg.ReadPayload (reader);
-
-						if (connection == null)
+						if (msg.MessageTypeCode == (ushort)ClientMessageType.PunchThrough)
 						{
-							if (debugLogging) log.DebugFormat ("Connectionless message received {0}", msg.MessageTypeCode);
-							OnConnectionlessMessageReceived (new ConnectionlessMessageReceivedEventArgs (this, msg, tendpoint));
+							var punch = (PunchThroughMessage)msg;
+							if (punch.Status == PunchThroughStatus.Punch)
+								connection.Send (new PunchThroughReceivedMessage ());
+							else if (punch.Status == PunchThroughStatus.Bleeding)
+								connection.bleeding = true;
 						}
 						else
-						{
-							if (msg.MessageTypeCode == (ushort)ClientMessageType.PunchThrough)
-							{
-								var punch = (PunchThroughMessage)msg;
-								if (punch.Status == PunchThroughStatus.Punch)
-									connection.Send (new PunchThroughReceivedMessage ());
-								else if (punch.Status == PunchThroughStatus.Bleeding)
-									connection.bleeding = true;
-							}
-							else
-								connection.Receive (msg);
-						}
+							connection.Receive (msg);
 					}
 				}
 				catch (SocketException)

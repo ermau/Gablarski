@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -37,11 +37,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using Gablarski.Audio;
 using Gablarski.Client;
 using Gablarski.Messages;
 using System.Diagnostics;
+using Cadenza;
+using log4net;
 
 namespace Gablarski.Server
 {
@@ -60,17 +62,14 @@ namespace Gablarski.Server
 		/// <param name="permissionProvider">The user permissions provider for the server to use.</param>
 		/// <param name="channelProvider">The channel provider for the server to use.</param>
 		public GablarskiServer (ServerSettings settings, IAuthenticationProvider authProvider, IPermissionsProvider permissionProvider, IChannelProvider channelProvider)
-			: this()
+			: this (settings)
 		{
-			this.settings = settings;
 			this.authProvider = authProvider;
 			
 			this.permissionProvider = permissionProvider;
 			this.permissionProvider.PermissionsChanged += OnPermissionsChanged;
 		
 			this.channelProvider = channelProvider;
-			this.channelProvider.ChannelsUpdated += OnChannelsUpdatedExternally;
-			this.UpdateChannels (false);
 		}
 
 		/// <summary>
@@ -79,14 +78,15 @@ namespace Gablarski.Server
 		/// <param name="settings">The settings for the server, providing name, description, etc.</param>
 		/// <param name="provider">The backend provider for the server to use.</param>
 		public GablarskiServer (ServerSettings settings, IBackendProvider provider)
-			: this()
+			: this (settings)
 		{
-			this.settings = settings;
-
 			this.backendProvider = provider;
-			this.backendProvider.ChannelsUpdated += OnChannelsUpdatedExternally;
 			this.backendProvider.PermissionsChanged += OnPermissionsChanged;
-			this.UpdateChannels (false);
+		}
+
+		public object SyncRoot
+		{
+			get { return syncRoot; }
 		}
 
 		/// <summary>
@@ -102,17 +102,35 @@ namespace Gablarski.Server
 			get { return this.running; }
 		}
 
-		public int UserCount
-		{
-			get { return this.connections.UserCount; }
-		}
-
 		public ServerSettings Settings
 		{
 			get { return this.settings; }
 		}
 
 		public IServerUserHandler Users
+		{
+			get;
+			private set;
+		}
+
+		public IConnectionHandler Connections
+		{
+			get { return Users; }
+		}
+
+		public IServerUserManager UserManager
+		{
+			get;
+			private set;
+		}
+
+		public IServerSourceHandler Sources
+		{
+			get;
+			private set;
+		}
+
+		public IServerChannelHandler Channels
 		{
 			get;
 			private set;
@@ -140,7 +158,7 @@ namespace Gablarski.Server
 			if (provider == null)
 				throw new ArgumentNullException ("provider");
 
-			Trace.WriteLine ("[Server] " + provider.GetType().Name + " added.");
+			this.Log.InfoFormat ("{0} added.", provider.GetType().Name);
 
 			// MUST provide a gaurantee of persona
 			lock (this.availableConnections)
@@ -222,45 +240,14 @@ namespace Gablarski.Server
 					var provider = this.availableConnections[i];
 
 					provider.ConnectionMade -= OnConnectionMade;
-					this.RemoveConnectionProvider (provider);
+					RemoveConnectionProvider (provider);
 				}
 			}
 
 			this.incomingWait.Set ();
 			this.messageRunnerThread.Join();
 
-			while (this.connections.ConnectionCount > 0)
-				this.Disconnect (this.connections[0].Key);
-		}
-
-		public IEnumerable<UserInfo> GetUsers()
-		{
-			return this.connections.Users.Select (u => new UserInfo (u));
-		}
-
-		public IEnumerable<ChannelInfo> GetChannels()
-		{
-			IEnumerable<ChannelInfo> cs;
-			lock (channelLock)
-			{
-				cs = this.channels.Values.ToList();
-			}
-
-			return cs.Select (c => new ChannelInfo (c));
-		}
-
-		/// <summary>
-		/// Disconnections an <c>IConnection</c>.
-		/// </summary>
-		/// <param name="user">The user to disconnect.</param>
-		public void Disconnect (ServerUserInfo user)
-		{
-			if (user == null)
-				throw new ArgumentNullException ("user");
-
-			var userConnection = this.connections[user];
-			if (userConnection != null)
-				this.Disconnect (userConnection);
+			Users.Disconnect (c => true);
 		}
 		#endregion
 
@@ -271,42 +258,129 @@ namespace Gablarski.Server
 
 		private readonly IBackendProvider backendProvider;
 
+		private readonly IServerContext context;
 		private readonly IChannelProvider channelProvider;
 		private readonly IPermissionsProvider permissionProvider;
 		private readonly IAuthenticationProvider authProvider;
 		private volatile bool running = true;
 
-		protected IBackendProvider BackendProvider
+		private readonly object syncRoot = new object();
+
+		protected readonly ILog Log;
+
+		private readonly Dictionary<ClientMessageType, Action<MessageReceivedEventArgs>> Handlers;
+
+		private readonly Thread messageRunnerThread;
+		private readonly Queue<MessageReceivedEventArgs> mqueue = new Queue<MessageReceivedEventArgs> (1000);
+		private readonly AutoResetEvent incomingWait = new AutoResetEvent (false);
+
+		IBackendProvider IServerContext.BackendProvider
 		{
 			get { return backendProvider; }
 		}
 
-		protected IChannelProvider ChannelProvider
+		IChannelProvider IServerContext.ChannelsProvider
 		{
 			get { return (backendProvider ?? channelProvider); }
 		}
 
-		protected IPermissionsProvider PermissionProvider
+		IPermissionsProvider IServerContext.PermissionsProvider
 		{
 			get { return (backendProvider ?? permissionProvider); }
 		}
 
-		protected IAuthenticationProvider AuthenticationProvider
+		IAuthenticationProvider IServerContext.AuthenticationProvider
 		{
 			get { return (backendProvider ?? authProvider); }
 		}
 
-		private readonly object sourceLock = new object ();
-		private ILookup<IConnection, AudioSource> sourceLookup;
-		private readonly List<AudioSource> sources = new List<AudioSource>();
+		int IServerContext.ProtocolVersion
+		{
+			get { return GablarskiServer.ProtocolVersion; }
+		}
 
-		private readonly ConnectionCollection connections = new ConnectionCollection();
-		private Dictionary<int, object> nativeusers = new Dictionary<int, object>();
+		protected GablarskiServer (ServerSettings serverSettings)
+		{
+			Log = LogManager.GetLogger (serverSettings.Name.Remove (" "));
 
-		private readonly object channelLock = new object ();
-		private ChannelInfo defaultChannel;
-		private Dictionary<int, ChannelInfo> channels;
-		private Dictionary<int, object> nativeChannels = new Dictionary<int, object>();
+			this.settings = serverSettings;
+			this.context = this;
+
+			UserManager = new ServerUserManager();
+
+			var userHandler = new ServerUserHandler (this, UserManager);
+			Users = userHandler;
+
+			var sourceHandler = new ServerSourceHandler (this, new ServerSourceManager (this));
+			Sources = sourceHandler;
+			
+			var channelHandler = new ServerChannelHandler (this);
+			Channels = channelHandler;
+
+			this.Handlers = new Dictionary<ClientMessageType, Action<MessageReceivedEventArgs>>
+			{
+				{ ClientMessageType.Connect, userHandler.ConnectMessage },
+				{ ClientMessageType.Disconnect, ClientDisconnected },
+				{ ClientMessageType.Login, userHandler.LoginMessage },
+				{ ClientMessageType.Join, userHandler.JoinMessage },
+
+				{ ClientMessageType.RequestSource, sourceHandler.RequestSourceMessage },
+				{ ClientMessageType.AudioData, sourceHandler.SendAudioDataMessage },
+				{ ClientMessageType.ClientAudioSourceStateChange, sourceHandler.ClientAudioSourceStateChangeMessage },
+				{ ClientMessageType.RequestMuteUser, userHandler.RequestMuteUserMessage },
+				{ ClientMessageType.RequestMuteSource, sourceHandler.RequestMuteSourceMessage },
+
+				{ ClientMessageType.QueryServer, ClientQueryServer },
+				{ ClientMessageType.RequestChannelList, channelHandler.ChanneListMessage },
+				{ ClientMessageType.RequestUserList, userHandler.RequestUserListMessage },
+				{ ClientMessageType.RequestSourceList, sourceHandler.RequestSourceListMessage },
+
+				{ ClientMessageType.ChannelChange, userHandler.ChannelChangeMessage },
+				{ ClientMessageType.ChannelEdit, channelHandler.ChannelEditMessage },
+			};
+
+			this.messageRunnerThread = new Thread (this.MessageRunner);
+			this.messageRunnerThread.Name = "Gablarski Server Message Runner";
+		}
+
+		private void MessageRunner ()
+		{
+			while (this.running)
+			{
+				if (mqueue.Count == 0)
+					incomingWait.WaitOne ();
+
+				while (mqueue.Count > 0)
+				{
+					MessageReceivedEventArgs e;
+					lock (mqueue)
+					{
+						e = mqueue.Dequeue();
+					}
+
+					var msg = (e.Message as ClientMessage);
+					if (msg == null)
+					{
+						Disconnect (e.Connection);
+						return;
+					}
+
+					Action<MessageReceivedEventArgs> handler;
+					if (Handlers.TryGetValue (msg.MessageType, out handler))
+						handler (e);
+				}
+			}
+		}
+
+		protected virtual void OnMessageReceived (object sender, MessageReceivedEventArgs e)
+		{
+			lock (mqueue)
+			{
+				mqueue.Enqueue (e);
+			}
+
+			incomingWait.Set ();
+		}
 
 		private void Disconnect (IConnection connection)
 		{
@@ -316,12 +390,12 @@ namespace Gablarski.Server
 			connection.Disconnect ();
 			connection.MessageReceived -= this.OnMessageReceived;
 			connection.Disconnected -= this.OnClientDisconnected;
-			this.connections.Remove (connection);
+			Users.Disconnect (connection);
 		}
 
 		private void RemoveConnectionProvider (IConnectionProvider provider, bool listRemove)
 		{
-			Trace.WriteLine ("[Server] " + provider.GetType ().Name + " removed.");
+			Log.InfoFormat ("{0} removed.", provider.GetType ().Name);
 
 			provider.StopListening ();
 			provider.ConnectionMade -= OnConnectionMade;
@@ -336,86 +410,11 @@ namespace Gablarski.Server
 			}
 		}
 
-		private void UpdateChannels (bool sendUpdate)
-		{
-			lock (channelLock)
-			{
-				this.channels = this.ChannelProvider.GetChannels().ToDictionary (c => c.ChannelId);
-				this.defaultChannel = this.ChannelProvider.DefaultChannel;
-			}
-
-			if (sendUpdate)
-			{
-				int defaultChannelId;
-				List<int> movedUsers = new List<int>();
-				lock (channelLock)
-				{
-					defaultChannelId = ChannelProvider.DefaultChannel.ChannelId;
-					foreach (var u in this.connections.Users)
-					{
-						if (!this.channels.ContainsKey (u.CurrentChannelId))
-						{
-							movedUsers.Add (u.UserId);
-							this.connections.UpdateIfExists (new ServerUserInfo (u) { CurrentChannelId = defaultChannelId  });
-						}
-					}
-				}
-
-				foreach (var userId in movedUsers)
-				{
-					this.connections.Send (new UserChangedChannelMessage 
-						{ ChangeInfo = new ChannelChangeInfo (userId, defaultChannelId, defaultChannelId) });
-				}
-
-				this.connections.Send (new ChannelListMessage (this.channels.Values));
-			}
-		}
-
 		private void OnPermissionsChanged (object sender, PermissionsChangedEventArgs e)
 		{
-			this.connections.GetConnection (e.UserId).Send (new PermissionsMessage (e.UserId, PermissionProvider.GetPermissions (e.UserId)));
-		}
-
-		private void OnChannelsUpdatedExternally (object sender, EventArgs e)
-		{
-			UpdateChannels (true);
-		}
-
-		private IEnumerable<AudioSource> GetSourceInfoList ()
-		{
-			AudioSource[] currentSources;
-			lock (this.sourceLock)
-			{
-				currentSources = new AudioSource[this.sources.Count];
-				this.sources.CopyTo (currentSources, 0);
-			}
-
-			return currentSources;
-		}
-
-		protected bool GetPermission (PermissionName name, int channelId, int userId)
-		{
-			if (this.BackendProvider != null)
-				return this.BackendProvider.GetPermissions (channelId, userId).CheckPermission (name);
-			else
-				return this.PermissionProvider.GetPermissions (userId).CheckPermission (name);
-		}
-
-		protected bool GetPermission (PermissionName name, int channelId, IConnection connection)
-		{
-			return GetPermission (name, channelId, this.connections[connection].UserId);
-		}
-
-		protected bool GetPermission (PermissionName name, IConnection connection)
-		{
-			var user = this.connections[connection];
-
-			return GetPermission (name, (user != null) ? user.CurrentChannelId : 0, (user != null) ? user.UserId : 0);
-		}
-
-		protected bool GetPermission (PermissionName name, UserInfo user)
-		{
-			return GetPermission (name, user.CurrentChannelId, user.UserId);
+			UserInfo user = Users[e.UserId];
+			if (user != null)
+				UserManager.GetConnection (user).Send (new PermissionsMessage (e.UserId, this.context.PermissionsProvider.GetPermissions (e.UserId)));
 		}
 
 		protected void ClientDisconnected (MessageReceivedEventArgs e)
@@ -425,37 +424,57 @@ namespace Gablarski.Server
 
 		private void OnClientDisconnected (object sender, ConnectionEventArgs e)
 		{
-			Trace.WriteLine ("[Server] Client disconnected");
+			Log.Debug ("Client disconnected");
 
 			e.Connection.MessageReceived -= this.OnMessageReceived;
 			e.Connection.Disconnected -= this.OnClientDisconnected;
 			e.Connection.Disconnect();
 
-			int userId;
-			if (this.connections.Remove (e.Connection, out userId))
-				this.connections.Send (new UserDisconnectedMessage (userId));
+			UserInfo user = UserManager.GetUser (e.Connection);
 
-			lock (sourceLock)
-			{
-				if (this.sourceLookup == null || !this.sourceLookup.Contains (e.Connection))
-					return;
+			Users.Disconnect (e.Connection);
 
-				this.connections.Send (new SourcesRemovedMessage (this.sourceLookup[e.Connection]));
-				foreach (var source in this.sourceLookup[e.Connection])
-					this.sources.Remove (source);
-
-				this.sourceLookup = this.sources.ToLookup (k => this.connections.GetConnection (k.OwnerId));
-			}
+			Sources.Remove (user);
 		}
 		
 		private void OnConnectionMade (object sender, ConnectionEventArgs e)
 		{
-			Trace.WriteLine ("[Server] Connection Made");
-
-			this.connections.Add (e.Connection);
+			Log.Debug ("Connection Made");
 
 			e.Connection.MessageReceived += this.OnMessageReceived;
 			e.Connection.Disconnected += this.OnClientDisconnected;
+		}
+
+		protected ServerInfo GetServerInfo()
+		{
+			return new ServerInfo (this.settings);
+		}
+
+		private void ClientQueryServer (MessageReceivedEventArgs e)
+		{
+			var msg = (QueryServerMessage)e.Message;
+			var connectionless = (e as ConnectionlessMessageReceivedEventArgs);
+			
+			if (!msg.ServerInfoOnly && (connectionless != null || !context.GetPermission (PermissionName.RequestChannelList, e.Connection)))
+			{
+				e.Connection.Send (new PermissionDeniedMessage (ClientMessageType.QueryServer));
+				return;
+			}
+
+			var result = new QueryServerResultMessage();
+
+			if (!msg.ServerInfoOnly)
+			{
+				result.Channels = this.context.ChannelsProvider.GetChannels();
+				result.Users = this.Users;
+			}
+
+			result.ServerInfo = GetServerInfo();
+
+			if (connectionless == null)
+				e.Connection.Send (result);
+			else
+				connectionless.Provider.SendConnectionlessMessage (result, connectionless.EndPoint);
 		}
 	}
 }

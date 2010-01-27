@@ -40,6 +40,9 @@ using Gablarski.Audio;
 
 namespace Gablarski
 {
+	/// <summary>
+	/// Base contract for audio source managers.
+	/// </summary>
 	public interface ISourceManager
 		: IIndexedEnumerable<int, AudioSource>
 	{
@@ -49,13 +52,6 @@ namespace Gablarski
 		/// <param name="user">The owner to find sources for.</param>
 		/// <returns>An empty enumerable if this user doesn't own any sources, otherwise the owned sources.</returns>
 		IEnumerable<AudioSource> this[UserInfo user] { get; }
-
-		/// <summary>
-		/// Adds the audio <paramref name="source"/>.
-		/// </summary>
-		/// <param name="source">The source to add.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
-		void Add (AudioSource source);
 
 		/// <summary>
 		/// Removes the audio <paramref name="source"/>.
@@ -70,5 +66,13 @@ namespace Gablarski
 		/// <param name="user">The user to remove all sources for.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
 		void Remove (UserInfo user);
+
+		/// <summary>
+		/// Toggles mute for the <paramref name="source"/>.
+		/// </summary>
+		/// <param name="source">The source to toggle mute for.</param>
+		/// <returns><c>true</c> if <paramref name="source"/> was muted, <c>false</c> if not or not found.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
+		bool ToggleMute (AudioSource source);
 	}
 }

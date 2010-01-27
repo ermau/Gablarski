@@ -1,4 +1,4 @@
-// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -41,7 +41,7 @@ using System.Text;
 
 namespace Gablarski.Messages
 {
-	// Next: 44
+	// Next: 46
 
 	public enum ClientMessageType
 		: ushort
@@ -64,10 +64,11 @@ namespace Gablarski.Messages
 		RequestUserList = 13,
 		
 		RequestChannelList = 18,
-		ChangeChannel = 20,
-		EditChannel = 22,
+		ChannelChange = 20,
+		ChannelEdit = 22,
 		
-		RequestMute = 30,
+		RequestMuteUser = 44,
+		RequestMuteSource = 45,
 	}
 
 	public enum ServerMessageType
