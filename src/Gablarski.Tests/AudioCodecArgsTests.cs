@@ -54,7 +54,7 @@ namespace Gablarski.Tests
 			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioCodecArgs (0, 48000, 44100, 512, 10));
 			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioCodecArgs (11, 48000, 44100, 512, 10));
 
-			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioCodecArgs (1, 1, 44100, 512, 10));
+			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioCodecArgs (1, -1, 44100, 512, 10));
 			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioCodecArgs (1, 480000, 44100, 512, 10));
 
 			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioCodecArgs (1, 48000, 5, 512, 10));
@@ -63,7 +63,7 @@ namespace Gablarski.Tests
 			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioCodecArgs (1, 48000, 44100, 1, 10));
 			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioCodecArgs (1, 48000, 44100, 5120, 10));
 
-			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioCodecArgs (1, 48000, 44100, 512, 1));
+			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioCodecArgs (1, 48000, 44100, 512, 0));
 			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioCodecArgs (11, 48000, 44100, 512, 10));
 		}
 

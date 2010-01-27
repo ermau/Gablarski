@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -35,53 +35,50 @@
 // DAMAGE.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Gablarski.CELT;
 
 namespace Gablarski.Audio
 {
 	public class AudioSource
+		: AudioCodec
 	{
-		public AudioSource (IValueReader reader)
-		{
-			if (reader == null)
-				throw new ArgumentNullException ("reader");
-
-			Deserialize (reader);
-		}
-
-		public AudioSource (AudioSource source)
-			: this (source.Name, source.Id, source.OwnerId, source.Channels, source.Bitrate, source.Frequency, source.FrameSize, source.Complexity, source.IsMuted)
+		internal AudioSource (IValueReader reader)
+			: base (reader)
 		{
 		}
 
-		public AudioSource (string name, int sourceId, int ownerId, byte channels, int bitrate, int frequency, short frameSize, byte complexity, bool muted)
+		internal AudioSource (AudioSource source)
+			: this (source.Name, source.Id, source.OwnerId, source.IsMuted, new AudioCodecArgs (source.Channels, source.Bitrate, source.Frequency, source.FrameSize, source.Complexity))
+		{
+		}
+
+		internal AudioSource (string name, int sourceId, int ownerId, AudioCodecArgs args)
+			: this (name, sourceId, ownerId, false, args)
+		{
+		}
+
+		internal AudioSource (string name, int sourceId, int ownerId, byte channels, int bitrate, int frequency, short frameSize, byte complexity)
+			: this(name, sourceId, ownerId, channels, bitrate, frequency, frameSize, complexity, false)
+		{
+		}
+
+		internal AudioSource (string name, int sourceId, int ownerId, byte channels, int bitrate, int frequency, short frameSize, byte complexity, bool isMuted)
+			: this (name, sourceId, ownerId, isMuted, new AudioCodecArgs (channels, bitrate, frequency, frameSize, complexity))
+		{
+		}
+
+		internal AudioSource (string name, int sourceId, int ownerId, bool isMuted, AudioCodecArgs args)
+			: base (args)
 		{
 			if (name == null)
 				throw new ArgumentNullException ("name");
-			if (sourceId <= 0)
-				throw new ArgumentOutOfRangeException ("sourceId");
 			if (ownerId == 0)
-				throw new ArgumentException ("ownerId");
-			if (bitrate <= 0)
-				throw new ArgumentOutOfRangeException ("bitrate");
-			if (complexity < 1 || complexity > 10)
-				throw new ArgumentOutOfRangeException ("complexity");
-
-			CheckRanges (channels, frequency, frameSize);
+				throw new ArgumentException ("ownerId");			
 
 			this.Name = name;
 			this.Id = sourceId;
 			this.OwnerId = ownerId;
-			this.Bitrate = bitrate;
-			this.complexity = complexity;
-			this.IsMuted = muted;
-
-			this.Channels = channels;
-			this.Frequency = frequency;
-			this.FrameSize = frameSize;
+			this.IsMuted = isMuted;
 		}
 
 		/// <summary>
@@ -120,147 +117,27 @@ namespace Gablarski.Audio
 			protected internal set;
 		}
 
-		/// <summary>
-		/// The bitrate of the media data.
-		/// </summary>
-		public int Bitrate
-		{
-			get;
-			protected internal set;
-		}
-
-		private readonly byte complexity = 10;
-
-		/// <summary>
-		/// Gets the complexity of the audio encoding.
-		/// </summary>
-		public byte Complexity
-		{
-			get { return this.complexity; }
-		}
-
-		/// <summary>
-		/// Gets the number of audio channels in this source.
-		/// </summary>
-		public byte Channels
-		{
-			get;
-			protected internal set;
-		}
-
-		/// <summary>
-		/// Gets the frequency of the audio.
-		/// </summary>
-		public int Frequency
-		{
-			get;
-			protected internal set;
-		}
-
-		/// <summary>
-		/// Gets the frame size for the encoded packets.
-		/// </summary>
-		public short FrameSize
-		{
-			get;
-			protected internal set;
-		}
-
-		public byte[] Encode (byte[] data)
-		{
-			#if DEBUG
-			if (data == null)
-				throw new ArgumentNullException("data");
-			#endif
-
-			if (this.encoder == null)
-			{
-				lock (this.codecLock)
-				{
-					if (this.mode == null)
-						this.mode = CeltMode.Create (this.Frequency, this.Channels, this.FrameSize);
-
-					if (this.encoder == null)
-						this.encoder = CeltEncoder.Create (this.mode);
-				}
-			}
-
-			int len;
-			byte[] encoded = this.encoder.Encode (data, this.Bitrate, out len);
-			if (encoded.Length != len)
-			{
-				byte[] final = new byte[len];
-				Array.Copy (encoded, final, len);
-				encoded = final;
-			}
-
-			return encoded;
-		}
-
-		public byte[] Decode (byte[] data)
-		{
-			#if DEBUG
-			if (data == null)
-				throw new ArgumentNullException("data");
-			#endif
-			
-			if (this.decoder == null)
-			{
-				lock (this.codecLock)
-				{
-					if (this.mode == null)
-						this.mode = CeltMode.Create (this.Frequency, this.Channels, this.FrameSize);
-
-					if (this.decoder == null)
-						this.decoder = CeltDecoder.Create (this.mode);
-				}
-			}
-
-			return this.decoder.Decode (data);
-		}
-
 		public override string ToString ()
 		{
 			return "AudioSource:" + Name + ":" + Id + ":" + OwnerId;
 		}
 
-		private readonly object codecLock = new object();
-		private CeltEncoder encoder;
-		private CeltDecoder decoder;
-		private CeltMode mode;
-
-		protected internal void Serialize (IValueWriter writer)
+		protected internal override void Serialize (IValueWriter writer)
 		{
 			writer.WriteString (this.Name);
 			writer.WriteInt32 (this.Id);
 			writer.WriteInt32 (this.OwnerId);
-			writer.WriteInt32 (this.Bitrate);
-			writer.WriteByte (this.Channels);
-			writer.WriteInt32 (this.Frequency);
-			writer.WriteInt16 (this.FrameSize);
 			writer.WriteBool (this.IsMuted);
+			base.Serialize (writer);
 		}
 
-		protected internal void Deserialize (IValueReader reader)
+		protected internal override void Deserialize (IValueReader reader)
 		{
 			this.Name = reader.ReadString();
 			this.Id = reader.ReadInt32 ();
 			this.OwnerId = reader.ReadInt32();
-			this.Bitrate = reader.ReadInt32();
-			this.Channels = reader.ReadByte();
-			this.Frequency = reader.ReadInt32();
-			this.FrameSize = reader.ReadInt16();
 			this.IsMuted = reader.ReadBool();
-		}
-
-		protected static void CheckRanges (byte channels, int frequency, short frameSize)
-		{
-			if (channels <= 0 || channels > 2)
-				throw new ArgumentOutOfRangeException ("channels");
-			if (frequency < 20000 || frequency > 96000)
-				throw new ArgumentOutOfRangeException ("frequency");
-			if (frameSize < 64 || frameSize > 512)
-				throw new ArgumentOutOfRangeException ("frameSize");
+			base.Deserialize (reader);
 		}
 
 		public override int GetHashCode ()

@@ -69,6 +69,9 @@ namespace Gablarski.Audio
 
 		internal AudioCodecArgs (IValueReader reader)
 		{
+			if (reader == null)
+				throw new ArgumentNullException ("reader");
+
 			Deserialize (reader);
 		}
 
@@ -169,6 +172,7 @@ namespace Gablarski.Audio
 			writer.WriteByte (this.Channels);
 			writer.WriteInt32 (this.Frequency);
 			writer.WriteInt16 (this.FrameSize);
+			writer.WriteByte (this.Complexity);
 		}
 
 		protected internal virtual void Deserialize (IValueReader reader)
@@ -177,6 +181,7 @@ namespace Gablarski.Audio
 			this.Channels = reader.ReadByte();
 			this.Frequency = reader.ReadInt32();
 			this.FrameSize = reader.ReadInt16();
+			this.Complexity = reader.ReadByte();
 		}
 
 		public static bool IsInvalidFrequency (int value)
@@ -196,7 +201,7 @@ namespace Gablarski.Audio
 
 		public static bool IsInvalidBitrate (int value)
 		{
-			return value <= 0;
+			return value <= 0 || value >= 320000;
 		}
 
 
