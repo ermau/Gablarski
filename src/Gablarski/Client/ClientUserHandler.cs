@@ -1,4 +1,4 @@
-// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -164,7 +164,7 @@ namespace Gablarski.Client
 			if (user == null)
 				throw new ArgumentNullException ("user");
 
-			context.Connection.Send (new RequestMuteMessage { Target = user.Username, Type = MuteType.User, Unmute = user.IsMuted });
+			context.Connection.Send (new RequestMuteUserMessage (user, !user.IsMuted));
 		}
 
 		public IEnumerable<UserInfo> GetUsersInChannel (int channelId)
