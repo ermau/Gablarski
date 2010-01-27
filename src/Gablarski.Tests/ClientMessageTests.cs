@@ -196,7 +196,7 @@ namespace Gablarski.Tests
 
 			var user = new UserInfo ("Nick", 1, 2, true);
 
-			var msg = new RequestMuteUserMessage (user, true);
+			var msg = new RequestMuteUserMessage (user, false);
 
 			msg.WritePayload (writer);
 			long length = stream.Position;
@@ -214,7 +214,7 @@ namespace Gablarski.Tests
 		{
 			Assert.Throws<ArgumentNullException> (() => new RequestMuteSourceMessage (null, true));
 
-			var msg = new RequestMuteSourceMessage (new AudioSource ("Name", 5, 2, 1, 64000, 44100, 512, 10, false), true);
+			var msg = new RequestMuteSourceMessage (new AudioSource ("Name", 5, 2, 1, 64000, 44100, 512, 10, false), false);
 			msg.WritePayload (writer);
 			long length = stream.Position;
 			stream.Position = 0;
