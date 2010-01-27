@@ -74,6 +74,8 @@ namespace Gablarski.Audio
 				throw new ArgumentNullException ("name");
 			if (ownerId == 0)
 				throw new ArgumentException ("ownerId");			
+			if (sourceId <= 0)
+				throw new ArgumentOutOfRangeException ("sourceId");
 
 			this.Name = name;
 			this.Id = sourceId;

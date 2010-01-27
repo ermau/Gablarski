@@ -29,7 +29,7 @@ namespace Gablarski.Tests
 			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource ("voice", 1, 1, 1, 64000, 100000, 512, 10, false));
 
 			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource ("voice", 1, 1, 1, 64000, 44100, 32, 10, false));
-			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource ("voice", 1, 1, 1, 64000, 44100, 1024, 10, false));
+			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource ("voice", 1, 1, 1, 64000, 44100, 5120, 10, false));
 
 			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource ("voice", 1, 1, 1, 64000, 100000, 512, 0, false));
 			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource ("voice", 1, 1, 1, 64000, 100000, 512, 11, false));
