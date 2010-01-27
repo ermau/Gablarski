@@ -56,6 +56,11 @@ namespace Gablarski.Server
 		/// </summary>
 		bool UpdatedSupported { get; }
 
+		/// <remarks>
+		/// &lt;0 is guests.
+		/// 0 is connections only
+		/// &gt;1 is logged in users.
+		/// </remarks>
 		IEnumerable<Permission> GetPermissions (int userId);
 
 		/// <summary>

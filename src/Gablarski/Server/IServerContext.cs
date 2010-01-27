@@ -112,7 +112,7 @@ namespace Gablarski.Server
 
 			UserInfo user = self.UserManager.GetUser (connection);
 			if (user == null)
-				return false;
+				return self.GetPermission (name);
 
 			return self.GetPermission (name, user.CurrentChannelId, user.UserId);
 		}
@@ -136,7 +136,7 @@ namespace Gablarski.Server
 
 			UserInfo user = self.UserManager.GetUser (connection);
 			if (user == null)
-				return false;
+				return self.GetPermission (name);
 
 			return GetPermission (self, name, channel.ChannelId, user.UserId);
 		}
@@ -160,6 +160,14 @@ namespace Gablarski.Server
 				return self.BackendProvider.GetPermissions (channelid, userId).CheckPermission (name);
 			else
 				return self.PermissionsProvider.GetPermissions (userId).CheckPermission (name);
+		}
+
+		public static bool GetPermission (this IServerContext self, PermissionName name)
+		{
+			if (self == null)
+				throw new ArgumentNullException ("self");
+
+			return self.PermissionsProvider.GetPermissions (0).CheckPermission (name);
 		}
 	}
 }
