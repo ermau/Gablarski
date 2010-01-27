@@ -167,5 +167,10 @@ namespace Gablarski.Messages
 		/// Failed because invalid arguments were supplied for the request.
 		/// </summary>
 		FailedInvalidArguments = 9,
+		
+		/// <summary>
+		/// Failed because the requesting user already has a source with this name.
+		/// </summary>
+		FailedDuplicateSourceName = 10
 	}
 }
