@@ -70,6 +70,8 @@ namespace Gablarski.Server
 			this.permissionProvider.PermissionsChanged += OnPermissionsChanged;
 		
 			this.channelProvider = channelProvider;
+
+			SetupHandlers();
 		}
 
 		/// <summary>
@@ -82,6 +84,8 @@ namespace Gablarski.Server
 		{
 			this.backendProvider = provider;
 			this.backendProvider.PermissionsChanged += OnPermissionsChanged;
+
+			SetupHandlers();
 		}
 
 		public object SyncRoot
@@ -268,7 +272,7 @@ namespace Gablarski.Server
 
 		protected readonly ILog Log;
 
-		private readonly Dictionary<ClientMessageType, Action<MessageReceivedEventArgs>> Handlers;
+		private Dictionary<ClientMessageType, Action<MessageReceivedEventArgs>> handlers;
 
 		private readonly Thread messageRunnerThread;
 		private readonly Queue<MessageReceivedEventArgs> mqueue = new Queue<MessageReceivedEventArgs> (1000);
@@ -306,18 +310,24 @@ namespace Gablarski.Server
 			this.settings = serverSettings;
 			this.context = this;
 
-			UserManager = new ServerUserManager();
+			this.messageRunnerThread = new Thread (this.MessageRunner);
+			this.messageRunnerThread.Name = "Gablarski Server Message Runner";
+		}
 
-			var userHandler = new ServerUserHandler (this, UserManager);
-			Users = userHandler;
+		private void SetupHandlers()
+		{
+			this.UserManager = new ServerUserManager();
+
+			var userHandler = new ServerUserHandler (this, this.UserManager);
+			this.Users = userHandler;
 
 			var sourceHandler = new ServerSourceHandler (this, new ServerSourceManager (this));
-			Sources = sourceHandler;
+			this.Sources = sourceHandler;
 			
 			var channelHandler = new ServerChannelHandler (this);
-			Channels = channelHandler;
+			this.Channels = channelHandler;
 
-			this.Handlers = new Dictionary<ClientMessageType, Action<MessageReceivedEventArgs>>
+			this.handlers = new Dictionary<ClientMessageType, Action<MessageReceivedEventArgs>>
 			{
 				{ ClientMessageType.Connect, userHandler.ConnectMessage },
 				{ ClientMessageType.Disconnect, ClientDisconnected },
@@ -338,9 +348,6 @@ namespace Gablarski.Server
 				{ ClientMessageType.ChannelChange, userHandler.ChannelChangeMessage },
 				{ ClientMessageType.ChannelEdit, channelHandler.ChannelEditMessage },
 			};
-
-			this.messageRunnerThread = new Thread (this.MessageRunner);
-			this.messageRunnerThread.Name = "Gablarski Server Message Runner";
 		}
 
 		private void MessageRunner ()
@@ -366,7 +373,7 @@ namespace Gablarski.Server
 					}
 
 					Action<MessageReceivedEventArgs> handler;
-					if (Handlers.TryGetValue (msg.MessageType, out handler))
+					if (this.handlers.TryGetValue (msg.MessageType, out handler))
 						handler (e);
 				}
 			}
