@@ -157,7 +157,7 @@ namespace Gablarski.Audio
 
 		public static bool IsInvalidFrameSize(short value)
 		{
-			return value < 64 || value > 1024 || (value % 64) != 0;
+			return value != 0 && (value < 64 || value > 1024 || (value % 64) != 0);
 		}
 
 		private short frameSize;
@@ -201,9 +201,7 @@ namespace Gablarski.Audio
 
 		public static bool IsInvalidBitrate (int value)
 		{
-			return value <= 0 || value >= 320000;
+			return value < 0 || value >= 320000;
 		}
-
-
 	}
 }
