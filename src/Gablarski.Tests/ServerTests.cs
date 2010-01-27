@@ -161,7 +161,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void RequestChannelList ()
 		{
-			var connection = provider.EstablishConnection ();
+			var connection = Connect();
 			connection.Client.Send (new RequestChannelListMessage ());
 
 			MessageBase message = connection.Client.DequeueMessage ();
@@ -176,7 +176,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void BadNickname ()
 		{
-			var connection = provider.EstablishConnection ();
+			var connection = Connect();
 			connection.Client.Send (new JoinMessage { Nickname = String.Empty });
 
 			var join = connection.Client.DequeueAndAssertMessage<JoinResultMessage>();
@@ -202,7 +202,7 @@ namespace Gablarski.Tests
 		{
 			this.server.Settings.ServerPassword = "foo";
 
-			var connection = provider.EstablishConnection();
+			var connection = Connect();
 			Join (false, connection, Nickname, "foo");
 		}
 
@@ -249,6 +249,8 @@ namespace Gablarski.Tests
 			var barc = Login (Username2, Password2);
 
 			fooc.Disconnect();
+
+			barc.Client.DequeueAndAssertMessage<SourcesRemovedMessage>();
 
 			var msg = barc.Client.DequeueAndAssertMessage<UserDisconnectedMessage>();
 			Assert.AreEqual (foo.UserId, msg.UserId);
