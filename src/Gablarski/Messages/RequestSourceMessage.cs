@@ -58,6 +58,7 @@ namespace Gablarski.Messages
 				throw new ArgumentNullException ("args");
 
 			this.Name = name;
+			AudioSettings = args;
 		}
 
 		public string Name
