@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -37,23 +37,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Gablarski.Messages
 {
-	[Flags]
-	public enum MuteType
-		: byte
-	{
-		User = 1,
-		AudioSource = 2,
-	}
-
-	public class RequestMuteMessage
+	public abstract class RequestMuteMessage
 		: ClientMessage
 	{
-		public RequestMuteMessage()
-			: base (ClientMessageType.RequestMute)
+		protected RequestMuteMessage (ClientMessageType type)
+			: base (type)
 		{
 		}
 
@@ -62,36 +53,21 @@ namespace Gablarski.Messages
 			get; set;
 		}
 
-		public object Target
-		{
-			get; set;
-		}
-
-		public MuteType Type
+		public int TargetId
 		{
 			get; set;
 		}
 
 		public override void WritePayload (IValueWriter writer)
 		{
-			writer.WriteByte ((byte)this.Type);
 			writer.WriteBool (this.Unmute);
-			
-			if (this.Type == MuteType.User)
-				writer.WriteString ((string)this.Target);
-			else
-				writer.WriteInt32 ((int)this.Target);
+			writer.WriteInt32 (this.TargetId);
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
-			this.Type = (MuteType)reader.ReadByte();
 			this.Unmute = reader.ReadBool();
-
-			if (this.Type == MuteType.User)
-				this.Target = reader.ReadString();
-			else
-				this.Target = reader.ReadInt32();
+			this.TargetId = reader.ReadInt32();
 		}
 	}
 }
