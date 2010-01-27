@@ -118,7 +118,7 @@ namespace Gablarski.Tests
 			var msg = new ConnectMessage { ProtocolVersion = 42 };
 			handler.Send (msg, cc => cc == server);
 
-			server.DequeueAndAssertMessage<ConnectMessage>();
+			server.Client.DequeueAndAssertMessage<ConnectMessage>();
 		}
 
 		[Test]
@@ -131,15 +131,19 @@ namespace Gablarski.Tests
 
 			var msg = new ConnectMessage { ProtocolVersion = 42 };
 			handler.Send (msg, (cc, u) => cc == server && u == user);
+
+			server.Client.DequeueAndAssertMessage<ConnectMessage>();
 		}
 
 		[Test]
 		public void Connect()
 		{
-			handler.ConnectMessage (new MessageReceivedEventArgs (server.Client, 
+			handler.ConnectMessage (new MessageReceivedEventArgs (server, 
 				new ConnectMessage { ProtocolVersion = GablarskiServer.ProtocolVersion }));
 
-			Assert.IsTrue (handler.Manager.GetIsConnected (server.Client));
+			Assert.IsTrue (handler.Manager.GetIsConnected (server));
+
+			server.Client.DequeueAndAssertMessage<ServerInfoMessage>();
 		}
 
 		[Test]
@@ -148,7 +152,7 @@ namespace Gablarski.Tests
 			handler.ConnectMessage (new MessageReceivedEventArgs (server, 
 				new ConnectMessage { ProtocolVersion = 1 }));
 
-			Assert.IsFalse (handler.Manager.GetIsConnected (server.Client));
+			Assert.IsFalse (handler.Manager.GetIsConnected (server));
 
 			var rejected = server.Client.DequeueAndAssertMessage<ConnectionRejectedMessage>();
 			Assert.AreEqual (ConnectionRejectedReason.IncompatibleVersion, rejected.Reason);
@@ -214,7 +218,18 @@ namespace Gablarski.Tests
 				new JoinMessage (nickname, userServerpassword)));
 			
 			if (shouldWork)
+			{
 				Assert.IsTrue (handler.Manager.GetIsJoined (server));
+
+				var msg = server.Client.DequeueAndAssertMessage<JoinResultMessage>();
+				Assert.AreEqual (nickname, msg.UserInfo.Nickname);
+
+				server.Client.DequeueAndAssertMessage<PermissionsMessage>();
+				server.Client.DequeueAndAssertMessage<UserJoinedMessage>();
+				server.Client.DequeueAndAssertMessage<ChannelListMessage>();
+				server.Client.DequeueAndAssertMessage<UserListMessage>();
+				server.Client.DequeueAndAssertMessage<SourceListMessage>();
+			}
 			else
 				Assert.IsFalse (handler.Manager.GetIsJoined (server));
 		}
