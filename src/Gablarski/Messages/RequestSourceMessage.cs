@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -37,7 +37,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using Gablarski.Audio;
 
 namespace Gablarski.Messages
 {
@@ -49,24 +49,15 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public RequestSourceMessage (string name, int channels, int targetBitrate, short frameSize)
+		public RequestSourceMessage (string name, AudioCodecArgs args)
 			: this ()
 		{
 			if (name == null)
-				throw new ArgumentNullException("name");
-			if (channels < 1 || channels > 2)
-				throw new ArgumentOutOfRangeException ("channels");
-			if ((frameSize != 0 && frameSize < 64) || frameSize > 1024)
-				throw new ArgumentOutOfRangeException ("frameSize");
-			if ((frameSize % 64) != 0)
-				throw new ArgumentException ("frameSize");
+				throw new ArgumentNullException ("name");
+			if (args == null)
+				throw new ArgumentNullException ("args");
 
 			this.Name = name;
-			this.Channels = channels;
-			this.TargetBitrate = targetBitrate;
-
-			if (frameSize != 0)
-				this.FrameSize = frameSize;
 		}
 
 		public string Name
@@ -74,43 +65,22 @@ namespace Gablarski.Messages
 			get; set;
 		}
 
-		public int Channels
+		public AudioCodecArgs AudioSettings
 		{
 			get;
 			set;
-		}
-
-		/// <summary>
-		/// Gets or sets the target bitrate to be requested (0 leaves it to the server.)
-		/// </summary>
-		public int TargetBitrate
-		{
-			get;
-			set;
-		}
-
-		private short frameSize = 256;
-
-		public short FrameSize
-		{
-			get { return this.frameSize; }
-			set { this.frameSize = value; }
 		}
 
 		public override void WritePayload (IValueWriter writer)
 		{
 			writer.WriteString (this.Name);
-			writer.WriteByte ((byte)this.Channels);
-			writer.WriteInt32 (this.TargetBitrate);
-			writer.WriteInt16 (this.FrameSize);
+			AudioSettings.Serialize (writer);
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
 			this.Name = reader.ReadString();
-			this.Channels = reader.ReadByte ();
-			this.TargetBitrate = reader.ReadInt32();
-			this.FrameSize = reader.ReadInt16();
+			AudioSettings = new AudioCodecArgs (reader);
 		}
 	}
 }
