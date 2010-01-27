@@ -60,7 +60,22 @@ namespace Gablarski.Server
 			if (audioArgs == null)
 				throw new ArgumentNullException ("audioArgs");
 
-			throw new NotImplementedException();
+			if (OwnedSources.Contains (owner.UserId))
+			{
+				if (OwnedSources[owner.UserId].Any (s => s.Name == name))
+					throw new ArgumentException ("Duplicate source name", "name");
+			}
+
+			int id = 1;
+			if (Sources.Keys.Any())
+				id = Sources.Keys.Max() + 1;
+
+			var source = new AudioSource (name, id, owner.UserId, audioArgs);
+
+			Sources.Add (source.Id, source);
+			OwnedSources.Add (owner.UserId, source);
+
+			return source;
 		}
 
 		public bool IsSourceNameTaken (UserInfo user, string sourceName)
@@ -70,7 +85,7 @@ namespace Gablarski.Server
 			if (sourceName == null)
 				throw new ArgumentNullException ("sourceName");
 
-			throw new NotImplementedException();
+			return (OwnedSources.Contains (user.UserId) && (OwnedSources[user.UserId].Any (s => s.Name == sourceName)));
 		}
 	}
 }
