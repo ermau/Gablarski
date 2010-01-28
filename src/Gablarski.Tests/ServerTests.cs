@@ -190,7 +190,7 @@ namespace Gablarski.Tests
 			var c = Login (Username, Password);
 			Join (true, c, Nickname);
 
-			var connection = provider.EstablishConnection();
+			var connection = Connect();
 			connection.Client.Send (new JoinMessage (Nickname, null));
 
 			var join = connection.Client.DequeueAndAssertMessage<JoinResultMessage>();

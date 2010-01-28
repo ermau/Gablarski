@@ -174,6 +174,25 @@ namespace Gablarski.Tests
 		}
 
 		[Test]
+		public void JoinLoggedIn()
+		{
+			manager.Connect (client);
+			manager.Login (client, new UserInfo (user.Username, user.UserId, user.CurrentChannelId, false));
+			manager.Join (client, user);
+
+			Assert.IsTrue (manager.GetIsJoined (client));
+			Assert.IsTrue (manager.GetIsJoined (user));
+
+			UserInfo joinedUser = manager.GetUser (client);
+			Assert.AreEqual (user.UserId, joinedUser.UserId);
+			Assert.AreEqual (user.Username, joinedUser.Username);
+			Assert.AreEqual (user.Nickname, joinedUser.Nickname);
+			Assert.AreEqual (user.Phonetic, joinedUser.Phonetic);
+			Assert.AreEqual (user.Status, joinedUser.Status);
+			Assert.AreEqual (user.IsMuted, joinedUser.IsMuted);
+		}
+
+		[Test]
 		public void JoinIgnoreDupe()
 		{
 			manager.Connect (client);

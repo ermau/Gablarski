@@ -512,7 +512,7 @@ namespace Gablarski.Clients.Windows
 				gablarski.Disconnect();
 			}
 			else
-				this.gablarski.Sources.Request ("voice", 1);
+				this.gablarski.Sources.Request ("voice", 1, 512);
 		}
 
 		void GablarskiDisconnected (object sender, EventArgs e)

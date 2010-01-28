@@ -155,11 +155,6 @@ namespace Gablarski.Audio
 			}
 		}
 
-		public static bool IsInvalidFrameSize(short value)
-		{
-			return value != 0 && (value < 64 || value > 1024 || (value % 64) != 0);
-		}
-
 		private short frameSize;
 		private byte channels;
 		private byte complexity;
@@ -182,6 +177,11 @@ namespace Gablarski.Audio
 			this.Frequency = reader.ReadInt32();
 			this.FrameSize = reader.ReadInt16();
 			this.Complexity = reader.ReadByte();
+		}
+
+		public static bool IsInvalidFrameSize(short value)
+		{
+			return value < 64 || value > 1024 || (value % 64) != 0;
 		}
 
 		public static bool IsInvalidFrequency (int value)
