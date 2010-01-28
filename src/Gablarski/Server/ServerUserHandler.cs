@@ -59,6 +59,10 @@ namespace Gablarski.Server
 			if (connection == null)
 				throw new ArgumentNullException ("connection");
 
+			UserInfo user = Manager.GetUser (connection);
+			if (user != null)
+				context.Users.Send (new UserDisconnectedMessage (user.UserId));
+
 			Manager.Disconnect (connection);
 		}
 
@@ -66,6 +70,15 @@ namespace Gablarski.Server
 		{
 			if (predicate == null)
 				throw new ArgumentNullException ("predicate");
+
+			foreach (IConnection c in Manager.GetConnections().Where (predicate))
+			{
+				UserInfo user = Manager.GetUser (c);
+				if (user != null)
+					context.Users.Send (new UserDisconnectedMessage (user.UserId));
+
+				c.Disconnect();
+			}
 
 			Manager.Disconnect (predicate);
 		}

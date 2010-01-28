@@ -98,7 +98,7 @@ namespace Gablarski.Server
 			if (!connections.Contains (connection) || joined.Contains (connection))
 				return;
 
-			connectedUsers[user] = connection;
+			connectedUsers.Inverse[connection] = new UserInfo (user);
 			joined.Add (connection);
 		}
 

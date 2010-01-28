@@ -426,6 +426,8 @@ namespace Gablarski.Server
 
 		protected void ClientDisconnected (MessageReceivedEventArgs e)
 		{
+			e.Connection.Disconnect();
+
 			OnClientDisconnected (this, new ConnectionEventArgs (e.Connection));
 		}
 
@@ -435,13 +437,13 @@ namespace Gablarski.Server
 
 			e.Connection.MessageReceived -= this.OnMessageReceived;
 			e.Connection.Disconnected -= this.OnClientDisconnected;
-			e.Connection.Disconnect();
 
 			UserInfo user = UserManager.GetUser (e.Connection);
-
-			Users.Disconnect (e.Connection);
-
-			Sources.Remove (user);
+			if (user != null)
+			{
+				Sources.Remove (user);
+				Users.Disconnect (e.Connection);
+			}
 		}
 		
 		private void OnConnectionMade (object sender, ConnectionEventArgs e)

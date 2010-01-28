@@ -37,13 +37,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Gablarski.Client;
 using Cadenza;
 
 namespace Gablarski
 {
 	public class UserInfo
+		: IEquatable<UserInfo>
 	{
 		internal UserInfo()
 		{
@@ -192,7 +192,17 @@ namespace Gablarski
 			return false;
 		}
 
-		public override int GetHashCode ()
+		public bool Equals (UserInfo other)
+		{
+			if (ReferenceEquals (null, other))
+				return false;
+			if (ReferenceEquals (this, other))
+				return true;
+
+			return Equals (other.Username, this.Username);
+		}
+
+		public override int GetHashCode()
 		{
 			return this.Username.GetHashCode();
 		}

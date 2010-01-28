@@ -6055,6 +6055,25 @@ Assert.AreEqual (-1, "*default*".Match (m));
             node is provided to <paramref name="valueSelector" />, and the
             values are returned.
           </para>
+            </remarks>
+            <example>
+                <para>
+            Given the <c>TreeNode&lt;T&gt;</c> declaration:
+          </para>
+                <code lang="C#" src="../../Test/Cadenza/ObjectTest.cs#TreeNode_Declaration">class TreeNode&lt;T&gt;
+{
+	public TreeNode ()
+	{
+		Children = new TreeNode&lt;T&gt; [0];
+	}
+
+	public T Value;
+	public IEnumerable&lt;TreeNode&lt;T&gt;&gt; Children;
+}
+</code>
+                <para>
+                    <c>TraverseBreadthFirst()</c> is used as:
+          </para>
                 <code lang="C#" src="../../Test/Cadenza/ObjectTest.cs#TraverseBreadthFirst">TreeNode&lt;int&gt; root = new TreeNode&lt;int&gt; {
 	Value = 1, Children = new [] {
 		new TreeNode&lt;int&gt; { Value = 2 },
@@ -6070,7 +6089,7 @@ IEnumerable&lt;int&gt; values = root
 	.TraverseBreadthFirst (x =&gt; x.Value, x =&gt; x.Children);
 AssertAreSame (new[]{ 1, 2, 3, 4, 5 }, values);
 </code>
-            </remarks>
+            </example>
             <exception cref="T:System.ArgumentNullException">
                 <para>
                     <paramref name="self" /> is <see langword="null" />.
@@ -6198,6 +6217,25 @@ AssertAreSame (new[]{ 1, 2, 3, 4, 5 }, values);
             node is provided to <paramref name="valueSelector" />, and the
             values are returned.
           </para>
+            </remarks>
+            <example>
+                <para>
+            Given the <c>TreeNode&lt;T&gt;</c> declaration:
+          </para>
+                <code lang="C#" src="../../Test/Cadenza/ObjectTest.cs#TreeNode_Declaration">class TreeNode&lt;T&gt;
+{
+	public TreeNode ()
+	{
+		Children = new TreeNode&lt;T&gt; [0];
+	}
+
+	public T Value;
+	public IEnumerable&lt;TreeNode&lt;T&gt;&gt; Children;
+}
+</code>
+                <para>
+                    <c>TraverseDepthFirst()</c> is used as:
+          </para>
                 <code lang="C#" src="../../Test/Cadenza/ObjectTest.cs#TraverseDepthFirst">TreeNode&lt;int&gt; root = new TreeNode&lt;int&gt; {
 	Value = 1, Children = new [] {
 		new TreeNode&lt;int&gt; { Value = 2 },
@@ -6213,7 +6251,7 @@ IEnumerable&lt;int&gt; values = root
 	.TraverseDepthFirst (x =&gt; x.Value, x =&gt; x.Children);
 AssertAreSame (new[]{ 1, 2, 3, 5, 4 }, values);
 </code>
-            </remarks>
+            </example>
             <exception cref="T:System.ArgumentNullException">
                 <para>
                     <paramref name="self" /> is <see langword="null" />.
@@ -6849,10 +6887,28 @@ Assert.AreEqual ("1,2,3,4,5",
         </exception>
         </member>
         <member name="M:Cadenza.StringCoda.IsNullOrWhitespace(System.String)">
-            <param name="self">To be added.</param>
-            <summary>To be added.</summary>
-            <returns>To be added.</returns>
-            <remarks>To be added.</remarks>
+            <param name="self">
+          A <see cref="T:System.String" /> to check to see if it is
+          <see langword="null" /> or contains only whitespace characters.
+        </param>
+            <summary>
+          Indicates whether <paramref name="self" /> is a
+          <see langword="null" /> or contains only whitespace.
+        </summary>
+            <returns>
+                <see langword="true" /> if <paramref name="self" />
+          is <see langword="null" /> or contains only
+          whitespace; otherwise, <see langword="false" />.
+        </returns>
+            <remarks>
+                <code lang="C#" src="../../Test/Cadenza/StringTest.cs#IsNullOrWhitespace">string s = null;
+Assert.IsTrue (s.IsNullOrWhitespace());
+Assert.IsTrue ("".IsNullOrWhitespace());
+Assert.IsTrue ("    ".IsNullOrWhitespace());
+Assert.IsFalse ("foo".IsNullOrWhitespace());
+</code>
+            </remarks>
+            <altmember cref="M:System.String.Trim" />
         </member>
         <member name="M:Cadenza.StringCoda.Lines(System.String)">
             <param name="self">
@@ -7082,11 +7138,31 @@ AssertAreSame (expected, actual);
         </exception>
         </member>
         <member name="M:Cadenza.StringCoda.Remove(System.String,System.String[])">
-            <param name="self">To be added.</param>
-            <param name="targets">To be added.</param>
-            <summary>To be added.</summary>
-            <returns>To be added.</returns>
-            <remarks>To be added.</remarks>
+            <param name="self">
+          A <see cref="T:System.String" /> to remove all occurrences of all
+          elements within <paramref name="targets" />.
+        </param>
+            <param name="targets">
+          A <see cref="T:System.String" /> array containing the strings to
+          remove from <paramref name="self " />.
+        </param>
+            <summary>
+          Deletes all strings within <paramref name="targets" /> from
+          <paramref name="self" />.
+        </summary>
+            <returns>
+          A <see cref="T:System.String" /> instance in which all strings
+          within <paramref name="targets " /> have been removed.
+        </returns>
+            <remarks>
+                <code lang="C#" src="../../Test/Cadenza/StringTest.cs#Remove">Assert.AreEqual (" Bar ", "Foo Bar Monkeys".Remove ("Foo", "Monkeys"));
+Assert.AreEqual (" Bar ", "Foo Bar Foo".Remove ("Foo"));
+</code>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+                <paramref name="self" /> or <paramref name="targets" /> is
+          <see langword="null" />.
+        </exception>
         </member>
         <member name="M:Cadenza.StringCoda.Slice(System.String,System.Int32,System.Int32)">
             <param name="self">
@@ -7280,18 +7356,350 @@ AssertAreSame (expected, actual);
         </exception>
         </member>
         <member name="M:Cadenza.StringCoda.WrappedLines(System.String,System.Collections.Generic.IEnumerable{System.Int32})">
-            <param name="self">To be added.</param>
-            <param name="widths">To be added.</param>
-            <summary>To be added.</summary>
-            <returns>To be added.</returns>
-            <remarks>To be added.</remarks>
+            <param name="self">
+          A <see cref="T:System.String" /> to split into segments no longer
+          than lenghts in the <paramref name="widths" /> sequence.
+        </param>
+            <param name="widths">
+          A
+          <see cref="T:System.Collections.Generic.IEnumerable{System.String}" />
+          containing the maximum lengths
+          to use for corresponding returned segments.  The last value in this
+          array is used for all remaining segments.
+        </param>
+            <summary>
+          Splits a string into line segments with a maximum length constrained
+          by <paramref name="widths" />.
+        </summary>
+            <returns>
+          A
+          <see cref="T:System.Collections.Generic.IEnumerable{System.String}" />
+          containing segments from <paramref name="self" /> with a length
+          no longer than entries from <paramref name="widths" />.
+        </returns>
+            <remarks>
+                <para>
+            This is a "DWIM"-style interface for line wrapping.
+          </para>
+                <para>
+                    <c>WrappedLines()</c> is oriented toward
+            <see cref="T:System.Console" />-style output in which line widths
+            are controlled by the number of characters (i.e. fixed-width fonts,
+            not proportional fonts).  <paramref name="widths" /> is used
+            to constrain the length of each corresponding segment within the
+            returned
+            <see cref="T:System.Collections.Generic.IEnumerable{System.String}" />.
+            For example, the first string segment returned will have a length
+            no longer than the first element in <paramref name="widths" />,
+            the second string segment returned will have a length no longer
+            than the second element in <paramref name="widths" />, etc.
+            The last element in <paramref name="widths" /> is used to constrain
+            the lenghts of all remaining string segments; thus, if
+            <paramref name="widths" /> has only one element, that value is
+            used to constrain all returned string segments.
+          </para>
+                <para>
+            Note that <paramref name="widths" /> constrains the width of
+            segments; a segment may be shorter, and may be empty.
+          </para>
+                <para>
+            String splitting is done as follows:
+          </para>
+                <list type="number">
+                    <item>
+                        <term>
+                Determine the <c>width</c>to use for the current segment by
+                getting a value from <paramref name="widths" />.  If
+                <paramref name="widths" /> is empty, then the maximum
+                segment length is <see cref="F:System.Int32.MaxValue" />.
+                If there is no remaining value in <paramref name="widths" />,
+                use the last width value found.
+              </term>
+                    </item>
+                    <item>
+                        <term>
+                Beginning at index <c>i</c> within <paramref name="self" />
+                (starting at index <c>0</c>), look for all "end-of-line
+                characters" -- characters for which
+                <see cref="M:System.Char.IsLetterOrDigit(System.Char)" />
+                returns <see langword="false" />, thus including punctuation,
+                whitespace, etc. --
+                from <c>self[i]</c> until <c>self[i+width]</c>.
+                If a newline is found, return the segment starting from index
+                <c>i</c> until the first newline position.  If no newline
+                is found but an end-of-line character is is found, return a
+                segment starting from index <c>i</c> until the last end-of-line
+                character. If no end-of-line character is found within
+                <c>self[i]</c> until <c>self[i+width]</c>, create a segment from
+                <c>self[i]</c> until <c>self[i+width-1]</c>, and append
+                <c>'-'</c> to the segment as a line-continuation character.
+              </term>
+                    </item>
+                    <item>
+                        <term>
+                Repeat steps 1-2 until the end of the string is encountered.
+              </term>
+                    </item>
+                </list>
+                <code lang="C#" src="../../Test/Cadenza/StringTest.cs#WrappedLines">// Notice that the first width is 50, but the actual returned length is 17.
+// This is because the newline is encountered first.
+// The width of 48 is used to constrain all remaining lines, causing
+// the 4th line to require line-wrapping.
+//
+// Notice also that all embedded '\n's are removed.
+IEnumerable&lt;string&gt; wrappedLines =
+		("This has a really\n" +
+		 "long, multi-line description that also\n" +
+		 "tests\n" +
+		 "the-builtin-supercalifragilisticexpialidicious-break-on-hyphen.  " +
+		 "Also, a list:\n" +
+		 "  item 1\n" +
+		 "  item 2")
+		.WrappedLines (50, 48);
+Assert.IsTrue (new[]{
+		"This has a really",
+		"long, multi-line description that also",
+		"tests",
+		"the-builtin-supercalifragilisticexpialidicious-",
+		"break-on-hyphen.  Also, a list:",
+		"  item 1",
+		"  item 2",
+}.SequenceEqual (wrappedLines));
+
+// Another example where the text has no whitespace before the
+// constrained width.
+wrappedLines =
+	"IWantThisDescriptionToBreakInsideAWordGeneratingAutoWordHyphenation."
+	.WrappedLines (50, 4, 5, 12);
+Assert.IsTrue (new[]{
+		"IWantThisDescriptionToBreakInsideAWordGeneratingA-", // length=50
+		"uto-",                                               // length=4
+		"Word-",                                              // length=5
+		"Hyphenation.",                                       // length=12
+}.SequenceEqual (wrappedLines));
+
+// Notice that '.' is treated as an end-of-line character
+wrappedLines =
+	"OnlyOnePeriod.AndNoWhitespaceShouldBeSupportedEvenWithLongDescriptions"
+	.WrappedLines (50, 48);
+Assert.IsTrue (new[]{
+		"OnlyOnePeriod.",
+		"AndNoWhitespaceShouldBeSupportedEvenWithLongDes-",
+		"criptions",
+}.SequenceEqual (wrappedLines));
+
+wrappedLines =
+	"Lots of spaces in the middle 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 and more until the end."
+	.WrappedLines (50, 48);
+Assert.IsTrue (new []{
+		"Lots of spaces in the middle 1 2 3 4 5 6 7 8 9 0",
+		"1 2 3 4 5 and more until the end.",
+}.SequenceEqual (wrappedLines));
+
+wrappedLines =
+	"Lots of spaces in the middle - . - . - . - . - . - . - . - and more until the end."
+	.WrappedLines (50, 48);
+Assert.IsTrue (new[]{
+		"Lots of spaces in the middle - . - . - . - . - . -",
+		" . - . - and more until the end.",
+}.SequenceEqual (wrappedLines));
+
+// An ~infinite sequence of widths
+wrappedLines =
+	"1121231234123451234561234567123456781234567891234567890"
+	.WrappedLines (Sequence.Iterate(2, v =&gt; v + 1));
+Assert.IsTrue (new[]{
+		"1-",
+		"12-",
+		"123-",
+		"1234-",
+		"12345-",
+		"123456-",
+		"1234567-",
+		"12345678-",
+		"123456789-",
+		"1234567890",
+}.SequenceEqual (wrappedLines));
+</code>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+                <paramref name="widths" /> is <see langword="null" />.
+        </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+                <paramref name="widths" /> contains a value that is less than 2.
+        </exception>
         </member>
         <member name="M:Cadenza.StringCoda.WrappedLines(System.String,System.Int32[])">
-            <param name="self">To be added.</param>
-            <param name="widths">To be added.</param>
-            <summary>To be added.</summary>
-            <returns>To be added.</returns>
-            <remarks>To be added.</remarks>
+            <param name="self">
+          A <see cref="T:System.String" /> to split into segments no longer
+          than lenghts in the <paramref name="widths" /> sequence.
+        </param>
+            <param name="widths">
+          A <see cref="T:System.Int32" /> array containing the maximum lengths
+          to use for corresponding returned segments.  The last value in this
+          array is used for all remaining segments.
+        </param>
+            <summary>
+          Splits a string into line segments with a maximum length constrained
+          by <paramref name="widths" />.
+        </summary>
+            <returns>
+          A
+          <see cref="T:System.Collections.Generic.IEnumerable{System.String}" />
+          containing segments from <paramref name="self" /> with a length
+          no longer than entries from <paramref name="widths" />.
+        </returns>
+            <remarks>
+                <para>
+            This is a "DWIM"-style interface for line wrapping.
+          </para>
+                <para>
+                    <c>WrappedLines()</c> is oriented toward
+            <see cref="T:System.Console" />-style output in which line widths
+            are controlled by the number of characters (i.e. fixed-width fonts,
+            not proportional fonts).  <paramref name="widths" /> is used
+            to constrain the length of each corresponding segment within the
+            returned
+            <see cref="T:System.Collections.Generic.IEnumerable{System.String}" />.
+            For example, the first string segment returned will have a length
+            no longer than the first element in <paramref name="widths" />,
+            the second string segment returned will have a length no longer
+            than the second element in <paramref name="widths" />, etc.
+            The last element in <paramref name="widths" /> is used to constrain
+            the lenghts of all remaining string segments; thus, if
+            <paramref name="widths" /> has only one element, that value is
+            used to constrain all returned string segments.
+          </para>
+                <para>
+            Note that <paramref name="widths" /> constrains the width of
+            segments; a segment may be shorter, and may be empty.
+          </para>
+                <para>
+            String splitting is done as follows:
+          </para>
+                <list type="number">
+                    <item>
+                        <term>
+                Determine the <c>width</c>to use for the current segment by
+                getting a value from <paramref name="widths" />.  If
+                <paramref name="widths" /> is empty, then the maximum
+                segment length is <see cref="F:System.Int32.MaxValue" />.
+                If there is no remaining value in <paramref name="widths" />,
+                use the last width value found.
+              </term>
+                    </item>
+                    <item>
+                        <term>
+                Beginning at index <c>i</c> within <paramref name="self" />
+                (starting at index <c>0</c>), look for all "end-of-line
+                characters" -- characters for which
+                <see cref="M:System.Char.IsLetterOrDigit(System.Char)" />
+                returns <see langword="false" />, thus including punctuation,
+                whitespace, etc. --
+                from <c>self[i]</c> until <c>self[i+width]</c>.
+                If a newline is found, return the segment starting from index
+                <c>i</c> until the first newline position.  If no newline
+                is found but an end-of-line character is is found, return a
+                segment starting from index <c>i</c> until the last end-of-line
+                character. If no end-of-line character is found within
+                <c>self[i]</c> until <c>self[i+width]</c>, create a segment from
+                <c>self[i]</c> until <c>self[i+width-1]</c>, and append
+                <c>'-'</c> to the segment as a line-continuation character.
+              </term>
+                    </item>
+                    <item>
+                        <term>
+                Repeat steps 1-2 until the end of the string is encountered.
+              </term>
+                    </item>
+                </list>
+                <code lang="C#" src="../../Test/Cadenza/StringTest.cs#WrappedLines">// Notice that the first width is 50, but the actual returned length is 17.
+// This is because the newline is encountered first.
+// The width of 48 is used to constrain all remaining lines, causing
+// the 4th line to require line-wrapping.
+//
+// Notice also that all embedded '\n's are removed.
+IEnumerable&lt;string&gt; wrappedLines =
+		("This has a really\n" +
+		 "long, multi-line description that also\n" +
+		 "tests\n" +
+		 "the-builtin-supercalifragilisticexpialidicious-break-on-hyphen.  " +
+		 "Also, a list:\n" +
+		 "  item 1\n" +
+		 "  item 2")
+		.WrappedLines (50, 48);
+Assert.IsTrue (new[]{
+		"This has a really",
+		"long, multi-line description that also",
+		"tests",
+		"the-builtin-supercalifragilisticexpialidicious-",
+		"break-on-hyphen.  Also, a list:",
+		"  item 1",
+		"  item 2",
+}.SequenceEqual (wrappedLines));
+
+// Another example where the text has no whitespace before the
+// constrained width.
+wrappedLines =
+	"IWantThisDescriptionToBreakInsideAWordGeneratingAutoWordHyphenation."
+	.WrappedLines (50, 4, 5, 12);
+Assert.IsTrue (new[]{
+		"IWantThisDescriptionToBreakInsideAWordGeneratingA-", // length=50
+		"uto-",                                               // length=4
+		"Word-",                                              // length=5
+		"Hyphenation.",                                       // length=12
+}.SequenceEqual (wrappedLines));
+
+// Notice that '.' is treated as an end-of-line character
+wrappedLines =
+	"OnlyOnePeriod.AndNoWhitespaceShouldBeSupportedEvenWithLongDescriptions"
+	.WrappedLines (50, 48);
+Assert.IsTrue (new[]{
+		"OnlyOnePeriod.",
+		"AndNoWhitespaceShouldBeSupportedEvenWithLongDes-",
+		"criptions",
+}.SequenceEqual (wrappedLines));
+
+wrappedLines =
+	"Lots of spaces in the middle 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 and more until the end."
+	.WrappedLines (50, 48);
+Assert.IsTrue (new []{
+		"Lots of spaces in the middle 1 2 3 4 5 6 7 8 9 0",
+		"1 2 3 4 5 and more until the end.",
+}.SequenceEqual (wrappedLines));
+
+wrappedLines =
+	"Lots of spaces in the middle - . - . - . - . - . - . - . - and more until the end."
+	.WrappedLines (50, 48);
+Assert.IsTrue (new[]{
+		"Lots of spaces in the middle - . - . - . - . - . -",
+		" . - . - and more until the end.",
+}.SequenceEqual (wrappedLines));
+
+// An ~infinite sequence of widths
+wrappedLines =
+	"1121231234123451234561234567123456781234567891234567890"
+	.WrappedLines (Sequence.Iterate(2, v =&gt; v + 1));
+Assert.IsTrue (new[]{
+		"1-",
+		"12-",
+		"123-",
+		"1234-",
+		"12345-",
+		"123456-",
+		"1234567-",
+		"12345678-",
+		"123456789-",
+		"1234567890",
+}.SequenceEqual (wrappedLines));
+</code>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+                <paramref name="widths" /> is <see langword="null" />.
+        </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+                <paramref name="widths" /> contains a value that is less than 2.
+        </exception>
         </member>
         <member name="T:Cadenza.Tuple">
             <summary>
@@ -8613,11 +9021,39 @@ KeyValuePair&lt;string, int&gt; kvp   = tuple.ToKeyValuePair ();
             <remarks />
         </member>
         <member name="M:Cadenza.TypeCoda.IsAssignableTo(System.Type,System.Type)">
-            <param name="self">To be added.</param>
-            <param name="type">To be added.</param>
-            <summary>To be added.</summary>
-            <returns>To be added.</returns>
-            <remarks>To be added.</remarks>
+            <param name="self">
+          A <see cref="T:System.Type" /> which is used to check that
+          instances of type <paramref name="self" /> can be stored
+          into references of type <paramref name="type" />.
+        </param>
+            <param name="type">
+          A <see cref="T:System.Type" /> which is the type of the
+          reference to store an instance of type <paramref name="self" />.
+        </param>
+            <summary>
+          Determines whether an instance of <paramref name="self" /> can be
+          stored in a reference of a type <paramref name="type" />.
+        </summary>
+            <returns>
+                <see langword="true" /> if an instance of type <paramref name="self" />
+          can be stored into a reference of type <paramref name="type" />;
+          otherwise, <see langword="false" />.
+        </returns>
+            <remarks>
+                <para>
+            This is equivalent to
+            <c><paramref name="type" />.IsAssignableFrom(<paramref name="self" />)</c>.
+          </para>
+                <code lang="C#" src="../../Test/Cadenza/TypeTest.cs#IsAssignableTo">// Can string be implicitly converted to object?  Yes.
+Assert.IsTrue (typeof(string).IsAssignableTo (typeof (object)));
+// Can object be implicitly converted to string?  No.
+Assert.IsFalse (typeof(object).IsAssignableTo (typeof (string)));
+</code>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+                <paramref name="self" /> is <see langword="null" />.
+        </exception>
+            <altmember cref="M:System.Type.IsAssignableFrom(System.Type)" />
         </member>
         <member name="M:Cadenza.TypeCoda.IsNullable(System.Type)">
             <param name="self">
@@ -8937,92 +9373,443 @@ Assert.IsFalse (typeof (Nullable&lt;&gt;).IsNullable ());
             <remarks>To be added.</remarks>
         </member>
         <member name="T:Cadenza.Collections.CachedSequence`1">
-            <typeparam name="T">To be added.</typeparam>
-            <summary>To be added.</summary>
-            <remarks>To be added.</remarks>
+            <typeparam name="T">
+      The type of the value to store in the sequence.
+    </typeparam>
+            <summary>
+      An immutable, thread-safe, singly-linked list.
+    </summary>
+            <remarks>
+                <para>
+                    <c>CachedSequence&lt;T&gt;</c> is useful for caching the current values
+        within a <see cref="T:System.Collections.Generic.IEnumerable{T}" />
+        which come from a generator that will generate different values
+        from each invocation.  Consider the following generator:
+      </para>
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#CachedSequence_RandomValuesGenerator">internal static IEnumerable&lt;int&gt; RandomValues (Random r, int max)
+{
+	while (true)
+		yield return r.Next (max);
+}
+</code>
+                <para>
+        The above generator does two things: it generates an infinite sequence,
+        and each time
+        <see cref="T:System.Collections.Generic.IEnumerable{T}.GetEnumerator" />
+        is called on the
+        <see cref="T:System.Collections.Generic.IEnumerable{T}" /> that
+        <c>RandomValues()</c> returns, it may return a different sequence:
+      </para>
+                <code>var r = new Random();
+
+// prints e.g.: 6, 2, 8
+foreach (var v in RandomValues (r, 10).Take(3))
+    Console.WriteLine (v);
+
+// prints e.g.: 1, 4, 3
+foreach (var v in RandomValues (r, 10).Take(3))
+    Console.WriteLine (v);</code>
+                <para>
+        This is potentially fine if you're aware of the problem, but it
+        can potentially break some algorithms if the generator is
+        referenced multiple times (under the assumption that the
+        sequence won't change):
+      </para>
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#NoCache">var randSeq = RandomValues (new Random (), 100);
+// this could pass, but that's highly improbable
+Assert.IsFalse (
+		randSeq.Take (10).SelectFromEach (randSeq.Take (10),
+			(l, r) =&gt; l + r)
+		.All (x =&gt; x % 2 == 0));
+</code>
+                <para>
+        The above algorithm attempts to say: give me two sets of 10 random
+        numbers, add them together, and assert that the results are always
+        even (as any number added to itself will be even).  This algorithm
+        fails because the generator returns a different sequence on the
+        second <c>randSeq.Take(10)</c> call.
+      </para>
+                <para>
+        A fix is to "memoize" the sequence.  <c>CachedSequence&lt;T&gt;</c>
+        will record the input sequence, so that subsequent iterations
+        will return the same values as the first iteration.  This allows
+        the same algorithm to work:
+      </para>
+                <code lang="C#" src="../../Test/Cadenza.Collections/CachedSequenceTest.cs#RandomValues">var values = new Random ();
+// Note: wrapping an infinite sequence
+var randSeq = new CachedSequence&lt;int&gt; (EnumerableTest.RandomValues (values, 10));
+Assert.IsTrue (
+		randSeq.Take (20).SelectFromEach (randSeq.Take (10),
+			(l, r) =&gt; l + r)
+		.All (x =&gt; x % 2 == 0));
+</code>
+                <para>
+                    <c>CachedSequence&lt;T&gt;</c> has two modes of operation: as a
+        "fully realized" singly-linked list constructed one node at a time,
+        and (as seen above) as a caching wrapper over an
+        <see cref="T:System.Collections.Generic.IEnumerable{T}" /> sequence.
+      </para>
+                <para>
+        Node at a time construction is performed with the
+        <see cref="C:Cadenza.Collections.CachedSequence{T}(`0)" /> and
+        <see cref="C:Cadenza.Collections.CachedSequence{T}(`0,Cadenza.Collections.CachedSequence{`0})" />
+        constructors.  For both, the <typeparamref name="T" /> parameter then
+        becomes accessible via
+        <see cref="P:Cadenza.Collections.CachedSequence{T}.Head" />,
+        while
+        <see cref="P:Cadenza.Collections.CachedSequence{T}.Tail" /> is either
+        <see langword="null" /> (for the first constructor) or the specified
+        <c>CachedSequence&lt;T&gt;</c> value.  The second constructor
+        thus allows creating sequences of arbitrary length.
+      </para>
+                <para>
+        When wrapping
+        <see cref="T:System.Collections.Generic.IEnumerable{T}" /> sequences
+        via the
+        <see cref="C:Cadenza.Collections.CachedSequence{T}(System.Collections.Generic.IEnumerable{`0})" />
+        constructor, an alternate mode is used.  The sequence is not
+        immediately executed; instead, the sequence is evaluated on-demand
+        when the
+        <see cref="P:Cadenza.Collections.CachedSequence{T}.Head" />
+        and
+        <see cref="P:Cadenza.Collections.CachedSequence{T}.Tail" />
+        properties are accessed.  This allows infinite sequences to be
+        wrapped without requiring infinite memory, as seen above with the
+        random sequence generator.
+      </para>
+            </remarks>
         </member>
         <member name="C:Cadenza.Collections.CachedSequence`1(`0System`0.`0Collections`0.`0Generic`0.`0IEnumerable`0{`0T`0})">
-            <param name="collection">To be added.</param>
-            <summary>To be added.</summary>
-            <remarks>To be added.</remarks>
+            <param name="collection">
+          A <see cref="T:System.Collections.Generic.IEnumerable{T}" />
+          which is the sequence to wrap.  <paramref name="collection" />
+          may refer to an infinite sequence.
+        </param>
+            <summary>
+          Constructs and initializes a new instance of the
+          <see cref="T:Cadenza.Collections.CachedSequence{T}" /> class
+          which wraps the specified <paramref name="collection" />.
+        </summary>
+            <remarks>
+                <para>
+            This constructor invokes
+            <see cref="M:System.Collections.Generic.IEnumerable{T}.GetEnumerator" />
+            on <paramref name="collection" /> to obtain a
+            <see cref="T:System.Collections.Generic.IEnumerator{T}" />.  This is
+            referred to as the "underlying enumerator".
+            <see cref="M:System.Collections.IEnumerator.MoveNext" /> is invoked
+            on the underlying enumerator; if <see langword="false" /> is
+            returned, then <see cref="T:System.InvalidOperationException" />
+            is thrown; otherwise,
+            <see cref="P:System.Collections.Generic.IEnumerator{T}.Current" />
+            is used to initialize the
+            <see cref="P:Cadenza.Collections.CachedSequence{T}.Head" />
+            property.
+          </para>
+                <para>
+            The value of the
+            <see cref="P:Cadenza.Collections.CachedSequence{T}.Tail" />
+            property is determined lazily, depending upon the state of the
+            underlying enumerator.
+          </para>
+                <para>
+            The underlying enumerator is
+            <see cref="M:System.IDisposable.Dispose" />d
+            when one of two circumstances occurs:
+          </para>
+                <list type="number">
+                    <item>
+                        <term>
+                The sequence has been completely evaluated (causing
+                <see cref="P:Cadenza.Collections.CachedSequence{T}.Tail" />
+                to return <see langword="null" />).  This can't happen
+                with infinite sequences.
+              </term>
+                    </item>
+                    <item>
+                        <term>
+                            <see cref="M:Cadenza.Collections.CachedSequence{T}.GetEnumerator" />
+                is invoked, and the returned enumerator is disposed.  This
+                will cause the underlying enumerator to also be disposed.
+              </term>
+                    </item>
+                </list>
+                <para>
+            Note that disposing the underlying enumerator effectively
+            terminates the sequence.  Thus, <paramref name="collection" />
+            is an infinite sequence, if the <c>CachedSequence&lt;T&gt;</c>
+            is enumerated and the enumerator is disposed, the infinite
+            sequence is also disposed, and no additional elements will be
+            accessible.
+          </para>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+                <paramref name="collection" /> is <see langword="null" />.
+        </exception>
+            <exception cref="T:System.InvalidOperationException">
+                <paramref name="collection" /> contains no elements.
+        </exception>
         </member>
         <member name="C:Cadenza.Collections.CachedSequence`1(`0T`0)">
-            <param name="head">To be added.</param>
-            <summary>To be added.</summary>
-            <remarks>To be added.</remarks>
+            <param name="head">
+          A <typeparamref name="T" /> containing the value to hold.
+        </param>
+            <summary>
+          Constructs and initializes a new instance of the
+          <see cref="T:Cadenza.Collections.CachedSequence{T}" /> class
+          using the specified <paramref name="head" />.
+        </summary>
+            <remarks>
+                <para>
+            This constructor initializes the
+            <see cref="P:Cadenza.Collections.CachedSequence{T}.Head" />
+            property of the new instance using <paramref name="head" />.
+            The <see cref="P:Cadenza.Collections.CachedSequence{T}.Tail" />
+            property of the new sequence will be <see langword="null" />.
+          </para>
+            </remarks>
         </member>
         <member name="C:Cadenza.Collections.CachedSequence`1(`0T`0,`0Cadenza`0.`0Collections`0.`0CachedSequence`0{`0T`0})">
-            <param name="head">To be added.</param>
-            <param name="tail">To be added.</param>
-            <summary>To be added.</summary>
-            <remarks>To be added.</remarks>
+            <param name="head">
+          A <typeparamref name="T" /> containing the value to hold.
+        </param>
+            <param name="tail">
+          A <see cref="T:Cadenza.Collections.CachedSequence{T}" />
+          which is used to initialize the
+          <see cref="P:Cadenza.Collections.CachedSequence{T}.Tail" />
+          property of the created instance.
+        </param>
+            <summary>
+          Constructs and initializes a new instance of the
+          <see cref="T:Cadenza.Collections.CachedSequence{T}" /> class
+          using the specified <paramref name="head" /> and
+          <paramref name="tail" />.
+        </summary>
+            <remarks>
+                <para>
+            This constructor initializes the
+            <see cref="P:Cadenza.Collections.CachedSequence{T}.Head" />
+            property of the new instance using <paramref name="head" />,
+            and initializes the
+            <see cref="P:Cadenza.Collections.CachedSequence{T}.Tail" />
+            property of the new instance using <paramref name="tail" />.
+          </para>
+            </remarks>
         </member>
         <member name="M:Cadenza.Collections.CachedSequence`1.Append(`0T`0)">
-            <param name="value">To be added.</param>
-            <summary>To be added.</summary>
-            <returns>To be added.</returns>
-            <remarks>To be added.</remarks>
+            <param name="value">
+          A <typeparamref name="T" /> containing the value to append
+          to the sequence.
+        </param>
+            <summary>Clones the current sequence with <paramref name="value" /> appended.</summary>
+            <returns>
+          A new <see cref="T:Cadenza.Collections.CachedSequence{T}" />
+          which has <paramref name="value" /> as the last value in the sequence.
+        </returns>
+            <remarks>
+                <para>
+            This is an O(n) operation.  Do not use when wrapping infinite sequences.
+          </para>
+                <para>
+            This creates a new, cloned sequence which is identical to the
+            current sequence except that <paramref name="value" /> is
+            the last element in the sequence.  This sequence is unchanged.
+          </para>
+            </remarks>
         </member>
         <member name="M:Cadenza.Collections.CachedSequence`1.Count">
-            <summary>To be added.</summary>
-            <returns>To be added.</returns>
-            <remarks>To be added.</remarks>
+            <summary>Returns the number of elements in the sequence.</summary>
+            <returns>
+          A <see cref="T:System.Int32" /> containing the number of elements
+          in the sequence.
+        </returns>
+            <remarks>
+                <para>
+            This is an O(n) operation, and will immediately evaluate the entire
+            sequence.  Do not use when wrapping infinite sequences.
+          </para>
+            </remarks>
         </member>
         <member name="M:Cadenza.Collections.CachedSequence`1.ElementAt(`0System`0.`0Int32`0)">
-            <param name="index">To be added.</param>
-            <summary>To be added.</summary>
-            <returns>To be added.</returns>
-            <remarks>To be added.</remarks>
+            <param name="index">
+          An <see cref="T:System.Int32" /> which is the in
+        </param>
+            <summary>Returns the value at a specified index in the sequence.</summary>
+            <returns>
+          A <typeparamref name="T" /> which is the value at the
+          <paramref name="index" /> index in the sequence.
+        </returns>
+            <remarks>
+                <para>
+            This is an O(<paramref name="index" />) operation.
+          </para>
+                <para>
+            If this element or a preceding element was constructed via the
+            <see cref="C:Cadenza.Collections.CachedSequence{T}(System.Collections.Generic.IEnumerable{`0})" />
+            constructor, then this may evaluate <paramref name="index" />
+            values.
+          </para>
+            </remarks>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+                <paramref name="index" /> is negative or is larger than
+          <see cref="M:Cadenza.Collections.CachedSequence{T}.LongCount" />.
+        </exception>
         </member>
         <member name="M:Cadenza.Collections.CachedSequence`1.First">
-            <summary>To be added.</summary>
-            <returns>To be added.</returns>
-            <remarks>To be added.</remarks>
+            <summary>
+          Returns <see cref="P:Cadenza.Collections.CachedSequence{T}.Head" />.
+        </summary>
+            <returns>
+          A <typeparamref name="T" /> which is the value held by
+          <see cref="P:Cadenza.Collections.CachedSequence{T}.Head" />.
+        </returns>
+            <remarks />
         </member>
         <member name="M:Cadenza.Collections.CachedSequence`1.FirstOrDefault">
-            <summary>To be added.</summary>
-            <returns>To be added.</returns>
-            <remarks>To be added.</remarks>
+            <summary>
+          Returns <see cref="P:Cadenza.Collections.CachedSequence{T}.Head" />.
+        </summary>
+            <returns>
+          A <typeparamref name="T" /> which is the value held by
+          <see cref="P:Cadenza.Collections.CachedSequence{T}.Head" />.
+        </returns>
+            <remarks />
         </member>
         <member name="M:Cadenza.Collections.CachedSequence`1.GetEnumerator">
-            <summary>To be added.</summary>
-            <returns>To be added.</returns>
-            <remarks>To be added.</remarks>
+            <summary>Returns an enumerator that iterates through the linked list.</summary>
+            <returns>
+          An <see cref="T:System.Collections.Generic.IEnumerator{T}" />
+          that can be used to iterate through the linked list as a collection.
+        </returns>
+            <remarks />
         </member>
         <member name="P:Cadenza.Collections.CachedSequence`1.Head">
-            <summary>To be added.</summary>
-            <value>To be added.</value>
-            <remarks>To be added.</remarks>
+            <summary>Returns the value held by this instance.</summary>
+            <value>
+          A <typeparamref name="T" /> which is the value held by this instance.
+        </value>
+            <remarks />
         </member>
         <member name="M:Cadenza.Collections.CachedSequence`1.LongCount">
-            <summary>To be added.</summary>
-            <returns>To be added.</returns>
-            <remarks>To be added.</remarks>
+            <summary>Returns the number of elements in the sequence.</summary>
+            <returns>
+          A <see cref="T:System.Int64" /> containing the number of elements
+          in the sequence.
+        </returns>
+            <remarks>
+                <para>
+            This is an O(n) operation, and will immediately evaluate the entire
+            sequence.  Do not use when wrapping infinite sequences.
+          </para>
+            </remarks>
         </member>
         <member name="M:Cadenza.Collections.CachedSequence`1.Prepend(`0T`0)">
-            <param name="value">To be added.</param>
-            <summary>To be added.</summary>
-            <returns>To be added.</returns>
-            <remarks>To be added.</remarks>
+            <param name="value">
+          A <typeparamref name="T" /> value which should be inserted
+          before the current sequence.
+        </param>
+            <summary>
+          Returns a new <see cref="T:Cadenza.Collections.CachedSequence{T}" />
+          with <paramref name="value" /> as the
+          <see cref="P:Cadenza.Collections.CachedSequence{T}.Head" /> and
+          the current sequence as the
+          <see cref="P:Cadenza.Collections.CachedSequence{T}.Tail" />.
+        </summary>
+            <returns>
+          A new <see cref="T:Cadenza.Collections.CachedSequence{T}" />
+          with <paramref name="value" /> as the
+          <see cref="P:Cadenza.Collections.CachedSequence{T}.Head" /> and
+          the current sequence as the
+          <see cref="P:Cadenza.Collections.CachedSequence{T}.Tail" />.
+        </returns>
+            <remarks>
+                <para>
+            This is an O(1) operation.
+          </para>
+                <para>
+            This is equivalent to: <c>new CachedSequence&lt;T&gt;(value, this)</c>.
+          </para>
+            </remarks>
         </member>
         <member name="M:Cadenza.Collections.CachedSequence`1.Reverse">
-            <summary>To be added.</summary>
-            <returns>To be added.</returns>
-            <remarks>To be added.</remarks>
+            <summary>Reverse the sequence that the current instance is the start of.</summary>
+            <returns>
+          A new <see cref="T:Cadenza.Collections.CachedSequence{T}" />
+          in which
+          <see cref="P:Cadenza.Collections.CachedSequence{T}.Head" />
+          is the last value in the returned sequence,
+          <c><see cref="P:Cadenza.Collections.CachedSequence{T}.Tail" />.Head</c>
+          is the second to last value in the returned sequence, etc.
+        </returns>
+            <remarks>
+                <para>
+            This is an O(n) operation.
+          </para>
+                <para>
+            This immediately evaluates the entire sequence.  Do not use
+            when wrapping infinite sequences.
+          </para>
+            </remarks>
         </member>
         <member name="M:Cadenza.Collections.CachedSequence`1.System#Collections#IEnumerable#GetEnumerator">
-            <summary>To be added.</summary>
-            <returns>To be added.</returns>
-            <remarks>To be added.</remarks>
+            <summary>Returns an enumerator that iterates through the linked list.</summary>
+            <returns>
+          An <see cref="T:System.Collections.IEnumerator" /> that can be used
+          to iterate through the linked list as a collection.
+        </returns>
+            <remarks />
         </member>
         <member name="P:Cadenza.Collections.CachedSequence`1.Tail">
-            <summary>To be added.</summary>
-            <value>To be added.</value>
-            <remarks>To be added.</remarks>
+            <summary>
+          Obtains the items in the sequence following the current item,
+          <see cref="P:Cadenza.Collections.CachedSequence{T}.Head" />.
+        </summary>
+            <value>
+          A <see cref="T:Cadenza.Collections.CachedSequence{T}" />
+          containing the items in the sequence following
+          <see cref="P:Cadenza.Collections.CachedSequence{T}.Head" />.
+          If there are no more items, then <see langword="null" />
+          is returned.
+        </value>
+            <remarks>
+                <block subset="none" type="behaviors">
+                    <para>
+              If this instance was constructed via the
+              <see cref="C:Cadenza.Collections.CachedSequence{T}(`0)" />
+              constructor, <see langword="null" /> is returned.
+            </para>
+                    <para>
+              If this instance was constructed via the
+              <see cref="C:Cadenza.Collections.CachedSequence{T}(`0,Cadenza.Collections.CachedSequence{`0})" />
+              constructor, then the <c>tail</c> parameter is
+              returned (which may be <see langword="null" />).
+            </para>
+                    <para>
+              If this instance or an instance preceding this instance was
+              constructed via the
+              <see cref="C:Cadenza.Collections.CachedSequence{T}(System.Collections.Generic.IEnumerable{`0})" />
+              constructor, then a lock is taken and
+              <see cref="M:System.Collections.IEnumerator.MoveNext" />
+              is invoked on the underlying enumerator.  If
+              <see langword="false" /> is returned from <c>MoveNext()</c>,
+              then <see langword="null" /> will be returned.  Otherwise,
+              a new <see cref="T:Cadenza.Collections.CachedSequence{T}" />
+              will be returned in which
+              <see cref="P:Cadenza.Collections.CachedSequence{T}.Head" />
+              will contain the
+              <see cref="P:System.Collections.Generic.IEnumerator{T}.Current" />.
+              value and will gain "ownership" of the underlying
+              <see cref="T:System.Collections.Generic.IEnumerator{T}" />.
+            </para>
+                </block>
+            </remarks>
         </member>
         <member name="T:Cadenza.Collections.EnumerableCoda">
-            <summary>To be added.</summary>
-            <remarks>To be added.</remarks>
+            <summary>
+      Extension methods on
+      <see cref="T:System.Collections.Generic.IEnumerable{T}" />.
+    </summary>
+            <remarks />
         </member>
         <member name="M:Cadenza.Collections.EnumerableCoda.AggregateHistory``1(System.Collections.Generic.IEnumerable{``0},System.Func{``0,``0,``0})">
             <typeparam name="TSource">To be added.</typeparam>
@@ -9533,84 +10320,575 @@ AssertAreSame (new[]{'a', 'b', 'c'},  l [3]);
             <exception cref="T:System.ArgumentNullException">To be added; from: <see cref="M:Cadenza.Check.Self(System.Object)" />, <see cref="M:Cadenza.Check.Func(System.Object)" /></exception>
         </member>
         <member name="M:Cadenza.Collections.EnumerableCoda.Partition``1(System.Collections.Generic.IEnumerable{``0},System.Func{``0,System.Boolean})">
-            <typeparam name="TSource">To be added.</typeparam>
-            <param name="self">To be added.</param>
-            <param name="predicate">To be added.</param>
-            <summary>To be added.</summary>
-            <returns>To be added.</returns>
-            <remarks>To be added.</remarks>
-            <exception cref="T:System.ArgumentNullException">To be added; from: <see cref="M:Cadenza.Check.Self(System.Object)" />, <see cref="M:Cadenza.Check.Predicate(System.Object)" /></exception>
+            <typeparam name="TSource">
+          The type of the elements in <paramref name="self" />.
+        </typeparam>
+            <param name="self">
+          A <see cref="T:System.Collections.Generic.IEnumerable{TSource}" />
+          containing the sequence to partition into elements which match
+          <paramref name="predicate" /> and those which do not.
+        </param>
+            <param name="predicate">
+          A <see cref="T:System.Func{TSource,System.Boolean}" /> which is used
+          to partition <paramref name="self" /> into the set of elements for
+          which <paramref name="predicate" /> returns <see langword="true" />
+          and those for which <paramref name="predicate" /> returns
+          <see langword="false" />.
+        </param>
+            <summary>
+          Partitions <paramref name="self" /> into two sequences, those which
+          contain elements satisfying <paramref name="predicate" /> and those
+          which do not.
+        </summary>
+            <returns>
+          A <see cref="T:Cadenza.Tuple{System.Collections.Generic.IEnumerable{TSource},System.Collections.Generic.IEnumerable{TSource}}" />
+          in which
+          <see cref="P:Cadenza.Tuple{System.Collections.Generic.IEnumerable{TSource},System.Collections.Generic.IEnumerable{TSource}}.Item1" />
+          contains the elements from <paramref name="self" /> which satisfy
+          <paramref name="predicate" />, and
+          <see cref="P:Cadenza.Tuple{System.Collections.Generic.IEnumerable{TSource},System.Collections.Generic.IEnumerable{TSource}}.Item2" />
+          contains the elements which do not satisfy <paramref name="predicate" />.
+        </returns>
+            <remarks>
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#Partition">Tuple&lt;IEnumerable&lt;int&gt;, IEnumerable&lt;int&gt;&gt; r =
+	Enumerable.Range (1,6).Partition (x =&gt; x % 2 == 0);
+Assert.IsTrue (new[]{2, 4, 6}.SequenceEqual (r.Item1));
+Assert.IsTrue (new[]{1, 3, 5}.SequenceEqual (r.Item2));
+</code>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+                <paramref name="self" /> or <paramref name="predicate" /> are <see langword="null" />.
+        </exception>
         </member>
         <member name="M:Cadenza.Collections.EnumerableCoda.PathCombine(System.Collections.Generic.IEnumerable{System.String})">
-            <param name="self">To be added.</param>
-            <summary>To be added.</summary>
-            <returns>To be added.</returns>
-            <remarks>To be added.</remarks>
-            <exception cref="T:System.ArgumentNullException">To be added; from: <see cref="M:Cadenza.Check.Self(System.Object)" /></exception>
+            <param name="self">
+          A <see cref="T:System.Collections.Generic.IEnumerable{TSource}" />
+          containing the values to combine into a path name.
+        </param>
+            <summary>
+          Creates a path string by concatenating the elements of
+          <paramref name="self" />.
+        </summary>
+            <returns>
+          A <see cref="T:System.String" /> which is the result of combining
+          all the elements within <paramref name="self" /> into a path name.
+        </returns>
+            <remarks>
+                <block subset="none" type="behaviors">
+            For each element within <paramref name="self" />, if the
+            current element is rooted
+            (<see cref="M:System.IO.Path.IsPathRooted(System.String)" />),
+            then the current path string is dropped and the current element
+            becomes the new path root.  Otherwise,
+            <see cref="F:System.IO.Path.DirectorySeparatorChar" /> is
+            appended to the current path string and the current element
+            is appended.
+          </block>
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#PathCombine">var data = new [] {"a", "b", "c"};
+var result = string.Format ("a{0}b{0}c", Path.DirectorySeparatorChar);
+Assert.AreEqual (result, data.PathCombine ());
+
+data = new [] { "a", String.Empty, "b", "c" };
+Assert.AreEqual (result, data.PathCombine (), "empty elemetns");
+
+string rooted = Path.DirectorySeparatorChar + "d";
+data = new [] { "a", rooted };
+Assert.AreEqual (rooted, data.PathCombine (), "rooted path2");
+
+data = new [] { "a", "b", rooted, "c" };
+string expected = Path.Combine (Path.Combine (Path.Combine ("a", "b"), rooted), "c");
+Assert.AreEqual (expected, data.PathCombine (), "rooted path2 (complex)");
+
+string end1 = "d" + Path.DirectorySeparatorChar;
+data = new [] { rooted, end1, "e" };
+expected = Path.Combine (Path.Combine (rooted, end1), "e");
+Assert.AreEqual (expected, data.PathCombine (), "DirectorySeparatorChar");
+
+string end2 = "d" + Path.AltDirectorySeparatorChar;
+data = new [] { rooted, end2, "f" };
+expected = Path.Combine (Path.Combine (rooted, end2), "f");
+Assert.AreEqual (expected, data.PathCombine (), "AltDirectorySeparatorChar");
+
+data = new [] { "a" };
+Assert.AreEqual (Path.Combine ("a", String.Empty), data.PathCombine (), "single string");
+
+data = new [] { String.Empty };
+Assert.AreEqual (Path.Combine (String.Empty, String.Empty), data.PathCombine (), "single empty string");
+</code>
+            </remarks>
+            <exception cref="T:System.ArgumentException">
+          An element of <paramref name="self" /> contains an invalid path
+          character; see <see cref="M:System.IO.Path.GetInvalidPathChars" />.
+        </exception>
+            <exception cref="T:System.ArgumentNullException">
+                <para>
+                    <paramref name="self" /> is <see langword="null" />.
+          </para>
+                <para>-or-</para>
+                <para>
+            An element within <paramref name="self" /> is <see langword="null" />.
+          </para>
+            </exception>
         </member>
         <member name="M:Cadenza.Collections.EnumerableCoda.RemoveFirstOccurrence``1(System.Collections.Generic.IEnumerable{``0},``0)">
-            <typeparam name="TSource">To be added.</typeparam>
-            <param name="self">To be added.</param>
-            <param name="value">To be added.</param>
-            <summary>To be added.</summary>
-            <returns>To be added.</returns>
-            <remarks>To be added.</remarks>
-            <exception cref="T:System.ArgumentNullException">To be added; from: <see cref="M:Cadenza.Check.Self(System.Object)" />, <see cref="M:Cadenza.Collections.EnumerableCoda.RemoveFirstOccurrences``1(System.Collections.Generic.IEnumerable{``0},``0,System.Int32)" /></exception>
-            <exception cref="T:System.ArgumentOutOfRangeException">To be added; from: <see cref="M:Cadenza.Check.Self(System.Object)" />, <see cref="M:Cadenza.Collections.EnumerableCoda.RemoveFirstOccurrences``1(System.Collections.Generic.IEnumerable{``0},``0,System.Int32)" /></exception>
+            <typeparam name="TSource">
+          The type of the elements in <paramref name="self" />.
+        </typeparam>
+            <param name="self">
+          A <see cref="T:System.Collections.Generic.IEnumerable{TSource}" />
+          containing the sequence from which to remove the first element
+          equal to <paramref name="value" />.
+        </param>
+            <param name="value">
+          A <typeparamref name="TSource" /> which is the value
+          to remove once from <paramref name="self" />.
+        </param>
+            <summary>
+          Removes the first occurrence of
+          <paramref name="value" /> from the sequence <paramref name="self" />.
+        </summary>
+            <returns>
+          A <see cref="T:System.Collections.Generic.IEnumerable{TSource}" />
+          which is a copy of <paramref name="self" />
+          in which the first occurrence of
+          <paramref name="value" /> has been removed.
+        </returns>
+            <remarks>
+                <para>
+            This is equivalent to calling
+            <c><paramref name="self" />.RemoveFirstOccurrence(<paramref name="value" />,
+            <see langword="null" />)</c>.
+          </para>
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#RemoveFirstOccurrence">Assert.AreEqual ("bnana",
+		"banana".RemoveFirstOccurrence ('a').Implode ());
+</code>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+                <paramref name="self" /> is <see langword="null" />.
+        </exception>
+            <altmember cref="M:Cadenza.Collections.EnumerableCoda.RemoveFirstOccurrence``1(System.Collections.Generic.IEnumerable{``0},``0,System.Collections.Generic.IEqualityComparer{``0})" />
+        </member>
+        <member name="M:Cadenza.Collections.EnumerableCoda.RemoveFirstOccurrence``1(System.Collections.Generic.IEnumerable{``0},``0,System.Collections.Generic.IEqualityComparer{``0})">
+            <typeparam name="TSource">
+          The type of the elements in <paramref name="self" />.
+        </typeparam>
+            <param name="self">
+          A <see cref="T:System.Collections.Generic.IEnumerable{TSource}" />
+          containing the sequence from which to remove the first element
+          equal to <paramref name="value" />.
+        </param>
+            <param name="value">
+          A <typeparamref name="TSource" /> which is the value
+          to remove once from <paramref name="self" />.
+        </param>
+            <param name="comparer">
+          A <see cref="T:System.Collections.Generic.IEqualityComparer{TSource}" />
+          to use when comparing elements from <paramref name="self" />
+          to <paramref name="value" />. If <see langword="null" /> then
+          <see cref="P:System.Collections.Generic.EqualityComparer{TSource}.Default" />
+          is used.
+        </param>
+            <summary>
+          Removes the first occurrence of
+          <paramref name="value" /> from the sequence <paramref name="self" />.
+        </summary>
+            <returns>
+          A <see cref="T:System.Collections.Generic.IEnumerable{TSource}" />
+          which is a copy of <paramref name="self" />
+          in which the first occurrence of
+          <paramref name="value" /> has been removed.
+        </returns>
+            <remarks>
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#RemoveFirstOccurrence">Assert.AreEqual ("bnana",
+		"banana".RemoveFirstOccurrence ('a').Implode ());
+</code>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+                <paramref name="self" /> is <see langword="null" />.
+        </exception>
         </member>
         <member name="M:Cadenza.Collections.EnumerableCoda.RemoveFirstOccurrences``1(System.Collections.Generic.IEnumerable{``0},``0,System.Int32)">
-            <typeparam name="TSource">To be added.</typeparam>
-            <param name="self">To be added.</param>
-            <param name="value">To be added.</param>
-            <param name="count">To be added.</param>
-            <summary>To be added.</summary>
-            <returns>To be added.</returns>
-            <remarks>To be added.</remarks>
-            <exception cref="T:System.ArgumentNullException">To be added; from: <see cref="M:Cadenza.Check.Self(System.Object)" /></exception>
-            <exception cref="T:System.ArgumentOutOfRangeException">To be added; from: <see cref="M:Cadenza.Collections.EnumerableCoda.RemoveFirstOccurrences``1(System.Collections.Generic.IEnumerable{``0},``0,System.Int32)" /></exception>
+            <typeparam name="TSource">
+          The type of the elements in <paramref name="self" />.
+        </typeparam>
+            <param name="self">
+          A <see cref="T:System.Collections.Generic.IEnumerable{TSource}" />
+          containing the sequence from which to remove the leading elements
+          equal to <paramref name="value" /> from.
+        </param>
+            <param name="value">
+          A <typeparamref name="TSource" /> which is the value
+          to remove from the start of <paramref name="self" />.
+        </param>
+            <param name="count">
+          A <see cref="T:System.Int32" /> containing the number
+          of <paramref name="value" /> elements to remove from
+          <paramref name="self" />.
+        </param>
+            <summary>
+          Removes the first <paramref name="count" /> occurrences of
+          <paramref name="value" /> from the sequence <paramref name="self" />.
+        </summary>
+            <returns>
+          A <see cref="T:System.Collections.Generic.IEnumerable{TSource}" />
+          which is a copy of <paramref name="self" />
+          in which the first <paramref name="count" /> occurrences of
+          <paramref name="value" /> have been removed.
+        </returns>
+            <remarks>
+                <para>
+            This is equivalent to calling
+            <c><paramref name="self" />.RemoveFirstOccurrences(<paramref name="value" />,
+            <paramref name="count" />, <see langword="null" />)</c>.
+          </para>
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#RemoveFirstOccurrences">Assert.AreEqual ("bnna",
+		"banana".RemoveFirstOccurrences ('a', 2).Implode ());
+</code>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+                <paramref name="self" /> is <see langword="null" />.
+        </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+                <paramref name="count" /> is negative.
+        </exception>
+            <altmember cref="M:Cadenza.Collections.EnumerableCoda.RemoveFirstOccurrences``1(System.Collections.Generic.IEnumerable{``0},``0,System.Int32,System.Collections.Generic.IEqualityComparer{``0})" />
+        </member>
+        <member name="M:Cadenza.Collections.EnumerableCoda.RemoveFirstOccurrences``1(System.Collections.Generic.IEnumerable{``0},``0,System.Int32,System.Collections.Generic.IEqualityComparer{``0})">
+            <typeparam name="TSource">
+          The type of the elements in <paramref name="self" />.
+        </typeparam>
+            <param name="self">
+          A <see cref="T:System.Collections.Generic.IEnumerable{TSource}" />
+          containing the sequence from which to remove the leading elements
+          equal to <paramref name="value" /> from.
+        </param>
+            <param name="value">
+          A <typeparamref name="TSource" /> which is the value
+          to remove from the start of <paramref name="self" />.
+        </param>
+            <param name="count">
+          A <see cref="T:System.Int32" /> containing the number
+          of <paramref name="value" /> elements to remove from
+          <paramref name="self" />.
+        </param>
+            <param name="comparer">
+          A <see cref="T:System.Collections.Generic.IEqualityComparer{TSource}" />
+          to use when comparing elements from <paramref name="self" />
+          and <paramref name="value" />. If <see langword="null" /> then
+          <see cref="P:System.Collections.Generic.EqualityComparer{TSource}.Default" />
+          is used.
+        </param>
+            <summary>
+          Removes the first <paramref name="count" /> occurrences of
+          <paramref name="value" /> from the sequence <paramref name="self" />.
+        </summary>
+            <returns>
+          A <see cref="T:System.Collections.Generic.IEnumerable{TSource}" />
+          which is a copy of <paramref name="self" />
+          in which the first <paramref name="count" /> occurrences of
+          <paramref name="value" /> have been removed.
+        </returns>
+            <remarks>
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#RemoveFirstOccurrences">Assert.AreEqual ("bnna",
+		"banana".RemoveFirstOccurrences ('a', 2).Implode ());
+</code>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+                <paramref name="self" /> is <see langword="null" />.
+        </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+                <paramref name="count" /> is negative.
+        </exception>
         </member>
         <member name="M:Cadenza.Collections.EnumerableCoda.Repeat``1(System.Collections.Generic.IEnumerable{``0},System.Int32)">
-            <typeparam name="TSource">To be added.</typeparam>
-            <param name="self">To be added.</param>
-            <param name="number">To be added.</param>
-            <summary>To be added.</summary>
-            <returns>To be added.</returns>
-            <remarks>To be added.</remarks>
-            <exception cref="T:System.ArgumentNullException">To be added; from: <see cref="M:Cadenza.Check.Self(System.Object)" /></exception>
+            <typeparam name="TSource">
+          The type of the elements in <paramref name="self" />.
+        </typeparam>
+            <param name="self">
+          A <see cref="T:System.Collections.Generic.IEnumerable{TSource}" />
+          containing the sequence to repeat.
+        </param>
+            <param name="number">
+          The number of times to repeat <paramref name="self" />.
+        </param>
+            <summary>
+          Repeats the sequence <paramref name="self" /> for
+          <paramref name="number" /> repetitions.
+        </summary>
+            <returns>
+          A <see cref="T:System.Collections.Generic.IEnumerable{TSource}" />
+          sequence containing
+          <c><paramref name="count" /> * <paramref name="self" />.Count()</c>
+          elements, consisting of the sequence <paramref name="self" />,
+          followed by the sequence <paramref name="self" />, etc.
+        </returns>
+            <remarks>
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#Repeat">Assert.AreEqual ("foofoofoo", new [] {"foo"}.Repeat (3).Implode ());
+Assert.AreEqual ("foobarfoobar", new [] {"foo", "bar"}.Repeat (2).Implode ());
+</code>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+                <paramref name="self" /> is <see langword="null" />.
+        </exception>
         </member>
         <member name="M:Cadenza.Collections.EnumerableCoda.SelectAggregated``3(System.Collections.Generic.IEnumerable{``0},``1,System.Func{``1,``0,Cadenza.Tuple{``1,``2}})">
-            <typeparam name="TSource">To be added.</typeparam>
-            <typeparam name="TAccumulate">To be added.</typeparam>
-            <typeparam name="TResult">To be added.</typeparam>
-            <param name="self">To be added.</param>
-            <param name="seed">To be added.</param>
-            <param name="func">To be added.</param>
-            <summary>To be added.</summary>
-            <returns>To be added.</returns>
-            <remarks>To be added.</remarks>
-            <exception cref="T:System.ArgumentNullException">To be added; from: <see cref="M:Cadenza.Check.Self(System.Object)" />, <see cref="M:Cadenza.Check.Func(System.Object)" /></exception>
+            <typeparam name="TSource">
+          The type of the elements within <paramref name="self" />.
+        </typeparam>
+            <typeparam name="TAccumulate">
+          The type of the accumulator value.
+        </typeparam>
+            <typeparam name="TResult">
+          The type of the return value.
+        </typeparam>
+            <param name="self">
+          A <see cref="T:System.Collections.Generic.IEnumerable{TSource}" />
+          containing the sequence to return the values of successive
+          <see cref="M:System.Linq.Enumerable.Select``2(System.Collections.Generic.IEnumerable{``0},System.Func{``0,``1})" />
+          and
+          <see cref="M:Cadenza.Collections.EnumerableCoda.AggregateReverse``3(System.Collections.Generic.IEnumerable{``0},``1,System.Func{``1,``0,``1},System.Func{``1,``2})" />
+          calls from.
+        </param>
+            <param name="seed">
+          The first <typeparamref name="TAccumulate" /> value to pass to
+          <paramref name="func" />.
+        </param>
+            <param name="func">
+          A
+          <see cref="T:System.Func{TAccumulate,TSource,Cadenza.Tuple{TAccumulate,TResult}}" />
+          which is applied against each element within <paramref name="self" />
+          and the current <paramref name="TAccumulate" />
+          value (initially using <paramref name="seed" />), generating the
+          next accumulated value and the (partial) result value.
+        </param>
+            <summary>
+          Applies <paramref name="func" /> to each element within
+          <paramref name="self" />, returning the final
+          value of the accumulator and the list of intermediate values.
+        </summary>
+            <returns>
+          A
+          <see cref="T:Cadenza.Tuple{TAccumulate,System.Collections.Generic.List{TResult}}" />
+          which contains the final accumulated value in
+          <see cref="P:Cadenza.Tuple{TAccumulate,System.Collections.Generic.List{TResult}}.Item1" />
+          and the list of intermediate results in
+          <see cref="P:Cadenza.Tuple{TAccumulate,System.Collections.Generic.List{TResult}}.Item2" />.
+        </returns>
+            <remarks>
+                <para>This is Haskell's <c>mapAccumL</c>.</para>
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#SelectAggregated">IEnumerable&lt;int&gt; s = new []{2, 3, 4, 5};
+Tuple&lt;int, List&lt;string&gt;&gt; r = s.SelectAggregated (1,
+		(a,b) =&gt; Tuple.Create (a-b, "s" + (a-b)));
+Assert.AreEqual (-13, r.Item1);
+Assert.IsTrue (new[]{
+		"s-1",
+		"s-4",
+		"s-8",
+		"s-13",
+}.SequenceEqual (r.Item2));
+
+r = new int[]{}.SelectAggregated (42,
+		(a,b) =&gt; Tuple.Create (a-b, b.ToString ()));
+Assert.AreEqual (42, r.Item1);
+Assert.AreEqual (0, r.Item2.Count);
+</code>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+                <paramref name="self" /> or <paramref name="func" /> is <see langword="null" />.
+        </exception>
         </member>
         <member name="M:Cadenza.Collections.EnumerableCoda.SelectBreadthFirst``2(System.Collections.Generic.IEnumerable{``0},System.Func{``0,``1},System.Func{``0,System.Collections.Generic.IEnumerable{``0}})">
-            <typeparam name="TSource">To be added.</typeparam>
-            <typeparam name="TResult">To be added.</typeparam>
-            <param name="self">To be added.</param>
-            <param name="valueSelector">To be added.</param>
-            <param name="childrenSelector">To be added.</param>
-            <summary>To be added.</summary>
-            <returns>To be added.</returns>
-            <remarks>To be added.</remarks>
-            <exception cref="T:System.ArgumentNullException">To be added; from: <see cref="M:Cadenza.Check.Self(System.Object)" />, <see cref="M:Cadenza.Check.ValueSelector(System.Object)" />, <see cref="M:Cadenza.Check.ChildrenSelector(System.Object)" /></exception>
+            <typeparam name="TSource">
+          The type of the root nodes and intermediate nodes of the tree.
+        </typeparam>
+            <typeparam name="TResult">
+          The type of the object to return.
+        </typeparam>
+            <param name="self">
+          A <see cref="T:System.Collections.Generic.IEnumerable{TSource}" />
+          containing the elements to perform a breadth-first traversal on.
+        </param>
+            <param name="valueSelector">
+          A <see cref="T:System.Func{TSource,TResult}" /> which is used to
+          convert tree nodes into <typeparamref name="TResult" /> instances.
+        </param>
+            <param name="childrenSelector">
+          A <see cref="T:System.Func{TSource,System.Collections.Generic.IEnumerable{TSource}}" />
+          which returns the child nodes of <paramref name="root" />
+          and all intermediate non-leaf nodes.
+        </param>
+            <summary>
+          Traverse a sequence of nodes in a breadth-first fashion, converting each
+          encountered node.
+        </summary>
+            <returns>
+          A <see cref="T:System.Collections.Generic.IEnumerable{TResult}" />
+          containing the result of applying <paramref name="valueSelector" />
+          to all nodes encountered while traversing the forest
+          <paramref name="self" /> in a breadth-first fashion.
+        </returns>
+            <remarks>
+                <para>
+                    <paramref name="self" /> is a "forest", a sequence of tree roots
+            (siblings), wherein each
+            node is a data structure containing a value and child nodes.
+            The value is retrieved via <paramref name="valueSelector" />,
+            and the children are obtained via
+            <paramref name="childrenSelector" />.
+          </para>
+                <para>
+            Each node is traversed in a breadth-first fashion, with each
+            encountered node is provided to <paramref name="valueSelector" />,
+            and the values are returned.
+          </para>
+            </remarks>
+            <example>
+                <para>
+            Given the <c>TreeNode&lt;T&gt;</c> declaration:
+          </para>
+                <code lang="C#" src="../../Test/Cadenza/ObjectTest.cs#TreeNode_Declaration">class TreeNode&lt;T&gt;
+{
+	public TreeNode ()
+	{
+		Children = new TreeNode&lt;T&gt; [0];
+	}
+
+	public T Value;
+	public IEnumerable&lt;TreeNode&lt;T&gt;&gt; Children;
+}
+</code>
+                <para>
+                    <c>SelectBreadthFirst()</c> is used as:
+          </para>
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#SelectBreadthFirst">TreeNode&lt;int&gt;[] root = new TreeNode&lt;int&gt;[] {
+	new TreeNode&lt;int&gt; {
+		Value = 1, Children = new [] {
+			new TreeNode&lt;int&gt; { Value = 2 },
+			new TreeNode&lt;int&gt; {
+				Value = 3, Children = new [] {
+					new TreeNode&lt;int&gt; { Value = 5 },
+				}
+			},
+			new TreeNode&lt;int&gt; { Value = 4 },
+		}
+	},
+	new TreeNode&lt;int&gt; { Value = -1 },
+};
+IEnumerable&lt;int&gt; values = root
+	.SelectBreadthFirst (x =&gt; x.Value, x =&gt; x.Children);
+AssertAreSame (new[]{ 1, 2, 3, 4, 5, -1 }, values);
+</code>
+            </example>
+            <exception cref="T:System.ArgumentNullException">
+                <para>
+                    <paramref name="self" /> is <see langword="null" />.
+          </para>
+                <para>-or-</para>
+                <para>
+                    <paramref name="childrenSelector" /> is <see langword="null" />.
+          </para>
+                <para>-or-</para>
+                <para>
+                    <paramref name="valueSelector" /> is <see langword="null" />.
+          </para>
+            </exception>
         </member>
         <member name="M:Cadenza.Collections.EnumerableCoda.SelectDepthFirst``2(System.Collections.Generic.IEnumerable{``0},System.Func{``0,``1},System.Func{``0,System.Collections.Generic.IEnumerable{``0}})">
-            <typeparam name="TSource">To be added.</typeparam>
-            <typeparam name="TResult">To be added.</typeparam>
-            <param name="self">To be added.</param>
-            <param name="valueSelector">To be added.</param>
-            <param name="childrenSelector">To be added.</param>
-            <summary>To be added.</summary>
-            <returns>To be added.</returns>
-            <remarks>To be added.</remarks>
-            <exception cref="T:System.ArgumentNullException">To be added; from: <see cref="M:Cadenza.Check.Self(System.Object)" />, <see cref="M:Cadenza.Check.ValueSelector(System.Object)" />, <see cref="M:Cadenza.Check.ChildrenSelector(System.Object)" /></exception>
+            <typeparam name="TSource">
+          The type of the root nodes and intermediate nodes of the tree.
+        </typeparam>
+            <typeparam name="TResult">
+          The type of the object to return.
+        </typeparam>
+            <param name="self">
+          A <see cref="T:System.Collections.Generic.IEnumerable{TSource}" />
+          containing the elements to perform a depth-first traversal on.
+        </param>
+            <param name="valueSelector">
+          A <see cref="T:System.Func{TSource,TResult}" /> which is used to
+          convert tree nodes into <typeparamref name="TResult" /> instances.
+        </param>
+            <param name="childrenSelector">
+          A <see cref="T:System.Func{TSource,System.Collections.Generic.IEnumerable{TSource}}" />
+          which returns the child nodes of an element in
+          <paramref name="self" /> (and grand-children, and
+          great-grandchildren, and...).
+        </param>
+            <summary>
+          Traverse a sequence of nodes in a depth-first fashion, converting each
+          encountered node.
+        </summary>
+            <returns>
+          A <see cref="T:System.Collections.Generic.IEnumerable{TResult}" />
+          containing the result of applying <paramref name="valueSelector" />
+          to all nodes encountered while traversing the forest
+          <paramref name="self" /> in a depth-first fashion.
+        </returns>
+            <remarks>
+                <para>
+                    <paramref name="self" /> is a "forest", a sequence of tree roots
+            (siblings), wherein each
+            node is a data structure containing a value and child nodes.
+            The value is retrieved via <paramref name="valueSelector" />,
+            and the children are obtained via
+            <paramref name="childrenSelector" />.
+          </para>
+                <para>
+            The tree is traversed in a depth-first fashion, each encountered
+            node is provided to <paramref name="valueSelector" />, and the
+            values are returned.
+          </para>
+            </remarks>
+            <example>
+                <para>
+            Given the <c>TreeNode&lt;T&gt;</c> declaration:
+          </para>
+                <code lang="C#" src="../../Test/Cadenza/ObjectTest.cs#TreeNode_Declaration">class TreeNode&lt;T&gt;
+{
+	public TreeNode ()
+	{
+		Children = new TreeNode&lt;T&gt; [0];
+	}
+
+	public T Value;
+	public IEnumerable&lt;TreeNode&lt;T&gt;&gt; Children;
+}
+</code>
+                <para>
+                    <c>SelectDepthFirst()</c> is used as:
+          </para>
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#SelectDepthFirst">TreeNode&lt;int&gt;[] root = new TreeNode&lt;int&gt;[] {
+	new TreeNode&lt;int&gt; {
+		Value = 1, Children = new [] {
+			new TreeNode&lt;int&gt; { Value = 2 },
+			new TreeNode&lt;int&gt; {
+				Value = 3, Children = new [] {
+					new TreeNode&lt;int&gt; { Value = 5 },
+				}
+			},
+			new TreeNode&lt;int&gt; { Value = 4 },
+		}
+	},
+	new TreeNode&lt;int&gt; { Value = -1 },
+};
+IEnumerable&lt;int&gt; values = root
+	.SelectDepthFirst (x =&gt; x.Value, x =&gt; x.Children);
+AssertAreSame (new[]{ 1, 2, 3, 5, 4, -1 }, values);
+</code>
+            </example>
+            <exception cref="T:System.ArgumentNullException">
+                <para>
+                    <paramref name="self" /> is <see langword="null" />.
+          </para>
+                <para>-or-</para>
+                <para>
+                    <paramref name="childrenSelector" /> is <see langword="null" />.
+          </para>
+                <para>-or-</para>
+                <para>
+                    <paramref name="valueSelector" /> is <see langword="null" />.
+          </para>
+            </exception>
         </member>
         <member name="M:Cadenza.Collections.EnumerableCoda.SelectFromEach``3(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{``1},System.Func{``0,``1,``2})">
             <typeparam name="T1">
@@ -9820,61 +11098,412 @@ Assert.AreEqual ('d', c [3].Second);
             <altmember cref="M:Cadenza.Collections.EnumerableCoda.Zip``4(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{``1},System.Collections.Generic.IEnumerable{``2},System.Collections.Generic.IEnumerable{``3})" />
         </member>
         <member name="M:Cadenza.Collections.EnumerableCoda.SelectReverseAggregated``3(System.Collections.Generic.IEnumerable{``0},``1,System.Func{``1,``0,Cadenza.Tuple{``1,``2}})">
-            <typeparam name="TSource">To be added.</typeparam>
-            <typeparam name="TAccumulate">To be added.</typeparam>
-            <typeparam name="TResult">To be added.</typeparam>
-            <param name="self">To be added.</param>
-            <param name="seed">To be added.</param>
-            <param name="func">To be added.</param>
-            <summary>To be added.</summary>
-            <returns>To be added.</returns>
-            <remarks>To be added.</remarks>
-            <exception cref="T:System.ArgumentNullException">To be added; from: <see cref="M:Cadenza.Check.Self(System.Object)" />, <see cref="M:Cadenza.Check.Func(System.Object)" /></exception>
+            <typeparam name="TSource">
+          The type of the elements within <paramref name="self" />.
+        </typeparam>
+            <typeparam name="TAccumulate">
+          The type of the accumulator value.
+        </typeparam>
+            <typeparam name="TResult">
+          The type of the return value.
+        </typeparam>
+            <param name="self">
+          A <see cref="T:System.Collections.Generic.IEnumerable{TSource}" />
+          containing the sequence to return the values of successive
+          <see cref="M:System.Linq.Enumerable.Select``2(System.Collections.Generic.IEnumerable{``0},System.Func{``0,``1})" />
+          and
+          <see cref="M:Cadenza.Collections.EnumerableCoda.AggregateReverse``3(System.Collections.Generic.IEnumerable{``0},``1,System.Func{``1,``0,``1},System.Func{``1,``2})" />
+          calls from.
+        </param>
+            <param name="seed">
+          The first <typeparamref name="TAccumulate" /> value to pass to
+          <paramref name="func" />.
+        </param>
+            <param name="func">
+          A
+          <see cref="T:System.Func{TAccumulate,TSource,Cadenza.Tuple{TAccumulate,TResult}}" />
+          which is applied against each element within <paramref name="self" />
+          in reverse order and the current <paramref name="TAccumulate" />
+          value (initially using <paramref name="seed" />), generating the
+          next accumulated value and the (partial) result value.
+        </param>
+            <summary>
+          Applies <paramref name="func" /> to each element within
+          <paramref name="self" /> in reverse order, returning the final
+          value of the accumulator and the list of intermediate values.
+        </summary>
+            <returns>
+          A
+          <see cref="T:Cadenza.Tuple{TAccumulate,System.Collections.Generic.List{TResult}}" />
+          which contains the final accumulated value in
+          <see cref="P:Cadenza.Tuple{TAccumulate,System.Collections.Generic.List{TResult}}.Item1" />
+          and the list of intermediate results in
+          <see cref="P:Cadenza.Tuple{TAccumulate,System.Collections.Generic.List{TResult}}.Item2" />.
+        </returns>
+            <remarks>
+                <para>This is Haskell's <c>mapAccumR</c>.</para>
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#SelectReverseAggregated">IEnumerable&lt;int&gt; s = new []{1, 2, 3, 4};
+Tuple&lt;int, List&lt;string&gt;&gt; r = s.SelectReverseAggregated (5,
+		(a,b) =&gt; Tuple.Create (a-b, "s" + (a-b)));
+Assert.AreEqual (-5, r.Item1);
+Assert.IsTrue (new[]{
+	"s1",
+	"s-2",
+	"s-4",
+	"s-5",
+}.SequenceEqual (r.Item2));
+
+r = new int[]{}.SelectReverseAggregated (42,
+		(a,b) =&gt; Tuple.Create (a-b, b.ToString ()));
+Assert.AreEqual (42, r.Item1);
+Assert.AreEqual (0, r.Item2.Count);
+</code>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+                <paramref name="self" /> or <paramref name="func" /> is <see langword="null" />.
+        </exception>
         </member>
         <member name="M:Cadenza.Collections.EnumerableCoda.SequenceCompare``1(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{``0})">
-            <typeparam name="TSource">To be added.</typeparam>
-            <param name="self">To be added.</param>
-            <param name="list">To be added.</param>
-            <summary>To be added.</summary>
-            <returns>To be added.</returns>
-            <remarks>To be added.</remarks>
-            <exception cref="T:System.ArgumentNullException">To be added; from: <see cref="M:Cadenza.Check.Self(System.Object)" />, <see cref="M:Cadenza.Check.List(System.Object)" />, <see cref="M:Cadenza.Check.Comparer(System.Object)" /></exception>
+            <typeparam name="TSource">
+          The type of the elements within <paramref name="self" />.
+        </typeparam>
+            <param name="self">
+          A <see cref="T:System.Collections.Generic.IEnumerable{TSource}" />
+          containing the sequence to compare against <paramref name="list" />.
+        </param>
+            <param name="list">
+          A <see cref="T:System.Collections.Generic.IEnumerable{TSource}" />
+          containing the sequence to compare against <paramref name="self" />.
+        </param>
+            <summary>
+          Compares the elements of two sequences by using the default
+          comparer for their type.
+        </summary>
+            <returns>
+          An <see cref="T:System.Int32" /> which is:
+          <list type="table"><listheader><term>Value</term><description>Condition</description></listheader><item><term>Less than zero</term><description>
+                The default comparer
+                returned less than zero when comparing element
+                <c>x</c> at index <c>i</c> from sequence <paramref name="self" />
+                against element
+                <c>y</c> at index <c>i</c> from sequence <paramref name="list" />,
+                or <paramref name="self" /> had more elements than
+                <paramref name="list" /> (and all elements in
+                <paramref name="list" /> were equal to their corresponding
+                elements within <paramref name="self" />).
+              </description></item><item><term>Zero</term><description>
+                The default comparer
+                returned zero for all elements whe comparing element
+                <c>x</c> at index <c>i</c> from sequence <paramref name="self" />
+                against element
+                <c>y</c> at index <c>i</c> from sequence <paramref name="list" />,
+                and <paramref name="self" /> and <paramref name="list" />
+                have the same number of elements.
+              </description></item><item><term>Greater than zero</term><description>
+                The default comparer
+                returned greater than zero when comparing element
+                <c>x</c> at index <c>i</c> from sequence <paramref name="self" />
+                against element
+                <c>y</c> at index <c>i</c> from sequence <paramref name="list" />,
+                or <paramref name="list" /> had more elements than
+                <paramref name="self" /> (and all elements in
+                <paramref name="self" /> were equal to their corresponding
+                elements within <paramref name="list" />).
+              </description></item></list></returns>
+            <remarks>
+                <para>
+            This is the
+            <see cref="T:System.Collections.Generic.IComparer{TSource}" />
+            analog to
+            <see cref="M:System.Linq.Enumerable.SequenceEqual``1(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{``0})" />.
+          </para>
+                <para>
+            This method enumerates <paramref name="self" /> and
+            <paramref name="list" /> in parallel and compares corresponding
+            elements by using the default
+            <see cref="T:System.Collections.Generic.IComparer{TSource}" />.
+            It returns non-zero the first time the default comparer
+            returns non-zero.  If it runs out of elements, then it will return
+            less than zero if <paramref name="self" /> still contains elements,
+            will return zero if neither <paramref name="self" /> nor
+            <paramref name="list" /> contain elements, and will return greater
+            than zero if <paramref name="list" /> still contains elements.
+          </para>
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#SequenceCompare">Assert.AreEqual (0,
+		new[]{1, 2}.SequenceCompare (new[]{1, 2}));
+Assert.AreEqual (-1,
+		new[]{1, 1}.SequenceCompare (new[]{1, 2}));
+Assert.AreEqual (1,
+		new[]{1, 3}.SequenceCompare (new[]{1, 2}));
+Assert.AreEqual (-1,
+		new[]{1, 2}.SequenceCompare (new[]{1}));
+Assert.AreEqual (1,
+		new[]{1}.SequenceCompare (new[]{1, 2}));
+</code>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+                <paramref name="self" /> or <paramref name="list" /> is <see langword="null" />.
+        </exception>
+            <altmember cref="M:Cadenza.Collections.EnumerableCoda.SequenceCompare``1(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IComparer{``0})" />
         </member>
         <member name="M:Cadenza.Collections.EnumerableCoda.SequenceCompare``1(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IComparer{``0})">
-            <typeparam name="TSource">To be added.</typeparam>
-            <param name="self">To be added.</param>
-            <param name="list">To be added.</param>
-            <param name="comparer">To be added.</param>
-            <summary>To be added.</summary>
-            <returns>To be added.</returns>
-            <remarks>To be added.</remarks>
-            <exception cref="T:System.ArgumentNullException">To be added; from: <see cref="M:Cadenza.Check.Self(System.Object)" />, <see cref="M:Cadenza.Check.List(System.Object)" />, <see cref="M:Cadenza.Check.Comparer(System.Object)" /></exception>
+            <typeparam name="TSource">
+          The type of the elements within <paramref name="self" />.
+        </typeparam>
+            <param name="self">
+          A <see cref="T:System.Collections.Generic.IEnumerable{TSource}" />
+          containing the sequence to compare against <paramref name="list" />.
+        </param>
+            <param name="list">
+          A <see cref="T:System.Collections.Generic.IEnumerable{TSource}" />
+          containing the sequence to compare against <paramref name="self" />.
+        </param>
+            <param name="comparer">
+          A <see cref="T:System.Collections.Generic.IComparer{TSource}" />
+          which is used to compare elements from <paramref name="self" />
+          and <paramref name="list" /> are to each other.  If
+          <see langword="null" />, then
+          <see cref="P:System.Collections.Generic.Comparer{TSource}.Default" />
+          is used.
+        </param>
+            <summary>
+          Compares the elements of two sequences by using a specified
+          <see cref="T:System.Collections.Generic.IComparer{TSource}" />.
+        </summary>
+            <returns>
+          An <see cref="T:System.Int32" /> which is:
+          <list type="table"><listheader><term>Value</term><description>Condition</description></listheader><item><term>Less than zero</term><description><c><paramref name="comparer" />.Compare(x, y)</c>
+                returned less than zero when comparing element
+                <c>x</c> at index <c>i</c> from sequence <paramref name="self" />
+                against element
+                <c>y</c> at index <c>i</c> from sequence <paramref name="list" />,
+                or <paramref name="self" /> had more elements than
+                <paramref name="list" /> (and all elements in
+                <paramref name="list" /> were equal to their corresponding
+                elements within <paramref name="self" />).
+              </description></item><item><term>Zero</term><description><c><paramref name="comparer" />.Compare(x, y)</c>
+                returned zero for all elements whe comparing element
+                <c>x</c> at index <c>i</c> from sequence <paramref name="self" />
+                against element
+                <c>y</c> at index <c>i</c> from sequence <paramref name="list" />,
+                and <paramref name="self" /> and <paramref name="list" />
+                have the same number of elements.
+              </description></item><item><term>Greater than zero</term><description><c><paramref name="comparer" />.Compare(x, y)</c>
+                returned greater than zero when comparing element
+                <c>x</c> at index <c>i</c> from sequence <paramref name="self" />
+                against element
+                <c>y</c> at index <c>i</c> from sequence <paramref name="list" />,
+                or <paramref name="list" /> had more elements than
+                <paramref name="self" /> (and all elements in
+                <paramref name="self" /> were equal to their corresponding
+                elements within <paramref name="list" />).
+              </description></item></list></returns>
+            <remarks>
+                <para>
+            This is the
+            <see cref="T:System.Collections.Generic.IComparer{TSource}" />
+            analog to
+            <see cref="M:System.Linq.Enumerable.SequenceEqual``1(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEqualityComparer{``0})" />.
+          </para>
+                <para>
+            This method enumerates <paramref name="self" /> and
+            <paramref name="list" /> in parallel and compares corresponding
+            elements by using the specified
+            <see cref="T:System.Collections.Generic.IComparer{TSource}" />.
+            It returns non-zero the first time <paramref name="comparer" />
+            returns non-zero.  If it runs out of elements, then it will return
+            less than zero if <paramref name="self" /> still contains elements,
+            will return zero if neither <paramref name="self" /> nor
+            <paramref name="list" /> contain elements, and will return greater
+            than zero if <paramref name="list" /> still contains elements.
+          </para>
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#SequenceCompare">Assert.AreEqual (0,
+		new[]{1, 2}.SequenceCompare (new[]{1, 2}));
+Assert.AreEqual (-1,
+		new[]{1, 1}.SequenceCompare (new[]{1, 2}));
+Assert.AreEqual (1,
+		new[]{1, 3}.SequenceCompare (new[]{1, 2}));
+Assert.AreEqual (-1,
+		new[]{1, 2}.SequenceCompare (new[]{1}));
+Assert.AreEqual (1,
+		new[]{1}.SequenceCompare (new[]{1, 2}));
+</code>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+                <paramref name="self" /> or <paramref name="list" /> is <see langword="null" />.
+        </exception>
         </member>
         <member name="M:Cadenza.Collections.EnumerableCoda.Shuffle``1(System.Collections.Generic.IEnumerable{``0})">
-            <typeparam name="TSource">To be added.</typeparam>
-            <param name="self">To be added.</param>
-            <summary>To be added.</summary>
-            <returns>To be added.</returns>
-            <remarks>To be added.</remarks>
-            <exception cref="T:System.ArgumentNullException">To be added; from: <see cref="M:Cadenza.Check.Self(System.Object)" />, <see cref="M:Cadenza.Check.Random(System.Object)" /></exception>
+            <typeparam name="TSource">
+          The type of the elements within <paramref name="self" />.
+        </typeparam>
+            <param name="self">
+          A <see cref="T:System.Collections.Generic.IEnumerable{TSource}" />
+          containing the sequence to remove <paramref name="prefix" /> from.
+        </param>
+            <summary>
+          Randomizes the ordering of items within <paramref name="self" />.
+        </summary>
+            <returns>
+          A new <see cref="T:System.Collections.Generic.IEnumerable{TSource}" />
+          with the same number of elements as <paramref name="self" /> except
+          that the elements returned may be in a different order.  The order of
+          the elements returned is controlled by <paramref name="random" />.
+        </returns>
+            <remarks>
+                <para>
+            This is equivalent to calling <c>Shuffle(self, null)</c>.
+          </para>
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#Shuffle">IEnumerable&lt;int&gt; r = new[]{1,2,3,4,5}.Shuffle ();
+Assert.AreEqual (5, r.Count());
+Assert.IsTrue (r.Contains (1));
+Assert.IsTrue (r.Contains (2));
+Assert.IsTrue (r.Contains (3));
+Assert.IsTrue (r.Contains (4));
+Assert.IsTrue (r.Contains (5));
+
+Assert.IsFalse (r.Contains (0));
+Assert.IsFalse (r.Contains (6));
+</code>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+                <paramref name="self" /> is <see langword="null" />.
+        </exception>
+            <altmember cref="M:Cadenza.Collections.EnumerableCoda.Shuffle``1(System.Collections.Generic.IEnumerable{``0},System.Random)" />
         </member>
         <member name="M:Cadenza.Collections.EnumerableCoda.Shuffle``1(System.Collections.Generic.IEnumerable{``0},System.Random)">
-            <typeparam name="TSource">To be added.</typeparam>
-            <param name="self">To be added.</param>
-            <param name="random">To be added.</param>
-            <summary>To be added.</summary>
-            <returns>To be added.</returns>
-            <remarks>To be added.</remarks>
-            <exception cref="T:System.ArgumentNullException">To be added; from: <see cref="M:Cadenza.Check.Self(System.Object)" />, <see cref="M:Cadenza.Check.Random(System.Object)" /></exception>
+            <typeparam name="TSource">
+          The type of the elements within <paramref name="self" />.
+        </typeparam>
+            <param name="self">
+          A <see cref="T:System.Collections.Generic.IEnumerable{TSource}" />
+          containing the sequence to remove <paramref name="prefix" /> from.
+        </param>
+            <param name="random">
+          A <see cref="T:System.Random" /> instance to get random numbers from.
+        </param>
+            <summary>
+          Randomizes the ordering of items within <paramref name="self" />.
+        </summary>
+            <returns>
+          A new <see cref="T:System.Collections.Generic.IEnumerable{TSource}" />
+          with the same number of elements as <paramref name="self" /> except
+          that the elements returned may be in a different order.  The order of
+          the elements returned is controlled by <paramref name="random" />.
+        </returns>
+            <remarks>
+                <block subset="none" type="behaviors">
+            Calls <see cref="M:System.Random.Next(System.Int32)" />
+            once for each element within <paramref name="self" /> to partially
+            determine the element's position within the returned sequence, then
+            creates a new sequence based on the random element ordering.
+          </block>
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#Shuffle">IEnumerable&lt;int&gt; r = new[]{1,2,3,4,5}.Shuffle ();
+Assert.AreEqual (5, r.Count());
+Assert.IsTrue (r.Contains (1));
+Assert.IsTrue (r.Contains (2));
+Assert.IsTrue (r.Contains (3));
+Assert.IsTrue (r.Contains (4));
+Assert.IsTrue (r.Contains (5));
+
+Assert.IsFalse (r.Contains (0));
+Assert.IsFalse (r.Contains (6));
+</code>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+                <paramref name="self" /> is <see langword="null" />.
+        </exception>
         </member>
         <member name="M:Cadenza.Collections.EnumerableCoda.SkipPrefix``1(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{``0})">
-            <typeparam name="TSource">To be added.</typeparam>
-            <param name="self">To be added.</param>
-            <param name="prefix">To be added.</param>
-            <summary>To be added.</summary>
-            <returns>To be added.</returns>
-            <remarks>To be added.</remarks>
-            <exception cref="T:System.ArgumentNullException">To be added; from: <see cref="M:Cadenza.Check.Self(System.Object)" />, <see cref="M:Cadenza.Collections.EnumerableCoda.SkipPrefix``1(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{``0})" /></exception>
+            <typeparam name="TSource">
+          The type of the elements within <paramref name="self" />.
+        </typeparam>
+            <param name="self">
+          A <see cref="T:System.Collections.Generic.IEnumerable{TSource}" />
+          containing the sequence to remove <paramref name="prefix" /> from.
+        </param>
+            <param name="prefix">
+          A <see cref="T:System.Collections.Generic.IEnumerable{TSource}" />
+          containing the sequence to remove from the start of
+          <paramref name="self" />.
+        </param>
+            <summary>
+          Skips over <paramref name="prefix" />, returning the elements following
+          <paramref name="prefix" />.
+        </summary>
+            <returns>
+          A <see cref="T:System.Collections.Generic.IEnumerable{TSource}" />
+          if <paramref name="self" /> begins with <paramref name="prefix" />
+          which contains the elements within <paramref name="self" /> following
+          the sequence within <paramref name="prefix" />.
+          If <paramref name="self" /> does not start with
+          <paramref name="prefix" />, then <see langword="null" /> is returned.
+        </returns>
+            <remarks>
+                <para>
+            This is equivalent to calling <c>SkipPrefix(self, prefix, null).</c></para>
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#SkipPrefix">Assert.AreEqual ("bar",
+		"foobar".SkipPrefix ("foo").Implode ());
+Assert.AreEqual ("",
+		"foo".SkipPrefix ("foo").Implode ());
+Assert.AreEqual (null,
+		"barfoo".SkipPrefix ("foo"));
+Assert.AreEqual (null,
+		"barfoobaz".SkipPrefix ("foo"));
+</code>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+                <paramref name="self" /> or <paramref name="prefix" /> is <see langword="null" />.
+        </exception>
+            <altmember cref="M:Cadenza.Collections.EnumerableCoda.SkipPrefix``1(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEqualityComparer{``0})" />
+        </member>
+        <member name="M:Cadenza.Collections.EnumerableCoda.SkipPrefix``1(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEqualityComparer{``0})">
+            <typeparam name="TSource">
+          The type of the elements within <paramref name="self" />.
+        </typeparam>
+            <param name="self">
+          A <see cref="T:System.Collections.Generic.IEnumerable{TSource}" />
+          containing the sequence to remove <paramref name="prefix" /> from.
+        </param>
+            <param name="prefix">
+          A <see cref="T:System.Collections.Generic.IEnumerable{TSource}" />
+          containing the sequence to remove from the start of
+          <paramref name="self" />.
+        </param>
+            <param name="comparer">
+          A <see cref="T:System.Collections.Generic.IEqualityComparer{TSource}" />
+          to use to compare elements between the <paramref name="self" />
+          and <paramref name="prefix" /> sequences.  If <see langword="null" />
+          then
+          <see cref="P:System.Collections.Generic.EqualityComparer{TSource}.Default" />
+          is used.
+        </param>
+            <summary>
+          Skips over <paramref name="prefix" />, returning the elements following
+          <paramref name="prefix" />.
+        </summary>
+            <returns>
+          A <see cref="T:System.Collections.Generic.IEnumerable{TSource}" />
+          if <paramref name="self" /> begins with <paramref name="prefix" />
+          which contains the elements within <paramref name="self" /> following
+          the sequence within <paramref name="prefix" />.
+          If <paramref name="self" /> does not start with
+          <paramref name="prefix" />, then <see langword="null" /> is returned.
+        </returns>
+            <remarks>
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#SkipPrefix">Assert.AreEqual ("bar",
+		"foobar".SkipPrefix ("foo").Implode ());
+Assert.AreEqual ("",
+		"foo".SkipPrefix ("foo").Implode ());
+Assert.AreEqual (null,
+		"barfoo".SkipPrefix ("foo"));
+Assert.AreEqual (null,
+		"barfoobaz".SkipPrefix ("foo"));
+</code>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+                <paramref name="self" /> or <paramref name="prefix" /> is <see langword="null" />.
+        </exception>
         </member>
         <member name="M:Cadenza.Collections.EnumerableCoda.Sort``1(System.Collections.Generic.IEnumerable{``0})">
             <typeparam name="TSource">
@@ -10043,7 +11672,9 @@ Assert.AreEqual ('d', c [3].Second);
             This method does not modify <paramref name="self" />.
           </para>
             </remarks>
-            <exception cref="T:System.ArgumentNullException">To be added; from: <see cref="M:Cadenza.Check.Self(System.Object)" />, <see cref="M:Cadenza.Collections.EnumerableCoda.Sort``1(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IComparer{``0})" /></exception>
+            <exception cref="T:System.ArgumentNullException">
+                <paramref name="self" /> is <see langword="null" />.
+        </exception>
         </member>
         <member name="M:Cadenza.Collections.EnumerableCoda.Span``1(System.Collections.Generic.IEnumerable{``0},System.Func{``0,System.Boolean})">
             <typeparam name="TSource">
@@ -10093,7 +11724,9 @@ Assert.AreEqual ("|123",
 		.Aggregate ((x, y) =&gt; x.Implode () + "|" + y.Implode ()));
 </code>
             </remarks>
-            <exception cref="T:System.ArgumentNullException">To be added; from: <see cref="M:Cadenza.Check.Self(System.Object)" />, <see cref="M:Cadenza.Check.Predicate(System.Object)" /></exception>
+            <exception cref="T:System.ArgumentNullException">
+                <paramref name="self" /> or <paramref name="predicate" /> is <see langword="null" />.
+        </exception>
         </member>
         <member name="M:Cadenza.Collections.EnumerableCoda.SplitAt``1(System.Collections.Generic.IEnumerable{``0},System.Int32)">
             <typeparam name="TSource">
@@ -11290,6 +12923,65 @@ Tuple&lt;string, int&gt;        tuple = kvp.ToTuple ();
     // tuple._1 == "s", tuple._2 == 1</code>
             </remarks>
             <altmember cref="M:Cadenza.TupleCoda.ToKeyValuePair``2(Cadenza.Tuple{``0,``1})" />
+        </member>
+        <member name="T:Cadenza.Collections.LinkedListCoda">
+            <summary>
+                <see cref="T:System.Collections.Generic.LinkedList{T}" /> extension methods.
+    </summary>
+            <remarks />
+        </member>
+        <member name="M:Cadenza.Collections.LinkedListCoda.NodeAt``1(System.Collections.Generic.LinkedList{``0},System.Int32)">
+            <typeparam name="T">
+          The type of the elements within <paramref name="self" />.
+        </typeparam>
+            <param name="self">
+          A <see cref="T:System.Collections.Generic.LinkedList{T}" />
+          to get a
+          <see cref="T:System.Collections.Generic.LinkedListNode{T}" /> from.
+        </param>
+            <param name="index">
+          A <see cref="T:System.Int32" /> containing the zero-based index of the
+          <see cref="T:System.Collections.Generic.LinkedListNode{T}" /> to
+          retrieve.
+        </param>
+            <summary>
+          Returns the
+          <see cref="T:System.Collections.Generic.LinkedListNode{T}" />
+          at the specified <paramref name="index" /> of the
+          <see cref="T:System.Collections.Generic.LinkedList{T}" />.
+        </summary>
+            <returns>
+          The
+          <see cref="T:System.Collections.Generic.LinkedListNode{T}" />
+          at the specified <paramref name="index" /> of the
+          <see cref="T:System.Collections.Generic.LinkedList{T}" />.
+        </returns>
+            <remarks>
+                <code lang="C#" src="../../Test/Cadenza.Collections/LinkedListCodaTest.cs#NodeAt">LinkedList&lt;int&gt; list = new LinkedList&lt;int&gt;();
+list.AddLast (1); // first node;  index=0
+list.AddLast (2); // middle node; index=1
+list.AddLast (3); // last node;   index=2
+
+Assert.AreSame (list.First,         list.NodeAt (0));
+Assert.AreSame (list.First.Next,    list.NodeAt (1));
+Assert.AreSame (list.Last.Previous, list.NodeAt (1));
+Assert.AreSame (list.Last,          list.NodeAt (2));
+Assert.AreEqual (3, list.NodeAt (2).Value);
+</code>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+                <paramref name="self" /> is <see langword="null" />.
+        </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+                <para>
+                    <paramref name="index" /> is negative.
+          </para>
+                <para>-or-</para>
+                <para>
+                    <paramref name="index" /> is greater than or equal to
+            <see cref="P:System.Collections.Generic.LinkedList{T}.Count" />.
+          </para>
+            </exception>
         </member>
         <member name="T:Cadenza.Collections.MutableLookup`2">
             <typeparam name="TKey">The lookup key.</typeparam>
