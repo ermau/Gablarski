@@ -94,6 +94,15 @@ namespace Gablarski.Tests
 			return (T)message;
 		}
 
+		public void AssertNoMessage()
+		{
+			DateTime start = DateTime.Now;
+			while (DateTime.Now.Subtract (start).TotalSeconds < .75)
+				Thread.Sleep (1);
+
+			Assert.AreEqual (0, this.waiting, "Message was waiting");
+		}
+
 		#region IConnection Members
 		public event EventHandler<MessageReceivedEventArgs> MessageReceived;
 		public event EventHandler<ConnectionEventArgs> Disconnected;

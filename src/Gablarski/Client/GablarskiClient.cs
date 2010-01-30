@@ -63,7 +63,7 @@ namespace Gablarski.Client
 			DebugLogging = Log.IsDebugEnabled;
 
 			this.Connection = connection;
-			Setup (new ClientUserHandler (this), new ClientChannelManager (this), new ClientSourceManager (this), new CurrentUser (this), audioEngine);
+			Setup (new ClientUserHandler (this, new ClientUserManager()), new ClientChannelManager (this), new ClientSourceManager (this), new CurrentUser (this), audioEngine);
 		}
 
 		#region Events

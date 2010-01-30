@@ -37,6 +37,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Gablarski.Audio;
+using Gablarski.Messages;
 using Gablarski.Server;
 using Gablarski.Tests.Mocks;
 using NUnit.Framework;
@@ -49,13 +51,25 @@ namespace Gablarski.Tests
 		private IServerContext context;
 		private IServerSourceManager manager;
 		private ServerSourceHandler handler;
+		private MockServerConnection server;
+		private UserInfo user;
 
 		[SetUp]
 		public void Setup()
 		{
-			context = new MockServerContext { PermissionsProvider = new GuestPermissionProvider() };
+			ServerUserManager userManager = new ServerUserManager();
+			MockServerContext c;
+			context = c = new MockServerContext { Settings = new ServerSettings { Name = "Server" }, UserManager = userManager, PermissionsProvider = new GuestPermissionProvider() };
+			c.Users = new ServerUserHandler (context, userManager);
+
 			manager = new ServerSourceManager (context);
 			handler = new ServerSourceHandler (context, manager);
+
+			user = UserInfoTests.GetTestUser();
+			server = new MockServerConnection();
+
+			context.UserManager.Connect (server);
+			context.UserManager.Join (server, user);
 		}
         
 		[TearDown]
@@ -64,6 +78,7 @@ namespace Gablarski.Tests
 			handler = null;
 			manager = null;
 			context = null;
+			server = null;
 		}
 
 		[Test]
@@ -74,9 +89,34 @@ namespace Gablarski.Tests
 		}
 
 		[Test]
+		public void RequestSourceNotConnected()
+		{
+			var c = new MockServerConnection();
+			handler.RequestSourceMessage (new MessageReceivedEventArgs (c,
+				new RequestSourceMessage ("Name", new AudioCodecArgs (1, 64000, 44100, 512, 10))));
+
+			c.Client.AssertNoMessage();
+		}
+
+		[Test]
+		public void RequestSourceNotJoined()
+		{
+			var c = new MockServerConnection();
+			context.UserManager.Connect (c);
+
+			handler.RequestSourceMessage (new MessageReceivedEventArgs (c,
+				new RequestSourceMessage ("Name", new AudioCodecArgs (1, 64000, 44100, 512, 10))));
+
+			c.Client.AssertNoMessage();
+		}
+
+		[Test]
 		public void RequestSource()
 		{
-			
+			handler.RequestSourceMessage (new MessageReceivedEventArgs (server,
+				new RequestSourceMessage ("Name", new AudioCodecArgs (1, 64000, 44100, 512, 10))));
+
+
 		}
 	}
 }

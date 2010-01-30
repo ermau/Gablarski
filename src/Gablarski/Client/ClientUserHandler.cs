@@ -49,12 +49,15 @@ namespace Gablarski.Client
 	public class ClientUserHandler
 		: IClientUserHandler
 	{
-		protected internal ClientUserHandler (IClientContext context)
+		protected internal ClientUserHandler (IClientContext context, IClientUserManager manager)
 		{
 			if (context == null)
 				throw new ArgumentNullException ("context");
+			if (manager == null)
+				throw new ArgumentNullException ("manager");
 
 			this.context = context;
+			this.users = manager;
 		}
 
 		#region Events
@@ -225,7 +228,7 @@ namespace Gablarski.Client
 
 		protected readonly object SyncRoot = new object ();
 
-		private readonly IClientUserManager users = new ClientUserManager();
+		private readonly IClientUserManager users;
 		private readonly MutableLookup<int, UserInfo> channels = new MutableLookup<int, UserInfo> ();
 
 		private readonly HashSet<int> ignores = new HashSet<int> ();

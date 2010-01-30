@@ -233,5 +233,10 @@ namespace Gablarski.Tests
 			else
 				Assert.IsFalse (handler.Manager.GetIsJoined (server));
 		}
+
+		public void UserUpdate()
+		{
+			
+		}
 	}
 }

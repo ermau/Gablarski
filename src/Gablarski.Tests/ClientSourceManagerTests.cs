@@ -23,7 +23,7 @@ namespace Gablarski.Tests
 			var channels = new ClientChannelManager (context);
 			ClientChannelManagerTests.PopulateChannels (channels, server);
 
-			context.Users = new ClientUserHandler (context);
+			context.Users = new ClientUserHandler (context, new ClientUserManager());
 			context.Channels = channels;
 			context.CurrentUser = new CurrentUser (context, 1, "Foo", channels.First().ChannelId);
 
@@ -35,8 +35,8 @@ namespace Gablarski.Tests
 			manager.OnSourceListReceivedMessage (new MessageReceivedEventArgs (this.client, 
 			                                                                   new SourceListMessage (new []
 			                                                                   {
-			                                                                   	new AudioSource ("ownvoice", 1, 1, 1, 64000, 44100, 256, 10, false),
-			                                                                   	new AudioSource ("voice", 2, 2, 1, 96000, 44100, 512, 10, true),
+																				   AudioSourceTests.GetTestSource (1, 0),
+																				   AudioSourceTests.GetTestSource (2, 1),
 			                                                                   })
 			                                     	));
 		}
@@ -79,25 +79,11 @@ namespace Gablarski.Tests
 
 			var csource = manager.FirstOrDefault (s => s.Id == 1);
 			Assert.IsNotNull (csource, "Source not found");
-			Assert.AreEqual ("ownvoice", csource.Name, "Name not matching");
-			Assert.AreEqual (1, csource.OwnerId, "OwnerId not matching");
-			Assert.AreEqual (1, csource.Channels, "Channels not matching");
-			Assert.AreEqual (64000, csource.Bitrate, "Bitrate not matching");
-			Assert.AreEqual (44100, csource.Frequency, "Frequency not matching");
-			Assert.AreEqual (256, csource.FrameSize, "FrameSize not matching");
-			Assert.AreEqual (10, csource.Complexity, "Complexity not matching.");
-			Assert.AreEqual (false, csource.IsMuted, "IsMuted not matching");
+			AudioSourceTests.AssertSourcesMatch (AudioSourceTests.GetTestSource (1, 0), csource);
 
 			var source = manager.FirstOrDefault (s => s.Id == 2);
 			Assert.IsNotNull (source, "Source not found");
-			Assert.AreEqual ("voice", source.Name, "Name not matching");
-			Assert.AreEqual (2, source.OwnerId, "OwnerId not matching");
-			Assert.AreEqual (1, source.Channels, "Channels not matching");
-			Assert.AreEqual (96000, source.Bitrate, "Bitrate not matching");
-			Assert.AreEqual (44100, source.Frequency, "Frequency not matching");
-			Assert.AreEqual (512, source.FrameSize, "FrameSize not matching");
-			Assert.AreEqual (10, source.Complexity, "Complexity not matching");
-			Assert.AreEqual (true, source.IsMuted, "IsMuted not matching");
+			AudioSourceTests.AssertSourcesMatch (AudioSourceTests.GetTestSource (2, 1), source);
 		}
 
 		[Test]

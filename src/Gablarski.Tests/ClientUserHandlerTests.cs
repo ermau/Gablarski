@@ -23,7 +23,8 @@ namespace Gablarski.Tests
 			var channels = new ClientChannelManager (context);
 			ClientChannelManagerTests.PopulateChannels (channels, this.server);
 
-			this.handler = new ClientUserHandler (context);
+			var userManager = new ClientUserManager();
+			this.handler = new ClientUserHandler (context, userManager);
 			context.Users = this.handler;
 			context.Channels = channels;
 		}
@@ -62,7 +63,8 @@ namespace Gablarski.Tests
 		[Test]
 		public void NullConnection()
 		{
-			Assert.Throws<ArgumentNullException> (() => new ClientUserHandler (null));
+			Assert.Throws<ArgumentNullException> (() => new ClientUserHandler (null, new ClientUserManager()));
+			Assert.Throws<ArgumentNullException> (() => new ClientUserHandler (new MockClientContext(), null));
 		}
 
 		[Test]
