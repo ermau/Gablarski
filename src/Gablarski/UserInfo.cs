@@ -42,6 +42,16 @@ using Cadenza;
 
 namespace Gablarski
 {
+	[Flags]
+	public enum UserState
+		: byte
+	{
+		Normal = 0,
+
+		MutedMicrophone = 1,
+		MutedSound = 2,
+	}
+
 	public class UserInfo
 		: IEquatable<UserInfo>
 	{
@@ -151,6 +161,12 @@ namespace Gablarski
 			set;
 		}
 
+		public UserState State
+		{
+			get;
+			set;
+		}
+
 		public string Status
 		{
 			get;
@@ -165,6 +181,7 @@ namespace Gablarski
 			writer.WriteString (this.Nickname);
 			writer.WriteString (this.Phonetic);
 			writer.WriteBool (this.IsMuted);
+			writer.WriteByte ((byte)this.State);
 			writer.WriteString (this.Status);
 		}
 
@@ -176,6 +193,7 @@ namespace Gablarski
 			this.Nickname = reader.ReadString();
 			this.Phonetic = reader.ReadString();
 			this.IsMuted = reader.ReadBool();
+			this.State = (UserState)reader.ReadByte();
 			this.Status = reader.ReadString();
 		}
 

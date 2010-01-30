@@ -41,7 +41,7 @@ using System.Text;
 
 namespace Gablarski.Messages
 {
-	// Next: 46
+	// Next: 48
 
 	public enum ClientMessageType
 		: ushort
@@ -53,6 +53,7 @@ namespace Gablarski.Messages
 		Disconnect = 5,
 		QueryServer = 34,
 		PunchThrough = 39,
+		UserUpdate = 47,
 
 		RequestSourceList = 15,
 		RequestSource = 7,
@@ -103,6 +104,7 @@ namespace Gablarski.Messages
 		ChannelEditResult = 23,
 
 		Muted = 31,
+		UserUpdated = 46
 	}
 
 	public abstract class Message<TMessage>

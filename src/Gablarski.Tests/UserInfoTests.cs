@@ -17,6 +17,33 @@ namespace Gablarski.Tests
 		private const int ChanId = 2;
 		private const bool Muted = true;
 		private const string Status = "There's a monkey in my barrel!";
+		private const UserState State = UserState.MutedMicrophone | UserState.MutedSound;
+
+		public static UserInfo GetTestUser()
+		{
+			return GetTestUser (0);
+		}
+
+		public static UserInfo GetTestUser (int increment)
+		{
+			return new UserInfo (Nickname + increment, Phonetic + increment, Username + increment, UserId + increment,
+			                     ChanId + increment, Muted)
+			{
+				Status = Status,
+				State = State
+			};
+		}
+
+		public static void AssertUserInfosMatch (UserInfo expected, UserInfo actual)
+		{
+			Assert.AreEqual (expected.UserId, actual.UserId);
+			Assert.AreEqual (expected.CurrentChannelId, actual.CurrentChannelId);
+			Assert.AreEqual (expected.Nickname, actual.Nickname);
+			Assert.AreEqual (expected.Phonetic, actual.Phonetic);
+			Assert.AreEqual (expected.IsMuted, actual.IsMuted);
+			Assert.AreEqual (expected.Status, actual.Status);
+			Assert.AreEqual (expected.State, actual.State);
+		}
 
 		[Test]
 		public void InvalidCtor()
@@ -64,6 +91,7 @@ namespace Gablarski.Tests
 
 			var info = new UserInfo (Nickname, Phonetic, Username, UserId, ChanId, Muted);
 			info.Status = Status;
+			info.State = State;
 
 			info.Serialize (writer);
 			long length = stream.Position;
@@ -77,6 +105,7 @@ namespace Gablarski.Tests
 			Assert.AreEqual (Phonetic, info.Phonetic);
 			Assert.AreEqual (Muted, info.IsMuted);
 			Assert.AreEqual (Status, info.Status);
+			Assert.AreEqual (State, info.State);
 		}
 
 		[Test]

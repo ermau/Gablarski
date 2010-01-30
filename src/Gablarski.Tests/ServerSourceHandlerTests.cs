@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -37,31 +37,46 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Gablarski.Server;
+using Gablarski.Tests.Mocks;
+using NUnit.Framework;
 
-namespace Gablarski.Messages
+namespace Gablarski.Tests
 {
-	public class UserChangedChannelMessage
-		: ServerMessage
+	[TestFixture]
+	public class ServerSourceHandlerTests
 	{
-		public UserChangedChannelMessage()
-			: base (ServerMessageType.UserChangedChannel)
+		private IServerContext context;
+		private IServerSourceManager manager;
+		private ServerSourceHandler handler;
+
+		[SetUp]
+		public void Setup()
 		{
+			context = new MockServerContext { PermissionsProvider = new GuestPermissionProvider() };
+			manager = new ServerSourceManager (context);
+			handler = new ServerSourceHandler (context, manager);
+		}
+        
+		[TearDown]
+		public void Teardown()
+		{
+			handler = null;
+			manager = null;
+			context = null;
 		}
 
-		public ChannelChangeInfo ChangeInfo
+		[Test]
+		public void CtorNull()
 		{
-			get;
-			set;
+			Assert.Throws<ArgumentNullException> (() => new ServerSourceHandler (null, manager));
+			Assert.Throws<ArgumentNullException> (() => new ServerSourceHandler (context, null));
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		[Test]
+		public void RequestSource()
 		{
-			this.ChangeInfo.Serialize (writer);
-		}
-
-		public override void ReadPayload (IValueReader reader)
-		{
-			this.ChangeInfo = new ChannelChangeInfo (reader);
+			
 		}
 	}
 }

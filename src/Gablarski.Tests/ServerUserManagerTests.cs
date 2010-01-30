@@ -249,8 +249,27 @@ namespace Gablarski.Tests
 		[Test]
 		public void MoveNull()
 		{
-			Assert.Throws<ArgumentNullException> (() => manager.Move (null, new ChannelInfo()));
+			Assert.Throws<ArgumentNullException> (() => manager.Move (null, new ChannelInfo (1)));
 			Assert.Throws<ArgumentNullException> (() => manager.Move (user, null));
+		}
+
+		[Test]
+		public void MoveNotConnected()
+		{
+			Assert.DoesNotThrow (() =>
+				manager.Move (user, new ChannelInfo (1)));
+
+			Assert.IsNull (manager.GetUser (client));
+		}
+
+		[Test]
+		public void MoveNotJoined()
+		{
+			manager.Connect (client);
+			Assert.DoesNotThrow (() =>
+				manager.Move (user, new ChannelInfo (1)));
+
+			Assert.IsNull (manager.GetUser (client));
 		}
 
 		[Test]
@@ -266,19 +285,6 @@ namespace Gablarski.Tests
 			user = manager.GetUser (client);
 
 			Assert.AreEqual (c.ChannelId, user.CurrentChannelId);
-		}
-
-		[Test]
-		public void MoveNotJoined()
-		{
-			var c = new ChannelInfo (3);
-			
-			manager.Connect (client);
-			manager.Move (user, c);
-
-			user = manager.GetUser (client);
-
-			Assert.IsNull (user);
 		}
 
 		[Test]
@@ -300,6 +306,15 @@ namespace Gablarski.Tests
 		public void ToggleMuteNull()
 		{
 			Assert.Throws<ArgumentNullException> (() => manager.ToggleMute (null));
+		}
+
+		[Test]
+		public void ToggleMuteNotConnected()
+		{
+			Assert.DoesNotThrow (() => 
+				manager.ToggleMute (user));
+
+			Assert.IsNull (manager.GetConnection (user));
 		}
 
 		[Test]
@@ -338,6 +353,33 @@ namespace Gablarski.Tests
 			user = manager.GetUser (client);
 			Assert.IsNotNull (user);
 			Assert.IsFalse (user.IsMuted);
+		}
+
+		[Test]
+		public void SetStateNull()
+		{
+			Assert.Throws<ArgumentNullException> (() => manager.SetState (null, UserState.Normal));
+		}
+
+		[Test]
+		public void SetState()
+		{
+			manager.Connect (client);
+			manager.Join (client, user);
+
+			Assert.AreEqual (UserState.Normal, user.State);
+			manager.SetState (user, UserState.MutedSound);
+
+			user = manager.GetUser (client);
+			Assert.IsNotNull (user);
+			Assert.AreEqual (UserState.MutedSound, user.State);
+		}
+
+		[Test]
+		public void SetStateNotConnected()
+		{
+			Assert.DoesNotThrow (() =>
+				manager.SetState (user, UserState.Normal));
 		}
 
 		[Test]

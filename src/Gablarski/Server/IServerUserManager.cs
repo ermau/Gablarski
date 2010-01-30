@@ -79,6 +79,14 @@ namespace Gablarski.Server
 		bool ToggleMute (UserInfo user);
 
 		/// <summary>
+		/// Sets the state for the <paramref name="user"/>.
+		/// </summary>
+		/// <param name="user">The user to set the state of.</param>
+		/// <param name="newState">The new state of the user.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
+		void SetState (UserInfo user, UserState newState);
+
+		/// <summary>
 		/// Gets whether <paramref name="nickname"/> is currently in use or not.
 		/// </summary>
 		/// <param name="nickname">The name to check.</param>

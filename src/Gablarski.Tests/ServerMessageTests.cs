@@ -140,8 +140,8 @@ namespace Gablarski.Tests
 		{
 			List<UserInfo> users = new List<UserInfo>
 			{
-				new UserInfo (Nickname, Nickname, UserId, ChannelId, false),
-				new UserInfo (Nickname2, Nickname2, UserId2, ChannelId2, true)
+				UserInfoTests.GetTestUser(1),
+				UserInfoTests.GetTestUser(2)
 			};
 
 			var msg = new UserListMessage (users);
@@ -215,8 +215,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void UserLoggedIn()
 		{
-			var info = new UserInfo (Nickname, Nickname, UserId, ChannelId, false);
-			var msg = new UserJoinedMessage (info);
+			var msg = new UserJoinedMessage (UserInfoTests.GetTestUser());
 			msg.WritePayload (writer);
 			long length = stream.Position;
 			stream.Position = 0;
@@ -224,9 +223,7 @@ namespace Gablarski.Tests
 			msg = new UserJoinedMessage();
 			msg.ReadPayload (reader);
 			Assert.AreEqual (length, stream.Position);
-			Assert.AreEqual (info.UserId, msg.UserInfo.UserId);
-			Assert.AreEqual (info.Nickname, msg.UserInfo.Nickname);
-			Assert.AreEqual (info.CurrentChannelId, msg.UserInfo.CurrentChannelId);
+			UserInfoTests.AssertUserInfosMatch (UserInfoTests.GetTestUser(), msg.UserInfo);
 		}
 
 		[Test]
@@ -401,6 +398,30 @@ namespace Gablarski.Tests
 			msg = new ServerInfoMessage();
 			msg.ReadPayload (reader);
 			Assert.AreEqual (length, stream.Position);
+		}
+
+		[Test]
+		public void UserUpdatedMessage()
+		{
+			var msg = new UserUpdatedMessage (UserInfoTests.GetTestUser());
+			UserInfoTests.AssertUserInfosMatch (UserInfoTests.GetTestUser(), msg.User);
+
+			msg = AssertLengthMatches (msg);
+			UserInfoTests.AssertUserInfosMatch (UserInfoTests.GetTestUser(), msg.User);
+		}
+
+		private T AssertLengthMatches<T> (T msg)
+			where T : MessageBase, new()
+		{
+			msg.WritePayload (writer);
+			long len = stream.Position;
+			stream.Position = 0;
+
+			msg = new T();
+			msg.ReadPayload (reader);
+			Assert.AreEqual (len, stream.Position);
+
+			return msg;
 		}
 	}
 }

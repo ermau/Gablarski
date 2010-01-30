@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -40,28 +40,34 @@ using System.Linq;
 
 namespace Gablarski.Messages
 {
-	public class UserChangedChannelMessage
+	public class UserUpdatedMessage
 		: ServerMessage
 	{
-		public UserChangedChannelMessage()
-			: base (ServerMessageType.UserChangedChannel)
+		public UserUpdatedMessage()
+			: base (ServerMessageType.UserUpdated)
 		{
 		}
 
-		public ChannelChangeInfo ChangeInfo
+		public UserUpdatedMessage (UserInfo user)
+			: this()
+		{
+			User = user;
+		}
+
+		public UserInfo User
 		{
 			get;
-			set;
-		}
-
-		public override void WritePayload (IValueWriter writer)
-		{
-			this.ChangeInfo.Serialize (writer);
+			private set;
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
-			this.ChangeInfo = new ChannelChangeInfo (reader);
+			User = new UserInfo (reader);
+		}
+
+		public override void WritePayload (IValueWriter writer)
+		{
+			User.Serialize (writer);
 		}
 	}
 }

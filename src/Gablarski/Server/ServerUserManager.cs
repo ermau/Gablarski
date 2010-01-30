@@ -149,6 +149,8 @@ namespace Gablarski.Server
 				throw new ArgumentNullException ("user");
 
 			IConnection connection = GetConnection (user);
+			if (connection == null)
+				return false;
 
 			UserInfo old;
 			if (!connectedUsers.TryGetKey (connection, out old))
@@ -160,6 +162,25 @@ namespace Gablarski.Server
 			connectedUsers.Inverse[connection] = newUser;
 
 			return newUser.IsMuted;
+		}
+
+		public void SetState (UserInfo user, UserState newState)
+		{
+			if (user == null)
+				throw new ArgumentNullException ("user");
+
+			IConnection connection = GetConnection (user);
+			if (connection == null)
+				return;
+
+			UserInfo old;
+			if (!connectedUsers.TryGetKey (connection, out old))
+				return;
+
+			UserInfo newUser = new UserInfo (old);
+			newUser.State = newState;
+
+			connectedUsers.Inverse[connection] = newUser;
 		}
 
 		public void Login (IConnection connection, UserInfo user)
