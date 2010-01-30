@@ -55,7 +55,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void RequestDefaultBitrate()
 		{
-			this.manager.Request ("voice", 1);
+			this.manager.Request ("voice", 1, 512);
 
 			var msg = this.server.DequeueAndAssertMessage<RequestSourceMessage>();
 			Assert.AreEqual (1, msg.AudioSettings.Channels);
@@ -65,7 +65,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void RequestBitRate()
 		{
-			this.manager.Request ("voice", 2, 64000);
+			this.manager.Request ("voice", 2, 512, 64000);
 
 			var msg = this.server.DequeueAndAssertMessage<RequestSourceMessage>();
 			Assert.AreEqual (2, msg.AudioSettings.Channels);
