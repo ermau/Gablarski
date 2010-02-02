@@ -146,9 +146,8 @@ namespace Gablarski.Audio
 
 			lock (captures)
 			{
-				if (options.Mode == AudioEngineCaptureMode.Activated)
-					capture.BeginCapture (format);
-
+				//if (options.Mode == AudioEngineCaptureMode.Activated)
+				capture.BeginCapture (format);
 				captures[source] = new AudioCaptureEntity (capture, format, source, options);
 			}
 		}
@@ -318,7 +317,7 @@ namespace Gablarski.Audio
 				e.CurrentTargets = channels.Select (c => c.ChannelId).ToArray();
 				e.Talking = true;
 				AudioSender.BeginSending (source);
-				e.Capture.BeginCapture (AudioFormat.Mono16Bit);
+				//e.Capture.BeginCapture (AudioFormat.Mono16Bit);
 			}
 		}
 
@@ -343,7 +342,7 @@ namespace Gablarski.Audio
 				e.CurrentTargets = users.Select (c => c.UserId).ToArray();
 				e.Talking = true;
 				AudioSender.BeginSending (source);
-				e.Capture.BeginCapture (AudioFormat.Mono16Bit);
+				//e.Capture.BeginCapture (AudioFormat.Mono16Bit);
 			}
 		}
 
@@ -363,8 +362,8 @@ namespace Gablarski.Audio
 				e.Talking = false;
 				AudioSender.EndSending (source);
 
-				if (e.Capture.IsCapturing)
-					e.Capture.EndCapture ();
+				//if (e.Capture.IsCapturing)
+				//	e.Capture.EndCapture ();
 			}
 		}
 
@@ -503,8 +502,6 @@ namespace Gablarski.Audio
 
 		private void Engine ()
 		{
-			byte[] previousFrame = null;
-
 			while (this.running)
 			{
 				lock (playbackProviders)
@@ -540,28 +537,24 @@ namespace Gablarski.Audio
 								c.Value.CurrentTargets = new[] { Context.GetCurrentChannel().ChannelId };
 							}
 
-							byte[] samples = c.Value.Capture.ReadSamples (c.Key.FrameSize);
-							if (c.Value.Options.Mode == AudioEngineCaptureMode.Activated)
+							while (c.Value.Capture.AvailableSampleCount > c.Key.FrameSize)
 							{
-								talking = c.Value.VoiceActivation.IsTalking (samples);
-
-								if (talking && !c.Value.Talking)
+								byte[] samples = c.Value.Capture.ReadSamples (c.Key.FrameSize);
+								if (c.Value.Options.Mode == AudioEngineCaptureMode.Activated)
 								{
-									AudioSender.BeginSending (c.Key);
+									talking = c.Value.VoiceActivation.IsTalking (samples);
+	
+									if (talking && !c.Value.Talking)
+										AudioSender.BeginSending (c.Key);
 									
-									if (previousFrame != null)
-										AudioSender.SendAudioData (c.Key, c.Value.TargetType, c.Value.CurrentTargets, previousFrame);
+									c.Value.Talking = talking;
 								}
-
-								previousFrame = samples;
+									
+								if (talking)
+									AudioSender.SendAudioData (c.Key, c.Value.TargetType, c.Value.CurrentTargets, samples);
+								else if (c.Value.Talking && c.Value.Options.Mode == AudioEngineCaptureMode.Activated)
+									AudioSender.EndSending (c.Key);						
 							}
-
-							if (talking)
-								AudioSender.SendAudioData (c.Key, c.Value.TargetType, c.Value.CurrentTargets, samples);
-							else if (c.Value.Talking && c.Value.Options.Mode == AudioEngineCaptureMode.Activated)
-								AudioSender.EndSending (c.Key);
-
-							c.Value.Talking = talking;
 						}
 
 						if (!skipSwitch)
