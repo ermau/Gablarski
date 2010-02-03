@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2010, Eric Maupin
+// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -53,13 +53,30 @@ namespace Gablarski.Tests
 		private ServerSourceHandler handler;
 		private MockServerConnection server;
 		private UserInfo user;
+		
+		private const int defaultBitrate = 96000;
+		private const int maxBitrate = 192000;
+		private const int minBitrate = 32000;
 
 		[SetUp]
 		public void Setup()
 		{
 			ServerUserManager userManager = new ServerUserManager();
 			MockServerContext c;
-			context = c = new MockServerContext { Settings = new ServerSettings { Name = "Server" }, UserManager = userManager, PermissionsProvider = new GuestPermissionProvider() };
+			context = c = new MockServerContext
+			{
+				Settings = new ServerSettings
+				{
+					Name = "Server",
+					DefaultAudioBitrate = defaultBitrate,
+					MaximumAudioBitrate = maxBitrate,
+					MinimumAudioBitrate = minBitrate
+				},
+				
+				UserManager = userManager,
+				PermissionsProvider = new GuestPermissionProvider()
+			
+			};
 			c.Users = new ServerUserHandler (context, userManager);
 
 			manager = new ServerSourceManager (context);
@@ -113,10 +130,79 @@ namespace Gablarski.Tests
 		[Test]
 		public void RequestSource()
 		{
+			var audioArgs = new AudioCodecArgs (1, 64000, 44100, 512, 10);
 			handler.RequestSourceMessage (new MessageReceivedEventArgs (server,
-				new RequestSourceMessage ("Name", new AudioCodecArgs (1, 64000, 44100, 512, 10))));
+				new RequestSourceMessage ("Name", audioArgs)));
 
-
+			var result = server.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			Assert.AreEqual (SourceResult.Succeeded, result.SourceResult);
+			Assert.AreEqual ("Name", result.SourceName);
+			Assert.AreEqual ("Name", result.Source.Name);
+			
+			AudioCodecArgsTests.AssertAreEqual (audioArgs, result.Source);
+		}
+		
+		[Test]
+		public void RequestSourceDefaultBitrate()
+		{
+			var audioArgs = new AudioCodecArgs (1, 0, 44100, 512, 10);
+			handler.RequestSourceMessage (new MessageReceivedEventArgs (server, new RequestSourceMessage ("Name", audioArgs)));
+			
+			var result = server.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			Assert.AreEqual (SourceResult.Succeeded, result.SourceResult);
+			Assert.AreEqual ("Name", result.SourceName);
+			Assert.AreEqual ("Name", result.Source.Name);
+			
+			audioArgs.Bitrate = defaultBitrate;
+			AudioCodecArgsTests.AssertAreEqual (audioArgs, result.Source);
+		}
+		
+		[Test]
+		public void RequestSourceExceedMaxBitrate()
+		{
+			var audioArgs = new AudioCodecArgs (1, 200000, 44100, 512, 10);
+			handler.RequestSourceMessage (new MessageReceivedEventArgs (server, new RequestSourceMessage ("Name", audioArgs)));
+			
+			var result = server.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			Assert.AreEqual (SourceResult.Succeeded, result.SourceResult);
+			Assert.AreEqual ("Name", result.SourceName);
+			Assert.AreEqual ("Name", result.Source.Name);
+			
+			audioArgs.Bitrate = maxBitrate;
+			AudioCodecArgsTests.AssertAreEqual (audioArgs, result.Source);
+		}
+		
+		[Test]
+		public void RequestSourceBelowMinBitrate()
+		{
+			var audioArgs = new AudioCodecArgs (1, 1, 44100, 512, 10);
+			handler.RequestSourceMessage (new MessageReceivedEventArgs (server, new RequestSourceMessage ("Name", audioArgs)));
+			
+			var result = server.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			Assert.AreEqual (SourceResult.Succeeded, result.SourceResult);
+			Assert.AreEqual ("Name", result.SourceName);
+			Assert.AreEqual ("Name", result.Source.Name);
+			
+			audioArgs.Bitrate = minBitrate;
+			AudioCodecArgsTests.AssertAreEqual (audioArgs, result.Source);
+		}
+		
+		[Test]
+		public void RequestSourceListNotConnected()
+		{
+			var c = new MockServerConnection();			
+			handler.RequestSourceListMessage (new MessageReceivedEventArgs (c, new RequestSourceListMessage ()));
+			
+			c.Client.AssertNoMessage();
+		}
+		
+		[Test]
+		public void RequestSourceListEmpty()
+		{
+			handler.RequestSourceListMessage (new MessageReceivedEventArgs (server, new RequestSourceListMessage()));
+			
+			var list = server.Client.DequeueAndAssertMessage<SourceListMessage>();
+			Assert.IsEmpty (list.Sources.ToList());
 		}
 	}
 }

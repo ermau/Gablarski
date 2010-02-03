@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -100,7 +100,8 @@ namespace Gablarski.Tests
 			while (DateTime.Now.Subtract (start).TotalSeconds < .75)
 				Thread.Sleep (1);
 
-			Assert.AreEqual (0, this.waiting, "Message was waiting");
+			if (this.waiting > 0)
+				Assert.Fail (DequeueMessage().GetType().Name + " was waiting");
 		}
 
 		#region IConnection Members
@@ -124,7 +125,7 @@ namespace Gablarski.Tests
 
 		#endregion
 
-		private bool connected;
+		private bool connected = true;
 
 		private readonly StreamValueWriter writer;
 		private readonly StreamValueReader reader;
