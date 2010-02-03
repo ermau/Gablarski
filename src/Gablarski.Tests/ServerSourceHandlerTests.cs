@@ -52,6 +52,7 @@ namespace Gablarski.Tests
 		private IServerSourceManager manager;
 		private ServerSourceHandler handler;
 		private MockServerConnection server;
+		private GuestPermissionProvider permissions;
 		private UserInfo user;
 		
 		private const int defaultBitrate = 96000;
@@ -61,6 +62,8 @@ namespace Gablarski.Tests
 		[SetUp]
 		public void Setup()
 		{
+			permissions = new GuestPermissionProvider();
+
 			ServerUserManager userManager = new ServerUserManager();
 			MockServerContext c;
 			context = c = new MockServerContext
@@ -74,7 +77,7 @@ namespace Gablarski.Tests
 				},
 				
 				UserManager = userManager,
-				PermissionsProvider = new GuestPermissionProvider()
+				PermissionsProvider = permissions
 			
 			};
 			c.Users = new ServerUserHandler (context, userManager);
@@ -96,6 +99,7 @@ namespace Gablarski.Tests
 			manager = null;
 			context = null;
 			server = null;
+			permissions = null;
 		}
 
 		[Test]
@@ -188,6 +192,23 @@ namespace Gablarski.Tests
 			audioArgs.Bitrate = minBitrate;
 			AudioCodecArgsTests.AssertAreEqual (audioArgs, result.Source);
 		}
+
+		[Test]
+		public void RequestSourceDuplicateSourceName()
+		{
+			var audioArgs = new AudioCodecArgs (1, 64000, 44100, 512, 10);
+			handler.RequestSourceMessage (new MessageReceivedEventArgs (server,
+				new RequestSourceMessage ("Name", audioArgs)));
+
+			var result = server.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			Assert.AreEqual (SourceResult.Succeeded, result.SourceResult);
+
+			handler.RequestSourceMessage (new MessageReceivedEventArgs (server,
+				new RequestSourceMessage ("Name", audioArgs)));
+
+			result = server.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			Assert.AreEqual (SourceResult.FailedDuplicateSourceName, result.SourceResult);
+		}
 		
 		[Test]
 		public void RequestSourceListNotConnected()
@@ -207,6 +228,30 @@ namespace Gablarski.Tests
 			
 			var list = server.Client.DequeueAndAssertMessage<SourceListMessage>();
 			Assert.IsEmpty (list.Sources.ToList());
+		}
+
+		[Test]
+		public void RequestSourceList()
+		{
+			var audioArgs = new AudioCodecArgs (1, 64000, 44100, 512, 10);
+			handler.RequestSourceMessage (new MessageReceivedEventArgs (server,
+				new RequestSourceMessage ("Name", audioArgs)));
+
+			var result = server.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			Assert.AreEqual (SourceResult.Succeeded, result.SourceResult);
+
+			handler.RequestSourceMessage (new MessageReceivedEventArgs (server,
+				new RequestSourceMessage ("Name2", audioArgs)));
+
+			var result2 = server.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			Assert.AreEqual (SourceResult.Succeeded, result2.SourceResult);
+
+			handler.RequestSourceListMessage (new MessageReceivedEventArgs (server, new RequestSourceListMessage()));
+			var list = server.Client.DequeueAndAssertMessage<SourceListMessage>();
+
+			Assert.AreEqual (2, list.Sources.Count());
+			Assert.Contains (result.Source, list.Sources.ToList());
+			Assert.Contains (result2.Source, list.Sources.ToList());
 		}
 	}
 }

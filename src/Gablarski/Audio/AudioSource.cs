@@ -40,7 +40,7 @@ using System.Linq;
 namespace Gablarski.Audio
 {
 	public class AudioSource
-		: AudioCodec
+		: AudioCodec, IEquatable<AudioSource>
 	{
 		internal AudioSource (IValueReader reader)
 			: base (reader)
@@ -142,18 +142,44 @@ namespace Gablarski.Audio
 			base.Deserialize (reader);
 		}
 
-		public override int GetHashCode ()
-		{
-			return this.Id.GetHashCode();
-		}
-
 		public override bool Equals (object obj)
 		{
-			var s = (obj as AudioSource);
-			if (s != null)
-				return (this.Id == s.Id);
+			if (ReferenceEquals (null, obj))
+				return false;
+			if (ReferenceEquals (this, obj))
+				return true;
 
-			return base.Equals (obj);
+			return Equals (obj as AudioSource);
+		}
+
+		public bool Equals (AudioSource other)
+		{
+			if (ReferenceEquals (null, other))
+				return false;
+			if (ReferenceEquals (this, other))
+				return true;
+
+			return base.Equals (other) && other.Id == this.Id;
+		}
+
+		public override int GetHashCode()
+		{
+			unchecked
+			{
+				{
+					return (base.GetHashCode() * 397) ^ this.Id;
+				}
+			}
+		}
+
+		public static bool operator == (AudioSource left, AudioSource right)
+		{
+			return Equals (left, right);
+		}
+
+		public static bool operator != (AudioSource left, AudioSource right)
+		{
+			return !Equals (left, right);
 		}
 	}
 }

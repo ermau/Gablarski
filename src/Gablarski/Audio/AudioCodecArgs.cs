@@ -39,7 +39,7 @@ using System.Linq;
 
 namespace Gablarski.Audio
 {
-	public class AudioCodecArgs
+	public class AudioCodecArgs : IEquatable<AudioCodecArgs>
 	{
 		public AudioCodecArgs()
 			: this (1, 48000, 44100, 512, 10)
@@ -155,6 +155,40 @@ namespace Gablarski.Audio
 			}
 		}
 
+		public override bool Equals (object obj)
+		{
+			if (ReferenceEquals (null, obj))
+				return false;
+			if (ReferenceEquals (this, obj))
+				return true;
+			if (obj.GetType() != typeof (AudioCodecArgs))
+				return false;
+
+			return Equals ((AudioCodecArgs)obj);
+		}
+
+		public bool Equals (AudioCodecArgs other)
+		{
+			if (ReferenceEquals (null, other))
+				return false;
+			if (ReferenceEquals (this, other))
+				return true;
+			return other.frameSize == this.frameSize && other.channels == this.channels && other.complexity == this.complexity && other.bitrate == this.bitrate && other.frequency == this.frequency;
+		}
+
+		public override int GetHashCode()
+		{
+			unchecked
+			{
+				int result = this.frameSize.GetHashCode();
+				result = (result * 397) ^ this.channels.GetHashCode();
+				result = (result * 397) ^ this.complexity.GetHashCode();
+				result = (result * 397) ^ this.bitrate;
+				result = (result * 397) ^ this.frequency;
+				return result;
+			}
+		}
+
 		private short frameSize;
 		private byte channels;
 		private byte complexity;
@@ -202,6 +236,16 @@ namespace Gablarski.Audio
 		public static bool IsInvalidBitrate (int value)
 		{
 			return value < 0 || value >= 320000;
+		}
+
+		public static bool operator == (AudioCodecArgs left, AudioCodecArgs right)
+		{
+			return Equals (left, right);
+		}
+
+		public static bool operator != (AudioCodecArgs left, AudioCodecArgs right)
+		{
+			return !Equals (left, right);
 		}
 	}
 }
