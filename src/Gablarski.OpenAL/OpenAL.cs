@@ -119,7 +119,7 @@ namespace Gablarski.OpenAL
 		/// </summary>
 		public static string Version
 		{
-			get { return new Marshal.PtrToStringAnsi (alGetString (AL_VERSION)); }
+			get { return Marshal.PtrToStringAnsi (alGetString (AL_VERSION)); }
 		}
 
 		public static PlaybackDevice GetDefaultPlaybackDevice()
