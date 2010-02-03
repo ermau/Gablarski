@@ -179,7 +179,7 @@ namespace Gablarski.Audio
 			this.Complexity = reader.ReadByte();
 		}
 
-		public static bool IsInvalidFrameSize(short value)
+		public static bool IsInvalidFrameSize (short value)
 		{
 			return value < 64 || value > 1024 || (value % 64) != 0;
 		}
@@ -191,7 +191,7 @@ namespace Gablarski.Audio
 
 		public static bool IsInvalidChannels (byte value)
 		{
-			return value <= 0 || value > 2;
+			return value < 1 || value > 2;
 		}
 
 		public static bool IsInvalidComplexity (byte value)

@@ -119,7 +119,7 @@ namespace Gablarski.OpenAL
 		/// </summary>
 		public static string Version
 		{
-			get { return Marshal.PtrToStringAnsi (alGetString (AL_VERSION)); }
+			get { return new Marshal.PtrToStringAnsi (alGetString (AL_VERSION)); }
 		}
 
 		public static PlaybackDevice GetDefaultPlaybackDevice()
@@ -171,8 +171,8 @@ namespace Gablarski.OpenAL
 
 		public static CaptureDevice GetDefaultCaptureDevice()
 		{
-			if (!IsCaptureSupported)
-				throw new NotSupportedException();
+			//if (!IsCaptureSupported)
+			//	throw new NotSupportedException();
 
 			CaptureDevice defaultDevice;
 			GetCaptureDevices (out defaultDevice);
@@ -187,8 +187,8 @@ namespace Gablarski.OpenAL
 
 		public static IEnumerable<CaptureDevice> GetCaptureDevices (out CaptureDevice defaultDevice)
 		{
-			if (!IsCaptureSupported)
-				throw new NotSupportedException();
+			//if (!IsCaptureSupported)
+			//	throw new NotSupportedException();
 			
 			OpenAL.Debug ("Getting capture devices");
 

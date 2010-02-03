@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2010, Eric Maupin
+// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -80,6 +80,15 @@ namespace Gablarski.Tests
 		private const int FrameSize = 512;
 		private const byte Complexity = 10;
 
+		public static void AssertAreEqual (AudioCodecArgs expected, AudioCodecArgs actual)
+		{
+			Assert.AreEqual (expected.Bitrate, actual.Bitrate);
+			Assert.AreEqual (expected.Channels, actual.Channels);
+			Assert.AreEqual (expected.Complexity, actual.Complexity);
+			Assert.AreEqual (expected.FrameSize, actual.FrameSize);
+			Assert.AreEqual (expected.Frequency, actual.Frequency);
+		}
+		
 		[Test]
 		public void Ctor()
 		{
