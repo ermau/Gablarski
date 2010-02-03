@@ -132,7 +132,7 @@ namespace Gablarski.Tests
 		public void AssertNoMessage()
 		{
 			DateTime start = DateTime.Now;
-			while (DateTime.Now.Subtract (start).TotalSeconds < .75)
+			while (DateTime.Now.Subtract (start).TotalSeconds < .5)
 				Thread.Sleep (1);
 
 			if (this.waiting > 0)

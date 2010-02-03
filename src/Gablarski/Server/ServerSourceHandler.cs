@@ -157,6 +157,8 @@ namespace Gablarski.Server
 		internal void RequestMuteSourceMessage (MessageReceivedEventArgs e)
 		{
 			var request = (RequestMuteMessage)e.Message;
+			if (!e.Connection.IsConnected)
+				return;
 
 			if (!context.GetPermission (PermissionName.MuteAudioSource, e.Connection))
 			{
