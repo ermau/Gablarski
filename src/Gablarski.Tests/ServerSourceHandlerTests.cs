@@ -109,6 +109,8 @@ namespace Gablarski.Tests
 		public void RequestSourceNotConnected()
 		{
 			var c = new MockServerConnection();
+			c.Disconnect();
+
 			handler.RequestSourceMessage (new MessageReceivedEventArgs (c,
 				new RequestSourceMessage ("Name", new AudioCodecArgs (1, 64000, 44100, 512, 10))));
 
@@ -190,7 +192,9 @@ namespace Gablarski.Tests
 		[Test]
 		public void RequestSourceListNotConnected()
 		{
-			var c = new MockServerConnection();			
+			var c = new MockServerConnection();
+			c.Disconnect();
+
 			handler.RequestSourceListMessage (new MessageReceivedEventArgs (c, new RequestSourceListMessage ()));
 			
 			c.Client.AssertNoMessage();
