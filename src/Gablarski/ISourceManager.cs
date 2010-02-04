@@ -50,7 +50,7 @@ namespace Gablarski
 		/// Gets the audio sources owned by <paramref name="user"/>.
 		/// </summary>
 		/// <param name="user">The owner to find sources for.</param>
-		/// <returns>An empty enumerable if this user doesn't own any sources, otherwise the owned sources.</returns>
+		/// <returns>An empty enumerable if <paramref name="user"/> doesn't own any sources, otherwise the owned sources.</returns>
 		IEnumerable<AudioSource> this[UserInfo user] { get; }
 
 		/// <summary>

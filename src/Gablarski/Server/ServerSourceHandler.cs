@@ -186,9 +186,15 @@ namespace Gablarski.Server
 		{
 			var msg = (ClientAudioSourceStateChangeMessage)e.Message;
 
-			var speaker = context.UserManager.GetUser (e.Connection);
+			if (!e.Connection.IsConnected)
+				return;
 
-			if (speaker.IsMuted)
+			var speaker = context.UserManager.GetUser (e.Connection);
+			if (speaker == null || speaker.IsMuted)
+				return;
+
+			var source = manager[msg.SourceId];
+			if (source == null || source.IsMuted || source.OwnerId != speaker.UserId)
 				return;
 
 			context.Users.Send (new AudioSourceStateChangeMessage { Starting = msg.Starting, SourceId = msg.SourceId },

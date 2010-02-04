@@ -91,7 +91,7 @@ namespace Gablarski.Tests
 			manager = new ServerSourceManager (context);
 			handler = new ServerSourceHandler (context, manager);
 
-			user = UserInfoTests.GetTestUser(1);
+			user = UserInfoTests.GetTestUser (1, 1, false);
 			server = new MockServerConnection();
 
 			context.UserManager.Connect (server);
@@ -115,6 +115,7 @@ namespace Gablarski.Tests
 			Assert.Throws<ArgumentNullException> (() => new ServerSourceHandler (context, null));
 		}
 
+		#region RequestSourceMessage
 		[Test]
 		public void RequestSourceNotConnected()
 		{
@@ -142,16 +143,23 @@ namespace Gablarski.Tests
 		[Test]
 		public AudioSource RequestSource()
 		{
+			return RequestSource (server);
+		}
+
+		public AudioSource RequestSource (MockServerConnection connection)
+		{
 			var audioArgs = new AudioCodecArgs (1, 64000, 44100, 512, 10);
-			handler.RequestSourceMessage (new MessageReceivedEventArgs (server,
+			handler.RequestSourceMessage (new MessageReceivedEventArgs (connection,
 				new RequestSourceMessage ("Name", audioArgs)));
 
-			var result = server.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			var result = connection.Client.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.Succeeded, result.SourceResult);
 			Assert.AreEqual ("Name", result.SourceName);
 			Assert.AreEqual ("Name", result.Source.Name);
 			
 			AudioCodecArgsTests.AssertAreEqual (audioArgs, result.Source);
+
+			connection.Client.AssertNoMessage();
 
 			return result.Source;
 		}
@@ -169,6 +177,8 @@ namespace Gablarski.Tests
 			
 			audioArgs.Bitrate = defaultBitrate;
 			AudioCodecArgsTests.AssertAreEqual (audioArgs, result.Source);
+
+			server.Client.AssertNoMessage();
 		}
 		
 		[Test]
@@ -184,6 +194,8 @@ namespace Gablarski.Tests
 			
 			audioArgs.Bitrate = maxBitrate;
 			AudioCodecArgsTests.AssertAreEqual (audioArgs, result.Source);
+
+			server.Client.AssertNoMessage();
 		}
 		
 		[Test]
@@ -199,6 +211,8 @@ namespace Gablarski.Tests
 			
 			audioArgs.Bitrate = minBitrate;
 			AudioCodecArgsTests.AssertAreEqual (audioArgs, result.Source);
+
+			server.Client.AssertNoMessage();
 		}
 
 		[Test]
@@ -233,8 +247,12 @@ namespace Gablarski.Tests
 			Assert.AreEqual (SourceResult.NewSource, sourceAdded.SourceResult);
 			Assert.AreEqual ("Name", sourceAdded.SourceName);
 			AudioCodecArgsTests.AssertAreEqual (audioArgs, sourceAdded.Source);
+
+			c.Client.AssertNoMessage();
 		}
-		
+		#endregion
+
+		#region RequestSourceListMessage
 		[Test]
 		public void RequestSourceListNotConnected()
 		{
@@ -253,6 +271,8 @@ namespace Gablarski.Tests
 			
 			var list = server.Client.DequeueAndAssertMessage<SourceListMessage>();
 			Assert.IsEmpty (list.Sources.ToList());
+
+			server.Client.AssertNoMessage();
 		}
 
 		[Test]
@@ -264,12 +284,14 @@ namespace Gablarski.Tests
 
 			var result = server.Client.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.Succeeded, result.SourceResult);
+			server.Client.AssertNoMessage();
 
 			handler.RequestSourceMessage (new MessageReceivedEventArgs (server,
 				new RequestSourceMessage ("Name2", audioArgs)));
 
 			var result2 = server.Client.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.Succeeded, result2.SourceResult);
+			server.Client.AssertNoMessage();
 
 			handler.RequestSourceListMessage (new MessageReceivedEventArgs (server, new RequestSourceListMessage()));
 			var list = server.Client.DequeueAndAssertMessage<SourceListMessage>();
@@ -277,6 +299,8 @@ namespace Gablarski.Tests
 			Assert.AreEqual (2, list.Sources.Count());
 			Assert.Contains (result.Source, list.Sources.ToList());
 			Assert.Contains (result2.Source, list.Sources.ToList());
+
+			server.Client.AssertNoMessage();
 		}
 
 		[Test]
@@ -294,6 +318,7 @@ namespace Gablarski.Tests
 
 			var result2 = server.Client.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.Succeeded, result2.SourceResult);
+			server.Client.AssertNoMessage();
 
 			var c = new MockServerConnection();
 			context.UserManager.Connect (c);
@@ -305,6 +330,7 @@ namespace Gablarski.Tests
 			Assert.AreEqual (2, list.Sources.Count());
 			Assert.Contains (result.Source, list.Sources.ToList());
 			Assert.Contains (result2.Source, list.Sources.ToList());
+			c.Client.AssertNoMessage();
 		}
 
 		[Test]
@@ -322,6 +348,7 @@ namespace Gablarski.Tests
 
 			Assert.AreEqual (1, list.Sources.Count());
 			Assert.Contains (result.Source, list.Sources.ToList());
+			server.Client.AssertNoMessage();
 
 			handler.RequestSourceMessage (new MessageReceivedEventArgs (server,
 				new RequestSourceMessage ("Name2", audioArgs)));
@@ -335,8 +362,11 @@ namespace Gablarski.Tests
 			Assert.AreEqual (2, list.Sources.Count());
 			Assert.Contains (result.Source, list.Sources.ToList());
 			Assert.Contains (result2.Source, list.Sources.ToList());
+			server.Client.AssertNoMessage();
 		}
+		#endregion
 
+		#region RequestMuteSourceMessage
 		[Test]
 		public void RequestMuteNotConnected()
 		{
@@ -367,6 +397,175 @@ namespace Gablarski.Tests
 
 			var denied = c.Client.DequeueAndAssertMessage<PermissionDeniedMessage>();
 			Assert.AreEqual (ClientMessageType.RequestMuteSource, denied.DeniedMessage);
+			c.Client.AssertNoMessage();
 		}
+
+		[Test]
+		public void RequestMuteWithoutPermission()
+		{
+			var c = new MockServerConnection();
+			context.UserManager.Connect (c);
+			context.UserManager.Join (c, UserInfoTests.GetTestUser (2));
+
+			var source = RequestSource();
+			Assert.AreEqual (SourceResult.NewSource, c.Client.DequeueAndAssertMessage<SourceResultMessage>().SourceResult);
+			c.Client.AssertNoMessage();
+
+			handler.RequestMuteSourceMessage (new MessageReceivedEventArgs (c,
+				new RequestMuteSourceMessage (source, true)));
+
+			var denied = c.Client.DequeueAndAssertMessage<PermissionDeniedMessage>();
+			Assert.AreEqual (ClientMessageType.RequestMuteSource, denied.DeniedMessage);
+			c.Client.AssertNoMessage();
+		}
+
+		[Test]
+		public void RequestMuteWithPermission()
+		{
+			var u = UserInfoTests.GetTestUser (2);
+			var c = new MockServerConnection();
+			context.UserManager.Connect (c);
+			context.UserManager.Join (c, u);
+			permissions.SetAdmin (u.UserId);
+
+			var source = RequestSource();
+			Assert.AreEqual (SourceResult.NewSource, c.Client.DequeueAndAssertMessage<SourceResultMessage>().SourceResult);
+
+			handler.RequestMuteSourceMessage (new MessageReceivedEventArgs (c,
+				new RequestMuteSourceMessage (source, true)));
+
+			var mute = c.Client.DequeueAndAssertMessage<MutedMessage>();
+			Assert.AreEqual (false, mute.Unmuted);
+			Assert.AreEqual (source.Id, mute.Target);
+			Assert.AreEqual (MuteType.AudioSource, mute.Type);
+			c.Client.AssertNoMessage();
+
+			mute = server.Client.DequeueAndAssertMessage<MutedMessage>();
+			Assert.AreEqual (false, mute.Unmuted);
+			Assert.AreEqual (source.Id, mute.Target);
+			Assert.AreEqual (MuteType.AudioSource, mute.Type);
+			c.Client.AssertNoMessage();
+		}
+		#endregion
+
+		#region ClientAudioSourceStateChangeMessage
+		[Test]
+		public void ClientAudioSourceStateChangeNotConnected()
+		{
+			var c = new MockServerConnection();
+			c.Disconnect();
+
+			handler.ClientAudioSourceStateChangeMessage (new MessageReceivedEventArgs (c,
+				new ClientAudioSourceStateChangeMessage { SourceId = 1, Starting = true }));
+
+			server.Client.AssertNoMessage();
+			c.Client.AssertNoMessage();
+		}
+
+		[Test]
+		public void ClientAudioSourceStateChangeNotJoined()
+		{
+			var c = new MockServerConnection();
+			context.UserManager.Connect (c);
+
+			handler.ClientAudioSourceStateChangeMessage (new MessageReceivedEventArgs (c,
+				new ClientAudioSourceStateChangeMessage { SourceId = 1, Starting = true }));
+
+			server.Client.AssertNoMessage();
+			c.Client.AssertNoMessage();
+		}
+
+		[Test]
+		public void ClientAudioSourceStateChangeNotOwnedSource()
+		{
+			var u = UserInfoTests.GetTestUser (2, 1, false);
+			var c = new MockServerConnection();
+			context.UserManager.Connect (c);
+			context.UserManager.Join (c, u);
+
+			var s = manager.Create ("Name", user, new AudioCodecArgs());
+
+			handler.ClientAudioSourceStateChangeMessage (new MessageReceivedEventArgs (c,
+				new ClientAudioSourceStateChangeMessage { SourceId = s.Id, Starting = true }));
+
+			server.Client.AssertNoMessage();
+			c.Client.AssertNoMessage();
+		}
+
+		[Test]
+		public void ClientAudioSourceStateChangedUserMuted()
+		{
+			var u = UserInfoTests.GetTestUser (2, 1, true);
+			var c = new MockServerConnection();
+			context.UserManager.Connect (c);
+			context.UserManager.Join (c, u);
+
+			var s = manager.Create ("Name", u, new AudioCodecArgs ());
+
+			handler.ClientAudioSourceStateChangeMessage (new MessageReceivedEventArgs (c,
+				new ClientAudioSourceStateChangeMessage { SourceId = s.Id, Starting = true }));
+
+			server.Client.AssertNoMessage();
+			c.Client.AssertNoMessage();
+		}
+
+		[Test]
+		public void ClientAudioSourceStateChangedSourceMuted()
+		{
+			var u = UserInfoTests.GetTestUser (2, 1, false);
+			var c = new MockServerConnection();
+			context.UserManager.Connect (c);
+			context.UserManager.Join (c, u);
+
+			var s = manager.Create ("Name", u, new AudioCodecArgs ());
+			manager.ToggleMute (s);
+
+			handler.ClientAudioSourceStateChangeMessage (new MessageReceivedEventArgs (c,
+				new ClientAudioSourceStateChangeMessage { SourceId = s.Id, Starting = true }));
+
+			server.Client.AssertNoMessage();
+			c.Client.AssertNoMessage();
+		}
+
+		[Test]
+		public void ClientAudioSourceStateChangedSameChannel()
+		{
+			var u = UserInfoTests.GetTestUser (2, 1, false);
+			var c = new MockServerConnection();
+			context.UserManager.Connect (c);
+			context.UserManager.Join (c, u);
+
+			var s = manager.Create ("Name", u, new AudioCodecArgs ());
+
+			handler.ClientAudioSourceStateChangeMessage (new MessageReceivedEventArgs (c,
+				new ClientAudioSourceStateChangeMessage { SourceId = s.Id, Starting = true }));
+
+			c.Client.AssertNoMessage();
+
+			var change = server.Client.DequeueAndAssertMessage<AudioSourceStateChangeMessage>();
+			Assert.AreEqual (s.Id, change.SourceId);
+			Assert.AreEqual (true, change.Starting);
+		}
+
+		[Test]
+		public void ClientAudioSourceStateChangedDifferentChannel()
+		{
+			var u = UserInfoTests.GetTestUser (2, 2, false);
+			var c = new MockServerConnection();
+			context.UserManager.Connect (c);
+			context.UserManager.Join (c, u);
+
+			var s = manager.Create ("Name", u, new AudioCodecArgs ());
+
+			handler.ClientAudioSourceStateChangeMessage (new MessageReceivedEventArgs (c,
+				new ClientAudioSourceStateChangeMessage { SourceId = s.Id, Starting = true }));
+
+			c.Client.AssertNoMessage();
+
+			var change = server.Client.DequeueAndAssertMessage<AudioSourceStateChangeMessage>();
+			Assert.AreEqual (s.Id, change.SourceId);
+			Assert.AreEqual (true, change.Starting);
+		}
+		#endregion
 	}
 }

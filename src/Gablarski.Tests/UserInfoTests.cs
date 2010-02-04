@@ -26,8 +26,13 @@ namespace Gablarski.Tests
 
 		public static UserInfo GetTestUser (int increment)
 		{
+			return GetTestUser (increment, ChanId + increment, Muted);
+		}
+
+		public static UserInfo GetTestUser (int increment, int channelId, bool muted)
+		{
 			return new UserInfo (Nickname + increment, Phonetic + increment, Username + increment, UserId + increment,
-			                     ChanId + increment, Muted)
+			                     channelId, muted)
 			{
 				Status = Status,
 				State = State

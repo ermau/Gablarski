@@ -52,7 +52,7 @@ namespace Gablarski.Server
 		/// <param name="audioArgs">The audio properties of the source to create.</param>
 		/// <returns>The newly created audio source.</returns>
 		/// <exception cref="ArgumentException"><paramref name="name"/> is in use by the user already.</exception>
-		/// <exception cref="ArgumentNullException"><paramref name="name"/>, <paramref name="user"/> or <paramref name="audioArgs"/> is <c>null</c>.</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="name"/>, <paramref name="owner"/> or <paramref name="audioArgs"/> is <c>null</c>.</exception>
 		AudioSource Create (string name, UserInfo owner, AudioCodecArgs audioArgs);
 
 		/// <summary>
