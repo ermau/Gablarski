@@ -48,7 +48,7 @@ namespace Gablarski.Audio
 		}
 
 		internal AudioSource (AudioSource source)
-			: this (source.Name, source.Id, source.OwnerId, source.IsMuted, new AudioCodecArgs (source.Channels, source.Bitrate, source.Frequency, source.FrameSize, source.Complexity))
+			: this (source.Name, source.Id, source.OwnerId, source.IsMuted, source)
 		{
 		}
 
