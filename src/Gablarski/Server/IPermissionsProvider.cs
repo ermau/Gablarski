@@ -47,7 +47,7 @@ namespace Gablarski.Server
 	public interface IPermissionsProvider
 	{
 		/// <summary>
-		/// Fired when persmissions have changed
+		/// Fired when persmissions have changed.
 		/// </summary>
 		event EventHandler<PermissionsChangedEventArgs> PermissionsChanged;
 

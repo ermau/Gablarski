@@ -186,15 +186,8 @@ namespace Gablarski.Server
 		{
 			var msg = (ClientAudioSourceStateChangeMessage)e.Message;
 
-			if (!e.Connection.IsConnected)
-				return;
-
-			var speaker = context.UserManager.GetUser (e.Connection);
-			if (speaker == null || speaker.IsMuted)
-				return;
-
-			var source = manager[msg.SourceId];
-			if (source == null || source.IsMuted || source.OwnerId != speaker.UserId)
+			UserInfo speaker;
+			if (!CanSendFromSource (e.Connection, msg.SourceId, out speaker))
 				return;
 
 			context.Users.Send (new AudioSourceStateChangeMessage { Starting = msg.Starting, SourceId = msg.SourceId },
@@ -205,16 +198,21 @@ namespace Gablarski.Server
 		{
 			var msg = (SendAudioDataMessage)e.Message;
 
-			UserInfo speaker = context.UserManager.GetUser (e.Connection);
-
-			if (speaker.IsMuted)
+			UserInfo speaker;
+			if (!CanSendFromSource (e.Connection, msg.SourceId, out speaker))
 				return;
 
 			if (!context.GetPermission (PermissionName.SendAudio, speaker))
+			{
+				e.Connection.Send (new PermissionDeniedMessage (ClientMessageType.AudioData));
 				return;
+			}
 
 			if (msg.TargetIds.Length > 1 && !context.GetPermission (PermissionName.SendAudioToMultipleTargets, speaker))
+			{
+				e.Connection.Send (new PermissionDeniedMessage (ClientMessageType.AudioData));
 				return;
+			}
 
 			var sendMessage = new AudioDataReceivedMessage { Data = msg.Data, SourceId = msg.SourceId };
 
@@ -227,6 +225,22 @@ namespace Gablarski.Server
 			{
 				context.Users.Send (sendMessage, (con, user) => con != e.Connection && msg.TargetIds.Contains (user.UserId));
 			}
+		}
+
+		private bool CanSendFromSource (IConnection connection, int sourceId, out UserInfo speaker)
+		{
+			speaker = null;
+
+			if (connection == null || !connection.IsConnected)
+				return false;
+
+			var source = manager[sourceId];
+			if (source == null || source.IsMuted)
+				return false;
+
+			speaker = context.UserManager.GetUser (connection);
+
+			return (speaker != null && !speaker.IsMuted && speaker.UserId == source.OwnerId);
 		}
 	}
 }

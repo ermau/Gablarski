@@ -52,7 +52,7 @@ namespace Gablarski.Tests
 		private IServerSourceManager manager;
 		private ServerSourceHandler handler;
 		private MockServerConnection server;
-		private GuestPermissionProvider permissions;
+		private MockPermissionsProvider permissions;
 		private UserInfo user;
 		
 		private const int defaultBitrate = 96000;
@@ -62,7 +62,7 @@ namespace Gablarski.Tests
 		[SetUp]
 		public void Setup()
 		{
-			permissions = new GuestPermissionProvider();
+			permissions = new MockPermissionsProvider();
 
 			LobbyChannelProvider channels = new LobbyChannelProvider();
 			channels.SaveChannel (new ChannelInfo
@@ -148,6 +148,8 @@ namespace Gablarski.Tests
 
 		public AudioSource RequestSource (MockServerConnection connection)
 		{
+			permissions.EnablePermissions (context.UserManager.GetUser (connection).UserId,	PermissionName.RequestSource);
+
 			var audioArgs = new AudioCodecArgs (1, 64000, 44100, 512, 10);
 			handler.RequestSourceMessage (new MessageReceivedEventArgs (connection,
 				new RequestSourceMessage ("Name", audioArgs)));
@@ -167,9 +169,11 @@ namespace Gablarski.Tests
 		[Test]
 		public void RequestSourceDefaultBitrate()
 		{
+			permissions.EnablePermissions (user.UserId, PermissionName.RequestSource);
+
 			var audioArgs = new AudioCodecArgs (1, 0, 44100, 512, 10);
 			handler.RequestSourceMessage (new MessageReceivedEventArgs (server, new RequestSourceMessage ("Name", audioArgs)));
-			
+
 			var result = server.Client.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.Succeeded, result.SourceResult);
 			Assert.AreEqual ("Name", result.SourceName);
@@ -184,6 +188,8 @@ namespace Gablarski.Tests
 		[Test]
 		public void RequestSourceExceedMaxBitrate()
 		{
+			permissions.EnablePermissions (user.UserId, PermissionName.RequestSource);
+
 			var audioArgs = new AudioCodecArgs (1, 200000, 44100, 512, 10);
 			handler.RequestSourceMessage (new MessageReceivedEventArgs (server, new RequestSourceMessage ("Name", audioArgs)));
 			
@@ -201,6 +207,8 @@ namespace Gablarski.Tests
 		[Test]
 		public void RequestSourceBelowMinBitrate()
 		{
+			permissions.EnablePermissions (user.UserId, PermissionName.RequestSource);
+
 			var audioArgs = new AudioCodecArgs (1, 1, 44100, 512, 10);
 			handler.RequestSourceMessage (new MessageReceivedEventArgs (server, new RequestSourceMessage ("Name", audioArgs)));
 			
@@ -218,6 +226,8 @@ namespace Gablarski.Tests
 		[Test]
 		public void RequestSourceDuplicateSourceName()
 		{
+			permissions.EnablePermissions (user.UserId, PermissionName.RequestSource);
+
 			var audioArgs = new AudioCodecArgs (1, 64000, 44100, 512, 10);
 			handler.RequestSourceMessage (new MessageReceivedEventArgs (server,
 				new RequestSourceMessage ("Name", audioArgs)));
@@ -235,6 +245,8 @@ namespace Gablarski.Tests
 		[Test]
 		public void RequestSourceNotification()
 		{
+			permissions.EnablePermissions (user.UserId, PermissionName.RequestSource);
+
 			var c = new MockServerConnection();
 			context.UserManager.Connect (c);
 			context.UserManager.Join (c, UserInfoTests.GetTestUser (2));
@@ -278,6 +290,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void RequestSourceList()
 		{
+			permissions.EnablePermissions (user.UserId, PermissionName.RequestSource);
 			var audioArgs = new AudioCodecArgs (1, 64000, 44100, 512, 10);
 			handler.RequestSourceMessage (new MessageReceivedEventArgs (server,
 				new RequestSourceMessage ("Name", audioArgs)));
@@ -306,6 +319,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void RequestSourceListFromViewer()
 		{
+			permissions.EnablePermissions (user.UserId, PermissionName.RequestSource);
 			var audioArgs = new AudioCodecArgs (1, 64000, 44100, 512, 10);
 			handler.RequestSourceMessage (new MessageReceivedEventArgs (server,
 				new RequestSourceMessage ("Name", audioArgs)));
@@ -336,6 +350,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void RequestUpdatedSourceList()
 		{
+			permissions.EnablePermissions (user.UserId, PermissionName.RequestSource);
 			var audioArgs = new AudioCodecArgs (1, 64000, 44100, 512, 10);
 			handler.RequestSourceMessage (new MessageReceivedEventArgs (server,
 				new RequestSourceMessage ("Name", audioArgs)));
@@ -426,7 +441,7 @@ namespace Gablarski.Tests
 			var c = new MockServerConnection();
 			context.UserManager.Connect (c);
 			context.UserManager.Join (c, u);
-			permissions.SetAdmin (u.UserId);
+			permissions.SetPermissions (u.UserId, new[] { new Permission (PermissionName.MuteAudioSource, true) });
 
 			var source = RequestSource();
 			Assert.AreEqual (SourceResult.NewSource, c.Client.DequeueAndAssertMessage<SourceResultMessage>().SourceResult);
@@ -565,6 +580,390 @@ namespace Gablarski.Tests
 			var change = server.Client.DequeueAndAssertMessage<AudioSourceStateChangeMessage>();
 			Assert.AreEqual (s.Id, change.SourceId);
 			Assert.AreEqual (true, change.Starting);
+		}
+		#endregion
+
+		#region SendAudioDataMessage
+		[Test]
+		public void SendAudioDataMessageNotConnected()
+		{			
+			var c = new MockServerConnection();
+			c.Disconnect();
+
+			handler.SendAudioDataMessage (new MessageReceivedEventArgs (c,
+				new SendAudioDataMessage
+				{
+					Data = new byte[512],
+					SourceId = 1,
+					TargetType = TargetType.Channel,
+					TargetIds = new [] { 1 }
+				}));
+
+			c.Client.AssertNoMessage();
+			server.Client.AssertNoMessage();
+		}
+
+		[Test]
+		public void SendAudioDataMessageNotJoined()
+		{
+			var c = new MockServerConnection();
+			context.UserManager.Connect (c);
+
+			handler.SendAudioDataMessage (new MessageReceivedEventArgs (c,
+				new SendAudioDataMessage
+				{
+					Data = new byte[512],
+					SourceId = 1,
+					TargetType = TargetType.Channel,
+					TargetIds = new [] { 1 }
+				}));
+
+			c.Client.AssertNoMessage();
+			server.Client.AssertNoMessage();
+		}
+
+		[Test]
+		public void SendAudioDataMessageUnknownSource()
+		{
+			var c = new MockServerConnection();
+			context.UserManager.Connect (c);
+			context.UserManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
+
+			handler.SendAudioDataMessage (new MessageReceivedEventArgs (server,
+				new SendAudioDataMessage
+				{
+					Data = new byte[512],
+					SourceId = 1,
+					TargetType = TargetType.Channel,
+					TargetIds = new [] { 1 }
+				}));
+
+			c.Client.AssertNoMessage();
+			server.Client.AssertNoMessage();
+		}
+        
+		[Test]
+		public void SendAudioDataMessageSourceNotOwned()
+		{
+			var c = new MockServerConnection();
+			context.UserManager.Connect (c);
+			context.UserManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
+
+			var s = RequestSource();
+			var result = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
+			c.Client.AssertNoMessage();
+
+			handler.SendAudioDataMessage (new MessageReceivedEventArgs (c,
+				new SendAudioDataMessage
+				{
+					Data = new byte[512],
+					SourceId = s.Id,
+					TargetType = TargetType.Channel,
+					TargetIds = new [] { 1 }
+				}));
+
+			c.Client.AssertNoMessage();
+			server.Client.AssertNoMessage();
+		}
+
+		[Test]
+		public void SendAudioDataMessageSourceMuted ()
+		{
+			var c = new MockServerConnection();
+			context.UserManager.Connect (c);
+			context.UserManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
+
+			var s = RequestSource();
+			manager.ToggleMute (s);
+
+			var result = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
+			c.Client.AssertNoMessage();
+
+			handler.SendAudioDataMessage (new MessageReceivedEventArgs (server,
+				new SendAudioDataMessage
+				{
+					Data = new byte[512],
+					SourceId = s.Id,
+					TargetType = TargetType.Channel,
+					TargetIds = new [] { 1 }
+				}));
+
+			c.Client.AssertNoMessage();
+			server.Client.AssertNoMessage();
+		}
+
+		[Test]
+		public void SendAudioDataMessageUserMuted()
+		{
+			var c = new MockServerConnection();
+			context.UserManager.Connect (c);
+			context.UserManager.Join (c, UserInfoTests.GetTestUser (2, 1, true));
+
+			var s = RequestSource (c);
+			var result = server.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
+			server.Client.AssertNoMessage();
+
+			handler.SendAudioDataMessage (new MessageReceivedEventArgs (c,
+				new SendAudioDataMessage
+				{
+					Data = new byte[512],
+					SourceId = s.Id,
+					TargetType = TargetType.Channel,
+					TargetIds = new [] { 1 }
+				}));
+
+			c.Client.AssertNoMessage();
+			server.Client.AssertNoMessage();
+		}
+
+		[Test]
+		public void SendAudioDataMessageToUser()
+		{
+			var c = new MockServerConnection();
+			context.UserManager.Connect (c);
+			var u = UserInfoTests.GetTestUser (2, 2, false);
+			context.UserManager.Join (c, u);
+
+			var s = RequestSource();
+			var result = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
+			c.Client.AssertNoMessage();
+
+			permissions.EnablePermissions (user.UserId, PermissionName.SendAudio);
+
+			handler.SendAudioDataMessage (new MessageReceivedEventArgs (server,
+				new SendAudioDataMessage
+				{
+					Data = new byte[512],
+					SourceId = s.Id,
+					TargetType = TargetType.User,
+					TargetIds = new [] { u.UserId }
+				}));
+
+			server.Client.AssertNoMessage();
+			Assert.AreEqual (s.Id, c.Client.DequeueAndAssertMessage<AudioDataReceivedMessage>().SourceId);
+		}
+
+		[Test]
+		public void SendAudioDataMessageToUserWithoutPermission()
+		{
+			var c = new MockServerConnection();
+			context.UserManager.Connect (c);
+			var u = UserInfoTests.GetTestUser (2, 2, false);
+			context.UserManager.Join (c, u);
+
+			var s = RequestSource();
+			var result = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
+			c.Client.AssertNoMessage();
+
+			handler.SendAudioDataMessage (new MessageReceivedEventArgs (server,
+				new SendAudioDataMessage
+				{
+					Data = new byte[512],
+					SourceId = s.Id,
+					TargetType = TargetType.User,
+					TargetIds = new [] { u.UserId }
+				}));
+
+			c.Client.AssertNoMessage();
+			Assert.AreEqual (ClientMessageType.AudioData, server.Client.DequeueAndAssertMessage<PermissionDeniedMessage>().DeniedMessage);
+		}
+
+		[Test]
+		public void SendAudioDataMessageToCurrentChannel()
+		{
+			var c = new MockServerConnection();
+			context.UserManager.Connect (c);
+			context.UserManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
+
+			var s = RequestSource();
+			var result = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
+			c.Client.AssertNoMessage();
+
+			permissions.EnablePermissions (user.UserId, PermissionName.SendAudio);
+
+			handler.SendAudioDataMessage (new MessageReceivedEventArgs (server,
+				new SendAudioDataMessage
+				{
+					Data = new byte[512],
+					SourceId = s.Id,
+					TargetType = TargetType.Channel,
+					TargetIds = new [] { user.CurrentChannelId }
+				}));
+
+			server.Client.AssertNoMessage();
+			Assert.AreEqual (s.Id, c.Client.DequeueAndAssertMessage<AudioDataReceivedMessage>().SourceId);
+		}
+
+		[Test]
+		public void SendAudioDataMessageToCurrentChannelWithoutPermission()
+		{
+			var c = new MockServerConnection();
+			context.UserManager.Connect (c);
+			context.UserManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
+
+			var s = RequestSource();
+			var result = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
+			c.Client.AssertNoMessage();
+
+			handler.SendAudioDataMessage (new MessageReceivedEventArgs (server,
+				new SendAudioDataMessage
+				{
+					Data = new byte[512],
+					SourceId = s.Id,
+					TargetType = TargetType.Channel,
+					TargetIds = new [] { user.CurrentChannelId }
+				}));
+
+			c.Client.AssertNoMessage();
+			Assert.AreEqual (ClientMessageType.AudioData, server.Client.DequeueAndAssertMessage<PermissionDeniedMessage>().DeniedMessage);
+		}
+
+		[Test]
+		public void SendAudioDataMessageToMultipleChannels()
+		{
+			var c = new MockServerConnection();
+			context.UserManager.Connect (c);
+			context.UserManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
+
+			var c2 = new MockServerConnection();
+			context.UserManager.Connect (c2);
+			context.UserManager.Join (c2, UserInfoTests.GetTestUser (3, 2, false));
+
+			var s = RequestSource();
+			var result = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
+			c.Client.AssertNoMessage();
+
+			result = c2.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
+			c2.Client.AssertNoMessage();
+
+			permissions.EnablePermissions (user.UserId, PermissionName.SendAudio, PermissionName.SendAudioToMultipleTargets);
+
+			handler.SendAudioDataMessage (new MessageReceivedEventArgs (server,
+				new SendAudioDataMessage
+				{
+					Data = new byte[512],
+					SourceId = s.Id,
+					TargetType = TargetType.Channel,
+					TargetIds = new [] { 1, 2 }
+				}));
+
+			server.Client.AssertNoMessage();
+			Assert.AreEqual (s.Id, c.Client.DequeueAndAssertMessage<AudioDataReceivedMessage>().SourceId);
+			Assert.AreEqual (s.Id, c2.Client.DequeueAndAssertMessage<AudioDataReceivedMessage>().SourceId);
+		}
+
+		[Test]
+		public void SendAudioDataMessageToMultipleChannelsWithoutPermission()
+		{
+			var c = new MockServerConnection();
+			context.UserManager.Connect (c);
+			context.UserManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
+
+			var c2 = new MockServerConnection();
+			context.UserManager.Connect (c2);
+			context.UserManager.Join (c2, UserInfoTests.GetTestUser (3, 2, false));
+
+			var s = RequestSource();
+			var result = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
+			c.Client.AssertNoMessage();
+
+			result = c2.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
+			c2.Client.AssertNoMessage();
+
+			handler.SendAudioDataMessage (new MessageReceivedEventArgs (server,
+				new SendAudioDataMessage
+				{
+					Data = new byte[512],
+					SourceId = s.Id,
+					TargetType = TargetType.Channel,
+					TargetIds = new [] { 1, 2 }
+				}));
+
+			c.Client.AssertNoMessage();
+			c2.Client.AssertNoMessage();
+			Assert.AreEqual (ClientMessageType.AudioData, server.Client.DequeueAndAssertMessage<PermissionDeniedMessage>().DeniedMessage);
+		}
+
+		[Test]
+		public void SendAudioDataMessageToMultipleUsers()
+		{
+			var c = new MockServerConnection();
+			context.UserManager.Connect (c);
+			var u1 = UserInfoTests.GetTestUser (2, 1, false);
+			context.UserManager.Join (c, u1);
+
+			var c2 = new MockServerConnection();
+			context.UserManager.Connect (c2);
+			var u2 = UserInfoTests.GetTestUser (3, 2, false);
+			context.UserManager.Join (c2, u2);
+
+			var s = RequestSource();
+			var result = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
+			c.Client.AssertNoMessage();
+
+			result = c2.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
+			c2.Client.AssertNoMessage();
+
+			permissions.EnablePermissions (user.UserId, PermissionName.SendAudio, PermissionName.SendAudioToMultipleTargets);
+
+			handler.SendAudioDataMessage (new MessageReceivedEventArgs (server,
+				new SendAudioDataMessage
+				{
+					Data = new byte[512],
+					SourceId = s.Id,
+					TargetType = TargetType.User,
+					TargetIds = new [] { u1.UserId, u2.UserId }
+				}));
+
+			server.Client.AssertNoMessage();
+			Assert.AreEqual (s.Id, c.Client.DequeueAndAssertMessage<AudioDataReceivedMessage>().SourceId);
+			Assert.AreEqual (s.Id, c2.Client.DequeueAndAssertMessage<AudioDataReceivedMessage>().SourceId);
+		}
+
+		[Test]
+		public void SendAudioDataMessageToMultipleUsersWithoutPermission()
+		{
+			var c = new MockServerConnection();
+			context.UserManager.Connect (c);
+			var u1 = UserInfoTests.GetTestUser (2, 1, false);
+			context.UserManager.Join (c, u1);
+
+			var c2 = new MockServerConnection();
+			context.UserManager.Connect (c2);
+			var u2 = UserInfoTests.GetTestUser (3, 1, false);
+			context.UserManager.Join (c2, u2);
+
+			var s = RequestSource();
+			var result = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
+			c.Client.AssertNoMessage();
+
+			permissions.EnablePermissions (user.UserId, PermissionName.SendAudio);
+
+			handler.SendAudioDataMessage (new MessageReceivedEventArgs (server,
+				new SendAudioDataMessage
+				{
+					Data = new byte[512],
+					SourceId = s.Id,
+					TargetType = TargetType.User,
+					TargetIds = new [] { u1.UserId, u2.UserId }
+				}));
+
+			c.Client.AssertNoMessage();
+			Assert.AreEqual (ClientMessageType.AudioData, server.Client.DequeueAndAssertMessage<PermissionDeniedMessage>().DeniedMessage);
 		}
 		#endregion
 	}
