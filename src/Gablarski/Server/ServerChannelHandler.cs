@@ -49,6 +49,9 @@ namespace Gablarski.Server
 
 		public ServerChannelHandler (IServerContext context)
 		{
+			if (context == null)
+				throw new ArgumentNullException ("context");
+
 			this.context = context;
 			this.context.ChannelsProvider.ChannelsUpdated += ChannelsProviderOnChannelsUpdated;
 		}
@@ -79,8 +82,11 @@ namespace Gablarski.Server
 			context.Connections.Send (new ChannelListMessage (channels));
 		}
 
-		internal void ChanneListMessage (MessageReceivedEventArgs e)
-		{			
+		internal void RequestChanneListMessage (MessageReceivedEventArgs e)
+		{
+			if (!e.Connection.IsConnected)
+				return;
+
 			if (!context.GetPermission (PermissionName.RequestChannelList, e.Connection))
 				e.Connection.Send (new ChannelListMessage (GenericResult.FailedPermissions));
 			else

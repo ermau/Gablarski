@@ -341,7 +341,7 @@ namespace Gablarski.Server
 				{ ClientMessageType.RequestMuteSource, sourceHandler.RequestMuteSourceMessage },
 
 				{ ClientMessageType.QueryServer, ClientQueryServer },
-				{ ClientMessageType.RequestChannelList, channelHandler.ChanneListMessage },
+				{ ClientMessageType.RequestChannelList, channelHandler.RequestChanneListMessage },
 				{ ClientMessageType.RequestUserList, userHandler.RequestUserListMessage },
 				{ ClientMessageType.RequestSourceList, sourceHandler.RequestSourceListMessage },
 
