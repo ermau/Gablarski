@@ -141,12 +141,17 @@ namespace Gablarski.Tests
 		}
 
 		[Test]
-		public AudioSource RequestSource()
+		public void RequestSource()
 		{
-			return RequestSource (server);
+			GetSourceFromRequest();
 		}
 
-		public AudioSource RequestSource (MockServerConnection connection)
+		public AudioSource GetSourceFromRequest()
+		{
+			return GetSourceFromRequest (server);
+		}
+
+		public AudioSource GetSourceFromRequest (MockServerConnection connection)
 		{
 			permissions.EnablePermissions (context.UserManager.GetUser (connection).UserId,	PermissionName.RequestSource);
 
@@ -388,7 +393,7 @@ namespace Gablarski.Tests
 			var c = new MockServerConnection();
 			c.Disconnect();
 
-			var source = RequestSource();
+			var source = GetSourceFromRequest();
 
 			handler.RequestMuteSourceMessage (new MessageReceivedEventArgs (c,
 				new RequestMuteSourceMessage (source, true)));
@@ -403,7 +408,7 @@ namespace Gablarski.Tests
 			var c = new MockServerConnection();
 			context.UserManager.Connect (c);
 
-			var source = RequestSource();
+			var source = GetSourceFromRequest();
 
 			Assert.AreEqual (SourceResult.NewSource, c.Client.DequeueAndAssertMessage<SourceResultMessage>().SourceResult);
 
@@ -422,7 +427,7 @@ namespace Gablarski.Tests
 			context.UserManager.Connect (c);
 			context.UserManager.Join (c, UserInfoTests.GetTestUser (2));
 
-			var source = RequestSource();
+			var source = GetSourceFromRequest();
 			Assert.AreEqual (SourceResult.NewSource, c.Client.DequeueAndAssertMessage<SourceResultMessage>().SourceResult);
 			c.Client.AssertNoMessage();
 
@@ -443,7 +448,7 @@ namespace Gablarski.Tests
 			context.UserManager.Join (c, u);
 			permissions.SetPermissions (u.UserId, new[] { new Permission (PermissionName.MuteAudioSource, true) });
 
-			var source = RequestSource();
+			var source = GetSourceFromRequest();
 			Assert.AreEqual (SourceResult.NewSource, c.Client.DequeueAndAssertMessage<SourceResultMessage>().SourceResult);
 
 			handler.RequestMuteSourceMessage (new MessageReceivedEventArgs (c,
@@ -649,7 +654,7 @@ namespace Gablarski.Tests
 			context.UserManager.Connect (c);
 			context.UserManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
 
-			var s = RequestSource();
+			var s = GetSourceFromRequest();
 			var result = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
 			c.Client.AssertNoMessage();
@@ -674,7 +679,7 @@ namespace Gablarski.Tests
 			context.UserManager.Connect (c);
 			context.UserManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
 
-			var s = RequestSource();
+			var s = GetSourceFromRequest();
 			manager.ToggleMute (s);
 
 			var result = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
@@ -701,7 +706,7 @@ namespace Gablarski.Tests
 			context.UserManager.Connect (c);
 			context.UserManager.Join (c, UserInfoTests.GetTestUser (2, 1, true));
 
-			var s = RequestSource (c);
+			var s = GetSourceFromRequest (c);
 			var result = server.Client.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
 			server.Client.AssertNoMessage();
@@ -727,7 +732,7 @@ namespace Gablarski.Tests
 			var u = UserInfoTests.GetTestUser (2, 2, false);
 			context.UserManager.Join (c, u);
 
-			var s = RequestSource();
+			var s = GetSourceFromRequest();
 			var result = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
 			c.Client.AssertNoMessage();
@@ -755,7 +760,7 @@ namespace Gablarski.Tests
 			var u = UserInfoTests.GetTestUser (2, 2, false);
 			context.UserManager.Join (c, u);
 
-			var s = RequestSource();
+			var s = GetSourceFromRequest();
 			var result = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
 			c.Client.AssertNoMessage();
@@ -780,7 +785,7 @@ namespace Gablarski.Tests
 			context.UserManager.Connect (c);
 			context.UserManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
 
-			var s = RequestSource();
+			var s = GetSourceFromRequest();
 			var result = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
 			c.Client.AssertNoMessage();
@@ -807,7 +812,7 @@ namespace Gablarski.Tests
 			context.UserManager.Connect (c);
 			context.UserManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
 
-			var s = RequestSource();
+			var s = GetSourceFromRequest();
 			var result = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
 			c.Client.AssertNoMessage();
@@ -836,7 +841,7 @@ namespace Gablarski.Tests
 			context.UserManager.Connect (c2);
 			context.UserManager.Join (c2, UserInfoTests.GetTestUser (3, 2, false));
 
-			var s = RequestSource();
+			var s = GetSourceFromRequest();
 			var result = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
 			c.Client.AssertNoMessage();
@@ -872,7 +877,7 @@ namespace Gablarski.Tests
 			context.UserManager.Connect (c2);
 			context.UserManager.Join (c2, UserInfoTests.GetTestUser (3, 2, false));
 
-			var s = RequestSource();
+			var s = GetSourceFromRequest();
 			var result = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
 			c.Client.AssertNoMessage();
@@ -908,7 +913,7 @@ namespace Gablarski.Tests
 			var u2 = UserInfoTests.GetTestUser (3, 2, false);
 			context.UserManager.Join (c2, u2);
 
-			var s = RequestSource();
+			var s = GetSourceFromRequest();
 			var result = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
 			c.Client.AssertNoMessage();
@@ -946,7 +951,7 @@ namespace Gablarski.Tests
 			var u2 = UserInfoTests.GetTestUser (3, 1, false);
 			context.UserManager.Join (c2, u2);
 
-			var s = RequestSource();
+			var s = GetSourceFromRequest();
 			var result = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
 			c.Client.AssertNoMessage();
