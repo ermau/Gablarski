@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -37,8 +37,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Gablarski.Client;
 
 namespace Gablarski
 {
@@ -51,6 +49,9 @@ namespace Gablarski
 
 		internal ChannelInfo (IValueReader reader)
 		{
+			if (reader == null)
+				throw new ArgumentNullException ("reader");
+
 			Deserialize (reader);
 		}
 
@@ -60,19 +61,29 @@ namespace Gablarski
 		}
 
 		public ChannelInfo (ChannelInfo channelInfo)
-			: this (channelInfo.ChannelId, channelInfo)
 		{
+			if (channelInfo == null)
+				throw new ArgumentNullException ("channelInfo");
+
+			ChannelId = channelInfo.ChannelId;
+			ParentChannelId = channelInfo.ParentChannelId;
+			Name = channelInfo.Name;
+			Description = channelInfo.Description;
+			UserLimit = channelInfo.UserLimit;
+			ReadOnly = channelInfo.ReadOnly;
 		}
 
-		public ChannelInfo (int channelId, ChannelInfo channel)
+		public ChannelInfo (int channelId, ChannelInfo channelInfo)
 			: this (channelId)
 		{
-			this.ParentChannelId = channel.ParentChannelId;
-			this.Name = channel.Name;
-			this.Description = channel.Description;
-			this.UserLimit = channel.UserLimit;
+			if (channelInfo == null)
+				throw new ArgumentNullException ("channelInfo");
 
-			this.ReadOnly = channel.ReadOnly;
+			ParentChannelId = channelInfo.ParentChannelId;
+			Name = channelInfo.Name;
+			Description = channelInfo.Description;
+			UserLimit = channelInfo.UserLimit;
+			ReadOnly = channelInfo.ReadOnly;
 		}
 
 		/// <summary>
@@ -93,23 +104,13 @@ namespace Gablarski
 			set;
 		}
 
-		protected string name;
-		protected string description;
-		protected int userLimit;
-
 		/// <summary>
 		/// Gets or sets the name of the channel.
 		/// </summary>
 		public virtual string Name
 		{
-			get { return this.name; }
-			set
-			{
-				if (this.ReadOnly)
-					throw new InvalidOperationException ();
-
-				this.name = value;
-			}
+			get;
+			set;
 		}
 
 		/// <summary>
@@ -117,14 +118,8 @@ namespace Gablarski
 		/// </summary>
 		public virtual string Description
 		{
-			get { return this.description; }
-			set
-			{
-				if (this.ReadOnly)
-					throw new InvalidOperationException ();
-
-				this.description = value;
-			}
+			get;
+			set;
 		}
 
 		/// <summary>
@@ -132,14 +127,8 @@ namespace Gablarski
 		/// </summary>
 		public virtual int UserLimit
 		{
-			get { return this.userLimit; }
-			set
-			{
-				if (this.ReadOnly)
-					throw new InvalidOperationException ();
-
-				this.userLimit = value;
-			}
+			get;
+			set;
 		}
 
 		/// <summary>
@@ -166,9 +155,9 @@ namespace Gablarski
 			this.ChannelId = reader.ReadInt32();
 			this.ParentChannelId = reader.ReadInt32();
 			this.ReadOnly = reader.ReadBool();
-			this.userLimit = reader.ReadInt32 ();
-			this.name = reader.ReadString ();
-			this.description = reader.ReadString ();
+			this.UserLimit = reader.ReadInt32 ();
+			this.Name = reader.ReadString ();
+			this.Description = reader.ReadString ();
 		}
 	}
 

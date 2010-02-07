@@ -36,6 +36,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using NUnit.Framework;
 
@@ -52,6 +53,58 @@ namespace Gablarski.Tests
 			Assert.AreEqual (expected.Description, actual.Description);
 			Assert.AreEqual (expected.ReadOnly, actual.ReadOnly);
 			Assert.AreEqual (expected.UserLimit, actual.UserLimit);
+		}
+
+		[Test]
+		public void CtorNull()
+		{
+			Assert.Throws<ArgumentNullException> (() => new ChannelInfo ((ChannelInfo)null));
+			Assert.Throws<ArgumentNullException> (() => new ChannelInfo (1, null));
+			Assert.Throws<ArgumentNullException> (() => new ChannelInfo ((IValueReader)null));
+		}
+
+		[Test]
+		public void CtorCopy()
+		{
+			var channel = new ChannelInfo (1)
+			{
+				ParentChannelId = 2,
+				Name = "Name",
+				Description = "Description",
+				ReadOnly = false,
+				UserLimit = 2
+			};
+
+			var channel2 = new ChannelInfo (channel);
+
+			AssertChanelsAreEqual (channel, channel2);
+		}
+
+		[Test]
+		public void SerializeDeserialize()
+		{
+			var stream = new MemoryStream (new byte[20480], true);
+			var writer = new StreamValueWriter (stream);
+			var reader = new StreamValueReader (stream);
+
+			var channel = new ChannelInfo (1)
+			{
+				ParentChannelId = 2,
+				Name = "Name",
+				Description = "Description",
+				ReadOnly = false,
+				UserLimit = 2
+			};
+
+			channel.Serialize (writer);
+			long length = stream.Position;
+			stream.Position = 0;
+
+			var deserializedChannel = new ChannelInfo();
+			deserializedChannel.Deserialize (reader);
+
+			Assert.AreEqual (length, stream.Position);
+			AssertChanelsAreEqual (channel, deserializedChannel);
 		}
 	}
 }
