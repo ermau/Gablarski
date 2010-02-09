@@ -37,7 +37,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Gablarski
 {
@@ -90,7 +89,16 @@ namespace Gablarski
 		/// <summary>
 		/// Failed because the connection is already joined.
 		/// </summary>
-		FailedAlreadyJoined = 9
+		FailedAlreadyJoined = 9,
+		
+		/// <summary>
+		/// Failed because the connection hasn't been formalized.
+		/// </summary>
+		/// <remarks>
+		/// This may occur when trying to join or login when you've only connected
+		/// on a transport level and not actually sent the ConnectMessage.
+		/// </remarks>
+		FailedNotConnected = 10,
 	}
 
 	/// <summary>

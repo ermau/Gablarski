@@ -157,6 +157,31 @@ namespace Gablarski.Tests
 			var rejected = server.Client.DequeueAndAssertMessage<ConnectionRejectedMessage>();
 			Assert.AreEqual (ConnectionRejectedReason.IncompatibleVersion, rejected.Reason);
 		}
+		
+		[Test]
+		public void JoinNotConnectedLiterally()
+		{
+			server.Disconnect();
+
+			context.Settings.AllowGuestLogins = true;
+			
+			handler.JoinMessage (new MessageReceivedEventArgs (server,
+				new JoinMessage ("nickname", null)));
+
+			server.Client.AssertNoMessage();
+		}
+
+		[Test]
+		public void JoinNotConnectedFormally()
+		{
+			context.Settings.AllowGuestLogins = true;
+			
+			handler.JoinMessage (new MessageReceivedEventArgs (server,
+				new JoinMessage ("nickname", null)));
+
+			var result = server.Client.DequeueAndAssertMessage<JoinResultMessage>();
+			Assert.AreEqual (LoginResultState.FailedNotConnected, result.Result);
+		}
 
 		[Test]
 		public void JoinAsGuest()

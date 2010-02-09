@@ -182,6 +182,9 @@ namespace Gablarski.Server
 		{
 			var join = (JoinMessage)e.Message;
 
+			if (!e.Connection.IsConnected)
+				return;
+
 			if (join.Nickname.IsNullOrWhitespace ())
 			{
 				e.Connection.Send (new JoinResultMessage (LoginResultState.FailedInvalidNickname, null));
@@ -316,6 +319,12 @@ namespace Gablarski.Server
 
 		private UserInfo GetJoiningUserInfo (IConnection connection, JoinMessage join)
 		{
+			if (!Manager.GetIsConnected (connection))
+			{
+				connection.Send (new JoinResultMessage (LoginResultState.FailedNotConnected, null));
+				return null;
+			}
+
 			UserInfo info = this.Manager.GetUser (connection);
 
 			if (info == null)
