@@ -298,7 +298,7 @@ namespace Gablarski.Network
 
 				var stream = client.GetStream ();
 				var tendpoint = (IPEndPoint)client.Client.RemoteEndPoint;
-				Trace.WriteLine ("[Server] Accepted TCP Connection from " + tendpoint);
+				log.Info ("Accepted TCP Connection from " + tendpoint);
 
 				uint nid = 0;
 				NetworkServerConnection connection;
@@ -321,7 +321,7 @@ namespace Gablarski.Network
 			}
 			catch (SocketException sex)
 			{
-				Trace.WriteLine ("[Server] Failed to accept connection: " + sex.Message);
+				log.Info ("Failed to accept connection", sex);
 			}
 			catch (ObjectDisposedException)
 			{
