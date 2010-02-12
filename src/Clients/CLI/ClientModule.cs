@@ -50,6 +50,18 @@ namespace Gablarski.Clients.CLI
 			: base (client, writer)
 		{
 			client.Connected += OnConnected;
+			client.CurrentUser.ReceivedJoinResult += OnJoinResult;
+			client.CurrentUser.ReceivedLoginResult += OnLoginResult;
+		}
+
+		private void OnLoginResult (object sender, ReceivedLoginResultEventArgs e)
+		{
+			Writer.WriteLine ("Login result: {0}", e.Result.ResultState);
+		}
+
+		private void OnJoinResult (object sender, ReceivedJoinResultEventArgs e)
+		{
+			Writer.WriteLine ("Join result: {0}", e.Result);
 		}
 
 		void OnConnected (object sender, EventArgs e)
