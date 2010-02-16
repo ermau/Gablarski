@@ -317,23 +317,16 @@ namespace Gablarski.Clients.Windows
 			if (!Settings.UsePushToTalk)
 				return;
 
-			Type providerType = null;
+			Type settingType;
+			if (Settings.InputProvider.IsNullOrWhitespace() || (settingType = Type.GetType (Settings.InputProvider)) == null)
+				this.inputProvider = Modules.Input.FirstOrDefault();
+			else
+				this.inputProvider = (IInputProvider)Activator.CreateInstance (settingType);
 
-			try
-			{
-				providerType = Type.GetType (Settings.InputProvider);
-			}
-			finally
-			{
-				if (providerType == null)
-					providerType = Modules.Input.FirstOrDefault();
-			}
-
-			if (providerType == null)
+			if (this.inputProvider == null)
 				Settings.UsePushToTalk = false;
 			else
 			{
-				this.inputProvider = (IInputProvider)Activator.CreateInstance (providerType);
 				this.inputProvider.InputStateChanged += OnInputStateChanged;
 				this.inputProvider.Attach (this.Handle, Settings.InputSettings);
 			}
@@ -401,7 +394,10 @@ namespace Gablarski.Clients.Windows
 			else if (e.Result == SourceResult.NewSource)
 			{
 				this.gablarski.Audio.Attach (playback, e.Source, new AudioEnginePlaybackOptions ());
-				users.Update (gablarski.Channels, gablarski.Users.Cast<UserInfo> (), gablarski.Sources);
+
+				var user = gablarski.Users[e.Source.OwnerId];
+				users.RemoveUser (user);
+				users.AddUser (user, gablarski.Sources[user]);
 			}
 			else
 			{
@@ -434,7 +430,7 @@ namespace Gablarski.Clients.Windows
 			}
 
 			this.users.RemoveUser (e.User);
-			this.users.AddUser (e.User);
+			this.users.AddUser (e.User, gablarski.Sources[e.User]);
 		}
 
 		private void UsersUserDisconnected (object sender, UserEventArgs e)
@@ -444,7 +440,7 @@ namespace Gablarski.Clients.Windows
 
 		private void UsersUserLoggedIn (object sender, UserEventArgs e)
 		{
-			this.users.AddUser (e.User);
+			this.users.AddUser (e.User, Enumerable.Empty<AudioSource>());
 		}
 
 		void UsersReceivedUserList (object sender, ReceivedListEventArgs<UserInfo> e)
@@ -692,9 +688,9 @@ namespace Gablarski.Clients.Windows
 				if (mf.ShowDialog (this) != DialogResult.OK)
 					return;
 			
-				if (!mf.File && mf.ProviderType != null)
+				if (!mf.File && mf.Provider != null)
 				{
-					musicprovider = (ICaptureProvider)Activator.CreateInstance (mf.ProviderType);
+					musicprovider = (ICaptureProvider)mf.Provider;
 					musicprovider.Device = mf.CaptureDevice;
 				}
 				else

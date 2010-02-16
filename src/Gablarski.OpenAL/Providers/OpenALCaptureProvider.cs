@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -36,12 +36,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 using Gablarski.Audio;
 
 namespace Gablarski.OpenAL.Providers
 {
+	[Export (typeof(ICaptureProvider))]
 	public class OpenALCaptureProvider
 		: ICaptureProvider
 	{
@@ -143,6 +145,11 @@ namespace Gablarski.OpenAL.Providers
 		}
 		
 		#endregion
+
+		public override string ToString()
+		{
+			return "OpenAL Capture";
+		}
 		
 		#region IDisposable Members
 

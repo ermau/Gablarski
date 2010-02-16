@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -36,6 +36,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -44,6 +45,7 @@ using Microsoft.DirectX.DirectInput;
 
 namespace Gablarski.Input.DirectInput
 {
+	[Export (typeof (IInputProvider))]
 	public class DirectInputProvider
 		: IInputProvider
 	{

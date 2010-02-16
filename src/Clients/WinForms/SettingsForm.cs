@@ -7,7 +7,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Gablarski.Audio;
 using Gablarski.Clients.Input;
+using Gablarski.Clients.Media;
 using Gablarski.Clients.Windows.Properties;
 using Cadenza;
 
@@ -32,11 +34,11 @@ namespace Gablarski.Clients.Windows
 			this.inInputProvider.DataSource = Modules.Input.ToList();
 			this.inInputProvider.SelectedText = Settings.InputProvider;
 
-			this.playbackSelector.ProviderSource = Modules.Playback;
+			this.playbackSelector.ProviderSource = Modules.Playback.Cast<IAudioDeviceProvider>();
 			this.playbackSelector.SetProvider (Settings.PlaybackProvider);
 			this.playbackSelector.SetDevice (Settings.PlaybackDevice);
 
-			this.voiceSelector.ProviderSource = Modules.Capture;
+			this.voiceSelector.ProviderSource = Modules.Capture.Cast<IAudioDeviceProvider>();
 			this.voiceSelector.SetProvider (Settings.VoiceProvider);
 			this.voiceSelector.SetDevice (Settings.VoiceDevice);
 			
@@ -54,22 +56,20 @@ namespace Gablarski.Clients.Windows
 			this.talkingVolume.Value = Settings.TalkingMusicVolume;
 			this.normalVolume.Value = Settings.NormalMusicVolume;
 
-			foreach (Type player in Modules.MediaPlayers)
+			foreach (IMediaPlayer player in Modules.MediaPlayers)
 			{
-				this.musicPlayers.Items.Add (player.Name.Remove ("Integration", "Provider"), Settings.EnabledMediaPlayerIntegrations.Any (s => s.Contains (player.FullName)));
+				this.musicPlayers.Items.Add (player.GetType().Name.Remove ("Integration", "Provider"), Settings.EnabledMediaPlayerIntegrations.Any (s => s.Contains (player.GetType().FullName)));
 			}
 
 			this.enableNotifications.Checked = Settings.EnableNotifications;
-			foreach (Type t in Modules.Notifiers)
+			foreach (INotifier n in Modules.Notifiers)
 			{
 				try
 				{
-					var n = (INotifier)Activator.CreateInstance (t);
-
 					bool enabled = false;
 					foreach (var s in Settings.EnabledNotifiers)
 					{
-						if (!t.AssemblyQualifiedName.Contains (s))
+						if (!n.GetType().AssemblyQualifiedName.Contains (s))
 							continue;
 
 						enabled = true;
@@ -77,7 +77,7 @@ namespace Gablarski.Clients.Windows
 
 					this.notifiers.Items.Add (new ListViewItem (n.Name)
 					{
-						Tag = t,
+						Tag = n,
 						Checked = enabled
 					});
 				}
@@ -97,11 +97,28 @@ namespace Gablarski.Clients.Windows
 			Settings.InputSettings = this.inputSettings;
 			Settings.UsePushToTalk = !this.voiceActivation.Checked;
 
-			Settings.PlaybackProvider = this.playbackSelector.Provider.AssemblyQualifiedName;
-			Settings.PlaybackDevice = this.playbackSelector.Device.Name;
+			if (this.playbackSelector.Provider != null)
+			{
+				Settings.PlaybackProvider = this.playbackSelector.Provider.GetType().AssemblyQualifiedName;
+				Settings.PlaybackDevice = this.playbackSelector.Device.Name;
+			}
+			else
+			{
+				Settings.PlaybackProvider = null;
+				Settings.PlaybackDevice = null;
+			}
 
-			Settings.VoiceProvider = this.voiceSelector.Provider.AssemblyQualifiedName;
-			Settings.VoiceDevice = this.voiceSelector.Device.Name;
+			if (this.voiceSelector.Provider != null)
+			{
+				Settings.VoiceProvider = this.voiceSelector.Provider.GetType().AssemblyQualifiedName;
+				Settings.VoiceDevice = this.voiceSelector.Device.Name;
+			}
+			else
+			{
+				Settings.VoiceProvider = null;
+				Settings.VoiceDevice = null;
+			}
+
 			Settings.VoiceActivationContinueThreshold = this.threshold.Value * 100;
 			Settings.VoiceActivationLevel = this.vadSensitivity.Value;
 
@@ -111,7 +128,7 @@ namespace Gablarski.Clients.Windows
 			Settings.MediaVolumeControlIgnoresYou = this.musicIgnoreYou.Checked;
 
 			List<string> enabledPlayers = new List<string> ();
-			foreach (Type playerSupport in Modules.MediaPlayers)
+			foreach (Type playerSupport in Modules.MediaPlayers.Select (m => m.GetType()))
 			{
 				foreach (string enabled in this.musicPlayers.CheckedItems.Cast<string> ())
 				{
@@ -127,7 +144,7 @@ namespace Gablarski.Clients.Windows
 			List<string> enabledNotifiers = new List<string>();
 			foreach (ListViewItem li in this.notifiers.CheckedItems.Cast<ListViewItem>().Where (li => li.Checked))
 			{
-				var t = ((Type)li.Tag);
+				var t = li.Tag.GetType();
 				enabledNotifiers.Add (t.FullName + ", " + t.Assembly.GetName().Name);
 			}
 			Settings.EnabledNotifiers = enabledNotifiers;
@@ -168,7 +185,7 @@ namespace Gablarski.Clients.Windows
 			if (this.inInputProvider.SelectedItem == null)
 				return;
 
-			currentInputProvider = (IInputProvider)Activator.CreateInstance ((Type)this.inInputProvider.SelectedItem);
+			currentInputProvider = (IInputProvider)this.inInputProvider.SelectedItem;
 			currentInputProvider.InputStateChanged += OnInputStateChanged;
 			currentInputProvider.Attach (this.Handle, null);
 		}
@@ -180,8 +197,8 @@ namespace Gablarski.Clients.Windows
 
 			currentInputProvider.Detach();
 			currentInputProvider.InputStateChanged -= OnInputStateChanged;
-			currentInputProvider.Dispose();
-			currentInputProvider = null;
+			//currentInputProvider.Dispose();
+			//currentInputProvider = null;
 		}
 
 		private void linkSet_LinkClicked (object sender, LinkLabelLinkClickedEventArgs e)

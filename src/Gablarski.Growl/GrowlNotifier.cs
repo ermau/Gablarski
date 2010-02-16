@@ -1,4 +1,4 @@
-// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -36,13 +36,16 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 using Growl.Connector;
 using System.IO;
+using NotificationType=Growl.Connector.NotificationType;
 
 namespace Gablarski.Growl
 {
+	[Export (typeof(Clients.INotifier))]
 	public class GrowlNotifier
 		: Clients.INotifier
 	{

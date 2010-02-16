@@ -114,14 +114,14 @@ namespace Gablarski.Clients.Windows
 			this.channelNodes.Add (channel, node);
 		}
 
-		public void AddUser (UserInfo user)
+		public void AddUser (UserInfo user, IEnumerable<AudioSource> sources)
 		{
 			if (user == null)
 				return;
 
 			if (this.InvokeRequired)
 			{
-				this.BeginInvoke ((Action<UserInfo>)this.AddUser, user);
+				this.BeginInvoke ((Action<UserInfo, IEnumerable<AudioSource>>)this.AddUser, user, sources);
 				return;
 			}
 
@@ -136,6 +136,12 @@ namespace Gablarski.Clients.Windows
 			SetupUserContext (node);
 
 			this.userNodes[user] = node;
+
+			if (Settings.DisplaySources)
+			{
+				foreach (var source in sources)
+					AddSource (source);
+			}
 
 			node.Parent.Expand();
 		}
@@ -170,7 +176,6 @@ namespace Gablarski.Clients.Windows
 			userNode.Expand();
 		}
 
-
 		public void RemoveUser (UserInfo user)
 		{
 			if (user == null)
@@ -188,6 +193,9 @@ namespace Gablarski.Clients.Windows
 			var node = this.userNodes[user];
 			node.Remove();
 			this.userNodes.Remove (user);
+
+			foreach (var kvp in this.sourceNodes.Where (kvp => kvp.Key.OwnerId == user.UserId).ToList())
+				sourceNodes.Remove (kvp.Key);
 		}
 
 		public void MarkTalking (UserInfo user)
@@ -362,13 +370,7 @@ namespace Gablarski.Clients.Windows
 			this.serverNode.Expand();
 
 			foreach (var user in users)
-				AddUser (user);
-
-			if (Settings.DisplaySources)
-			{
-				foreach (var source in sources)
-					AddSource (source);
-			}
+				AddUser (user, sources.Where (s => s.OwnerId == user.UserId));
 
 			UpdateContextMenus (false);
 

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -36,6 +36,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -44,6 +45,7 @@ using Gablarski.Clients.Media;
 
 namespace Gablarski.Winamp
 {
+	[Export (typeof(IMediaPlayer))]
 	public class WinampIntegration
 		: IMediaPlayer
 	{

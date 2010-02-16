@@ -1,4 +1,4 @@
-// Copyright (c) 2010, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -36,81 +36,24 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using Gablarski.Clients;
-using System.Speech.Synthesis;
-using Gablarski.Clients.Media;
 
-namespace Gablarski.SpeechNotifier
+namespace Gablarski.Clients
 {
-	[Export (typeof(INotifier))]
-	[Export (typeof(ITextToSpeech))]
-	public class EventSpeech
-		: INotifier, ITextToSpeech
+	/// <summary>
+	/// TTS Contract
+	/// </summary>
+	public interface ITextToSpeech
 	{
-		public string Name
-		{
-			get { return "Text to Speech"; }
-		}
+		/// <summary>
+		/// Gets the name of the text to speech engine.
+		/// </summary>
+		string Name { get; }
 
-		public void Say (string say)
-		{
-			if (say == null)
-				throw new ArgumentNullException ("say");
-
-			ThreadPool.QueueUserWorkItem (o =>
-			{
-				lock (sync)
-				{
-					if (media == null)
-						return;
-
-					media.AddTalker();
-					lock (speech)
-						speech.Speak ((string)o);
-					media.RemoveTalker();
-				}
-			}, say);
-		}
-
-		public IMediaController Media
-		{
-			get
-			{
-				return media;
-			}
-
-			set
-			{
-				lock (sync)
-				{
-					media = value;
-				}
-			}
-		}
-
-		private readonly object sync = new object();
-		private IMediaController media;
-		private static readonly SpeechSynthesizer speech = new SpeechSynthesizer ();
-
-		public void Notify (NotificationType type, string say, NotifyPriority priority)
-		{
-			Say (say);
-		}
-		
-		public void Notify (NotificationType type, string say, string nickname, string phonetic, NotifyPriority priority)
-		{
-			if (say == null)
-				throw new ArgumentNullException ("say");
-			if (nickname == null)
-				throw new ArgumentNullException ("nickname");
-			if (phonetic == null)
-				throw new ArgumentNullException ("phonetic");
-
-			Notify (type, String.Format (say, phonetic), priority);
-		}
+		/// <summary>
+		/// Tells the text to speech engine what to say.
+		/// </summary>
+		/// <param name="say"></param>
+		void Say (string say);
 	}
 }

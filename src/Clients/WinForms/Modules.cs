@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.Composition;
+using System.ComponentModel.Composition.Hosting;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -9,87 +12,85 @@ using Gablarski.Clients.Media;
 
 namespace Gablarski.Clients.Windows
 {
-	public static class Modules
+	public class Modules
 	{
-		private static ModuleLoader<IInputProvider> inputLoader;
-		public static IEnumerable<Type> Input
+		private Modules()
 		{
-			get
-			{
-				if (inputLoader == null)
-					inputLoader = GetLoader<IInputProvider>();
-
-				return inputLoader.GetImplementers();
-			}
+			new CompositionContainer(new DirectoryCatalog (".")).ComposeParts (this);
 		}
 
-		private static ModuleLoader<IPlaybackProvider> playback;
-		public static IEnumerable<Type> Playback
+		public static IEnumerable<IInputProvider> Input
 		{
-			get
-			{
-				if (playback == null)
-					playback = GetLoader<IPlaybackProvider>();
-
-				return playback.GetImplementers();
-			}
+			get { return modules.input; }
 		}
 
-		private static ModuleLoader<ICaptureProvider> capture;
-		public static IEnumerable<Type> Capture
+		public static IEnumerable<IPlaybackProvider> Playback
 		{
-			get
-			{
-				if (capture == null)
-					capture = GetLoader<ICaptureProvider>();
-
-				return capture.GetImplementers();
-			}
+			get { return modules.playback; }
 		}
 
-		private static ModuleLoader<IAudioEngine> audioEngines;
-		public static IEnumerable<Type> AudioEngine
+		public static IEnumerable<ICaptureProvider> Capture
 		{
-			get
-			{
-				if (audioEngines == null)
-					audioEngines = GetLoader<IAudioEngine>();
-
-				return audioEngines.GetImplementers();
-			}
+			get { return modules.capture; }
 		}
 
-		private static ModuleLoader<IMediaPlayer> mediaPlayers;
-		public static IEnumerable<Type> MediaPlayers
+		public static IEnumerable<IAudioEngine> AudioEngines
 		{
-			get
-			{
-				if (mediaPlayers == null)
-					mediaPlayers = GetLoader<IMediaPlayer>();
-
-				return mediaPlayers.GetImplementers();
-			}
+			get { return modules.audioEngines; }
 		}
 
-		private static ModuleLoader<INotifier> notifiers;
-		public static IEnumerable<Type> Notifiers
+		public static IEnumerable<IMediaPlayer> MediaPlayers
 		{
-			get
-			{
-				if (notifiers == null)
-					notifiers = GetLoader<INotifier> ();
-
-				return notifiers.GetImplementers ();
-			}
+			get { return modules.mediaPlayers; }
 		}
 
-		private static ModuleLoader<T> GetLoader<T> ()
-			where T : class
+		public static IEnumerable<INotifier> Notifiers
 		{
-			return new ModuleLoader<T>(
-						ModuleLoaderOptions.SearchAll,
-						(new FileInfo (System.Diagnostics.Process.GetCurrentProcess ().MainModule.FileName)).Directory.FullName,
-						Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.ApplicationData), "Gablarski"));
+			get { return modules.notifiers; }
+		}
+
+		private static readonly Modules modules = new Modules();
+
+		[ImportMany]
+		private IEnumerable<IInputProvider> input
+		{
+			get;
+			set;
+		}
+
+		[ImportMany]
+		private IEnumerable<IAudioEngine> audioEngines
+		{
+			get;
+			set;
+		}
+
+		[ImportMany (typeof (INotifier))]
+		private IEnumerable<INotifier> notifiers
+		{
+			get;
+			set;
+		}
+
+		[ImportMany]
+		private IEnumerable<IMediaPlayer> mediaPlayers
+		{
+			get;
+			set;
+		}
+
+		[ImportMany]
+		private IEnumerable<ICaptureProvider> capture
+		{
+			get;
+			set;
+		}
+
+		[ImportMany]
+		private IEnumerable<IPlaybackProvider> playback
+		{
+			get;
+			set;
 		}
 	}
 }

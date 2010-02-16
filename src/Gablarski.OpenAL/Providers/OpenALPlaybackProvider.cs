@@ -1,4 +1,4 @@
-// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -35,6 +35,7 @@
 // DAMAGE.
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 using Gablarski.Audio;
@@ -43,6 +44,7 @@ using AudioFormat = Gablarski.OpenAL.AudioFormat;
 
 namespace Gablarski.OpenAL.Providers
 {
+	[Export (typeof(IPlaybackProvider))]
 	public class OpenALPlaybackProvider
 		: IPlaybackProvider
 	{
@@ -107,8 +109,7 @@ namespace Gablarski.OpenAL.Providers
 
 			if (!source.IsPlaying)
 			{
-				if (OpenAL.Log.IsDebugEnabled)
-					OpenAL.Log.DebugFormat ("{0} bound to {1} isn't playing, inserting silent buffers", audioSource, source);
+				OpenAL.DebugFormat ("{0} bound to {1} isn't playing, inserting silent buffers", audioSource, source);
 
 				RequireBuffers (bufferStack, source, bufferLen);
 				for (int i = 0; i < bufferLen; ++i)
@@ -138,8 +139,7 @@ namespace Gablarski.OpenAL.Providers
 			if (source == null)
 				throw new ArgumentNullException ("source");
 
-			if (OpenAL.Log.IsDebugEnabled)
-				OpenAL.Log.DebugFormat ("Freeing source {0}", source);
+			OpenAL.DebugFormat ("Freeing source {0}", source);
 
 			buffers.Remove (source);
 			pool.FreeSource (source);
@@ -147,8 +147,7 @@ namespace Gablarski.OpenAL.Providers
 
 		public void Tick()
 		{
-			if (OpenAL.Log.IsDebugEnabled)
-				OpenAL.Log.Debug ("Tick");
+			OpenAL.Debug ("Tick");
 
 			pool.Tick();
 		}
@@ -160,12 +159,16 @@ namespace Gablarski.OpenAL.Providers
 
 		#endregion
 
+		public override string ToString()
+		{
+			return "OpenAL Playback";
+		}
+
 		#region IDisposable Members
 
 		public void Dispose ()
 		{
-			if (OpenAL.Log.IsDebugEnabled)
-				OpenAL.Log.Debug ("Freeing OpenALPlaybackProvider");
+			OpenAL.Debug ("Freeing OpenALPlaybackProvider");
 
 			if (this.device != null)
 			{

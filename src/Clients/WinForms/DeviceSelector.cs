@@ -17,7 +17,7 @@ namespace Gablarski
 		{
 			InitializeComponent ();
 
-			this.provider.DisplayMember = "Name";
+			//this.provider.DisplayMember = "Name";
 		}
 
 		public string ProviderLabel
@@ -32,20 +32,20 @@ namespace Gablarski
 			set { this.label2.Text = value; }
 		}
 
-		public IEnumerable<Type> ProviderSource
+		public IEnumerable<IAudioDeviceProvider> ProviderSource
 		{
 			set
 			{
-				IList<Type> pvalue = value.ToList ();
+				IList<IAudioDeviceProvider> pvalue = value.ToList ();
 				this.provider.DataSource = pvalue;
 				if (pvalue.Count == 1)
 					this.provider.SelectedItem = pvalue[0];
 			}
 		}
 
-		public Type Provider
+		public IAudioDeviceProvider Provider
 		{
-			get { return (provider.SelectedItem != null) ? (Type)provider.SelectedItem : null; }
+			get { return (provider.SelectedItem != null) ? (IAudioDeviceProvider)provider.SelectedItem : null; }
 		}
 
 		public IAudioDevice Device
@@ -58,7 +58,7 @@ namespace Gablarski
 			if (String.IsNullOrEmpty (providerName))
 				return;
 
-			provider.SelectedItem = provider.Items.Cast<Type>().FirstOrDefault (d => d.AssemblyQualifiedName.Contains (providerName));
+			provider.SelectedItem = provider.Items.Cast<IAudioDeviceProvider>().FirstOrDefault (p => p.GetType().AssemblyQualifiedName.Contains (providerName));
 		}
 
 		public void SetDevice (string deviceName)
@@ -80,11 +80,8 @@ namespace Gablarski
 				this.device.Enabled = true;
 				try
 				{
-					using (var p = ((IAudioDeviceProvider)Activator.CreateInstance (Provider)))
-					{
-						this.device.DataSource = p.GetDevices ().ToList ();
-						this.device.SelectedItem = p.DefaultDevice;
-					}
+					this.device.DataSource = Provider.GetDevices ().ToList ();
+					this.device.SelectedItem = Provider.DefaultDevice;
 				}
 				catch
 				{

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -35,17 +35,17 @@
 // DAMAGE.
 
 using System;
-using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using Gablarski.Clients;
 using Gablarski.Clients.Media;
 using iTunesLib;
 
 namespace Gablarski.iTunes
 {
+	[Export (typeof(IMediaPlayer))]
+	[Export (typeof(IControlMediaPlayer))]
 	public class iTunesIntegration
 		: IControlMediaPlayer
 	{

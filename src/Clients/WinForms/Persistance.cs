@@ -1,14 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.Common;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using Gablarski.Clients.Windows.Entities;
 using System.Data.SQLite;
+using System.IO;
+using Gablarski.Clients.Windows.Entities;
 
 namespace Gablarski.Clients.Windows
 {

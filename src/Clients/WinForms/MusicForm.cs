@@ -25,7 +25,7 @@ namespace Gablarski.Clients.Windows
 			get { return this.fileMusic.Checked; }
 		}
 
-		public Type ProviderType
+		public IAudioDeviceProvider Provider
 		{
 			get { return deviceSelector.Provider; }
 		}
@@ -42,7 +42,7 @@ namespace Gablarski.Clients.Windows
 
 		private void MusicForm_Load (object sender, EventArgs e)
 		{
-			this.deviceSelector.ProviderSource = Modules.Capture;
+			this.deviceSelector.ProviderSource = Modules.Capture.Cast<IAudioDeviceProvider>();
 		}
 
 		private void browseButton_Click (object sender, EventArgs e)
