@@ -95,7 +95,7 @@ namespace Gablarski.Client
 		/// </summary>
 		public bool IsConnected
 		{
-			get { return this.Connection.IsConnected; }
+			get { return (this.Connection.IsConnected && this.formallyConnected); }
 		}
 
 		/// <summary>
@@ -169,6 +169,8 @@ namespace Gablarski.Client
 		}
 
 		private int reconnectAttemptFrequency = 5000;
+		private bool formallyConnected;
+
 		/// <summary>
 		/// Gets or sets the frequency (ms) at which to attempt reconnection. (5s default).
 		/// </summary>

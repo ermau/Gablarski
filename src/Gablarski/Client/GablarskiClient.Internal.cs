@@ -180,6 +180,7 @@ namespace Gablarski.Client
 		private void OnServerInfoReceivedMessage (MessageReceivedEventArgs e)
 		{
 			this.serverInfo = ((ServerInfoMessage)e.Message).ServerInfo;
+			this.formallyConnected = true;
 
 			OnConnected (this, EventArgs.Empty);
 		}
@@ -212,6 +213,7 @@ namespace Gablarski.Client
 		private void DisconnectCore (DisconnectHandling handling, IConnection connection, bool fireEvent)
 		{
 			this.running = false;
+			this.formallyConnected = false;
 
 			connection.Disconnected -= this.OnDisconnectedInternal;
 			connection.MessageReceived -= this.OnMessageReceived;
