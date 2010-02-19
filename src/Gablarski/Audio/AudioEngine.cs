@@ -587,14 +587,14 @@ namespace Gablarski.Audio
 	
 									if (talking && !entity.Talking)
 										AudioSender.BeginSending (source);
-									
-									entity.Talking = talking;
 								}
 									
 								if (talking)
 									AudioSender.SendAudioData (source, entity.TargetType, entity.CurrentTargets, samples);
 								else if (entity.Talking && entity.Options.Mode == AudioEngineCaptureMode.Activated)
-									AudioSender.EndSending (source);						
+									AudioSender.EndSending (source);
+
+								entity.Talking = talking;
 							}
 						}
 
