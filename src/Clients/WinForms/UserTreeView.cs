@@ -173,7 +173,7 @@ namespace Gablarski.Clients.Windows
 				return;
 			}
 
-			var user = Client.Users[source.Id];
+			var user = Client.Users[source.OwnerId];
 			if (user == null)
 				return;
 
