@@ -713,9 +713,9 @@ namespace Gablarski.Clients.Windows
 				return;
 
 			if (this.btnMute.Checked)
-				gablarski.Audio.Mute (this.playback);
+				gablarski.CurrentUser.MutePlayback();
 			else
-				gablarski.Audio.Unmute (this.playback);
+				gablarski.CurrentUser.UnmutePlayback();
 		}
 
 		private void btnMuteMic_Click (object sender, EventArgs e)
@@ -724,9 +724,9 @@ namespace Gablarski.Clients.Windows
 				return;
 
 			if (this.btnMuteMic.Checked)
-				gablarski.Audio.Mute (this.voiceCapture);
+				gablarski.CurrentUser.MuteCapture();
 			else
-				gablarski.Audio.Unmute (this.voiceCapture);
+				gablarski.CurrentUser.UnmuteCapture();
 		}
 
 		private void btnComment_Click (object sender, EventArgs e)

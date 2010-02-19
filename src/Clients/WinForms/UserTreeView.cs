@@ -33,6 +33,7 @@ namespace Gablarski.Clients.Windows
 			this.ImageList.Images.Add ("talking",	Resources.SoundImage);
 			this.ImageList.Images.Add ("music",		Resources.MusicImage);
 			this.ImageList.Images.Add ("muted",		Resources.SoundMuteImage);
+			this.ImageList.Images.Add ("mutedmic",	Resources.CaptureMuteImage);
 		}
 
 		[Browsable (false)]
@@ -137,7 +138,16 @@ namespace Gablarski.Clients.Windows
 
 			var node = channelPair.Value.Nodes.Add (displayName);
 			node.Tag = user;
-			node.ImageKey = node.SelectedImageKey = (!user.IsMuted) ? "silent" : "muted";
+
+			string imageKey = "silent";
+			if (user.IsMuted)
+				imageKey = "muted";
+			else if ((user.Status & UserStatus.MutedSound) == UserStatus.MutedSound)
+				imageKey = "muted";
+			else if ((user.Status & UserStatus.MutedMicrophone) == UserStatus.MutedMicrophone)
+				imageKey = "mutedmic";
+
+			node.ImageKey = node.SelectedImageKey = imageKey;
 
 			SetupUserContext (node);
 
