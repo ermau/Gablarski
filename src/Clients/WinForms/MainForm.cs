@@ -31,10 +31,10 @@ namespace Gablarski.Clients.Windows
 			this.gablarski.Disconnected += this.GablarskiDisconnected;
 			this.gablarski.Channels.ReceivedChannelList += this.ChannelsReceivedChannelList;
 			this.gablarski.Users.ReceivedUserList += this.UsersReceivedUserList;
-			this.gablarski.Users.UserJoined += UsersUserLoggedIn;
+			this.gablarski.Users.UserJoined += UsersUserJoined;
 			this.gablarski.Users.UserDisconnected += UsersUserDisconnected;
 			this.gablarski.Users.UserChangedChannel += UsersUserChangedChannel;
-			this.gablarski.Users.UserUpdated += new EventHandler<UserEventArgs>(UsersUserUpdated);
+			this.gablarski.Users.UserUpdated += UsersUserUpdated;
 			this.gablarski.CurrentUser.ReceivedLoginResult += this.CurrentUserReceivedLoginResult;
 			this.gablarski.CurrentUser.ReceivedJoinResult += this.CurrentUserReceivedJoinResult;
 
@@ -48,10 +48,12 @@ namespace Gablarski.Clients.Windows
 			if (Settings.EnableMediaVolumeControl)
 				players = Settings.EnabledMediaPlayerIntegrations.Select (s => (IMediaPlayer)Activator.CreateInstance (Type.GetType (s))).ToList ();
 
-			this.mediaPlayerIntegration = new MediaController (this.gablarski, this.gablarski.Sources, players);
-			this.mediaPlayerIntegration.NormalVolume = Settings.NormalMusicVolume;
-			this.mediaPlayerIntegration.TalkingVolume = Settings.TalkingMusicVolume;
-			this.mediaPlayerIntegration.UserTalkingCounts = !Settings.MediaVolumeControlIgnoresYou;
+			this.mediaPlayerIntegration = new MediaController (this.gablarski, this.gablarski.Sources, players)
+			{
+				NormalVolume = Settings.NormalMusicVolume,
+				TalkingVolume = Settings.TalkingMusicVolume,
+				UserTalkingCounts = !Settings.MediaVolumeControlIgnoresYou
+			};
 
 			if (Settings.EnableNotifications)
 				SetupNotifications ();
@@ -345,25 +347,21 @@ namespace Gablarski.Clients.Windows
 				return;
 
 			if (e.State == InputState.On)
-			{
-				this.users.MarkTalking (this.gablarski.CurrentUser);
 				this.gablarski.Audio.BeginCapture (voiceSource, this.gablarski.CurrentChannel);
-			}
 			else
-			{
-				this.users.MarkSilent (this.gablarski.CurrentUser);
 				this.gablarski.Audio.EndCapture (voiceSource);
-			}
 		}
 
 		void SourceStarted (object sender, AudioSourceEventArgs e)
 		{
 			this.users.MarkTalking (this.gablarski.Users[e.Source.OwnerId]);
+			this.users.MarkTalking (e.Source);
 		}
 
 		void SourceStoped (object sender, AudioSourceEventArgs e)
 		{
 			this.users.MarkSilent (this.gablarski.Users[e.Source.OwnerId]);
+			this.users.MarkSilent (e.Source);
 		}
 
 		void SourcesRemoved (object sender, ReceivedListEventArgs<AudioSource> e)
@@ -445,7 +443,7 @@ namespace Gablarski.Clients.Windows
 			this.users.RemoveUser (e.User);
 		}
 
-		private void UsersUserLoggedIn (object sender, UserEventArgs e)
+		private void UsersUserJoined (object sender, UserEventArgs e)
 		{
 			this.users.AddUser (e.User, Enumerable.Empty<AudioSource>());
 		}
@@ -457,7 +455,7 @@ namespace Gablarski.Clients.Windows
 
 		void ChannelsReceivedChannelList (object sender, ReceivedListEventArgs<ChannelInfo> e)
 		{
-			this.users.Update (e.Data, this.gablarski.Users.Cast<UserInfo>(), this.gablarski.Sources);
+			this.users.Update (e.Data, this.gablarski.Users, this.gablarski.Sources);
 		}
 
 		void CurrentUserReceivedLoginResult (object sender, ReceivedLoginResultEventArgs e)
