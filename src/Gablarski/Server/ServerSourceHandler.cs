@@ -62,7 +62,7 @@ namespace Gablarski.Server
 
 		public IEnumerator<AudioSource> GetEnumerator()
 		{
-			return Enumerable.Empty<AudioSource>().GetEnumerator();
+			return manager.GetEnumerator();
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()

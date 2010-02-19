@@ -115,6 +115,16 @@ namespace Gablarski.Tests
 			Assert.Throws<ArgumentNullException> (() => new ServerSourceHandler (context, null));
 		}
 
+		[Test]
+		public void Enumerable()
+		{
+			var source = manager.Create ("Name", user, AudioSourceTests.GetTestSource());
+			var source2 = manager.Create ("Name2", user, AudioSourceTests.GetTestSource());
+
+			Assert.Contains (source, handler.ToList());
+			Assert.Contains (source2, handler.ToList());
+		}
+
 		#region RequestSourceMessage
 		[Test]
 		public void RequestSourceNotConnected()
