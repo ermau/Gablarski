@@ -141,11 +141,7 @@ namespace Gablarski.Clients.Windows
 
 		private void SetupPlayback ()
 		{
-			if (this.playback != null)
-			{
-				this.gablarski.Audio.Detach (this.playback);
-				this.playback.Dispose ();
-			}
+			DisablePlayback();
 
 			this.playback = (IPlaybackProvider)Activator.CreateInstance (Type.GetType (Settings.PlaybackProvider));
 
@@ -161,24 +157,20 @@ namespace Gablarski.Clients.Windows
 			this.gablarski.Audio.Attach (this.playback, this.gablarski.Sources.Where (s => s.OwnerId != gablarski.CurrentUser.UserId), new AudioEnginePlaybackOptions());
 		}
 
+		private void DisablePlayback()
+		{
+			if (this.playback == null)
+				return;
+
+			this.gablarski.Audio.Detach (this.playback);
+			this.playback.Dispose ();
+		}
+
 		private void SetupVoiceCapture ()
 		{
 			try
 			{
-				foreach (var source in gablarski.Sources.Where (s => s.OwnerId == gablarski.CurrentUser.UserId))
-					gablarski.Audio.EndCapture (source);
-
-				if (this.voiceCapture != null)
-				{
-					gablarski.Audio.Detach (this.voiceCapture);
-					this.voiceCapture.Dispose ();
-				}
-
-				if (this.musicprovider != null)
-				{
-					gablarski.Audio.Detach (this.musicprovider);
-					this.musicprovider.Dispose ();
-				}
+				DisableVoiceCapture();
 
 				this.voiceCapture = (ICaptureProvider)Activator.CreateInstance (Type.GetType (Settings.VoiceProvider));
 
@@ -220,6 +212,24 @@ namespace Gablarski.Clients.Windows
 					btnMuteMic.Checked = true;
 					btnMuteMic.Enabled = false;
 				}));
+			}
+		}
+
+		private void DisableVoiceCapture()
+		{
+			foreach (var source in this.gablarski.Sources.Where (s => s.OwnerId == this.gablarski.CurrentUser.UserId))
+				this.gablarski.Audio.EndCapture (source);
+
+			if (this.voiceCapture != null)
+			{
+				this.gablarski.Audio.Detach (this.voiceCapture);
+				this.voiceCapture.Dispose ();
+			}
+
+			if (this.musicprovider != null)
+			{
+				this.gablarski.Audio.Detach (this.musicprovider);
+				this.musicprovider.Dispose ();
 			}
 		}
 
@@ -678,6 +688,10 @@ namespace Gablarski.Clients.Windows
 		{
 			if (this.gablarski.IsConnected)
 			{
+				DisableInput();
+				DisablePlayback();
+				DisableVoiceCapture();
+
 				this.gablarski.Disconnect();
 				LocalServer.Shutdown();
 			}
