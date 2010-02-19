@@ -265,7 +265,7 @@ namespace Gablarski.Client
 			{
 				users.Update (msg.User);
 
-				if (msg.User == context.CurrentUser)
+				if (msg.User.Equals (context.CurrentUser))
 				{
 					context.CurrentUser.Comment = msg.User.Comment;
 					context.CurrentUser.Status = msg.User.Status;
