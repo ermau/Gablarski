@@ -30,7 +30,7 @@ namespace Gablarski.Clients.Windows
 			this.inConnectOnStart.Checked = Settings.ShowConnectOnStart;
 
 			this.voiceActivation.Checked = !Settings.UsePushToTalk;
-			this.inInputProvider.DisplayMember = "Name";
+			this.inInputProvider.DisplayMember = "DisplayName";
 			this.inInputProvider.DataSource = Modules.Input.ToList();
 			this.inInputProvider.SelectedText = Settings.InputProvider;
 
@@ -89,6 +89,7 @@ namespace Gablarski.Clients.Windows
 
 		private void btnOk_Click (object sender, EventArgs e)
 		{
+			DialogResult = DialogResult.OK;
 			Settings.ShowConnectOnStart = this.inConnectOnStart.Checked;
 			Settings.DisplaySources = this.inDisplaySources.Checked;
 
@@ -152,11 +153,6 @@ namespace Gablarski.Clients.Windows
 			Settings.SaveSettings();
 
 			Close();
-		}
-
-		private void btnCancel_Click (object sender, EventArgs e)
-		{
-			DisableInput();
 		}
 
 		private string inputSettings;
@@ -229,6 +225,12 @@ namespace Gablarski.Clients.Windows
 		private void threshold_Scroll (object sender, EventArgs e)
 		{
 			this.dispThreshold.Text = String.Format ("{0:N1}s", (double)this.threshold.Value / 10);
+		}
+
+		private void SettingsForm_FormClosing (object sender, FormClosingEventArgs e)
+		{
+			if (DialogResult != DialogResult.OK)
+				DisableInput();
 		}
 	}
 }

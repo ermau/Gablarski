@@ -110,7 +110,6 @@
 			this.btnCancel.TabIndex = 3;
 			this.btnCancel.Text = "Cancel";
 			this.btnCancel.UseVisualStyleBackColor = true;
-			this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
 			// 
 			// tabs
 			// 
@@ -558,6 +557,7 @@
 			this.Name = "SettingsForm";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "Settings";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SettingsForm_FormClosing);
 			this.Load += new System.EventHandler(this.SettingsForm_Load);
 			this.tabs.ResumeLayout(false);
 			this.generalTab.ResumeLayout(false);

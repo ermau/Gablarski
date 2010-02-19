@@ -61,16 +61,14 @@ namespace Gablarski.Input.DirectInput
 			get { return "DirectInput"; }
 		}
 
-		/// <summary>
-		/// Attaches the input provider to listen for the given settings.
-		/// </summary>
-		/// <param name="settings">The settings provided by <see cref="IInputProvider.EndRecord()"/>. <c>null</c> or <c>String.Empty</c> if not yet set.</param>
 		public void Attach (IntPtr window, string settings)
 		{
 			if (this.running)
 				throw new InvalidOperationException ("Already attached");
 			if (window == IntPtr.Zero)
 				throw new ArgumentException ("Invalid window", "window");
+
+			this.running = true;
 
 			if (!String.IsNullOrEmpty (settings))
 			{
@@ -93,8 +91,6 @@ namespace Gablarski.Input.DirectInput
 			this.mouse.SetDataFormat (DeviceDataFormat.Mouse);
 			this.mouse.SetEventNotification (this.mouseWait);
 			this.mouse.Acquire ();
-
-			this.running = true;
 
 			this.pollThread = new Thread (Poller);
 			this.pollThread.IsBackground = true;

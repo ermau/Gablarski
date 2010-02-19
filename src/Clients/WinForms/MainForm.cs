@@ -63,11 +63,6 @@ namespace Gablarski.Clients.Windows
 			this.InitializeComponent ();
 
 			this.users.Client = this.gablarski;
-
-			SetupInput ();
-
-			SetupPlayback ();
-			SetupVoiceCapture ();
 		}
 
 		void UsersUserUpdated (object sender, UserEventArgs e)
@@ -85,7 +80,7 @@ namespace Gablarski.Clients.Windows
 
 		private void SourcesOnReceivedSourceList(object sender, ReceivedListEventArgs<AudioSource> args)
 		{
-			gablarski.Audio.Attach (playback, args.Data.Where (s => s.OwnerId != this.gablarski.CurrentUser.UserId), new AudioEnginePlaybackOptions());
+			SetupPlayback();
 		}
 
 		public void Connect (string host, int port)
@@ -163,7 +158,7 @@ namespace Gablarski.Clients.Windows
 			}
 
 			this.playback.Open();
-			this.gablarski.Audio.Attach (this.playback, this.gablarski.Sources, new AudioEnginePlaybackOptions());
+			this.gablarski.Audio.Attach (this.playback, this.gablarski.Sources.Where (s => s.OwnerId != gablarski.CurrentUser.UserId), new AudioEnginePlaybackOptions());
 		}
 
 		private void SetupVoiceCapture ()
@@ -205,15 +200,26 @@ namespace Gablarski.Clients.Windows
 						Mode = (!Settings.UsePushToTalk) ? AudioEngineCaptureMode.Activated : AudioEngineCaptureMode.Explicit
 					});
 				}
+
+				BeginInvoke ((Action)(() =>
+				{
+					if (!btnMute.Checked)
+					{
+						btnMuteMic.Checked = false;
+						btnMuteMic.Enabled = true;
+					}
+				}));
 			}
 			catch (Exception ex)
 			{
-				//TaskDialog.Show (ex.ToDisplayString(), "An error as occured initializing capture.", "Capture Initialization", TaskDialogStandardIcon.Error);
-				MessageBox.Show (this, "An error occured initializing capture. " + Environment.NewLine + ex.ToDisplayString(),
-				                 "Capture Initialization", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				this.voiceCapture = null;
 
-				btnMuteMic.Checked = true;
-				btnMuteMic.Enabled = false;
+				BeginInvoke ((Action) (() =>
+				{
+					MessageBox.Show (this, "An error occured initializing capture. ", "Capture Initialization", MessageBoxButtons.OK, MessageBoxIcon.Error);
+					btnMuteMic.Checked = true;
+					btnMuteMic.Enabled = false;
+				}));
 			}
 		}
 
@@ -321,6 +327,12 @@ namespace Gablarski.Clients.Windows
 
 		private void SetupInput()
 		{
+			if (InvokeRequired)
+			{
+				Invoke ((Action) SetupInput);
+				return;
+			}
+
 			DisableInput();
 
 			if (!Settings.UsePushToTalk)
@@ -377,14 +389,7 @@ namespace Gablarski.Clients.Windows
 				if (e.Source.Name == VoiceName)
 				{
 					voiceSource = e.Source;
-					gablarski.Audio.Attach (voiceCapture, AudioFormat.Mono16Bit, voiceSource,
-					                        new AudioEngineCaptureOptions
-					                        {
-					                        	StartVolume = Settings.VoiceActivationLevel,
-												ContinuationVolume = Settings.VoiceActivationLevel / 2,
-												ContinueThreshold = TimeSpan.FromMilliseconds (Settings.VoiceActivationContinueThreshold),
-												Mode = (!Settings.UsePushToTalk) ? AudioEngineCaptureMode.Activated : AudioEngineCaptureMode.Explicit
-					                        });
+					SetupVoiceCapture();
 				}
 				else if (e.Source.Name == MusicName)
 				{
@@ -513,7 +518,11 @@ namespace Gablarski.Clients.Windows
 				gablarski.Disconnect();
 			}
 			else
+			{
+				SetupInput();
+
 				this.gablarski.Sources.Request ("voice", 1, 512);
+			}
 		}
 
 		void GablarskiDisconnected (object sender, EventArgs e)
@@ -678,6 +687,8 @@ namespace Gablarski.Clients.Windows
 
 		private void btnSettings_Click (object sender, EventArgs e)
 		{
+			DisableInput();
+
 			SettingsForm settingsForm = new SettingsForm();
 			settingsForm.ShowDialog();
 		}
