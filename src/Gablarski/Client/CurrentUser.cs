@@ -141,7 +141,7 @@ namespace Gablarski.Client
 		}
 
 		/// <summary>
-		/// Set's the current user's comment.
+		/// Sets the current user's comment.
 		/// </summary>
 		/// <param name="comment">The comment to set. <c>null</c> is valid to clear.</param>
 		public void SetComment (string comment)
@@ -153,7 +153,7 @@ namespace Gablarski.Client
 		}
 
 		/// <summary>
-		/// Set's the current user's status.
+		/// Sets the current user's status.
 		/// </summary>
 		/// <param name="status">The status to set.</param>
 		public void SetStatus (UserStatus status)
@@ -162,6 +162,46 @@ namespace Gablarski.Client
 				return;
 
 			this.context.Connection.Send (new SetStatusMessage (status));
+		}
+
+		/// <summary>
+		/// Mutes all playback and sets the user's status accordingly.
+		/// </summary>
+		public void MutePlayback()
+		{
+			context.Audio.MutePlayback();
+
+			SetStatus (Status | UserStatus.MutedSound);
+		}
+
+		/// <summary>
+		/// Unmutes all playback and sets the user's status accordingly.
+		/// </summary>
+		public void UnmutePlayback()
+		{
+			context.Audio.UnmutePlayback();
+
+			SetStatus (Status ^ UserStatus.MutedSound);
+		}
+
+		/// <summary>
+		/// Mutes all capture and sets the user's status accordingly.
+		/// </summary>
+		public void MuteCapture()
+		{
+			context.Audio.MuteCapture();
+
+			SetStatus (Status | UserStatus.MutedMicrophone);
+		}
+
+		/// <summary>
+		/// Unmutes all capture and sets the user's status accordingly.
+		/// </summary>
+		public void UnmuteCapture()
+		{
+			context.Audio.UnmuteCapture();
+
+			SetStatus (Status ^ UserStatus.MutedMicrophone);
 		}
 
 		private readonly IClientContext context;
