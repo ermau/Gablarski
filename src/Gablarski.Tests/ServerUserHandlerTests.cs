@@ -186,82 +186,175 @@ namespace Gablarski.Tests
 		[Test]
 		public void JoinAsGuest()
 		{
-			JoinAsGuest (true, true, null, "Nickname", null);
+			JoinAsGuest (server, true, true, null, "Nickname", null);
 		}
 		
 		[Test]
 		public void JoinAsGuestWithServerPassword()
 		{
-			JoinAsGuest (true, true, "pass", "Nickname", "pass");
+			JoinAsGuest (server, true, true, "pass", "Nickname", "pass");
 		}
 		
 		[Test]
 		public void JoinAsGuestWhenNotAllowed()
 		{
-			JoinAsGuest (false, false, null, "Nickname", null);
+			JoinAsGuest (server, false, false, null, "Nickname", null);
 		}
 		
 		[Test]
 		public void JoinAsGuestWhenNotAllowedWithPassword()
 		{
-			JoinAsGuest (false, false, "pass", "Nickname", "pass");
+			JoinAsGuest (server, false, false, "pass", "Nickname", "pass");
 		}
 		
 		[Test]
 		public void JoinAsGuestWhenNotAllowedWithWrongPassword()
 		{
-			JoinAsGuest (false, false, "pass", "Nickname", "wrong");
+			JoinAsGuest (server, false, false, "pass", "Nickname", "wrong");
 		}
 		
 		[Test]
 		public void JoinAsGuestWithNoPassword()
 		{
-			JoinAsGuest (false, true, "pass", "Nickname", null);
+			JoinAsGuest (server, false, true, "pass", "Nickname", null);
 		}
 		
 		[Test]
 		public void JoinAsGuestWithWrongPassword()
 		{
-			JoinAsGuest (false, true, "pass", "Nickname", "wrong");
+			JoinAsGuest (server, false, true, "pass", "Nickname", "wrong");
 		}
-		
-//		[TestCase (true, true, null, "Nickname", null)]
-//		[TestCase (true, true, "pass", "Nickname", "pass")]
-//		[TestCase (false, false, null, "Nickname", null)]
-//		[TestCase (false, false, "pass", "Nickname", "pass")]
-//		[TestCase (false, false, "pass", "Nickname", "pwrong")]
-//		[TestCase (false, true, "pass", "Nickname", null)]
-//		[TestCase (false, true, "pass", "Nickname", "wrong")]
-		public void JoinAsGuest (bool shouldWork, bool allowGuests, string serverPassword, string nickname, string userServerpassword)
+
+		public void JoinAsGuest (MockServerConnection connection, string nickname)
+		{
+			JoinAsGuest (connection, true, true, null, nickname, null);
+		}
+
+		public void JoinAsGuest (MockServerConnection connection, bool shouldWork, bool allowGuests, string serverPassword, string nickname, string userServerpassword)
 		{
 			context.Settings.AllowGuestLogins = allowGuests;
 			context.Settings.ServerPassword = serverPassword;
 
-			handler.Manager.Connect (server);
+			handler.Manager.Connect (connection);
 			
-			handler.JoinMessage (new MessageReceivedEventArgs (server,
+			handler.JoinMessage (new MessageReceivedEventArgs (connection,
 				new JoinMessage (nickname, userServerpassword)));
 			
 			if (shouldWork)
 			{
-				Assert.IsTrue (handler.Manager.GetIsJoined (server));
+				Assert.IsTrue (handler.Manager.GetIsJoined (connection));
 
-				var msg = server.Client.DequeueAndAssertMessage<JoinResultMessage>();
+				var msg = connection.Client.DequeueAndAssertMessage<JoinResultMessage>();
 				Assert.AreEqual (nickname, msg.UserInfo.Nickname);
 
-				server.Client.DequeueAndAssertMessage<PermissionsMessage>();
-				server.Client.DequeueAndAssertMessage<UserJoinedMessage>();
-				server.Client.DequeueAndAssertMessage<ChannelListMessage>();
-				server.Client.DequeueAndAssertMessage<UserListMessage>();
-				server.Client.DequeueAndAssertMessage<SourceListMessage>();
+				connection.Client.DequeueAndAssertMessage<PermissionsMessage>();
+				connection.Client.DequeueAndAssertMessage<UserJoinedMessage>();
+				connection.Client.DequeueAndAssertMessage<ChannelListMessage>();
+				connection.Client.DequeueAndAssertMessage<UserListMessage>();
+				connection.Client.DequeueAndAssertMessage<SourceListMessage>();
 			}
 			else
-				Assert.IsFalse (handler.Manager.GetIsJoined (server));
+				Assert.IsFalse (handler.Manager.GetIsJoined (connection));
 		}
 
-		public void UserUpdate()
+		[Test]
+		public void SetCommentNotConnected()
 		{
+			server.Disconnect();
+
+			handler.SetCommentMessage(new MessageReceivedEventArgs (server,
+				new SetCommentMessage ("comment")));
+
+			server.AssertNoMessage();
+		}
+
+		[Test]
+		public void SetCommentSameComment()
+		{
+			JoinAsGuest (server, "Nickname");
 			
+			var c = new MockServerConnection();
+			JoinAsGuest (c, "Nickname2");
+
+			server.Client.DequeueAndAssertMessage<UserJoinedMessage>();
+
+			handler.SetCommentMessage (new MessageReceivedEventArgs (server,
+				new SetCommentMessage ("comment")));
+
+			var update = c.Client.DequeueAndAssertMessage<UserUpdatedMessage>();
+			Assert.AreEqual ("comment", update.User.Comment);
+
+			handler.SetCommentMessage (new MessageReceivedEventArgs (server,
+				new SetCommentMessage ("comment")));
+
+			c.Client.AssertNoMessage();
+		}
+
+		[Test]
+		public void SetComment()
+		{
+			JoinAsGuest (server, "Nickname");
+
+			var c = new MockServerConnection();
+			JoinAsGuest (c, "Nickname2");
+
+			server.Client.DequeueAndAssertMessage<UserJoinedMessage>();
+
+			handler.SetCommentMessage (new MessageReceivedEventArgs (server,
+				new SetCommentMessage ("comment")));
+
+			var update = c.Client.DequeueAndAssertMessage<UserUpdatedMessage>();
+			Assert.AreEqual ("comment", update.User.Comment);
+		}
+
+		[Test]
+		public void SetStatusNotConnected()
+		{
+			server.Disconnect();
+
+			handler.SetStatusMessage(new MessageReceivedEventArgs (server,
+				new SetStatusMessage (UserStatus.MutedMicrophone)));
+
+			server.AssertNoMessage();
+		}
+
+		[Test]
+		public void SetStatusSameStatus()
+		{
+			JoinAsGuest (server, "Nickname");
+			
+			var c = new MockServerConnection();
+			JoinAsGuest (c, "Nickname2");
+
+			server.Client.DequeueAndAssertMessage<UserJoinedMessage>();
+
+			handler.SetStatusMessage (new MessageReceivedEventArgs (server,
+				new SetStatusMessage (UserStatus.MutedMicrophone)));
+
+			var update = c.Client.DequeueAndAssertMessage<UserUpdatedMessage>();
+			Assert.AreEqual (UserStatus.MutedMicrophone, update.User.Status);
+
+			handler.SetStatusMessage (new MessageReceivedEventArgs (server,
+				new SetStatusMessage (UserStatus.MutedMicrophone)));
+
+			c.Client.AssertNoMessage();
+		}
+
+		[Test]
+		public void SetStatus ()
+		{
+			JoinAsGuest (server, "Nickname");
+			
+			var c = new MockServerConnection();
+			JoinAsGuest (c, "Nickname2");
+
+			server.Client.DequeueAndAssertMessage<UserJoinedMessage>();
+
+			handler.SetStatusMessage (new MessageReceivedEventArgs (server,
+				new SetStatusMessage (UserStatus.MutedMicrophone)));
+
+			var update = c.Client.DequeueAndAssertMessage<UserUpdatedMessage>();
+			Assert.AreEqual (UserStatus.MutedMicrophone, update.User.Status);
 		}
 	}
 }

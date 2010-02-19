@@ -356,30 +356,56 @@ namespace Gablarski.Tests
 		}
 
 		[Test]
-		public void SetStateNull()
+		public void SetStatusNull()
 		{
-			Assert.Throws<ArgumentNullException> (() => manager.SetState (null, UserState.Normal));
+			Assert.Throws<ArgumentNullException> (() => manager.SetStatus (null, UserStatus.Normal));
 		}
 
 		[Test]
-		public void SetState()
+		public void SetStatus()
 		{
 			manager.Connect (client);
 			manager.Join (client, user);
 
-			Assert.AreEqual (UserState.Normal, user.State);
-			manager.SetState (user, UserState.MutedSound);
+			Assert.AreEqual (UserStatus.Normal, user.Status);
+			user = manager.SetStatus (user, UserStatus.MutedSound);
 
-			user = manager.GetUser (client);
 			Assert.IsNotNull (user);
-			Assert.AreEqual (UserState.MutedSound, user.State);
+			Assert.AreEqual (UserStatus.MutedSound, user.Status);
 		}
 
 		[Test]
-		public void SetStateNotConnected()
+		public void SetStatusNotConnected()
 		{
-			Assert.DoesNotThrow (() =>
-				manager.SetState (user, UserState.Normal));
+			Assert.IsNull (manager.SetStatus (user, UserStatus.Normal));
+		}
+
+		[Test]
+		public void SetCommentNull()
+		{
+			Assert.Throws<ArgumentNullException> (() => manager.SetComment (null, "comment"));
+			Assert.DoesNotThrow (() => manager.SetComment (user, null));
+		}
+
+		[Test]
+		public void SetCommentNotConnected()
+		{
+			Assert.IsNull (manager.SetComment (user, "comment"));
+		}
+
+		[Test]
+		public void SetComment()
+		{
+			manager.Connect (client);
+			manager.Join (client, user);
+
+			Assert.AreEqual (null, user.Comment);
+
+			const string comment = "There are three monkeys in the barrel.";
+			var u = manager.SetComment (user, comment);
+
+			Assert.IsNotNull (u);
+			Assert.AreEqual (comment, u.Comment);
 		}
 
 		[Test]

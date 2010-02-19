@@ -317,6 +317,32 @@ namespace Gablarski.Server
 			this.Send (new MutedMessage { Type = MuteType.User, Target = user.Username, Unmuted = msg.Unmute });
 		}
 
+		internal void SetCommentMessage (MessageReceivedEventArgs e)
+		{
+			var msg = (SetCommentMessage)e.Message;
+
+			UserInfo user = Manager.GetUser (e.Connection);
+			if (user == null || user.Comment == msg.Comment)
+				return;
+
+			user = Manager.SetComment (user, msg.Comment);
+
+			this.Send (new UserUpdatedMessage (user));
+		}
+
+		internal void SetStatusMessage (MessageReceivedEventArgs e)
+		{
+			var msg = (SetStatusMessage) e.Message;
+
+			UserInfo user = Manager.GetUser (e.Connection);
+			if (user == null || user.Status == msg.Status)
+				return;
+
+			user = Manager.SetStatus (user, msg.Status);
+
+			this.Send (new UserUpdatedMessage (user));
+		}
+
 		private UserInfo GetJoiningUserInfo (IConnection connection, JoinMessage join)
 		{
 			if (!Manager.GetIsConnected (connection))

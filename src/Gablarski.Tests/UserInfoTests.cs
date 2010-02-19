@@ -16,8 +16,8 @@ namespace Gablarski.Tests
 		private const int UserId = 1;
 		private const int ChanId = 2;
 		private const bool Muted = true;
-		private const string Status = "There's a monkey in my barrel!";
-		private const UserState State = UserState.MutedMicrophone | UserState.MutedSound;
+		private const string Comment = "There's a monkey in my barrel!";
+		private const UserStatus Status = UserStatus.MutedMicrophone | UserStatus.MutedSound;
 
 		public static UserInfo GetTestUser()
 		{
@@ -34,8 +34,8 @@ namespace Gablarski.Tests
 			return new UserInfo (Nickname + increment, Phonetic + increment, Username + increment, UserId + increment,
 			                     channelId, muted)
 			{
-				Status = Status,
-				State = State
+				Comment = Comment,
+				Status = Status
 			};
 		}
 
@@ -47,7 +47,7 @@ namespace Gablarski.Tests
 			Assert.AreEqual (expected.Phonetic, actual.Phonetic);
 			Assert.AreEqual (expected.IsMuted, actual.IsMuted);
 			Assert.AreEqual (expected.Status, actual.Status);
-			Assert.AreEqual (expected.State, actual.State);
+			Assert.AreEqual (expected.Comment, actual.Comment);
 		}
 
 		[Test]
@@ -95,8 +95,8 @@ namespace Gablarski.Tests
 			var reader = new StreamValueReader (stream);
 
 			var info = new UserInfo (Nickname, Phonetic, Username, UserId, ChanId, Muted);
+			info.Comment = Comment;
 			info.Status = Status;
-			info.State = State;
 
 			info.Serialize (writer);
 			long length = stream.Position;
@@ -109,8 +109,8 @@ namespace Gablarski.Tests
 			Assert.AreEqual (Nickname, info.Nickname);
 			Assert.AreEqual (Phonetic, info.Phonetic);
 			Assert.AreEqual (Muted, info.IsMuted);
+			Assert.AreEqual (Comment, info.Comment);
 			Assert.AreEqual (Status, info.Status);
-			Assert.AreEqual (State, info.State);
 		}
 
 		[Test]

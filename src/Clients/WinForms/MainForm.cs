@@ -34,6 +34,7 @@ namespace Gablarski.Clients.Windows
 			this.gablarski.Users.UserJoined += UsersUserLoggedIn;
 			this.gablarski.Users.UserDisconnected += UsersUserDisconnected;
 			this.gablarski.Users.UserChangedChannel += UsersUserChangedChannel;
+			this.gablarski.Users.UserUpdated += new EventHandler<UserEventArgs>(UsersUserUpdated);
 			this.gablarski.CurrentUser.ReceivedLoginResult += this.CurrentUserReceivedLoginResult;
 			this.gablarski.CurrentUser.ReceivedJoinResult += this.CurrentUserReceivedJoinResult;
 
@@ -65,6 +66,12 @@ namespace Gablarski.Clients.Windows
 
 			SetupPlayback ();
 			SetupVoiceCapture ();
+		}
+
+		void UsersUserUpdated (object sender, UserEventArgs e)
+		{
+			this.users.RemoveUser (e.User);
+			this.users.AddUser (e.User, gablarski.Sources[e.User]);
 		}
 
 		private void SetupNotifications ()
@@ -720,6 +727,13 @@ namespace Gablarski.Clients.Windows
 				gablarski.Audio.Mute (this.voiceCapture);
 			else
 				gablarski.Audio.Unmute (this.voiceCapture);
+		}
+
+		private void btnComment_Click (object sender, EventArgs e)
+		{
+			var changeComment = new CommentForm (this.gablarski.CurrentUser.Comment);
+			if (changeComment.ShowDialog() == DialogResult.OK)
+				this.gablarski.CurrentUser.SetComment (changeComment.Comment);
 		}
 	}
 }

@@ -146,6 +146,12 @@
     <Compile Include="ChannelForm.Designer.cs">
       <DependentUpon>ChannelForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="CommentForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CommentForm.Designer.cs">
+      <DependentUpon>CommentForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="DeviceSelector.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -194,6 +200,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="ChannelForm.resx">
       <DependentUpon>ChannelForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CommentForm.resx">
+      <DependentUpon>CommentForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="DeviceSelector.resx">
       <DependentUpon>DeviceSelector.cs</DependentUpon>
@@ -299,6 +308,7 @@
     <Content Include="Headphones.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Resources\comment.png" />
     <None Include="Resources\microphone--minus.png" />
     <None Include="Resources\Headphones.ico" />
   </ItemGroup>

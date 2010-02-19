@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -38,13 +38,19 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Gablarski.Clients.Input
 {
 	public enum InputState
 	{
+		///<summary>
+		/// Wax on.
+		///</summary>
 		On,
+		
+		/// <summary>
+		/// Wax off.
+		/// </summary>
 		Off
 	}
 

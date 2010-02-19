@@ -43,7 +43,7 @@ using Cadenza;
 namespace Gablarski
 {
 	[Flags]
-	public enum UserState
+	public enum UserStatus
 		: byte
 	{
 		Normal = 0,
@@ -161,13 +161,13 @@ namespace Gablarski
 			set;
 		}
 
-		public UserState State
+		public UserStatus Status
 		{
 			get;
 			set;
 		}
 
-		public string Status
+		public string Comment
 		{
 			get;
 			set;
@@ -181,8 +181,8 @@ namespace Gablarski
 			writer.WriteString (this.Nickname);
 			writer.WriteString (this.Phonetic);
 			writer.WriteBool (this.IsMuted);
-			writer.WriteByte ((byte)this.State);
-			writer.WriteString (this.Status);
+			writer.WriteByte ((byte)this.Status);
+			writer.WriteString (this.Comment);
 		}
 
 		internal void Deserialize (IValueReader reader)
@@ -193,8 +193,8 @@ namespace Gablarski
 			this.Nickname = reader.ReadString();
 			this.Phonetic = reader.ReadString();
 			this.IsMuted = reader.ReadBool();
-			this.State = (UserState)reader.ReadByte();
-			this.Status = reader.ReadString();
+			this.Status = (UserStatus)reader.ReadByte();
+			this.Comment = reader.ReadString();
 		}
 
 		public override bool Equals (object obj)

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Cadenza;
 using Gablarski.Audio;
 using Gablarski.Client;
 using Gablarski.Clients.Windows.Properties;
@@ -129,7 +131,11 @@ namespace Gablarski.Clients.Windows
 			if (channelPair.Equals (default(KeyValuePair<ChannelInfo,TreeNode>)))
 				return;
 
-			var node = channelPair.Value.Nodes.Add (user.Nickname);
+			string displayName = user.Nickname;
+			if (!user.Comment.IsNullOrWhitespace())
+				displayName += " (" + user.Comment + ")";
+
+			var node = channelPair.Value.Nodes.Add (displayName);
 			node.Tag = user;
 			node.ImageKey = node.SelectedImageKey = (!user.IsMuted) ? "silent" : "muted";
 
@@ -591,57 +597,88 @@ namespace Gablarski.Clients.Windows
 			
 			var target = (UserInfo)un.Tag;
 
-			//if (target.Username != Client.CurrentUser.Username)
-			//{
-				if (!Client.Users.GetIsIgnored (target))
-				{
-					var ignore = new ToolStripMenuItem ("Ignore user", Resources.SoundMuteImage);
-					ignore.ToolTipText = "Ignores the user";
-					ignore.Click += ContextIgnoreUserClick;
+			if (!target.Comment.IsNullOrWhitespace())
+			{
+				var copy = new ToolStripMenuItem ("Copy comment", Resources.CommentImage);
+				copy.ToolTipText = "Copys the user's comment";
+				copy.Click += ContextCopyUserCommentClick;
+				un.ContextMenuStrip.Items.Add (copy);
 
-					un.ContextMenuStrip.Items.Add (ignore);
+				string comment = target.Comment.Trim();
+				if (comment.StartsWith ("http://") || comment.StartsWith ("www."))
+				{
+					var gotourl = new ToolStripMenuItem ("Open web page", Resources.CommentImage);
+					gotourl.ToolTipText = "Opens the URL in your web browser";
+					gotourl.Click += ContextGotoUrlUserCommentClick;
+					un.ContextMenuStrip.Items.Add (gotourl);
+				}
+
+				un.ContextMenuStrip.Items.Add (new ToolStripSeparator());
+			}
+
+			if (!Client.Users.GetIsIgnored (target))
+			{
+				var ignore = new ToolStripMenuItem ("Ignore user", Resources.SoundMuteImage);
+				ignore.ToolTipText = "Ignores the user";
+				ignore.Click += ContextIgnoreUserClick;
+
+				un.ContextMenuStrip.Items.Add (ignore);
+			}
+			else
+			{
+				var ignore = new ToolStripMenuItem ("Unignore user", Resources.SoundImage);
+				ignore.ToolTipText = "Unignores the user";
+				ignore.Click += ContextIgnoreUserClick;
+
+				un.ContextMenuStrip.Items.Add (ignore);
+			}
+
+			if (this.Client.CurrentUser.Permissions.CheckPermission (PermissionName.MuteUser))
+			{
+				if (!target.IsMuted)
+				{
+					var mute = new ToolStripMenuItem ("Mute user", Resources.SoundMuteImage);
+					mute.ToolTipText = "Mutes the user for everyone";
+					mute.Click += ContextMuteUserClick;
+
+					un.ContextMenuStrip.Items.Add (mute);
 				}
 				else
 				{
-					var ignore = new ToolStripMenuItem ("Unignore user", Resources.SoundImage);
-					ignore.ToolTipText = "Unignores the user";
-					ignore.Click += ContextIgnoreUserClick;
+					var mute = new ToolStripMenuItem ("Unmute user", Resources.SoundImage);
+					mute.ToolTipText = "Unmutes the user for everyone";
+					mute.Click += ContextMuteUserClick;
 
-					un.ContextMenuStrip.Items.Add (ignore);
+					un.ContextMenuStrip.Items.Add (mute);
 				}
+			}
 
-				if (this.Client.CurrentUser.Permissions.CheckPermission (PermissionName.MuteUser))
+			ToolStripMenuItem menu = null;
+			foreach (var source in Client.Sources[target])
+			{
+				if (menu == null)
 				{
-					if (!target.IsMuted)
-					{
-						var mute = new ToolStripMenuItem ("Mute user", Resources.SoundMuteImage);
-						mute.ToolTipText = "Mutes the user for everyone";
-						mute.Click += ContextMuteUserClick;
-
-						un.ContextMenuStrip.Items.Add (mute);
-					}
-					else
-					{
-						var mute = new ToolStripMenuItem ("Unmute user", Resources.SoundImage);
-						mute.ToolTipText = "Unmutes the user for everyone";
-						mute.Click += ContextMuteUserClick;
-
-						un.ContextMenuStrip.Items.Add (mute);
-					}
+					menu = new ToolStripMenuItem ("Sources");
+					un.ContextMenuStrip.Items.Add (menu);
 				}
 
-				ToolStripMenuItem menu = null;
-				foreach (var source in Client.Sources[target])
-				{
-					if (menu == null)
-					{
-						menu = new ToolStripMenuItem ("Sources");
-						un.ContextMenuStrip.Items.Add (menu);
-					}
+				AddSourceContext (menu.DropDown.Items, source);
+			}
+		}
 
-					AddSourceContext (menu.DropDown.Items, source);
-				}
-		//	}
+		private void ContextGotoUrlUserCommentClick(object sender, EventArgs e)
+		{
+			string url = ((UserInfo) this.SelectedNode.Tag).Comment.Trim();
+
+			if (url.StartsWith ("www."))
+				url = "http://" + url;
+
+			Process.Start (url);
+		}
+
+		private void ContextCopyUserCommentClick (object sender, EventArgs e)
+		{
+			Clipboard.SetText (((UserInfo)this.SelectedNode.Tag).Comment);
 		}
 		
 		private void SetupChannelContext (TreeNode cn)

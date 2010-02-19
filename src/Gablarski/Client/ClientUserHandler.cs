@@ -82,6 +82,11 @@ namespace Gablarski.Client
 		public event EventHandler<UserMutedEventArgs> UserMuted;
 
 		/// <summary>
+		/// A user's information was updated.
+		/// </summary>
+		public event EventHandler<UserEventArgs> UserUpdated;
+
+		/// <summary>
 		/// A user has changed channels.
 		/// </summary>
 		public event EventHandler<ChannelChangedEventArgs> UserChangedChannel;
@@ -252,18 +257,39 @@ namespace Gablarski.Client
 			OnReceivedUserList (new ReceivedListEventArgs<UserInfo> (userlist));
 		}
 
-		internal void OnMutedMessage (string username, bool unmuted)
+		internal void OnUserUpdatedMessage (MessageReceivedEventArgs e)
 		{
+			var msg = (UserUpdatedMessage) e.Message;
+
 			lock (SyncRoot)
 			{
-		        var user = this.SingleOrDefault (u => u.Username == username);
-		        if (user == null)
-		            return;
+				users.Update (msg.User);
 
-		        user.IsMuted = true;
-
-			    OnUserMuted (new UserMutedEventArgs (user, unmuted));
+				if (msg.User == context.CurrentUser)
+				{
+					context.CurrentUser.Comment = msg.User.Comment;
+					context.CurrentUser.Status = msg.User.Status;
+				}
 			}
+
+			OnUserUpdated (new UserEventArgs (msg.User));
+		}
+
+		internal void OnMutedMessage (string username, bool unmuted)
+		{
+			UserInfo user;
+
+			lock (SyncRoot)
+			{
+				user = this.SingleOrDefault (u => u.Username == username);
+				if (user == null)
+					return;
+
+				user.IsMuted = true;
+			}
+
+			OnUserMuted (new UserMutedEventArgs (user, unmuted));
+			OnUserUpdated (new UserEventArgs (user));
 		}
 
 		internal void OnUserDisconnectedMessage (MessageReceivedEventArgs e)
@@ -323,6 +349,7 @@ namespace Gablarski.Client
 			}
 
 			OnUserChangedChannnel (new ChannelChangedEventArgs (user, channel, previous, movedBy));
+			OnUserUpdated (new UserEventArgs (user));
 		}
 
 		internal void OnChannelChangeResultMessage (MessageReceivedEventArgs e)
@@ -339,6 +366,13 @@ namespace Gablarski.Client
 			var muted = this.UserMuted;
 			if (muted != null)
 				muted (this, e);
+		}
+
+		protected virtual void OnUserUpdated (UserEventArgs e)
+		{
+			var updated = this.UserUpdated;
+			if (updated != null)
+				updated (this, e);
 		}
 
 		protected virtual void OnUserDisconnected (UserEventArgs e)

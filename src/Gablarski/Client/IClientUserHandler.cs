@@ -65,6 +65,11 @@ namespace Gablarski.Client
 		event EventHandler<UserMutedEventArgs> UserMuted;
 
 		/// <summary>
+		/// An existing user's information was updated.
+		/// </summary>
+		event EventHandler<UserEventArgs> UserUpdated;
+
+		/// <summary>
 		/// A user has changed channels.
 		/// </summary>
 		event EventHandler<ChannelChangedEventArgs> UserChangedChannel;

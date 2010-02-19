@@ -82,9 +82,22 @@ namespace Gablarski.Server
 		/// Sets the state for the <paramref name="user"/>.
 		/// </summary>
 		/// <param name="user">The user to set the state of.</param>
-		/// <param name="newState">The new state of the user.</param>
+		/// <param name="newStatus>The new state of the user.</param>
+		/// <returns>The updated <see cref="UserInfo"/>. <c>null</c> if the user was not found.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
-		void SetState (UserInfo user, UserState newState);
+		UserInfo SetStatus (UserInfo user, UserStatus newStatus);
+
+		/// <summary>
+		/// Sets the comment for the <paramref name="user"/>.
+		/// </summary>
+		/// <param name="user">The user to set the comment of.</param>
+		/// <param name="comment">The new comment for the user.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
+		/// <returns>The updated <see cref="UserInfo"/>. <c>null</c> if the user was not found.</returns>
+		/// <remarks>
+		/// Passing either <c>null</c> or <c>String.Empty</c> for <paramref name="comment"/> is ok to clear it.
+		/// </remarks>
+		UserInfo SetComment (UserInfo user, string comment);
 
 		/// <summary>
 		/// Gets whether <paramref name="nickname"/> is currently in use or not.

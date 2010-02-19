@@ -87,6 +87,7 @@ namespace Gablarski.Client
 				{ ServerMessageType.Redirect, OnRedirectReceived },
 				{ ServerMessageType.ServerInfoReceived, OnServerInfoReceivedMessage },
 				{ ServerMessageType.UserListReceived, this.users.OnUserListReceivedMessage },
+				{ ServerMessageType.UserUpdated, this.users.OnUserUpdatedMessage },
 				{ ServerMessageType.SourceListReceived, this.Sources.OnSourceListReceivedMessage },
 				{ ServerMessageType.SourcesRemoved, this.Sources.OnSourcesRemovedMessage },
 				

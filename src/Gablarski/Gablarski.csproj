@@ -132,8 +132,9 @@
     <Compile Include="Messages\MutedMessage.cs" />
     <Compile Include="Messages\RequestMuteSourceMessage.cs" />
     <Compile Include="Messages\RequestMuteUserMessage.cs" />
+    <Compile Include="Messages\SetCommentMessage.cs" />
+    <Compile Include="Messages\SetStatusMessage.cs" />
     <Compile Include="Messages\UserUpdatedMessage.cs" />
-    <Compile Include="Messages\UserUpdateMessage.cs" />
     <Compile Include="ModuleSelectableAttribute.cs" />
     <Compile Include="MusicFileCaptureProvider.cs" />
     <Compile Include="ChannelInfo.cs" />

@@ -40,34 +40,33 @@ using System.Linq;
 
 namespace Gablarski.Messages
 {
-	public class UserUpdateMessage
+	public class SetCommentMessage
 		: ClientMessage
 	{
-		public UserUpdateMessage (UserInfo user)
-			: this()
-		{
-			User = user;
-		}
-
-		public UserUpdateMessage()
-			: base (ClientMessageType.UserUpdate)
+		public SetCommentMessage ()
+			: base (ClientMessageType.SetComment)
 		{
 		}
 
-		public UserInfo User
+		public SetCommentMessage (string comment)
+			: this ()
 		{
-			get;
-			set;
+			Comment = comment;
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public string Comment
 		{
-			User = new UserInfo (reader);
+			get; set;
 		}
 
 		public override void WritePayload (IValueWriter writer)
 		{
-			User.Serialize (writer);
+			writer.WriteString (Comment);
+		}
+
+		public override void ReadPayload (IValueReader reader)
+		{
+			Comment = reader.ReadString();
 		}
 	}
 }

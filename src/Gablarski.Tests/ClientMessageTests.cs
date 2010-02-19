@@ -298,13 +298,23 @@ namespace Gablarski.Tests
 		}
 
 		[Test]
-		public void UserUpdateMessage()
+		public void SetComment()
 		{
-			var msg = new UserUpdateMessage (UserInfoTests.GetTestUser());
-			UserInfoTests.AssertUserInfosMatch (UserInfoTests.GetTestUser(), msg.User);
+			var msg = new SetCommentMessage ("Comment");
+			Assert.AreEqual ("Comment", msg.Comment);
 
 			msg = AssertLengthMatches (msg);
-			UserInfoTests.AssertUserInfosMatch (UserInfoTests.GetTestUser(), msg.User);
+			Assert.AreEqual ("Comment", msg.Comment);
+		}
+
+		[Test]
+		public void SetStatus()
+		{
+			var msg = new SetStatusMessage (UserStatus.MutedMicrophone);
+			Assert.AreEqual (UserStatus.MutedMicrophone, msg.Status);
+
+			msg = AssertLengthMatches (msg);
+			Assert.AreEqual (UserStatus.MutedMicrophone, msg.Status);
 		}
 
 		private T AssertLengthMatches<T> (T msg)

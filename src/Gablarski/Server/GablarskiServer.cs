@@ -333,6 +333,8 @@ namespace Gablarski.Server
 				{ ClientMessageType.Disconnect, ClientDisconnected },
 				{ ClientMessageType.Login, userHandler.LoginMessage },
 				{ ClientMessageType.Join, userHandler.JoinMessage },
+				{ ClientMessageType.SetComment, userHandler.SetCommentMessage },
+				{ ClientMessageType.SetStatus, userHandler.SetStatusMessage },
 
 				{ ClientMessageType.RequestSource, sourceHandler.RequestSourceMessage },
 				{ ClientMessageType.AudioData, sourceHandler.SendAudioDataMessage },

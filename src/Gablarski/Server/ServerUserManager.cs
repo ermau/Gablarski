@@ -164,23 +164,46 @@ namespace Gablarski.Server
 			return newUser.IsMuted;
 		}
 
-		public void SetState (UserInfo user, UserState newState)
+		public UserInfo SetStatus (UserInfo user, UserStatus newStatus)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
 
 			IConnection connection = GetConnection (user);
 			if (connection == null)
-				return;
+				return null;
 
 			UserInfo old;
 			if (!connectedUsers.TryGetKey (connection, out old))
-				return;
+				return null;
 
 			UserInfo newUser = new UserInfo (old);
-			newUser.State = newState;
+			newUser.Status = newStatus;
 
 			connectedUsers.Inverse[connection] = newUser;
+
+			return newUser;
+		}
+
+		public UserInfo SetComment (UserInfo user, string comment)
+		{
+			if (user == null)
+				throw new ArgumentNullException ("user");
+
+			IConnection connection = GetConnection (user);
+			if (connection == null)
+				return null;
+
+			UserInfo old;
+			if (!connectedUsers.TryGetKey (connection, out old))
+				return null;
+
+			UserInfo newUser = new UserInfo (old);
+			newUser.Comment = comment;
+
+			connectedUsers.Inverse[connection] = newUser;
+
+			return newUser;
 		}
 
 		public void Login (IConnection connection, UserInfo user)

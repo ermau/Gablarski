@@ -140,6 +140,30 @@ namespace Gablarski.Client
 			this.context.Connection.Send (new JoinMessage (nickname, phonetic, serverPassword));
 		}
 
+		/// <summary>
+		/// Set's the current user's comment.
+		/// </summary>
+		/// <param name="comment">The comment to set. <c>null</c> is valid to clear.</param>
+		public void SetComment (string comment)
+		{
+			if (comment == this.Comment)
+				return;
+
+			this.context.Connection.Send (new SetCommentMessage (comment));
+		}
+
+		/// <summary>
+		/// Set's the current user's status.
+		/// </summary>
+		/// <param name="status">The status to set.</param>
+		public void SetStatus (UserStatus status)
+		{
+			if (status == this.Status)
+				return;
+
+			this.context.Connection.Send (new SetStatusMessage (status));
+		}
+
 		private readonly IClientContext context;
 		private readonly object permissionLock = new object();
 		private IEnumerable<Permission> permissions;
