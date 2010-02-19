@@ -192,10 +192,31 @@ namespace Gablarski.Audio
 		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
 		bool Detach (AudioSource source);
 
+		/// <summary>
+		/// Mutes all capture.
+		/// </summary>
+		void MuteCapture();
+
+		/// <summary>
+		/// Unmutes all capture, not including those muted individually.
+		/// </summary>
+		void UnmuteCapture();
+
 		/// <exception cref="ArgumentNullException"><paramref name="capture"/> is <c>null</c>.</exception>
 		void Mute (ICaptureProvider capture);
+
 		/// <exception cref="ArgumentNullException"><paramref name="capture"/> is <c>null</c>.</exception>
 		void Unmute (ICaptureProvider capture);
+
+		/// <summary>
+		/// Mutes all playback.
+		/// </summary>
+		void MutePlayback();
+
+		/// <summary>
+		/// Unmutes all playback, not including those muted individually.
+		/// </summary>
+		void UnmutePlayback();
 
 		/// <exception cref="ArgumentNullException"><paramref name="playback"/> is <c>null</c>.</exception>
 		void Mute (IPlaybackProvider playback);

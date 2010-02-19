@@ -108,7 +108,7 @@ namespace Gablarski.Audio
 				{
 					playbacks[s] = new AudioPlaybackEntity (playback, s, options);
 
-					if (mutedPlayers.Contains (playback))
+					if (this.playbackMuted || mutedPlayers.Contains (playback))
 						playbacks[s].Muted = true;
 				}
 			}
@@ -127,7 +127,7 @@ namespace Gablarski.Audio
 			{
 				playbacks[source] = new AudioPlaybackEntity (playback, source, options);
 
-				if (mutedPlayers.Contains (playback))
+				if (this.playbackMuted || mutedPlayers.Contains (playback))
 					playbacks[source].Muted = true;
 			}
 		}
@@ -149,7 +149,7 @@ namespace Gablarski.Audio
 				capture.BeginCapture (format);
 				captures[source] = new AudioCaptureEntity (capture, format, source, options);
 
-				if (mutedCaptures.Contains (capture))
+				if (this.captureMuted || mutedCaptures.Contains (capture))
 					captures[source].Muted = true;
 			}
 		}
@@ -368,6 +368,22 @@ namespace Gablarski.Audio
 			}
 		}
 
+		public void MuteCapture()
+		{
+			lock (captures)
+			{
+				this.captureMuted = true;
+			}
+		}
+
+		public void UnmuteCapture()
+		{
+			lock (captures)
+			{
+				this.captureMuted = false;
+			}
+		}
+
 		public void Mute (ICaptureProvider capture)
 		{
 			MuteCore (capture, true);
@@ -376,6 +392,22 @@ namespace Gablarski.Audio
 		public void Unmute (ICaptureProvider capture)
 		{
 			MuteCore (capture, false);
+		}
+
+		public void MutePlayback()
+		{
+			lock (this.playbacks)
+			{
+				this.playbackMuted = true;
+			}
+		}
+
+		public void UnmutePlayback()
+		{
+			lock (this.playbacks)
+			{
+				this.playbackMuted = false;
+			}
 		}
 
 		public void Mute (IPlaybackProvider playback)
@@ -450,9 +482,14 @@ namespace Gablarski.Audio
 		private IClientContext context;
 		private IAudioSender audioSender;
 		private IAudioReceiver audioReceiver;
+		private bool captureMuted;
+		private bool playbackMuted;
 
 		private void OnReceivedAudio (object sender, ReceivedAudioEventArgs e)
 		{
+			if (this.playbackMuted)
+				return;
+
 			byte[] decoded = e.Source.Decode (e.AudioData);
 
 			lock (playbacks)
@@ -517,49 +554,52 @@ namespace Gablarski.Audio
 				{
 					foreach (var c in captures)
 					{
-						bool muted = c.Value.Muted;
+						AudioCaptureEntity entity = c.Value;
+						AudioSource source = c.Key;
 
-						if ((!c.Value.Talking && muted) || (!c.Value.Capture.IsCapturing && c.Value.Options.Mode == AudioEngineCaptureMode.Explicit))
+						bool muted = (entity.Muted || this.captureMuted);
+
+						if ((!entity.Talking && muted) || (!entity.Capture.IsCapturing && entity.Options.Mode == AudioEngineCaptureMode.Explicit))
 							continue;
-
-						if (c.Value.Talking && muted)
+						
+						if (entity.Talking && muted)
 						{
-							c.Value.Talking = false;
-							AudioSender.EndSending (c.Key);
+							entity.Talking = false;
+							AudioSender.EndSending (source);
 							continue;
 						}
 
-						if (c.Value.Capture.AvailableSampleCount > c.Key.FrameSize)
+						if (entity.Capture.AvailableSampleCount > source.FrameSize)
 						{
-							bool talking = c.Value.Talking;
-							if (c.Value.CurrentTargets == null || c.Value.CurrentTargets.Length == 0)
+							bool talking = entity.Talking;
+							if (entity.CurrentTargets == null || entity.CurrentTargets.Length == 0)
 							{
-								c.Value.TargetType = TargetType.Channel;
-								c.Value.CurrentTargets = new[] { Context.GetCurrentChannel().ChannelId };
+								entity.TargetType = TargetType.Channel;
+								entity.CurrentTargets = new[] { Context.GetCurrentChannel().ChannelId };
 							}
 
-							while (c.Value.Capture.AvailableSampleCount > c.Key.FrameSize)
+							while (entity.Capture.AvailableSampleCount > source.FrameSize)
 							{
-								byte[] samples = c.Value.Capture.ReadSamples (c.Key.FrameSize);
-								if (c.Value.Options.Mode == AudioEngineCaptureMode.Activated)
+								byte[] samples = entity.Capture.ReadSamples (source.FrameSize);
+								if (entity.Options.Mode == AudioEngineCaptureMode.Activated)
 								{
-									talking = c.Value.VoiceActivation.IsTalking (samples);
+									talking = entity.VoiceActivation.IsTalking (samples);
 	
-									if (talking && !c.Value.Talking)
-										AudioSender.BeginSending (c.Key);
+									if (talking && !entity.Talking)
+										AudioSender.BeginSending (source);
 									
-									c.Value.Talking = talking;
+									entity.Talking = talking;
 								}
 									
 								if (talking)
-									AudioSender.SendAudioData (c.Key, c.Value.TargetType, c.Value.CurrentTargets, samples);
-								else if (c.Value.Talking && c.Value.Options.Mode == AudioEngineCaptureMode.Activated)
-									AudioSender.EndSending (c.Key);						
+									AudioSender.SendAudioData (source, entity.TargetType, entity.CurrentTargets, samples);
+								else if (entity.Talking && entity.Options.Mode == AudioEngineCaptureMode.Activated)
+									AudioSender.EndSending (source);						
 							}
 						}
 
 						if (!skipSwitch)
-							skipSwitch = (c.Value.Capture.AvailableSampleCount > c.Key.FrameSize);
+							skipSwitch = (entity.Capture.AvailableSampleCount > source.FrameSize);
 					}
 				}
 
