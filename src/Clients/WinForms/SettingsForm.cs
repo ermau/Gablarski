@@ -178,7 +178,7 @@ namespace Gablarski.Clients.Windows
 			}), nice);
 		}
 
-		private void inInputProvider_SelectedIndexChanged (object sender, EventArgs e)
+		private void inInputProvider_SelectedValueChanged(object sender, EventArgs e)
 		{
 			DisableInput();
 

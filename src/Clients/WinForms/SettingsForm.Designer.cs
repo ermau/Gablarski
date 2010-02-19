@@ -70,7 +70,7 @@
 			this.tabNotifications = new System.Windows.Forms.TabPage();
 			this.enableNotifications = new System.Windows.Forms.CheckBox();
 			this.notifiers = new System.Windows.Forms.ListView();
-			columnHeader1 = new System.Windows.Forms.ColumnHeader();
+			columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.tabs.SuspendLayout();
 			this.generalTab.SuspendLayout();
 			this.voiceTab.SuspendLayout();
@@ -144,7 +144,6 @@
 			// gablarskiURLs
 			// 
 			this.gablarskiURLs.AutoSize = true;
-			this.gablarskiURLs.Enabled = false;
 			this.gablarskiURLs.Location = new System.Drawing.Point(8, 52);
 			this.gablarskiURLs.Name = "gablarskiURLs";
 			this.gablarskiURLs.Size = new System.Drawing.Size(136, 17);
@@ -155,7 +154,6 @@
 			// inConnectOnStart
 			// 
 			this.inConnectOnStart.AutoSize = true;
-			this.inConnectOnStart.Enabled = false;
 			this.inConnectOnStart.Location = new System.Drawing.Point(8, 29);
 			this.inConnectOnStart.Name = "inConnectOnStart";
 			this.inConnectOnStart.Size = new System.Drawing.Size(146, 17);
@@ -166,7 +164,6 @@
 			// inDisplaySources
 			// 
 			this.inDisplaySources.AutoSize = true;
-			this.inDisplaySources.Enabled = false;
 			this.inDisplaySources.Location = new System.Drawing.Point(8, 6);
 			this.inDisplaySources.Name = "inDisplaySources";
 			this.inDisplaySources.Size = new System.Drawing.Size(129, 17);
@@ -371,7 +368,7 @@
 			this.inInputProvider.Name = "inInputProvider";
 			this.inInputProvider.Size = new System.Drawing.Size(194, 21);
 			this.inInputProvider.TabIndex = 5;
-			this.inInputProvider.SelectedIndexChanged += new System.EventHandler(this.inInputProvider_SelectedIndexChanged);
+			this.inInputProvider.SelectedValueChanged += new System.EventHandler(this.inInputProvider_SelectedValueChanged);
 			// 
 			// lblInputProvider
 			// 
