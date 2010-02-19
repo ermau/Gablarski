@@ -149,6 +149,7 @@ namespace Gablarski.Client
 			if (comment == this.Comment)
 				return;
 
+			Comment = comment;
 			this.context.Connection.Send (new SetCommentMessage (comment));
 		}
 
@@ -161,6 +162,7 @@ namespace Gablarski.Client
 			if (status == this.Status)
 				return;
 
+			Status = status;
 			this.context.Connection.Send (new SetStatusMessage (status));
 		}
 

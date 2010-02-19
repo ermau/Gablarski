@@ -711,9 +711,20 @@ namespace Gablarski.Clients.Windows
 				return;
 
 			if (this.btnMute.Checked)
+			{
+				if (!this.btnMuteMic.Checked)
+					this.btnMuteMic.PerformClick();
+
+				this.btnMuteMic.Enabled = false;
+
 				gablarski.CurrentUser.MutePlayback();
+			}
 			else
+			{
 				gablarski.CurrentUser.UnmutePlayback();
+
+				this.btnMuteMic.Enabled = true;
+			}
 		}
 
 		private void btnMuteMic_Click (object sender, EventArgs e)
