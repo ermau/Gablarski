@@ -146,9 +146,11 @@ namespace Gablarski.Audio
 
 			lock (captures)
 			{
-				//if (options.Mode == AudioEngineCaptureMode.Activated)
 				capture.BeginCapture (format);
 				captures[source] = new AudioCaptureEntity (capture, format, source, options);
+
+				if (mutedCaptures.Contains (capture))
+					captures[source].Muted = true;
 			}
 		}
 
@@ -317,7 +319,6 @@ namespace Gablarski.Audio
 				e.CurrentTargets = channels.Select (c => c.ChannelId).ToArray();
 				e.Talking = true;
 				AudioSender.BeginSending (source);
-				//e.Capture.BeginCapture (AudioFormat.Mono16Bit);
 			}
 		}
 
