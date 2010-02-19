@@ -109,6 +109,13 @@ namespace Gablarski.Clients.Windows.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap CopyCommentImage {
+            get {
+                object obj = ResourceManager.GetObject("CopyCommentImage", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap DisconnectImage {
             get {
                 object obj = ResourceManager.GetObject("DisconnectImage", resourceCulture);
@@ -120,6 +127,13 @@ namespace Gablarski.Clients.Windows.Properties {
             get {
                 object obj = ResourceManager.GetObject("Headphones", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap LinkImage {
+            get {
+                object obj = ResourceManager.GetObject("LinkImage", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         

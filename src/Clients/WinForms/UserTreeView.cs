@@ -599,7 +599,7 @@ namespace Gablarski.Clients.Windows
 
 			if (!target.Comment.IsNullOrWhitespace())
 			{
-				var copy = new ToolStripMenuItem ("Copy comment", Resources.CommentImage);
+				var copy = new ToolStripMenuItem ("Copy comment", Resources.CopyCommentImage);
 				copy.ToolTipText = "Copys the user's comment";
 				copy.Click += ContextCopyUserCommentClick;
 				un.ContextMenuStrip.Items.Add (copy);
@@ -607,7 +607,7 @@ namespace Gablarski.Clients.Windows
 				string comment = target.Comment.Trim();
 				if (comment.StartsWith ("http://") || comment.StartsWith ("www."))
 				{
-					var gotourl = new ToolStripMenuItem ("Open web page", Resources.CommentImage);
+					var gotourl = new ToolStripMenuItem ("Open web page", Resources.LinkImage);
 					gotourl.ToolTipText = "Opens the URL in your web browser";
 					gotourl.Click += ContextGotoUrlUserCommentClick;
 					un.ContextMenuStrip.Items.Add (gotourl);
