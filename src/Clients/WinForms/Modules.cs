@@ -5,7 +5,6 @@ using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.IO;
 using System.Linq;
-using System.Text;
 using Gablarski.Audio;
 using Gablarski.Clients.Input;
 using Gablarski.Clients.Media;
@@ -49,7 +48,19 @@ namespace Gablarski.Clients.Windows
 			get { return modules.notifiers; }
 		}
 
+		public static IEnumerable<ITextToSpeech> TextToSpeech
+		{
+			get { return modules.tts; }
+		}
+
 		private static readonly Modules modules = new Modules();
+
+		[ImportMany]
+		private IEnumerable<ITextToSpeech> tts
+		{
+			get;
+			set;
+		}
 
 		[ImportMany]
 		private IEnumerable<IInputProvider> input

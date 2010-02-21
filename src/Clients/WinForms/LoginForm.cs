@@ -241,7 +241,28 @@ namespace Gablarski.Clients.Windows
 			this.servers.LargeImageList = images;
 			this.servers.SmallImageList = images;
 
+			Settings.SettingChanged += OnSettingsChanged;
+			SetupTTS();
+
 			this.LoadServerEntries();
+		}
+
+		private void LoginForm_FormClosing(object sender, FormClosingEventArgs e)
+		{
+			Settings.SettingChanged -= OnSettingsChanged;
+		}
+
+		private void OnSettingsChanged(object sender, PropertyChangedEventArgs e)
+		{
+			if (e.PropertyName != Settings.TextToSpeechSettingName)
+				return;
+
+			SetupTTS();
+		}
+
+		private void SetupTTS ()
+		{
+			playPhonetic.Enabled = Modules.TextToSpeech.Any (tts => tts.GetType().FullName.Contains (Settings.TextToSpeech));
 		}
 
 		private void startLocal_Click (object sender, EventArgs e)
@@ -287,6 +308,13 @@ namespace Gablarski.Clients.Windows
 				Servers.DeleteServer (s);
 				this.servers.Items.Remove (li);
 			}
+		}
+
+		private void playPhonetic_Click (object sender, EventArgs e)
+		{
+			ITextToSpeech tts = Modules.TextToSpeech.FirstOrDefault (t => t.GetType().FullName.Contains (Settings.TextToSpeech));
+			if (tts != null)
+				tts.Say (this.inPhonetic.Text);
 		}
 	}
 }

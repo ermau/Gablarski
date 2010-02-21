@@ -30,6 +30,8 @@
 		{
 			this.servers = new System.Windows.Forms.ListView();
 			this.pnlModServer = new System.Windows.Forms.Panel();
+			this.playPhonetic = new System.Windows.Forms.Button();
+			this.lblPhonetic = new System.Windows.Forms.Label();
 			this.inPhonetic = new System.Windows.Forms.TextBox();
 			this.inServerPassword = new System.Windows.Forms.TextBox();
 			this.lblServerPassword = new System.Windows.Forms.Label();
@@ -52,7 +54,6 @@
 			this.btnSaveServer = new System.Windows.Forms.Button();
 			this.btnEditServer = new System.Windows.Forms.Button();
 			this.btnAddServer = new System.Windows.Forms.Button();
-			this.lblPhonetic = new System.Windows.Forms.Label();
 			this.pnlModServer.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -75,6 +76,7 @@
 			this.pnlModServer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
 						| System.Windows.Forms.AnchorStyles.Left)
 						| System.Windows.Forms.AnchorStyles.Right)));
+			this.pnlModServer.Controls.Add(this.playPhonetic);
 			this.pnlModServer.Controls.Add(this.lblPhonetic);
 			this.pnlModServer.Controls.Add(this.inPhonetic);
 			this.pnlModServer.Controls.Add(this.inServerPassword);
@@ -97,12 +99,32 @@
 			this.pnlModServer.TabIndex = 3;
 			this.pnlModServer.Visible = false;
 			// 
+			// playPhonetic
+			// 
+			this.playPhonetic.Enabled = false;
+			this.playPhonetic.Image = global::Gablarski.Clients.Windows.Properties.Resources.control_play_blue;
+			this.playPhonetic.Location = new System.Drawing.Point(221, 176);
+			this.playPhonetic.Name = "playPhonetic";
+			this.playPhonetic.Size = new System.Drawing.Size(26, 23);
+			this.playPhonetic.TabIndex = 15;
+			this.playPhonetic.UseVisualStyleBackColor = true;
+			this.playPhonetic.Click += new System.EventHandler(this.playPhonetic_Click);
+			// 
+			// lblPhonetic
+			// 
+			this.lblPhonetic.AutoSize = true;
+			this.lblPhonetic.Location = new System.Drawing.Point(6, 181);
+			this.lblPhonetic.Name = "lblPhonetic";
+			this.lblPhonetic.Size = new System.Drawing.Size(52, 13);
+			this.lblPhonetic.TabIndex = 14;
+			this.lblPhonetic.Text = "Phonetic:";
+			// 
 			// inPhonetic
 			// 
 			this.inPhonetic.Location = new System.Drawing.Point(102, 178);
 			this.inPhonetic.MaxLength = 255;
 			this.inPhonetic.Name = "inPhonetic";
-			this.inPhonetic.Size = new System.Drawing.Size(145, 20);
+			this.inPhonetic.Size = new System.Drawing.Size(113, 20);
 			this.inPhonetic.TabIndex = 13;
 			// 
 			// inServerPassword
@@ -331,15 +353,6 @@
 			this.btnAddServer.UseVisualStyleBackColor = true;
 			this.btnAddServer.Click += new System.EventHandler(this.btnAddServer_Click);
 			// 
-			// lblPhonetic
-			// 
-			this.lblPhonetic.AutoSize = true;
-			this.lblPhonetic.Location = new System.Drawing.Point(6, 181);
-			this.lblPhonetic.Name = "lblPhonetic";
-			this.lblPhonetic.Size = new System.Drawing.Size(52, 13);
-			this.lblPhonetic.TabIndex = 14;
-			this.lblPhonetic.Text = "Phonetic:";
-			// 
 			// LoginForm
 			// 
 			this.AcceptButton = this.btnConnect;
@@ -361,6 +374,7 @@
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "Connect to Gablarski";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.LoginForm_FormClosing);
 			this.Load += new System.EventHandler(this.LoginForm_Load);
 			this.pnlModServer.ResumeLayout(false);
 			this.pnlModServer.PerformLayout();
@@ -395,5 +409,6 @@
 		private System.Windows.Forms.Button settingsButton;
 		private System.Windows.Forms.TextBox inPhonetic;
 		private System.Windows.Forms.Label lblPhonetic;
+		private System.Windows.Forms.Button playPhonetic;
 	}
 }

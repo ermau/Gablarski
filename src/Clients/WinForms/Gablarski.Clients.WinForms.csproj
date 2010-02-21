@@ -308,6 +308,8 @@
     <Content Include="Headphones.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Resources\control_play_blue.png" />
+    <None Include="Resources\control_pause_blue.png" />
     <None Include="Resources\world_link.png" />
     <None Include="Resources\comments.png" />
     <None Include="Resources\comment.png" />

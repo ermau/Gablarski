@@ -65,13 +65,14 @@ namespace Gablarski.SpeechNotifier
 			{
 				lock (sync)
 				{
-					if (media == null)
-						return;
+					if (media != null)
+						media.AddTalker();
 
-					media.AddTalker();
 					lock (speech)
 						speech.Speak ((string)o);
-					media.RemoveTalker();
+
+					if (media != null)
+						media.RemoveTalker();
 				}
 			}, say);
 		}

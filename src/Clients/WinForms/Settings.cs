@@ -99,6 +99,17 @@ namespace Gablarski.Clients.Windows
 			}
 		}
 
+		public const string TextToSpeechSettingName = "TextToSpeech";
+		public static string TextToSpeech
+		{
+			get { return GetSetting (TextToSpeechSettingName, "Gablarski.SpeechNotifier.EventSpeech"); }
+			set
+			{
+				if (SetSetting (TextToSpeechSettingName, value))
+					OnSettingsChanged (TextToSpeechSettingName);
+			}
+		}
+
 		public static string InputProvider
 		{
 			get { return GetSetting ("InputProvider", "Gablarski.Input.DirectInput.DirectInputProvider, Gablarski.Input.DirectInput"); }

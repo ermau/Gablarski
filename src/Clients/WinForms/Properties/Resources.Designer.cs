@@ -109,6 +109,20 @@ namespace Gablarski.Clients.Windows.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap control_pause_blue {
+            get {
+                object obj = ResourceManager.GetObject("control_pause_blue", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap control_play_blue {
+            get {
+                object obj = ResourceManager.GetObject("control_play_blue", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap CopyCommentImage {
             get {
                 object obj = ResourceManager.GetObject("CopyCommentImage", resourceCulture);
