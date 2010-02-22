@@ -742,10 +742,12 @@ namespace Gablarski.Clients.Windows
 
 				this.btnMuteMic.Enabled = false;
 
+				notifications.Muted = true;
 				gablarski.CurrentUser.MutePlayback();
 			}
 			else
 			{
+				notifications.Muted = false;
 				gablarski.CurrentUser.UnmutePlayback();
 
 				this.btnMuteMic.Enabled = true;

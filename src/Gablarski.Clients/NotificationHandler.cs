@@ -1,4 +1,4 @@
-// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -43,8 +43,15 @@ using Gablarski.Clients.Media;
 
 namespace Gablarski.Clients
 {
+	/// <summary>
+	/// Handles automatically notifying a collection of <see cref="INotifier"/>s with the events.
+	/// </summary>
 	public class NotificationHandler
 	{
+		/// <summary>
+		/// Creates a new instance of <see cref="NotificationHandler"/>.
+		/// </summary>
+		/// <param name="client"></param>
 		public NotificationHandler (GablarskiClient client)
 		{
 			this.client = client;
@@ -55,6 +62,17 @@ namespace Gablarski.Clients
 			this.client.Users.UserChangedChannel += OnUserChangedChannel;
 		}
 
+		/// <summary>
+		/// Gets or sets whether notifications are muted.
+		/// </summary>
+		public bool Muted
+		{
+			get; set;
+		}
+
+		/// <summary>
+		/// Sets the notifiers to notify.
+		/// </summary>
 		public IEnumerable<INotifier> Notifiers
 		{
 			set
@@ -80,6 +98,9 @@ namespace Gablarski.Clients
 
 		public void Notify (NotificationType type, string notification, NotifyPriority priority)
 		{
+			if (Muted)
+				return;
+
 			lock (notifiers)
 			{
 				foreach (var n in notifiers)
@@ -94,6 +115,9 @@ namespace Gablarski.Clients
 
 		public void Notify (NotificationType type, string notification, string nickname, string phonetic, NotifyPriority priority)
 		{
+			if (Muted)
+				return;
+
 			lock (notifiers)
 			{
 				foreach (var n in notifiers)
@@ -114,6 +138,7 @@ namespace Gablarski.Clients
 			this.client.Users.UserChangedChannel -= OnUserChangedChannel;
 		}
 
+		private bool isDisposed;
 		private readonly HashSet<INotifier> notifiers = new HashSet<INotifier> ();
 		private readonly GablarskiClient client;
 
@@ -160,9 +185,9 @@ namespace Gablarski.Clients
 			}
 		}
 
-		private void Attach (IEnumerable<INotifier> notifiers)
+		private void Attach (IEnumerable<INotifier> attachNotifiers)
 		{
-			foreach (var n in notifiers)
+			foreach (var n in attachNotifiers)
 				Attach (n);
 		}
 
