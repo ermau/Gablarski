@@ -193,6 +193,7 @@ namespace Gablarski.Clients.Windows
 			this.Entry.UserName = this.inUsername.Text.Trim();
 			this.Entry.UserPassword = this.inPassword.Text.Trim();
 			Servers.SaveServer (Entry);
+			Program.UpdateTaskbarServers();
 
 			this.ClearEdit();
 			this.LoadServerEntries();
@@ -308,6 +309,8 @@ namespace Gablarski.Clients.Windows
 				Servers.DeleteServer (s);
 				this.servers.Items.Remove (li);
 			}
+
+			Program.UpdateTaskbarServers();
 		}
 
 		private void playPhonetic_Click (object sender, EventArgs e)

@@ -51,6 +51,41 @@ namespace Gablarski.Clients.Windows
 			}
 		}
 
+		public static void UpdateTaskbarServers()
+		{
+			if (!TaskbarManager.IsPlatformSupported)
+				return;
+
+			var jl = JumpList.CreateJumpList ();
+			var serverCategory = new JumpListCustomCategory ("Servers");
+
+			string exe = Process.GetCurrentProcess ().MainModule.FileName;
+
+			IList<ServerEntry> servers = Servers.GetEntries ().ToList ();
+			JumpListLink[] links = new JumpListLink[servers.Count];
+			for (int i = 0; i < servers.Count; ++i)
+			{
+				var s = servers[i];
+				links[i] = new JumpListLink (exe, s.Name)
+				{
+					Arguments = s.Id.ToString(),
+					IconReference = new IconReference (exe, 1)
+				};
+			}
+			
+			serverCategory.AddJumpListItems (links);
+
+			jl.AddCustomCategories (serverCategory);
+
+			try
+			{
+				jl.Refresh ();
+			}
+			catch (UnauthorizedAccessException) // Jumplists disabled
+			{
+			}
+		}
+
 		/// <summary>
 		/// The main entry point for the application.
 		/// </summary>
@@ -95,37 +130,7 @@ namespace Gablarski.Clients.Windows
 			var m = new MainForm();
 			m.Show();
 
-			if (TaskbarManager.IsPlatformSupported)
-			{
-				var jl = JumpList.CreateJumpList ();
-				var serverCategory = new JumpListCustomCategory ("Servers");
-
-				string exe = Process.GetCurrentProcess ().MainModule.FileName;
-
-				IList<ServerEntry> servers = Servers.GetEntries ().ToList ();
-				JumpListLink[] links = new JumpListLink[servers.Count];
-				for (int i = 0; i < servers.Count; ++i)
-				{
-					var s = servers[i];
-					links[i] = new JumpListLink (exe, s.Name)
-					{
-						Arguments = s.Id.ToString(),
-						IconReference = new IconReference (exe, 1)
-					};
-				}
-				
-				serverCategory.AddJumpListItems (links);
-
-				jl.AddCustomCategories (serverCategory);
-
-				try
-				{
-					jl.Refresh ();
-				}
-				catch (UnauthorizedAccessException) // Jumplists disabled
-				{
-				}
-			}
+			UpdateTaskbarServers();
 
 			if (args.Length > 0)
 			{
