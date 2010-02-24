@@ -297,6 +297,14 @@ namespace Gablarski.Clients.Windows
 
 					break;
 
+				case Settings.EnableGablarskiURLsSettingName:
+					if (Settings.EnableGablarskiURLs)
+						Program.EnableGablarskiURIs();
+					else
+						Program.DisableGablarskiURIs();
+
+					break;
+
 				case Settings.PlaybackProviderSettingName:
 					SetupPlayback ();
 					break;

@@ -13,6 +13,44 @@ namespace Gablarski.Clients.Windows
 {
 	static class Program
 	{
+		public static void EnableGablarskiURIs()
+		{
+			try
+			{
+				Process p = new Process
+				{
+					StartInfo = new ProcessStartInfo ("cmd.exe", "/C ftype gablarski=\"" + Path.Combine (Environment.CurrentDirectory, Process.GetCurrentProcess ().ProcessName) + ".exe\" \"%1\"")
+					{
+						Verb = "runas",
+					}
+				};
+				p.Start ();
+				p.WaitForExit ();
+			}
+			catch (Win32Exception)
+			{
+			}
+		}
+
+		public static void DisableGablarskiURIs()
+		{
+			try
+			{
+				Process p = new Process
+				{
+					StartInfo = new ProcessStartInfo ("cmd.exe", "/C ftype gablarski=")
+					{
+						Verb = "runas",
+					}
+				};
+				p.Start();
+				p.WaitForExit();
+			}
+			catch (Win32Exception)
+			{
+			}
+		}
+
 		/// <summary>
 		/// The main entry point for the application.
 		/// </summary>
@@ -41,23 +79,7 @@ namespace Gablarski.Clients.Windows
 				try
 				{
 					if (Settings.EnableGablarskiURLs)
-					{
-						try
-						{
-							Process p = new Process
-							{
-								StartInfo = new ProcessStartInfo ("cmd.exe", "/C ftype gablarski=\"" + Path.Combine (Environment.CurrentDirectory, Process.GetCurrentProcess ().ProcessName) + ".exe\" \"%1\"")
-								{
-									Verb = "runas",
-								}
-							};
-							p.Start ();
-							p.WaitForExit ();
-						}
-						catch (Win32Exception)
-						{
-						}
-					}
+						EnableGablarskiURIs();
 
 					Settings.FirstRun = false;
 					Settings.SaveSettings ();

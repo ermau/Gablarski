@@ -28,6 +28,7 @@ namespace Gablarski.Clients.Windows
 		{
 			this.inDisplaySources.Checked = Settings.DisplaySources;
 			this.inConnectOnStart.Checked = Settings.ShowConnectOnStart;
+			this.gablarskiURLs.Checked = Settings.EnableGablarskiURLs;
 
 			this.voiceActivation.Checked = !Settings.UsePushToTalk;
 			this.inInputProvider.DisplayMember = "DisplayName";
@@ -92,6 +93,7 @@ namespace Gablarski.Clients.Windows
 			DialogResult = DialogResult.OK;
 			Settings.ShowConnectOnStart = this.inConnectOnStart.Checked;
 			Settings.DisplaySources = this.inDisplaySources.Checked;
+			Settings.EnableGablarskiURLs = this.gablarskiURLs.Checked;
 
 			DisableInput();
 			Settings.InputProvider = (this.inInputProvider.SelectedItem != null) ? this.inInputProvider.SelectedItem.ToString () : String.Empty;
