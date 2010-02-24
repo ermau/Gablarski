@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -37,7 +37,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using Gablarski.Audio;
 using Gablarski.Client;
@@ -53,12 +52,15 @@ namespace Gablarski.Clients.Media
 			this.mediaPlayers = mediaPlayers;
 
 			this.receiver = audioReceiver;
-			this.receiver.AudioSourceStarted += OnAudioSourceStarted;
+			this.receiver.ReceivedAudio += OnReceivedAudio;
 			this.receiver.AudioSourceStopped += OnAudioSourceStopped;
 
 			playerTimer = new Timer (Pulse, null, 0, 2500);
 		}
 
+		/// <summary>
+		/// Gets or sets the media players to adjust.
+		/// </summary>
 		public IEnumerable<IMediaPlayer> MediaPlayers
 		{
 			get { return this.mediaPlayers; }
@@ -104,7 +106,23 @@ namespace Gablarski.Clients.Media
 
 		public void AddTalker ()
 		{
-			if (Interlocked.Increment (ref this.playing) > 1)
+			if (Interlocked.Increment (ref this.playing) > 1 || playingSources.Count > 0)
+				return;
+
+			SetVolume (TalkingVolume);
+		}
+
+		public void AddTalker (AudioSource source)
+		{
+			lock (playingSources)
+			{
+				if (playingSources.Contains (source))
+					return;
+
+				playingSources.Add (source);
+			}
+
+			if (this.playing > 0 || playingSources.Count > 1)
 				return;
 
 			SetVolume (TalkingVolume);
@@ -112,7 +130,21 @@ namespace Gablarski.Clients.Media
 
 		public void RemoveTalker ()
 		{
-			if (Interlocked.Decrement (ref this.playing) > 0)
+			if (Interlocked.Decrement (ref this.playing) > 0 || playingSources.Count > 0)
+				return;
+
+			SetVolume (NormalVolume);
+		}
+
+		public void RemoveTalker (AudioSource source)
+		{
+			lock (playingSources)
+			{
+				if (!playingSources.Remove (source))
+					return;
+			}
+
+			if (this.playing > 0 || playingSources.Count > 0)
 				return;
 
 			SetVolume (NormalVolume);
@@ -121,6 +153,10 @@ namespace Gablarski.Clients.Media
 		public void Reset()
 		{
 			Interlocked.Exchange (ref this.playing, 0);
+			
+			lock (playingSources)
+				playingSources.Clear();
+
 			SetVolume (NormalVolume);
 		}
 
@@ -129,9 +165,11 @@ namespace Gablarski.Clients.Media
 		private IEnumerable<IMediaPlayer> mediaPlayers;
 
 		private int playing;
+
 		private readonly IClientContext context;
 		private readonly IAudioReceiver receiver;
 		private readonly HashSet<IMediaPlayer> attachedPlayers = new HashSet<IMediaPlayer>();
+		private readonly HashSet<AudioSource> playingSources = new HashSet<AudioSource>();
 		private readonly Timer playerTimer;
 
 		private void Pulse (object state)
@@ -155,15 +193,15 @@ namespace Gablarski.Clients.Media
 			if (!UserTalkingCounts && e.Source.OwnerId == context.CurrentUser.UserId)
 				return;
 
-			RemoveTalker ();
+			RemoveTalker (e.Source);
 		}
 
-		private void OnAudioSourceStarted (object sender, AudioSourceEventArgs e)
+		private void OnReceivedAudio (object sender, ReceivedAudioEventArgs e)
 		{
 			if (!UserTalkingCounts && e.Source.OwnerId == context.CurrentUser.UserId)
 				return;
 
-			AddTalker ();
+			AddTalker (e.Source);
 		}
 
 		private void SetVolume (int volume)
