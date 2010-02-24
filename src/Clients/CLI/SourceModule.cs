@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -22,15 +22,16 @@ namespace Gablarski.Clients.CLI
 		public override bool Process (string line)
 		{
 			var parts = CommandLine.Parse (line);
-			if (parts.Count == 0 || parts[0].ToLower() == "sources")
+			if (parts.Count == 0 || parts[0].ToLower() != "sources")
 				return false;
 
-			if (parts.Count == 1 || parts[0].ToLower() == "sources")
+			if (parts.Count == 1 && parts[0].ToLower() == "sources")
 			{
-				Console.WriteLine ("Source commands:");
-				Console.WriteLine ("source request <name>");
-				Console.WriteLine ("source request <name> <bitrate>");
-				Console.WriteLine ("source request <name> <bitrate> <frameSize>");
+				Console.WriteLine ("Sources commands:");
+				Console.WriteLine ("sources list");
+				Console.WriteLine ("sources request <name>");
+				Console.WriteLine ("sources request <name> <bitrate>");
+				Console.WriteLine ("sources request <name> <bitrate> <frameSize>");
 				return true;
 			}
 
@@ -38,9 +39,9 @@ namespace Gablarski.Clients.CLI
 			{
 				case "request":
 				{
-					if (parts.Count == 2)
+					if (parts.Count == 3)
 						Client.Sources.Request (parts[2], 1, 512);
-					else if (parts.Count == 3)
+					else if (parts.Count == 4)
 					{
 						short frameSize;
 						int bitrate;
@@ -81,7 +82,7 @@ namespace Gablarski.Clients.CLI
 			return false;
 		}
 
-		private void OnSourceStopped(object sender, AudioSourceEventArgs e)
+		private void OnSourceStopped (object sender, AudioSourceEventArgs e)
 		{
 			var user = Client.Users[e.Source.OwnerId];
 			if (user == null)
@@ -90,7 +91,7 @@ namespace Gablarski.Clients.CLI
 			Writer.WriteLine("{0} stopped talking.", user.Nickname);
 		}
 
-		private void OnSourceStarted(object sender, AudioSourceEventArgs e)
+		private void OnSourceStarted (object sender, AudioSourceEventArgs e)
 		{
 			var user = Client.Users[e.Source.OwnerId];
 			if (user == null)
