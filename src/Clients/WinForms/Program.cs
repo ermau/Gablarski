@@ -140,8 +140,8 @@ namespace Gablarski.Clients.Windows
 					ServerEntry server = Servers.GetEntries ().FirstOrDefault (s => s.Id == id);
 					if (server == null)
 					{
-						if (m.ShowConnect (true))
-							Application.Run (m);
+						if (!m.ShowConnect (true))
+							return;
 					}
 					else
 					{
@@ -153,11 +153,14 @@ namespace Gablarski.Clients.Windows
 					Uri server = new Uri (args[0]);
 					m.Connect (server.Host, (server.Port != -1) ? server.Port : 6112);
 				}
-
-				Application.Run (m);
 			}
-			else if (m.ShowConnect (true))
-				Application.Run (m);
+			else if (Settings.ShowConnectOnStart)
+			{
+				if (!m.ShowConnect (true))
+					return;
+			}
+			
+			Application.Run (m);
 
 			Settings.SaveSettings();
 		}
