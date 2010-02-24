@@ -1,4 +1,4 @@
-// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -91,6 +91,11 @@ namespace Gablarski.Clients.CLI
 
 						if (line.StartsWith ("join"))
 							line = line.Replace ("join", "client join");
+
+						if (line == "st")
+							line = "sources talk";
+						else if (line == "et")
+							line = "sources endtalk";
 
 						foreach (var m in modules)
 						{
