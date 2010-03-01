@@ -1,4 +1,4 @@
-// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -41,7 +41,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
 using Gablarski.Messages;
 
@@ -188,6 +187,8 @@ namespace Gablarski.Network
 			this.udp = new Socket (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 			this.udp.Bind ((IPEndPoint)this.tcp.Client.LocalEndPoint);
 
+			pinger = new Timer (Ping, endpoint, 45000, 45000);
+
 			log.DebugFormat ("UDP Local Endpoint: {0}", this.udp.LocalEndPoint);
 
 			this.rwriter = new StreamValueWriter (this.rstream);
@@ -212,6 +213,11 @@ namespace Gablarski.Network
 			this.runnerThread.Start();
 		}
 
+		private void Ping (object endpoint)
+		{
+			this.udp.SendTo (new byte[] { 24, 24 }, (IPEndPoint)endpoint);
+		}
+
 		#endregion
 
 		private readonly bool debugLogging;
@@ -234,6 +240,7 @@ namespace Gablarski.Network
 
 		private readonly AutoResetEvent sendWait = new AutoResetEvent (false);
 		private readonly Queue<MessageBase> sendQueue = new Queue<MessageBase>();
+		private Timer pinger;
 
 		private void Runner()
 		{
