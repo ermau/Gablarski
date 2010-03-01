@@ -48,6 +48,7 @@ namespace Gablarski.Tests
 	public class ServerUserHandlerTests
 	{
 		private ServerUserHandler handler;
+		private MockServerConnection observer;
 		private MockServerConnection server;
 		private MockServerContext context;
 
@@ -66,6 +67,7 @@ namespace Gablarski.Tests
 
 			handler = new ServerUserHandler (context, new ServerUserManager());
 			server = new MockServerConnection();
+			observer = new MockServerConnection();
 		}
 
 		[TearDown]
@@ -73,6 +75,7 @@ namespace Gablarski.Tests
 		{
 			handler = null;
 			server = null;
+			observer = null;
 			context = null;
 		}
 
@@ -232,11 +235,20 @@ namespace Gablarski.Tests
 
 		public void JoinAsGuest (MockServerConnection connection, bool shouldWork, bool allowGuests, string serverPassword, string nickname, string userServerpassword)
 		{
+			JoinAsGuest(connection, true, shouldWork, allowGuests, serverPassword, nickname, userServerpassword);
+		}
+
+		public void JoinAsGuest (MockServerConnection connection, bool connect, bool shouldWork, bool allowGuests, string serverPassword, string nickname, string userServerpassword)
+		{
 			context.Settings.AllowGuestLogins = allowGuests;
 			context.Settings.ServerPassword = serverPassword;
 
-			handler.Manager.Connect (connection);
-			
+			if (connect)
+			{
+				handler.Manager.Connect (observer);
+				handler.Manager.Connect (connection);
+			}
+
 			handler.JoinMessage (new MessageReceivedEventArgs (connection,
 				new JoinMessage (nickname, userServerpassword)));
 			
@@ -252,9 +264,21 @@ namespace Gablarski.Tests
 				connection.Client.DequeueAndAssertMessage<ChannelListMessage>();
 				connection.Client.DequeueAndAssertMessage<UserListMessage>();
 				connection.Client.DequeueAndAssertMessage<SourceListMessage>();
+
+				observer.Client.DequeueAndAssertMessage<UserJoinedMessage>();
 			}
 			else
+			{
 				Assert.IsFalse (handler.Manager.GetIsJoined (connection));
+				observer.AssertNoMessage();
+			}
+		}
+
+		[Test]
+		public void JoinAsGuestAlreadyJoined()
+		{
+			JoinAsGuest (server, true, true, null, "Nickname", null);
+			JoinAsGuest (server, false, false, true, null, "Nickname", null);
 		}
 
 		[Test]
