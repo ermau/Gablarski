@@ -112,6 +112,10 @@ namespace Gablarski.Network
 			
 			this.running = false;
 
+			ManualResetEvent mre = new ManualResetEvent (false);
+			this.pinger.Dispose(mre);
+			mre.WaitOne();
+
 			try
 			{
 				if (this.tcp != null)
@@ -186,6 +190,7 @@ namespace Gablarski.Network
 
 			this.udp = new Socket (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 			this.udp.Bind ((IPEndPoint)this.tcp.Client.LocalEndPoint);
+			Ping (endpoint);
 
 			pinger = new Timer (Ping, endpoint, 45000, 45000);
 
