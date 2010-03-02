@@ -76,6 +76,9 @@ Section -Main SEC0000
     File ..\..\..\lib\OpenAL32.dll
     File ..\..\..\lib\OpenALSoft.License.txt
     File ..\..\..\lib\System.Data.SQLite.DLL
+    File ..\..\..\lib\System.ComponentModel.Composition.dll
+    File ..\..\..\lib\System.ComponentModel.Composition.pdb
+    File ..\..\..\lib\System.ComponentModel.Composition.License.txt
     File ..\..\Gablarski\bin\{config}\Gablarski.dll
     File ..\..\..\Gablarski.License.txt
     File ..\..\Gablarski\bin\{config}\Gablarski.pdb
@@ -179,6 +182,9 @@ Section /o -un.Main UNSEC0000
     Delete /REBOOTOK $INSTDIR\Gablarski.pdb
     Delete /REBOOTOK $INSTDIR\Gablarski.License.txt
     Delete /REBOOTOK $INSTDIR\Gablarski.dll
+    Delete /REBOOTOK $INSTDIR\System.ComponentModel.Composition.dll
+    Delete /REBOOTOK $INSTDIR\System.ComponentModel.Composition.pdb
+    Delete /REBOOTOK $INSTDIR\System.ComponentModel.Composition.License.txt
     Delete /REBOOTOK $INSTDIR\System.Data.SQLite.DLL
     Delete /REBOOTOK $INSTDIR\OpenALSoft.License.txt
     Delete /REBOOTOK $INSTDIR\OpenAL32.dll
