@@ -63,14 +63,14 @@ namespace Gablarski.Clients.CLI
 
 			if (parts.Count == 1 && parts[0].ToLower() == "sources")
 			{
-				Console.WriteLine ("Sources commands:");
-				Console.WriteLine ("sources list");
-				Console.WriteLine ("sources request <name>");
-				Console.WriteLine ("sources request <name> <bitrate>");
-				Console.WriteLine ("sources request <name> <bitrate> <frameSize>");
-				Console.WriteLine ("sources talk <id|name>");
-				Console.WriteLine ("sources talk <id|name> <channel>");
-				Console.WriteLine ("sources endtalk <id|name>");
+				Writer.WriteLine ("Sources commands:");
+				Writer.WriteLine ("sources list");
+				Writer.WriteLine ("sources request <name>");
+				Writer.WriteLine ("sources request <name> <bitrate>");
+				Writer.WriteLine ("sources request <name> <bitrate> <frameSize>");
+				Writer.WriteLine ("sources talk <id|name>");
+				Writer.WriteLine ("sources talk <id|name> <channel>");
+				Writer.WriteLine ("sources endtalk <id|name>");
 				return true;
 			}
 
@@ -85,11 +85,11 @@ namespace Gablarski.Clients.CLI
 						short frameSize;
 						int bitrate;
 						if (!Int16.TryParse (parts[3], out frameSize) || !Int32.TryParse (parts[4], out bitrate))
-							Console.WriteLine ("source request <name> <bitrate> <frameSize>");
+							Writer.WriteLine ("source request <name> <bitrate> <frameSize>");
 						else if (frameSize < 128 || frameSize > 1024)
-							Console.WriteLine ("source request <name> <bitrate> <frameSize>");
+							Writer.WriteLine ("source request <name> <bitrate> <frameSize>");
 						else if (bitrate < 32000 || bitrate > 128000)
-							Console.WriteLine ("source request <name> <bitrate> <frameSize>");
+							Writer.WriteLine ("source request <name> <bitrate> <frameSize>");
 						else
 							Client.Sources.Request (parts[2], 1, frameSize, bitrate);
 					}
@@ -101,29 +101,32 @@ namespace Gablarski.Clients.CLI
 				{
 					if (Client.Sources.Mine.Any())
 					{
-						Console.WriteLine ("My sources:");
+						Writer.WriteLine();
+						Writer.WriteLine ("My sources:");
 
 						foreach (var source in Client.Sources.Mine)
 						{
-							Console.WriteLine ("\"{0}\"", source.Name);
-							Console.WriteLine ("ID:	        {0}", source.Id);
-							Console.WriteLine ("Muted:      {0}", source.IsMuted);
-							Console.WriteLine ("Frequency:  {0}", source.Frequency);
-							Console.WriteLine ("Channels:   {0}", source.Channels);
-							Console.WriteLine ("Frame size: {0}", source.FrameSize);
-							Console.WriteLine ("Bitrate:    {0}", source.Bitrate);
+							Writer.WriteLine ("\"{0}\"", source.Name);
+							Writer.WriteLine ("ID:	        {0}", source.Id);
+							Writer.WriteLine ("Muted:      {0}", source.IsMuted);
+							Writer.WriteLine ("Frequency:  {0}", source.Frequency);
+							Writer.WriteLine ("Channels:   {0}", source.Channels);
+							Writer.WriteLine ("Frame size: {0}", source.FrameSize);
+							Writer.WriteLine ("Bitrate:    {0}", source.Bitrate);
+							Writer.WriteLine();
 						}
 					}
 
 					foreach (var source in Client.Sources)
 					{
-						Console.WriteLine ("{1}: \"{0}\"", source.Name, Client.Users[source.OwnerId].Nickname);
-						Console.WriteLine ("ID:	        {0}", source.Id);
-						Console.WriteLine ("Muted:      {0}", source.IsMuted);
-						Console.WriteLine ("Frequency:  {0}", source.Frequency);
-						Console.WriteLine ("Channels:   {0}", source.Channels);
-						Console.WriteLine ("Frame size: {0}", source.FrameSize);
-						Console.WriteLine ("Bitrate:    {0}", source.Bitrate);
+						Writer.WriteLine();
+						Writer.WriteLine ("{1}: \"{0}\"", source.Name, Client.Users[source.OwnerId].Nickname);
+						Writer.WriteLine ("ID:	        {0}", source.Id);
+						Writer.WriteLine ("Muted:      {0}", source.IsMuted);
+						Writer.WriteLine ("Frequency:  {0}", source.Frequency);
+						Writer.WriteLine ("Channels:   {0}", source.Channels);
+						Writer.WriteLine ("Frame size: {0}", source.FrameSize);
+						Writer.WriteLine ("Bitrate:    {0}", source.Bitrate);
 					}
 
 					return true;
@@ -134,7 +137,7 @@ namespace Gablarski.Clients.CLI
 					AudioSource source = FindSource ((parts.Count > 2) ? parts[2] : null);
 
 					if (source == null)
-						Console.WriteLine ("Own source '{0}' not found.", parts[2].Trim().ToLower());
+						Writer.WriteLine ("Own source '{0}' not found.", parts[2].Trim().ToLower());
 					else
 					{
 						lastTalkedId = source.Id;
@@ -161,7 +164,7 @@ namespace Gablarski.Clients.CLI
 					AudioSource source = FindSource ((parts.Count > 2) ? parts[2] : null);
 					
 					if (source == null)
-						Console.WriteLine ("Own source '{0}' not found.", parts[2].Trim().ToLower());
+						Writer.WriteLine ("Own source '{0}' not found.", parts[2].Trim().ToLower());
 					else
 						Client.Audio.EndCapture (source);
 
@@ -201,7 +204,7 @@ namespace Gablarski.Clients.CLI
 			if (user == null)
 				return;
 
-			Writer.WriteLine ("{0} started talking.", user);
+			Writer.WriteLine ("{0} started talking.", user.Nickname);
 		}
 	}
 }

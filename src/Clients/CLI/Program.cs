@@ -64,8 +64,7 @@ namespace Gablarski.Clients.CLI
 				new ChannelModule (client, Console.Out),
 				new SourceModule (client, Console.Out),
 				new ClientModule (client, Console.Out),
-
-				//new ServerModule (),
+				new ProvidersModule (client, Console.Out)
 			};
 
 			bool exit = false;
@@ -99,8 +98,8 @@ namespace Gablarski.Clients.CLI
 
 						foreach (var m in modules)
 						{
-							if (m.Process (line))
-								break;
+							if (!m.Process (line))
+								continue;
 						}
 
 						break;
