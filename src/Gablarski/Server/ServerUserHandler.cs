@@ -90,7 +90,11 @@ namespace Gablarski.Server
 			if (channel == null)
 				throw new ArgumentNullException ("channel");
 
-			throw new NotImplementedException();
+			if (user.CurrentChannelId == channel.ChannelId)
+				return;
+			
+			Manager.Move (user, channel);
+			Send (new ChannelChangeMessage (user.UserId, channel.ChannelId));
 		}
 
 		public void Send (MessageBase message, Func<IConnection, bool> predicate)
