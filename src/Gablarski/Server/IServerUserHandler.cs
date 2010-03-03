@@ -51,11 +51,10 @@ namespace Gablarski.Server
 		/// <param name="user">The user to move.</param>
 		/// <param name="targetChannel">The channel to move the user to.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="user" /> or <paramref name="targetChannel"/> is <c>null</c>.</exception>
-		/// <returns><c>true</c> if the move succeeded, <c>false</c> if it failed.</returns>
 		/// <remarks>
 		/// The main reasons for a failed move are that the user or channel no longer exists.
 		/// </remarks>
-		bool Move (UserInfo user, ChannelInfo targetChannel);
+		void Move (UserInfo user, ChannelInfo targetChannel);
 
 		void Send (MessageBase message, Func<IConnection, UserInfo, bool> predicate);
 	}

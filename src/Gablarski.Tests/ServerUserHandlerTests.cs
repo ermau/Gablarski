@@ -64,8 +64,10 @@ namespace Gablarski.Tests
 			};
 
 			context.Sources = new ServerSourceHandler (context, new ServerSourceManager (context));
+			context.Channels = new ServerChannelHandler (context);
+			context.UserManager = new ServerUserManager();
+			context.Users = handler = new ServerUserHandler (context, context.UserManager);
 
-			handler = new ServerUserHandler (context, new ServerUserManager());
 			server = new MockServerConnection();
 			observer = new MockServerConnection();
 		}
@@ -93,16 +95,52 @@ namespace Gablarski.Tests
 			Assert.Throws<ArgumentNullException> (() => handler.Move (new UserInfo(), null));
 		}
 
-		//[Test]
-		//public void Move()
-		//{
-		//    Connect();
-		//    JoinAsGuest();
+		[Test]
+		public void MoveToUnknownChannel()
+		{
+			Connect();
+			JoinAsGuest();
 
-		//    UserInfo user = handler.First();
-			
-		//    server.Client.DequeueAndAssertMessage<ChannelChangeResultMessage>();
-		//}
+			UserInfo user = handler.First();
+
+			handler.Move (user, new ChannelInfo());
+
+			server.Client.AssertNoMessage();
+		}
+
+		[Test]
+		public void MoveToSameChannel()
+		{
+			Connect();
+			JoinAsGuest();
+
+			UserInfo user = handler.First();
+
+			handler.Move (user, context.Channels[user.CurrentChannelId]);
+
+			server.Client.AssertNoMessage();
+		}
+
+		[Test]
+		public void Move()
+		{
+			var altChannel = new ChannelInfo { Name = "Channel 2" };
+			context.ChannelsProvider.SaveChannel (altChannel);
+			altChannel = context.ChannelsProvider.GetChannels().Single (c => c.Name == "Channel 2");
+
+		    Connect();
+		    JoinAsGuest();
+
+		    UserInfo user = handler.First();
+
+			handler.Move (user, altChannel);
+
+		    var move = server.Client.DequeueAndAssertMessage<UserChangedChannelMessage>();
+			Assert.AreEqual (user.UserId, move.ChangeInfo.TargetUserId);
+			Assert.AreEqual (altChannel.ChannelId, move.ChangeInfo.TargetChannelId);
+			Assert.AreEqual (1, move.ChangeInfo.PreviousChannelId);
+			Assert.AreEqual (0, move.ChangeInfo.RequestingUserId);
+		}
 
 		[Test]
 		public void SendNull()

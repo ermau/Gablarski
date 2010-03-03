@@ -83,18 +83,29 @@ namespace Gablarski.Server
 			Manager.Disconnect (predicate);
 		}
 
-		public bool Move (UserInfo user, ChannelInfo channel)
+		public void Move (UserInfo user, ChannelInfo channel)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
 			if (channel == null)
 				throw new ArgumentNullException ("channel");
 
-			if (user.CurrentChannelId == channel.ChannelId)
+			int previousChannel = user.CurrentChannelId;
+
+			if (previousChannel == channel.ChannelId)
 				return;
-			
-			Manager.Move (user, channel);
-			Send (new ChannelChangeMessage (user.UserId, channel.ChannelId));
+
+			var realUser = this[user.UserId];
+			if (realUser == null)
+				return;
+
+			var realChannel = context.Channels[channel.ChannelId];
+			if (realChannel == null)
+				return;
+
+			Manager.Move (realUser, realChannel);
+			this.Send (new UserChangedChannelMessage { ChangeInfo =
+				new ChannelChangeInfo (user.UserId, channel.ChannelId, previousChannel) });
 		}
 
 		public void Send (MessageBase message, Func<IConnection, bool> predicate)
