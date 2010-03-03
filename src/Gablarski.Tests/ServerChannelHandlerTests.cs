@@ -60,14 +60,17 @@ namespace Gablarski.Tests
 			permissions = new MockPermissionsProvider();
 			channels = new LobbyChannelProvider();
 
-			context = new MockServerContext
+			MockServerContext mcontext;
+			context = mcontext = new MockServerContext
 			{
 				ChannelsProvider = channels,
 				PermissionsProvider = permissions,
-				UserManager = new ServerUserManager ()
+				UserManager = new ServerUserManager (),
+				Settings = new ServerSettings { Name = "Test Server" }
 			};
 
-			handler = new ServerChannelHandler (context);
+			mcontext.Users = new ServerUserHandler (context, context.UserManager);
+			mcontext.Channels = handler = new ServerChannelHandler (context);
 
 			user = UserInfoTests.GetTestUser (1, 1, false);
 			server = new MockServerConnection();
@@ -116,6 +119,37 @@ namespace Gablarski.Tests
 			var msg = c.Client.DequeueAndAssertMessage<ChannelListMessage>();
 			Assert.AreEqual (GenericResult.Success, msg.Result);
 			ChannelInfoTests.AssertChanelsAreEqual (channels.GetChannels().Single(), msg.Channels.Single());
+		}
+
+		[Test]
+		public void DeleteChannelUserIsIn()
+		{
+			channels.SaveChannel (new ChannelInfo { Name = "Channel 2" });
+			server.Client.DequeueAndAssertMessage<ChannelListMessage>();
+
+			var channel = channels.GetChannels().Single (c => c.Name == "Channel 2");
+			context.Users.Move (user, channel);
+			server.Client.DequeueAndAssertMessage<UserChangedChannelMessage>();
+
+			permissions.EnablePermissions (user.UserId, PermissionName.DeleteChannel, PermissionName.RequestChannelList);
+			
+			handler.ChannelEditMessage (new MessageReceivedEventArgs (server, new ChannelEditMessage
+			{
+				Channel = channel,
+				Delete = true
+			}));
+
+			var moved = server.Client.DequeueAndAssertMessage<UserChangedChannelMessage>();
+			Assert.AreEqual (user.UserId, moved.ChangeInfo.TargetUserId);
+			Assert.AreEqual (channels.GetChannels().Single().ChannelId, moved.ChangeInfo.TargetChannelId);
+			Assert.AreEqual (channel.ChannelId, moved.ChangeInfo.PreviousChannelId);
+			Assert.AreEqual (0, moved.ChangeInfo.RequestingUserId);
+
+			server.Client.DequeueAndAssertMessage<ChannelListMessage>();
+
+			var result = server.Client.DequeueAndAssertMessage<ChannelEditResultMessage>();
+			Assert.AreEqual (channel.ChannelId, result.ChannelId);
+			Assert.AreEqual (ChannelEditResult.Success, result.Result);
 		}
 	}
 }
