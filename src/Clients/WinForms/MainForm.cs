@@ -713,6 +713,9 @@ namespace Gablarski.Clients.Windows
 
 			SettingsForm settingsForm = new SettingsForm();
 			settingsForm.ShowDialog();
+
+			if (inputProvider == null)
+				SetupInput();
 		}
 
 		private ICaptureProvider musicprovider;
