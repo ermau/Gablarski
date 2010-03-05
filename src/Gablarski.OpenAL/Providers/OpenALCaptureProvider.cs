@@ -59,9 +59,18 @@ namespace Gablarski.OpenAL.Providers
 			}
 		}
 
-		public bool CanCaptureStereo
+		public IEnumerable<AudioFormat> SupportedFormats
 		{
-			get { return true; }
+			get
+			{
+				return new[]
+				{
+					AudioFormat.Mono8Bit,
+					AudioFormat.Mono16Bit,
+					AudioFormat.Stereo8Bit,
+					AudioFormat.Stereo16Bit,
+				};
+			}
 		}
 
 		public IAudioDevice Device
@@ -85,13 +94,13 @@ namespace Gablarski.OpenAL.Providers
 		}
 
 		private bool isOpened;
-		public void BeginCapture (Audio.AudioFormat format)
+		public void BeginCapture (int frequency, AudioFormat format)
 		{
 			CheckDevice();
 
 			if (!this.isOpened)
 			{
-				this.device.Open (44100, GetOpenALFormat (format));
+				this.device.Open ((uint)frequency, format.ToOpenALFormat());
 				this.isOpened = true;
 			}
 
@@ -167,31 +176,6 @@ namespace Gablarski.OpenAL.Providers
 		{
 			if (this.device == null)
 				throw new InvalidOperationException ("No device set.");
-		}
-
-		internal static AudioFormat GetOpenALFormat (Audio.AudioFormat format)
-		{
-			AudioFormat oalFormat = AudioFormat.Mono16Bit;
-			switch (format)
-			{
-				case Audio.AudioFormat.Mono16Bit:
-					oalFormat = AudioFormat.Mono16Bit;
-					break;
-
-				case Audio.AudioFormat.Mono8Bit:
-					oalFormat = AudioFormat.Mono8Bit;
-					break;
-
-				case Audio.AudioFormat.Stereo16Bit:
-					oalFormat = AudioFormat.Stereo16Bit;
-					break;
-
-				case Audio.AudioFormat.Stereo8Bit:
-					oalFormat = AudioFormat.Stereo8Bit;
-					break;
-			}
-
-			return oalFormat;
 		}
 	}
 }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -37,7 +37,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Gablarski.Messages
 {
@@ -48,10 +47,10 @@ namespace Gablarski.Messages
 		User = 1,
 	}
 
-	public class SendAudioDataMessage
+	public class ClientAudioDataMessage
 		: ClientMessage
 	{
-		public SendAudioDataMessage ()
+		public ClientAudioDataMessage ()
 			: base (ClientMessageType.AudioData)
 		{
 		}
@@ -67,6 +66,12 @@ namespace Gablarski.Messages
 			get;
 			set;
 		}
+		
+		public int Sequence
+		{
+			get;
+			set;
+		}
 
 		public int SourceId
 		{
@@ -74,7 +79,7 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public byte[] Data
+		public byte[][] Data
 		{
 			get;
 			set;
@@ -93,14 +98,18 @@ namespace Gablarski.Messages
 			for (int i = 0; i < TargetIds.Length; ++i)
 				writer.WriteInt32 (TargetIds[i]);
 
-			writer.WriteInt32 (this.SourceId);
-			writer.WriteBytes (this.Data);
+			writer.WriteInt32 (Sequence);
+			writer.WriteInt32 (SourceId);
+
+			writer.WriteByte ((byte)Data.Length);
+			for (int i = 0; i < Data.Length; ++i)
+				writer.WriteBytes (Data[i]);
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
 			this.TargetType = (TargetType)reader.ReadByte();
-
+			
 			ushort numTargets = reader.ReadUInt16();
 			int[] targets = new int[numTargets];
 			for (int i = 0; i < targets.Length; ++i)
@@ -108,8 +117,14 @@ namespace Gablarski.Messages
 
 			TargetIds = targets;
 			
-			this.SourceId = reader.ReadInt32();
-			this.Data = reader.ReadBytes();
+			Sequence = reader.ReadInt32();
+			SourceId = reader.ReadInt32();
+
+			byte frames = reader.ReadByte();
+			Data = new byte[frames][];
+
+			for (int i = 0; i < frames; ++i)
+				Data[i] = reader.ReadBytes();
 		}
 	}
 }

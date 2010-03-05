@@ -57,7 +57,7 @@ namespace Gablarski.Tests
 		public void Setup()
 		{
 			this.provider = new MockCaptureProvider();
-			this.source = new AudioSource ("mockSource", 1, 1, 1, 64000, 44100, 256, 10, false);
+			this.source = new AudioSource ("mockSource", 1, 1, AudioFormat.Mono16Bit, 64000, 44100, 256, 10, false);
 
 			var client = new GablarskiClient (new MockClientConnection (new MockConnectionProvider().EstablishConnection()));
 			this.context = client;
@@ -80,9 +80,9 @@ namespace Gablarski.Tests
 		{
 			var engine = new AudioEngine();
 
-			Assert.Throws<ArgumentNullException> (() => engine.Attach (null, AudioFormat.Mono16Bit, this.source, new AudioEngineCaptureOptions()));
-			Assert.Throws<ArgumentNullException> (() => engine.Attach (this.provider, AudioFormat.Mono16Bit, null, new AudioEngineCaptureOptions()));
-			Assert.Throws<ArgumentNullException> (() => engine.Attach (this.provider, AudioFormat.Mono16Bit, this.source,  null));
+			Assert.Throws<ArgumentNullException> (() => engine.Attach (null, this.source, new AudioEngineCaptureOptions()));
+			Assert.Throws<ArgumentNullException> (() => engine.Attach (this.provider, null, new AudioEngineCaptureOptions()));
+			Assert.Throws<ArgumentNullException> (() => engine.Attach (this.provider, this.source, null));
 		}
 
 		[Test]
@@ -205,7 +205,7 @@ namespace Gablarski.Tests
 		{
 		    var engine = new AudioEngine();
 
-		    engine.Attach (this.provider, AudioFormat.Mono16Bit, this.source, new AudioEngineCaptureOptions());
+		    engine.Attach (this.provider, this.source, new AudioEngineCaptureOptions());
 		    Assert.IsTrue (engine.Detach (this.source));
 		}
 
@@ -214,7 +214,7 @@ namespace Gablarski.Tests
 		{
 		    var engine = new AudioEngine();
 
-		    engine.Attach (this.provider, AudioFormat.Mono16Bit, this.source, new AudioEngineCaptureOptions());
+		    engine.Attach (this.provider, this.source, new AudioEngineCaptureOptions());
 		    Assert.IsTrue (engine.Detach (this.provider));
 		}
 

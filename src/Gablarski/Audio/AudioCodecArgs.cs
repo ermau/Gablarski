@@ -42,7 +42,7 @@ namespace Gablarski.Audio
 	public class AudioCodecArgs : IEquatable<AudioCodecArgs>
 	{
 		public AudioCodecArgs()
-			: this (1, 48000, 44100, 512, 10)
+			: this (AudioFormat.Mono16Bit, 48000, 44100, 512, 10)
 		{
 		}
 
@@ -51,16 +51,16 @@ namespace Gablarski.Audio
 			if (args == null)
 				throw new ArgumentNullException ("args");
 
-			Channels = args.Channels;
+			Format = args.Format;
 			Bitrate = args.Bitrate;
 			Frequency = args.Frequency;
 			FrameSize = args.FrameSize;
 			Complexity = args.Complexity;
 		}
 
-		public AudioCodecArgs (byte channels, int bitrate, int frequency, short frameSize, byte complexity)
+		public AudioCodecArgs (AudioFormat format, int bitrate, int frequency, short frameSize, byte complexity)
 		{
-			Channels = channels;
+			Format = format;
 			Bitrate = bitrate;
 			Frequency = frequency;
 			FrameSize = frameSize;
@@ -108,19 +108,11 @@ namespace Gablarski.Audio
 		}
 
 		/// <summary>
-		/// Gets the number of audio channels in this source.
+		/// Gets the audio format of this source.
 		/// </summary>
-		public byte Channels
+		public AudioFormat Format
 		{
-			get { return this.channels; }
-
-			protected internal set
-			{
-				if (IsInvalidChannels(value))
-					throw new ArgumentOutOfRangeException ("value");
-
-				this.channels = value;
-			}
+			get; set;
 		}
 
 		/// <summary>
@@ -155,6 +147,7 @@ namespace Gablarski.Audio
 			}
 		}
 
+
 		public override bool Equals (object obj)
 		{
 			if (ReferenceEquals (null, obj))
@@ -185,6 +178,7 @@ namespace Gablarski.Audio
 				result = (result * 397) ^ this.complexity.GetHashCode();
 				result = (result * 397) ^ this.bitrate;
 				result = (result * 397) ^ this.frequency;
+				result = (result * 397) ^ this.Format.GetHashCode();
 				return result;
 			}
 		}
@@ -197,20 +191,20 @@ namespace Gablarski.Audio
 
 		protected internal virtual void Serialize (IValueWriter writer)
 		{
-			writer.WriteInt32 (this.Bitrate);
-			writer.WriteByte (this.Channels);
-			writer.WriteInt32 (this.Frequency);
-			writer.WriteInt16 (this.FrameSize);
-			writer.WriteByte (this.Complexity);
+			writer.WriteByte ((byte) Format);
+			writer.WriteInt32 (Bitrate);
+			writer.WriteInt32 (Frequency);
+			writer.WriteInt16 (FrameSize);
+			writer.WriteByte (Complexity);
 		}
 
 		protected internal virtual void Deserialize (IValueReader reader)
 		{
-			this.Bitrate = reader.ReadInt32();
-			this.Channels = reader.ReadByte();
-			this.Frequency = reader.ReadInt32();
-			this.FrameSize = reader.ReadInt16();
-			this.Complexity = reader.ReadByte();
+			Format = (AudioFormat)reader.ReadByte();
+			Bitrate = reader.ReadInt32();
+			Frequency = reader.ReadInt32();
+			FrameSize = reader.ReadInt16();
+			Complexity = reader.ReadByte();
 		}
 
 		public static bool IsInvalidFrameSize (short value)
@@ -221,11 +215,6 @@ namespace Gablarski.Audio
 		public static bool IsInvalidFrequency (int value)
 		{
 			return value < 20000 || value > 96000;
-		}
-
-		public static bool IsInvalidChannels (byte value)
-		{
-			return value < 1 || value > 2;
 		}
 
 		public static bool IsInvalidComplexity (byte value)

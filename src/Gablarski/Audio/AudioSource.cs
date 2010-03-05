@@ -57,13 +57,13 @@ namespace Gablarski.Audio
 		{
 		}
 
-		internal AudioSource (string name, int sourceId, int ownerId, byte channels, int bitrate, int frequency, short frameSize, byte complexity)
-			: this(name, sourceId, ownerId, channels, bitrate, frequency, frameSize, complexity, false)
+		internal AudioSource (string name, int sourceId, int ownerId, AudioFormat format, int bitrate, int frequency, short frameSize, byte complexity)
+			: this(name, sourceId, ownerId, format, bitrate, frequency, frameSize, complexity, false)
 		{
 		}
 
-		internal AudioSource (string name, int sourceId, int ownerId, byte channels, int bitrate, int frequency, short frameSize, byte complexity, bool isMuted)
-			: this (name, sourceId, ownerId, isMuted, new AudioCodecArgs (channels, bitrate, frequency, frameSize, complexity))
+		internal AudioSource (string name, int sourceId, int ownerId, AudioFormat format, int bitrate, int frequency, short frameSize, byte complexity, bool isMuted)
+			: this (name, sourceId, ownerId, isMuted, new AudioCodecArgs (format, bitrate, frequency, frameSize, complexity))
 		{
 		}
 

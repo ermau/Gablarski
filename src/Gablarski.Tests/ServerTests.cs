@@ -262,15 +262,14 @@ namespace Gablarski.Tests
 			var c = Connect();
 			var u = Join (false, c, Nickname);
 
-			c.Client.Send (new RequestSourceMessage ("source", new AudioCodecArgs (1, 64000, 44100, 512, 10)));
+			var args = AudioCodecArgsTests.GetTestArgs();
+			c.Client.Send (new RequestSourceMessage ("source", args));
 
 			var msg = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.Succeeded, msg.SourceResult);
 			Assert.AreEqual ("source", msg.Source.Name);
-			Assert.AreEqual (1, msg.Source.Channels);
-			Assert.AreEqual (64000, msg.Source.Bitrate);
-			Assert.AreEqual (512, msg.Source.FrameSize);
 			Assert.AreEqual (false, msg.Source.IsMuted);
+			AudioCodecArgsTests.AssertAreEqual (args, msg.Source);
 		}
 
 		//[Test]
@@ -295,7 +294,7 @@ namespace Gablarski.Tests
 		    var c = Connect();
 		    var u = Join (false, c, Nickname);
 
-		    c.Client.Send (new RequestSourceMessage ("source", new AudioCodecArgs (1, 64000, 44100, 512, 10)));
+		    c.Client.Send (new RequestSourceMessage ("source", AudioCodecArgsTests.GetTestArgs()));
 		    c.Client.DequeueAndAssertMessage<SourceResultMessage>();
 
 		    c.Client.Send (new ClientAudioSourceStateChangeMessage { Starting = true, SourceId = 1 });

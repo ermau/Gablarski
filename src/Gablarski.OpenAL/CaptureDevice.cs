@@ -1,4 +1,4 @@
-// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -70,7 +70,7 @@ namespace Gablarski.OpenAL
 		/// <summary>
 		/// Gets the current format of the capture device.
 		/// </summary>
-		public AudioFormat Format
+		public OpenALAudioFormat Format
 		{
 			get;
 			private set;
@@ -99,7 +99,7 @@ namespace Gablarski.OpenAL
 		/// <param name="frequency">The frequency to open the capture device with.</param>
 		/// <param name="format">The audio format to open the device with.</param>
 		/// <returns>Returns <c>this</c>.</returns>
-		public unsafe CaptureDevice Open (uint frequency, AudioFormat format)
+		public unsafe CaptureDevice Open (uint frequency, OpenALAudioFormat format)
 		{
 			ThrowIfDisposed();
 			
@@ -214,7 +214,7 @@ namespace Gablarski.OpenAL
 		private static extern void alcCaptureSamples (IntPtr device, IntPtr buffer, int numSamples);
 
 		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
-		private static extern IntPtr alcCaptureOpenDevice (string deviceName, uint frequency, AudioFormat format, int bufferSize);
+		private static extern IntPtr alcCaptureOpenDevice (string deviceName, uint frequency, OpenALAudioFormat format, int bufferSize);
 
 		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
 		private static extern void alcCaptureCloseDevice (IntPtr device);
@@ -230,7 +230,8 @@ namespace Gablarski.OpenAL
 		{
 			ThrowIfDisposed();
 
-			byte[] samples = new byte[numSamples * 2];
+			int bytesPerSample = (int)Format.GetBytesPerSample();
+			byte[] samples = new byte[numSamples * bytesPerSample];
 
 			while (this.capturing && block && this.AvailableSamples < numSamples)
 				Thread.Sleep (0);
@@ -239,7 +240,7 @@ namespace Gablarski.OpenAL
 			if (diff > 0)
 			{
 				numSamples -= diff;
-				for (int i = diff * 2; i < samples.Length; i++)
+				for (int i = diff * bytesPerSample; i < samples.Length; i++)
 				{
 					samples[i] = 0;
 					samples[++i] = 0;

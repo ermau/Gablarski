@@ -1,4 +1,4 @@
-// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -132,7 +132,7 @@ namespace Gablarski.Audio
 			}
 		}
 
-		public void Attach (ICaptureProvider capture, AudioFormat format, AudioSource source, AudioEngineCaptureOptions options)
+		public void Attach (ICaptureProvider capture, AudioSource source, AudioEngineCaptureOptions options)
 		{
 			if (capture == null)
 				throw new ArgumentNullException ("capture");
@@ -146,8 +146,8 @@ namespace Gablarski.Audio
 
 			lock (captures)
 			{
-				capture.BeginCapture (format);
-				captures[source] = new AudioCaptureEntity (capture, format, source, options);
+				capture.BeginCapture (source.Frequency, source.Format);
+				captures[source] = new AudioCaptureEntity (capture, source, options);
 
 				if (this.captureMuted || mutedCaptures.Contains (capture))
 					captures[source].Muted = true;
@@ -170,7 +170,7 @@ namespace Gablarski.Audio
 				if (c.Talking && c.Options.Mode != options.Mode)
 					AudioSender.EndSending (source);
 				
-				var newc = new AudioCaptureEntity (c.Capture, c.Format, source, options);
+				var newc = new AudioCaptureEntity (c.Capture, source, options);
 				newc.TargetType = c.TargetType;
 				newc.CurrentTargets = c.CurrentTargets;
 
@@ -490,13 +490,22 @@ namespace Gablarski.Audio
 			if (this.playbackMuted)
 				return;
 
-			byte[] decoded = e.Source.Decode (e.AudioData);
-
+			AudioPlaybackEntity entity;
 			lock (playbacks)
 			{
-				AudioPlaybackEntity entity;
-				if (playbacks.TryGetValue (e.Source, out entity) && !entity.Muted)
-					entity.Playback.QueuePlayback (e.Source, decoded);
+				if (!playbacks.TryGetValue (e.Source, out entity) || entity.Muted)
+					return;
+			}
+
+			for (int i = 0; i < e.AudioData.Length; ++i)
+			{
+				byte[] decoded = e.Source.Decode (e.AudioData[i]);
+
+				lock (playbacks)
+				{
+					if (!entity.Muted)
+						entity.Playback.QueuePlayback (e.Source, decoded);
+				}
 			}
 		}
 
@@ -578,24 +587,46 @@ namespace Gablarski.Audio
 								entity.CurrentTargets = new[] { Context.GetCurrentChannel().ChannelId };
 							}
 
-							while (entity.Capture.AvailableSampleCount > source.FrameSize)
+							AudioEngineCaptureMode mode = entity.Options.Mode;
+							
+							int framesAvailable = entity.Capture.AvailableSampleCount / source.FrameSize;
+							int talkingFrames = (mode == AudioEngineCaptureMode.Explicit) ? framesAvailable : 0;
+							int talkingIndex = -1;
+
+							byte[][] frames = new byte[framesAvailable][];
+							for (int i = 0; i < framesAvailable; ++i)
 							{
 								byte[] samples = entity.Capture.ReadSamples (source.FrameSize);
-								if (entity.Options.Mode == AudioEngineCaptureMode.Activated)
+								if (mode == AudioEngineCaptureMode.Activated)
 								{
 									talking = entity.VoiceActivation.IsTalking (samples);
-	
+									if (talking)
+									{
+										talkingFrames++;
+										if (talkingIndex == -1)
+											talkingIndex = i;
+									}
+
 									if (talking && !entity.Talking)
 										AudioSender.BeginSending (source);
 								}
-									
-								if (talking)
-									AudioSender.SendAudioData (source, entity.TargetType, entity.CurrentTargets, samples);
-								else if (entity.Talking && entity.Options.Mode == AudioEngineCaptureMode.Activated)
-									AudioSender.EndSending (source);
 
-								entity.Talking = talking;
+								frames[i] = samples;
 							}
+
+							if (talkingFrames != frames.Length)
+							{
+								byte[][] actualFrames = new byte[talkingFrames][];
+								Array.Copy (frames, talkingIndex, actualFrames, 0, talkingFrames);
+								frames = actualFrames;
+							}
+
+							if (talking)
+								AudioSender.SendAudioData (source, entity.TargetType, entity.CurrentTargets, frames);
+							else if (entity.Talking && entity.Options.Mode == AudioEngineCaptureMode.Activated)
+								AudioSender.EndSending (source);
+
+							entity.Talking = talking;
 						}
 
 						if (!skipSwitch)

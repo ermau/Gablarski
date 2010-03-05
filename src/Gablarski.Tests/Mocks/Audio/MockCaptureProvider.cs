@@ -35,9 +35,18 @@ namespace Gablarski.Tests.Mocks.Audio
 			get { return captureDevice; }
 		}
 
-		public bool CanCaptureStereo
+		public IEnumerable<AudioFormat> SupportedFormats
 		{
-			get { return true; }
+			get
+			{
+				return new[]
+				{
+					AudioFormat.Mono8Bit,
+					AudioFormat.Mono16Bit,
+					AudioFormat.Stereo8Bit,
+					AudioFormat.Stereo16Bit,
+				};
+			}
 		}
 
 		public int AvailableSampleCount
@@ -68,7 +77,7 @@ namespace Gablarski.Tests.Mocks.Audio
 
 		public bool IsCapturing { get; private set; }
 
-		public void BeginCapture (AudioFormat format)
+		public void BeginCapture (int frequency, AudioFormat format)
 		{
 			this.IsCapturing = true;
 		}

@@ -89,7 +89,7 @@ namespace Gablarski.Audio
 	public class ReceivedAudioEventArgs
 		: AudioSourceEventArgs
 	{
-		public ReceivedAudioEventArgs (AudioSource source, byte[] data)
+		public ReceivedAudioEventArgs (AudioSource source, byte[][] data)
 			: base (source)
 		{
 			this.AudioData = data;
@@ -98,7 +98,7 @@ namespace Gablarski.Audio
 		/// <summary>
 		/// Gets the audio data.
 		/// </summary>
-		public byte[] AudioData
+		public byte[][] AudioData
 		{
 			get;
 			private set;

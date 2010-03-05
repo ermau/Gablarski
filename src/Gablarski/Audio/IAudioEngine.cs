@@ -126,11 +126,10 @@ namespace Gablarski.Audio
 		/// Starts a capture with the given <paramref name="capture"/> pumped to the <paramref name="source"/> with the given <paramref name="options"/>.
 		/// </summary>
 		/// <param name="capture">The provider to pump the audio from. (If the device is not preselected, the default device will be used.)</param>
-		/// <param name="format">The format to capture audio in.</param>
 		/// <param name="source">The audio source to pump the audio to.</param>
 		/// <param name="options">Capturing options.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="capture"/> or <paramref name="source"/> or <paramref name="options"/> are <c>null</c>.</exception>
-		void Attach (ICaptureProvider capture, AudioFormat format, AudioSource source, AudioEngineCaptureOptions options);
+		void Attach (ICaptureProvider capture,AudioSource source, AudioEngineCaptureOptions options);
 
 		/// <summary>
 		/// Updates <paramref name="source"/> with <paramref name="options"/>.

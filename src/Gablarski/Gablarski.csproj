@@ -136,7 +136,6 @@
     <Compile Include="Messages\SetStatusMessage.cs" />
     <Compile Include="Messages\UserUpdatedMessage.cs" />
     <Compile Include="ModuleSelectableAttribute.cs" />
-    <Compile Include="MusicFileCaptureProvider.cs" />
     <Compile Include="ChannelInfo.cs" />
     <Compile Include="Client\ClientChannelManager.cs" />
     <Compile Include="Client\GablarskiClient.cs" />
@@ -149,7 +148,7 @@
     <Compile Include="IClientConnection.cs" />
     <Compile Include="IConnection.cs" />
     <Compile Include="LoginResult.cs" />
-    <Compile Include="Messages\AudioDataReceivedMessage.cs" />
+    <Compile Include="Messages\ServerAudioDataMessage.cs" />
     <Compile Include="Messages\ChannelChangeMessage.cs" />
     <Compile Include="Messages\ChannelEditMessage.cs" />
     <Compile Include="Messages\ChannelEditResultMessage.cs" />
@@ -162,7 +161,7 @@
     <Compile Include="Messages\RequestChannelListMessage.cs" />
     <Compile Include="Messages\RequestUserListMessage.cs" />
     <Compile Include="Messages\RequestSourceListMessage.cs" />
-    <Compile Include="Messages\SendAudioDataMessage.cs" />
+    <Compile Include="Messages\ClientAudioDataMessage.cs" />
     <Compile Include="Messages\UserListMessage.cs" />
     <Compile Include="Messages\RequestSourceMessage.cs" />
     <Compile Include="Messages\ServerInfoMessage.cs" />
@@ -228,10 +227,6 @@
     <Compile Include="Client\ClientUserManager.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Audio\CELT\libcelt.dll" />
-    <None Include="Audio\CELT\libcelt.license.txt" />
-    <None Include="Audio\Speex\libspeexdsp.dll" />
-    <None Include="Audio\Speex\libspeexdsp.license.txt" />
     <None Include="Gablarski.dll.config" />
   </ItemGroup>
   <ItemGroup>

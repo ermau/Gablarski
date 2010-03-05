@@ -117,7 +117,7 @@ namespace Gablarski.Clients.CLI
 
 				if (Client.Sources.Mine.Any())
 				{
-					Client.Audio.Attach (value, AudioFormat.Mono16Bit, Client.Sources.Mine.Single(),
+					Client.Audio.Attach (value, Client.Sources.Mine.Single(),
 					                     new AudioEngineCaptureOptions {Mode = AudioEngineCaptureMode.Explicit});
 				}
 				
@@ -236,7 +236,7 @@ namespace Gablarski.Clients.CLI
 				Client.Audio.Attach (SelectedPlayback, e.Source, new AudioEnginePlaybackOptions());
 			else if (SelectedCapture != null && e.Result == Messages.SourceResult.Succeeded)
 			{
-				Client.Audio.Attach (SelectedCapture, AudioFormat.Mono16Bit, e.Source,
+				Client.Audio.Attach (SelectedCapture, e.Source,
 				                     new AudioEngineCaptureOptions { Mode = AudioEngineCaptureMode.Explicit });
 			}
 		}
@@ -252,7 +252,7 @@ namespace Gablarski.Clients.CLI
 
 			if (SelectedCapture != null && Client.Sources.Mine.Any())
 			{
-				Client.Audio.Attach (SelectedCapture, AudioFormat.Mono16Bit, Client.Sources.Mine.Single(),
+				Client.Audio.Attach (SelectedCapture, Client.Sources.Mine.Single(),
 				                     new AudioEngineCaptureOptions {Mode = AudioEngineCaptureMode.Explicit});
 			}
 		}

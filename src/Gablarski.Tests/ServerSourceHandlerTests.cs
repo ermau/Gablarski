@@ -133,7 +133,7 @@ namespace Gablarski.Tests
 			c.Disconnect();
 
 			handler.RequestSourceMessage (new MessageReceivedEventArgs (c,
-				new RequestSourceMessage ("Name", new AudioCodecArgs (1, 64000, 44100, 512, 10))));
+				new RequestSourceMessage ("Name", AudioCodecArgsTests.GetTestArgs())));
 
 			c.Client.AssertNoMessage();
 		}
@@ -145,7 +145,7 @@ namespace Gablarski.Tests
 			context.UserManager.Connect (c);
 
 			handler.RequestSourceMessage (new MessageReceivedEventArgs (c,
-				new RequestSourceMessage ("Name", new AudioCodecArgs (1, 64000, 44100, 512, 10))));
+				new RequestSourceMessage ("Name", AudioCodecArgsTests.GetTestArgs())));
 
 			c.Client.AssertNoMessage();
 		}
@@ -165,7 +165,7 @@ namespace Gablarski.Tests
 		{
 			permissions.EnablePermissions (context.UserManager.GetUser (connection).UserId,	PermissionName.RequestSource);
 
-			var audioArgs = new AudioCodecArgs (1, 64000, 44100, 512, 10);
+			var audioArgs = new AudioCodecArgs (AudioFormat.Mono16Bit, 64000, 44100, 512, 10);
 			handler.RequestSourceMessage (new MessageReceivedEventArgs (connection,
 				new RequestSourceMessage ("Name", audioArgs)));
 
@@ -186,7 +186,7 @@ namespace Gablarski.Tests
 		{
 			permissions.EnablePermissions (user.UserId, PermissionName.RequestSource);
 
-			var audioArgs = new AudioCodecArgs (1, 0, 44100, 512, 10);
+			var audioArgs = new AudioCodecArgs (AudioFormat.Mono16Bit, 0, 44100, 512, 10);
 			handler.RequestSourceMessage (new MessageReceivedEventArgs (server, new RequestSourceMessage ("Name", audioArgs)));
 
 			var result = server.Client.DequeueAndAssertMessage<SourceResultMessage>();
@@ -205,7 +205,7 @@ namespace Gablarski.Tests
 		{
 			permissions.EnablePermissions (user.UserId, PermissionName.RequestSource);
 
-			var audioArgs = new AudioCodecArgs (1, 200000, 44100, 512, 10);
+			var audioArgs = new AudioCodecArgs (AudioFormat.Mono16Bit, 200000, 44100, 512, 10);
 			handler.RequestSourceMessage (new MessageReceivedEventArgs (server, new RequestSourceMessage ("Name", audioArgs)));
 			
 			var result = server.Client.DequeueAndAssertMessage<SourceResultMessage>();
@@ -224,7 +224,7 @@ namespace Gablarski.Tests
 		{
 			permissions.EnablePermissions (user.UserId, PermissionName.RequestSource);
 
-			var audioArgs = new AudioCodecArgs (1, 1, 44100, 512, 10);
+			var audioArgs = new AudioCodecArgs (AudioFormat.Mono16Bit, 1, 44100, 512, 10);
 			handler.RequestSourceMessage (new MessageReceivedEventArgs (server, new RequestSourceMessage ("Name", audioArgs)));
 			
 			var result = server.Client.DequeueAndAssertMessage<SourceResultMessage>();
@@ -243,7 +243,7 @@ namespace Gablarski.Tests
 		{
 			permissions.EnablePermissions (user.UserId, PermissionName.RequestSource);
 
-			var audioArgs = new AudioCodecArgs (1, 64000, 44100, 512, 10);
+			var audioArgs = AudioCodecArgsTests.GetTestArgs();
 			handler.RequestSourceMessage (new MessageReceivedEventArgs (server,
 				new RequestSourceMessage ("Name", audioArgs)));
 
@@ -266,7 +266,7 @@ namespace Gablarski.Tests
 			context.UserManager.Connect (c);
 			context.UserManager.Join (c, UserInfoTests.GetTestUser (2));
 
-			var audioArgs = new AudioCodecArgs (1, 64000, 44100, 512, 10);
+			var audioArgs = AudioCodecArgsTests.GetTestArgs();
 			handler.RequestSourceMessage (new MessageReceivedEventArgs (server,
 				new RequestSourceMessage ("Name", audioArgs)));
 
@@ -306,7 +306,7 @@ namespace Gablarski.Tests
 		public void RequestSourceList()
 		{
 			permissions.EnablePermissions (user.UserId, PermissionName.RequestSource);
-			var audioArgs = new AudioCodecArgs (1, 64000, 44100, 512, 10);
+			var audioArgs = AudioCodecArgsTests.GetTestArgs();
 			handler.RequestSourceMessage (new MessageReceivedEventArgs (server,
 				new RequestSourceMessage ("Name", audioArgs)));
 
@@ -335,7 +335,7 @@ namespace Gablarski.Tests
 		public void RequestSourceListFromViewer()
 		{
 			permissions.EnablePermissions (user.UserId, PermissionName.RequestSource);
-			var audioArgs = new AudioCodecArgs (1, 64000, 44100, 512, 10);
+			var audioArgs = AudioCodecArgsTests.GetTestArgs();
 			handler.RequestSourceMessage (new MessageReceivedEventArgs (server,
 				new RequestSourceMessage ("Name", audioArgs)));
 
@@ -366,7 +366,7 @@ namespace Gablarski.Tests
 		public void RequestUpdatedSourceList()
 		{
 			permissions.EnablePermissions (user.UserId, PermissionName.RequestSource);
-			var audioArgs = new AudioCodecArgs (1, 64000, 44100, 512, 10);
+			var audioArgs = AudioCodecArgsTests.GetTestArgs();
 			handler.RequestSourceMessage (new MessageReceivedEventArgs (server,
 				new RequestSourceMessage ("Name", audioArgs)));
 
@@ -598,7 +598,7 @@ namespace Gablarski.Tests
 		}
 		#endregion
 
-		#region SendAudioDataMessage
+		#region ClientAudioDataMessage
 		[Test]
 		public void SendAudioDataMessageNotConnected()
 		{			
@@ -606,9 +606,9 @@ namespace Gablarski.Tests
 			c.Disconnect();
 
 			handler.SendAudioDataMessage (new MessageReceivedEventArgs (c,
-				new SendAudioDataMessage
+				new ClientAudioDataMessage
 				{
-					Data = new byte[512],
+					Data = new [] { new byte[512] },
 					SourceId = 1,
 					TargetType = TargetType.Channel,
 					TargetIds = new [] { 1 }
@@ -625,9 +625,9 @@ namespace Gablarski.Tests
 			context.UserManager.Connect (c);
 
 			handler.SendAudioDataMessage (new MessageReceivedEventArgs (c,
-				new SendAudioDataMessage
+				new ClientAudioDataMessage
 				{
-					Data = new byte[512],
+					Data = new [] { new byte[512] },
 					SourceId = 1,
 					TargetType = TargetType.Channel,
 					TargetIds = new [] { 1 }
@@ -645,9 +645,9 @@ namespace Gablarski.Tests
 			context.UserManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
 
 			handler.SendAudioDataMessage (new MessageReceivedEventArgs (server,
-				new SendAudioDataMessage
+				new ClientAudioDataMessage
 				{
-					Data = new byte[512],
+					Data = new [] { new byte[512] },
 					SourceId = 1,
 					TargetType = TargetType.Channel,
 					TargetIds = new [] { 1 }
@@ -670,9 +670,9 @@ namespace Gablarski.Tests
 			c.Client.AssertNoMessage();
 
 			handler.SendAudioDataMessage (new MessageReceivedEventArgs (c,
-				new SendAudioDataMessage
+				new ClientAudioDataMessage
 				{
-					Data = new byte[512],
+					Data = new [] { new byte[512] },
 					SourceId = s.Id,
 					TargetType = TargetType.Channel,
 					TargetIds = new [] { 1 }
@@ -697,9 +697,9 @@ namespace Gablarski.Tests
 			c.Client.AssertNoMessage();
 
 			handler.SendAudioDataMessage (new MessageReceivedEventArgs (server,
-				new SendAudioDataMessage
+				new ClientAudioDataMessage
 				{
-					Data = new byte[512],
+					Data = new [] { new byte[512] },
 					SourceId = s.Id,
 					TargetType = TargetType.Channel,
 					TargetIds = new [] { 1 }
@@ -722,9 +722,9 @@ namespace Gablarski.Tests
 			server.Client.AssertNoMessage();
 
 			handler.SendAudioDataMessage (new MessageReceivedEventArgs (c,
-				new SendAudioDataMessage
+				new ClientAudioDataMessage
 				{
-					Data = new byte[512],
+					Data = new [] { new byte[512] },
 					SourceId = s.Id,
 					TargetType = TargetType.Channel,
 					TargetIds = new [] { 1 }
@@ -750,16 +750,16 @@ namespace Gablarski.Tests
 			permissions.EnablePermissions (user.UserId, PermissionName.SendAudio);
 
 			handler.SendAudioDataMessage (new MessageReceivedEventArgs (server,
-				new SendAudioDataMessage
+				new ClientAudioDataMessage
 				{
-					Data = new byte[512],
+					Data = new [] { new byte[512] },
 					SourceId = s.Id,
 					TargetType = TargetType.User,
 					TargetIds = new [] { u.UserId }
 				}));
 
 			server.Client.AssertNoMessage();
-			Assert.AreEqual (s.Id, c.Client.DequeueAndAssertMessage<AudioDataReceivedMessage>().SourceId);
+			Assert.AreEqual (s.Id, c.Client.DequeueAndAssertMessage<ServerAudioDataMessage>().SourceId);
 		}
 
 		[Test]
@@ -776,9 +776,9 @@ namespace Gablarski.Tests
 			c.Client.AssertNoMessage();
 
 			handler.SendAudioDataMessage (new MessageReceivedEventArgs (server,
-				new SendAudioDataMessage
+				new ClientAudioDataMessage
 				{
-					Data = new byte[512],
+					Data = new [] { new byte[512] },
 					SourceId = s.Id,
 					TargetType = TargetType.User,
 					TargetIds = new [] { u.UserId }
@@ -803,16 +803,16 @@ namespace Gablarski.Tests
 			permissions.EnablePermissions (user.UserId, PermissionName.SendAudio);
 
 			handler.SendAudioDataMessage (new MessageReceivedEventArgs (server,
-				new SendAudioDataMessage
+				new ClientAudioDataMessage
 				{
-					Data = new byte[512],
+					Data = new [] { new byte[512] },
 					SourceId = s.Id,
 					TargetType = TargetType.Channel,
 					TargetIds = new [] { user.CurrentChannelId }
 				}));
 
 			server.Client.AssertNoMessage();
-			Assert.AreEqual (s.Id, c.Client.DequeueAndAssertMessage<AudioDataReceivedMessage>().SourceId);
+			Assert.AreEqual (s.Id, c.Client.DequeueAndAssertMessage<ServerAudioDataMessage>().SourceId);
 		}
 
 		[Test]
@@ -828,9 +828,9 @@ namespace Gablarski.Tests
 			c.Client.AssertNoMessage();
 
 			handler.SendAudioDataMessage (new MessageReceivedEventArgs (server,
-				new SendAudioDataMessage
+				new ClientAudioDataMessage
 				{
-					Data = new byte[512],
+					Data = new [] { new byte[512] },
 					SourceId = s.Id,
 					TargetType = TargetType.Channel,
 					TargetIds = new [] { user.CurrentChannelId }
@@ -863,17 +863,17 @@ namespace Gablarski.Tests
 			permissions.EnablePermissions (user.UserId, PermissionName.SendAudio, PermissionName.SendAudioToMultipleTargets);
 
 			handler.SendAudioDataMessage (new MessageReceivedEventArgs (server,
-				new SendAudioDataMessage
+				new ClientAudioDataMessage
 				{
-					Data = new byte[512],
+					Data = new [] { new byte[512] },
 					SourceId = s.Id,
 					TargetType = TargetType.Channel,
 					TargetIds = new [] { 1, 2 }
 				}));
 
 			server.Client.AssertNoMessage();
-			Assert.AreEqual (s.Id, c.Client.DequeueAndAssertMessage<AudioDataReceivedMessage>().SourceId);
-			Assert.AreEqual (s.Id, c2.Client.DequeueAndAssertMessage<AudioDataReceivedMessage>().SourceId);
+			Assert.AreEqual (s.Id, c.Client.DequeueAndAssertMessage<ServerAudioDataMessage>().SourceId);
+			Assert.AreEqual (s.Id, c2.Client.DequeueAndAssertMessage<ServerAudioDataMessage>().SourceId);
 		}
 
 		[Test]
@@ -897,9 +897,9 @@ namespace Gablarski.Tests
 			c2.Client.AssertNoMessage();
 
 			handler.SendAudioDataMessage (new MessageReceivedEventArgs (server,
-				new SendAudioDataMessage
+				new ClientAudioDataMessage
 				{
-					Data = new byte[512],
+					Data = new [] { new byte[512] },
 					SourceId = s.Id,
 					TargetType = TargetType.Channel,
 					TargetIds = new [] { 1, 2 }
@@ -935,17 +935,17 @@ namespace Gablarski.Tests
 			permissions.EnablePermissions (user.UserId, PermissionName.SendAudio, PermissionName.SendAudioToMultipleTargets);
 
 			handler.SendAudioDataMessage (new MessageReceivedEventArgs (server,
-				new SendAudioDataMessage
+				new ClientAudioDataMessage
 				{
-					Data = new byte[512],
+					Data = new [] { new byte[512] },
 					SourceId = s.Id,
 					TargetType = TargetType.User,
 					TargetIds = new [] { u1.UserId, u2.UserId }
 				}));
 
 			server.Client.AssertNoMessage();
-			Assert.AreEqual (s.Id, c.Client.DequeueAndAssertMessage<AudioDataReceivedMessage>().SourceId);
-			Assert.AreEqual (s.Id, c2.Client.DequeueAndAssertMessage<AudioDataReceivedMessage>().SourceId);
+			Assert.AreEqual (s.Id, c.Client.DequeueAndAssertMessage<ServerAudioDataMessage>().SourceId);
+			Assert.AreEqual (s.Id, c2.Client.DequeueAndAssertMessage<ServerAudioDataMessage>().SourceId);
 		}
 
 		[Test]
@@ -969,9 +969,9 @@ namespace Gablarski.Tests
 			permissions.EnablePermissions (user.UserId, PermissionName.SendAudio);
 
 			handler.SendAudioDataMessage (new MessageReceivedEventArgs (server,
-				new SendAudioDataMessage
+				new ClientAudioDataMessage
 				{
-					Data = new byte[512],
+					Data = new [] { new byte[512] },
 					SourceId = s.Id,
 					TargetType = TargetType.User,
 					TargetIds = new [] { u1.UserId, u2.UserId }

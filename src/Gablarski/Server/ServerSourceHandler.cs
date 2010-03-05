@@ -112,7 +112,6 @@ namespace Gablarski.Server
 
 			if (String.IsNullOrEmpty (request.Name) 
 				|| AudioCodecArgs.IsInvalidBitrate (request.AudioSettings.Bitrate)
-				|| AudioCodecArgs.IsInvalidChannels (request.AudioSettings.Channels)
 				|| AudioCodecArgs.IsInvalidComplexity (request.AudioSettings.Complexity)
 				|| AudioCodecArgs.IsInvalidFrequency (request.AudioSettings.Frequency)
 				|| AudioCodecArgs.IsInvalidFrameSize (request.AudioSettings.FrameSize))
@@ -196,7 +195,7 @@ namespace Gablarski.Server
 
 		internal void SendAudioDataMessage (MessageReceivedEventArgs e)
 		{
-			var msg = (SendAudioDataMessage)e.Message;
+			var msg = (ClientAudioDataMessage)e.Message;
 
 			UserInfo speaker;
 			if (!CanSendFromSource (e.Connection, msg.SourceId, out speaker))
@@ -214,7 +213,7 @@ namespace Gablarski.Server
 				return;
 			}
 
-			var sendMessage = new AudioDataReceivedMessage { Data = msg.Data, SourceId = msg.SourceId };
+			var sendMessage = new ServerAudioDataMessage { Data = msg.Data, Sequence = msg.Sequence, SourceId = msg.SourceId };
 
 			if (msg.TargetType == TargetType.Channel)
 			{

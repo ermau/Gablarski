@@ -105,7 +105,7 @@ namespace Gablarski.Client
 				{ ServerMessageType.Muted, OnMuted },
 				
 				{ ServerMessageType.SourceResult, this.Sources.OnSourceResultMessage },
-				{ ServerMessageType.AudioDataReceived, this.Sources.OnAudioDataReceivedMessage },
+				{ ServerMessageType.AudioData, this.Sources.OnAudioDataReceivedMessage },
 				{ ServerMessageType.AudioSourceStateChange, this.Sources.OnAudioSourceStateChangedMessage },
 			};
 		}

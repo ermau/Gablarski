@@ -40,7 +40,6 @@ using System.Linq;
 using System.Text;
 using Gablarski.Audio;
 using Gablarski.OpenAL;
-using AudioFormat = Gablarski.OpenAL.AudioFormat;
 
 namespace Gablarski.OpenAL.Providers
 {
@@ -114,10 +113,9 @@ namespace Gablarski.OpenAL.Providers
 				RequireBuffers (bufferStack, source, bufferLen);
 				for (int i = 0; i < bufferLen; ++i)
 				{
+					OpenALAudioFormat format = audioSource.Format.ToOpenALFormat();
 					SourceBuffer wait = bufferStack.Pop();
-					wait.Buffer (new byte[audioSource.FrameSize * 2 * audioSource.Channels],
-					             (audioSource.Channels == 1) ? AudioFormat.Mono16Bit : AudioFormat.Stereo16Bit,
-					             (uint)audioSource.Frequency);
+					wait.Buffer (new byte[format.GetBytesPerSample()], format, (uint)audioSource.Frequency);
 					source.QueueAndPlay (wait);
 				}
 			}
@@ -125,7 +123,7 @@ namespace Gablarski.OpenAL.Providers
 			RequireBuffers (bufferStack, source, 1);
 			SourceBuffer buffer = bufferStack.Pop ();
 
-			buffer.Buffer (data, (audioSource.Channels == 1) ? AudioFormat.Mono16Bit : AudioFormat.Stereo16Bit, (uint)audioSource.Frequency);
+			buffer.Buffer (data, audioSource.Format.ToOpenALFormat(), (uint)audioSource.Frequency);
 			source.QueueAndPlay (buffer);
 		}
 

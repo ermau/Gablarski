@@ -55,20 +55,23 @@ namespace Gablarski.Tests
 		[Test]
 		public void RequestDefaultBitrate()
 		{
-			this.manager.Request ("voice", 1, 512);
+			this.manager.Request ("voice", AudioFormat.Stereo16Bit, 512);
 
 			var msg = this.server.DequeueAndAssertMessage<RequestSourceMessage>();
-			Assert.AreEqual (1, msg.AudioSettings.Channels);
-			Assert.AreEqual (0, msg.AudioSettings.Bitrate);
+			Assert.AreEqual ("voice", msg.Name);
+			Assert.AreEqual (AudioFormat.Stereo16Bit, msg.AudioSettings.Format);
+			Assert.AreEqual (0,	msg.AudioSettings.Bitrate);
 		}
 
 		[Test]
-		public void RequestBitRate()
+		public void RequestFrequencyAndBitRate()
 		{
-			this.manager.Request ("voice", 2, 512, 64000);
+			this.manager.Request ("voice", AudioFormat.Stereo16Bit, 48000, 512, 64000);
 
 			var msg = this.server.DequeueAndAssertMessage<RequestSourceMessage>();
-			Assert.AreEqual (2, msg.AudioSettings.Channels);
+			Assert.AreEqual ("voice", msg.Name);
+			Assert.AreEqual (AudioFormat.Stereo16Bit, msg.AudioSettings.Format);
+			Assert.AreEqual (48000, msg.AudioSettings.Frequency);
 			Assert.AreEqual (64000, msg.AudioSettings.Bitrate);
 		}
 

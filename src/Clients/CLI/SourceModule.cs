@@ -79,7 +79,7 @@ namespace Gablarski.Clients.CLI
 				case "request":
 				{
 					if (parts.Count == 3)
-						Client.Sources.Request (parts[2], 1, 512);
+						Client.Sources.Request (parts[2], AudioFormat.Mono16Bit, 512);
 					else if (parts.Count == 4)
 					{
 						short frameSize;
@@ -91,7 +91,7 @@ namespace Gablarski.Clients.CLI
 						else if (bitrate < 32000 || bitrate > 128000)
 							Writer.WriteLine ("source request <name> <bitrate> <frameSize>");
 						else
-							Client.Sources.Request (parts[2], 1, frameSize, bitrate);
+							Client.Sources.Request (parts[2], AudioFormat.Mono16Bit, 44100, frameSize, bitrate);
 					}
 
 					return true;
@@ -108,9 +108,9 @@ namespace Gablarski.Clients.CLI
 						{
 							Writer.WriteLine ("\"{0}\"", source.Name);
 							Writer.WriteLine ("ID:	        {0}", source.Id);
+							Writer.WriteLine ("Format:		{0}", source.Format);
 							Writer.WriteLine ("Muted:      {0}", source.IsMuted);
 							Writer.WriteLine ("Frequency:  {0}", source.Frequency);
-							Writer.WriteLine ("Channels:   {0}", source.Channels);
 							Writer.WriteLine ("Frame size: {0}", source.FrameSize);
 							Writer.WriteLine ("Bitrate:    {0}", source.Bitrate);
 							Writer.WriteLine();
@@ -122,9 +122,9 @@ namespace Gablarski.Clients.CLI
 						Writer.WriteLine();
 						Writer.WriteLine ("{1}: \"{0}\"", source.Name, Client.Users[source.OwnerId].Nickname);
 						Writer.WriteLine ("ID:	        {0}", source.Id);
+						Writer.WriteLine ("Format:		{0}", source.Format);
 						Writer.WriteLine ("Muted:      {0}", source.IsMuted);
 						Writer.WriteLine ("Frequency:  {0}", source.Frequency);
-						Writer.WriteLine ("Channels:   {0}", source.Channels);
 						Writer.WriteLine ("Frame size: {0}", source.FrameSize);
 						Writer.WriteLine ("Bitrate:    {0}", source.Bitrate);
 					}

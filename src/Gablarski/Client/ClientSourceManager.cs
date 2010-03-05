@@ -38,6 +38,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Gablarski.Audio;
 using Gablarski.Messages;
 
@@ -172,9 +173,9 @@ namespace Gablarski.Client
 		/// </summary>
 		/// <param name="channels">The number of channels to request. 1-2 is the valid range.</param>
 		/// <param name="name">The user-local name of the source, used to identify the source later.</param>
-		public void Request (string name, byte channels, short frameSize)
+		public void Request (string name, AudioFormat format, short frameSize)
 		{
-			Request (name, channels, frameSize, 0);
+			Request (name, format, 44100, frameSize, 0);
 		}
 
 		/// <summary>
@@ -187,9 +188,9 @@ namespace Gablarski.Client
 		/// The server may not agree with the bitrate you request, do not set up audio based on this
 		/// target, but on the bitrate of the source you actually receive.
 		/// </remarks>
-		public void Request (string name, byte channels, short frameSize, int targetBitrate)
+		public void Request (string name, AudioFormat format, int frequency, short frameSize, int targetBitrate)
 		{
-			this.context.Connection.Send (new RequestSourceMessage (name, new AudioCodecArgs (channels, targetBitrate, 44100, frameSize, 10)));
+			this.context.Connection.Send (new RequestSourceMessage (name, new AudioCodecArgs (format, targetBitrate, frequency, frameSize, 10)));
 		}
 
 		/// <summary>
@@ -235,6 +236,7 @@ namespace Gablarski.Client
 		private readonly IClientContext context;
 		private readonly Dictionary<int, AudioSource> sources = new Dictionary<int, AudioSource>();
 		private readonly HashSet<AudioSource> ignoredSources = new HashSet<AudioSource>();
+		private int sequence;
 
 		void IAudioSender.BeginSending (AudioSource source)
 		{
@@ -243,12 +245,13 @@ namespace Gablarski.Client
 			if (source.OwnerId != this.context.CurrentUser.UserId)
 				throw new ArgumentException ("Can not send audio from a source you don't own", "source");
 
+			Interlocked.Exchange (ref sequence, 0);
 			this.context.Connection.Send (new ClientAudioSourceStateChangeMessage { Starting = true, SourceId = source.Id });
 
 			OnAudioSourceStarted (new AudioSourceEventArgs (source));
 		}
 
-		void IAudioSender.SendAudioData (AudioSource source, TargetType type,  int[] targets, byte[] data)
+		void IAudioSender.SendAudioData (AudioSource source, TargetType type, int[] targets, byte[][] data)
 		{
 			#if DEBUG
 			if (source == null)
@@ -260,15 +263,21 @@ namespace Gablarski.Client
 			if (data == null)
 				throw new ArgumentNullException ("data");
 			if (data.Length == 0)
-				throw new ArgumentException ("Audio frame can not be empty", "data");
+				throw new ArgumentException ("Can not have 0 frames", "data");
 			#endif
 
-			this.context.Connection.Send (new SendAudioDataMessage
+			byte[][] encoded = new byte[data.Length][];
+
+			for (int i = 0; i < data.Length; i++)
+				encoded[i] = source.Encode (data[i]);
+
+			this.context.Connection.Send (new ClientAudioDataMessage
 			{
+				Sequence = (ushort)Interlocked.Increment (ref sequence),
 				TargetType = type,
 				TargetIds = targets,
-				SourceId = source.Id, 
-				Data = source.Encode (data)
+				SourceId = source.Id,
+				Data = encoded
 			});
 		}
 
@@ -384,7 +393,7 @@ namespace Gablarski.Client
 
 		internal void OnAudioDataReceivedMessage (MessageReceivedEventArgs e)
 		{
-			var msg = (AudioDataReceivedMessage)e.Message;
+			var msg = (ServerAudioDataMessage)e.Message;
 
 			var source = this[msg.SourceId];
 			if (source == null || GetIsIgnored (source))
@@ -468,12 +477,13 @@ namespace Gablarski.Client
 			target.Name = updatedSource.Name;
 			target.Id = updatedSource.Id;
 			target.OwnerId = updatedSource.OwnerId;
-			target.Bitrate = updatedSource.Bitrate;
 			target.IsMuted = updatedSource.IsMuted;
 
-			target.Channels = updatedSource.Channels;
+			target.Bitrate = updatedSource.Bitrate;
+			target.Format = updatedSource.Format;
 			target.Frequency = updatedSource.Frequency;
 			target.FrameSize = updatedSource.FrameSize;
+			target.Complexity = updatedSource.Complexity;
 		}
 	}
 

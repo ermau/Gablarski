@@ -42,11 +42,12 @@ using System.Text;
 namespace Gablarski.Audio
 {
 	public enum AudioFormat
+		: byte
 	{
-		Mono8Bit,
-		Mono16Bit,
-		Stereo8Bit,
-		Stereo16Bit
+		Mono8Bit = 1,
+		Mono16Bit = 0,
+		Stereo8Bit = 2,
+		Stereo16Bit = 3
 	}
 
 	public interface ICaptureProvider
@@ -62,10 +63,7 @@ namespace Gablarski.Audio
 		/// </summary>
 		bool IsCapturing { get; }
 
-		/// <summary>
-		/// Gets whether or not this provider can capture stereo.
-		/// </summary>
-		bool CanCaptureStereo { get; }
+		IEnumerable<AudioFormat> SupportedFormats { get; }
 
 		/// <summary>
 		/// Number of samples available to be read.
@@ -76,7 +74,7 @@ namespace Gablarski.Audio
 		/// Begins a capture.
 		/// </summary>
 		/// <exception cref="InvalidOperationException">If <see cref="Device"/> is null.</exception>
-		void BeginCapture (AudioFormat format);
+		void BeginCapture (int frequency, AudioFormat format);
 
 		/// <summary>
 		/// Ends a capture.

@@ -51,7 +51,7 @@ namespace Gablarski.Server
 		: IServerContext
 	{
 		// ReSharper disable ConvertToConstant.Global
-		public static readonly int ProtocolVersion = 5;
+		public static readonly int ProtocolVersion = 6;
 		// ReSharper restore ConvertToConstant.Global
 
 		/// <summary>

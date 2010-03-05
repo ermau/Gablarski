@@ -1,4 +1,4 @@
-// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -52,7 +52,7 @@ namespace Gablarski.OpenAL
 			this.bufferID = bufferID;
 		}
 
-		public void Buffer (byte[] data, AudioFormat format, uint frequency)
+		public void Buffer (byte[] data, OpenALAudioFormat format, uint frequency)
 		{
 			alBufferData (this.bufferID, format, data, data.Length, frequency);
 			OpenAL.ErrorCheck ();
@@ -170,7 +170,7 @@ namespace Gablarski.OpenAL
 		private static extern void alGenBuffers (int count, uint[] bufferIDs);
 
 		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
-		private static extern void alBufferData (uint bufferID, AudioFormat format, byte[] data, int byteSize, uint frequency);
+		private static extern void alBufferData (uint bufferID, OpenALAudioFormat format, byte[] data, int byteSize, uint frequency);
 
 		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
 		private static extern void alDeleteBuffers (int numBuffers, uint[] bufferIDs);

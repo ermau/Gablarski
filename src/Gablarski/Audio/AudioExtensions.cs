@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -48,7 +48,6 @@ namespace Gablarski.Audio
 			switch (self)
 			{
 				default:
-				case AudioFormat.Mono8Bit:
 					return 1;
 
 				case AudioFormat.Mono16Bit:
@@ -57,6 +56,19 @@ namespace Gablarski.Audio
 
 				case AudioFormat.Stereo16Bit:
 					return 4;
+			}
+		}
+
+		public static int GetChannels (this AudioFormat self)
+		{
+			switch (self)
+			{
+				default:
+					return 1;
+
+				case AudioFormat.Stereo16Bit:
+				case AudioFormat.Stereo8Bit:
+					return 2;
 			}
 		}
 
@@ -70,8 +82,6 @@ namespace Gablarski.Audio
 			switch (self)
 			{
 				default:
-				case AudioFormat.Mono8Bit:
-				case AudioFormat.Mono16Bit:
 					return frequency;
 
 				case AudioFormat.Stereo8Bit:

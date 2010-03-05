@@ -56,12 +56,12 @@ namespace Gablarski.Audio
 		/// <param name="source">The source to send from.</param>
 		/// <param name="targetType">The type that the <paramref name="targetIds"/> belong to.</param>
 		/// <param name="targetIds">The ids of the targets to send audio to.</param>
-		/// <param name="frame">The unencoded PCM matching <paramref name="source"/>'s attributes.</param>
+		/// <param name="data">The unencoded PCM matching <paramref name="source"/>'s attributes</param>
 		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
 		/// <exception cref="ArgumentException"><paramref name="source"/> does not belong to you.</exception>
-		/// <exception cref="ArgumentNullException"><paramref name="frame"/> is <c>null</c>.</exception>
-		/// <exception cref="ArgumentException"><paramref name="frame"/> is empty.</exception>
-		void SendAudioData (AudioSource source, TargetType targetType, int[] targetIds, byte[] frame);
+		/// <exception cref="ArgumentNullException"><paramref name="data"/> is <c>null</c>.</exception>
+		/// <exception cref="ArgumentException"><paramref name="data"/> is empty.</exception>
+		void SendAudioData (AudioSource source, TargetType targetType, int[] targetIds, byte[][] data);
 
 		/// <summary>
 		/// Sends notifications that you're finished sending audio from <paramref name="source"/>.

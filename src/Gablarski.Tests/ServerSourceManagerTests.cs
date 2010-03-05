@@ -50,7 +50,7 @@ namespace Gablarski.Tests
 		private readonly UserInfo user = new UserInfo ("username", 1, 2, false);
 		private readonly UserInfo user2 = new UserInfo ("Username2", 2, 1, false);
 
-		private readonly AudioCodecArgs args = new AudioCodecArgs (1, 64000, 44100, 512, 10);
+		private readonly AudioCodecArgs args = new AudioCodecArgs (AudioFormat.Mono16Bit, 64000, 44100, 512, 10);
 
 		private IServerContext context;
 		private ServerSourceManager manager;
@@ -78,11 +78,11 @@ namespace Gablarski.Tests
 			Assert.IsNotNull (source);
 			Assert.AreEqual ("Name", source.Name);
 			Assert.AreEqual (1, source.OwnerId);
-			Assert.AreEqual (1, source.Channels);
-			Assert.AreEqual (64000, source.Bitrate);
-			Assert.AreEqual (44100, source.Frequency);
-			Assert.AreEqual (512, source.FrameSize);
-			Assert.AreEqual (10, source.Complexity);
+			Assert.AreEqual (args.Format, source.Format);
+			Assert.AreEqual (args.Bitrate, source.Bitrate);
+			Assert.AreEqual (args.Frequency, source.Frequency);
+			Assert.AreEqual (args.FrameSize, source.FrameSize);
+			Assert.AreEqual (args.Complexity, source.Complexity);
 
 			Assert.That (source.Id > 0, "Source ID is not greater than 0");
 		}

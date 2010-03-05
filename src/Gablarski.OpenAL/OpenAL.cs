@@ -1,4 +1,4 @@
-// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -41,6 +41,7 @@ using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 using System.Security;
+using Gablarski.Audio;
 using Gablarski.OpenAL;
 
 namespace Gablarski.OpenAL
@@ -212,40 +213,65 @@ namespace Gablarski.OpenAL
 			return devices;
 		}
 
-		#region AudioFormat Extensions
-		public static uint GetBytesPerSample (this AudioFormat self)
+		#region OpenALAudioFormat Extensions
+		public static OpenALAudioFormat ToOpenALFormat (this AudioFormat format)
+		{
+			OpenALAudioFormat oalFormat = OpenALAudioFormat.Mono16Bit;
+			switch (format)
+			{
+				case Audio.AudioFormat.Mono16Bit:
+					oalFormat = OpenALAudioFormat.Mono16Bit;
+					break;
+
+				case Audio.AudioFormat.Mono8Bit:
+					oalFormat = OpenALAudioFormat.Mono8Bit;
+					break;
+
+				case Audio.AudioFormat.Stereo16Bit:
+					oalFormat = OpenALAudioFormat.Stereo16Bit;
+					break;
+
+				case Audio.AudioFormat.Stereo8Bit:
+					oalFormat = OpenALAudioFormat.Stereo8Bit;
+					break;
+			}
+
+			return oalFormat;
+		}
+
+		public static uint GetBytesPerSample (this OpenALAudioFormat self)
 		{
 			switch (self)
 			{
 				default:
-				case AudioFormat.Mono8Bit:
+				case OpenALAudioFormat.Mono8Bit:
 					return 1;
 
-				case AudioFormat.Mono16Bit:
-				case AudioFormat.Stereo8Bit:
+				case OpenALAudioFormat.Mono16Bit:
+				case OpenALAudioFormat.Stereo8Bit:
 					return 2;
 
-				case AudioFormat.Stereo16Bit:
+				case OpenALAudioFormat.Stereo16Bit:
 					return 4;
 			}
 		}
 
-		public static uint GetBytes (this AudioFormat self, uint samples)
+		public static uint GetBytes (this OpenALAudioFormat self, uint samples)
 		{
 			return self.GetBytesPerSample () * samples;
 		}
 
-		public static uint GetSamplesPerSecond (this AudioFormat self, uint frequency)
+		public static uint GetSamplesPerSecond (this OpenALAudioFormat self, uint frequency)
 		{
 			switch (self)
 			{
 				default:
-				case AudioFormat.Mono8Bit:
-				case AudioFormat.Mono16Bit:
+				case OpenALAudioFormat.Mono8Bit:
+				case OpenALAudioFormat.Mono16Bit:
 					return frequency;
 
-				case AudioFormat.Stereo8Bit:
-				case AudioFormat.Stereo16Bit:
+				case OpenALAudioFormat.Stereo8Bit:
+				case OpenALAudioFormat.Stereo16Bit:
 					return (frequency * 2);
 			}
 		}
@@ -478,7 +504,7 @@ namespace Gablarski.OpenAL
 		None = 0
 	}
 
-	public enum AudioFormat
+	public enum OpenALAudioFormat
 	{
 		Mono8Bit = 0x1100,
 		Mono16Bit = 0x1101,

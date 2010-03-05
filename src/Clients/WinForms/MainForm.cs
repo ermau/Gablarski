@@ -184,7 +184,7 @@ namespace Gablarski.Clients.Windows
 
 				if (this.voiceSource != null)
 				{
-					gablarski.Audio.Attach (this.voiceCapture, AudioFormat.Mono16Bit, this.voiceSource, new AudioEngineCaptureOptions
+					gablarski.Audio.Attach (this.voiceCapture, this.voiceSource, new AudioEngineCaptureOptions
 					{
 						StartVolume = Settings.VoiceActivationLevel,
 						ContinuationVolume = Settings.VoiceActivationLevel / 2,
@@ -412,7 +412,7 @@ namespace Gablarski.Clients.Windows
 				else if (e.Source.Name == MusicName)
 				{
 					musicSource = e.Source;
-					gablarski.Audio.Attach (musicprovider, AudioFormat.Mono16Bit, musicSource,
+					gablarski.Audio.Attach (musicprovider, musicSource,
 					                        new AudioEngineCaptureOptions { Mode = AudioEngineCaptureMode.Explicit });
 					gablarski.Audio.BeginCapture (musicSource, gablarski.CurrentChannel);
 				}
@@ -539,7 +539,7 @@ namespace Gablarski.Clients.Windows
 			{
 				SetupInput();
 
-				this.gablarski.Sources.Request ("voice", 1, 512);
+				this.gablarski.Sources.Request ("voice", AudioFormat.Mono16Bit, 512);
 			}
 		}
 

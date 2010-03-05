@@ -130,27 +130,6 @@ namespace Gablarski.CELT
 			return encoded;
 		}
 
-		//public unsafe byte[] Encode (byte[] pcm, int bitrate, out int length, out short[] synthesis)
-		//{
-		//    ThrowIfDisposed ();
-
-		//    int nbCompressedBytes = (bitrate / 8) / (this.Mode.SampleRate / this.Mode.FrameSize);
-
-		//    IntPtr encodedPtr;
-		//    byte[] encoded = new byte[nbCompressedBytes];
-		//    fixed (byte* benc = encoded)
-		//        encodedPtr = new IntPtr ((void*)benc);
-
-		//    IntPtr synthPtr;
-		//    synthesis = new short[this.Mode.FrameSize * 2];
-		//    fixed (short* synth = synthesis)
-		//        synthPtr = new IntPtr ((void*)synth);
-
-		//    length = celt_encode (this, pcm, synthPtr, encodedPtr, nbCompressedBytes);
-
-		//    return encoded;
-		//}
-
 		#region IDisposable Members
 		public void Dispose ()
 		{

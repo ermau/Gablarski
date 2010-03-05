@@ -173,7 +173,7 @@ namespace Gablarski.Tests
 			const int frequency = 44100;
 			const byte complexity = 10;
 
-			var msg = new RequestSourceMessage (name, new AudioCodecArgs (channels, bitrate, frequency, frameSize, complexity));
+			var msg = new RequestSourceMessage (name, new AudioCodecArgs (AudioFormat.Mono16Bit, bitrate, frequency, frameSize, complexity));
 			Assert.AreEqual (name, msg.Name);
 			msg.WritePayload (writer);
 			long length = stream.Position;
@@ -188,40 +188,33 @@ namespace Gablarski.Tests
 		[Test]
 		public void SendAudioData()
 		{
-			var msg = new SendAudioDataMessage
+			var msg = new ClientAudioDataMessage
 			{
 				SourceId = 1,
 				TargetType = TargetType.User,
 				TargetIds = new[] { 2 },
-				Data = new byte[] { 0x4, 0x8, 0xF, 0x10, 0x17, 0x2A }
+				Sequence = 20,
+				Data = new [] { new byte[] { 0x4, 0x8, 0xF, 0x10, 0x17, 0x2A } }
 			};
-
-			Assert.AreEqual (new[] { 2 }, msg.TargetIds);
-			Assert.AreEqual (TargetType.User, msg.TargetType);
-			Assert.AreEqual (1, msg.SourceId);
-			Assert.AreEqual (0x4, msg.Data[0]);
-			Assert.AreEqual (0x8, msg.Data[1]);
-			Assert.AreEqual (0xF, msg.Data[2]);
-			Assert.AreEqual (0x10, msg.Data[3]);
-			Assert.AreEqual (0x17, msg.Data[4]);
-			Assert.AreEqual (0x2A, msg.Data[5]);
 
 			msg.WritePayload (writer);
 			long length = stream.Position;
 			stream.Position = 0;
 
-			msg = new SendAudioDataMessage();
+			msg = new ClientAudioDataMessage();
 			msg.ReadPayload (reader);
 			Assert.AreEqual (length, stream.Position);
 			Assert.AreEqual (new[] { 2 }, msg.TargetIds);
 			Assert.AreEqual (TargetType.User, msg.TargetType);
+			Assert.AreEqual (20, msg.Sequence);
 			Assert.AreEqual (1, msg.SourceId);
-			Assert.AreEqual (0x4, msg.Data[0]);
-			Assert.AreEqual (0x8, msg.Data[1]);
-			Assert.AreEqual (0xF, msg.Data[2]);
-			Assert.AreEqual (0x10, msg.Data[3]);
-			Assert.AreEqual (0x17, msg.Data[4]);
-			Assert.AreEqual (0x2A, msg.Data[5]);
+			Assert.AreEqual (1, msg.Data.Length);
+			Assert.AreEqual (0x4, msg.Data[0][0]);
+			Assert.AreEqual (0x8, msg.Data[0][1]);
+			Assert.AreEqual (0xF, msg.Data[0][2]);
+			Assert.AreEqual (0x10, msg.Data[0][3]);
+			Assert.AreEqual (0x17, msg.Data[0][4]);
+			Assert.AreEqual (0x2A, msg.Data[0][5]);
 		}
 
 		[Test]
@@ -249,7 +242,7 @@ namespace Gablarski.Tests
 		{
 			Assert.Throws<ArgumentNullException> (() => new RequestMuteSourceMessage (null, true));
 
-			var msg = new RequestMuteSourceMessage (new AudioSource ("Name", 5, 2, 1, 64000, 44100, 512, 10, false), false);
+			var msg = new RequestMuteSourceMessage (new AudioSource ("Name", 5, 2, AudioFormat.Mono16Bit, 64000, 44100, 512, 10, false), false);
 			msg.WritePayload (writer);
 			long length = stream.Position;
 			stream.Position = 0;

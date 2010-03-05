@@ -1,4 +1,4 @@
-// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -37,38 +37,33 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Gablarski.Messages
 {
-	public class AudioDataReceivedMessage
+	public class ServerAudioDataMessage
 		: ServerMessage
 	{
-		public AudioDataReceivedMessage ()
-			: base (ServerMessageType.AudioDataReceived)
+		public ServerAudioDataMessage ()
+			: base (ServerMessageType.AudioData)
 		{
 		}
 
-		public AudioDataReceivedMessage (int sourceId, /*int sequence,*/ byte[] data)
+		public ServerAudioDataMessage (int sourceId, int sequence, byte frames, byte[][] data)
 			: this()
 		{
 			#if DEBUG
 			if (sourceId <= 0)
-				throw new ArgumentOutOfRangeException("sourceId");
+				throw new ArgumentOutOfRangeException ("sourceId");
 			if (data == null)
-				throw new ArgumentNullException("data");
+				throw new ArgumentNullException ("data");
+			if (frames <= 1)
+				throw new ArgumentOutOfRangeException ("frames");
 			#endif
 
-			this.SourceId = sourceId;
-			//this.Sequence = sequence;
-			this.Data = data;
+			SourceId = sourceId;
+			Sequence = sequence;
+			Data = data;
 		}
-
-		//public int Sequence
-		//{
-		//    get;
-		//    set;
-		//}
 
 		public int SourceId
 		{
@@ -76,7 +71,13 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public byte[] Data
+		public int Sequence
+		{
+		    get;
+		    set;
+		}
+
+		public byte[][] Data
 		{
 			get;
 			set;
@@ -89,16 +90,24 @@ namespace Gablarski.Messages
 
 		public override void WritePayload (IValueWriter writer)
 		{
-			writer.WriteInt32 (this.SourceId);
-			//writer.WriteInt32 (this.Sequence);
-			writer.WriteBytes (this.Data);
+			writer.WriteInt32 (SourceId);
+			writer.WriteInt32 (Sequence);
+			
+			writer.WriteByte ((byte)Data.Length);
+			for (int i = 0; i < Data.Length; ++i)
+				writer.WriteBytes (Data[i]);
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
-			this.SourceId = reader.ReadInt32 ();
-			//this.Sequence = reader.ReadInt32();
-			this.Data = reader.ReadBytes ();
+			SourceId = reader.ReadInt32 ();
+			Sequence = reader.ReadInt32();
+			
+			byte frames = reader.ReadByte();
+			Data = new byte[frames][];
+
+			for (int i = 0; i < frames; ++i)
+				Data[i] = reader.ReadBytes();
 		}
 	}
 }

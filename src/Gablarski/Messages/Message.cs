@@ -91,7 +91,7 @@ namespace Gablarski.Messages
 
 		SourceListReceived = 16,
 		SourceResult = 8,
-		AudioDataReceived = 10,
+		AudioData = 10,
 		AudioSourceStateChange = 29,
 		SourcesRemoved = 25,
 	

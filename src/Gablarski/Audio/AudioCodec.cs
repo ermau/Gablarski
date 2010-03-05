@@ -53,8 +53,8 @@ namespace Gablarski.Audio
 		{
 		}
 
-		public AudioCodec (byte channels, int bitrate, int frequency, short frameSize, byte complexity)
-			: base (channels, bitrate, frequency, frameSize, complexity)
+		public AudioCodec (AudioFormat format, int bitrate, int frequency, short frameSize, byte complexity)
+			: base (format, bitrate, frequency, frameSize, complexity)
 		{
 		}
 
@@ -79,7 +79,7 @@ namespace Gablarski.Audio
 				lock (this.codecLock)
 				{
 					if (this.mode == null)
-						this.mode = CeltMode.Create (this.Frequency, this.Channels, this.FrameSize);
+						this.mode = CeltMode.Create (this.Frequency, Format.GetChannels(), this.FrameSize);
 
 					if (this.encoder == null)
 						this.encoder = CeltEncoder.Create (this.mode);
@@ -110,7 +110,7 @@ namespace Gablarski.Audio
 				lock (this.codecLock)
 				{
 					if (this.mode == null)
-						this.mode = CeltMode.Create (this.Frequency, this.Channels, this.FrameSize);
+						this.mode = CeltMode.Create (this.Frequency, Format.GetChannels(), this.FrameSize);
 
 					if (this.decoder == null)
 						this.decoder = CeltDecoder.Create (this.mode);
