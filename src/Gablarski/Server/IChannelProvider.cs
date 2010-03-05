@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -37,7 +37,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Gablarski.Server
 {
@@ -50,11 +49,6 @@ namespace Gablarski.Server
 		/// Fired when the channel list or default channel is updated.
 		/// </summary>
 		event EventHandler ChannelsUpdated;
-
-		/// <summary>
-		/// Gets the type used to uniquely identify a channel.
-		/// </summary>
-		Type IdentifyingType { get; }
 
 		/// <summary>
 		/// Gets whether or not clients can create/update/delete channels.
