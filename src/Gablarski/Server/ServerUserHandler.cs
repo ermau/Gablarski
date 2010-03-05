@@ -218,9 +218,7 @@ namespace Gablarski.Server
 
 			LoginResultState result = LoginResultState.Success;
 
-			if (!this.context.PermissionsProvider.GetPermissions (info.UserId).CheckPermission (PermissionName.Login))
-				result = LoginResultState.FailedPermissions;
-			else if (Manager.GetIsNicknameInUse (join.Nickname))
+			if (Manager.GetIsNicknameInUse (join.Nickname))
 			{
 				if (!AttemptNicknameRecovery (info, join.Nickname))
 					result = LoginResultState.FailedNicknameInUse;
@@ -256,6 +254,9 @@ namespace Gablarski.Server
 
 			LoginResult result = this.context.AuthenticationProvider.Login (login.Username, login.Password);
 
+			if (!this.context.PermissionsProvider.GetPermissions (result.UserId).CheckPermission (PermissionName.Login))
+				result.ResultState = LoginResultState.FailedPermissions;
+
 			e.Connection.Send (new LoginResultMessage (result));
 
 			if (result.Succeeded)
@@ -269,7 +270,28 @@ namespace Gablarski.Server
 
 		internal void RequestUserListMessage (MessageReceivedEventArgs e)
 		{
-			e.Connection.Send (new UserListMessage (this));
+			var msg = (RequestUserListMessage) e.Message;
+
+			if (msg.Mode == UserListMode.Current)
+			{
+				if (!context.GetPermission (PermissionName.RequestChannelList))
+				{
+					e.Connection.Send (new PermissionDeniedMessage (ClientMessageType.RequestUserList));
+					return;
+				}
+
+				e.Connection.Send (new UserInfoListMessage (this));
+			}
+			else
+			{
+				if (!context.GetPermission (PermissionName.RequestFullUserList))
+				{
+					e.Connection.Send (new PermissionDeniedMessage (ClientMessageType.RequestUserList));
+					return;
+				}
+
+				e.Connection.Send (new UserListMessage (context.AuthenticationProvider.GetUsers()));
+			}
 		}
 
 		internal void ChannelChangeMessage (MessageReceivedEventArgs e)
@@ -394,7 +416,7 @@ namespace Gablarski.Server
 		private void SendInfoMessages (IConnection connection)
 		{
 			connection.Send (new ChannelListMessage (this.context.ChannelsProvider.GetChannels()));
-			connection.Send (new UserListMessage (Manager));
+			connection.Send (new UserInfoListMessage (Manager));
 			connection.Send (new SourceListMessage (this.context.Sources));
 		}
 

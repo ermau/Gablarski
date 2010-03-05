@@ -1,4 +1,4 @@
-// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -37,7 +37,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Gablarski
 {
@@ -105,6 +104,16 @@ namespace Gablarski
 		/// </summary>
 		RequestChannelList = 10,
 
+		/// <summary>
+		/// Request a list of user's online.
+		/// </summary>
+		RequestUserList = 18,
+
+		/// <summary>
+		/// Request a list of all users.
+		/// </summary>
+		RequestFullUserList = 19,
+
 		MuteAudioSource = 14,
 
 		MuteUser = 15,
@@ -113,7 +122,7 @@ namespace Gablarski
 
 		AdminPanel = 17,
 
-		// Next: 18
+		// Next: 20
 	}
 
 	public class Permission

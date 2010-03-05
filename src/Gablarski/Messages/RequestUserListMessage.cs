@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -37,10 +37,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Gablarski.Messages
 {
+	public enum UserListMode
+		: byte
+	{
+		Current = 0,
+		All = 1
+	}
+
 	public class RequestUserListMessage
 		: ClientMessage
 	{
@@ -49,12 +55,26 @@ namespace Gablarski.Messages
 		{
 		}
 
+		public RequestUserListMessage (UserListMode mode)
+			: this()
+		{
+			Mode = mode;
+		}
+
+		public UserListMode Mode
+		{
+			get;
+			private set;
+		}
+
 		public override void WritePayload (IValueWriter writer)
 		{
+			writer.WriteByte ((byte) Mode);
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
+			Mode = (UserListMode) reader.ReadByte();
 		}
 	}
 }

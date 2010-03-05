@@ -134,6 +134,7 @@
     <Compile Include="Messages\RequestMuteUserMessage.cs" />
     <Compile Include="Messages\SetCommentMessage.cs" />
     <Compile Include="Messages\SetStatusMessage.cs" />
+    <Compile Include="Messages\UserListMessage.cs" />
     <Compile Include="Messages\UserUpdatedMessage.cs" />
     <Compile Include="ModuleSelectableAttribute.cs" />
     <Compile Include="ChannelInfo.cs" />
@@ -162,7 +163,7 @@
     <Compile Include="Messages\RequestUserListMessage.cs" />
     <Compile Include="Messages\RequestSourceListMessage.cs" />
     <Compile Include="Messages\ClientAudioDataMessage.cs" />
-    <Compile Include="Messages\UserListMessage.cs" />
+    <Compile Include="Messages\UserInfoListMessage.cs" />
     <Compile Include="Messages\RequestSourceMessage.cs" />
     <Compile Include="Messages\ServerInfoMessage.cs" />
     <Compile Include="Messages\SourceListMessage.cs" />
@@ -188,6 +189,7 @@
     <Compile Include="AudioSourceManager.cs" />
     <Compile Include="Server\ServerUserHandler.cs" />
     <Compile Include="Server\ServerUserManager.cs" />
+    <Compile Include="User.cs" />
     <Compile Include="UserInfo.cs" />
     <Compile Include="ServerInfo.cs" />
     <Compile Include="Server\GuestPermissionProvider.cs" />

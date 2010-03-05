@@ -51,15 +51,18 @@ namespace Gablarski.Tests
 		private MockServerConnection observer;
 		private MockServerConnection server;
 		private MockServerContext context;
+		private MockPermissionsProvider permissions;
 
 		[SetUp]
 		public void Setup()
 		{
+			permissions = new MockPermissionsProvider();
+
 			context = new MockServerContext
 			{
 				Settings = new ServerSettings(),
 				AuthenticationProvider = new GuestAuthProvider(),
-				PermissionsProvider = new GuestPermissionProvider(),
+				PermissionsProvider = permissions,
 				ChannelsProvider = new LobbyChannelProvider()
 			};
 
@@ -266,17 +269,17 @@ namespace Gablarski.Tests
 			JoinAsGuest (server, false, true, "pass", "Nickname", "wrong");
 		}
 
-		public void JoinAsGuest (MockServerConnection connection, string nickname)
+		public UserInfo JoinAsGuest (MockServerConnection connection, string nickname)
 		{
-			JoinAsGuest (connection, true, true, null, nickname, null);
+			return JoinAsGuest (connection, true, true, null, nickname, null);
 		}
 
-		public void JoinAsGuest (MockServerConnection connection, bool shouldWork, bool allowGuests, string serverPassword, string nickname, string userServerpassword)
+		public UserInfo JoinAsGuest (MockServerConnection connection, bool shouldWork, bool allowGuests, string serverPassword, string nickname, string userServerpassword)
 		{
-			JoinAsGuest(connection, true, shouldWork, allowGuests, serverPassword, nickname, userServerpassword);
+			return JoinAsGuest (connection, true, shouldWork, allowGuests, serverPassword, nickname, userServerpassword);
 		}
 
-		public void JoinAsGuest (MockServerConnection connection, bool connect, bool shouldWork, bool allowGuests, string serverPassword, string nickname, string userServerpassword)
+		public UserInfo JoinAsGuest (MockServerConnection connection, bool connect, bool shouldWork, bool allowGuests, string serverPassword, string nickname, string userServerpassword)
 		{
 			context.Settings.AllowGuestLogins = allowGuests;
 			context.Settings.ServerPassword = serverPassword;
@@ -292,7 +295,7 @@ namespace Gablarski.Tests
 			
 			if (shouldWork)
 			{
-				Assert.IsTrue (handler.Manager.GetIsJoined (connection));
+				Assert.IsTrue (handler.Manager.GetIsJoined (connection), "User is not joined");
 
 				var msg = connection.Client.DequeueAndAssertMessage<JoinResultMessage>();
 				Assert.AreEqual (nickname, msg.UserInfo.Nickname);
@@ -300,15 +303,19 @@ namespace Gablarski.Tests
 				connection.Client.DequeueAndAssertMessage<PermissionsMessage>();
 				connection.Client.DequeueAndAssertMessage<UserJoinedMessage>();
 				connection.Client.DequeueAndAssertMessage<ChannelListMessage>();
-				connection.Client.DequeueAndAssertMessage<UserListMessage>();
+				connection.Client.DequeueAndAssertMessage<UserInfoListMessage>();
 				connection.Client.DequeueAndAssertMessage<SourceListMessage>();
 
 				observer.Client.DequeueAndAssertMessage<UserJoinedMessage>();
+				
+				return msg.UserInfo;
 			}
 			else
 			{
 				Assert.IsFalse (handler.Manager.GetIsJoined (connection));
 				observer.AssertNoMessage();
+				
+				return null;
 			}
 		}
 
@@ -417,6 +424,80 @@ namespace Gablarski.Tests
 
 			var update = c.Client.DequeueAndAssertMessage<UserUpdatedMessage>();
 			Assert.AreEqual (UserStatus.MutedMicrophone, update.User.Status);
+		}
+
+		[Test]
+		public void RequestOnlineUserList()
+		{
+			permissions.EnablePermissions (0, PermissionName.RequestChannelList);
+
+			var u1 = JoinAsGuest (server, "Nickname");
+
+			var c = new MockServerConnection();
+			var u2 = JoinAsGuest (c, "Nickname2");
+
+			server.Client.DequeueAndAssertMessage<UserJoinedMessage>();
+
+			handler.RequestUserListMessage (new MessageReceivedEventArgs (server,
+				new RequestUserListMessage (UserListMode.Current)));
+
+			var list = server.Client.DequeueAndAssertMessage<UserInfoListMessage>().Users.ToList();
+			Assert.AreEqual (2, list.Count);
+			Assert.IsTrue (list.Any (u => u.Nickname == "Nickname"), "User was not in returned list.");
+			Assert.IsTrue (list.Any (u => u.Nickname == "Nickname2"), "User was not in returned list.");
+		}
+
+		[Test]
+		public void RequestOnlineUserListWithoutPermission()
+		{
+			var u1 = JoinAsGuest (server, "Nickname");
+
+			var c = new MockServerConnection();
+			var u2 = JoinAsGuest (c, "Nickname2");
+
+			server.Client.DequeueAndAssertMessage<UserJoinedMessage>();
+
+			handler.RequestUserListMessage (new MessageReceivedEventArgs (server,
+				new RequestUserListMessage (UserListMode.Current)));
+
+			Assert.AreEqual (ClientMessageType.RequestUserList,
+				server.Client.DequeueAndAssertMessage<PermissionDeniedMessage>().DeniedMessage);
+		}
+
+		[Test]
+		public void RequestAllUserList()
+		{
+			permissions.EnablePermissions (0, PermissionName.RequestFullUserList);
+
+			var u1 = JoinAsGuest (server, "Nickname");
+
+			var c = new MockServerConnection();
+			var u2 = JoinAsGuest (c, "Nickname2");
+
+			server.Client.DequeueAndAssertMessage<UserJoinedMessage>();
+
+			handler.RequestUserListMessage (new MessageReceivedEventArgs (server,
+				new RequestUserListMessage (UserListMode.All)));
+
+			var list = server.Client.DequeueAndAssertMessage<UserListMessage>().Users.ToList();
+			Assert.AreEqual (0, list.Count);
+		}
+
+		[Test]
+		public void RequestAllUserListWithoutPermission()
+		{
+			var u1 = JoinAsGuest (server, "Nickname");
+
+			var c = new MockServerConnection();
+			var u2 = JoinAsGuest (c, "Nickname2");
+
+			server.Client.DequeueAndAssertMessage<UserJoinedMessage>();
+
+			handler.RequestUserListMessage (new MessageReceivedEventArgs (server,
+				new RequestUserListMessage (UserListMode.All)));
+
+			Assert.AreEqual (ClientMessageType.RequestUserList,
+				server.Client.DequeueAndAssertMessage<PermissionDeniedMessage>().DeniedMessage);
 		}
 	}
 }

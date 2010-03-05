@@ -144,14 +144,14 @@ namespace Gablarski.Tests
 				UserInfoTests.GetTestUser(2)
 			};
 
-			var msg = new UserListMessage (users);
+			var msg = new UserInfoListMessage (users);
 			Assert.AreEqual (1, msg.Users.Count (ui => ui.UserId.Equals (users[0].UserId) && ui.CurrentChannelId.Equals (users[0].CurrentChannelId) && ui.Nickname == users[0].Nickname && ui.IsMuted == users[0].IsMuted));
 			Assert.AreEqual (1, msg.Users.Count (ui => ui.UserId.Equals (users[1].UserId) && ui.CurrentChannelId.Equals (users[1].CurrentChannelId) && ui.Nickname == users[1].Nickname && ui.IsMuted == users[1].IsMuted));
 			msg.WritePayload (writer);
 			long length = stream.Position;
 			stream.Position = 0;
 
-			msg = new UserListMessage();
+			msg = new UserInfoListMessage();
 			msg.ReadPayload (reader);
 			Assert.AreEqual (length, stream.Position);
 			Assert.AreEqual (1, msg.Users.Count (ui => ui.UserId.Equals (users[0].UserId) && ui.CurrentChannelId.Equals (users[0].CurrentChannelId) && ui.Nickname == users[0].Nickname && ui.IsMuted == users[0].IsMuted));
@@ -161,13 +161,13 @@ namespace Gablarski.Tests
 		[Test]
 		public void EmptyUserList()
 		{
-			var msg = new UserListMessage(new List<UserInfo>());
+			var msg = new UserInfoListMessage(new List<UserInfo>());
 			Assert.AreEqual (0, msg.Users.Count());
 			msg.WritePayload (writer);
 			long length = stream.Position;
 			stream.Position = 0;
 
-			msg = new UserListMessage();
+			msg = new UserInfoListMessage();
 			msg.ReadPayload (reader);
 			Assert.AreEqual (length, stream.Position);
 			Assert.AreEqual (0, msg.Users.Count ());
@@ -408,6 +408,18 @@ namespace Gablarski.Tests
 
 			msg = AssertLengthMatches (msg);
 			UserInfoTests.AssertUserInfosMatch (UserInfoTests.GetTestUser(), msg.User);
+		}
+
+		[Test]
+		public void UserListMessage()
+		{
+			var msg = new UserListMessage (new[] {new User (1, "One"), new User (2, "Two")});
+			Assert.AreEqual (msg.Users.First().UserId, 1);
+			Assert.AreEqual (msg.Users.Skip (1).First().UserId, 2);
+
+			msg = AssertLengthMatches (msg);
+			Assert.AreEqual (msg.Users.First().UserId, 1);
+			Assert.AreEqual (msg.Users.Skip (1).First().UserId, 2);
 		}
 
 		private T AssertLengthMatches<T> (T msg)

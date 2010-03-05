@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2010, Eric Maupin
+﻿// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -37,44 +37,44 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Gablarski.Messages
 {
-	public class UserListMessage
+	public class UserInfoListMessage
 		: ServerMessage
 	{
-		public UserListMessage()
-			: base (ServerMessageType.UserList)
+		public UserInfoListMessage()
+			: base (ServerMessageType.UserInfoList)
 		{
 		}
 
-		public UserListMessage (IEnumerable<User> users)
+		public UserInfoListMessage (IEnumerable<UserInfo> users)
 			: this()
 		{
-			Users = users;
+			this.Users = users;
 		}
 
-		public IEnumerable<User> Users
+		public IEnumerable<UserInfo> Users
 		{
-			get; set;
-		}
-
-		public override void ReadPayload (IValueReader reader)
-		{
-			int numUsers = reader.ReadInt32();
-			User[] users = new User[numUsers];
-			for (int i = 0; i < users.Length; ++i)
-				users[i] = new User (reader);
-
-			Users = users;
+			get;
+			set;
 		}
 
 		public override void WritePayload (IValueWriter writer)
 		{
-			var users = Users.ToList();
-			writer.WriteInt32 (users.Count);
-			for (int i = 0; i < users.Count; ++i)
-				users[i].Serialize (writer);
+			writer.WriteInt32 (this.Users.Count());
+			foreach (UserInfo info in this.Users)
+				info.Serialize (writer);
+		}
+
+		public override void ReadPayload (IValueReader reader)
+		{
+			UserInfo[] users = new UserInfo[reader.ReadInt32()];
+			for (int i = 0; i < users.Length; ++i)
+				users[i] = new UserInfo (reader);
+
+			this.Users = users;
 		}
 	}
 }

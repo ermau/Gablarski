@@ -242,7 +242,7 @@ namespace Gablarski.Client
 		#region Message handlers
 		internal void OnUserListReceivedMessage (MessageReceivedEventArgs e)
 		{
-			var msg = (UserListMessage)e.Message;
+			var msg = (UserInfoListMessage)e.Message;
 
 			IEnumerable<UserInfo> userlist;
 			lock (SyncRoot)

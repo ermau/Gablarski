@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -37,7 +37,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Gablarski.Server
 {
@@ -47,9 +46,17 @@ namespace Gablarski.Server
 		public GuestPermissionProvider ()
 		{
 			this.adminPermissions = GetNamesAsPermissions (Permission.GetAllNames ()).ToList();
-			this.guestPermissions = GetNamesAsPermissions (PermissionName.Login, PermissionName.ChangeChannel, PermissionName.AddChannel,
-			                                  PermissionName.EditChannel, PermissionName.DeleteChannel,
-			                                  PermissionName.RequestChannelList, PermissionName.RequestSource, PermissionName.SendAudio).ToList();
+			this.guestPermissions = GetNamesAsPermissions (
+				PermissionName.Login,
+				PermissionName.ChangeChannel,
+				PermissionName.AddChannel,
+				PermissionName.EditChannel,
+				PermissionName.DeleteChannel,
+				PermissionName.RequestChannelList,
+				PermissionName.RequestUserList,
+				PermissionName.RequestSource,
+				PermissionName.SendAudio
+				).ToList();
 		}
 
 		public event EventHandler<PermissionsChangedEventArgs> PermissionsChanged;

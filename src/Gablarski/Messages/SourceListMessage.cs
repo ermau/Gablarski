@@ -46,7 +46,7 @@ namespace Gablarski.Messages
 		: ServerMessage
 	{
 		public SourceListMessage()
-			: base (ServerMessageType.SourceListReceived)
+			: base (ServerMessageType.SourceList)
 		{
 
 		}

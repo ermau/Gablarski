@@ -39,7 +39,7 @@ namespace Gablarski.Tests
 		private static void CreateUsers (IClientConnection client, ClientUserHandler handler)
 		{
 			handler.OnUserListReceivedMessage (new MessageReceivedEventArgs (client,
-			                                                                 new UserListMessage (new[]
+			                                                                 new UserInfoListMessage (new[]
 			                                                                 {
 			                                                                 	new UserInfo ("Foo", "Foo", 1, 1, false),
 			                                                                 	new UserInfo ("Bar", "Bar", 2, 1, false),
