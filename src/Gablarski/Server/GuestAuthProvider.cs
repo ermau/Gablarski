@@ -35,6 +35,8 @@
 // DAMAGE.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
 namespace Gablarski.Server
@@ -51,6 +53,11 @@ namespace Gablarski.Server
 		public Type IdentifyingType
 		{
 			get { return typeof (Int32);}
+		}
+
+		public IEnumerable<User> GetUsers()
+		{
+			return Enumerable.Empty<User>();
 		}
 
 		public bool UserExists (string username)

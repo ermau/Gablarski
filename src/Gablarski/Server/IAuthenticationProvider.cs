@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -37,7 +37,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Gablarski.Server
 {
@@ -49,10 +48,16 @@ namespace Gablarski.Server
 		bool UpdateSupported { get; }
 
 		/// <summary>
+		/// Gets all the users.
+		/// </summary>
+		IEnumerable<User> GetUsers();
+
+		/// <summary>
 		/// Gets whether a user exists or not.
 		/// </summary>
 		/// <param name="username">The username to check.</param>
 		/// <returns><c>true</c> if the username exists, <c>false</c> otherwise</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="username"/> is <c>null</c>.</exception>
 		bool UserExists (string username);
 
 		/// <summary>
@@ -60,6 +65,7 @@ namespace Gablarski.Server
 		/// </summary>
 		/// <param name="username">The username to login with.</param>
 		/// <param name="password">The password to login to the username with.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="username"/> or <paramref name="password"/> is <c>null</c>.</exception>
 		LoginResult Login (string username, string password);
 
 		/// <summary>
@@ -67,6 +73,7 @@ namespace Gablarski.Server
 		/// </summary>
 		/// <param name="username">The username to register.</param>
 		/// <param name="password">The password to register <paramref name="username"/> with.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="username"/> or <paramref name="password"/> is <c>null</c>.</exception>
 		LoginResult Register (string username, string password);
 	}
 }
