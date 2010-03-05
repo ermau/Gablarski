@@ -52,8 +52,11 @@ namespace Gablarski
 		MutedSound = 2,
 	}
 
+	/// <summary>
+	/// Represents a joined user.
+	/// </summary>
 	public class UserInfo
-		: IEquatable<UserInfo>
+		: User, IEquatable<UserInfo>
 	{
 		internal UserInfo()
 		{
@@ -125,22 +128,10 @@ namespace Gablarski
 			Deserialize (reader);
 		}
 
-		public int UserId
-		{
-			get;
-			protected set;
-		}
-
 		public int CurrentChannelId
 		{
 			get;
 			set;
-		}
-
-		public string Username
-		{
-			get;
-			protected set;
 		}
 
 		public string Nickname
@@ -173,10 +164,9 @@ namespace Gablarski
 			set;
 		}
 
-		internal void Serialize (IValueWriter writer)
+		internal override void Serialize (IValueWriter writer)
 		{
-			writer.WriteInt32 (this.UserId);
-			writer.WriteString (this.Username);
+			base.Serialize (writer);
 			writer.WriteInt32 (this.CurrentChannelId);
 			writer.WriteString (this.Nickname);
 			writer.WriteString (this.Phonetic);
@@ -185,10 +175,9 @@ namespace Gablarski
 			writer.WriteString (this.Comment);
 		}
 
-		internal void Deserialize (IValueReader reader)
+		internal override void Deserialize (IValueReader reader)
 		{
-			this.UserId = reader.ReadInt32();
-			this.Username = reader.ReadString();
+			base.Deserialize (reader);
 			this.CurrentChannelId = reader.ReadInt32();
 			this.Nickname = reader.ReadString();
 			this.Phonetic = reader.ReadString();
@@ -218,11 +207,6 @@ namespace Gablarski
 				return true;
 
 			return Equals (other.Username, this.Username);
-		}
-
-		public override int GetHashCode()
-		{
-			return this.Username.GetHashCode();
 		}
 	}
 }
