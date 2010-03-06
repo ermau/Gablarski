@@ -133,6 +133,7 @@
     <Compile Include="Messages\RequestMuteSourceMessage.cs" />
     <Compile Include="Messages\RequestMuteUserMessage.cs" />
     <Compile Include="Messages\SetCommentMessage.cs" />
+    <Compile Include="Messages\SetPermissionsMessage.cs" />
     <Compile Include="Messages\SetStatusMessage.cs" />
     <Compile Include="Messages\UserListMessage.cs" />
     <Compile Include="Messages\UserUpdatedMessage.cs" />
