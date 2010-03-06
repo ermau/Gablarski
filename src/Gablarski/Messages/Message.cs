@@ -41,7 +41,7 @@ using System.Text;
 
 namespace Gablarski.Messages
 {
-	// Next: 50
+	// Next: 53
 
 	public enum ClientMessageType
 		: ushort
@@ -72,6 +72,10 @@ namespace Gablarski.Messages
 		
 		RequestMuteUser = 44,
 		RequestMuteSource = 45,
+
+		SetPermissions = 52,
+		KickUser = 50,
+		BanUser = 51,
 	}
 
 	public enum ServerMessageType

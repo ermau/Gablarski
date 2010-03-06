@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -37,23 +37,59 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-namespace Gablarski.Server
+namespace Gablarski.Messages
 {
-	public interface IServerPersistance
+	public class SetPermissionsMessage
+		: ClientMessage
 	{
-		/// <summary>
-		/// Persists information about the user.
-		/// </summary>
-		/// <param name="user">The user to persist.</param>
-		void Persist (UserInfo user);
+		public SetPermissionsMessage()
+			: base (ClientMessageType.SetPermissions)
+		{
+		}
 
-		/// <summary>
-		/// Loads persisted data about the user.
-		/// </summary>
-		/// <param name="userId">The id of the user to load.</param>
-		/// <returns><c>null</c> if the user does not exist.</returns>
-		UserInfo GetUser (int userId);
+		public SetPermissionsMessage (UserInfo user, IEnumerable<Permission> permissions)
+			: this()
+		{
+			if (user == null)
+				throw new ArgumentNullException ("user");
+			if (permissions == null)
+				throw new ArgumentNullException ("permissions");
+
+			User = user;
+			Permissions = permissions;
+		}
+
+		public UserInfo User
+		{
+			get; set;
+		}
+
+		public IEnumerable<Permission> Permissions
+		{
+			get; set;
+		}
+
+		public override void WritePayload (IValueWriter writer)
+		{
+			User.Serialize (writer);
+
+			var perms = Permissions.ToList();
+
+			writer.WriteInt32 (perms.Count);
+
+			for (int i = 0; i < perms.Count; ++i)
+				perms[i].Serialize (writer);
+		}
+
+		public override void ReadPayload (IValueReader reader)
+		{
+			User = new UserInfo (reader);
+
+			int permissionCount = reader.ReadInt32();
+			Permission[] permissions = new Permission[permissionCount];
+			for (int i = 0; i < permissions.Length; ++i)
+				permissions[i] = new Permission (reader);
+		}
 	}
 }
