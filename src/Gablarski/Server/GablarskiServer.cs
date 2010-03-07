@@ -466,9 +466,15 @@ namespace Gablarski.Server
 			var msg = (QueryServerMessage)e.Message;
 			var connectionless = (e as ConnectionlessMessageReceivedEventArgs);
 			
-			if (!msg.ServerInfoOnly && (connectionless != null || !context.GetPermission (PermissionName.RequestChannelList, e.Connection)))
+			if (!msg.ServerInfoOnly && !context.GetPermission (PermissionName.RequestChannelList, e.Connection))
 			{
-				e.Connection.Send (new PermissionDeniedMessage (ClientMessageType.QueryServer));
+				var denied = new PermissionDeniedMessage (ClientMessageType.QueryServer);
+
+				if (connectionless != null)
+					connectionless.Provider.SendConnectionlessMessage (denied, connectionless.EndPoint);
+				else
+					e.Connection.Send (denied);
+
 				return;
 			}
 

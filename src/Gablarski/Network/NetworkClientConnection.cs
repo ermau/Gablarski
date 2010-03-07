@@ -112,9 +112,14 @@ namespace Gablarski.Network
 			
 			this.running = false;
 
-			ManualResetEvent mre = new ManualResetEvent (false);
-			this.pinger.Dispose(mre);
-			mre.WaitOne();
+			if (this.pinger != null)
+			{
+				using (ManualResetEvent mre = new ManualResetEvent (false))
+				{
+					this.pinger.Dispose(mre);
+					mre.WaitOne();
+				}
+			}
 
 			try
 			{
