@@ -55,6 +55,11 @@ namespace Gablarski.Messages
 			get { return true; }
 		}
 
+		public virtual bool AcceptedConnectionless
+		{
+			get { return false; }
+		}
+
 		public virtual int MessageSize
 		{
 			get { return 0; }

@@ -54,6 +54,11 @@ namespace Gablarski.Messages
 			get; set;
 		}
 
+		public override bool AcceptedConnectionless
+		{
+			get { return true; }
+		}
+
 		public override bool Reliable
 		{
 			get { return false; }
