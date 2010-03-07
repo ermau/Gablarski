@@ -218,8 +218,17 @@ namespace Gablarski.Network
 
 					if (connection == null)
 					{
-						if (this.debugLogging) this.log.DebugFormat ("Connectionless message received {0}", msg.MessageTypeCode);
-						OnConnectionlessMessageReceived (new ConnectionlessMessageReceivedEventArgs (this, msg, tendpoint));
+						if (msg.AcceptedConnectionless)
+						{
+							if (this.debugLogging)
+								this.log.DebugFormat ("Connectionless message received {0}", msg.MessageTypeCode);
+
+							OnConnectionlessMessageReceived (new ConnectionlessMessageReceivedEventArgs (this, msg, tendpoint));
+						}
+						else
+						{
+							this.log.WarnFormat ("{0} attempted to send message {1} connectionlessly", tendpoint, msg.MessageTypeCode);
+						}
 					}
 					else
 					{
