@@ -216,6 +216,15 @@ namespace Gablarski.Server
 			if (!connections.Contains (connection))
 				return;
 
+			IConnection oldConnection;
+			if (connectedUsers.TryGetValue (user, out oldConnection))
+			{
+				oldConnection.Disconnect();
+				connectedUsers.Remove (user);
+				loggedIn.Remove (oldConnection);
+				connections.Remove (oldConnection);
+			}
+
 			connectedUsers.Add (user, connection);
 			loggedIn.Add (connection);
 		}

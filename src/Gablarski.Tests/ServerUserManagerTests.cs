@@ -98,6 +98,23 @@ namespace Gablarski.Tests
 		}
 
 		[Test]
+		public void LoginAlreadyLoggedIn()
+		{
+			manager.Connect (client);
+			manager.Login (client, user);
+			Assert.IsTrue (manager.GetIsLoggedIn (client));
+
+			var c = new MockServerConnection();
+			manager.Connect (c);
+			manager.Login (c, user);
+
+			Assert.IsFalse (client.IsConnected);
+			Assert.IsFalse (manager.GetIsLoggedIn (client));
+			Assert.IsTrue (manager.GetIsLoggedIn (user));
+			Assert.IsTrue (manager.GetIsLoggedIn (c));
+		}
+
+		[Test]
 		public void GetIsLoggedInNull()
 		{
 			Assert.Throws<ArgumentNullException> (() => manager.GetIsLoggedIn ((IConnection)null));
