@@ -108,7 +108,7 @@ namespace Gablarski.Server
 			if (self == null)
 				throw new ArgumentNullException ("self");
 			if (connection == null)
-				throw new ArgumentNullException ("connection");
+				return self.GetPermission (name);
 
 			UserInfo user = self.UserManager.GetUser (connection);
 			if (user == null)
