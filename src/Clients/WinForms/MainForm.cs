@@ -451,10 +451,18 @@ namespace Gablarski.Clients.Windows
 
 		private void UsersUserChangedChannel (object sender, ChannelChangedEventArgs e)
 		{
-			if (e.User.Equals (gablarski.CurrentUser) && musicSource != null)
+			if (e.User.Equals (gablarski.CurrentUser))
 			{
-				gablarski.Audio.EndCapture (musicSource);
-				gablarski.Audio.BeginCapture (musicSource, e.TargetChannel);
+				if (musicSource != null)
+				{
+					gablarski.Audio.EndCapture (musicSource);
+					gablarski.Audio.BeginCapture (musicSource, e.TargetChannel);
+				}
+				else if (voiceSource != null && !Settings.UsePushToTalk)
+				{
+					gablarski.Audio.EndCapture (voiceSource);
+					gablarski.Audio.BeginCapture (voiceSource, e.TargetChannel);
+				}
 			}
 
 			this.users.RemoveUser (e.User);
