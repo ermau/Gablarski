@@ -175,6 +175,7 @@
     <Compile Include="Network\NetworkServerConnection.cs" />
     <Compile Include="Network\NetworkServerConnectionProvider.cs" />
     <Compile Include="Network\SocketValueWriter.cs" />
+    <Compile Include="Server\IChannelPermissionsProvider.cs" />
     <Compile Include="Server\IConnectionProvider.cs" />
     <Compile Include="Server\IRedirector.cs" />
     <Compile Include="Server\IServerChannelHandler.cs" />
@@ -194,7 +195,6 @@
     <Compile Include="ServerInfo.cs" />
     <Compile Include="Server\GuestPermissionProvider.cs" />
     <Compile Include="Server\GuestUserProvider.cs" />
-    <Compile Include="Server\IBackendProvider.cs" />
     <Compile Include="Server\IChannelProvider.cs" />
     <Compile Include="Server\IPermissionsProvider.cs" />
     <Compile Include="IValueReader.cs" />

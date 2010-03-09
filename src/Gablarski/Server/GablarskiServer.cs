@@ -74,20 +74,6 @@ namespace Gablarski.Server
 			SetupHandlers();
 		}
 
-		/// <summary>
-		/// Initializes a new <c>GablarskiServer</c> instance.
-		/// </summary>
-		/// <param name="settings">The settings for the server, providing name, description, etc.</param>
-		/// <param name="provider">The backend provider for the server to use.</param>
-		public GablarskiServer (ServerSettings settings, IBackendProvider provider)
-			: this (settings)
-		{
-			this.backendProvider = provider;
-			this.backendProvider.PermissionsChanged += OnPermissionsChanged;
-
-			SetupHandlers();
-		}
-
 		public object SyncRoot
 		{
 			get { return syncRoot; }
@@ -260,8 +246,6 @@ namespace Gablarski.Server
 		private readonly List<IRedirector> redirectors = new List<IRedirector>();
 		private readonly List<IConnectionProvider> availableConnections = new List<IConnectionProvider> ();
 
-		private readonly IBackendProvider backendProvider;
-
 		private readonly IServerContext context;
 		private readonly IChannelProvider channelProvider;
 		private readonly IPermissionsProvider permissionProvider;
@@ -278,24 +262,19 @@ namespace Gablarski.Server
 		private readonly Queue<MessageReceivedEventArgs> mqueue = new Queue<MessageReceivedEventArgs> (1000);
 		private readonly AutoResetEvent incomingWait = new AutoResetEvent (false);
 
-		IBackendProvider IServerContext.BackendProvider
-		{
-			get { return backendProvider; }
-		}
-
 		IChannelProvider IServerContext.ChannelsProvider
 		{
-			get { return (backendProvider ?? channelProvider); }
+			get { return channelProvider; }
 		}
 
 		IPermissionsProvider IServerContext.PermissionsProvider
 		{
-			get { return (backendProvider ?? permissionProvider); }
+			get { return permissionProvider; }
 		}
 
 		IUserProvider IServerContext.UserProvider
 		{
-			get { return (backendProvider ?? authProvider); }
+			get { return authProvider; }
 		}
 
 		int IServerContext.ProtocolVersion

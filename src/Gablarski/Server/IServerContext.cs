@@ -44,11 +44,6 @@ namespace Gablarski.Server
 		object SyncRoot { get; }
 
 		/// <summary>
-		/// Gets the backend provider for the server (<c>null</c> if not specified).
-		/// </summary>
-		IBackendProvider BackendProvider { get; }
-
-		/// <summary>
 		/// Gets the authentication provider for the server.
 		/// </summary>
 		IUserProvider UserProvider { get; }
@@ -156,8 +151,10 @@ namespace Gablarski.Server
 			if (self == null)
 				throw new ArgumentNullException ("self");
 
-			if (self.BackendProvider != null)
-				return self.BackendProvider.GetPermissions (channelid, userId).CheckPermission (name);
+			var channelPermissions = (self.PermissionsProvider as IChannelPermissionsProvider);
+
+			if (channelPermissions != null)
+				return channelPermissions.GetPermissions (channelid, userId).CheckPermission (name);
 			else
 				return self.PermissionsProvider.GetPermissions (userId).CheckPermission (name);
 		}

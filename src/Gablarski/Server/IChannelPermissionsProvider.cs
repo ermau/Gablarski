@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -37,15 +37,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Gablarski.Server
 {
-	/// <summary>
-	/// Interface for integrated backend providers.
-	/// </summary>
-	public interface IBackendProvider
-		: IUserProvider, IChannelProvider, IPermissionsProvider
+	public interface IChannelPermissionsProvider
+		: IPermissionsProvider
 	{
 		/// <summary>
 		/// Gets user permissions for a specific channel.
