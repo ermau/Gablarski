@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,7 +14,8 @@ namespace Gablarski.Tests
 		[Test]
 		public void InvalidCtor()
 		{
-			Assert.Throws<ArgumentNullException> (() => new ServerInfo ((ServerSettings)null));
+			Assert.Throws<ArgumentNullException> (() => new ServerInfo ((ServerSettings)null, new GuestUserProvider()));
+			Assert.Throws<ArgumentNullException> (() => new ServerInfo (new ServerSettings(), null));
 			Assert.Throws<ArgumentNullException> (() => new ServerInfo ((IValueReader)null));
 		}
 
@@ -31,12 +32,14 @@ namespace Gablarski.Tests
 				Name = name,
 				Description = desc,
 				ServerPassword = "foo",
-			});
+			}, new GuestUserProvider());
 
 			Assert.AreEqual (logo, info.Logo);
 			Assert.AreEqual (name, info.Name);
 			Assert.AreEqual (desc, info.Description);
 			Assert.AreEqual (true, info.Passworded);
+			Assert.AreEqual (UserRegistrationMode.None, info.RegistrationMode);
+			Assert.IsNull (info.RegistrationContent);
 		}
 
 		[Test]
@@ -52,7 +55,7 @@ namespace Gablarski.Tests
 				Name = name,
 				Description = desc,
 				ServerPassword = "passworded"
-			});
+			}, new GuestUserProvider());
 
 			var stream = new MemoryStream (new byte[20480], true);
 			var writer = new StreamValueWriter (stream);
@@ -68,6 +71,8 @@ namespace Gablarski.Tests
 			Assert.AreEqual (name, info.Name);
 			Assert.AreEqual (desc, info.Description);
 			Assert.AreEqual (true, info.Passworded);
+			Assert.AreEqual (UserRegistrationMode.None, info.RegistrationMode);
+			Assert.IsNull (info.RegistrationContent);
 		}
 	}
 }

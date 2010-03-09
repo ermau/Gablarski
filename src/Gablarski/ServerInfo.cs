@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -49,15 +49,21 @@ namespace Gablarski
 			Deserialize (reader);
 		}
 
-		internal ServerInfo (ServerSettings settings)
+		internal ServerInfo (ServerSettings settings, IUserProvider userProvider)
 		{
 			if (settings == null)
-				throw new ArgumentNullException("settings");
+				throw new ArgumentNullException ("settings");
+			if (userProvider == null)
+				throw new ArgumentNullException ("userProvider");
 
 			this.Name = settings.Name;
 			this.Description = settings.Description;
 			this.Logo = settings.ServerLogo;
 			this.Passworded = !String.IsNullOrEmpty (settings.ServerPassword);
+			RegistrationMode = userProvider.RegistrationMode;
+			
+			if (userProvider.RegistrationMode != UserRegistrationMode.None)
+				RegistrationContent = userProvider.RegistrationContent;
 		}
 
 		/// <summary>
@@ -95,21 +101,47 @@ namespace Gablarski
 			get;
 			private set;
 		}
+		
+		/// <summary>
+		/// Gets the server's registration mode. 
+		/// </summary>
+		public UserRegistrationMode RegistrationMode
+		{
+			get;
+			private set;
+		}
+		
+		/// <summary>
+		/// Gets the server's registration content. 
+		/// </summary>
+		public string RegistrationContent
+		{
+			get;
+			private set;
+		}
 
 		internal void Serialize (IValueWriter writer)
 		{
-			writer.WriteString (this.Name);
-			writer.WriteString (this.Description);
-			writer.WriteString (this.Logo);
-			writer.WriteBool (this.Passworded);
+			writer.WriteString (Name);
+			writer.WriteString (Description);
+			writer.WriteString (Logo);
+			writer.WriteBool (Passworded);
+			writer.WriteByte ((byte)RegistrationMode);
+			
+			if (RegistrationMode != UserRegistrationMode.None)
+				writer.WriteString (RegistrationContent);
 		}
 
 		internal void Deserialize (IValueReader reader)
 		{
-			this.Name = reader.ReadString();
-			this.Description = reader.ReadString();
-			this.Logo = reader.ReadString();
-			this.Passworded = reader.ReadBool();
+			Name = reader.ReadString();
+			Description = reader.ReadString();
+			Logo = reader.ReadString();
+			Passworded = reader.ReadBool();
+			RegistrationMode = (UserRegistrationMode)reader.ReadByte();
+			
+			if (RegistrationMode != UserRegistrationMode.None)
+				RegistrationContent = reader.ReadString();
 		}
 	}
 }

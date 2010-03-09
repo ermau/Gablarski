@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -390,7 +390,7 @@ namespace Gablarski.Tests
 				ServerLogo = "logo",
 				Name = "name",
 				Description = "description"
-			}));
+			}, new GuestUserProvider()));
 			msg.WritePayload (writer);
 			long length = stream.Position;
 			stream.Position = 0;

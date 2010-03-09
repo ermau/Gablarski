@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2010, Eric Maupin
+// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -40,11 +40,13 @@ using System.Linq;
 
 namespace Gablarski.Server
 {
-	public enum RegistrationMode
+	public enum UserRegistrationMode
+		: byte
 	{
-		Normal = 0,
-		WebPage = 1,
-		Message = 2
+		None = 0,
+		Normal = 1,
+		WebPage = 2,
+		Message = 3
 	}
 
 	public interface IUserProvider
@@ -53,17 +55,16 @@ namespace Gablarski.Server
 		/// Gets whether or not users can be updated.
 		/// </summary>
 		bool UpdateSupported { get; }
-
+		
 		/// <summary>
 		/// Gets the registration mode of the user provider.
 		/// </summary>
-		/// <exception cref="NotSupportedException"><see cref="UpdateSupported"/> is <c>false</c>.</exception>
-		RegistrationMode RegistrationMode { get; }
+		UserRegistrationMode RegistrationMode { get; }
 
 		/// <summary>
 		/// Gets the content for any of the various forms of <see cref="Server.RegistrationMode"/>.
 		/// </summary>
-		/// <exception cref="NotSupportedException"><see cref="UpdateSupported"/> is <c>false</c>.</exception>
+		/// <exception cref="NotSupportedException"><see cref="RegistrationMode"/> is <see cref="Server.RegistrationMode.None"/>.</exception>
 		/// <remarks>
 		/// When <see cref="RegistrationMode"/> is:
 		/// <see cref="Server.RegistrationMode.Normal"/>: This is the user agreement to register (<c>null</c>/<c>String.Empty</c> to skip.)

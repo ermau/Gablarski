@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -50,9 +50,9 @@ namespace Gablarski.Server
 			get { return false; }
 		}
 
-		public RegistrationMode RegistrationMode
+		public UserRegistrationMode RegistrationMode
 		{
-			get { throw new NotSupportedException(); }
+			get { return UserRegistrationMode.None; }
 		}
 
 		public string RegistrationContent

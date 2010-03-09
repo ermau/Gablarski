@@ -190,7 +190,7 @@ namespace Gablarski.Server
 
 			Manager.Connect (e.Connection);
 
-			e.Connection.Send (new ServerInfoMessage { ServerInfo = new ServerInfo (this.context.Settings) });
+			e.Connection.Send (new ServerInfoMessage { ServerInfo = new ServerInfo (context.Settings, context.UserProvider) });
 		}
 
 		internal void JoinMessage (MessageReceivedEventArgs e)
