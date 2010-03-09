@@ -52,17 +52,11 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\Gablarski.Clients.XML</DocumentationFile>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Mono Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Mono Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Optimize>false</Optimize>
-  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Cadenza, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\Cadenza.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -82,6 +76,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AvatarCache.cs" />
+    <Compile Include="AutomaticErrorReporter.cs" />
+    <Compile Include="GablarskiErrorReporter.cs" />
+    <Compile Include="IErrorReporter.cs" />
     <Compile Include="INotifier.cs" />
     <Compile Include="ITextToSpeech.cs" />
     <Compile Include="LocalServer.cs" />
