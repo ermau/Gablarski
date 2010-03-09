@@ -326,13 +326,18 @@ namespace Gablarski.Clients.Windows
 				return;
 			}
 
-			TreeNode node;
+			TreeNode node = null;
 			if (source.IsMuted)
 				return;
-			else if (Settings.DisplaySources && sourceNodes.TryGetValue (source, out node))
+			
+			if (Settings.DisplaySources && sourceNodes.TryGetValue (source, out node))
 				SetupUserContext (node.Parent);
-			else if (userNodes.TryGetValue (client.Users[source.OwnerId], out node))
-				SetupUserContext (node);
+			else
+			{
+				UserInfo user = client.Users[source.OwnerId];
+				if (user != null && userNodes.TryGetValue (user, out node))
+					SetupUserContext (node);
+			}
 
 			if (node != null)
 				node.ImageKey = node.SelectedImageKey = "silent";
