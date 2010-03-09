@@ -125,34 +125,6 @@ namespace Gablarski.Barrel.Config
 				}
 			}
 
-			try
-			{
-				Type backendType = providerTypes.SingleOrDefault (t => t.GetInterface ("IBackendProvider") != null);
-				if (backendType != null)
-				{
-					IBackendProvider backendProvider;
-					if (instances.ContainsKey (backendType))
-						backendProvider = (IBackendProvider)instances[backendType];
-					else
-						backendProvider = (IBackendProvider)Activator.CreateInstance (backendType);
-
-					log.Debug ("Backend provider found: " + backendType.FullName);
-					return new ServerProviders (backendProvider, cproviders);
-				}
-			}
-			catch (InvalidOperationException)
-			{
-				log.Warn ("Multiple backend providers found.");
-				return null;
-			}
-			catch (Exception ex)
-			{
-				log.Warn ("Error creating backend provider", ex);
-				return null;
-			}
-
-			log.Debug ("No backend provider found, looking for individual providers");
-
 			IChannelProvider channels = LoadProvider<IChannelProvider> (providerTypes, instances, log);
 			if (channels == null)
 				return null;

@@ -43,15 +43,6 @@ namespace Gablarski.Barrel
 {
 	public class ServerProviders
 	{
-		public ServerProviders (IBackendProvider backend, IEnumerable<IConnectionProvider> cproviders)
-			: this (cproviders)
-		{
-			if (backend == null)
-				throw new ArgumentNullException ("backend");
-
-			Backend = backend;
-		}
-
 		public ServerProviders (IChannelProvider channels, IUserProvider auth, IPermissionsProvider permissions, IEnumerable<IConnectionProvider> cproviders)
 			: this (cproviders)
 		{
@@ -76,12 +67,6 @@ namespace Gablarski.Barrel
 		}
 
 		public IEnumerable<IConnectionProvider> ConnectionProviders
-		{
-			get;
-			private set;
-		}
-
-		public IBackendProvider Backend
 		{
 			get;
 			private set;
