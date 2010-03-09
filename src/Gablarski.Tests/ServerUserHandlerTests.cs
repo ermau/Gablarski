@@ -61,7 +61,7 @@ namespace Gablarski.Tests
 			context = new MockServerContext
 			{
 				Settings = new ServerSettings(),
-				AuthenticationProvider = new GuestAuthProvider(),
+				UserProvider = new GuestUserProvider(),
 				PermissionsProvider = permissions,
 				ChannelsProvider = new LobbyChannelProvider()
 			};

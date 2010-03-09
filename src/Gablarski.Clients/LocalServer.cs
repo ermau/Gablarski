@@ -65,7 +65,7 @@ namespace Gablarski.Clients
 			get { return permissions; }
 		}
 
-		public static GuestAuthProvider Authorization
+		public static GuestUserProvider Authorization
 		{
 			get { return authorization; }
 		}
@@ -73,7 +73,7 @@ namespace Gablarski.Clients
 		public static void Start()
 		{
 			channels = new LobbyChannelProvider();
-			authorization = new GuestAuthProvider();
+			authorization = new GuestUserProvider();
 			permissions = new GuestPermissionProvider();
 			settings = new ServerSettings();
 			server = new GablarskiServer (settings, authorization, permissions, channels);
@@ -96,7 +96,7 @@ namespace Gablarski.Clients
 		}
 
 		private static LobbyChannelProvider channels;
-		private static GuestAuthProvider authorization;
+		private static GuestUserProvider authorization;
 		private static GuestPermissionProvider permissions;
 		private static ServerSettings settings;
 		private static GablarskiServer server;

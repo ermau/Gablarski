@@ -40,12 +40,37 @@ using System.Linq;
 
 namespace Gablarski.Server
 {
-	public interface IAuthenticationProvider
+	public enum RegistrationMode
+	{
+		Normal = 0,
+		WebPage = 1,
+		Message = 2
+	}
+
+	public interface IUserProvider
 	{
 		/// <summary>
 		/// Gets whether or not users can be updated.
 		/// </summary>
 		bool UpdateSupported { get; }
+
+		/// <summary>
+		/// Gets the registration mode of the user provider.
+		/// </summary>
+		/// <exception cref="NotSupportedException"><see cref="UpdateSupported"/> is <c>false</c>.</exception>
+		RegistrationMode RegistrationMode { get; }
+
+		/// <summary>
+		/// Gets the content for any of the various forms of <see cref="Server.RegistrationMode"/>.
+		/// </summary>
+		/// <exception cref="NotSupportedException"><see cref="UpdateSupported"/> is <c>false</c>.</exception>
+		/// <remarks>
+		/// When <see cref="RegistrationMode"/> is:
+		/// <see cref="Server.RegistrationMode.Normal"/>: This is the user agreement to register (<c>null</c>/<c>String.Empty</c> to skip.)
+		/// <see cref="Server.RegistrationMode.WebPage"/>: This is the URL.
+		/// <see cref="Server.RegistrationMode.Message"/>: This is the message.
+		/// </remarks>
+		string RegistrationContent { get; }
 
 		/// <summary>
 		/// Gets all the users.

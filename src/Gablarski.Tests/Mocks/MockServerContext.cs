@@ -20,7 +20,7 @@ namespace Gablarski.Tests.Mocks
 			set;
 		}
 
-		public IAuthenticationProvider AuthenticationProvider
+		public IUserProvider UserProvider
 		{
 			get;
 			set;

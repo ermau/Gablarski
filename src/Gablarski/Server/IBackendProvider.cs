@@ -45,7 +45,7 @@ namespace Gablarski.Server
 	/// Interface for integrated backend providers.
 	/// </summary>
 	public interface IBackendProvider
-		: IAuthenticationProvider, IChannelProvider, IPermissionsProvider
+		: IUserProvider, IChannelProvider, IPermissionsProvider
 	{
 		/// <summary>
 		/// Gets user permissions for a specific channel.

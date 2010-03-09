@@ -52,7 +52,7 @@ namespace Gablarski.Barrel
 			Backend = backend;
 		}
 
-		public ServerProviders (IChannelProvider channels, IAuthenticationProvider auth, IPermissionsProvider permissions, IEnumerable<IConnectionProvider> cproviders)
+		public ServerProviders (IChannelProvider channels, IUserProvider auth, IPermissionsProvider permissions, IEnumerable<IConnectionProvider> cproviders)
 			: this (cproviders)
 		{
 			if (channels == null)
@@ -63,7 +63,7 @@ namespace Gablarski.Barrel
 				throw new ArgumentNullException ("permissions");
 
 			Channels = channels;
-			Authentication = auth;
+			Users = auth;
 			Permissions = permissions;
 		}
 
@@ -93,7 +93,7 @@ namespace Gablarski.Barrel
 			private set;
 		}
 
-		public IAuthenticationProvider Authentication
+		public IUserProvider Users
 		{
 			get;
 			private set;

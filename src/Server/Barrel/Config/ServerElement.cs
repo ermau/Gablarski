@@ -157,7 +157,7 @@ namespace Gablarski.Barrel.Config
 			if (channels == null)
 				return null;
 
-			IAuthenticationProvider auth = LoadProvider<IAuthenticationProvider> (providerTypes, instances, log);
+			IUserProvider auth = LoadProvider<IUserProvider> (providerTypes, instances, log);
 			if (auth == null)
 				return null;
 

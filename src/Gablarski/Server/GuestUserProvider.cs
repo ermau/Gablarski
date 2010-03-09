@@ -41,13 +41,23 @@ using System.Threading;
 
 namespace Gablarski.Server
 {
-	public class GuestAuthProvider
-		: IAuthenticationProvider
+	public class GuestUserProvider
+		: IUserProvider
 	{
-		#region IAuthenticationProvider Members
+		#region IUserProvider Members
 		public bool UpdateSupported
 		{
 			get { return false; }
+		}
+
+		public RegistrationMode RegistrationMode
+		{
+			get { throw new NotSupportedException(); }
+		}
+
+		public string RegistrationContent
+		{
+			get { throw new NotSupportedException(); }
 		}
 
 		public Type IdentifyingType

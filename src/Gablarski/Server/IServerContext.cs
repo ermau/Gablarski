@@ -51,7 +51,7 @@ namespace Gablarski.Server
 		/// <summary>
 		/// Gets the authentication provider for the server.
 		/// </summary>
-		IAuthenticationProvider AuthenticationProvider { get; }
+		IUserProvider UserProvider { get; }
 
 		/// <summary>
 		/// Gets the permissions provider for the server.

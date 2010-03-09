@@ -61,7 +61,7 @@ namespace Gablarski.Server
 		/// <param name="authProvider">The user authentication provider for the server to use.</param>
 		/// <param name="permissionProvider">The user permissions provider for the server to use.</param>
 		/// <param name="channelProvider">The channel provider for the server to use.</param>
-		public GablarskiServer (ServerSettings settings, IAuthenticationProvider authProvider, IPermissionsProvider permissionProvider, IChannelProvider channelProvider)
+		public GablarskiServer (ServerSettings settings, IUserProvider authProvider, IPermissionsProvider permissionProvider, IChannelProvider channelProvider)
 			: this (settings)
 		{
 			this.authProvider = authProvider;
@@ -265,7 +265,7 @@ namespace Gablarski.Server
 		private readonly IServerContext context;
 		private readonly IChannelProvider channelProvider;
 		private readonly IPermissionsProvider permissionProvider;
-		private readonly IAuthenticationProvider authProvider;
+		private readonly IUserProvider authProvider;
 		private volatile bool running = true;
 
 		private readonly object syncRoot = new object();
@@ -293,7 +293,7 @@ namespace Gablarski.Server
 			get { return (backendProvider ?? permissionProvider); }
 		}
 
-		IAuthenticationProvider IServerContext.AuthenticationProvider
+		IUserProvider IServerContext.UserProvider
 		{
 			get { return (backendProvider ?? authProvider); }
 		}

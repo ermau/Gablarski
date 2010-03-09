@@ -252,7 +252,7 @@ namespace Gablarski.Server
 				return;
 			}
 
-			LoginResult result = this.context.AuthenticationProvider.Login (login.Username, login.Password);
+			LoginResult result = this.context.UserProvider.Login (login.Username, login.Password);
 
 			if (!this.context.PermissionsProvider.GetPermissions (result.UserId).CheckPermission (PermissionName.Login))
 				result.ResultState = LoginResultState.FailedPermissions;
@@ -290,7 +290,7 @@ namespace Gablarski.Server
 					return;
 				}
 
-				e.Connection.Send (new UserListMessage (context.AuthenticationProvider.GetUsers()));
+				e.Connection.Send (new UserListMessage (context.UserProvider.GetUsers()));
 			}
 		}
 
@@ -398,7 +398,7 @@ namespace Gablarski.Server
 					return null;
 				}
 
-				LoginResult r = this.context.AuthenticationProvider.Login (join.Nickname, null);
+				LoginResult r = this.context.UserProvider.Login (join.Nickname, null);
 				if (!r.Succeeded)
 				{
 					connection.Send (new JoinResultMessage (r.ResultState, null));
