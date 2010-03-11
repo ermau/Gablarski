@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle ("Gablarski.LocalServer")]
 [assembly: AssemblyDescription ("")]
 [assembly: AssemblyConfiguration ("")]
-[assembly: AssemblyCompany ("Microsoft")]
+[assembly: AssemblyCompany ("Eric Maupin")]
 [assembly: AssemblyProduct ("Gablarski.LocalServer")]
-[assembly: AssemblyCopyright ("Copyright © Microsoft 2009")]
+[assembly: AssemblyCopyright ("Copyright © Eric Maupin 2010")]
 [assembly: AssemblyTrademark ("")]
 [assembly: AssemblyCulture ("")]
 

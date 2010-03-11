@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2010, Eric Maupin
+// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -66,13 +66,13 @@ namespace Gablarski
 		{
 		}
 
-		public int UserId
+		public virtual int UserId
 		{
 			get;
 			protected set;
 		}
 
-		public string Username
+		public virtual string Username
 		{
 			get;
 			protected set;
