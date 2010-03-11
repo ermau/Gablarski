@@ -37,6 +37,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Threading;
 using Gablarski;
 using Gablarski.Server;
 
@@ -110,14 +111,20 @@ namespace Gablarski.Tests
 			
 			LoginResultState state = LoginResultState.Success;
 			MockUser user = users.FirstOrDefault (u => u.Username.Trim().ToLower() == username);
-			if (user == null)
-				state = LoginResultState.FailedUsername;
-			else if (password == null)
-				state = LoginResultState.FailedPassword;
-			else if (user.Password.Trim().ToLower() == password.Trim().ToLower())
-				state = LoginResultState.FailedPassword;
+			if (user != null)
+			{
+				if (password == null)
+					state = LoginResultState.FailedPassword;
+				else if (password.Trim().ToLower() != user.Password.Trim().ToLower())
+					state = LoginResultState.FailedPassword;
+			}
+			else
+			{
+				if (password != null)
+					state = LoginResultState.FailedUsernameAndPassword;
+			}
 			
-			return new LoginResult ((user != null) ? user.UserId : 0, state);
+			return new LoginResult ((user != null) ? user.UserId : Interlocked.Decrement (ref nextGuestId), state);
 		}
 		
 		public LoginResult Register (string username, string password)
