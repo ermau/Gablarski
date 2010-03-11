@@ -134,12 +134,26 @@ namespace Gablarski
 			set;
 		}
 
+		/// <summary>
+		/// Gets whether the user is registered or is a guest.
+		/// </summary>
+		public bool IsRegistered
+		{
+			get { return (UserId > 0); }
+		}
+
+		/// <summary>
+		/// Gets the user's unique username. <see cref="Nickname"/> if unregistered.
+		/// </summary>
 		public string Username
 		{
 			get;
 			set;
 		}
 
+		/// <summary>
+		/// Gets the Id of the channel the user is currently in.
+		/// </summary>
 		public int CurrentChannelId
 		{
 			get;
