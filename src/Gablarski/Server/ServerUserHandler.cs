@@ -379,6 +379,14 @@ namespace Gablarski.Server
 
 			this.Send (new UserUpdatedMessage (user));
 		}
+		
+		internal void RegisterMessage (MessageReceivedEventArgs e)
+		{
+			var msg = (RegisterMessage)e.Message;
+			
+			if (context.UserProvider.RegistrationMode == UserRegistrationMode.None || !Manager.GetIsConnected (e.Connection))
+				return;
+		}
 
 		private UserInfo GetJoiningUserInfo (IConnection connection, JoinMessage join)
 		{

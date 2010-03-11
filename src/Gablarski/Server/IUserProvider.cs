@@ -90,8 +90,8 @@ namespace Gablarski.Server
 		/// Attempts to login a user using the supplied <paramref name="username"/> and <paramref name="password"/>.
 		/// </summary>
 		/// <param name="username">The username to login with.</param>
-		/// <param name="password">The password to login to the username with.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="username"/> or <paramref name="password"/> is <c>null</c>.</exception>
+		/// <param name="password">The password to login to the username with, <c>null</c> for guests.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="username"/></exception>
 		LoginResult Login (string username, string password);
 
 		/// <summary>

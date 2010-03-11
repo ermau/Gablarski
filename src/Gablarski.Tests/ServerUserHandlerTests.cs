@@ -52,16 +52,18 @@ namespace Gablarski.Tests
 		private MockServerConnection server;
 		private MockServerContext context;
 		private MockPermissionsProvider permissions;
+		private MockUserProvider users;
 
 		[SetUp]
 		public void Setup()
 		{
 			permissions = new MockPermissionsProvider();
+			users = new MockUserProvider();
 
 			context = new MockServerContext
 			{
 				Settings = new ServerSettings(),
-				UserProvider = new GuestUserProvider(),
+				UserProvider = users,
 				PermissionsProvider = permissions,
 				ChannelsProvider = new LobbyChannelProvider()
 			};
@@ -498,6 +500,11 @@ namespace Gablarski.Tests
 
 			Assert.AreEqual (ClientMessageType.RequestUserList,
 				server.Client.DequeueAndAssertMessage<PermissionDeniedMessage>().DeniedMessage);
+		}
+		
+		[Test]
+		public void RegisterNotSupported()
+		{
 		}
 	}
 }
