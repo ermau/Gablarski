@@ -200,6 +200,11 @@ namespace Gablarski
 			Comment = reader.ReadString();
 		}
 
+		public override int GetHashCode()
+		{
+			return this.Username.GetHashCode();
+		}
+
 		public override bool Equals (object obj)
 		{
 			var info = (obj as UserInfo);
