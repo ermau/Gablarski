@@ -62,14 +62,14 @@ namespace Gablarski.Server
 		UserRegistrationMode RegistrationMode { get; }
 
 		/// <summary>
-		/// Gets the content for any of the various forms of <see cref="Server.RegistrationMode"/>.
+		/// Gets the content for any of the various forms of <see cref="Server.UserRegistrationMode"/>.
 		/// </summary>
-		/// <exception cref="NotSupportedException"><see cref="RegistrationMode"/> is <see cref="Server.RegistrationMode.None"/>.</exception>
+		/// <exception cref="NotSupportedException"><see cref="RegistrationMode"/> is <see cref="Server.UserRegistrationMode.None"/>.</exception>
 		/// <remarks>
 		/// When <see cref="RegistrationMode"/> is:
-		/// <see cref="Server.RegistrationMode.Normal"/>: This is the user agreement to register (<c>null</c>/<c>String.Empty</c> to skip.)
-		/// <see cref="Server.RegistrationMode.WebPage"/>: This is the URL.
-		/// <see cref="Server.RegistrationMode.Message"/>: This is the message.
+		/// <see cref="Server.UserRegistrationMode.Normal"/>: This is the user agreement to register (<c>null</c>/<c>String.Empty</c> to skip.)
+		/// <see cref="Server.UserRegistrationMode.WebPage"/>: This is the URL.
+		/// <see cref="Server.UserRegistrationMode.Message"/>: This is the message.
 		/// </remarks>
 		string RegistrationContent { get; }
 
