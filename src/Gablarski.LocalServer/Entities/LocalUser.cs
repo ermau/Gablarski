@@ -6,8 +6,20 @@ using System.Text;
 namespace Gablarski.LocalServer.Entities
 {
 	public class LocalUser
-		: User
+		: IUser
 	{
+		public virtual int UserId
+		{
+			get;
+			private set;
+		}
+
+		public virtual string Username
+		{
+			get;
+			set;
+		}
+
 		public virtual string EncryptedPassword
 		{
 			get; set;

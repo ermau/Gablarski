@@ -56,7 +56,7 @@ namespace Gablarski
 	/// Represents a joined user.
 	/// </summary>
 	public class UserInfo
-		: User, IEquatable<UserInfo>
+		: IUser, IEquatable<UserInfo>
 	{
 		internal UserInfo()
 		{
@@ -67,13 +67,13 @@ namespace Gablarski
 			if (info == null)
 				throw new ArgumentNullException ("info");
 
-			this.Nickname = info.Nickname;
-			this.Phonetic = info.Phonetic;
-			this.Username = info.Username;
-			this.UserId = info.UserId;
-			this.CurrentChannelId = info.CurrentChannelId;
-			this.IsMuted = info.IsMuted;
-			this.Status = info.Status;
+			UserId = info.UserId;
+			Username = info.Username;
+			Nickname = info.Nickname;
+			Phonetic = info.Phonetic;
+			CurrentChannelId = info.CurrentChannelId;
+			IsMuted = info.IsMuted;
+			Status = info.Status;
 		}
 		
 		internal UserInfo (string nickname, string username, int userId, int currentChannelId, bool muted)
@@ -97,12 +97,12 @@ namespace Gablarski
 			if (currentChannelId < 0)
 				throw new ArgumentOutOfRangeException ("currentChannelId");
 
-			this.Nickname = nickname;
-			this.Phonetic = phonetic;
-			this.Username = username;
-			this.UserId = userId;
-			this.CurrentChannelId = currentChannelId;
-			this.IsMuted = muted;
+			Nickname = nickname;
+			Phonetic = phonetic;
+			Username = username;
+			UserId = userId;
+			CurrentChannelId = currentChannelId;
+			IsMuted = muted;
 		}
 
 		internal UserInfo (string username, int userId, int currentChannelId, bool muted)
@@ -114,10 +114,10 @@ namespace Gablarski
 			if (currentChannelId < 0)
 				throw new ArgumentOutOfRangeException ("currentChannelId");
 
-			this.Username = username;
-			this.UserId = userId;
-			this.CurrentChannelId = currentChannelId;
-			this.IsMuted = muted;
+			Username = username;
+			UserId = userId;
+			CurrentChannelId = currentChannelId;
+			IsMuted = muted;
 		}
 
 		internal UserInfo (IValueReader reader)
@@ -126,6 +126,18 @@ namespace Gablarski
 				throw new ArgumentNullException("reader");
 
 			Deserialize (reader);
+		}
+
+		public int UserId
+		{
+			get;
+			set;
+		}
+
+		public string Username
+		{
+			get;
+			set;
 		}
 
 		public int CurrentChannelId
@@ -164,26 +176,28 @@ namespace Gablarski
 			set;
 		}
 
-		internal override void Serialize (IValueWriter writer)
+		internal void Serialize (IValueWriter writer)
 		{
-			base.Serialize (writer);
-			writer.WriteInt32 (this.CurrentChannelId);
-			writer.WriteString (this.Nickname);
-			writer.WriteString (this.Phonetic);
-			writer.WriteBool (this.IsMuted);
-			writer.WriteByte ((byte)this.Status);
-			writer.WriteString (this.Comment);
+			writer.WriteInt32 (UserId);
+			writer.WriteString (Username);
+			writer.WriteInt32 (CurrentChannelId);
+			writer.WriteString (Nickname);
+			writer.WriteString (Phonetic);
+			writer.WriteBool (IsMuted);
+			writer.WriteByte ((byte)Status);
+			writer.WriteString (Comment);
 		}
 
-		internal override void Deserialize (IValueReader reader)
+		internal void Deserialize (IValueReader reader)
 		{
-			base.Deserialize (reader);
-			this.CurrentChannelId = reader.ReadInt32();
-			this.Nickname = reader.ReadString();
-			this.Phonetic = reader.ReadString();
-			this.IsMuted = reader.ReadBool();
-			this.Status = (UserStatus)reader.ReadByte();
-			this.Comment = reader.ReadString();
+			UserId = reader.ReadInt32();
+			Username = reader.ReadString();
+			CurrentChannelId = reader.ReadInt32();
+			Nickname = reader.ReadString();
+			Phonetic = reader.ReadString();
+			IsMuted = reader.ReadBool();
+			Status = (UserStatus)reader.ReadByte();
+			Comment = reader.ReadString();
 		}
 
 		public override bool Equals (object obj)

@@ -76,7 +76,7 @@ namespace Gablarski.Server
 		/// <summary>
 		/// Gets all the users.
 		/// </summary>
-		IEnumerable<User> GetUsers();
+		IEnumerable<IUser> GetUsers();
 
 		/// <summary>
 		/// Gets whether a user exists or not.

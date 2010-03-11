@@ -36,13 +36,15 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
+using Gablarski.LocalServer.Entities;
 using NHibernate;
 using NHibernate.Cfg;
 using FluentNHibernate.Cfg;
 using FluentNHibernate.Data;
 using FluentNHibernate.Cfg.Db;
+using NHibernate.Tool.hbm2ddl;
 
 namespace Gablarski.LocalServer
 {
@@ -52,8 +54,8 @@ namespace Gablarski.LocalServer
 		{
 			SessionFactory = Fluently.Configure ()
 				.Database (() => SQLiteConfiguration.Standard.UsingFile ("barrel.db"))
-				.Mappings (mcfg => mcfg.FluentMappings.AddFromAssemblyOf<Persistance>())
-				.ExposeConfiguration (cfg => ExposedConfiguration (cfg))
+				.Mappings (mcfg => mcfg.FluentMappings.AddFromAssemblyOf<LocalUser>())
+				.ExposeConfiguration (ExposedConfiguration)
 				.BuildSessionFactory();
 		}
 		
@@ -65,10 +67,10 @@ namespace Gablarski.LocalServer
 		
 		private static void ExposedConfiguration (Configuration cfg)
 		{
-			if (IO.File.Exists ("barrel.db"))
+			if (File.Exists ("barrel.db"))
 				return;
-			
-			cfg.BuildMappings();
+		
+			new SchemaExport (cfg).Create (false, true);
 		}
 	}
 }

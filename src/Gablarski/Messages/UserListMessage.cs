@@ -48,13 +48,13 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public UserListMessage (IEnumerable<User> users)
+		public UserListMessage (IEnumerable<IUser> users)
 			: this()
 		{
 			Users = users;
 		}
 
-		public IEnumerable<User> Users
+		public IEnumerable<IUser> Users
 		{
 			get; set;
 		}
@@ -62,9 +62,9 @@ namespace Gablarski.Messages
 		public override void ReadPayload (IValueReader reader)
 		{
 			int numUsers = reader.ReadInt32();
-			User[] users = new User[numUsers];
+			IUser[] users = new IUser[numUsers];
 			for (int i = 0; i < users.Length; ++i)
-				users[i] = new User (reader);
+				users[i] = new User (reader.ReadInt32(), reader.ReadString());
 
 			Users = users;
 		}
@@ -74,7 +74,36 @@ namespace Gablarski.Messages
 			var users = Users.ToList();
 			writer.WriteInt32 (users.Count);
 			for (int i = 0; i < users.Count; ++i)
-				users[i].Serialize (writer);
+			{
+				var u = users[i];
+				writer.WriteInt32 (u.UserId);
+				writer.WriteString (u.Username);
+			}
+		}
+
+		private class User
+			: IUser
+		{
+			public int UserId
+			{
+				get;
+				private set;
+			}
+
+			public string Username
+			{
+				get;
+				private set;
+			}
+
+			public User (int userId, string username)
+			{
+				if (username == null)
+					throw new ArgumentNullException ("username");
+
+				UserId = userId;
+				Username = username;
+			}
 		}
 	}
 }

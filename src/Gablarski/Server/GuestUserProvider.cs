@@ -65,9 +65,9 @@ namespace Gablarski.Server
 			get { return typeof (Int32);}
 		}
 
-		public IEnumerable<User> GetUsers()
+		public IEnumerable<IUser> GetUsers()
 		{
-			return Enumerable.Empty<User>();
+			return Enumerable.Empty<IUser>();
 		}
 
 		public bool UserExists (string username)
