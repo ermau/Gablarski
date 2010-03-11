@@ -77,7 +77,7 @@ namespace Gablarski.Server
 
 		public LoginResult Login (string username, string password)
 		{
-			return new LoginResult (Interlocked.Increment (ref this.nextUserId), LoginResultState.Success);
+			return new LoginResult (Interlocked.Decrement (ref this.nextUserId), LoginResultState.Success);
 		}
 
 		public LoginResult Register (string username, string password)
