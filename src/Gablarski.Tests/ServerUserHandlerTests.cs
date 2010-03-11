@@ -505,6 +505,29 @@ namespace Gablarski.Tests
 		[Test]
 		public void RegisterNotSupported()
 		{
+			users.RegistrationMode = UserRegistrationMode.None;
+
+			var c = new MockServerConnection();
+			context.UserManager.Connect (c);
+
+			handler.RegisterMessage (new MessageReceivedEventArgs (c,
+				new RegisterMessage ("Username", "Password")));
+
+			c.Client.AssertNoMessage();
+		}
+
+		[Test]
+		public void RegisterNotConnected()
+		{
+			users.RegistrationMode = UserRegistrationMode.Normal;
+
+			var c = new MockServerConnection();
+			c.Disconnect();
+
+			handler.RegisterMessage (new MessageReceivedEventArgs (c,
+				new RegisterMessage ("Username", "Password")));
+
+			c.Client.AssertNoMessage();
 		}
 	}
 }

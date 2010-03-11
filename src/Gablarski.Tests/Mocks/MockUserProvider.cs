@@ -129,6 +129,8 @@ namespace Gablarski.Tests
 		
 		public LoginResult Register (string username, string password)
 		{
+			if (RegistrationMode != UserRegistrationMode.Normal)
+				throw new NotSupportedException();
 			if (username == null)
 				throw new ArgumentNullException ("username");
 			

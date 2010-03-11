@@ -98,6 +98,7 @@
     <Compile Include="Mocks\MockPermissionsProvider.cs" />
     <Compile Include="Mocks\MockServerContext.cs" />
     <Compile Include="Mocks\MockSourceManager.cs" />
+    <Compile Include="Mocks\MockUserProvider.cs" />
     <Compile Include="Mocks\Network\MockClientConnection.cs" />
     <Compile Include="Mocks\MockClientContext.cs" />
     <Compile Include="Mocks\Network\MockConnectionBase.cs" />
