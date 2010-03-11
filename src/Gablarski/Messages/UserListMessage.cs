@@ -80,30 +80,30 @@ namespace Gablarski.Messages
 				writer.WriteString (u.Username);
 			}
 		}
+	}
 
-		private class User
-			: IUser
+	internal class User
+		: IUser
+	{
+		public int UserId
 		{
-			public int UserId
-			{
-				get;
-				private set;
-			}
+			get;
+			private set;
+		}
 
-			public string Username
-			{
-				get;
-				private set;
-			}
+		public string Username
+		{
+			get;
+			private set;
+		}
 
-			public User (int userId, string username)
-			{
-				if (username == null)
-					throw new ArgumentNullException ("username");
+		public User (int userId, string username)
+		{
+			if (username == null)
+				throw new ArgumentNullException ("username");
 
-				UserId = userId;
-				Username = username;
-			}
+			UserId = userId;
+			Username = username;
 		}
 	}
 }
