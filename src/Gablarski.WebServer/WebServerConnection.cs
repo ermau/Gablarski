@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -37,7 +37,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Gablarski.Messages;
 using HttpServer.Sessions;
 
@@ -59,9 +58,15 @@ namespace Gablarski.WebServer
 		/// <summary>
 		/// Gets whether the connection is active.
 		/// </summary>
-		public bool IsConnected { get; private set; }
+		public bool IsConnected
+		{
+			get; private set;
+		}
 
-		public bool IsAsync { get { return true; } }
+		public bool IsAsync
+		{
+			get { return true; }
+		}
 
 			/// <summary>
 		/// Sends <paramref name="message"/> to the other end of the connection.
@@ -84,6 +89,11 @@ namespace Gablarski.WebServer
 		public void Disconnect()
 		{
 			this.IsConnected = false;
+		}
+
+		public void DisconnectAsync()
+		{
+			Disconnect();
 		}
 
 		#endregion

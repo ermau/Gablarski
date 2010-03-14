@@ -36,8 +36,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -89,6 +87,14 @@ namespace Gablarski.Network
 		{
 			if (debugLogging)
 				log.DebugFormat ("Enqueuing {1} message {0} for send", message.MessageTypeCode, (message.Reliable) ? "reliable" : "unreliable");
+
+			if (disconnecting)
+			{
+				if (debugLogging)
+					log.DebugFormat ("Rejected {1} message {0} for send since we're dsiconnecting", message.MessageTypeCode, (message.Reliable) ? "reliable" : "unreliable");
+				
+				return;
+			}
 
 			lock (sendQueue)
 			{
@@ -157,6 +163,12 @@ namespace Gablarski.Network
 			this.rstream = null;
 
 			OnDisconnected();
+		}
+
+		public void DisconnectAsync()
+		{
+			this.disconnecting = true;
+			sendWait.Set();
 		}
 
 		#endregion
@@ -240,17 +252,16 @@ namespace Gablarski.Network
 		private NetworkStream rstream;
 		private IValueWriter rwriter;
 		private IValueReader rreader;
-		private volatile bool rwaiting;
 
 		private uint nid;
 		private Socket udp;
 		private IValueWriter uwriter;
 		private IValueReader ureader;
-		private volatile bool uwaiting;
 
 		private readonly AutoResetEvent sendWait = new AutoResetEvent (false);
 		private readonly Queue<MessageBase> sendQueue = new Queue<MessageBase>();
 		private Timer pinger;
+		private volatile bool disconnecting;
 
 		private void Runner()
 		{
@@ -262,7 +273,7 @@ namespace Gablarski.Network
 
 			while (this.running)
 			{
-				MessageBase toSend = null;
+				MessageBase toSend;
 
 				while (queue.Count > 0)
 				{
@@ -284,6 +295,15 @@ namespace Gablarski.Network
 
 					toSend.WritePayload (iwriter);
 					iwriter.Flush ();
+				}
+
+				if (disconnecting)
+				{
+					if (queue.Count > 0)
+						continue;
+
+					Disconnect();
+					break;
 				}
 
 				if (queue.Count == 0)
@@ -343,10 +363,6 @@ namespace Gablarski.Network
 				Disconnect();
 				return;
 			}
-			finally
-			{
-				this.rwaiting = false;
-			}
 		}
 
 		private void UnreliableReceive (IAsyncResult result)
@@ -405,8 +421,6 @@ namespace Gablarski.Network
 			}
 			finally
 			{
-				this.uwaiting = false;
-
 				if (udp != null && running)
 					udp.BeginReceiveFrom (buffer, 0, buffer.Length, SocketFlags.None, ref endpoint, UnreliableReceive, buffer);
 			}

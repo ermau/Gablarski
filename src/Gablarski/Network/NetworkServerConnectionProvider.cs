@@ -149,6 +149,16 @@ namespace Gablarski.Network
 			}
 		}
 
+		internal void DisconnectAsync (NetworkServerConnection connection)
+		{
+			lock (disconnecting)
+			{
+				disconnecting.Add (connection);
+			}
+
+			outgoingWait.Set();
+		}
+
 		private volatile bool listening;
 		private int port = 6112;
 		private Socket udp;
@@ -159,6 +169,7 @@ namespace Gablarski.Network
 
 		private readonly AutoResetEvent outgoingWait = new AutoResetEvent (false);
 		private readonly Queue<KeyValuePair<NetworkServerConnection, MessageBase>> outgoing = new Queue<KeyValuePair<NetworkServerConnection, MessageBase>> (100);		
+		private readonly HashSet<NetworkServerConnection> disconnecting = new HashSet<NetworkServerConnection>();
 		
 		private SocketValueWriter clWriter;
 		private readonly Queue<ConnectionlessMessageReceivedEventArgs> outgoingConnectionless = new Queue<ConnectionlessMessageReceivedEventArgs>();
@@ -290,7 +301,19 @@ namespace Gablarski.Network
 						e = ocl.Dequeue();
 					}
 
-					Send (e.EndPoint, e.Message);
+					SendConnectionless (e.EndPoint, e.Message);
+				}
+
+				if (disconnecting.Count > 0)
+				{
+					if (o.Count > 0)
+						continue;
+
+					lock (disconnecting)
+					{
+						foreach (NetworkServerConnection c in disconnecting)
+							c.Disconnect();
+					}
 				}
 			}
 		}
@@ -370,13 +393,16 @@ namespace Gablarski.Network
 				else
 					connection.Disconnect ();
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
-				connection.Disconnect ();
+				log.Fatal ("Error during reliable receive, disconnecting.", ex);
+
+				if (connection != null)
+					connection.Disconnect ();
 			}
 		}
 
-		private void Send (EndPoint endpoint, MessageBase message)
+		private void SendConnectionless (EndPoint endpoint, MessageBase message)
 		{
 			try
 			{
@@ -388,8 +414,9 @@ namespace Gablarski.Network
 				message.WritePayload (clWriter);
 				clWriter.Flush ();
 			}
-			catch
+			catch (Exception ex)
 			{
+				log.Fatal ("Error during connectionless send", ex);
 			}
 		}
 

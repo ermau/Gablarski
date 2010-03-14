@@ -85,9 +85,14 @@ namespace Gablarski
 		IEnumerable<ReceivedMessage> Tick();
 
 		/// <summary>
-		/// Closes the connection.
+		/// Closes the connection immediately.
 		/// </summary>
 		void Disconnect ();
+
+		/// <summary>
+		/// Closes the connection as soon as current messages are sent. Any new messages will be ignored.
+		/// </summary>
+		void DisconnectAsync();
 	}
 
 	public class ReceivedMessage

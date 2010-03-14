@@ -158,6 +158,11 @@ namespace Gablarski.Tests
 				dced (this, new ConnectionEventArgs (this));
 		}
 
+		public virtual void DisconnectAsync()
+		{
+			Disconnect();
+		}
+
 		#endregion
 
 		private bool connected = true;

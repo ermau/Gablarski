@@ -52,7 +52,6 @@ namespace Gablarski.Network
 			this.Tcp = tcp;
 			this.ReliableStream = tcp.GetStream ();
 			this.provider = provider;
-			this.EndPoint = endPoint;
 			this.UnreliableWriter = uwriter;
 			this.ReliableReader = new StreamValueReader (ReliableStream);
 			this.ReliableWriter = new StreamValueWriter (ReliableStream);
@@ -73,7 +72,8 @@ namespace Gablarski.Network
 
 		public void Send (MessageBase message)
 		{
-			provider.EnqueueToSend (this, message);
+			if (!disconnecting)
+				provider.EnqueueToSend (this, message);
 		}
 
 		public IEnumerable<ReceivedMessage> Tick()
@@ -89,11 +89,17 @@ namespace Gablarski.Network
 			OnDisconnected ();
 		}
 
+		public void DisconnectAsync()
+		{
+			disconnecting = true;
+			provider.DisconnectAsync (this);
+		}
+
+		internal volatile bool disconnecting;
 		internal bool bleeding;
 		internal readonly uint NetworkId;
 		internal readonly TcpClient Tcp;
 		internal readonly Stream ReliableStream;
-		internal readonly IPEndPoint EndPoint;
 		internal readonly IValueWriter UnreliableWriter;
 		internal readonly IValueReader ReliableReader;
 		internal readonly IValueWriter ReliableWriter;
