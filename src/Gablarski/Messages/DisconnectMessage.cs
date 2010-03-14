@@ -37,19 +37,38 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Gablarski.Messages
 {
+	public enum DisconnectionReason
+		: byte
+	{
+		Unknown = 0,
+
+		/// <summary>
+		/// Disconnected because the user logged in elsewhere.
+		/// </summary>
+		/// <remarks>
+		/// Do not reconnect.
+		/// </remarks>
+		LoggedInElsewhere = 1
+	}
+
 	public class DisconnectMessage
-		: ClientMessage
+		: ServerMessage
 	{
 		public DisconnectMessage ()
-			: base (ClientMessageType.Disconnect)
+			: base (ServerMessageType.Disconnect)
 		{
 		}
 
-		public string Reason
+		public DisconnectMessage (DisconnectionReason reason)
+			: this()
+		{
+			Reason = reason;
+		}
+
+		public DisconnectionReason Reason
 		{
 			get;
 			set;
@@ -57,12 +76,12 @@ namespace Gablarski.Messages
 
 		public override void WritePayload (IValueWriter writer)
 		{
-			writer.WriteString (this.Reason);
+			writer.WriteByte ((byte)Reason);
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
-			this.Reason = reader.ReadString ();
+			Reason = (DisconnectionReason)reader.ReadByte ();
 		}
 	}
 }

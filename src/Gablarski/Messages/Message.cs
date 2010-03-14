@@ -90,7 +90,7 @@ namespace Gablarski.Messages
 		ServerInfoReceived = 12,
 		LoginResult = 4,
 		JoinResult = 38,
-		//Disconnect = 6,
+		Disconnect = 6,
 		PermissionDenied = 32,
 
 		SourceList = 16,

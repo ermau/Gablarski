@@ -51,7 +51,9 @@ namespace Gablarski.Client
 	public partial class GablarskiClient
 		: IClientContext
 	{
+		// ReSharper disable ConvertToConstant.Global
 		public static readonly int ProtocolVersion = 6;
+		// ReSharper restore ConvertToConstant.Global
 
 		public GablarskiClient (IClientConnection connection)
 			: this (connection, null)
@@ -85,7 +87,7 @@ namespace Gablarski.Client
 		/// <summary>
 		/// The connection to the server has been lost (or forcibly closed.)
 		/// </summary>
-		public event EventHandler Disconnected;
+		public event EventHandler<DisconnectedEventArgs> Disconnected;
 
 		#endregion
 
@@ -168,11 +170,11 @@ namespace Gablarski.Client
 			set { reconnectAutomatically = value; }
 		}
 
-		private int reconnectAttemptFrequency = 5000;
+		private int reconnectAttemptFrequency = 2000;
 		private bool formallyConnected;
 
 		/// <summary>
-		/// Gets or sets the frequency (ms) at which to attempt reconnection. (5s default).
+		/// Gets or sets the frequency (ms) at which to attempt reconnection. (2s default).
 		/// </summary>
 		public int ReconnectAttemptFrequency
 		{
@@ -209,7 +211,7 @@ namespace Gablarski.Client
 		/// </summary>
 		public void Disconnect()
 		{
-			ThreadPool.QueueUserWorkItem (s => DisconnectCore (DisconnectHandling.None, this.Connection));
+			ThreadPool.QueueUserWorkItem (s => DisconnectCore (DisconnectionReason.Unknown, DisconnectHandling.None, this.Connection));
 		}
 		#endregion
 
@@ -221,7 +223,7 @@ namespace Gablarski.Client
 				connected (this, e);
 		}
 
-		protected void OnDisconnected (object sender, EventArgs e)
+		protected void OnDisconnected (object sender, DisconnectedEventArgs e)
 		{
 			var disconnected = this.Disconnected;
 			if (disconnected != null)
@@ -230,7 +232,16 @@ namespace Gablarski.Client
 
 		protected void OnConnectionRejected (RejectedConnectionEventArgs e)
 		{
-			DisconnectCore (DisconnectHandling.None, this.Connection, false);
+			DisconnectHandling handling = DisconnectHandling.None;
+			switch (e.Reason)
+			{
+				case ConnectionRejectedReason.CouldNotConnect:
+				case ConnectionRejectedReason.Unknown:
+					handling = DisconnectHandling.Reconnect;
+					break;
+			}
+
+			DisconnectCore (DisconnectionReason.Unknown, handling, this.Connection, false);
 
 			var rejected = this.ConnectionRejected;
 			if (rejected != null)
@@ -413,6 +424,21 @@ namespace Gablarski.Client
 		}
 
 		public IEnumerable<T> Data
+		{
+			get;
+			private set;
+		}
+	}
+
+	public class DisconnectedEventArgs
+		: EventArgs
+	{
+		public DisconnectedEventArgs (DisconnectionReason reason)
+		{
+			Reason = reason;
+		}
+
+		protected DisconnectionReason Reason
 		{
 			get;
 			private set;

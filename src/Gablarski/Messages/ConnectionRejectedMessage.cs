@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -37,7 +37,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Gablarski.Messages
 {
@@ -54,6 +53,11 @@ namespace Gablarski.Messages
 		/// The client could not connect to the server.
 		/// </summary>
 		CouldNotConnect = 2,
+
+		/// <summary>
+		/// You were hit with a ban hammer.
+		/// </summary>
+		BanHammer = 3
 	}
 
 	public class ConnectionRejectedMessage

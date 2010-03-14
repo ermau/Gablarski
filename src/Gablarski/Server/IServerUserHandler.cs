@@ -57,6 +57,14 @@ namespace Gablarski.Server
 		void Move (UserInfo user, ChannelInfo targetChannel);
 
 		void Send (MessageBase message, Func<IConnection, UserInfo, bool> predicate);
+
+		/// <summary>
+		/// Disconnects a user for a specific reason.
+		/// </summary>
+		/// <param name="user">The user to disconnect.</param>
+		/// <param name="reason">The reason to disconnect the user.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
+		void Disconnect (UserInfo user, DisconnectionReason reason);
 	}
 
 	public static class ServerUserHandlerExtensions

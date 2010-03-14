@@ -135,6 +135,19 @@ namespace Gablarski.Server
 				c.Send (message);
 		}
 
+		public void Disconnect (UserInfo user, DisconnectionReason reason)
+		{
+			if (user == null)
+				throw new ArgumentNullException ("user");
+
+			IConnection c = Manager.GetConnection (user);
+			if (c == null || !c.IsConnected)
+				return;
+
+			c.Send (new DisconnectMessage (reason));
+			c.DisconnectAsync();
+		}
+
 		#region IIndexedEnumerable<int,UserInfo> Members
 
 		public UserInfo this[int key]

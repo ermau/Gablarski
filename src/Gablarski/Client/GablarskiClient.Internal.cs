@@ -67,7 +67,11 @@ namespace Gablarski.Client
 		private readonly Queue<MessageReceivedEventArgs> mqueue = new Queue<MessageReceivedEventArgs> (100);
 		private Thread messageRunnerThread;
 
+		private IPEndPoint originalEndPoint;
+		private int disconnectedInChannelId;
+
 		private ClientUserHandler users;
+		private string originalHost;
 
 		protected void Setup (ClientUserHandler userMananger, ClientChannelManager channelManager, ClientSourceManager sourceManager, CurrentUser currentUser, IAudioEngine audioEngine)
 		{
@@ -97,6 +101,7 @@ namespace Gablarski.Client
 				{ ServerMessageType.ChangeChannelResult, this.users.OnChannelChangeResultMessage },
 
 				{ ServerMessageType.ConnectionRejected, OnConnectionRejectedMessage },
+				{ ServerMessageType.Disconnect, OnDisconnectedMessage },
 				{ ServerMessageType.LoginResult, this.CurrentUser.OnLoginResultMessage },
 				{ ServerMessageType.JoinResult, this.CurrentUser.OnJoinResultMessage },
 				{ ServerMessageType.Permissions, this.CurrentUser.OnPermissionsMessage },
@@ -108,6 +113,22 @@ namespace Gablarski.Client
 				{ ServerMessageType.AudioData, this.Sources.OnAudioDataReceivedMessage },
 				{ ServerMessageType.AudioSourceStateChange, this.Sources.OnAudioSourceStateChangedMessage },
 			};
+		}
+
+		private void OnDisconnectedMessage (MessageReceivedEventArgs e)
+		{
+			var msg = (DisconnectMessage) e.Message;
+
+			DisconnectHandling handling = DisconnectHandling.Reconnect;
+
+			switch (msg.Reason)
+			{
+				case DisconnectionReason.LoggedInElsewhere:
+					handling = DisconnectHandling.None;
+					break;
+			}
+
+			DisconnectCore (msg.Reason, handling, e.Connection, true);
 		}
 
 		private void OnPermissionDeniedMessage (MessageReceivedEventArgs obj)
@@ -192,7 +213,7 @@ namespace Gablarski.Client
 
 			int count = Interlocked.Increment (ref this.redirectCount);
 
-			DisconnectCore (DisconnectHandling.None, this.Connection);
+			DisconnectCore (DisconnectionReason.Unknown, DisconnectHandling.None, this.Connection);
 			
 			if (count > redirectLimit)
 				return;
@@ -206,13 +227,15 @@ namespace Gablarski.Client
 			Reconnect
 		}
 
-		private void DisconnectCore (DisconnectHandling handling, IConnection connection)
+		private void DisconnectCore (DisconnectionReason reason, DisconnectHandling handling, IConnection connection)
 		{
-			DisconnectCore (handling, connection, true);
+			DisconnectCore (reason, handling, connection, true);
 		}
 
-		private void DisconnectCore (DisconnectHandling handling, IConnection connection, bool fireEvent)
+		private void DisconnectCore (DisconnectionReason reason, DisconnectHandling handling, IConnection connection, bool fireEvent)
 		{
+			disconnectedInChannelId = CurrentUser.CurrentChannelId;
+
 			this.running = false;
 			this.formallyConnected = false;
 
@@ -233,7 +256,7 @@ namespace Gablarski.Client
 			}
 
 			if (fireEvent)
-				OnDisconnected (this, EventArgs.Empty);
+				OnDisconnected (this, new DisconnectedEventArgs (reason));
 			
 			this.Users.Reset();
 			this.Channels.Clear();
@@ -242,11 +265,34 @@ namespace Gablarski.Client
 			this.Audio.Stop();
 
 			connection.Disconnect();
+
+			if (handling == DisconnectHandling.Reconnect)
+				ThreadPool.QueueUserWorkItem (Reconnect);
 		}
 
 		private void OnDisconnectedInternal (object sender, ConnectionEventArgs e)
 		{
-			DisconnectCore ((ReconnectAutomatically) ? DisconnectHandling.Reconnect : DisconnectHandling.None, e.Connection);
+			DisconnectCore (DisconnectionReason.Unknown, (ReconnectAutomatically) ? DisconnectHandling.Reconnect : DisconnectHandling.None, e.Connection);
+		}
+
+		private void Reconnect (object state)
+		{
+			Thread.Sleep (ReconnectAttemptFrequency);
+
+			CurrentUser.ReceivedJoinResult += ReconnectJoinedResult;
+			ConnectCore();
+		}
+
+		private void ReconnectJoinedResult (object sender, ReceivedJoinResultEventArgs e)
+		{
+			if (e.Result != LoginResultState.Success)
+				return;
+
+			ChannelInfo channel = this.Channels[this.disconnectedInChannelId];
+			if (channel != null)
+				this.Users.Move (this.CurrentUser, channel);
+
+			this.disconnectedInChannelId = 0;
 		}
 
 		private void ConnectCore (string host, int port)
@@ -256,8 +302,20 @@ namespace Gablarski.Client
 
 			try
 			{
-				IPEndPoint endPoint = new IPEndPoint (Dns.GetHostAddresses (host).First (ip => ip.AddressFamily == AddressFamily.InterNetwork), port);
+				this.originalHost = host;
+				this.originalEndPoint = new IPEndPoint (Dns.GetHostAddresses (host).First (ip => ip.AddressFamily == AddressFamily.InterNetwork), port);
+				ConnectCore();
+			}
+			catch (SocketException)
+			{
+				OnConnectionRejected (new RejectedConnectionEventArgs (ConnectionRejectedReason.CouldNotConnect));
+			}
+		}
 
+		private void ConnectCore ()
+		{
+			try
+			{
 				this.running = true;
 
 				this.messageRunnerThread = new Thread (this.MessageRunner) { Name = "Gablarski Client Message Runner" };
@@ -267,8 +325,8 @@ namespace Gablarski.Client
 
 				this.Connection.Disconnected += this.OnDisconnectedInternal;
 				this.Connection.MessageReceived += OnMessageReceived;
-				this.Connection.Connect (endPoint);
-				this.Connection.Send (new ConnectMessage { ProtocolVersion = ProtocolVersion, Host = host, Port = port });
+				this.Connection.Connect (this.originalEndPoint);
+				this.Connection.Send (new ConnectMessage { ProtocolVersion = ProtocolVersion, Host = this.originalHost, Port = this.originalEndPoint.Port });
 
 				if (Audio.AudioSender == null)
 					Audio.AudioSender = Sources;
