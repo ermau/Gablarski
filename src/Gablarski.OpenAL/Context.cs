@@ -131,7 +131,7 @@ namespace Gablarski.OpenAL
 		private extern static void alcDestroyContext (IntPtr context);
 
 		private static Dictionary<IntPtr, Context> contexts;
-		private static object lck = new object ();
+		private static readonly object lck = new object ();
 
 		internal static Context Create (PlaybackDevice device)
 		{
@@ -145,7 +145,9 @@ namespace Gablarski.OpenAL
 
 				c = new Context (alcCreateContext (device.Handle, IntPtr.Zero), device);
 				OpenAL.ErrorCheck(device);
-				contexts.Add (c.Handle, c);
+
+				if (!contexts.ContainsKey (c.Handle))
+					contexts.Add (c.Handle, c);
 			}
 
 			OpenAL.ErrorCheck (device);
