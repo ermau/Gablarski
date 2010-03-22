@@ -81,7 +81,12 @@ namespace Gablarski.Barrel
 
 				log.Info ("Setting up");
 
-				GablarskiServer server = new GablarskiServer (new ServerSettings(), providers.Users, providers.Permissions, providers.Channels);
+				GablarskiServer server = new GablarskiServer (new ServerSettings
+				{
+					Name = serverConfig.Name,
+					Description = serverConfig.Description,
+					ServerPassword = serverConfig.Password,
+				}, providers.Users, providers.Permissions, providers.Channels);
 				server.AddConnectionProvider (new NetworkServerConnectionProvider { Port = serverConfig.Port });
 
 				foreach (IConnectionProvider provider in providers.ConnectionProviders)
