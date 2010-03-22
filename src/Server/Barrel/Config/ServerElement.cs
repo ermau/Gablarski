@@ -60,6 +60,13 @@ namespace Gablarski.Barrel.Config
 			set { this["description"] = value; }
 		}
 
+		[ConfigurationProperty ("password", IsRequired = false)]
+		public string Password
+		{
+			get { return (string) this["password"]; }
+			set { this["password"] = value; }
+		}
+
 		[ConfigurationProperty ("port", DefaultValue = 0)]
 		public int Port
 		{
