@@ -65,16 +65,13 @@ if ($messageType != QueryServerResult)
 $users = array();
 $channels = array();
 
-if (!$serverInfoOnly)
-{
-	$userCount = readInt32 ($socket);
-	for ($i = 0; $i < $userCount; $i++)
-		$users[] = readUser ($socket);
+$userCount = readInt32 ($socket);
+for ($i = 0; $i < $userCount; $i++)
+	$users[] = readUser ($socket);
 
-	$channelCount = readInt32 ($socket);
-	for ($i = 0; $i < $channelCount; $i++)
-		$channels[] = readChannel ($socket);
-}
+$channelCount = readInt32 ($socket);
+for ($i = 0; $i < $channelCount; $i++)
+	$channels[] = readChannel ($socket);
 
 $serverInfo = readServerInfo ($socket);
 fclose ($socket);
