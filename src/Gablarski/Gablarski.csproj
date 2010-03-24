@@ -109,6 +109,7 @@
     <Compile Include="Audio\IAudioReceiver.cs" />
     <Compile Include="Audio\Speex\SpeexPreprocessor.cs" />
     <Compile Include="Audio\VoiceActivation.cs" />
+    <Compile Include="BanInfo.cs" />
     <Compile Include="ByteArrayValueReader.cs" />
     <Compile Include="Audio\AudioEngine.cs" />
     <Compile Include="Audio\IAudioSender.cs" />
@@ -123,6 +124,7 @@
     <Compile Include="Messages\ClientAudioSourceStateChangeMessage.cs" />
     <Compile Include="Messages\JoinMessage.cs" />
     <Compile Include="Messages\JoinResultMessage.cs" />
+    <Compile Include="Messages\KickUserMessage.cs" />
     <Compile Include="Messages\PermissionDeniedMessage.cs" />
     <Compile Include="Messages\PermissionsMessage.cs" />
     <Compile Include="Messages\QueryServerMessage.cs" />
@@ -176,7 +178,7 @@
     <Compile Include="Network\NetworkServerConnection.cs" />
     <Compile Include="Network\NetworkServerConnectionProvider.cs" />
     <Compile Include="Network\SocketValueWriter.cs" />
-    <Compile Include="Server\IChannelPermissionsProvider.cs" />
+    <Compile Include="Server\IBanProvider.cs" />
     <Compile Include="Server\IConnectionProvider.cs" />
     <Compile Include="Server\IRedirector.cs" />
     <Compile Include="Server\IServerChannelHandler.cs" />
