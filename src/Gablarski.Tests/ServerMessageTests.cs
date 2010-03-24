@@ -106,7 +106,7 @@ namespace Gablarski.Tests
 				new ChannelInfo (ChannelId2)
 			};
 
-			var msg = new ChannelListMessage (channels);
+			var msg = new ChannelListMessage (channels, channels[0]);
 			Assert.AreEqual(1, msg.Channels.Count (c => c.ChannelId.Equals (channels[0].ChannelId) && c.ReadOnly == channels[0].ReadOnly));
 			Assert.AreEqual(1, msg.Channels.Count (c => c.ChannelId.Equals (channels[1].ChannelId) && c.ReadOnly == channels[1].ReadOnly));
 			msg.WritePayload (writer);
@@ -118,21 +118,6 @@ namespace Gablarski.Tests
 			Assert.AreEqual (length, stream.Position);
 			Assert.AreEqual (1, msg.Channels.Count (c => c.ChannelId.Equals (channels[0].ChannelId) && c.ReadOnly == channels[0].ReadOnly));
 			Assert.AreEqual (1, msg.Channels.Count (c => c.ChannelId.Equals (channels[1].ChannelId) && c.ReadOnly == channels[1].ReadOnly));
-		}
-
-		[Test]
-		public void EmptyChannelList()
-		{
-			var msg = new ChannelListMessage (new List<ChannelInfo>());
-			Assert.AreEqual (0, msg.Channels.Count());
-			msg.WritePayload (writer);
-			long length = stream.Position;
-			stream.Position = 0;
-
-			msg = new ChannelListMessage();
-			msg.ReadPayload (reader);
-			Assert.AreEqual (length, stream.Position);
-			Assert.AreEqual (0, msg.Channels.Count ());
 		}
 
 		[Test]

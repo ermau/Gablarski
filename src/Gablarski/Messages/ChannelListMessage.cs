@@ -50,11 +50,17 @@ namespace Gablarski.Messages
 
 		}
 
-		public ChannelListMessage (IEnumerable<ChannelInfo> channels)
+		public ChannelListMessage (IEnumerable<ChannelInfo> channels, ChannelInfo defaultChannel)
 			: this()
 		{
-			this.Channels = channels;
-			this.Result = GenericResult.Success;
+			if (channels == null)
+				throw new ArgumentNullException ("channels");
+			if (defaultChannel == null)
+				throw new ArgumentNullException ("defaultChannel");
+
+			Channels = channels;
+			DefaultChannelId = defaultChannel.ChannelId;
+			Result = GenericResult.Success;
 		}
 
 		public ChannelListMessage (GenericResult result)
@@ -67,6 +73,15 @@ namespace Gablarski.Messages
 		/// Gets or sets the result of the request.
 		/// </summary>
 		public GenericResult Result
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// Gets or sets the default channel in the message, <c>null</c> if request failed.
+		/// </summary>
+		public int DefaultChannelId
 		{
 			get;
 			set;
@@ -87,6 +102,8 @@ namespace Gablarski.Messages
 			if (this.Result != GenericResult.Success)
 				return;
 
+			writer.WriteInt32 (DefaultChannelId);
+
 			writer.WriteInt32 (this.Channels.Count ());
 			foreach (var c in this.Channels)
 				c.Serialize (writer);
@@ -98,6 +115,8 @@ namespace Gablarski.Messages
 			if (this.Result != GenericResult.Success)
 				return;
 
+			DefaultChannelId = reader.ReadInt32();
+			
 			ChannelInfo[] channels = new ChannelInfo[reader.ReadInt32 ()];
 			for (int i = 0; i < channels.Length; ++i)
 				channels[i] = new ChannelInfo (reader);

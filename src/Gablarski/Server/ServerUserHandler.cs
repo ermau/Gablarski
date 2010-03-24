@@ -436,7 +436,7 @@ namespace Gablarski.Server
 
 		private void SendInfoMessages (IConnection connection)
 		{
-			connection.Send (new ChannelListMessage (this.context.ChannelsProvider.GetChannels()));
+			connection.Send (new ChannelListMessage (this.context.ChannelsProvider.GetChannels(), this.context.ChannelsProvider.DefaultChannel));
 			connection.Send (new UserInfoListMessage (Manager));
 			connection.Send (new SourceListMessage (this.context.Sources));
 		}

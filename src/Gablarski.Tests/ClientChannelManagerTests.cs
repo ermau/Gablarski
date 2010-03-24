@@ -143,7 +143,7 @@ namespace Gablarski.Tests
 			};
 
 			manager.OnChannelListReceivedMessage (new MessageReceivedEventArgs (server,
-				new ChannelListMessage (new[] { c1, sc1, c2 })));
+				new ChannelListMessage (new[] { c1, sc1, c2 }, sc1)));
 
 			Assert.AreEqual (3, manager.Count ());
 			Assert.AreEqual (1, manager.Count (c => c.ChannelId == c1.ChannelId
@@ -185,7 +185,7 @@ namespace Gablarski.Tests
 			};
 
 			manager.OnChannelListReceivedMessage (new MessageReceivedEventArgs (this.server,
-				new ChannelListMessage (new[] { c1, sc1, c2 })));
+				new ChannelListMessage (new[] { c1, sc1, c2 }, sc1)));
 
 			ChannelInfo updated = new ChannelInfo (1, c1) { Name = "Updated 1", Description = "U Description 1" };
 			manager.OnChannelEditResultMessage (new MessageReceivedEventArgs (this.server,

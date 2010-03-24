@@ -79,7 +79,7 @@ namespace Gablarski.Server
 			foreach (UserInfo user in context.Users.Where (u => !channelIds.Contains (u.CurrentChannelId)))
 				context.Users.Move (user, context.ChannelsProvider.DefaultChannel);
 
-			context.Connections.Send (new ChannelListMessage (channels));
+			context.Connections.Send (new ChannelListMessage (channels, context.ChannelsProvider.DefaultChannel));
 		}
 
 		internal void RequestChanneListMessage (MessageReceivedEventArgs e)
@@ -92,7 +92,7 @@ namespace Gablarski.Server
 			else
 			{
 				IEnumerable<ChannelInfo> channels = this.context.ChannelsProvider.GetChannels();
-				e.Connection.Send (new ChannelListMessage (channels));
+				e.Connection.Send (new ChannelListMessage (channels, context.ChannelsProvider.DefaultChannel));
 			}
 		}
 
