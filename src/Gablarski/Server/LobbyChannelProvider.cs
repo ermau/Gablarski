@@ -52,6 +52,8 @@ namespace Gablarski.Server
 				Description = String.Empty,
 				ReadOnly = true
 			};
+			
+			DefaultChannel = this.lobby;
 		}
 
 		public event EventHandler ChannelsUpdated;
@@ -68,7 +70,8 @@ namespace Gablarski.Server
 
 		public ChannelInfo DefaultChannel
 		{
-			get { return this.lobby; }
+			get;
+			set;
 		}
 
 		public IEnumerable<ChannelInfo> GetChannels ()

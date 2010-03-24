@@ -56,12 +56,12 @@ namespace Gablarski.Server
 		bool UpdateSupported { get; }
 
 		/// <summary>
-		/// Gets the default channel. <c>null</c> if none set or not supported.
+		/// Gets or sets the default channel. <c>null</c> if none set or not supported.
 		/// </summary>
 		/// <remarks>
 		/// If no default channel is set or supported, the first channel returned from GetChannels will be used.
 		/// </remarks>
-		ChannelInfo DefaultChannel { get; }
+		ChannelInfo DefaultChannel { get; set; }
 
 		/// <summary>
 		/// Gets a listing channels from the underlying source.

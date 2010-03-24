@@ -37,7 +37,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Gablarski.Messages
 {
@@ -52,10 +51,19 @@ namespace Gablarski.Messages
 		public ChannelEditMessage (ChannelInfo channel)
 			: this()
 		{
-			this.Channel = channel;
+			if (channel == null)
+				throw new ArgumentNullException ("channel");
+
+			Channel = channel;
 		}
 
 		public ChannelInfo Channel
+		{
+			get;
+			set;
+		}
+
+		public bool MakeDefault
 		{
 			get;
 			set;
@@ -69,14 +77,16 @@ namespace Gablarski.Messages
 
 		public override void WritePayload (IValueWriter writer)
 		{
-			this.Channel.Serialize (writer);
-			writer.WriteBool (this.Delete);
+			Channel.Serialize (writer);
+			writer.WriteBool (Delete);
+			writer.WriteBool (MakeDefault);
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
-			this.Channel = new ChannelInfo (reader);
-			this.Delete = reader.ReadBool ();
+			Channel = new ChannelInfo (reader);
+			Delete = reader.ReadBool ();
+			MakeDefault = reader.ReadBool();
 		}
 	}
 }
