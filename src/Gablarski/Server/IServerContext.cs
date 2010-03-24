@@ -146,17 +146,12 @@ namespace Gablarski.Server
 			return GetPermission (self, name, channel.ChannelId, user.UserId);
 		}
 
-		public static bool GetPermission (this IServerContext self, PermissionName name, int channelid, int userId)
+		public static bool GetPermission (this IServerContext self, PermissionName name, int channelId, int userId)
 		{
 			if (self == null)
 				throw new ArgumentNullException ("self");
 
-			var channelPermissions = (self.PermissionsProvider as IChannelPermissionsProvider);
-
-			if (channelPermissions != null)
-				return channelPermissions.GetPermissions (channelid, userId).CheckPermission (name);
-			else
-				return self.PermissionsProvider.GetPermissions (userId).CheckPermission (name);
+			return self.PermissionsProvider.GetPermissions (userId).CheckPermission (channelId, name);
 		}
 
 		public static bool GetPermission (this IServerContext self, PermissionName name)
