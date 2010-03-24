@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -38,66 +38,52 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using Gablarski.Messages;
 using HttpServer;
 using HttpServer.HttpModules;
 using HttpServer.Sessions;
+using Newtonsoft.Json;
 
 namespace Gablarski.WebServer
 {
 	public class LoginModule
-		: HttpModule
+		: SectionModule
 	{
 		public LoginModule (ConnectionManager cmanager)
+			: base (cmanager, "login")
 		{
-			this.cmanager = cmanager;
 		}
 
-		public override bool Process (IHttpRequest request, IHttpResponse response, IHttpSession session)
+		protected override bool ProcessSection (IHttpRequest request, IHttpResponse response, IHttpSession session)
 		{
-			if (request.UriParts.Length > 0 && request.UriParts[0].ToLower() == "login" && request.Method.ToLower() == "post")
+			if (request.Method.ToLower() != "post")
+				return false;
+
+			if (!request.Form.Contains ("username") || !request.Form.Contains ("password"))
 			{
-				if (!request.Form.Contains ("username") || !request.Form.Contains ("password"))
-				{
-					WriteAndFlush (response, "Invalid Login");
-					return true;
-				}
-
-				cmanager.ProcessSession (session, response);
-
-				var result = cmanager.SendAndReceive<LoginMessage, LoginResultMessage> (
-								new LoginMessage { Username = request.Form["username"].Value, Password = request.Form["password"].Value }, session);
-
-				var permissions = cmanager.Receive<PermissionsMessage> (session);
-
-				if (!result.Result.Succeeded)
-					WriteAndFlush (response, "Invalid Login");
-				else if (permissions.Permissions.CheckPermission (PermissionName.AdminPanel))
-				{
-					session["loggedIn"] = true;
-					cmanager.SaveSession (session);
-					response.Redirect ("/admin");
-				}
-				else
-				{
-					WriteAndFlush (response, "Insufficient permissions");
-				}
-
+				WriteAndFlush (response, "{ error: \"Invalid request\" }");
 				return true;
 			}
 
-			return false;
-		}
+			var result = Connections.SendAndReceive<LoginMessage, LoginResultMessage> (
+							new LoginMessage { Username = request.Form["username"].Value, Password = request.Form["password"].Value }, session);
 
-		private readonly ConnectionManager cmanager;
+			var permissions = Connections.Receive<PermissionsMessage> (session);
+			
+			if (!result.Result.Succeeded)
+				WriteAndFlush (response, JsonConvert.SerializeObject (new { result.Result, SessionId = session.Id }));
+			else if (permissions.Permissions.CheckPermission (PermissionName.AdminPanel))
+			{
+				session["loggedIn"] = true;
+				Connections.SaveSession (session);
+				WriteAndFlush (response, JsonConvert.SerializeObject (new { result.Result, SessionId = session.Id }));
+			}
+			else
+			{
+				WriteAndFlush (response, "{ error: \"Insufficient permissions\" }");
+			}
 
-		private static void WriteAndFlush (IHttpResponse response, string body)
-		{
-			var writer = new StreamWriter (response.Body);
-			writer.WriteLine (body);
-			writer.Flush();
-			response.Send();
+			return true;
 		}
 	}
 }

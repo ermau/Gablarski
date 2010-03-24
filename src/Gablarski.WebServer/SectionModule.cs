@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -36,53 +36,49 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
-using Gablarski.Messages;
-using HttpServer.Controllers;
+using HttpServer;
+using HttpServer.HttpModules;
+using HttpServer.Sessions;
 
 namespace Gablarski.WebServer
 {
-	public class ChannelController
-		: RequestController
+	public abstract class SectionModule
+		: HttpModule
 	{
-		private readonly ConnectionManager manager;
-
-		public ChannelController (ConnectionManager manager)
+		protected SectionModule (ConnectionManager connectionManager, string sectionName)
 		{
-			this.manager = manager;
+			this.sectionName = sectionName;
+			this.Connections = connectionManager;
 		}
 
-		[BeforeFilter]
-		public bool ValidateUser()
+		public override bool Process (IHttpRequest request, IHttpResponse response, IHttpSession session)
 		{
-			if (!manager.ProcessSession (Session, Response))
+			if (request.UriParts.Length > 0 && request.UriParts[0].ToLower() == this.sectionName)
 			{
-				Response.Redirect ("/login");
-				return false;
+				this.Connections.ProcessSession (session, response);
+				return ProcessSection (request, response, session);
 			}
 
-			return true;
+			return false;
 		}
 
-		public string Index()
+		private readonly string sectionName;
+		protected ConnectionManager Connections
 		{
-			return "monkeys";
+			get;
+			set;
 		}
 
-		#region Overrides of RequestController
+		protected abstract bool ProcessSection (IHttpRequest request, IHttpResponse response, IHttpSession session);
 
-		/// <summary>
-		/// Make a clone of this controller
-		/// </summary>
-		/// <returns>
-		/// a new controller with the same base information as this one.
-		/// </returns>
-		public override object Clone()
+		protected static void WriteAndFlush (IHttpResponse response, string body)
 		{
-			return new ChannelController (this.manager);
+			var writer = new StreamWriter (response.Body);
+			writer.WriteLine (body);
+			writer.Flush();
+			response.Send();
 		}
-
-		#endregion
 	}
 }

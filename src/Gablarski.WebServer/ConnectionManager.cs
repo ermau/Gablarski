@@ -154,14 +154,14 @@ namespace Gablarski.WebServer
 
 			error = null;
 			TReceive receive = null;
-			while (receive == null || error == null)
+			do
 			{
 				Thread.Sleep (1);
 
 				receive = mqueue.OfType<TReceive>().FirstOrDefault();
 				if (receive == null)
 					error = mqueue.OfType<TError>().FirstOrDefault();
-			}
+			} while (receive == null || error == null);
 			
 			mqueue.Remove (receive);
 
@@ -195,6 +195,6 @@ namespace Gablarski.WebServer
 			lastScanned = DateTime.Now;
 		}
 
-		private IHttpSessionStore sessionStore = new MemorySessionStore();
+		private readonly IHttpSessionStore sessionStore = new MemorySessionStore();
 	}
 }

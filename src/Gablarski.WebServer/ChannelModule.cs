@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -37,66 +37,30 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Gablarski.Messages;
-using HttpServer.Controllers;
+using HttpServer;
+using HttpServer.Sessions;
 
 namespace Gablarski.WebServer
 {
-	public class UserController
-		: RequestController
+	public class ChannelModule
+		: SectionModule
 	{
-		public UserController (ConnectionManager manager)
+		public ChannelModule (ConnectionManager connectionManager)
+			: base (connectionManager, "channels")
 		{
-			this.manager = manager;
 		}
 
-		public string Login()
+		protected override bool ProcessSection (IHttpRequest request, IHttpResponse response, IHttpSession session)
 		{
-			if (Request.Method != "POST")
+			if (request.UriParts.Length == 1)
 			{
-				Response.Redirect ("/login.html");
-				return null;
+				PermissionDeniedMessage denied;
+				var channels = Connections.SendAndReceive<RequestChannelListMessage, ChannelListMessage, PermissionDeniedMessage> (
+					new RequestChannelListMessage(), session, out denied);
 			}
 
-			if (!Request.Form.Contains ("username") || !Request.Form.Contains ("password"))
-				return "Invalid Login";
-
-			manager.ProcessSession (Session, Response);
-
-			var result = manager.SendAndReceive<LoginMessage, LoginResultMessage> (
-							new LoginMessage { Username = Request.Form["username"].Value, Password = Request.Form["password"].Value }, Session);
-
-			var permissions = manager.Receive<PermissionsMessage> (Session);
-
-			if (!result.Result.Succeeded)
-				return "Invalid Login";
-			else if (permissions.Permissions.CheckPermission (PermissionName.AdminPanel))
-			{
-				Session["loggedIn"] = true;
-				manager.SaveSession (Session);
-				Response.Redirect ("/admin");
-				return null;
-			}
-			else
-				return "Insufficient Permissions";
+			return true;
 		}
-
-		private readonly ConnectionManager manager;
-
-		#region Overrides of RequestController
-
-		/// <summary>
-		/// Make a clone of this controller
-		/// </summary>
-		/// <returns>
-		/// a new controller with the same base information as this one.
-		/// </returns>
-		public override object Clone()
-		{
-			return new UserController (this.manager);
-		}
-
-		#endregion
 	}
 }
