@@ -149,6 +149,12 @@ namespace Gablarski
 			private set;
 		}
 
+		public virtual int ChannelId
+		{
+			get;
+			set;
+		}
+
 		public virtual bool IsAllowed
 		{
 			get;
@@ -177,7 +183,12 @@ namespace Gablarski
 	{
 		public static bool CheckPermission (this IEnumerable<Permission> self, PermissionName name)
 		{
-			return self.Any (p => p.Name == name && p.IsAllowed);
+			return self.Any (p => p.Name == name && p.IsAllowed && p.ChannelId == 0);
+		}
+
+		public static bool CheckPermission (this IEnumerable<Permission> self, int channelId, PermissionName name)
+		{
+			return self.Any (p => p.Name == name && p.IsAllowed && (p.ChannelId == 0 || p.ChannelId == channelId));
 		}
 	}
 }
