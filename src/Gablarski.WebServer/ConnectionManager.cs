@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2009, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -148,8 +148,21 @@ namespace Gablarski.WebServer
 
 			return Receive<TReceive> (session);
 		}
+		
+		public TReceive SendAndReceive<TReceive> (ClientMessage message, IHttpSession session, out PermissionDeniedMessage error)
+			where TReceive : MessageBase
+		{
+			return SendAndReceive<TReceive, PermissionDeniedMessage> (message, session, p => p.DeniedMessage == message.MessageType, out error);
+		}
 
 		public TReceive SendAndReceive<TReceive, TError> (MessageBase message, IHttpSession session, out TError error)
+			where TReceive : MessageBase
+			where TError : MessageBase
+		{
+			return SendAndReceive<TReceive, TError> (message, session, e => true, out error);
+		}
+		
+		public TReceive SendAndReceive<TReceive, TError> (MessageBase message, IHttpSession session, Func<TError, booL> errorPredicate, out TError error)
 			where TReceive : MessageBase
 			where TError : MessageBase
 		{
@@ -172,7 +185,7 @@ namespace Gablarski.WebServer
 				{
 					receive = mqueue.OfType<TReceive>().FirstOrDefault();
 					if (receive == null)
-						error = mqueue.OfType<TError>().FirstOrDefault();
+						error = mqueue.OfType<TError>().FirstOrDefault (errorPredicate);
 				}
 			} while (++i < 30000 && receive == null && error == null);
 			

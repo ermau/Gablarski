@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2010, Eric Maupin
+// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -57,7 +57,7 @@ namespace Gablarski.WebServer
 			if (request.UriParts.Length == 1)
 			{
 				PermissionDeniedMessage denied;
-				var msg = Connections.SendAndReceive<ChannelListMessage, PermissionDeniedMessage> (
+				var msg = Connections.SendAndReceive<ChannelListMessage> (
 					new RequestChannelListMessage(), session, out denied);
 
 				if (denied != null)
