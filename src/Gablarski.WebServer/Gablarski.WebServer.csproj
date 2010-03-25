@@ -124,6 +124,7 @@
     <Compile Include="ChannelModule.cs" />
     <Compile Include="Config\WebServerConfiguration.cs" />
     <Compile Include="ConnectionManager.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="FileResourceModule.cs" />
     <Compile Include="LoginModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

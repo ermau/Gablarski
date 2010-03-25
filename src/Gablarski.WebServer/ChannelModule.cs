@@ -40,6 +40,7 @@ using System.Linq;
 using Gablarski.Messages;
 using HttpServer;
 using HttpServer.Sessions;
+using Newtonsoft.Json;
 
 namespace Gablarski.WebServer
 {
@@ -56,8 +57,61 @@ namespace Gablarski.WebServer
 			if (request.UriParts.Length == 1)
 			{
 				PermissionDeniedMessage denied;
-				var channels = Connections.SendAndReceive<RequestChannelListMessage, ChannelListMessage, PermissionDeniedMessage> (
+				var msg = Connections.SendAndReceive<RequestChannelListMessage, ChannelListMessage, PermissionDeniedMessage> (
 					new RequestChannelListMessage(), session, out denied);
+
+				if (denied != null)
+				{
+					WriteAndFlush (response, "{ error: \"Permission denied\" }");
+					return true;
+				}
+
+				WriteAndFlush (response, JsonConvert.SerializeObject (new { DefaultChannel = msg.DefaultChannelId, Channels = msg.Channels.RunQuery (request.QueryString) }));
+			}
+			else if (request.UriParts.Length == 2)
+			{
+				/*if (request.Method.ToLower() != "post")
+					return false;*/
+
+				IHttpInput input = (request.Method.ToLower() == "post") ? request.Form : request.QueryString;
+
+				switch (request.UriParts[1])
+				{
+					case "new":
+						break;
+
+					case "edit":
+						string part = request.UriParts[0];
+
+						int arg = part.IndexOf ("(") + 1;
+						if (arg != 0 && part[part.Length - 1] == ')')
+							part = part.Substring (arg, part.Length - 1 - arg);
+
+						int channelId;
+						if (!Int32.TryParse (part, out channelId))
+						{
+							WriteAndFlush (response, "{ error: \"Invalid channel ID\" }");
+							return true;
+						}
+
+						if (!input.Contains ("SessionId", "ParentChannelId", "Name", "Description", "UserLimit"))
+						{
+							WriteAndFlush (response, "{ error: \"Invalid request\" }");
+							return true;
+						}
+
+						if (session.Id != input["SessionId"].Value)
+						{
+							WriteAndFlush (response, "{ error: \"Invalid request\" }");
+							return true;
+						}
+
+						break;
+				}
+			}
+			else
+			{
+				return false;
 			}
 
 			return true;

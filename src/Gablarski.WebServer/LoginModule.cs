@@ -54,33 +54,43 @@ namespace Gablarski.WebServer
 		{
 		}
 
+		protected override bool MustBeLoggedIn
+		{
+			get { return false; }
+		}
+
 		protected override bool ProcessSection (IHttpRequest request, IHttpResponse response, IHttpSession session)
 		{
-			if (request.Method.ToLower() != "post")
-				return false;
+			IHttpInput input = (request.Method.ToLower() == "post") ? request.Form : request.QueryString;
+			/*if (request.Method.ToLower() != "post")
+				return false;*/
 
-			if (!request.Form.Contains ("username") || !request.Form.Contains ("password"))
+			if (!input.Contains ("username") || !input.Contains ("password"))
 			{
 				WriteAndFlush (response, "{ error: \"Invalid request\" }");
 				return true;
 			}
 
 			var result = Connections.SendAndReceive<LoginMessage, LoginResultMessage> (
-							new LoginMessage { Username = request.Form["username"].Value, Password = request.Form["password"].Value }, session);
-
-			var permissions = Connections.Receive<PermissionsMessage> (session);
+							new LoginMessage { Username = input["username"].Value, Password = input["password"].Value }, session);
 			
 			if (!result.Result.Succeeded)
 				WriteAndFlush (response, JsonConvert.SerializeObject (new { result.Result, SessionId = session.Id }));
-			else if (permissions.Permissions.CheckPermission (PermissionName.AdminPanel))
-			{
-				session["loggedIn"] = true;
-				Connections.SaveSession (session);
-				WriteAndFlush (response, JsonConvert.SerializeObject (new { result.Result, SessionId = session.Id }));
-			}
 			else
 			{
-				WriteAndFlush (response, "{ error: \"Insufficient permissions\" }");
+				var pmsg = Connections.Receive<PermissionsMessage> (session);
+
+				if (pmsg.Permissions.CheckPermission (PermissionName.AdminPanel))
+				{
+					session["loggedIn"] = true;
+					Connections.SaveSession (session);
+
+					WriteAndFlush (response, JsonConvert.SerializeObject (new { result.Result, SessionId = session.Id, pmsg.Permissions }));
+				}
+				else
+				{
+					WriteAndFlush (response, "{ error: \"Insufficient permissions\" }");
+				}
 			}
 
 			return true;

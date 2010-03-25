@@ -75,7 +75,9 @@ namespace Gablarski.WebServer
 		/// <exception cref="System.ArgumentNullException"><paramref name="message"/> is <c>null</c>.</exception>
 		public void Send (MessageBase message)
 		{
-			((List<MessageBase>)session["mqueue"]).Add (message);
+			var mqueue = ((List<MessageBase>)session["mqueue"]);
+			lock (mqueue)
+				mqueue.Add (message);
 		}
 
 		public IEnumerable<ReceivedMessage> Tick()

@@ -48,6 +48,11 @@ namespace Gablarski.WebServer
 {
 	public class ConnectionManager
 	{
+		public ConnectionManager (IHttpSessionStore httpSessionStore)
+		{
+			this.sessionStore = httpSessionStore;
+		}
+
 		public WebServerConnectionProvider ConnectionProvider
 		{
 			get; set;
@@ -60,28 +65,31 @@ namespace Gablarski.WebServer
 
 		public TimeSpan SessionTtl
 		{
-			get { return sessionTtl; }
-			set { sessionTtl = value; }
+		    get { return sessionTtl; }
+		    set { sessionTtl = value; }
 		}
 
 		public TimeSpan TimeBetweenScans
 		{
-			get { return timeBetweenScans; }
-			set { timeBetweenScans = value; }
+		    get { return timeBetweenScans; }
+		    set { timeBetweenScans = value; }
 		}
 
 		public bool ProcessSession (IHttpSession session, IHttpResponse response)
 		{
 			bool newSession = false;
-			lock (sessions)
+			lock (connections)
 			{
-				if (!sessions.ContainsKey (session.Id))
-					newSession = true;
-				
-				sessions[session.Id] = session;
-
+				sessionStore.Cleanup();
 				if (DateTime.Now.Subtract (lastScanned) > TimeBetweenScans)
-					KillOldSessions();
+				    KillOldSessions();
+
+				//if (!sessions.ContainsKey (session.Id))
+				//    newSession = true;
+
+				newSession = !connections.ContainsKey (session);
+
+				//sessions[session.Id] = session;
 
 				if (newSession)
 				{
@@ -92,10 +100,10 @@ namespace Gablarski.WebServer
 					session["loggedIn"] = false;
 					sessionStore.Save (session);
 
-					response.Cookies.Add (new ResponseCookie (Server.SessionCookieName, session.Id, DateTime.Now.Add (SessionTtl)));
+					//response.Cookies.Add (new ResponseCookie (Server.SessionCookieName, session.Id, DateTime.Now.Add (SessionTtl)));
 
 					ConnectionProvider.OnConnectionMade (new ConnectionEventArgs (connection));
-					connections.Add (session.Id, connection);
+					connections.Add (session, connection);
 				}
 
 				return (bool)session["loggedIn"];
@@ -104,7 +112,7 @@ namespace Gablarski.WebServer
 
 		public void SaveSession (IHttpSession session)
 		{
-			lock (sessions)
+			lock (connections)
 			{
 				sessionStore.Save (session);
 			}
@@ -120,10 +128,12 @@ namespace Gablarski.WebServer
 			{
 				Thread.Sleep (1);
 
-				receive = mqueue.OfType<TReceive>().FirstOrDefault();
+				lock (mqueue)
+					receive = mqueue.OfType<TReceive>().FirstOrDefault();
 			}
 			
-			mqueue.Remove (receive);
+			lock (mqueue)
+				mqueue.Remove (receive);
 
 			return receive;
 		}
@@ -132,9 +142,9 @@ namespace Gablarski.WebServer
 			where TSend : MessageBase
 			where TReceive : MessageBase
 		{
-			lock (sessions)
+			lock (connections)
 			{
-				connections[session.Id].Receive (message);
+				connections[session].Receive (message);
 			}
 
 			return Receive<TReceive> (session);
@@ -147,10 +157,12 @@ namespace Gablarski.WebServer
 		{
 
 			List<MessageBase> mqueue = (List<MessageBase>)session["mqueue"];
-			lock (sessions)
+			lock (connections)
 			{
-				connections[session.Id].Receive (message);
+				connections[session].Receive (message);
 			}
+
+			int i = 0;
 
 			error = null;
 			TReceive receive = null;
@@ -158,12 +170,22 @@ namespace Gablarski.WebServer
 			{
 				Thread.Sleep (1);
 
-				receive = mqueue.OfType<TReceive>().FirstOrDefault();
-				if (receive == null)
-					error = mqueue.OfType<TError>().FirstOrDefault();
-			} while (receive == null || error == null);
+				lock (mqueue)
+				{
+					receive = mqueue.OfType<TReceive>().FirstOrDefault();
+					if (receive == null)
+						error = mqueue.OfType<TError>().FirstOrDefault();
+				}
+			} while (++i < 30000 && receive == null && error == null);
 			
-			mqueue.Remove (receive);
+			lock (mqueue)
+			{
+				if (receive != null)
+					mqueue.Remove (receive);
+
+				if (error != null)
+					mqueue.Remove (error);
+			}
 
 			return receive;
 		}
@@ -172,29 +194,24 @@ namespace Gablarski.WebServer
 		private TimeSpan timeBetweenScans = TimeSpan.FromMinutes (1);
 		private DateTime lastScanned = DateTime.Now;
 
-		private readonly Dictionary<string, IHttpSession> sessions = new Dictionary<string, IHttpSession>();
-		private readonly Dictionary<string, WebServerConnection> connections = new Dictionary<string, WebServerConnection>();
-		private readonly MemorySessionStore store = new MemorySessionStore();
+		private readonly Dictionary<IHttpSession, WebServerConnection> connections = new Dictionary<IHttpSession, WebServerConnection>();
+		private readonly IHttpSessionStore sessionStore;
 
 		private void KillOldSessions ()
 		{
-			lock (sessions)
-			{
-				foreach (var session in sessions.Values.ToList())
-				{
-					if (DateTime.Now.Subtract (session.Accessed) <= TimeBetweenScans)
-						continue;
+		    lock (connections)
+		    {
+		        foreach (var kvp in connections.ToList())
+		        {
+		            if (DateTime.Now.Subtract (kvp.Key.Accessed) <= sessionTtl)
+		                continue;
 
-					if (sessions.Remove (session.Id))
-						connections[session.Id].Disconnect();
+		        	kvp.Value.Disconnect();
+		            connections.Remove (kvp.Key);
+		        }
+		    }
 
-					connections.Remove (session.Id);
-				}
-			}
-
-			lastScanned = DateTime.Now;
+		    lastScanned = DateTime.Now;
 		}
-
-		private readonly IHttpSessionStore sessionStore = new MemorySessionStore();
 	}
 }

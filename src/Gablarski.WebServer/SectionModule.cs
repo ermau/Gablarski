@@ -55,13 +55,28 @@ namespace Gablarski.WebServer
 
 		public override bool Process (IHttpRequest request, IHttpResponse response, IHttpSession session)
 		{
-			if (request.UriParts.Length > 0 && request.UriParts[0].ToLower() == this.sectionName)
+			if (request.UriParts.Length > 0)
 			{
-				this.Connections.ProcessSession (session, response);
-				return ProcessSection (request, response, session);
+				string part = request.UriParts[0].ToLower();
+				int arg = part.IndexOf ("(");
+				if (arg != -1 && part[part.Length - 1] == ')')
+					part = part.Substring (0, arg);
+
+				if (part != this.sectionName)
+					return false;
+
+				if (this.Connections.ProcessSession (session, response) || !MustBeLoggedIn)
+					return ProcessSection (request, response, session);
+				else
+					return false;
 			}
 
 			return false;
+		}
+
+		protected virtual bool MustBeLoggedIn
+		{
+			get { return true; }
 		}
 
 		private readonly string sectionName;
