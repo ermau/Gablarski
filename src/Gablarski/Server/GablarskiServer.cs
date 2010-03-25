@@ -314,6 +314,7 @@ namespace Gablarski.Server
 				{ ClientMessageType.Join, userHandler.JoinMessage },
 				{ ClientMessageType.SetComment, userHandler.SetCommentMessage },
 				{ ClientMessageType.SetStatus, userHandler.SetStatusMessage },
+				{ ClientMessageType.SetPermissions, userHandler.SetPermissionsMessage},
 
 				{ ClientMessageType.RequestSource, sourceHandler.RequestSourceMessage },
 				{ ClientMessageType.AudioData, sourceHandler.SendAudioDataMessage },

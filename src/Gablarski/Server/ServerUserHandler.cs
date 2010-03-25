@@ -401,6 +401,30 @@ namespace Gablarski.Server
 				return;
 		}
 
+		internal void SetPermissionsMessage (MessageReceivedEventArgs e)
+		{
+			var msg = (SetPermissionsMessage)e.Message;
+
+			if (!e.Connection.IsConnected || !context.PermissionsProvider.UpdatedSupported)
+				return;
+
+			if (!context.GetPermission (PermissionName.ModifyPermissions, e.Connection))
+			{
+				e.Connection.Send (new PermissionDeniedMessage (ClientMessageType.SetPermissions));
+				return;
+			}
+
+			context.PermissionsProvider.SetPermissions (msg.UserId, msg.Permissions);
+
+			UserInfo target = Manager[msg.UserId];
+			if (target == null)
+				return;
+
+			IConnection c = Manager.GetConnection (target);
+			if (c != null)
+				c.Send (new PermissionsMessage (msg.UserId, context.PermissionsProvider.GetPermissions (msg.UserId)));
+		}
+
 		private UserInfo GetJoiningUserInfo (IConnection connection, JoinMessage join)
 		{
 			if (!Manager.GetIsConnected (connection))

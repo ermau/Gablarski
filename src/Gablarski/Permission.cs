@@ -126,6 +126,7 @@ namespace Gablarski
 	}
 
 	public class Permission
+		: IEquatable<Permission>
 	{
 		internal Permission (IValueReader reader)
 		{
@@ -166,6 +167,17 @@ namespace Gablarski
 			return Enum.GetValues (typeof (PermissionName)).Cast<PermissionName> ();
 		}
 
+		public override bool Equals(object obj)
+		{
+			if (ReferenceEquals (null, obj))
+				return false;
+			if (ReferenceEquals (this, obj))
+				return true;
+			if (obj.GetType() != typeof (Permission))
+				return false;
+			return Equals ((Permission) obj);
+		}
+
 		internal void Serialize (IValueWriter writer)
 		{
 			writer.WriteInt32 ((int)this.Name);
@@ -176,6 +188,23 @@ namespace Gablarski
 		{
 			this.Name = (PermissionName)reader.ReadInt32();
 			this.IsAllowed = reader.ReadBool();
+		}
+
+		public bool Equals (Permission other)
+		{
+			if (ReferenceEquals (null, other))
+				return false;
+			if (ReferenceEquals (this, other))
+				return true;
+			return Equals (other.Name, this.Name) && other.ChannelId == this.ChannelId;
+		}
+
+		public override int GetHashCode()
+		{
+			unchecked
+			{
+				return (this.Name.GetHashCode() * 397) ^ this.ChannelId;
+			}
 		}
 	}
 

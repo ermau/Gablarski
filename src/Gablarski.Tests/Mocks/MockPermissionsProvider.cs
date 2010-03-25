@@ -49,7 +49,8 @@ namespace Gablarski.Tests.Mocks
 
 		public bool UpdatedSupported
 		{
-			get { return true; }
+			get;
+			set;
 		}
 
 		public IEnumerable<Permission> GetPermissions (int userId)
@@ -59,10 +60,11 @@ namespace Gablarski.Tests.Mocks
 
 		public void SetPermissions (int userId, IEnumerable<Permission> newPermission)
 		{
-			permissions.Remove (userId);
-
-			foreach (var p in newPermission)
-				permissions.Add (userId, p);
+			foreach (var np in newPermission)
+			{
+				permissions.Remove (userId, np);
+				permissions.Add (userId, np);
+			}
 		}
 
 		public void EnablePermissions (int userid, params PermissionName[] permissionsToEnable)

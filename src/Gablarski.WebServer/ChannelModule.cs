@@ -85,18 +85,13 @@ namespace Gablarski.WebServer
 						{
 							WriteAndFlush (response, "{ error: \"Invalid channel ID\" }");
 							return true;
-						}
-					
-						if (request.UriParts[1] == "edit")
-							return SaveOrUpdateChannel (session, response, input, channelId);
-						else if (request.UriParts[1] == "delete")
-							return SaveOrUpdateChannel (session, response, input, channelId, true);
-					
-						return false;
+						} 
+						
+						return SaveOrUpdateChannel (session, response, input, channelId, (request.UriParts[1] == "delete"));
 					}
 					
 					case "new":
-						return SaveOrUpdateChannel (session, response, input, 0);
+						return SaveOrUpdateChannel (session, response, input, 0, false);
 				}
 			}
 			else
@@ -107,17 +102,6 @@ namespace Gablarski.WebServer
 			return true;
 		}
 		
-		private bool SaveOrUpdateChannel (IHttpSession session, IHttpResponse response, IHttpInput input, int channelId)
-		{
-			bool delete = false;
-			if (input.Contains ("Delete") && !Boolean.TryParse (input["Delete"].Value, out delete))
-			{
-				WriteAndFlush (response, "{ error: \"Invalid request\" }");
-				return true;
-			}
-			
-			return SaveOrUpdateChannel (session, response, input, channelId, delete);
-		}
 		
 		private bool SaveOrUpdateChannel (IHttpSession session, IHttpResponse response, IHttpInput input, int channelId, bool delete)
 		{

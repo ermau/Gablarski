@@ -529,5 +529,128 @@ namespace Gablarski.Tests
 
 			c.Client.AssertNoMessage();
 		}
+
+		[Test]
+		public void SetPermissionsNotConnected()
+		{
+			permissions.UpdatedSupported = true;
+
+			var u = UserInfoTests.GetTestUser();
+			permissions.EnablePermissions (u.UserId, PermissionName.ModifyPermissions);
+
+			var c = new MockServerConnection();
+			c.Disconnect();
+
+			handler.SetPermissionsMessage (new MessageReceivedEventArgs (c,
+				new SetPermissionsMessage (u, new Permission[0])));
+
+			c.Client.AssertNoMessage();
+		}
+
+		[Test]
+		public void SetPermissionsNotAllowed()
+		{
+			permissions.UpdatedSupported = true;
+			MockServerConnection c = new MockServerConnection();
+			var u = JoinAsGuest (c, "nick");
+
+			handler.SetPermissionsMessage (new MessageReceivedEventArgs (c,
+				new SetPermissionsMessage (u, new Permission[0])));
+
+			Assert.AreEqual (ClientMessageType.SetPermissions,
+			                 c.Client.DequeueAndAssertMessage<PermissionDeniedMessage>().DeniedMessage);
+		}
+
+		[Test]
+		public void SetPermissionsNoPermissions()
+		{
+			permissions.UpdatedSupported = true;
+
+			MockServerConnection c = new MockServerConnection();
+			var u = JoinAsGuest (c, "nick");
+			permissions.EnablePermissions (u.UserId, PermissionName.ModifyPermissions);
+
+			handler.SetPermissionsMessage (new MessageReceivedEventArgs (c,
+				new SetPermissionsMessage (u, new Permission[0])));
+
+			c.Client.AssertNoMessage();
+		}
+
+		[Test]
+		public void SetPermissionsUnsupported()
+		{
+			MockServerConnection c = new MockServerConnection();
+			var u = JoinAsGuest (c, "nick");
+			permissions.EnablePermissions (u.UserId, PermissionName.ModifyPermissions);
+
+			handler.SetPermissionsMessage (new MessageReceivedEventArgs (c,
+				new SetPermissionsMessage (u, new []
+				{
+					new Permission (PermissionName.SendAudio, true), 
+					new Permission (PermissionName.SendAudioToMultipleTargets, false), 
+					new Permission (PermissionName.KickPlayerFromChannel, true) { ChannelId = 1 }, 
+				})));
+
+			c.Client.AssertNoMessage();
+		}
+
+		[Test]
+		public void SetPermissionsSelf()
+		{
+			MockServerConnection c = new MockServerConnection();
+			var u = JoinAsGuest (c, "nick");
+
+			permissions.EnablePermissions (u.UserId, PermissionName.ModifyPermissions);
+
+			handler.SetPermissionsMessage (new MessageReceivedEventArgs (c,
+				new SetPermissionsMessage (u, new []
+				{
+					new Permission (PermissionName.SendAudio, true), 
+					new Permission (PermissionName.SendAudioToMultipleTargets, false), 
+					new Permission (PermissionName.KickPlayerFromChannel, true) { ChannelId = 1 }, 
+				})));
+
+			var msg = c.Client.DequeueAndAssertMessage<PermissionsMessage>();
+			Assert.AreEqual (u.UserId, msg.OwnerId);
+
+			var perms = msg.Permissions.ToList();
+			perms.Single (p => p.ChannelId == 0 && p.Name == PermissionName.SendAudio && p.IsAllowed);
+			perms.Single (p => p.ChannelId == 0 && p.Name == PermissionName.SendAudioToMultipleTargets && !p.IsAllowed);
+			perms.Single (p => p.ChannelId == 1 && p.Name == PermissionName.KickPlayerFromChannel && p.IsAllowed);
+		}
+
+		[Test]
+		public void SetPermissionsOtherConnected()
+		{
+			MockServerConnection c1 = new MockServerConnection();
+			var u1 = JoinAsGuest (c1, "nick");
+
+			permissions.EnablePermissions (u1.UserId, PermissionName.ModifyPermissions);
+
+			MockServerConnection c2 = new MockServerConnection();
+			var u2 = JoinAsGuest (c2, "nick2");
+
+			handler.SetPermissionsMessage (new MessageReceivedEventArgs (c1,
+				new SetPermissionsMessage (u2, new []
+				{
+					new Permission (PermissionName.SendAudio, true), 
+					new Permission (PermissionName.SendAudioToMultipleTargets, false), 
+					new Permission (PermissionName.KickPlayerFromChannel, true) { ChannelId = 1 }, 
+				})));
+
+			var msg = c1.Client.DequeueAndAssertMessage<PermissionsMessage>();
+			Assert.AreEqual (u1.UserId, msg.OwnerId);
+
+			var perms = msg.Permissions.ToList();
+			perms.Single (p => p.ChannelId == 0 && p.Name == PermissionName.SendAudio && p.IsAllowed);
+			perms.Single (p => p.ChannelId == 0 && p.Name == PermissionName.SendAudioToMultipleTargets && !p.IsAllowed);
+			perms.Single (p => p.ChannelId == 1 && p.Name == PermissionName.KickPlayerFromChannel && p.IsAllowed);
+		}
+
+		[Test]
+		public void SetPermissionsOtherNotConnected()
+		{
+			
+		}
 	}
 }

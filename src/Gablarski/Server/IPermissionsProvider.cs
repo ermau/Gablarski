@@ -69,6 +69,10 @@ namespace Gablarski.Server
 		/// <param name="userId">The user id to set permissions for.</param>
 		/// <param name="permissions">The permissions to set for the user.</param>
 		/// <exception cref="NotSupportedException">If <see cref="UpdatedSupported"/> is <c>false</c>.</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="permissions"/> is <c>null</c>.</exception>
+		/// <remarks>
+		/// This should only update permissions in <paramref name="permissions"/>, it's not a blanket set.
+		/// </remarks>
 		void SetPermissions (int userId, IEnumerable<Permission> permissions);
 	}
 
