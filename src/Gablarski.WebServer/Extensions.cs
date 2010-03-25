@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -24,7 +24,7 @@ namespace Gablarski.WebServer
 					case "$skip":
 					{
 						int skip;
-						if (query["$skip"].Value != null && Int32.TryParse (query["$skip"].Value, out skip))
+						if (Int32.TryParse (input.Value, out skip))
 							self = self.Skip (skip);
 
 						break;
@@ -33,35 +33,29 @@ namespace Gablarski.WebServer
 					case "$top":
 					{
 						int top;
-						if (query["$top"].Value != null && Int32.TryParse(query["$top"].Value, out top))
+						if (Int32.TryParse (input.Value, out top))
 							self = self.Take (top);
 
 						break;
 					}
-
-					/*case "orderby":
-					{
-						Type ty = typeof (T);
-						PropertyInfo property = null;
-						try
-						{
-							property = ty.GetProperty (input.Value.Trim().ToLower(), BindingFlags.Public | BindingFlags.GetProperty);
-
-							if (property != null)
-							{
-								
-							}
-						}
-						catch (AmbiguousMatchException)
-						{
-						}
-
-						break;
-					}*/
 				}
 			}
 			
 			return self;
+		}
+		
+		public static bool TryGetItemId (this IHttpRequest request, out int itemId)
+		{
+			string part = request.UriParts[0];
+
+			int arg = part.IndexOf ("(") + 1;
+			if (arg != 0 && part[part.Length - 1] == ')')
+				part = part.Substring (arg, part.Length - 1 - arg);
+
+			if (!Int32.TryParse (part, out itemId))
+				return false;
+			
+			return true;
 		}
 
 		public static bool ContainsAndNotNull (this IHttpInput self, params string[] fieldNames)

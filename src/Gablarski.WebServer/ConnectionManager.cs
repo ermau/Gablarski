@@ -162,7 +162,7 @@ namespace Gablarski.WebServer
 			return SendAndReceive<TReceive, TError> (message, session, e => true, out error);
 		}
 		
-		public TReceive SendAndReceive<TReceive, TError> (MessageBase message, IHttpSession session, Func<TError, booL> errorPredicate, out TError error)
+		public TReceive SendAndReceive<TReceive, TError> (MessageBase message, IHttpSession session, Func<TError, bool> errorPredicate, out TError error)
 			where TReceive : MessageBase
 			where TError : MessageBase
 		{

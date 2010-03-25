@@ -75,24 +75,26 @@ namespace Gablarski.WebServer
 
 				IHttpInput input = (request.Method.ToLower() == "post") ? request.Form : request.QueryString;
 
+				int channelId;
 				switch (request.UriParts[1])
 				{
+					case "delete":
 					case "edit":
-						string part = request.UriParts[0];
-
-						int arg = part.IndexOf ("(") + 1;
-						if (arg != 0 && part[part.Length - 1] == ')')
-							part = part.Substring (arg, part.Length - 1 - arg);
-
-						int channelId;
-						if (!Int32.TryParse (part, out channelId))
+					{
+						if (!request.TryGetItemId (out channelId))
 						{
 							WriteAndFlush (response, "{ error: \"Invalid channel ID\" }");
 							return true;
 						}
-
-						return SaveOrUpdateChannel (session, response, input, channelId);
-
+					
+						if (request.UriParts[1] == "edit")
+							return SaveOrUpdateChannel (session, response, input, channelId);
+						else if (request.UriParts[1] == "delete")
+							return SaveOrUpdateChannel (session, response, input, channelId, true);
+					
+						return false;
+					}
+					
 					case "new":
 						return SaveOrUpdateChannel (session, response, input, 0);
 				}
@@ -104,8 +106,20 @@ namespace Gablarski.WebServer
 
 			return true;
 		}
-
+		
 		private bool SaveOrUpdateChannel (IHttpSession session, IHttpResponse response, IHttpInput input, int channelId)
+		{
+			bool delete = false;
+			if (input.Contains ("Delete") && !Boolean.TryParse (input["Delete"].Value, out delete))
+			{
+				WriteAndFlush (response, "{ error: \"Invalid request\" }");
+				return true;
+			}
+			
+			return SaveOrUpdateChannel (session, response, input, channelId, delete);
+		}
+		
+		private bool SaveOrUpdateChannel (IHttpSession session, IHttpResponse response, IHttpInput input, int channelId, bool delete)
 		{
 			if (!input.ContainsAndNotNull ("SessionId", "ParentChannelId", "Name", "Description", "UserLimit"))
 			{
@@ -121,13 +135,6 @@ namespace Gablarski.WebServer
 
 			ChannelEditMessage editMessage;
 			ChannelInfo channel = new ChannelInfo (channelId);
-
-			bool delete = false;
-			if (input.Contains ("Delete") && !Boolean.TryParse (input["Delete"].Value, out delete))
-			{
-				WriteAndFlush (response, "{ error: \"Invalid request\" }");
-				return true;
-			}
 
 			if (!delete)
 			{
