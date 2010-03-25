@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2010, Eric Maupin
+// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -56,11 +56,11 @@ namespace Gablarski.Messages
 			if (permissions == null)
 				throw new ArgumentNullException ("permissions");
 
-			User = user;
+			UserId = user.UserId;
 			Permissions = permissions;
 		}
 
-		public UserInfo User
+		public int UserId
 		{
 			get; set;
 		}
@@ -72,24 +72,24 @@ namespace Gablarski.Messages
 
 		public override void WritePayload (IValueWriter writer)
 		{
-			User.Serialize (writer);
-
+			writer.WriteInt32 (UserId);
+			
 			var perms = Permissions.ToList();
-
 			writer.WriteInt32 (perms.Count);
-
 			for (int i = 0; i < perms.Count; ++i)
 				perms[i].Serialize (writer);
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
-			User = new UserInfo (reader);
+			UserId = reader.ReadInt32();
 
 			int permissionCount = reader.ReadInt32();
 			Permission[] permissions = new Permission[permissionCount];
 			for (int i = 0; i < permissions.Length; ++i)
 				permissions[i] = new Permission (reader);
+			
+			Permissions = permissions;
 		}
 	}
 }
