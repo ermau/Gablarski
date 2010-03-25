@@ -71,7 +71,7 @@ namespace Gablarski.WebServer
 				return true;
 			}
 
-			var result = Connections.SendAndReceive<LoginMessage, LoginResultMessage> (
+			var result = Connections.SendAndReceive<LoginResultMessage> (
 							new LoginMessage { Username = input["username"].Value, Password = input["password"].Value }, session);
 			
 			if (!result.Result.Succeeded)

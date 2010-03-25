@@ -138,8 +138,7 @@ namespace Gablarski.WebServer
 			return receive;
 		}
 
-		public TReceive SendAndReceive<TSend, TReceive> (TSend message, IHttpSession session)
-			where TSend : MessageBase
+		public TReceive SendAndReceive<TReceive> (MessageBase message, IHttpSession session)
 			where TReceive : MessageBase
 		{
 			lock (connections)
@@ -150,8 +149,7 @@ namespace Gablarski.WebServer
 			return Receive<TReceive> (session);
 		}
 
-		public TReceive SendAndReceive<TSend, TReceive, TError> (TSend message, IHttpSession session, out TError error)
-			where TSend : MessageBase
+		public TReceive SendAndReceive<TReceive, TError> (MessageBase message, IHttpSession session, out TError error)
 			where TReceive : MessageBase
 			where TError : MessageBase
 		{

@@ -66,7 +66,7 @@ namespace Gablarski.WebServer
 				
 				try
 				{
-					var result = cmanager.SendAndReceive<QueryServerMessage, QueryServerResultMessage> (new QueryServerMessage(), session);
+					var result = cmanager.SendAndReceive<QueryServerResultMessage> (new QueryServerMessage(), session);
 				
 					JsonTextWriter writer = new JsonTextWriter (bodyWriter);
 					serializer.Serialize (writer, result);

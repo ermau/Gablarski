@@ -64,9 +64,9 @@ namespace Gablarski.WebServer
 			return self;
 		}
 
-		public static bool Contains (this IHttpInput self, params string[] fieldNames)
+		public static bool ContainsAndNotNull (this IHttpInput self, params string[] fieldNames)
 		{
-			return fieldNames.All (self.Contains);
+			return fieldNames.All (n => self.Contains (n) && self[n].Value != null);
 		}
 	}
 }

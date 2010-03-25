@@ -57,7 +57,7 @@ namespace Gablarski.WebServer
 			if (request.UriParts.Length == 1)
 			{
 				PermissionDeniedMessage denied;
-				var msg = Connections.SendAndReceive<RequestChannelListMessage, ChannelListMessage, PermissionDeniedMessage> (
+				var msg = Connections.SendAndReceive<ChannelListMessage, PermissionDeniedMessage> (
 					new RequestChannelListMessage(), session, out denied);
 
 				if (denied != null)
@@ -77,9 +77,6 @@ namespace Gablarski.WebServer
 
 				switch (request.UriParts[1])
 				{
-					case "new":
-						break;
-
 					case "edit":
 						string part = request.UriParts[0];
 
@@ -94,19 +91,10 @@ namespace Gablarski.WebServer
 							return true;
 						}
 
-						if (!input.Contains ("SessionId", "ParentChannelId", "Name", "Description", "UserLimit"))
-						{
-							WriteAndFlush (response, "{ error: \"Invalid request\" }");
-							return true;
-						}
+						return SaveOrUpdateChannel (session, response, input, channelId);
 
-						if (session.Id != input["SessionId"].Value)
-						{
-							WriteAndFlush (response, "{ error: \"Invalid request\" }");
-							return true;
-						}
-
-						break;
+					case "new":
+						return SaveOrUpdateChannel (session, response, input, 0);
 				}
 			}
 			else
@@ -115,6 +103,69 @@ namespace Gablarski.WebServer
 			}
 
 			return true;
+		}
+
+		private bool SaveOrUpdateChannel (IHttpSession session, IHttpResponse response, IHttpInput input, int channelId)
+		{
+			if (!input.ContainsAndNotNull ("SessionId", "ParentChannelId", "Name", "Description", "UserLimit"))
+			{
+				WriteAndFlush (response, "{ error: \"Invalid request\" }");
+				return true;
+			}
+
+			if (session.Id != input["SessionId"].Value)
+			{
+				WriteAndFlush (response, "{ error: \"Invalid request\" }");
+				return true;
+			}
+
+			ChannelEditMessage editMessage;
+			ChannelInfo channel = new ChannelInfo (channelId);
+
+			bool delete = false;
+			if (input.Contains ("Delete") && !Boolean.TryParse (input["Delete"].Value, out delete))
+			{
+				WriteAndFlush (response, "{ error: \"Invalid request\" }");
+				return true;
+			}
+
+			if (!delete)
+			{
+				int userLimit, parentChannelId;
+				if (!Int32.TryParse(input["ParentChannelId"].Value, out parentChannelId))
+				{
+					WriteAndFlush (response, "{ error: \"Invalid request\" }");
+					return true;
+				}
+
+				if (!Int32.TryParse(input["UserLimit"].Value, out userLimit))
+				{
+					WriteAndFlush (response, "{ error: \"Invalid request\" }");
+					return true;
+				}
+
+				channel.ParentChannelId = parentChannelId;
+				channel.Name = input["Name"].Value.Trim();
+				channel.Description = input["Description"].Value.Trim();
+				channel.UserLimit = userLimit;
+
+				bool defaultChannel;
+				if (!Boolean.TryParse (input["Default"].Value, out defaultChannel))
+				{
+					WriteAndFlush (response, "{ error: \"Invalid request\" }");
+					return true;
+				}
+
+				editMessage = new ChannelEditMessage (channel) { MakeDefault = defaultChannel };
+			}
+			else
+			{
+				editMessage = new ChannelEditMessage (channel) { Delete = true };
+			}
+
+			var msg = Connections.SendAndReceive<ChannelEditResultMessage> (editMessage, session);
+			WriteAndFlush (response, JsonConvert.SerializeObject (new { msg.ChannelId, msg.Result }));
+			return false;
 		}
 	}
 }
