@@ -38,6 +38,7 @@ using System;
 using HttpServer.Sessions;
 using HttpServer;
 using Gablarski.Messages;
+using Newtonsoft.Json;
 
 namespace Gablarski.WebServer
 {
@@ -62,8 +63,16 @@ namespace Gablarski.WebServer
 					return true;
 				}
 				
-				WriteAndFlush (response, "");
+				WriteAndFlush (response, JsonConvert.SerializeObject (listmsg.Users));
+				return true;
 			}
+			else if (request.UriParts.Length == 2)
+			{
+				
+			}
+
+			WriteAndFlush (response, "{ error: \"Invalid request\" }");
+			return true;
 		}
 	}
 }
