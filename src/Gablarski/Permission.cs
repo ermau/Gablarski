@@ -180,14 +180,16 @@ namespace Gablarski
 
 		internal void Serialize (IValueWriter writer)
 		{
-			writer.WriteInt32 ((int)this.Name);
-			writer.WriteBool (this.IsAllowed);
+			writer.WriteInt32 ((int)Name);
+			writer.WriteInt32 (ChannelId);
+			writer.WriteBool (IsAllowed);
 		}
 
 		internal void Deserialize (IValueReader reader)
 		{
-			this.Name = (PermissionName)reader.ReadInt32();
-			this.IsAllowed = reader.ReadBool();
+			Name = (PermissionName)reader.ReadInt32();
+			ChannelId = reader.ReadInt32();
+			IsAllowed = reader.ReadBool();
 		}
 
 		public bool Equals (Permission other)

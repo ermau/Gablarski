@@ -414,7 +414,11 @@ namespace Gablarski.Server
 				return;
 			}
 
-			context.PermissionsProvider.SetPermissions (msg.UserId, msg.Permissions);
+			var perms = msg.Permissions.ToList();
+			if (perms.Count == 0)
+				return;
+
+			context.PermissionsProvider.SetPermissions (msg.UserId, perms);
 
 			UserInfo target = Manager[msg.UserId];
 			if (target == null)

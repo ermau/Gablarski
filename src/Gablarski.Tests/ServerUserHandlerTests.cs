@@ -600,6 +600,7 @@ namespace Gablarski.Tests
 			MockServerConnection c = new MockServerConnection();
 			var u = JoinAsGuest (c, "nick");
 
+			permissions.UpdatedSupported = true;
 			permissions.EnablePermissions (u.UserId, PermissionName.ModifyPermissions);
 
 			handler.SetPermissionsMessage (new MessageReceivedEventArgs (c,
@@ -625,6 +626,7 @@ namespace Gablarski.Tests
 			MockServerConnection c1 = new MockServerConnection();
 			var u1 = JoinAsGuest (c1, "nick");
 
+			permissions.UpdatedSupported = true;
 			permissions.EnablePermissions (u1.UserId, PermissionName.ModifyPermissions);
 
 			MockServerConnection c2 = new MockServerConnection();
@@ -638,8 +640,8 @@ namespace Gablarski.Tests
 					new Permission (PermissionName.KickPlayerFromChannel, true) { ChannelId = 1 }, 
 				})));
 
-			var msg = c1.Client.DequeueAndAssertMessage<PermissionsMessage>();
-			Assert.AreEqual (u1.UserId, msg.OwnerId);
+			var msg = c2.Client.DequeueAndAssertMessage<PermissionsMessage>();
+			Assert.AreEqual (u2.UserId, msg.OwnerId);
 
 			var perms = msg.Permissions.ToList();
 			perms.Single (p => p.ChannelId == 0 && p.Name == PermissionName.SendAudio && p.IsAllowed);
@@ -647,10 +649,10 @@ namespace Gablarski.Tests
 			perms.Single (p => p.ChannelId == 1 && p.Name == PermissionName.KickPlayerFromChannel && p.IsAllowed);
 		}
 
-		[Test]
-		public void SetPermissionsOtherNotConnected()
-		{
+		//[Test]
+		//public void SetPermissionsOtherNotConnected()
+		//{
 			
-		}
+		//}
 	}
 }
