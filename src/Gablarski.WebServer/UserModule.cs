@@ -59,7 +59,7 @@ namespace Gablarski.WebServer
 				
 				if (pmsg != null)
 				{
-					WriteAndFlush (response, "{ error: \"Permission denied\" }");
+					WriteAndFlush (response, "{ \"error\": \"Permission denied\" }");
 					return true;
 				}
 				
@@ -71,7 +71,7 @@ namespace Gablarski.WebServer
 				
 			}
 
-			WriteAndFlush (response, "{ error: \"Invalid request\" }");
+			WriteAndFlush (response, "{ \"error\": \"Invalid request\" }");
 			return true;
 		}
 	}

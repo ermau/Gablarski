@@ -67,7 +67,7 @@ namespace Gablarski.WebServer
 
 			if (!input.Contains ("username") || !input.Contains ("password"))
 			{
-				WriteAndFlush (response, "{ error: \"Invalid request\" }");
+				WriteAndFlush (response, "{ \"error\": \"Invalid request\" }");
 				return true;
 			}
 
@@ -89,7 +89,7 @@ namespace Gablarski.WebServer
 				}
 				else
 				{
-					WriteAndFlush (response, "{ error: \"Insufficient permissions\" }");
+					WriteAndFlush (response, "{ \"error\": \"Insufficient permissions\" }");
 				}
 			}
 

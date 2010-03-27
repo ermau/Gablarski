@@ -62,7 +62,7 @@ namespace Gablarski.WebServer
 
 				if (denied != null)
 				{
-					WriteAndFlush (response, "{ error: \"Permission denied\" }");
+					WriteAndFlush (response, "{ \"error\": \"Permission denied\" }");
 					return true;
 				}
 
@@ -83,7 +83,7 @@ namespace Gablarski.WebServer
 					{
 						if (!request.TryGetItemId (out channelId))
 						{
-							WriteAndFlush (response, "{ error: \"Invalid channel ID\" }");
+							WriteAndFlush (response, "{ \"error\": \"Invalid channel ID\" }");
 							return true;
 						} 
 						
@@ -107,13 +107,13 @@ namespace Gablarski.WebServer
 		{
 			if (!input.ContainsAndNotNull ("SessionId", "ParentChannelId", "Name", "Description", "UserLimit"))
 			{
-				WriteAndFlush (response, "{ error: \"Invalid request\" }");
+				WriteAndFlush (response, "{ \"error\": \"Invalid request\" }");
 				return true;
 			}
 
 			if (session.Id != input["SessionId"].Value)
 			{
-				WriteAndFlush (response, "{ error: \"Invalid request\" }");
+				WriteAndFlush (response, "{ \"error\": \"Invalid request\" }");
 				return true;
 			}
 
@@ -125,13 +125,13 @@ namespace Gablarski.WebServer
 				int userLimit, parentChannelId;
 				if (!Int32.TryParse(input["ParentChannelId"].Value, out parentChannelId))
 				{
-					WriteAndFlush (response, "{ error: \"Invalid request\" }");
+					WriteAndFlush (response, "{ \"error\": \"Invalid request\" }");
 					return true;
 				}
 
 				if (!Int32.TryParse(input["UserLimit"].Value, out userLimit))
 				{
-					WriteAndFlush (response, "{ error: \"Invalid request\" }");
+					WriteAndFlush (response, "{ \"error\": \"Invalid request\" }");
 					return true;
 				}
 
@@ -143,7 +143,7 @@ namespace Gablarski.WebServer
 				bool defaultChannel;
 				if (!Boolean.TryParse (input["Default"].Value, out defaultChannel))
 				{
-					WriteAndFlush (response, "{ error: \"Invalid request\" }");
+					WriteAndFlush (response, "{ \"error\": \"Invalid request\" }");
 					return true;
 				}
 
