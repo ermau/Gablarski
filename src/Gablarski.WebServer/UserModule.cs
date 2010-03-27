@@ -63,12 +63,16 @@ namespace Gablarski.WebServer
 					return true;
 				}
 				
-				WriteAndFlush (response, JsonConvert.SerializeObject (listmsg.Users));
+				WriteAndFlush (response, JsonConvert.SerializeObject (listmsg.Users.RunQuery (request.QueryString)));
 				return true;
 			}
 			else if (request.UriParts.Length == 2)
 			{
-				
+				switch (request.UriParts[1].Trim().ToLower())
+				{
+					//case "delete":
+
+				}
 			}
 
 			WriteAndFlush (response, "{ \"error\": \"Invalid request\" }");
