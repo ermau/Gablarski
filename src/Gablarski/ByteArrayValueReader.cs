@@ -87,6 +87,7 @@ namespace Gablarski
 
 			byte[] value = new byte[len];
 			Array.Copy (this.array, this.position, value, 0, len);
+			this.position += len;
 
 			return value;
 		}
