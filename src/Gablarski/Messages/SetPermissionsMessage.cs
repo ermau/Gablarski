@@ -60,6 +60,16 @@ namespace Gablarski.Messages
 			Permissions = permissions;
 		}
 
+		public SetPermissionsMessage (int userId, IEnumerable<Permission> permissions)
+			: this()
+		{
+			if (permissions == null)
+				throw new ArgumentNullException ("permissions");
+
+			UserId = userId;
+			Permissions = permissions;
+		}
+
 		public int UserId
 		{
 			get; set;

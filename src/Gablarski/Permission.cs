@@ -133,6 +133,10 @@ namespace Gablarski
 			Deserialize (reader);
 		}
 
+		public Permission()
+		{
+		}
+
 		public Permission (PermissionName name)
 		{
 			this.Name = name;
@@ -147,7 +151,7 @@ namespace Gablarski
 		public virtual PermissionName Name
 		{
 			get;
-			private set;
+			set;
 		}
 
 		public virtual int ChannelId

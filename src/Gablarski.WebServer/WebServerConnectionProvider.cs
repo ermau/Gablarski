@@ -82,9 +82,10 @@ namespace Gablarski.WebServer
 			cmanager.Server = server;
 
 			server.Add (new QueryModule (cmanager));
-			//server.Add (new FileResourceModule (config.Theme.Path));
+			server.Add (new FileResourceModule (config.Theme.Path));
 			server.Add (new LoginModule (cmanager));
 			server.Add (new ChannelModule (cmanager));
+			server.Add (new UserModule (cmanager));
 			
 			server.Start (IPAddress.Any, this.Port);
 		}

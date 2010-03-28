@@ -35,6 +35,8 @@
 // DAMAGE.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using HttpServer.Sessions;
 using HttpServer;
 using Gablarski.Messages;
@@ -68,10 +70,33 @@ namespace Gablarski.WebServer
 			}
 			else if (request.UriParts.Length == 2)
 			{
+				int userId;
+				if (!request.TryGetItemId (out userId))
+				{
+					WriteAndFlush (response, "{ \"error\": \"Invalid request\" }");
+					return true;
+				}
+
 				switch (request.UriParts[1].Trim().ToLower())
 				{
 					//case "delete":
+					case "edit":
+					{
+						IHttpInput input = (request.Method.ToLower() == "post") ? request.Form : request.QueryString;
 
+						if (!input.ContainsAndNotNull ("SessionId", "Permissions") || session.Id != input["SessionId"].Value)
+						{
+							WriteAndFlush (response, "{ \"error\": \"Invalid request\" }");
+							return true;
+						}
+
+						var permissions = JsonConvert.DeserializeObject<IEnumerable<Permission>> (input["Permissions"].Value).ToList();
+						if (permissions.Count == 0)
+							return true;
+
+						Connections.Send (new SetPermissionsMessage (userId, permissions), session);
+						return true;
+					}
 				}
 			}
 

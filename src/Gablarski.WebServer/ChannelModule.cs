@@ -105,13 +105,7 @@ namespace Gablarski.WebServer
 		
 		private bool SaveOrUpdateChannel (IHttpSession session, IHttpResponse response, IHttpInput input, int channelId, bool delete)
 		{
-			if (!input.ContainsAndNotNull ("SessionId", "ParentChannelId", "Name", "Description", "UserLimit"))
-			{
-				WriteAndFlush (response, "{ \"error\": \"Invalid request\" }");
-				return true;
-			}
-
-			if (session.Id != input["SessionId"].Value)
+			if (!input.ContainsAndNotNull ("SessionId", "ParentChannelId", "Name", "Description", "UserLimit") || session.Id != input["SessionId"].Value)
 			{
 				WriteAndFlush (response, "{ \"error\": \"Invalid request\" }");
 				return true;

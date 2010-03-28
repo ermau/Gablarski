@@ -166,13 +166,9 @@ namespace Gablarski.WebServer
 			where TReceive : MessageBase
 			where TError : MessageBase
 		{
+			Send (message, session);
 
 			List<MessageBase> mqueue = (List<MessageBase>)session["mqueue"];
-			lock (connections)
-			{
-				connections[session].Receive (message);
-			}
-
 			int i = 0;
 
 			error = null;
@@ -199,6 +195,14 @@ namespace Gablarski.WebServer
 			}
 
 			return receive;
+		}
+
+		public void Send (MessageBase message, IHttpSession session)
+		{
+			lock (connections)
+			{
+				connections[session].Receive (message);
+			}
 		}
 
 		private TimeSpan sessionTtl = TimeSpan.FromMinutes (15);
