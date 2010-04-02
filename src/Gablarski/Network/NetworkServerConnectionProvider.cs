@@ -37,6 +37,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -355,8 +356,13 @@ namespace Gablarski.Network
 			{
 				log.Info ("Failed to accept connection", sex);
 			}
-			catch (ObjectDisposedException)
+			catch (IOException ioex)
 			{
+				log.Info ("Failed to accept connection", ioex);
+			}
+			catch (ObjectDisposedException odex)
+			{
+				log.Info ("Failed to accept connection", odex);
 			}
 		}
 
