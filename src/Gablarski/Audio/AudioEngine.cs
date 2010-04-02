@@ -614,7 +614,7 @@ namespace Gablarski.Audio
 								frames[i] = samples;
 							}
 
-							if (talkingFrames != frames.Length)
+							if (talkingFrames > 0 && talkingFrames != frames.Length)
 							{
 								byte[][] actualFrames = new byte[talkingFrames][];
 								Array.Copy (frames, talkingIndex, actualFrames, 0, talkingFrames);
