@@ -50,6 +50,7 @@ namespace Gablarski
 
 		MutedMicrophone = 1,
 		MutedSound = 2,
+		AFK = 4
 	}
 
 	/// <summary>
