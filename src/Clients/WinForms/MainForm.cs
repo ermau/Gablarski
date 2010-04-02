@@ -11,6 +11,7 @@ using Gablarski.Clients.Windows.Entities;
 using Gablarski.Clients.Windows.Properties;
 using Gablarski.Messages;
 using Gablarski.Network;
+using Gablarski.Server;
 using Microsoft.WindowsAPICodePack.Taskbar;
 using System.IO;
 using System.Diagnostics;
@@ -571,6 +572,8 @@ namespace Gablarski.Clients.Windows
 				this.btnConnect.Image = Resources.DisconnectImage;
 				this.btnConnect.Text = "Connect";
 				this.btnConnect.ToolTipText = "Connect (Disconnected)";
+
+				this.btnRegister.Visible = false;
 			});
 		}
 
@@ -594,6 +597,9 @@ namespace Gablarski.Clients.Windows
 						ToolTipText = this.gablarski.ServerInfo.Description
 					}
 				);
+
+				if (this.server.UserName.IsNullOrWhitespace() && this.gablarski.ServerInfo.RegistrationMode != UserRegistrationMode.None)
+					btnRegister.Visible = true;
 			});
 
 			if (this.server == null)
@@ -789,6 +795,19 @@ namespace Gablarski.Clients.Windows
 			var changeComment = new CommentForm (this.gablarski.CurrentUser.Comment);
 			if (changeComment.ShowDialog() == DialogResult.OK)
 				this.gablarski.CurrentUser.SetComment (changeComment.Comment);
+		}
+
+		private void btnRegister_Click (object sender, EventArgs e)
+		{
+
+		}
+
+		private void btnAFK_CheckedChanged(object sender, EventArgs e)
+		{
+			if (this.btnAFK.Checked)
+				this.gablarski.CurrentUser.SetStatus (this.gablarski.CurrentUser.Status | UserStatus.AFK);
+			else
+				this.gablarski.CurrentUser.SetStatus (this.gablarski.CurrentUser.Status ^ UserStatus.AFK);
 		}
 	}
 }

@@ -36,6 +36,7 @@
 			this.btnRegister = new System.Windows.Forms.ToolStripButton();
 			this.btnMute = new System.Windows.Forms.ToolStripButton();
 			this.btnMuteMic = new System.Windows.Forms.ToolStripButton();
+			this.btnAFK = new System.Windows.Forms.ToolStripButton();
 			this.btnMusic = new System.Windows.Forms.ToolStripButton();
 			this.btnComment = new System.Windows.Forms.ToolStripButton();
 			this.btnSettings = new System.Windows.Forms.ToolStripButton();
@@ -68,6 +69,7 @@
             this.toolStripSeparator1,
             this.btnMute,
             this.btnMuteMic,
+            this.btnAFK,
             this.btnMusic,
             this.toolStripSeparator2,
             this.btnComment,
@@ -92,12 +94,14 @@
 			// 
 			// btnRegister
 			// 
+			this.btnRegister.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
 			this.btnRegister.Image = global::Gablarski.Clients.Windows.Properties.Resources.ChannelAddImage;
 			this.btnRegister.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.btnRegister.Name = "btnRegister";
-			this.btnRegister.Size = new System.Drawing.Size(69, 22);
+			this.btnRegister.Size = new System.Drawing.Size(23, 22);
 			this.btnRegister.Text = "Register";
 			this.btnRegister.Visible = false;
+			this.btnRegister.Click += new System.EventHandler(this.btnRegister_Click);
 			// 
 			// btnMute
 			// 
@@ -120,6 +124,17 @@
 			this.btnMuteMic.Size = new System.Drawing.Size(23, 22);
 			this.btnMuteMic.Text = "Mute Microphone";
 			this.btnMuteMic.Click += new System.EventHandler(this.btnMuteMic_Click);
+			// 
+			// btnAFK
+			// 
+			this.btnAFK.CheckOnClick = true;
+			this.btnAFK.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.btnAFK.Image = global::Gablarski.Clients.Windows.Properties.Resources.UserAFKImage;
+			this.btnAFK.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.btnAFK.Name = "btnAFK";
+			this.btnAFK.Size = new System.Drawing.Size(23, 22);
+			this.btnAFK.Text = "AFK";
+			this.btnAFK.CheckedChanged += new System.EventHandler(this.btnAFK_CheckedChanged);
 			// 
 			// btnMusic
 			// 
@@ -196,5 +211,6 @@
 		private System.Windows.Forms.ToolStripButton btnMute;
 		private System.Windows.Forms.ToolStripButton btnMuteMic;
 		private System.Windows.Forms.ToolStripButton btnComment;
+		private System.Windows.Forms.ToolStripButton btnAFK;
 	}
 }

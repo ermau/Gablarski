@@ -34,6 +34,7 @@ namespace Gablarski.Clients.Windows
 			this.ImageList.Images.Add ("music",		Resources.MusicImage);
 			this.ImageList.Images.Add ("muted",		Resources.SoundMuteImage);
 			this.ImageList.Images.Add ("mutedmic",	Resources.CaptureMuteImage);
+			this.ImageList.Images.Add ("afk",		Resources.UserAFKImage);
 		}
 
 		[Browsable (false)]
@@ -142,6 +143,8 @@ namespace Gablarski.Clients.Windows
 			string imageKey = "silent";
 			if (user.IsMuted)
 				imageKey = "muted";
+			else if ((user.Status & UserStatus.AFK) == UserStatus.AFK)
+				imageKey = "afk";
 			else if ((user.Status & UserStatus.MutedSound) == UserStatus.MutedSound)
 				imageKey = "muted";
 			else if ((user.Status & UserStatus.MutedMicrophone) == UserStatus.MutedMicrophone)

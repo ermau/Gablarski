@@ -262,5 +262,12 @@ namespace Gablarski.Clients.Windows.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
+        
+        internal static System.Drawing.Bitmap UserAFKImage {
+            get {
+                object obj = ResourceManager.GetObject("UserAFKImage", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
     }
 }
