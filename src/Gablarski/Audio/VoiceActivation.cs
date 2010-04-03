@@ -40,37 +40,67 @@ namespace Gablarski.Audio
 {
 	public class VoiceActivation
 	{
-		public VoiceActivation (int startVolume, int continueVolume, TimeSpan threshold)
+		public VoiceActivation (AudioSource source, int startVolume, int continueVolume, TimeSpan threshold)
 		{
+			if (source == null)
+				throw new ArgumentNullException ("source");
+
+			this.source = source;
+			this.length = (double) this.source.FrameSize / source.Frequency;
+
 			this.startVol = startVolume;
 			this.contVol = continueVolume;
-			this.threshold = threshold;
+			this.threshold = threshold.TotalMilliseconds;
 		}
 
 		public bool IsTalking (byte[] samples)
 		{
-			int total = 0;
-			for (int i = 0; i < samples.Length; i += 2)
+			int avg;
+			switch (this.source.Format)
 			{
-				unsafe
+				case AudioFormat.Mono16Bit:
 				{
-					fixed (byte* numRef = &(samples[i]))
-						total += Math.Abs (*((short*)numRef) - 128);
+					int total = 0;
+					for (int i = 0; i < samples.Length; i += 2)
+					{
+						#if !SAFE
+						unsafe
+						{
+							fixed (byte* numRef = &(samples[i]))
+								total += Math.Abs (*((short*) numRef) - 128);
+						}
+						#else
+						total += Math.Abs (BitConverter.ToInt16 (samples, i) - 128);
+						#endif
+					}
+
+					avg = total / (samples.Length / 2);
+					break;
 				}
-				//total += Math.Abs ((samples[i] | (samples[i + 1] << 8)) - 128);
-				//total += Math.Abs (BitConverter.ToInt16 (samples, i) - 128);
+					
+				case AudioFormat.Mono8Bit:
+				{
+					int total = 0;
+					for (int i = 0; i < samples.Length; ++i)
+						total += Math.Abs (samples[i] - 128);
+
+					avg = total / samples.Length;
+					break;
+				}
+					
+				default:
+					throw new NotSupportedException ("Format " + this.source.Format + " is unsupported for VoiceActivation");
 			}
 
-			int avg = total / (samples.Length / 2);
-			DateTime n = DateTime.Now;
+			time += length;
 
 			bool result = false;
 			if (avg >= ((talking) ? contVol : startVol))
 			{
 				result = true;
-				last = n;
+				time = 0;
 			}
-			else if (talking && n.Subtract (last) <= threshold)
+			else if (talking && time <= threshold)
 			{
 				result = true;
 			}
@@ -80,11 +110,13 @@ namespace Gablarski.Audio
 			return result;
 		}
 
+		private readonly AudioSource source;
 		private readonly int startVol;
 		private readonly int contVol;
-		private readonly TimeSpan threshold;
+		private readonly double threshold;
+		private readonly double length;
 
 		private bool talking;
-		private DateTime last;
+		private double time;
 	}
 }

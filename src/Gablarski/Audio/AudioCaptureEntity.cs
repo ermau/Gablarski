@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -37,7 +37,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Gablarski.Audio.Speex;
 using Gablarski.Client;
 using Gablarski.Messages;
@@ -46,7 +45,7 @@ namespace Gablarski.Audio
 {
 	internal class AudioCaptureEntity
 	{
-		public AudioCaptureEntity (ICaptureProvider capture,AudioSource source, AudioEngineCaptureOptions options)
+		public AudioCaptureEntity (ICaptureProvider capture, AudioSource source, AudioEngineCaptureOptions options)
 		{
 			this.capture = capture;
 			this.source = source;
@@ -56,7 +55,7 @@ namespace Gablarski.Audio
 
 			if (options.Mode == AudioEngineCaptureMode.Activated)
 			{
-				activation = new VoiceActivation (options.StartVolume, options.ContinuationVolume, options.ContinueThreshold);
+				activation = new VoiceActivation (source, options.StartVolume, options.ContinuationVolume, options.ContinueThreshold);
 				//preprocessor = new SpeexPreprocessor (this.source.FrameSize, this.source.Frequency);
 			}
 		}
