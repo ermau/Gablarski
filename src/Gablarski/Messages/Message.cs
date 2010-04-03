@@ -106,7 +106,7 @@ namespace Gablarski.Messages
 		UserDisconnected = 17,
 		UserChangedChannel = 27,
 
-		ChannelListReceived = 19,
+		ChannelList = 19,
 		ChangeChannelResult = 21,
 		ChannelEditResult = 23,
 

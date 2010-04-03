@@ -89,40 +89,50 @@ namespace Gablarski.Messages
 
 		static MessageBase ()
 		{
-			#if NOEMIT
+			#if SAFE
 
 			MessageTypes = new ReadOnlyDictionary<ushort,Func<MessageBase>> (new Dictionary<ushort, Func<MessageBase>>
 			{
-			    { (ushort)ServerMessageType.AudioDataReceived, () => new AudioDataReceivedMessage() },
+				{ (ushort)ServerMessageType.AudioData, () => new ServerAudioDataMessage() },
 			    { (ushort)ServerMessageType.AudioSourceStateChange, () => new AudioSourceStateChangeMessage() },
 			    { (ushort)ServerMessageType.ChangeChannelResult, () => new ChannelChangeResultMessage() },
 			    { (ushort)ServerMessageType.ChannelEditResult, () => new ChannelEditResultMessage() },
-			    { (ushort)ServerMessageType.ChannelListReceived, () => new ChannelListMessage() },
 			    { (ushort)ServerMessageType.ConnectionRejected, () => new ConnectionRejectedMessage() },
 			    { (ushort)ServerMessageType.LoginResult, () => new LoginResultMessage() },
+				{ (ushort)ServerMessageType.JoinResult, () => new JoinResultMessage() },
+				{ (ushort)ServerMessageType.ChannelList, () => new ChannelListMessage() },
 			    { (ushort)ServerMessageType.ServerInfoReceived, () => new ServerInfoMessage() },
-			    { (ushort)ServerMessageType.SourceListReceived, () => new SourceListMessage() },
+			    { (ushort)ServerMessageType.SourceList, () => new SourceListMessage() },
 			    { (ushort)ServerMessageType.SourceResult, () => new SourceResultMessage() },
 			    { (ushort)ServerMessageType.SourcesRemoved, () => new SourcesRemovedMessage() },
 			    { (ushort)ServerMessageType.UserChangedChannel, () => new UserChangedChannelMessage() },
 			    { (ushort)ServerMessageType.UserDisconnected, () => new UserDisconnectedMessage() },
-			    { (ushort)ServerMessageType.UserListReceived, () => new UserListMessage() },
-			    { (ushort)ServerMessageType.UserLoggedIn, () => new UserLoggedInMessage() },
+			    { (ushort)ServerMessageType.UserList, () => new UserListMessage() },
+			    { (ushort)ServerMessageType.UserLoggedIn, () => new UserJoinedMessage() },
+				{ (ushort)ServerMessageType.UserInfoList, () => new UserInfoListMessage() },
 			    { (ushort)ServerMessageType.Muted, () => new MutedMessage() },
 			    { (ushort)ServerMessageType.Permissions, () => new PermissionsMessage() },
+				{ (ushort)ServerMessageType.Redirect, () => new RedirectMessage() },
+				{ (ushort)ServerMessageType.RegisterResult, () => new RegisterMessage() },
+				{ (ushort)ServerMessageType.PermissionDenied, () => new PermissionDeniedMessage() },
+				{ (ushort)ServerMessageType.UserUpdated, () => new UserUpdatedMessage() },
 
-			    { (ushort)ClientMessageType.AudioData, () => new SendAudioDataMessage() },
+			    { (ushort)ClientMessageType.AudioData, () => new ServerAudioDataMessage() },
 			    { (ushort)ClientMessageType.ClientAudioSourceStateChange, () => new ClientAudioSourceStateChangeMessage() },
-			    { (ushort)ClientMessageType.ChangeChannel, () => new ChannelChangeMessage() },
+			    { (ushort)ClientMessageType.ChannelChange, () => new ChannelChangeMessage() },
 			    { (ushort)ClientMessageType.Connect, () => new ConnectMessage() },
 			    { (ushort)ClientMessageType.Disconnect, () => new DisconnectMessage() },
-			    { (ushort)ClientMessageType.EditChannel, () => new ChannelEditMessage() },
+			    { (ushort)ClientMessageType.ChannelEdit, () => new ChannelEditMessage() },
 			    { (ushort)ClientMessageType.Login, () => new LoginMessage() },
 			    { (ushort)ClientMessageType.RequestChannelList, () => new RequestChannelListMessage() },
 			    { (ushort)ClientMessageType.RequestSource, () => new RequestSourceMessage() },
 			    { (ushort)ClientMessageType.RequestSourceList, () => new RequestSourceListMessage() },
 			    { (ushort)ClientMessageType.RequestUserList, () => new RequestUserListMessage() },
-			    { (ushort)ClientMessageType.RequestMute, () => new RequestMuteMessage() }
+			    { (ushort)ClientMessageType.RequestMuteSource, () => new RequestMuteSourceMessage() },
+				{ (ushort)ClientMessageType.RequestMuteUser, () => new RequestMuteUserMessage() },
+				{ (ushort)ClientMessageType.SetComment, () => new SetCommentMessage() },
+				{ (ushort)ClientMessageType.SetStatus, () => new SetStatusMessage() },
+				{ (ushort)ClientMessageType.SetPermissions, () => new SetPermissionsMessage() }
 			});
 
 			#else

@@ -45,7 +45,7 @@ namespace Gablarski.Messages
 		: ServerMessage
 	{
 		public ChannelListMessage ()
-			: base (ServerMessageType.ChannelListReceived)
+			: base (ServerMessageType.ChannelList)
 		{
 
 		}

@@ -95,7 +95,7 @@ namespace Gablarski.Client
 				{ ServerMessageType.SourceList, this.Sources.OnSourceListReceivedMessage },
 				{ ServerMessageType.SourcesRemoved, this.Sources.OnSourcesRemovedMessage },
 				
-				{ ServerMessageType.ChannelListReceived, this.Channels.OnChannelListReceivedMessage },
+				{ ServerMessageType.ChannelList, this.Channels.OnChannelListReceivedMessage },
 				{ ServerMessageType.UserChangedChannel, this.users.OnUserChangedChannelMessage },
 				{ ServerMessageType.ChannelEditResult, this.Channels.OnChannelEditResultMessage },
 				{ ServerMessageType.ChangeChannelResult, this.users.OnChannelChangeResultMessage },
