@@ -572,6 +572,12 @@ namespace Gablarski.Clients.Windows
 				this.btnConnect.Image = Resources.DisconnectImage;
 				this.btnConnect.Text = "Connect";
 				this.btnConnect.ToolTipText = "Connect (Disconnected)";
+				this.btnConnect.Enabled = true;
+
+				this.btnComment.Enabled = false;
+				this.btnMute.Enabled = false;
+				this.btnMuteMic.Enabled = false;
+				this.btnAFK.Enabled = false;
 
 				this.btnRegister.Visible = false;
 			});
@@ -590,6 +596,12 @@ namespace Gablarski.Clients.Windows
 				this.btnConnect.Image = Resources.ConnectImage;
 				this.btnConnect.Text = "Disconnect";
 				this.btnConnect.ToolTipText = "Disconnect (Connected)";
+				this.btnConnect.Enabled = true;
+
+				this.btnComment.Enabled = true;
+				this.btnMute.Enabled = true;
+				this.btnMuteMic.Enabled = true;
+				this.btnAFK.Enabled = true;
 
 				this.users.SetServerNode (
 					new TreeNode (this.gablarski.ServerInfo.Name)
@@ -664,6 +676,9 @@ namespace Gablarski.Clients.Windows
 		private void GablarskiConnectionRejected (object sender, RejectedConnectionEventArgs e)
 		{
 			//TaskDialog.Show (e.Reason.ToString(), "Connection rejected");
+
+			BeginInvoke ((Action) (() => this.btnConnect.Enabled = true));
+
 			switch (e.Reason)
 			{
 				case ConnectionRejectedReason.CouldNotConnect:
@@ -708,6 +723,8 @@ namespace Gablarski.Clients.Windows
 
 		private void btnConnect_Click (object sender, EventArgs e)
 		{
+			this.btnConnect.Enabled = false;
+
 			if (this.gablarski.IsConnected)
 			{
 				DisableInput();

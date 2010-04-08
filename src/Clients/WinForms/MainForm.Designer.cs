@@ -107,6 +107,7 @@
 			// 
 			this.btnMute.CheckOnClick = true;
 			this.btnMute.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.btnMute.Enabled = false;
 			this.btnMute.Image = global::Gablarski.Clients.Windows.Properties.Resources.SoundMuteImage;
 			this.btnMute.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.btnMute.Name = "btnMute";
@@ -118,6 +119,7 @@
 			// 
 			this.btnMuteMic.CheckOnClick = true;
 			this.btnMuteMic.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.btnMuteMic.Enabled = false;
 			this.btnMuteMic.Image = global::Gablarski.Clients.Windows.Properties.Resources.CaptureMuteImage;
 			this.btnMuteMic.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.btnMuteMic.Name = "btnMuteMic";
@@ -129,6 +131,7 @@
 			// 
 			this.btnAFK.CheckOnClick = true;
 			this.btnAFK.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.btnAFK.Enabled = false;
 			this.btnAFK.Image = global::Gablarski.Clients.Windows.Properties.Resources.UserAFKImage;
 			this.btnAFK.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.btnAFK.Name = "btnAFK";
@@ -150,6 +153,7 @@
 			// btnComment
 			// 
 			this.btnComment.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.btnComment.Enabled = false;
 			this.btnComment.Image = global::Gablarski.Clients.Windows.Properties.Resources.CommentImage;
 			this.btnComment.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.btnComment.Name = "btnComment";
