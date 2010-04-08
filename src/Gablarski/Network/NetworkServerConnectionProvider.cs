@@ -253,7 +253,12 @@ namespace Gablarski.Network
 								connection.bleeding = true;
 						}
 						else
+						{
+							if (this.debugLogging)
+								this.log.DebugFormat ("Message received {0}", msg.MessageTypeCode);
+
 							connection.Receive (msg);
+						}
 					}
 				}
 				catch (SocketException)
@@ -388,6 +393,9 @@ namespace Gablarski.Network
 					MessageBase msg;
 					if (MessageBase.GetMessage (type, out msg))
 					{
+						if (this.debugLogging)
+							this.log.DebugFormat ("Message type {0} received", msg.MessageTypeCode);
+
 						msg.ReadPayload (connection.ReliableReader);
 
 						connection.Receive (msg);
