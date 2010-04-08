@@ -221,13 +221,13 @@ namespace Gablarski.Network
 						if (msg.AcceptedConnectionless)
 						{
 							if (this.debugLogging)
-								this.log.DebugFormat ("Connectionless message received {0}", msg.MessageTypeCode);
+								this.log.DebugFormat ("Connectionless message received {0} from {1}", mtype, tendpoint);
 
 							OnConnectionlessMessageReceived (new ConnectionlessMessageReceivedEventArgs (this, msg, tendpoint));
 						}
 						else
 						{
-							this.log.WarnFormat ("{0} attempted to send message {1} connectionlessly", tendpoint, msg.MessageTypeCode);
+							this.log.WarnFormat ("{0} attempted to send message {1} connectionlessly", tendpoint, mtype);
 						}
 					}
 					else
@@ -241,7 +241,12 @@ namespace Gablarski.Network
 								connection.bleeding = true;
 						}
 						else
+						{
+							if (this.debugLogging)
+								this.log.DebugFormat ("Message received {0}", mtype);
+
 							connection.Receive (msg);
+						}
 					}
 				}
 				catch (SocketException)
@@ -359,6 +364,9 @@ namespace Gablarski.Network
 					MessageBase msg;
 					if (MessageBase.GetMessage (type, out msg))
 					{
+						if (this.debugLogging)
+							this.log.DebugFormat ("Message type {0} received", msg.MessageTypeCode);
+
 						msg.ReadPayload (connection.ReliableReader);
 
 						connection.Receive (msg);
