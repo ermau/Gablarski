@@ -38,7 +38,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>3</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -115,7 +115,9 @@
     <Compile Include="Audio\IAudioSender.cs" />
     <Compile Include="Client\IClientSourceManager.cs" />
     <Compile Include="Client\IClientUserHandler.cs" />
+    <Compile Include="Encryption.cs" />
     <Compile Include="IConnectionHandler.cs" />
+    <Compile Include="IEncryption.cs" />
     <Compile Include="IIndexedEnumerable.cs" />
     <Compile Include="Client\IClientUserManager.cs" />
     <Compile Include="ISourceManager.cs" />
@@ -178,6 +180,8 @@
     <Compile Include="Network\NetworkServerConnection.cs" />
     <Compile Include="Network\NetworkServerConnectionProvider.cs" />
     <Compile Include="Network\SocketValueWriter.cs" />
+    <Compile Include="PublicRSAParameters.cs" />
+    <Compile Include="Decryption.cs" />
     <Compile Include="Server\IBanProvider.cs" />
     <Compile Include="Server\IConnectionProvider.cs" />
     <Compile Include="Server\IRedirector.cs" />

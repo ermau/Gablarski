@@ -203,7 +203,7 @@ namespace Gablarski.Server
 
 			Manager.Connect (e.Connection);
 
-			e.Connection.Send (new ServerInfoMessage { ServerInfo = new ServerInfo (context.Settings, context.UserProvider) });
+			e.Connection.Send (new ServerInfoMessage { ServerInfo = new ServerInfo (context.Settings, context.UserProvider, context.EncryptionParameters) });
 		}
 
 		internal void JoinMessage (MessageReceivedEventArgs e)

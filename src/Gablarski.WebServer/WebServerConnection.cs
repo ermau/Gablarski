@@ -68,6 +68,16 @@ namespace Gablarski.WebServer
 			get { return true; }
 		}
 
+		public IEncryption Encryption
+		{
+			get; set;
+		}
+
+		public IDecryption Decryption
+		{
+			get; set;
+		}
+
 			/// <summary>
 		/// Sends <paramref name="message"/> to the other end of the connection.
 		/// </summary>

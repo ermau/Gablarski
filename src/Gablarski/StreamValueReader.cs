@@ -51,6 +51,11 @@ namespace Gablarski
 		}
 
 		#region IValueReader Members
+		public bool ReadBool()
+		{
+			return ReadByte() == 1;
+		}
+
 		public byte[] ReadBytes ()
 		{
 			int length = ReadInt32 ();

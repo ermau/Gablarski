@@ -447,7 +447,22 @@ namespace Gablarski.Network
 				iwriter.WriteByte (42);
 				iwriter.WriteUInt16 (message.MessageTypeCode);
 
-				message.WritePayload (iwriter);
+				if (message.Encrypted)
+				{
+					MemoryStream buffer;
+					if (message.MessageSize != 0)
+						buffer = new MemoryStream (message.MessageSize);
+					else
+						buffer = new MemoryStream();
+
+					message.WritePayload (new StreamValueWriter (buffer));
+
+					byte[] encrypted = connection.Encryption.Encrypt (buffer.GetBuffer());
+					iwriter.WriteBytes (encrypted);
+				}
+				else
+					message.WritePayload (iwriter);
+
 				iwriter.Flush ();
 			}
 			catch

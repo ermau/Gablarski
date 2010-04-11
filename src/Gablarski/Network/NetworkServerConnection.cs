@@ -70,6 +70,16 @@ namespace Gablarski.Network
 			get { return true; }
 		}
 
+		public IEncryption Encryption
+		{
+			get; set;
+		}
+
+		public IDecryption Decryption
+		{
+			get; set;
+		}
+
 		public void Send (MessageBase message)
 		{
 			if (!disconnecting)

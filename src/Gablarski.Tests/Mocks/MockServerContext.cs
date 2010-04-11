@@ -114,6 +114,12 @@ namespace Gablarski.Tests.Mocks
 			set;
 		}
 
+		public PublicRSAParameters EncryptionParameters
+		{
+			get;
+			set;
+		}
+
 		private readonly object syncRoot = new object();
 	}
 }

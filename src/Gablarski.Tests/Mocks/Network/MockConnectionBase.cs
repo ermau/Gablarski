@@ -61,6 +61,16 @@ namespace Gablarski.Tests
 			get { return true; }
 		}
 
+		public IEncryption Encryption
+		{
+			get; set;
+		}
+
+		public IDecryption Decryption
+		{
+			get; set;
+		}
+
 		public void Receive (MessageBase message)
 		{
 			lock (this.buffer)

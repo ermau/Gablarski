@@ -1,4 +1,4 @@
-// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -35,15 +35,14 @@
 // DAMAGE.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Gablarski
 {
 	public interface IValueReader
 		: IDisposable
 	{
+		bool ReadBool();
 		byte[] ReadBytes ();
 
 		SByte ReadSByte ();
@@ -61,21 +60,6 @@ namespace Gablarski
 
 	public static class ValueReaderExtensions
 	{
-		public static bool ReadBool (this IValueReader reader)
-		{
-			return (reader.ReadByte () == 1);
-		}
-
-		public static Version ReadVersion (this IValueReader reader)
-		{
-			return new Version (reader.ReadInt32 (), reader.ReadInt32 (), reader.ReadInt32 (), reader.ReadInt32 ());
-		}
-
-		public static Type ReadType (this IValueReader reader)
-		{
-			return Type.GetType (reader.ReadString ());
-		}
-
 		public static GenericResult ReadGenericResult (this IValueReader reader)
 		{
 			return (GenericResult)reader.ReadByte ();

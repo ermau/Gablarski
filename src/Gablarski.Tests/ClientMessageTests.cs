@@ -148,9 +148,10 @@ namespace Gablarski.Tests
 		public void Login()
 		{
 			string username = "foo_";
-			string password = "monkeys";
+			string password = "pass";
 
 			var msg = new LoginMessage { Username = username, Password = password };
+			Assert.AreEqual (username.Length + password.Length, msg.MessageSize);
 			msg.WritePayload (writer);
 			long length = stream.Position;
 			stream.Position = 0;

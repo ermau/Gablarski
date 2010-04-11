@@ -80,6 +80,10 @@ namespace Gablarski
 		#endregion
 
 		#region Implementation of IValueReader
+		public bool ReadBool()
+		{
+			return array[this.position++] == 1;
+		}
 
 		public byte[] ReadBytes()
 		{

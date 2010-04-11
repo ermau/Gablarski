@@ -68,6 +68,16 @@ namespace Gablarski.Network
 			get { return true; }
 		}
 
+		public IEncryption Encryption
+		{
+			get; set;
+		}
+
+		public IDecryption Decryption
+		{
+			get; set;
+		}
+
 		/// <summary>
 		/// A message was received from the underlying transport.
 		/// </summary>
@@ -158,7 +168,6 @@ namespace Gablarski.Network
 			
 			this.rwriter = null;
 			this.rreader = null;
-			this.ureader = null;
 			this.uwriter = null;
 			this.rstream = null;
 
@@ -256,7 +265,6 @@ namespace Gablarski.Network
 		private uint nid;
 		private Socket udp;
 		private IValueWriter uwriter;
-		private IValueReader ureader;
 
 		private readonly AutoResetEvent sendWait = new AutoResetEvent (false);
 		private readonly Queue<MessageBase> sendQueue = new Queue<MessageBase>();
@@ -344,7 +352,13 @@ namespace Gablarski.Network
 				MessageBase msg;
 				if (MessageBase.GetMessage (type, out msg))
 				{
-					msg.ReadPayload (this.rreader);
+					if (msg.Encrypted)
+					{
+						byte[] decrypted = Decryption.Decrypt (this.rreader.ReadBytes());
+						msg.ReadPayload (new ByteArrayValueReader (decrypted));
+					}
+					else
+						msg.ReadPayload (this.rreader);
 					
 					if (debugLogging)
 						log.DebugFormat ("Received message {0} from server", msg.MessageTypeCode);

@@ -246,6 +246,8 @@ namespace Gablarski.Server
 		private readonly List<IRedirector> redirectors = new List<IRedirector>();
 		private readonly List<IConnectionProvider> availableConnections = new List<IConnectionProvider> ();
 
+		private readonly Decryption decryption = new Decryption();
+
 		private readonly IServerContext context;
 		private readonly IChannelProvider channelProvider;
 		private readonly IPermissionsProvider permissionProvider;
@@ -275,6 +277,11 @@ namespace Gablarski.Server
 		IUserProvider IServerContext.UserProvider
 		{
 			get { return authProvider; }
+		}
+
+		PublicRSAParameters IServerContext.EncryptionParameters
+		{
+			get { return this.decryption.PublicParameters; }
 		}
 
 		int IServerContext.ProtocolVersion
@@ -432,13 +439,14 @@ namespace Gablarski.Server
 		{
 			Log.Debug ("Connection Made");
 
+			e.Connection.Decryption = this.decryption;
 			e.Connection.MessageReceived += this.OnMessageReceived;
 			e.Connection.Disconnected += this.OnClientDisconnected;
 		}
 
 		protected ServerInfo GetServerInfo()
 		{
-			return new ServerInfo (this.settings, ((IServerContext)this).UserProvider);
+			return new ServerInfo (this.settings, ((IServerContext)this).UserProvider, this.decryption.PublicParameters);
 		}
 
 		private void ClientQueryServer (MessageReceivedEventArgs e)

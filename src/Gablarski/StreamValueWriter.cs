@@ -51,6 +51,11 @@ namespace Gablarski
 		}
 
 		#region IValueWriter Members
+		public void WriteBool (bool value)
+		{
+			baseStream.WriteByte ((byte) (value ? 1 : 0));
+		}
+
 		public void WriteBytes (byte[] value)
 		{
 			WriteInt32 (value.Length);

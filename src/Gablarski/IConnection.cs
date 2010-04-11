@@ -57,6 +57,16 @@ namespace Gablarski
 		bool IsAsync { get; }
 
 		/// <summary>
+		/// Sets the encryptor for the connection.
+		/// </summary>
+		IEncryption Encryption { set; }
+
+		/// <summary>
+		/// Sets the decryptor for the connection.
+		/// </summary>
+		IDecryption Decryption { set; }
+
+		/// <summary>
 		/// A message was received from the underlying transport.
 		/// </summary>
 		/// <exception cref="NotSupportedException"><see cref="IsAsync"/> is <c>false</c>.</exception>

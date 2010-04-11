@@ -202,6 +202,7 @@ namespace Gablarski.Client
 		private void OnServerInfoReceivedMessage (MessageReceivedEventArgs e)
 		{
 			this.serverInfo = ((ServerInfoMessage)e.Message).ServerInfo;
+			this.Connection.Encryption = new Encryption (this.serverInfo.PublicRSAParameters);
 			this.formallyConnected = true;
 
 			OnConnected (this, EventArgs.Empty);

@@ -49,18 +49,19 @@ namespace Gablarski
 			Deserialize (reader);
 		}
 
-		internal ServerInfo (ServerSettings settings, IUserProvider userProvider)
+		internal ServerInfo (ServerSettings settings, IUserProvider userProvider, PublicRSAParameters publicRSAParameters)
 		{
 			if (settings == null)
 				throw new ArgumentNullException ("settings");
 			if (userProvider == null)
 				throw new ArgumentNullException ("userProvider");
 
-			this.Name = settings.Name;
-			this.Description = settings.Description;
-			this.Logo = settings.ServerLogo;
-			this.Passworded = !String.IsNullOrEmpty (settings.ServerPassword);
+			Name = settings.Name;
+			Description = settings.Description;
+			Logo = settings.ServerLogo;
+			Passworded = !String.IsNullOrEmpty (settings.ServerPassword);
 			RegistrationMode = userProvider.RegistrationMode;
+			this.PublicRSAParameters = publicRSAParameters;
 			
 			if (userProvider.RegistrationMode != UserRegistrationMode.None)
 				RegistrationContent = userProvider.RegistrationContent;
@@ -120,6 +121,15 @@ namespace Gablarski
 			private set;
 		}
 
+		/// <summary>
+		/// Gets the server's public RSA parameters.
+		/// </summary>
+		public PublicRSAParameters PublicRSAParameters
+		{
+			get;
+			private set;
+		}
+
 		internal void Serialize (IValueWriter writer)
 		{
 			writer.WriteString (Name);
@@ -130,6 +140,8 @@ namespace Gablarski
 			
 			if (RegistrationMode != UserRegistrationMode.None)
 				writer.WriteString (RegistrationContent);
+
+			PublicRSAParameters.Serialize (writer);
 		}
 
 		internal void Deserialize (IValueReader reader)
@@ -142,6 +154,9 @@ namespace Gablarski
 			
 			if (RegistrationMode != UserRegistrationMode.None)
 				RegistrationContent = reader.ReadString();
+
+			PublicRSAParameters = new PublicRSAParameters();
+			PublicRSAParameters.Deserialize (reader);
 		}
 	}
 }

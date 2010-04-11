@@ -14,8 +14,8 @@ namespace Gablarski.Tests
 		[Test]
 		public void InvalidCtor()
 		{
-			Assert.Throws<ArgumentNullException> (() => new ServerInfo ((ServerSettings)null, new GuestUserProvider()));
-			Assert.Throws<ArgumentNullException> (() => new ServerInfo (new ServerSettings(), null));
+			Assert.Throws<ArgumentNullException> (() => new ServerInfo ((ServerSettings)null, new GuestUserProvider(), new Decryption().PublicParameters));
+			Assert.Throws<ArgumentNullException> (() => new ServerInfo (new ServerSettings(), null, new Decryption().PublicParameters));
 			Assert.Throws<ArgumentNullException> (() => new ServerInfo ((IValueReader)null));
 		}
 
@@ -25,6 +25,8 @@ namespace Gablarski.Tests
 			const string logo = "logo";
 			const string name = "name";
 			const string desc = "description";
+			
+			Decryption decryption = new Decryption();
 
 			ServerInfo info = new ServerInfo (new ServerSettings
 			{
@@ -32,13 +34,14 @@ namespace Gablarski.Tests
 				Name = name,
 				Description = desc,
 				ServerPassword = "foo",
-			}, new GuestUserProvider());
+			}, new GuestUserProvider(), decryption.PublicParameters);
 
 			Assert.AreEqual (logo, info.Logo);
 			Assert.AreEqual (name, info.Name);
 			Assert.AreEqual (desc, info.Description);
 			Assert.AreEqual (true, info.Passworded);
 			Assert.AreEqual (UserRegistrationMode.None, info.RegistrationMode);
+			//Assert.AreEqual (decryption.PublicParameters, info.PublicRSAParameters);
 			Assert.IsNull (info.RegistrationContent);
 		}
 
@@ -49,13 +52,15 @@ namespace Gablarski.Tests
 			const string name = "name";
 			const string desc = "description";
 
+			Decryption decryption = new Decryption();
+
 			ServerInfo info = new ServerInfo (new ServerSettings
 			{
 				ServerLogo = logo,
 				Name = name,
 				Description = desc,
 				ServerPassword = "passworded"
-			}, new GuestUserProvider());
+			}, new GuestUserProvider(), decryption.PublicParameters);
 
 			var stream = new MemoryStream (new byte[20480], true);
 			var writer = new StreamValueWriter (stream);
@@ -72,6 +77,7 @@ namespace Gablarski.Tests
 			Assert.AreEqual (desc, info.Description);
 			Assert.AreEqual (true, info.Passworded);
 			Assert.AreEqual (UserRegistrationMode.None, info.RegistrationMode);
+			//Assert.AreEqual (decryption.PublicParameters, info.PublicRSAParameters);
 			Assert.IsNull (info.RegistrationContent);
 		}
 	}

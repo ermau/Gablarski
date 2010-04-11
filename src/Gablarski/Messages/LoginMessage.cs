@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -37,7 +37,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Gablarski.Messages
 {
@@ -61,9 +60,19 @@ namespace Gablarski.Messages
 			set;
 		}
 
+		public override bool Encrypted
+		{
+			get { return true; }
+		}
+
+		public override int MessageSize
+		{
+			get { return Username.Length + Password.Length; }
+		}
+
 		public override void WritePayload (IValueWriter writer)
 		{
-			if (String.IsNullOrEmpty (this.Password))
+			if (Password == null)
 				throw new InvalidOperationException ("Can not login without a password.");
 
 			writer.WriteString (Username);
@@ -72,8 +81,8 @@ namespace Gablarski.Messages
 
 		public override void ReadPayload (IValueReader reader)
 		{
-			this.Username = reader.ReadString ();
-			this.Password = reader.ReadString ();
+			Username = reader.ReadString ();
+			Password = reader.ReadString ();
 		}
 	}
 }

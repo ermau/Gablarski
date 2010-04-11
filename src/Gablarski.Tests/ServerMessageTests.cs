@@ -375,7 +375,7 @@ namespace Gablarski.Tests
 				ServerLogo = "logo",
 				Name = "name",
 				Description = "description"
-			}, new GuestUserProvider()));
+			}, new GuestUserProvider(), new Decryption().PublicParameters));
 			msg.WritePayload (writer);
 			long length = stream.Position;
 			stream.Position = 0;

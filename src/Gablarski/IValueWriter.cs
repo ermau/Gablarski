@@ -44,6 +44,7 @@ namespace Gablarski
 	public interface IValueWriter
 		: IDisposable
 	{
+		void WriteBool (bool value);
 		void WriteBytes (byte[] value);
 
 		void WriteSByte (SByte value);
@@ -63,24 +64,6 @@ namespace Gablarski
 
 	public static class ValueWriterExtensions
 	{
-		public static void WriteBool (this IValueWriter writer, bool value)
-		{
-			writer.WriteByte ((byte)((value) ? 1 : 0));
-		}
-
-		public static void WriteVersion (this IValueWriter writer, Version version)
-		{
-			writer.WriteInt32 (version.Major);
-			writer.WriteInt32 (version.Minor);
-			writer.WriteInt32 (version.Build);
-			writer.WriteInt32 (version.Revision);
-		}
-
-		public static void WriteType (this IValueWriter writer, Type value)
-		{
-			writer.WriteString (value.AssemblyQualifiedName);
-		}
-
 		public static void WriteGenericResult (this IValueWriter writer, GenericResult result)
 		{
 			writer.WriteByte ((byte)result);

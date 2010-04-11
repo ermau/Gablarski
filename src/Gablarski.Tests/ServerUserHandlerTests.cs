@@ -65,7 +65,8 @@ namespace Gablarski.Tests
 				Settings = new ServerSettings(),
 				UserProvider = users,
 				PermissionsProvider = permissions,
-				ChannelsProvider = new LobbyChannelProvider()
+				ChannelsProvider = new LobbyChannelProvider(),
+				EncryptionParameters = new Decryption().PublicParameters
 			};
 
 			context.Sources = new ServerSourceHandler (context, new ServerSourceManager (context));

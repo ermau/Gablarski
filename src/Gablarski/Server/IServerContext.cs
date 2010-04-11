@@ -93,6 +93,14 @@ namespace Gablarski.Server
 		/// </summary>
 		IEnumerable<IRedirector> Redirectors { get; }
 
+		/// <summary>
+		/// Gets the public encryption parameters for this server.
+		/// </summary>
+		PublicRSAParameters EncryptionParameters { get; }
+
+		/// <summary>
+		/// Gets the settings for this server.
+		/// </summary>
 		ServerSettings Settings { get; }
 	}
 

@@ -82,6 +82,10 @@ namespace Gablarski.Network
 		#endregion
 
 		#region Implementation of IValueWriter
+		public void WriteBool (bool value)
+		{
+			WriteByte ((byte)(value ? 1 : 0));
+		}
 
 		public void WriteBytes (byte[] value)
 		{
