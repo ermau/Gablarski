@@ -146,10 +146,10 @@
     <Compile Include="ChannelInfo.cs" />
     <Compile Include="Client\ClientChannelManager.cs" />
     <Compile Include="Client\GablarskiClient.cs" />
-    <Compile Include="Audio\ICaptureProvider.cs" />
+    <Compile Include="Audio\IAudioCaptureProvider.cs" />
     <Compile Include="Audio\IAudioDevice.cs" />
     <Compile Include="Audio\IAudioDeviceProvider.cs" />
-    <Compile Include="Audio\IPlaybackProvider.cs" />
+    <Compile Include="Audio\IAudioPlaybackProvider.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="GenericResult.cs" />
     <Compile Include="IClientConnection.cs" />

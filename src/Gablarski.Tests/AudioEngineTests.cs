@@ -50,13 +50,13 @@ namespace Gablarski.Tests
 		private IClientContext context;
 		private IAudioReceiver receiver;
 		private IAudioSender sender;
-		private ICaptureProvider provider;
+		private IAudioCaptureProvider provider;
 		private AudioSource source;
 
 		[SetUp]
 		public void Setup()
 		{
-			this.provider = new MockCaptureProvider();
+			this.provider = new MockAudioCaptureProvider();
 			this.source = new AudioSource ("mockSource", 1, 1, AudioFormat.Mono16Bit, 64000, 44100, 256, 10, false);
 
 			var client = new GablarskiClient (new MockClientConnection (new MockConnectionProvider().EstablishConnection()));
@@ -129,7 +129,7 @@ namespace Gablarski.Tests
 		public void InvalidDetatch()
 		{
 			var engine = new AudioEngine();
-			Assert.Throws<ArgumentNullException> (() => engine.Detach ((ICaptureProvider)null));
+			Assert.Throws<ArgumentNullException> (() => engine.Detach ((IAudioCaptureProvider)null));
 			Assert.Throws<ArgumentNullException> (() => engine.Detach ((AudioSource)null));
 		}
 
@@ -222,16 +222,16 @@ namespace Gablarski.Tests
 		public void InvalidMute()
 		{
 			var engine = new AudioEngine();
-			Assert.Throws<ArgumentNullException> (() => engine.Mute ((IPlaybackProvider)null));
-			Assert.Throws<ArgumentNullException> (() => engine.Mute ((ICaptureProvider)null));
+			Assert.Throws<ArgumentNullException> (() => engine.Mute ((IAudioPlaybackProvider)null));
+			Assert.Throws<ArgumentNullException> (() => engine.Mute ((IAudioCaptureProvider)null));
 		}
 
 		[Test]
 		public void InvalidUnmute()
 		{
 			var engine = new AudioEngine();
-			Assert.Throws<ArgumentNullException> (() => engine.Unmute ((IPlaybackProvider)null));
-			Assert.Throws<ArgumentNullException> (() => engine.Unmute ((ICaptureProvider)null));
+			Assert.Throws<ArgumentNullException> (() => engine.Unmute ((IAudioPlaybackProvider)null));
+			Assert.Throws<ArgumentNullException> (() => engine.Unmute ((IAudioCaptureProvider)null));
 		}
 
 		//[Test]

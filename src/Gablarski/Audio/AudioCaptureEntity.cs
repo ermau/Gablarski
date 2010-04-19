@@ -45,9 +45,9 @@ namespace Gablarski.Audio
 {
 	internal class AudioCaptureEntity
 	{
-		public AudioCaptureEntity (ICaptureProvider capture, AudioSource source, AudioEngineCaptureOptions options)
+		public AudioCaptureEntity (IAudioCaptureProvider audioCapture, AudioSource source, AudioEngineCaptureOptions options)
 		{
-			this.capture = capture;
+			this.audioCapture = audioCapture;
 			this.source = source;
 			this.options = options;
 
@@ -74,9 +74,9 @@ namespace Gablarski.Audio
 			get { return frameLength; }
 		}
 
-		public ICaptureProvider Capture
+		public IAudioCaptureProvider AudioCapture
 		{
-			get { return this.capture; }
+			get { return this.audioCapture; }
 		}
 
 		public AudioSource Source
@@ -108,7 +108,7 @@ namespace Gablarski.Audio
 		private readonly VoiceActivation activation;
 		private readonly int frameLength;
 		private readonly SpeexPreprocessor preprocessor;
-		private readonly ICaptureProvider capture;
+		private readonly IAudioCaptureProvider audioCapture;
 		private readonly AudioSource source;
 		private readonly AudioEngineCaptureOptions options;
 

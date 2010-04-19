@@ -44,9 +44,9 @@ namespace Gablarski.Audio
 {
 	internal class AudioPlaybackEntity
 	{
-		public AudioPlaybackEntity (IPlaybackProvider playback, AudioSource source, AudioEnginePlaybackOptions options)
+		public AudioPlaybackEntity (IAudioPlaybackProvider audioPlayback, AudioSource source, AudioEnginePlaybackOptions options)
 		{
-			this.playback = playback;
+			this.audioPlayback = audioPlayback;
 			this.source = source;
 			this.options = options;
 		}
@@ -56,9 +56,9 @@ namespace Gablarski.Audio
 			get; set;
 		}
 
-		public IPlaybackProvider Playback
+		public IAudioPlaybackProvider AudioPlayback
 		{
-			get { return this.playback; }
+			get { return this.audioPlayback; }
 		}
 
 		public AudioSource Source
@@ -77,7 +77,7 @@ namespace Gablarski.Audio
 			set;
 		}
 		
-		private readonly IPlaybackProvider playback;
+		private readonly IAudioPlaybackProvider audioPlayback;
 		private readonly AudioSource source;
 		private readonly AudioEnginePlaybackOptions options;
 	}

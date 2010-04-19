@@ -1,4 +1,4 @@
-// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -37,11 +37,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Gablarski.Audio
 {
-	public interface IPlaybackProvider
+	public interface IAudioPlaybackProvider
 		: IAudioDeviceProvider
 	{
 		/// <summary>
@@ -93,7 +92,7 @@ namespace Gablarski.Audio
 		/// </summary>
 		/// <param name="device">The device to play audio on.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="device"/> is <c>null</c>.</exception>
-		public static void Open (this IPlaybackProvider self, IAudioDevice device)
+		public static void Open (this IAudioPlaybackProvider self, IAudioDevice device)
 		{
 			if (self == null)
 				throw new ArgumentNullException ("self");

@@ -6,8 +6,8 @@ using Gablarski.Audio;
 
 namespace Gablarski.Tests.Mocks.Audio
 {
-	public class MockCaptureProvider
-		: ICaptureProvider
+	public class MockAudioCaptureProvider
+		: IAudioCaptureProvider
 	{
 		private int frameSize = 256;
 		public int FrameSize
@@ -68,7 +68,7 @@ namespace Gablarski.Tests.Mocks.Audio
 
 		#endregion
 
-		#region Implementation of ICaptureProvider
+		#region Implementation of IAudioCaptureProvider
 
 		public IAudioDevice Device
 		{

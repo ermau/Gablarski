@@ -23,12 +23,12 @@ namespace Gablarski.Clients.Windows
 			get { return modules.input; }
 		}
 
-		public static IEnumerable<IPlaybackProvider> Playback
+		public static IEnumerable<IAudioPlaybackProvider> Playback
 		{
 			get { return modules.playback; }
 		}
 
-		public static IEnumerable<ICaptureProvider> Capture
+		public static IEnumerable<IAudioCaptureProvider> Capture
 		{
 			get { return modules.capture; }
 		}
@@ -91,14 +91,14 @@ namespace Gablarski.Clients.Windows
 		}
 
 		[ImportMany]
-		private IEnumerable<ICaptureProvider> capture
+		private IEnumerable<IAudioCaptureProvider> capture
 		{
 			get;
 			set;
 		}
 
 		[ImportMany]
-		private IEnumerable<IPlaybackProvider> playback
+		private IEnumerable<IAudioPlaybackProvider> playback
 		{
 			get;
 			set;

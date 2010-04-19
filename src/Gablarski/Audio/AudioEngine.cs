@@ -93,10 +93,10 @@ namespace Gablarski.Audio
 			}
 		}
 
-		public void Attach (IPlaybackProvider playback, IEnumerable<AudioSource> sources, AudioEnginePlaybackOptions options)
+		public void Attach (IAudioPlaybackProvider audioPlayback, IEnumerable<AudioSource> sources, AudioEnginePlaybackOptions options)
 		{
-			if (playback == null)
-				throw new ArgumentNullException ("playback");
+			if (audioPlayback == null)
+				throw new ArgumentNullException ("audioPlayback");
 			if (sources == null)
 				throw new ArgumentNullException ("sources");
 			if (options == null)
@@ -106,18 +106,18 @@ namespace Gablarski.Audio
 			{
 				foreach (var s in sources.Where (s => !playbacks.ContainsKey (s) && s.OwnerId != Context.CurrentUser.UserId))
 				{
-					playbacks[s] = new AudioPlaybackEntity (playback, s, options);
+					playbacks[s] = new AudioPlaybackEntity (audioPlayback, s, options);
 
-					if (this.playbackMuted || mutedPlayers.Contains (playback))
+					if (this.playbackMuted || mutedPlayers.Contains (audioPlayback))
 						playbacks[s].Muted = true;
 				}
 			}
 		}
 
-		public void Attach (IPlaybackProvider playback, AudioSource source, AudioEnginePlaybackOptions options)
+		public void Attach (IAudioPlaybackProvider audioPlayback, AudioSource source, AudioEnginePlaybackOptions options)
 		{
-			if (playback == null)
-				throw new ArgumentNullException ("playback");
+			if (audioPlayback == null)
+				throw new ArgumentNullException ("audioPlayback");
 			if (source == null)
 				throw new ArgumentNullException ("source");
 			if (options == null)
@@ -125,31 +125,31 @@ namespace Gablarski.Audio
 
 			lock (playbacks)
 			{
-				playbacks[source] = new AudioPlaybackEntity (playback, source, options);
+				playbacks[source] = new AudioPlaybackEntity (audioPlayback, source, options);
 
-				if (this.playbackMuted || mutedPlayers.Contains (playback))
+				if (this.playbackMuted || mutedPlayers.Contains (audioPlayback))
 					playbacks[source].Muted = true;
 			}
 		}
 
-		public void Attach (ICaptureProvider capture, AudioSource source, AudioEngineCaptureOptions options)
+		public void Attach (IAudioCaptureProvider audioCapture, AudioSource source, AudioEngineCaptureOptions options)
 		{
-			if (capture == null)
-				throw new ArgumentNullException ("capture");
+			if (audioCapture == null)
+				throw new ArgumentNullException ("audioCapture");
 			if (source == null)
 				throw new ArgumentNullException ("source");
 			if (options == null)
 				throw new ArgumentNullException ("options");
 
-			if (capture.Device == null)
-				capture.Device = capture.DefaultDevice;
+			if (audioCapture.Device == null)
+				audioCapture.Device = audioCapture.DefaultDevice;
 
 			lock (captures)
 			{
-				capture.BeginCapture (source.Frequency, source.Format);
-				captures[source] = new AudioCaptureEntity (capture, source, options);
+				audioCapture.BeginCapture (source.Frequency, source.Format);
+				captures[source] = new AudioCaptureEntity (audioCapture, source, options);
 
-				if (this.captureMuted || mutedCaptures.Contains (capture))
+				if (this.captureMuted || mutedCaptures.Contains (audioCapture))
 					captures[source].Muted = true;
 			}
 		}
@@ -170,7 +170,7 @@ namespace Gablarski.Audio
 				if (c.Talking && c.Options.Mode != options.Mode)
 					AudioSender.EndSending (source);
 				
-				var newc = new AudioCaptureEntity (c.Capture, source, options);
+				var newc = new AudioCaptureEntity (c.AudioCapture, source, options);
 				newc.TargetType = c.TargetType;
 				newc.CurrentTargets = c.CurrentTargets;
 
@@ -191,7 +191,7 @@ namespace Gablarski.Audio
 				if (!playbacks.TryGetValue (source, out p))
 					throw new ArgumentException ("source is not attached", "source");
 
-				playbacks[source] = new AudioPlaybackEntity (p.Playback, source, options);
+				playbacks[source] = new AudioPlaybackEntity (p.AudioPlayback, source, options);
 			}
 		}
 
@@ -231,7 +231,7 @@ namespace Gablarski.Audio
 			}
 		}
 
-		public bool Detach (IPlaybackProvider provider)
+		public bool Detach (IAudioPlaybackProvider provider)
 		{
 			if (provider == null)
 				throw new ArgumentNullException("provider");
@@ -240,7 +240,7 @@ namespace Gablarski.Audio
 
 			lock (playbacks)
 			{
-				foreach (var entity in playbacks.Values.Where (e => e.Playback == provider).ToList())
+				foreach (var entity in playbacks.Values.Where (e => e.AudioPlayback == provider).ToList())
 				{
 					playbacks.Remove (entity.Source);
 					removed = true;
@@ -252,7 +252,7 @@ namespace Gablarski.Audio
 			return removed;
 		}
 
-		public bool Detach (ICaptureProvider provider)
+		public bool Detach (IAudioCaptureProvider provider)
 		{
 			if (provider == null)
 				throw new ArgumentNullException ("provider");
@@ -261,7 +261,7 @@ namespace Gablarski.Audio
 
 			lock (captures)
 			{
-				foreach (var entity in captures.Values.Where (e => e.Capture == provider).ToList())
+				foreach (var entity in captures.Values.Where (e => e.AudioCapture == provider).ToList())
 				{
 					captures.Remove (entity.Source);
 					removed = true;
@@ -291,7 +291,7 @@ namespace Gablarski.Audio
 					AudioPlaybackEntity p;
 					if (playbacks.TryGetValue (source, out p))
 					{
-						p.Playback.FreeSource (source);
+						p.AudioPlayback.FreeSource (source);
 						removed = playbacks.Remove (source);
 					}
 				}
@@ -384,14 +384,14 @@ namespace Gablarski.Audio
 			}
 		}
 
-		public void Mute (ICaptureProvider capture)
+		public void Mute (IAudioCaptureProvider audioCapture)
 		{
-			MuteCore (capture, true);
+			MuteCore (audioCapture, true);
 		}
 
-		public void Unmute (ICaptureProvider capture)
+		public void Unmute (IAudioCaptureProvider audioCapture)
 		{
-			MuteCore (capture, false);
+			MuteCore (audioCapture, false);
 		}
 
 		public void MutePlayback()
@@ -410,14 +410,14 @@ namespace Gablarski.Audio
 			}
 		}
 
-		public void Mute (IPlaybackProvider playback)
+		public void Mute (IAudioPlaybackProvider audioPlayback)
 		{
-			MuteCore (playback, true);
+			MuteCore (audioPlayback, true);
 		}
 
-		public void Unmute (IPlaybackProvider playback)
+		public void Unmute (IAudioPlaybackProvider audioPlayback)
 		{
-			MuteCore (playback, false);
+			MuteCore (audioPlayback, false);
 		}
 
 		public void Start()
@@ -472,10 +472,10 @@ namespace Gablarski.Audio
 		
 		private readonly Dictionary<AudioSource, AudioCaptureEntity> captures = new Dictionary<AudioSource, AudioCaptureEntity>();
 		private readonly Dictionary<AudioSource, AudioPlaybackEntity> playbacks = new Dictionary<AudioSource, AudioPlaybackEntity>();
-		private readonly List<IPlaybackProvider> playbackProviders = new List<IPlaybackProvider>();
+		private readonly List<IAudioPlaybackProvider> playbackProviders = new List<IAudioPlaybackProvider>();
 
-		private readonly HashSet<IPlaybackProvider> mutedPlayers = new HashSet<IPlaybackProvider>();
-		private readonly HashSet<ICaptureProvider> mutedCaptures = new HashSet<ICaptureProvider>();
+		private readonly HashSet<IAudioPlaybackProvider> mutedPlayers = new HashSet<IAudioPlaybackProvider>();
+		private readonly HashSet<IAudioCaptureProvider> mutedCaptures = new HashSet<IAudioCaptureProvider>();
 
 		private Thread engineThread;
 
@@ -504,43 +504,43 @@ namespace Gablarski.Audio
 				lock (playbacks)
 				{
 					if (!entity.Muted)
-						entity.Playback.QueuePlayback (e.Source, decoded);
+						entity.AudioPlayback.QueuePlayback (e.Source, decoded);
 				}
 			}
 		}
 
-		private void MuteCore (ICaptureProvider capture, bool mute)
+		private void MuteCore (IAudioCaptureProvider audioCapture, bool mute)
 		{
-			if (capture == null)
-				throw new ArgumentNullException ("capture");
+			if (audioCapture == null)
+				throw new ArgumentNullException ("audioCapture");
 
 			lock (captures)
 			{
 				if (mute)
-					mutedCaptures.Add (capture);
+					mutedCaptures.Add (audioCapture);
 				else
-					mutedCaptures.Add (capture);
+					mutedCaptures.Add (audioCapture);
 
-				var ps = captures.Values.Where (e => e.Capture == capture);
+				var ps = captures.Values.Where (e => e.AudioCapture == audioCapture);
 
 				foreach (var e in ps)
 					e.Muted = mute;
 			}
 		}
 
-		private void MuteCore (IPlaybackProvider playback, bool mute)
+		private void MuteCore (IAudioPlaybackProvider audioPlayback, bool mute)
 		{
-			if (playback == null)
-				throw new ArgumentNullException ("playback");
+			if (audioPlayback == null)
+				throw new ArgumentNullException ("audioPlayback");
 
 			lock (playbacks)
 			{
 				if (mute)
-					mutedPlayers.Add (playback);
+					mutedPlayers.Add (audioPlayback);
 				else
-					mutedPlayers.Remove (playback);
+					mutedPlayers.Remove (audioPlayback);
 
-				var ps = playbacks.Values.Where (e => e.Playback == playback);
+				var ps = playbacks.Values.Where (e => e.AudioPlayback == audioPlayback);
 
 				foreach (var e in ps)
 					e.Muted = mute;
@@ -568,7 +568,7 @@ namespace Gablarski.Audio
 
 						bool muted = (entity.Muted || this.captureMuted);
 
-						if ((!entity.Talking && muted) || (!entity.Capture.IsCapturing && entity.Options.Mode == AudioEngineCaptureMode.Explicit))
+						if ((!entity.Talking && muted) || (!entity.AudioCapture.IsCapturing && entity.Options.Mode == AudioEngineCaptureMode.Explicit))
 							continue;
 						
 						if (entity.Talking && muted)
@@ -578,7 +578,7 @@ namespace Gablarski.Audio
 							continue;
 						}
 
-						if (entity.Capture.AvailableSampleCount > source.FrameSize)
+						if (entity.AudioCapture.AvailableSampleCount > source.FrameSize)
 						{
 							bool talking = entity.Talking;
 							if (entity.CurrentTargets == null || entity.CurrentTargets.Length == 0)
@@ -589,14 +589,14 @@ namespace Gablarski.Audio
 
 							AudioEngineCaptureMode mode = entity.Options.Mode;
 							
-							int framesAvailable = entity.Capture.AvailableSampleCount / source.FrameSize;
+							int framesAvailable = entity.AudioCapture.AvailableSampleCount / source.FrameSize;
 							int talkingFrames = (mode == AudioEngineCaptureMode.Explicit) ? framesAvailable : 0;
 							int talkingIndex = -1;
 
 							byte[][] frames = new byte[framesAvailable][];
 							for (int i = 0; i < framesAvailable; ++i)
 							{
-								byte[] samples = entity.Capture.ReadSamples (source.FrameSize);
+								byte[] samples = entity.AudioCapture.ReadSamples (source.FrameSize);
 								if (mode == AudioEngineCaptureMode.Activated)
 								{
 									talking = entity.VoiceActivation.IsTalking (samples);
@@ -630,7 +630,7 @@ namespace Gablarski.Audio
 						}
 
 						if (!skipSwitch)
-							skipSwitch = (entity.Capture.AvailableSampleCount > source.FrameSize);
+							skipSwitch = (entity.AudioCapture.AvailableSampleCount > source.FrameSize);
 					}
 				}
 

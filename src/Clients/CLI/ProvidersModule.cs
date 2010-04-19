@@ -60,34 +60,34 @@ namespace Gablarski.Clients.CLI
 		}
 
 		[ImportMany]
-		public IEnumerable<IPlaybackProvider> Playback
+		public IEnumerable<IAudioPlaybackProvider> Playback
 		{
 			get; set;
 		}
 
 		[ImportMany]
-		public IEnumerable<ICaptureProvider> Capture
+		public IEnumerable<IAudioCaptureProvider> Capture
 		{
 			get; set;
 		}
 
-		private IPlaybackProvider selectedPlayback;
-		public IPlaybackProvider SelectedPlayback
+		private IAudioPlaybackProvider selectedAudioPlayback;
+		public IAudioPlaybackProvider SelectedAudioPlayback
 		{
-			get { return this.selectedPlayback; }
+			get { return this.selectedAudioPlayback; }
 			set
 			{
-				if (this.selectedPlayback == value)
+				if (this.selectedAudioPlayback == value)
 					return;
 
-				if (this.selectedPlayback != null)
+				if (this.selectedAudioPlayback != null)
 				{
-					Client.Audio.Detach (this.selectedPlayback);
-					this.selectedPlayback.Dispose();
+					Client.Audio.Detach (this.selectedAudioPlayback);
+					this.selectedAudioPlayback.Dispose();
 				}
 
-				this.selectedPlayback = value;
-				this.selectedPlayback.Device = value.DefaultDevice;
+				this.selectedAudioPlayback = value;
+				this.selectedAudioPlayback.Device = value.DefaultDevice;
 
 				var otherSources = Client.Sources.Where (s => s.OwnerId != Client.CurrentUser.UserId).ToList();
 				if (otherSources.Any())
@@ -97,23 +97,23 @@ namespace Gablarski.Clients.CLI
 			}
 		}
 
-		private ICaptureProvider selectedCapture;
-		public ICaptureProvider SelectedCapture
+		private IAudioCaptureProvider selectedAudioCapture;
+		public IAudioCaptureProvider SelectedAudioCapture
 		{
-			get { return this.selectedCapture; }
+			get { return this.selectedAudioCapture; }
 			set
 			{
-				if (this.selectedCapture == value)
+				if (this.selectedAudioCapture == value)
 					return;
 
-				if (this.selectedCapture != null)
+				if (this.selectedAudioCapture != null)
 				{
-					Client.Audio.Detach (this.selectedCapture);
-					this.selectedCapture.Dispose();
+					Client.Audio.Detach (this.selectedAudioCapture);
+					this.selectedAudioCapture.Dispose();
 				}
 
-				this.selectedCapture = value;
-				this.selectedCapture.Device = value.DefaultDevice;
+				this.selectedAudioCapture = value;
+				this.selectedAudioCapture.Device = value.DefaultDevice;
 
 				if (Client.Sources.Mine.Any())
 				{
@@ -145,11 +145,11 @@ namespace Gablarski.Clients.CLI
 				{
 					if (parts.Count < 3 || parts[2].ToLower().Trim() == "playback")
 					{
-						if (SelectedPlayback != null)
+						if (this.SelectedAudioPlayback != null)
 							Writer.WriteLine ("Current playback provider: {0}{1}", Playback.GetType().FullName, Environment.NewLine);
 
 						Writer.WriteLine ("Playback Providers:");
-						foreach (IPlaybackProvider p in Playback)
+						foreach (IAudioPlaybackProvider p in Playback)
 							Writer.WriteLine (p.GetType().FullName);
 
 						Writer.WriteLine();
@@ -157,11 +157,11 @@ namespace Gablarski.Clients.CLI
 
 					if (parts.Count < 3 || parts[2].ToLower().Trim() == "capture")
 					{
-						if (SelectedCapture != null)
+						if (this.SelectedAudioCapture != null)
 							Writer.WriteLine ("Current capture provider: {0}{1}", Capture.GetType().FullName, Environment.NewLine);
 
 						Writer.WriteLine ("Capture Providers:");
-						foreach (ICaptureProvider p in Capture)
+						foreach (IAudioCaptureProvider p in Capture)
 							Writer.WriteLine (p.GetType().FullName);
 					}
 
@@ -186,15 +186,15 @@ namespace Gablarski.Clients.CLI
 									if (providerIndex < Playback.Count())
 										break;
 
-									SelectedPlayback = Playback.ElementAt (providerIndex);
+									this.SelectedAudioPlayback = Playback.ElementAt (providerIndex);
 								}
 								else
 								{
-									IPlaybackProvider playback = Playback.FirstOrDefault (p => p.GetType().Name.ToLower() == provider || p.GetType().FullName.ToLower() == provider);
-									if (playback == null)
+									IAudioPlaybackProvider audioPlayback = Playback.FirstOrDefault (p => p.GetType().Name.ToLower() == provider || p.GetType().FullName.ToLower() == provider);
+									if (audioPlayback == null)
 										break;
 
-									SelectedPlayback = playback;
+									this.SelectedAudioPlayback = audioPlayback;
 								}
 
 								return true;
@@ -207,15 +207,15 @@ namespace Gablarski.Clients.CLI
 									if (providerIndex < Playback.Count())
 										break;
 
-									SelectedPlayback = Playback.ElementAt (providerIndex);
+									this.SelectedAudioPlayback = Playback.ElementAt (providerIndex);
 								}
 								else
 								{
-									ICaptureProvider capture = Capture.FirstOrDefault (p => p.GetType().Name.ToLower() == provider || p.GetType().FullName.ToLower() == provider);
-									if (capture == null)
+									IAudioCaptureProvider audioCapture = Capture.FirstOrDefault (p => p.GetType().Name.ToLower() == provider || p.GetType().FullName.ToLower() == provider);
+									if (audioCapture == null)
 										break;
 
-									SelectedCapture = capture;
+									this.SelectedAudioCapture = audioCapture;
 								}
 
 								return true;
@@ -232,27 +232,27 @@ namespace Gablarski.Clients.CLI
 
 		private void OnReceivedAudioSource (object sender, ReceivedAudioSourceEventArgs e)
 		{
-			if (SelectedPlayback != null && e.Result == Messages.SourceResult.NewSource)
-				Client.Audio.Attach (SelectedPlayback, e.Source, new AudioEnginePlaybackOptions());
-			else if (SelectedCapture != null && e.Result == Messages.SourceResult.Succeeded)
+			if (this.SelectedAudioPlayback != null && e.Result == Messages.SourceResult.NewSource)
+				Client.Audio.Attach (this.SelectedAudioPlayback, e.Source, new AudioEnginePlaybackOptions());
+			else if (this.SelectedAudioCapture != null && e.Result == Messages.SourceResult.Succeeded)
 			{
-				Client.Audio.Attach (SelectedCapture, e.Source,
+				Client.Audio.Attach (this.SelectedAudioCapture, e.Source,
 				                     new AudioEngineCaptureOptions { Mode = AudioEngineCaptureMode.Explicit });
 			}
 		}
 
 		private void OnReceivedSourceList (object sender, ReceivedListEventArgs<AudioSource> e)
 		{
-			if (SelectedPlayback != null)
+			if (this.SelectedAudioPlayback != null)
 			{
 				var otherSources = Client.Sources.Where (s => s.OwnerId != Client.CurrentUser.UserId).ToList();
 				if (otherSources.Any())
-					Client.Audio.Attach (SelectedPlayback, otherSources, new AudioEnginePlaybackOptions());
+					Client.Audio.Attach (this.SelectedAudioPlayback, otherSources, new AudioEnginePlaybackOptions());
 			}
 
-			if (SelectedCapture != null && Client.Sources.Mine.Any())
+			if (this.SelectedAudioCapture != null && Client.Sources.Mine.Any())
 			{
-				Client.Audio.Attach (SelectedCapture, Client.Sources.Mine.Single(),
+				Client.Audio.Attach (this.SelectedAudioCapture, Client.Sources.Mine.Single(),
 				                     new AudioEngineCaptureOptions {Mode = AudioEngineCaptureMode.Explicit});
 			}
 		}

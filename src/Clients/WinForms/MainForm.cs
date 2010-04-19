@@ -135,8 +135,8 @@ namespace Gablarski.Clients.Windows
 		private const string VoiceName = "voice";
 		private const string MusicName = "music";
 
-		private IPlaybackProvider playback;
-		private ICaptureProvider voiceCapture;
+		private IAudioPlaybackProvider audioPlayback;
+		private IAudioCaptureProvider voiceCapture;
 		private AudioSource voiceSource;
 		private AudioSource musicSource;
 
@@ -144,27 +144,27 @@ namespace Gablarski.Clients.Windows
 		{
 			DisablePlayback();
 
-			this.playback = (IPlaybackProvider)Activator.CreateInstance (Type.GetType (Settings.PlaybackProvider));
+			this.audioPlayback = (IAudioPlaybackProvider)Activator.CreateInstance (Type.GetType (Settings.PlaybackProvider));
 
 			if (Settings.PlaybackDevice.IsNullOrWhitespace ())
-				this.playback.Device = this.playback.DefaultDevice;
+				this.audioPlayback.Device = this.audioPlayback.DefaultDevice;
 			else
 			{
-				this.playback.Device = this.playback.GetDevices ().FirstOrDefault (d => d.Name == Settings.PlaybackDevice) ??
-										this.playback.DefaultDevice;
+				this.audioPlayback.Device = this.audioPlayback.GetDevices ().FirstOrDefault (d => d.Name == Settings.PlaybackDevice) ??
+										this.audioPlayback.DefaultDevice;
 			}
 
-			this.playback.Open();
-			this.gablarski.Audio.Attach (this.playback, this.gablarski.Sources.Where (s => s.OwnerId != gablarski.CurrentUser.UserId), new AudioEnginePlaybackOptions());
+			this.audioPlayback.Open();
+			this.gablarski.Audio.Attach (this.audioPlayback, this.gablarski.Sources.Where (s => s.OwnerId != gablarski.CurrentUser.UserId), new AudioEnginePlaybackOptions());
 		}
 
 		private void DisablePlayback()
 		{
-			if (this.playback == null)
+			if (this.audioPlayback == null)
 				return;
 
-			this.gablarski.Audio.Detach (this.playback);
-			this.playback.Dispose ();
+			this.gablarski.Audio.Detach (this.audioPlayback);
+			this.audioPlayback.Dispose ();
 		}
 
 		private void SetupVoiceCapture ()
@@ -173,7 +173,7 @@ namespace Gablarski.Clients.Windows
 			{
 				DisableVoiceCapture();
 
-				this.voiceCapture = (ICaptureProvider)Activator.CreateInstance (Type.GetType (Settings.VoiceProvider));
+				this.voiceCapture = (IAudioCaptureProvider)Activator.CreateInstance (Type.GetType (Settings.VoiceProvider));
 
 				if (String.IsNullOrEmpty (Settings.VoiceDevice))
 					this.voiceCapture.Device = this.voiceCapture.DefaultDevice;
@@ -422,7 +422,7 @@ namespace Gablarski.Clients.Windows
 			}
 			else if (e.Result == SourceResult.NewSource)
 			{
-				this.gablarski.Audio.Attach (playback, e.Source, new AudioEnginePlaybackOptions ());
+				this.gablarski.Audio.Attach (this.audioPlayback, e.Source, new AudioEnginePlaybackOptions ());
 
 				var user = gablarski.Users[e.Source.OwnerId];
 				users.RemoveUser (user);
@@ -749,7 +749,7 @@ namespace Gablarski.Clients.Windows
 				SetupInput();
 		}
 
-		private ICaptureProvider musicprovider;
+		private IAudioCaptureProvider musicprovider;
 		private readonly MediaController mediaPlayerIntegration;
 		private NotificationHandler notifications;
 
@@ -762,7 +762,7 @@ namespace Gablarski.Clients.Windows
 			
 				if (!mf.File && mf.Provider != null)
 				{
-					musicprovider = (ICaptureProvider)mf.Provider;
+					musicprovider = (IAudioCaptureProvider)mf.Provider;
 					musicprovider.Device = mf.CaptureDevice;
 				}
 				else

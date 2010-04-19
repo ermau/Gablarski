@@ -115,21 +115,21 @@ namespace Gablarski.Audio
 		/// <summary>
 		/// Attaches a playback provider to all <paramref name="sources"/> not already attached, skipping any ClientAudioSources.
 		/// </summary>
-		void Attach (IPlaybackProvider playback, IEnumerable<AudioSource> sources, AudioEnginePlaybackOptions options);
+		void Attach (IAudioPlaybackProvider audioPlayback, IEnumerable<AudioSource> sources, AudioEnginePlaybackOptions options);
 
 		/// <summary>
 		/// Attaches a playback provider to be used for the given source.
 		/// </summary>
-		void Attach (IPlaybackProvider playback, AudioSource source, AudioEnginePlaybackOptions options);
+		void Attach (IAudioPlaybackProvider audioPlayback, AudioSource source, AudioEnginePlaybackOptions options);
 
 		/// <summary>
-		/// Starts a capture with the given <paramref name="capture"/> pumped to the <paramref name="source"/> with the given <paramref name="options"/>.
+		/// Starts a capture with the given <paramref name="audioCapture"/> pumped to the <paramref name="source"/> with the given <paramref name="options"/>.
 		/// </summary>
-		/// <param name="capture">The provider to pump the audio from. (If the device is not preselected, the default device will be used.)</param>
+		/// <param name="audioCapture">The provider to pump the audio from. (If the device is not preselected, the default device will be used.)</param>
 		/// <param name="source">The audio source to pump the audio to.</param>
 		/// <param name="options">Capturing options.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="capture"/> or <paramref name="source"/> or <paramref name="options"/> are <c>null</c>.</exception>
-		void Attach (ICaptureProvider capture,AudioSource source, AudioEngineCaptureOptions options);
+		/// <exception cref="ArgumentNullException"><paramref name="audioCapture"/> or <paramref name="source"/> or <paramref name="options"/> are <c>null</c>.</exception>
+		void Attach (IAudioCaptureProvider audioCapture, AudioSource source, AudioEngineCaptureOptions options);
 
 		/// <summary>
 		/// Updates <paramref name="source"/> with <paramref name="options"/>.
@@ -173,7 +173,7 @@ namespace Gablarski.Audio
 		/// <param name="provider">The provider to stop any captures for.</param>
 		/// <returns><c>true</c> if there were any captures for the <paramref name="provider"/>.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="provider"/> is <c>null</c>.</exception>
-		bool Detach (ICaptureProvider provider);
+		bool Detach (IAudioCaptureProvider provider);
 
 		/// <summary>
 		/// Stops any playbacks on the given provider.
@@ -181,7 +181,7 @@ namespace Gablarski.Audio
 		/// <param name="provider">The provider to stop playback for.</param>
 		/// <returns><c>true</c> if any sources were attached with <paramref name="provider"/>, <c>false</c> otherwise.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="provider"/> is <c>null</c>.</exception>
-		bool Detach (IPlaybackProvider provider);
+		bool Detach (IAudioPlaybackProvider provider);
 
 		/// <summary>
 		/// Stops any playback or capturing to <paramref name="source"/>.
@@ -201,11 +201,11 @@ namespace Gablarski.Audio
 		/// </summary>
 		void UnmuteCapture();
 
-		/// <exception cref="ArgumentNullException"><paramref name="capture"/> is <c>null</c>.</exception>
-		void Mute (ICaptureProvider capture);
+		/// <exception cref="ArgumentNullException"><paramref name="audioCapture"/> is <c>null</c>.</exception>
+		void Mute (IAudioCaptureProvider audioCapture);
 
-		/// <exception cref="ArgumentNullException"><paramref name="capture"/> is <c>null</c>.</exception>
-		void Unmute (ICaptureProvider capture);
+		/// <exception cref="ArgumentNullException"><paramref name="audioCapture"/> is <c>null</c>.</exception>
+		void Unmute (IAudioCaptureProvider audioCapture);
 
 		/// <summary>
 		/// Mutes all playback.
@@ -217,10 +217,10 @@ namespace Gablarski.Audio
 		/// </summary>
 		void UnmutePlayback();
 
-		/// <exception cref="ArgumentNullException"><paramref name="playback"/> is <c>null</c>.</exception>
-		void Mute (IPlaybackProvider playback);
-		/// <exception cref="ArgumentNullException"><paramref name="playback"/> is <c>null</c>.</exception>
-		void Unmute (IPlaybackProvider playback);
+		/// <exception cref="ArgumentNullException"><paramref name="audioPlayback"/> is <c>null</c>.</exception>
+		void Mute (IAudioPlaybackProvider audioPlayback);
+		/// <exception cref="ArgumentNullException"><paramref name="audioPlayback"/> is <c>null</c>.</exception>
+		void Unmute (IAudioPlaybackProvider audioPlayback);
 
 		/// <summary>
 		/// Starts the audio engine.

@@ -43,16 +43,16 @@ using Gablarski.OpenAL;
 
 namespace Gablarski.OpenAL.Providers
 {
-	[Export (typeof(IPlaybackProvider))]
+	[Export (typeof(IAudioPlaybackProvider))]
 	public class OpenALPlaybackProvider
-		: IPlaybackProvider
+		: IAudioPlaybackProvider
 	{
 		public OpenALPlaybackProvider()
 		{
 			this.pool.SourceFinished += PoolSourceFinished;
 		}
 
-		#region IPlaybackProvider Members
+		#region IAudioPlaybackProvider Members
 		public event EventHandler<SourceFinishedEventArgs> SourceFinished;
 
 		public float Gain

@@ -43,11 +43,11 @@ using Gablarski.Audio;
 
 namespace Gablarski.OpenAL.Providers
 {
-	[Export (typeof(ICaptureProvider))]
+	[Export (typeof(IAudioCaptureProvider))]
 	public class OpenALCaptureProvider
-		: ICaptureProvider
+		: IAudioCaptureProvider
 	{
-		#region ICaptureProvider Members
+		#region IAudioCaptureProvider Members
 		public int AvailableSampleCount
 		{
 			get
