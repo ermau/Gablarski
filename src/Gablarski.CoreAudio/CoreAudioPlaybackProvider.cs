@@ -44,7 +44,7 @@ using NAudio.CoreAudioApi;
 namespace Gablarski.CoreAudio
 {
 	public class CoreAudioPlaybackProvider
-		: IPlaybackProvider
+		: IAudioPlaybackProvider
 	{
 		public event EventHandler<SourceFinishedEventArgs> SourceFinished;
 
