@@ -62,6 +62,11 @@ namespace Gablarski
 			return baseStream.ReadBytes (length);
 		}
 
+		public byte[] ReadBytes (int count)
+		{
+			return baseStream.ReadBytes (count);
+		}
+
 		public sbyte ReadSByte ()
 		{
 			return (sbyte)this.baseStream.ReadByte ();

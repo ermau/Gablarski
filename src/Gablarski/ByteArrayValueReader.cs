@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -89,9 +89,14 @@ namespace Gablarski
 		{
 			int len = this.array.ReadInt32 (ref this.position);
 
-			byte[] value = new byte[len];
-			Array.Copy (this.array, this.position, value, 0, len);
-			this.position += len;
+			return ReadBytes (len);
+		}
+
+		public byte[] ReadBytes (int count)
+		{
+			byte[] value = new byte[count];
+			Array.Copy (this.array, this.position, value, 0, count);
+			this.position += count;
 
 			return value;
 		}

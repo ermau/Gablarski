@@ -44,6 +44,7 @@ namespace Gablarski
 	{
 		bool ReadBool();
 		byte[] ReadBytes ();
+		byte[] ReadBytes (int count);
 
 		SByte ReadSByte ();
 		Int16 ReadInt16 ();

@@ -110,6 +110,8 @@
     <Compile Include="Audio\Speex\SpeexPreprocessor.cs" />
     <Compile Include="Audio\VoiceActivation.cs" />
     <Compile Include="BanInfo.cs" />
+    <Compile Include="BinaryValueReader.cs" />
+    <Compile Include="BinaryValueWriter.cs" />
     <Compile Include="ByteArrayValueReader.cs" />
     <Compile Include="Audio\AudioEngine.cs" />
     <Compile Include="Audio\IAudioSender.cs" />
