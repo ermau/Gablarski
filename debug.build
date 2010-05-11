@@ -122,7 +122,7 @@
 
 		<exec program="${DotNetFramework3.5_x86_Path}\msbuild.exe">
 			<arg value='/property:Configuration="Debug";Platform="x86"' />
-			<arg value="src\Clients\WinForms\Gablarski-WinForms.sln" />
+			<arg value="Gablarski.sln" />
 		</exec>
 
 		<zip zipfile="Gablarski-Win32-Debug.zip">
@@ -143,8 +143,8 @@
 
 	<target name="gtk" depends="library">
 		<exec program="${DotNetFramework3.5_x86_Path}\msbuild.exe">
-			<arg value='/property:Configuration="Debug";Platform="x86"' />
-			<arg value="src\Clients\Gablarski-Gtk\Gablarski-Gtk.sln" />
+			<arg value='/property:Configuration="Mono Debug";Platform="x86"' />
+			<arg value="Gablarski.sln" />
 		</exec>
 
 		<zip zipfile="Gablarski-Gtk-Debug.zip">
@@ -162,7 +162,7 @@
 	<target name="barrelserver" depends="library">
 		<exec program="${DotNetFramework3.5_x86_Path}\msbuild.exe">
 			<arg value='/property:Configuration="Debug";Platform="x86"' />
-			<arg value="src\Server\Server.sln" />
+			<arg value="Gablarski.sln" />
 		</exec>
 
 		<zip zipfile="Gablarski-Server-Debug.zip">

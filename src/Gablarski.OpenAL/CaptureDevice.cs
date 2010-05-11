@@ -162,7 +162,7 @@ namespace Gablarski.OpenAL
 		/// <summary>
 		/// Gets the available samples.
 		/// </summary>
-		/// <returns>The available PCM samples.</returns>
+		/// <returns>The available LPCM samples.</returns>
 		public byte[] GetSamples ()
 		{
 			return GetSamples (AvailableSamples, false);
@@ -172,7 +172,7 @@ namespace Gablarski.OpenAL
 		/// Gets the available samples and provides the number of samples.
 		/// </summary>
 		/// <param name="numSamples">The number of samples returned.</param>
-		/// <returns>The available PCM samples.</returns>
+		/// <returns>The available LPCM samples.</returns>
 		public byte[] GetSamples (out int numSamples)
 		{
 			numSamples = GetSamplesAvailable ();

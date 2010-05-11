@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -37,7 +37,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Runtime.InteropServices;
 
 namespace Gablarski.CELT
@@ -61,10 +60,10 @@ namespace Gablarski.CELT
 		}
 
 		/// <summary>
-		/// Decodes CELT compressed data to PCM.
+		/// Decodes CELT compressed data to LPCM.
 		/// </summary>
 		/// <param name="encoded">The CELT encoded data.</param>
-		/// <returns>The CELT decoded PCM.</returns>
+		/// <returns>The CELT decoded LPCM.</returns>
 		public unsafe byte[] Decode (byte[] encoded)
 		{
 			#if DEBUG

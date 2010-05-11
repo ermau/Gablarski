@@ -39,10 +39,11 @@ using System.Linq;
 
 namespace Gablarski.Audio
 {
-	public class AudioCodecArgs : IEquatable<AudioCodecArgs>
+	public class AudioCodecArgs
+		: AudioFormat, IEquatable<AudioCodecArgs>
 	{
 		public AudioCodecArgs()
-			: this (AudioFormat.Mono16Bit, 48000, 44100, 512, 10)
+			: this (WaveFormatEncoding.LPCM, 1, 16, 48000, 44100, 512, 10)
 		{
 		}
 
@@ -51,28 +52,31 @@ namespace Gablarski.Audio
 			if (args == null)
 				throw new ArgumentNullException ("args");
 
-			Format = args.Format;
+			WaveEncoding = args.WaveEncoding;
+			Channels = args.Channels;
+			BitsPerSample = args.BitsPerSample;
+			SampleRate = args.SampleRate;
 			Bitrate = args.Bitrate;
-			Frequency = args.Frequency;
 			FrameSize = args.FrameSize;
 			Complexity = args.Complexity;
 		}
 
-		public AudioCodecArgs (AudioFormat format, int bitrate, int frequency, short frameSize, byte complexity)
+		public AudioCodecArgs (AudioFormat format, int bitrate, short frameSize, byte complexity)
+			: this (format.WaveEncoding, format.Channels, format.BitsPerSample, format.SampleRate, bitrate, frameSize, complexity)
 		{
-			Format = format;
+		}
+
+		public AudioCodecArgs (WaveFormatEncoding waveEnconding, int channels, int bitsPerChannel, int frequency, int bitrate, short frameSize, byte complexity)
+			: base (waveEnconding, channels, bitsPerChannel, frequency)
+		{
 			Bitrate = bitrate;
-			Frequency = frequency;
 			FrameSize = frameSize;
 			Complexity = complexity;
 		}
 
 		internal AudioCodecArgs (IValueReader reader)
+			: base (reader)
 		{
-			if (reader == null)
-				throw new ArgumentNullException ("reader");
-
-			Deserialize (reader);
 		}
 
 		/// <summary>
@@ -108,30 +112,6 @@ namespace Gablarski.Audio
 		}
 
 		/// <summary>
-		/// Gets the audio format of this source.
-		/// </summary>
-		public AudioFormat Format
-		{
-			get; set;
-		}
-
-		/// <summary>
-		/// Gets the frequency of the audio.
-		/// </summary>
-		public int Frequency
-		{
-			get { return this.frequency; }
-
-			protected internal set
-			{
-				if (IsInvalidFrequency (value))
-					throw new ArgumentOutOfRangeException ("value");
-
-				this.frequency = value;
-			}
-		}
-
-		/// <summary>
 		/// Gets the frame size for the encoded packets.
 		/// </summary>
 		public short FrameSize
@@ -147,17 +127,13 @@ namespace Gablarski.Audio
 			}
 		}
 
-
 		public override bool Equals (object obj)
 		{
 			if (ReferenceEquals (null, obj))
 				return false;
 			if (ReferenceEquals (this, obj))
 				return true;
-			if (obj.GetType() != typeof (AudioCodecArgs))
-				return false;
-
-			return Equals ((AudioCodecArgs)obj);
+			return Equals (obj as AudioCodecArgs);
 		}
 
 		public bool Equals (AudioCodecArgs other)
@@ -166,43 +142,37 @@ namespace Gablarski.Audio
 				return false;
 			if (ReferenceEquals (this, other))
 				return true;
-			return other.frameSize == this.frameSize && other.channels == this.channels && other.complexity == this.complexity && other.bitrate == this.bitrate && other.frequency == this.frequency;
+			return base.Equals (other) && other.frameSize == this.frameSize && other.complexity == this.complexity && other.bitrate == this.bitrate;
 		}
 
 		public override int GetHashCode()
 		{
 			unchecked
 			{
-				int result = this.frameSize.GetHashCode();
-				result = (result * 397) ^ this.channels.GetHashCode();
+				int result = base.GetHashCode();
+				result = (result * 397) ^ this.frameSize.GetHashCode();
 				result = (result * 397) ^ this.complexity.GetHashCode();
 				result = (result * 397) ^ this.bitrate;
-				result = (result * 397) ^ this.frequency;
-				result = (result * 397) ^ this.Format.GetHashCode();
 				return result;
 			}
 		}
 
 		private short frameSize;
-		private byte channels;
 		private byte complexity;
 		private int bitrate;
-		private int frequency;
 
-		protected internal virtual void Serialize (IValueWriter writer)
+		protected internal override void Serialize (IValueWriter writer)
 		{
-			writer.WriteByte ((byte) Format);
+			base.Serialize (writer);
 			writer.WriteInt32 (Bitrate);
-			writer.WriteInt32 (Frequency);
 			writer.WriteInt16 (FrameSize);
 			writer.WriteByte (Complexity);
 		}
 
-		protected internal virtual void Deserialize (IValueReader reader)
+		protected internal override void Deserialize (IValueReader reader)
 		{
-			Format = (AudioFormat)reader.ReadByte();
+			base.Deserialize (reader);
 			Bitrate = reader.ReadInt32();
-			Frequency = reader.ReadInt32();
 			FrameSize = reader.ReadInt16();
 			Complexity = reader.ReadByte();
 		}

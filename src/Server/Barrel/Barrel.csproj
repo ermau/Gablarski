@@ -125,7 +125,7 @@
     <VisualStudio />
   </ProjectExtensions>
   <PropertyGroup>
-    <PostBuildEvent>xcopy /Y "$(SolutionDir)..\Gablarski.WebServer\bin\$(ConfigurationName)\*.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)..\Gablarski.WebServer\bin\$(ConfigurationName)\*.pdb" "$(TargetDir)"</PostBuildEvent>
+    <PostBuildEvent>xcopy /Y "$(SolutionDir)src\Gablarski.WebServer\bin\$(ConfigurationName)\*.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)src\Gablarski.WebServer\bin\$(ConfigurationName)\*.pdb" "$(TargetDir)"</PostBuildEvent>
   </PropertyGroup>
 </Project>

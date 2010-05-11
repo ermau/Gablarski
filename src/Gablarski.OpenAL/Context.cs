@@ -1,4 +1,4 @@
-// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -36,9 +36,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Runtime.InteropServices;
-using Gablarski.OpenAL;
 
 namespace Gablarski.OpenAL
 {
@@ -115,6 +113,7 @@ namespace Gablarski.OpenAL
 			}
 		}
 
+		// ReSharper disable InconsistentNaming
 		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
 		private extern static IntPtr alcCreateContext (IntPtr device, IntPtr attrlist);
 
@@ -129,6 +128,7 @@ namespace Gablarski.OpenAL
 
 		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
 		private extern static void alcDestroyContext (IntPtr context);
+		// ReSharper restore InconsistentNaming
 
 		private static Dictionary<IntPtr, Context> contexts;
 		private static readonly object lck = new object ();

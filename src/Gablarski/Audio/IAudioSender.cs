@@ -56,7 +56,7 @@ namespace Gablarski.Audio
 		/// <param name="source">The source to send from.</param>
 		/// <param name="targetType">The type that the <paramref name="targetIds"/> belong to.</param>
 		/// <param name="targetIds">The ids of the targets to send audio to.</param>
-		/// <param name="data">The unencoded PCM matching <paramref name="source"/>'s attributes</param>
+		/// <param name="data">The unencoded LPCM matching <paramref name="source"/>'s attributes</param>
 		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
 		/// <exception cref="ArgumentException"><paramref name="source"/> does not belong to you.</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="data"/> is <c>null</c>.</exception>

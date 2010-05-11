@@ -49,17 +49,14 @@ namespace Gablarski.Tests
 		[Test]
 		public void InvalidParamsCtor ()
 		{
-			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioCodecArgs (AudioFormat.Mono16Bit, -1, 44100, 512, 10));
-			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioCodecArgs (AudioFormat.Mono16Bit, 480000, 44100, 512, 10));
+			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioCodecArgs (AudioFormat.Mono16bitLPCM, -1, 512, 10));
+			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 480000, 512, 10));
 
-			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioCodecArgs (AudioFormat.Mono16Bit, 48000, 5, 512, 10));
-			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioCodecArgs (AudioFormat.Mono16Bit, 48000, 200000, 512, 10));
+			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 48000, 1, 10));
+			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 48000, 5120, 10));
 
-			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioCodecArgs (AudioFormat.Mono16Bit, 48000, 44100, 1, 10));
-			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioCodecArgs (AudioFormat.Mono16Bit, 48000, 44100, 5120, 10));
-
-			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioCodecArgs (AudioFormat.Mono16Bit, 48000, 44100, 512, 0));
-			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioCodecArgs (AudioFormat.Mono16Bit, 48000, 44100, 512, 11));
+			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 48000, 512, 0));
+			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 48000, 512, 11));
 		}
 
 		[Test]
@@ -70,32 +67,35 @@ namespace Gablarski.Tests
 		}
 
 		private const int Bitrate = 64000;
-		private const AudioFormat Format = AudioFormat.Stereo16Bit;
-		private const int Frequency = 44100;
+		private readonly AudioFormat Format = AudioFormat.Mono16bitLPCM;
 		private const int FrameSize = 512;
 		private const byte Complexity = 10;
 
 		public static void AssertAreEqual (AudioCodecArgs expected, AudioCodecArgs actual)
 		{
+			Assert.AreEqual (expected.WaveEncoding, actual.WaveEncoding);
+			Assert.AreEqual (expected.Channels, actual.Channels);
+			Assert.AreEqual (expected.BitsPerSample, actual.BitsPerSample);
 			Assert.AreEqual (expected.Bitrate, actual.Bitrate);
-			Assert.AreEqual (expected.Format, actual.Format);
 			Assert.AreEqual (expected.Complexity, actual.Complexity);
 			Assert.AreEqual (expected.FrameSize, actual.FrameSize);
-			Assert.AreEqual (expected.Frequency, actual.Frequency);
+			Assert.AreEqual (expected.SampleRate, actual.SampleRate);
 		}
 
 		public static AudioCodecArgs GetTestArgs()
 		{
-			return new AudioCodecArgs (AudioFormat.Stereo16Bit, 64000, 48000, 512, 10);
+			return new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 64000, 512, 10);
 		}
 		
 		[Test]
 		public void Ctor()
 		{
-			var args = new AudioCodecArgs (Format, Bitrate, Frequency, FrameSize, Complexity);
-			Assert.AreEqual (Format, args.Format);
+			var args = new AudioCodecArgs (Format, Bitrate, FrameSize, Complexity);
+			Assert.AreEqual (Format.WaveEncoding, args.WaveEncoding);
+			Assert.AreEqual (Format.Channels, args.Channels);
+			Assert.AreEqual (Format.BitsPerSample, args.BitsPerSample);
 			Assert.AreEqual (Bitrate, args.Bitrate);
-			Assert.AreEqual (Frequency, args.Frequency);
+			Assert.AreEqual (Format.SampleRate, args.SampleRate);
 			Assert.AreEqual (FrameSize, args.FrameSize);
 			Assert.AreEqual (Complexity, args.Complexity);
 		}
@@ -107,7 +107,7 @@ namespace Gablarski.Tests
 			var writer = new StreamValueWriter (stream);
 			var reader = new StreamValueReader (stream);
 
-			var args = new AudioCodecArgs (Format, Bitrate, Frequency, FrameSize, Complexity);
+			var args = new AudioCodecArgs (Format, Bitrate, FrameSize, Complexity);
 			
 			args.Serialize (writer);
 			long length = stream.Position;
@@ -115,9 +115,11 @@ namespace Gablarski.Tests
 
 			args = new AudioCodecArgs (reader);
 			Assert.AreEqual (length, stream.Position);
-			Assert.AreEqual (Format, args.Format);
+			Assert.AreEqual (Format.WaveEncoding, args.WaveEncoding);
+			Assert.AreEqual (Format.Channels, args.Channels);
+			Assert.AreEqual (Format.BitsPerSample, args.BitsPerSample);
 			Assert.AreEqual (Bitrate, args.Bitrate);
-			Assert.AreEqual (Frequency, args.Frequency);
+			Assert.AreEqual (Format.SampleRate, args.SampleRate);
 			Assert.AreEqual (FrameSize, args.FrameSize);
 			Assert.AreEqual (Complexity, args.Complexity);
 		}

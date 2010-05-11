@@ -165,7 +165,7 @@ namespace Gablarski.Tests
 		{
 			permissions.EnablePermissions (context.UserManager.GetUser (connection).UserId,	PermissionName.RequestSource);
 
-			var audioArgs = new AudioCodecArgs (AudioFormat.Mono16Bit, 64000, 44100, 512, 10);
+			var audioArgs = new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 64000, 512, 10);
 			handler.RequestSourceMessage (new MessageReceivedEventArgs (connection,
 				new RequestSourceMessage ("Name", audioArgs)));
 
@@ -186,7 +186,7 @@ namespace Gablarski.Tests
 		{
 			permissions.EnablePermissions (user.UserId, PermissionName.RequestSource);
 
-			var audioArgs = new AudioCodecArgs (AudioFormat.Mono16Bit, 0, 44100, 512, 10);
+			var audioArgs = new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 0, 512, 10);
 			handler.RequestSourceMessage (new MessageReceivedEventArgs (server, new RequestSourceMessage ("Name", audioArgs)));
 
 			var result = server.Client.DequeueAndAssertMessage<SourceResultMessage>();
@@ -205,7 +205,7 @@ namespace Gablarski.Tests
 		{
 			permissions.EnablePermissions (user.UserId, PermissionName.RequestSource);
 
-			var audioArgs = new AudioCodecArgs (AudioFormat.Mono16Bit, 200000, 44100, 512, 10);
+			var audioArgs = new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 200000, 512, 10);
 			handler.RequestSourceMessage (new MessageReceivedEventArgs (server, new RequestSourceMessage ("Name", audioArgs)));
 			
 			var result = server.Client.DequeueAndAssertMessage<SourceResultMessage>();
@@ -224,7 +224,7 @@ namespace Gablarski.Tests
 		{
 			permissions.EnablePermissions (user.UserId, PermissionName.RequestSource);
 
-			var audioArgs = new AudioCodecArgs (AudioFormat.Mono16Bit, 1, 44100, 512, 10);
+			var audioArgs = new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 1, 512, 10);
 			handler.RequestSourceMessage (new MessageReceivedEventArgs (server, new RequestSourceMessage ("Name", audioArgs)));
 			
 			var result = server.Client.DequeueAndAssertMessage<SourceResultMessage>();

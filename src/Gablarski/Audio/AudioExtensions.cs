@@ -37,7 +37,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Gablarski.Audio
 {
@@ -45,31 +44,7 @@ namespace Gablarski.Audio
 	{
 		public static int GetBytesPerSample (this AudioFormat self)
 		{
-			switch (self)
-			{
-				default:
-					return 1;
-
-				case AudioFormat.Mono16Bit:
-				case AudioFormat.Stereo8Bit:
-					return 2;
-
-				case AudioFormat.Stereo16Bit:
-					return 4;
-			}
-		}
-
-		public static int GetChannels (this AudioFormat self)
-		{
-			switch (self)
-			{
-				default:
-					return 1;
-
-				case AudioFormat.Stereo16Bit:
-				case AudioFormat.Stereo8Bit:
-					return 2;
-			}
+			return self.BitsPerSample * self.Channels;
 		}
 
 		public static int GetBytes (this AudioFormat self, int samples)
@@ -77,17 +52,9 @@ namespace Gablarski.Audio
 			return self.GetBytesPerSample () * samples;
 		}
 
-		public static int GetSamplesPerSecond (this AudioFormat self, int frequency)
+		public static int GetSamplesPerSecond (this AudioFormat self)
 		{
-			switch (self)
-			{
-				default:
-					return frequency;
-
-				case AudioFormat.Stereo8Bit:
-				case AudioFormat.Stereo16Bit:
-					return (frequency * 2);
-			}
+			return self.SampleRate * self.Channels;
 		}
 	}
 }

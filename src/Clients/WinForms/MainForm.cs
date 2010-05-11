@@ -548,7 +548,7 @@ namespace Gablarski.Clients.Windows
 			{
 				SetupInput();
 
-				this.gablarski.Sources.Request ("voice", AudioFormat.Mono16Bit, 512);
+				this.gablarski.Sources.Request ("voice", AudioFormat.Mono16bitLPCM, 512);
 			}
 		}
 

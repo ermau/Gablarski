@@ -129,6 +129,7 @@ namespace Gablarski.Audio
 		/// <param name="source">The audio source to pump the audio to.</param>
 		/// <param name="options">Capturing options.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="audioCapture"/> or <paramref name="source"/> or <paramref name="options"/> are <c>null</c>.</exception>
+		/// <exception cref="ArgumentException"><paramref name="source"/> is a local source.</exception>
 		void Attach (IAudioCaptureProvider audioCapture, AudioSource source, AudioEngineCaptureOptions options);
 
 		/// <summary>

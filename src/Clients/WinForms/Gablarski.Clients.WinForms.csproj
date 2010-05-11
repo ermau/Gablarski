@@ -161,6 +161,7 @@
     <Compile Include="Entities\IgnoreEntry.cs" />
     <Compile Include="Entities\ServerEntry.cs" />
     <Compile Include="Entities\SettingEntry.cs" />
+    <Compile Include="Entities\VolumeEntry.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="LoginForm.cs">
       <SubType>Form</SubType>
@@ -318,24 +319,24 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /Y "$(SolutionDir)..\..\..\Gablarski.License.txt" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)..\..\..\lib\libcelt.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)..\..\..\lib\libcelt.license.txt" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)..\..\..\lib\libspeexdsp.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)..\..\..\lib\libspeexdsp.license.txt" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)..\..\..\lib\OpenAL32.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)..\..\..\lib\OpenALSoft.License.txt" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)..\..\Gablarski.OpenAL\bin\$(ConfigurationName)\*.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)..\..\Gablarski.OpenAL\bin\$(ConfigurationName)\*.pdb" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)..\..\Gablarski.Input.DirectInput\bin\$(ConfigurationName)\*.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)..\..\Gablarski.Input.DirectInput\bin\$(ConfigurationName)\*.pdb" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)..\..\Gablarski.iTunes\bin\$(ConfigurationName)\*.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)..\..\Gablarski.iTunes\bin\$(ConfigurationName)\*.pdb" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)..\..\Gablarski.Winamp\bin\$(ConfigurationName)\*.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)..\..\Gablarski.Winamp\bin\$(ConfigurationName)\*.pdb" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)..\..\Gablarski.SpeechNotifier\bin\$(ConfigurationName)\*.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)..\..\Gablarski.SpeechNotifier\bin\$(ConfigurationName)\*.pdb" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)..\..\Gablarski.Growl\bin\$(ConfigurationName)\*.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)..\..\Gablarski.Growl\bin\$(ConfigurationName)\*.pdb" "$(TargetDir)"</PostBuildEvent>
+    <PostBuildEvent>xcopy /Y "$(SolutionDir)Gablarski.License.txt" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)lib\libcelt.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)lib\libcelt.license.txt" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)lib\libspeexdsp.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)lib\libspeexdsp.license.txt" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)lib\OpenAL32.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)lib\OpenALSoft.License.txt" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)src\Gablarski.OpenAL\bin\$(ConfigurationName)\*.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)src\Gablarski.OpenAL\bin\$(ConfigurationName)\*.pdb" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)src\Gablarski.Input.DirectInput\bin\$(ConfigurationName)\*.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)src\Gablarski.Input.DirectInput\bin\$(ConfigurationName)\*.pdb" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)src\Gablarski.iTunes\bin\$(ConfigurationName)\*.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)src\Gablarski.iTunes\bin\$(ConfigurationName)\*.pdb" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)src\Gablarski.Winamp\bin\$(ConfigurationName)\*.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)src\Gablarski.Winamp\bin\$(ConfigurationName)\*.pdb" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)src\Gablarski.SpeechNotifier\bin\$(ConfigurationName)\*.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)src\Gablarski.SpeechNotifier\bin\$(ConfigurationName)\*.pdb" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)src\Gablarski.Growl\bin\$(ConfigurationName)\*.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)src\Gablarski.Growl\bin\$(ConfigurationName)\*.pdb" "$(TargetDir)"</PostBuildEvent>
   </PropertyGroup>
 </Project>

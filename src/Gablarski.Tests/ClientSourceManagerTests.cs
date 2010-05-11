@@ -1,7 +1,41 @@
-﻿using System;
-using System.Collections.Generic;
+﻿// Copyright (c) 2010, Eric Maupin
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with
+// or without modification, are permitted provided that
+// the following conditions are met:
+//
+// - Redistributions of source code must retain the above 
+//   copyright notice, this list of conditions and the
+//   following disclaimer.
+//
+// - Redistributions in binary form must reproduce the above
+//   copyright notice, this list of conditions and the
+//   following disclaimer in the documentation and/or other
+//   materials provided with the distribution.
+//
+// - Neither the name of Gablarski nor the names of its
+//   contributors may be used to endorse or promote products
+//   or services derived from this software without specific
+//   prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS
+// AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+// WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+// PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+// HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+// INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+// GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+// THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+// DAMAGE.
+
+using System;
 using System.Linq;
-using System.Text;
 using Gablarski.Audio;
 using Gablarski.Client;
 using Gablarski.Messages;
@@ -55,23 +89,28 @@ namespace Gablarski.Tests
 		[Test]
 		public void RequestDefaultBitrate()
 		{
-			this.manager.Request ("voice", AudioFormat.Stereo16Bit, 512);
+			this.manager.Request ("voice", AudioFormat.Mono16bitLPCM, 512);
 
 			var msg = this.server.DequeueAndAssertMessage<RequestSourceMessage>();
 			Assert.AreEqual ("voice", msg.Name);
-			Assert.AreEqual (AudioFormat.Stereo16Bit, msg.AudioSettings.Format);
+			Assert.AreEqual (AudioFormat.Mono16bitLPCM.BitsPerSample, msg.AudioSettings.BitsPerSample);
+			Assert.AreEqual (AudioFormat.Mono16bitLPCM.Channels, msg.AudioSettings.Channels);
+			Assert.AreEqual (AudioFormat.Mono16bitLPCM.SampleRate, msg.AudioSettings.SampleRate);
+			Assert.AreEqual (AudioFormat.Mono16bitLPCM.WaveEncoding, msg.AudioSettings.WaveEncoding);
 			Assert.AreEqual (0,	msg.AudioSettings.Bitrate);
 		}
 
 		[Test]
 		public void RequestFrequencyAndBitRate()
 		{
-			this.manager.Request ("voice", AudioFormat.Stereo16Bit, 48000, 512, 64000);
+			this.manager.Request ("voice", new AudioFormat (WaveFormatEncoding.LPCM, 1, 16, 48000), 512, 64000);
 
 			var msg = this.server.DequeueAndAssertMessage<RequestSourceMessage>();
 			Assert.AreEqual ("voice", msg.Name);
-			Assert.AreEqual (AudioFormat.Stereo16Bit, msg.AudioSettings.Format);
-			Assert.AreEqual (48000, msg.AudioSettings.Frequency);
+			Assert.AreEqual (AudioFormat.Mono16bitLPCM.BitsPerSample, msg.AudioSettings.BitsPerSample);
+			Assert.AreEqual (AudioFormat.Mono16bitLPCM.Channels, msg.AudioSettings.Channels);
+			Assert.AreEqual (AudioFormat.Mono16bitLPCM.WaveEncoding, msg.AudioSettings.WaveEncoding);
+			Assert.AreEqual (48000, msg.AudioSettings.SampleRate);
 			Assert.AreEqual (64000, msg.AudioSettings.Bitrate);
 		}
 

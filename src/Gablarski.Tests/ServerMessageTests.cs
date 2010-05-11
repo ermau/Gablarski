@@ -163,13 +163,13 @@ namespace Gablarski.Tests
 		{
 			var sources = new List<AudioSource>
 			{
-				new AudioSource ("voice", 1, UserId, AudioFormat.Mono16Bit, 64000, 44100, 256, 10, false),
-				new AudioSource ("voice", 2, UserId2, AudioFormat.Stereo16Bit, 128000, 48000, 512, 10, false)
+				new AudioSource ("voice", 1, UserId, AudioFormat.Mono16bitLPCM, 64000, 256, 10, false),
+				new AudioSource ("voice", 2, UserId2, AudioFormat.Stereo16bitLPCM, 128000, 512, 10, false)
 			};
 
 			var msg = new SourceListMessage (sources);
-			Assert.AreEqual (1, msg.Sources.Count (s => s.Id == sources[0].Id && s.OwnerId.Equals (sources[0].OwnerId) && s.Bitrate == sources[0].Bitrate));
-			Assert.AreEqual (1, msg.Sources.Count (s => s.Id == sources[1].Id && s.OwnerId.Equals (sources[1].OwnerId) && s.Bitrate == sources[1].Bitrate));
+			foreach (var s in msg.Sources)
+				Assert.Contains (s, sources);
 
 			msg.WritePayload (writer);
 			long length = stream.Position;
@@ -178,8 +178,8 @@ namespace Gablarski.Tests
 			msg = new SourceListMessage();
 			msg.ReadPayload (reader);
 			Assert.AreEqual (length, stream.Position);
-			Assert.AreEqual (1, msg.Sources.Count (s => s.Id == sources[0].Id && s.OwnerId.Equals (sources[0].OwnerId) && s.Bitrate == sources[0].Bitrate));
-			Assert.AreEqual (1, msg.Sources.Count (s => s.Id == sources[1].Id && s.OwnerId.Equals (sources[1].OwnerId) && s.Bitrate == sources[1].Bitrate));
+			foreach (var s in sources)
+				Assert.Contains (s, msg.Sources.ToList());
 		}
 
 		[Test]

@@ -50,7 +50,7 @@ namespace Gablarski.Tests
 		private readonly UserInfo user = new UserInfo ("username", 1, 2, false);
 		private readonly UserInfo user2 = new UserInfo ("Username2", 2, 1, false);
 
-		private readonly AudioCodecArgs args = new AudioCodecArgs (AudioFormat.Mono16Bit, 64000, 44100, 512, 10);
+		private readonly AudioCodecArgs args = new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 64000, 512, 10);
 
 		private IServerContext context;
 		private ServerSourceManager manager;
@@ -78,9 +78,11 @@ namespace Gablarski.Tests
 			Assert.IsNotNull (source);
 			Assert.AreEqual ("Name", source.Name);
 			Assert.AreEqual (1, source.OwnerId);
-			Assert.AreEqual (args.Format, source.Format);
+			Assert.AreEqual (args.WaveEncoding, source.WaveEncoding);
+			Assert.AreEqual (args.Channels, source.Channels);
+			Assert.AreEqual (args.BitsPerSample, source.BitsPerSample);
 			Assert.AreEqual (args.Bitrate, source.Bitrate);
-			Assert.AreEqual (args.Frequency, source.Frequency);
+			Assert.AreEqual (args.SampleRate, source.SampleRate);
 			Assert.AreEqual (args.FrameSize, source.FrameSize);
 			Assert.AreEqual (args.Complexity, source.Complexity);
 

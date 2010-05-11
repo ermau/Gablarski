@@ -146,7 +146,8 @@ namespace Gablarski.Audio
 
 			lock (captures)
 			{
-				audioCapture.BeginCapture (source.Frequency, source.Format);
+				audioCapture.SamplesAvailable += OnSamplesAvailable;
+				audioCapture.BeginCapture (source, source.FrameSize);
 				captures[source] = new AudioCaptureEntity (audioCapture, source, options);
 
 				if (this.captureMuted || mutedCaptures.Contains (audioCapture))
@@ -435,27 +436,22 @@ namespace Gablarski.Audio
 			this.running = true;
 
 			this.AudioReceiver.ReceivedAudio += OnReceivedAudio;
-
-			this.engineThread = new Thread (Engine);
-			this.engineThread.Name = "Audio Engine";
-			this.engineThread.Start();
 		}
 
 		public void Stop ()
 		{
-			if (!IsRunning)
-				return;
-
 			this.running = false;
 
 			if (this.AudioReceiver != null)
 				this.AudioReceiver.ReceivedAudio -= OnReceivedAudio;
 
-			if (this.engineThread != null)
-				this.engineThread.Join();
-
 			lock (captures)
 			{
+				captureToSourceLookup.Clear();
+
+				foreach (var kvp in captures)
+					kvp.Value.Dispose();
+
 				captures.Clear();
 				mutedCaptures.Clear();
 			}
@@ -469,7 +465,8 @@ namespace Gablarski.Audio
 		}
 
 		private volatile bool running;
-		
+
+		private readonly Dictionary<IAudioCaptureProvider, AudioSource> captureToSourceLookup = new Dictionary<IAudioCaptureProvider, AudioSource>();
 		private readonly Dictionary<AudioSource, AudioCaptureEntity> captures = new Dictionary<AudioSource, AudioCaptureEntity>();
 		private readonly Dictionary<AudioSource, AudioPlaybackEntity> playbacks = new Dictionary<AudioSource, AudioPlaybackEntity>();
 		private readonly List<IAudioPlaybackProvider> playbackProviders = new List<IAudioPlaybackProvider>();
@@ -484,6 +481,80 @@ namespace Gablarski.Audio
 		private IAudioReceiver audioReceiver;
 		private bool captureMuted;
 		private bool playbackMuted;
+
+		private void OnSamplesAvailable (object sender, SamplesAvailableEventArgs e)
+		{
+			lock (captures)
+			{
+				AudioSource source;
+				AudioCaptureEntity entity;
+				if (!captureToSourceLookup.TryGetValue (e.Provider, out source) || captures.TryGetValue (source, out entity))
+					return;
+
+				bool muted = (entity.Muted || this.captureMuted);
+
+				if ((!entity.Talking && muted) || (!entity.AudioCapture.IsCapturing && entity.Options.Mode == AudioEngineCaptureMode.Explicit))
+					return;
+						
+				if (entity.Talking && muted)
+				{
+					entity.Talking = false;
+					AudioSender.EndSending (source);
+					return;
+				}
+
+				if (e.Available <= source.FrameSize)
+					return;
+
+				bool talking = entity.Talking;
+				if (entity.CurrentTargets == null || entity.CurrentTargets.Length == 0)
+				{
+					entity.TargetType = TargetType.Channel;
+					entity.CurrentTargets = new[] { this.Context.GetCurrentChannel().ChannelId };
+				}
+
+				AudioEngineCaptureMode mode = entity.Options.Mode;
+					
+				int framesAvailable = e.Available / source.FrameSize;
+				int talkingFrames = (mode == AudioEngineCaptureMode.Explicit) ? framesAvailable : 0;
+				int talkingIndex = -1;
+
+				byte[][] frames = new byte[framesAvailable][];
+				for (int i = 0; i < framesAvailable; ++i)
+				{
+					byte[] samples = entity.AudioCapture.ReadSamples (source.FrameSize);
+					if (mode == AudioEngineCaptureMode.Activated)
+					{
+						talking = entity.VoiceActivation.IsTalking (samples);
+						if (talking)
+						{
+							talkingFrames++;
+							if (talkingIndex == -1)
+								talkingIndex = i;
+						}
+
+						if (talking && !entity.Talking)
+							this.AudioSender.BeginSending (source);
+					}
+
+					frames[i] = samples;
+				}
+
+				if (talkingFrames > 0 && talkingFrames != frames.Length)
+				{
+					byte[][] actualFrames = new byte[talkingFrames][];
+					Array.Copy (frames, talkingIndex, actualFrames, 0, talkingFrames);
+					frames = actualFrames;
+				}
+
+				if (talking)
+					this.AudioSender.SendAudioData (source, entity.TargetType, entity.CurrentTargets, frames);
+				else if (entity.Talking && entity.Options.Mode == AudioEngineCaptureMode.Activated)
+					this.AudioSender.EndSending (source);
+
+				entity.Talking = talking;
+			}
+		}
 
 		private void OnReceivedAudio (object sender, ReceivedAudioEventArgs e)
 		{
@@ -544,98 +615,6 @@ namespace Gablarski.Audio
 
 				foreach (var e in ps)
 					e.Muted = mute;
-			}
-		}
-
-		private void Engine ()
-		{
-			while (this.running)
-			{
-				lock (playbackProviders)
-				{
-					foreach (var p in playbackProviders)
-						p.Tick();
-				}
-
-				bool skipSwitch = false;
-
-				lock (captures)
-				{
-					foreach (var c in captures)
-					{
-						AudioCaptureEntity entity = c.Value;
-						AudioSource source = c.Key;
-
-						bool muted = (entity.Muted || this.captureMuted);
-
-						if ((!entity.Talking && muted) || (!entity.AudioCapture.IsCapturing && entity.Options.Mode == AudioEngineCaptureMode.Explicit))
-							continue;
-						
-						if (entity.Talking && muted)
-						{
-							entity.Talking = false;
-							AudioSender.EndSending (source);
-							continue;
-						}
-
-						if (entity.AudioCapture.AvailableSampleCount > source.FrameSize)
-						{
-							bool talking = entity.Talking;
-							if (entity.CurrentTargets == null || entity.CurrentTargets.Length == 0)
-							{
-								entity.TargetType = TargetType.Channel;
-								entity.CurrentTargets = new[] { Context.GetCurrentChannel().ChannelId };
-							}
-
-							AudioEngineCaptureMode mode = entity.Options.Mode;
-							
-							int framesAvailable = entity.AudioCapture.AvailableSampleCount / source.FrameSize;
-							int talkingFrames = (mode == AudioEngineCaptureMode.Explicit) ? framesAvailable : 0;
-							int talkingIndex = -1;
-
-							byte[][] frames = new byte[framesAvailable][];
-							for (int i = 0; i < framesAvailable; ++i)
-							{
-								byte[] samples = entity.AudioCapture.ReadSamples (source.FrameSize);
-								if (mode == AudioEngineCaptureMode.Activated)
-								{
-									talking = entity.VoiceActivation.IsTalking (samples);
-									if (talking)
-									{
-										talkingFrames++;
-										if (talkingIndex == -1)
-											talkingIndex = i;
-									}
-
-									if (talking && !entity.Talking)
-										AudioSender.BeginSending (source);
-								}
-
-								frames[i] = samples;
-							}
-
-							if (talkingFrames > 0 && talkingFrames != frames.Length)
-							{
-								byte[][] actualFrames = new byte[talkingFrames][];
-								Array.Copy (frames, talkingIndex, actualFrames, 0, talkingFrames);
-								frames = actualFrames;
-							}
-
-							if (talking)
-								AudioSender.SendAudioData (source, entity.TargetType, entity.CurrentTargets, frames);
-							else if (entity.Talking && entity.Options.Mode == AudioEngineCaptureMode.Activated)
-								AudioSender.EndSending (source);
-
-							entity.Talking = talking;
-						}
-
-						if (!skipSwitch)
-							skipSwitch = (entity.AudioCapture.AvailableSampleCount > source.FrameSize);
-					}
-				}
-
-				if (!skipSwitch)
-					Thread.Sleep (1);
 			}
 		}
 	}

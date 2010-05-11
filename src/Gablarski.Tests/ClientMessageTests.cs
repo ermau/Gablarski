@@ -170,11 +170,9 @@ namespace Gablarski.Tests
 			const string name = "Voice";
 			const int bitrate = 64000;
 			const short frameSize = 512;
-			const byte channels = 1;
-			const int frequency = 44100;
 			const byte complexity = 10;
 
-			var msg = new RequestSourceMessage (name, new AudioCodecArgs (AudioFormat.Mono16Bit, bitrate, frequency, frameSize, complexity));
+			var msg = new RequestSourceMessage (name, new AudioCodecArgs (AudioFormat.Mono16bitLPCM, bitrate, frameSize, complexity));
 			Assert.AreEqual (name, msg.Name);
 			msg.WritePayload (writer);
 			long length = stream.Position;
@@ -243,7 +241,7 @@ namespace Gablarski.Tests
 		{
 			Assert.Throws<ArgumentNullException> (() => new RequestMuteSourceMessage (null, true));
 
-			var msg = new RequestMuteSourceMessage (new AudioSource ("Name", 5, 2, AudioFormat.Mono16Bit, 64000, 44100, 512, 10, false), false);
+			var msg = new RequestMuteSourceMessage (new AudioSource ("Name", 5, 2, AudioFormat.Mono16bitLPCM, 64000, 512, 10, false), false);
 			msg.WritePayload (writer);
 			long length = stream.Position;
 			stream.Position = 0;

@@ -66,6 +66,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ChannelProvider.cs" />
     <Compile Include="Config\LocalServerConfiguration.cs" />
     <Compile Include="Entities\LocalUser.cs" />
     <Compile Include="Mappings\ChannelMap.cs" />

@@ -113,7 +113,7 @@ namespace Gablarski.Server
 			if (String.IsNullOrEmpty (request.Name) 
 				|| AudioCodecArgs.IsInvalidBitrate (request.AudioSettings.Bitrate)
 				|| AudioCodecArgs.IsInvalidComplexity (request.AudioSettings.Complexity)
-				|| AudioCodecArgs.IsInvalidFrequency (request.AudioSettings.Frequency)
+				|| AudioCodecArgs.IsInvalidFrequency (request.AudioSettings.SampleRate)
 				|| AudioCodecArgs.IsInvalidFrameSize (request.AudioSettings.FrameSize))
 			{
 				result = SourceResult.FailedInvalidArguments;

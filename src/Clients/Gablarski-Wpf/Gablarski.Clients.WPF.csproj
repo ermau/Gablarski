@@ -36,6 +36,15 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FluentNHibernate">
+      <HintPath>..\..\..\lib\FluentNHibernate.dll</HintPath>
+    </Reference>
+    <Reference Include="NHibernate">
+      <HintPath>..\..\..\lib\NHibernate.dll</HintPath>
+    </Reference>
+    <Reference Include="NHibernate.Linq">
+      <HintPath>..\..\..\lib\NHibernate.Linq.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -51,13 +60,30 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="LoginWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Compile Include="..\WinForms\Entities\IgnoreEntry.cs">
+      <Link>Entities\IgnoreEntry.cs</Link>
+    </Compile>
+    <Compile Include="..\WinForms\Entities\ServerEntry.cs">
+      <Link>Entities\ServerEntry.cs</Link>
+    </Compile>
+    <Compile Include="..\WinForms\Entities\SettingEntry.cs">
+      <Link>Entities\SettingEntry.cs</Link>
+    </Compile>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LoginViewModel.cs" />
+    <Compile Include="LoginWindow.xaml.cs">
+      <DependentUpon>LoginWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -65,6 +91,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Mappings\ServerMapping.cs" />
+    <Compile Include="PersistedServerCollection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -98,14 +126,13 @@
       <Name>Gablarski</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /Y "$(SolutionDir)..\..\Gablarski\Audio\CELT\libcelt.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)..\..\Gablarski\Audio\CELT\libcelt.license.txt" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)..\..\Gablarski\Audio\Speex\libspeexdsp.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)..\..\Gablarski\Audio\Speex\libspeexdsp.license.txt" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)..\..\Gablarski.OpenAL\OpenAL32.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)..\..\Gablarski.OpenAL\OpenALSoft.License.txt" "$(TargetDir)"
+    <PostBuildEvent>xcopy /Y "$(SolutionDir)..\lib\libcelt.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)..\lib\libcelt.license.txt" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)lib\OpenAL32.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)lib\OpenALSoft.License.txt" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)..\..\Gablarski.OpenAL\bin\$(ConfigurationName)\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)..\..\Gablarski.OpenAL\bin\$(ConfigurationName)\*.pdb" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)..\..\fluent-nhibernate\tools\NHibernate\*.dll" "$(TargetDir)"

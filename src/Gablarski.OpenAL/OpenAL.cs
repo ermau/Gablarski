@@ -216,24 +216,20 @@ namespace Gablarski.OpenAL
 		#region OpenALAudioFormat Extensions
 		public static OpenALAudioFormat ToOpenALFormat (this AudioFormat format)
 		{
-			OpenALAudioFormat oalFormat = OpenALAudioFormat.Mono16Bit;
-			switch (format)
+			OpenALAudioFormat oalFormat = OpenALAudioFormat.Unknown;
+			if (format.Channels == 1)
 			{
-				case Audio.AudioFormat.Mono16Bit:
-					oalFormat = OpenALAudioFormat.Mono16Bit;
-					break;
-
-				case Audio.AudioFormat.Mono8Bit:
+				if (format.BitsPerSample == 8)
 					oalFormat = OpenALAudioFormat.Mono8Bit;
-					break;
-
-				case Audio.AudioFormat.Stereo16Bit:
-					oalFormat = OpenALAudioFormat.Stereo16Bit;
-					break;
-
-				case Audio.AudioFormat.Stereo8Bit:
+				else if (format.BitsPerSample == 16)
+					oalFormat = OpenALAudioFormat.Mono16Bit;
+			}
+			else if (format.Channels == 2)
+			{
+				if (format.BitsPerSample == 8)
 					oalFormat = OpenALAudioFormat.Stereo8Bit;
-					break;
+				else if (format.BitsPerSample == 16)
+					oalFormat = OpenALAudioFormat.Stereo16Bit;
 			}
 
 			return oalFormat;
@@ -506,6 +502,7 @@ namespace Gablarski.OpenAL
 
 	public enum OpenALAudioFormat
 	{
+		Unknown = 0,
 		Mono8Bit = 0x1100,
 		Mono16Bit = 0x1101,
 		Stereo8Bit = 0x1102,

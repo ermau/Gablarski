@@ -84,10 +84,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\log4net.dll</HintPath>
     </Reference>
-    <Reference Include="NAudio, Version=1.3.8.0, Culture=neutral, PublicKeyToken=null">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\NAudio.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -100,6 +96,7 @@
     <Compile Include="Audio\AudioCodec.cs" />
     <Compile Include="Audio\AudioCodecArgs.cs" />
     <Compile Include="Audio\AudioExtensions.cs" />
+    <Compile Include="Audio\AudioFormat.cs" />
     <Compile Include="Audio\AudioPlaybackEntity.cs" />
     <Compile Include="Audio\CELT\Celt.cs" />
     <Compile Include="Audio\CELT\CeltDecoder.cs" />

@@ -35,15 +35,14 @@
 // DAMAGE.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Gablarski.Audio.Speex;
-using Gablarski.Client;
 using Gablarski.Messages;
 
 namespace Gablarski.Audio
 {
 	internal class AudioCaptureEntity
+		: IDisposable
 	{
 		public AudioCaptureEntity (IAudioCaptureProvider audioCapture, AudioSource source, AudioEngineCaptureOptions options)
 		{
@@ -51,7 +50,7 @@ namespace Gablarski.Audio
 			this.source = source;
 			this.options = options;
 
-			this.frameLength = (this.source.FrameSize / source.Frequency) * 1000;
+			this.frameLength = (this.source.FrameSize / source.SampleRate) * 1000;
 
 			if (options.Mode == AudioEngineCaptureMode.Activated)
 			{
@@ -105,6 +104,7 @@ namespace Gablarski.Audio
 			set;
 		}
 
+		private bool isDisposed;
 		private readonly VoiceActivation activation;
 		private readonly int frameLength;
 		private readonly SpeexPreprocessor preprocessor;
@@ -122,6 +122,19 @@ namespace Gablarski.Audio
 		{
 			get;
 			set;
+		}
+
+		public void Dispose()
+		{
+			if (this.isDisposed)
+				return;
+
+			if (this.preprocessor != null)
+				preprocessor.Dispose();
+			if (audioCapture != null)
+				audioCapture.Dispose();
+
+			this.isDisposed = true;
 		}
 	}
 }

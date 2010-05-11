@@ -40,18 +40,11 @@ using System.Linq;
 
 namespace Gablarski.Audio
 {
-	public enum AudioFormat
-		: byte
-	{
-		Mono8Bit = 1,
-		Mono16Bit = 0,
-		Stereo8Bit = 2,
-		Stereo16Bit = 3
-	}
-
 	public interface IAudioCaptureProvider
 		: IAudioDeviceProvider
 	{
+		event EventHandler<SamplesAvailableEventArgs> SamplesAvailable;
+
 		/// <summary>
 		/// Gets or sets the device to capture from.
 		/// </summary>
@@ -62,33 +55,70 @@ namespace Gablarski.Audio
 		/// </summary>
 		bool IsCapturing { get; }
 
-		IEnumerable<AudioFormat> SupportedFormats { get; }
-
 		/// <summary>
-		/// Number of samples available to be read.
+		/// Gets an enumeration of supported formats.
 		/// </summary>
-		int AvailableSampleCount { get; }
+		IEnumerable<AudioFormat> SupportedFormats { get; }
 
 		/// <summary>
 		/// Begins a capture.
 		/// </summary>
+		/// <param name="format">The format to capture in.</param>
+		/// <param name="frameSize">The size of frames.</param>
 		/// <exception cref="InvalidOperationException">If <see cref="Device"/> is null.</exception>
-		void BeginCapture (int frequency, AudioFormat format);
+		/// <exception cref="NotSupportedException"><paramref name="format"/> is an unsupported format.</exception>
+		/// <remarks>
+		/// <paramref name="frameSize"/> may affect how often <see cref="SamplesAvailable"/> is raised.
+		/// </remarks>
+		void BeginCapture (AudioFormat format, int frameSize);
+
+		/// <summary>
+		/// Reads <paramref name="count"/> samples, waits if neccessary.
+		/// </summary>
+		/// <param name="count">The number of samples to read.</param>
+		/// <returns>A byte array of the samples.</returns>
+		byte[] ReadSamples (int count);
 
 		/// <summary>
 		/// Ends a capture.
 		/// </summary>
 		/// <exception cref="InvalidOperationException">If <see cref="Device"/> is null.</exception>
 		void EndCapture ();
+	}
+
+	/// <summary>
+	/// Provides data for a samples available event.
+	/// </summary>
+	public class SamplesAvailableEventArgs
+		: EventArgs
+	{
+		/// <summary>
+		/// Constructs a new <see cref="SamplesAvailableEventArgs"/>
+		/// </summary>
+		/// <param name="provider">The provider samples are available from.</param>
+		/// <param name="available">The number of available samples.</param>
+		public SamplesAvailableEventArgs (IAudioCaptureProvider provider, int available)
+		{
+			if (provider == null)
+				throw new ArgumentNullException ("provider");
+
+			Provider = provider;
+			Available = available;
+		}
+
+		public IAudioCaptureProvider Provider
+		{
+			get;
+			private set;
+		}
 
 		/// <summary>
-		/// Reads all available samples from the provider.
+		/// Gets the number of available samples.
 		/// </summary>
-		/// <returns>The samples</returns>
-		/// <exception cref="InvalidOperationException">If <see cref="Device"/> is null.</exception>
-		byte[] ReadSamples ();
-
-		/// <exception cref="InvalidOperationException">If <see cref="Device"/> is null.</exception>
-		byte[] ReadSamples (int samples);
+		public int Available
+		{
+			get;
+			private set;
+		}
 	}
 }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -37,7 +37,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Runtime.InteropServices;
 
 namespace Gablarski.CELT
@@ -108,12 +107,12 @@ namespace Gablarski.CELT
 		}
 
 		/// <summary>
-		/// Encodes PCM to the specified bitrate.
+		/// Encodes LPCM to the specified bitrate.
 		/// </summary>
-		/// <param name="pcm">PCM data.</param>
+		/// <param name="pcm">LPCM data.</param>
 		/// <param name="bitrate">Target bitrate.</param>
 		/// <param name="length">The actual compressed length.</param>
-		/// <returns>CELT encoded audio of the supplied PCM.</returns>
+		/// <returns>CELT encoded audio of the supplied LPCM.</returns>
 		public unsafe byte[] Encode (byte[] pcm, int bitrate, out int length)
 		{
 			ThrowIfDisposed ();

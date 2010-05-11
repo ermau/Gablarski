@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Gablarski.Audio;
 
 namespace Gablarski.Tests.Mocks.Audio
@@ -41,10 +40,8 @@ namespace Gablarski.Tests.Mocks.Audio
 			{
 				return new[]
 				{
-					AudioFormat.Mono8Bit,
-					AudioFormat.Mono16Bit,
-					AudioFormat.Stereo8Bit,
-					AudioFormat.Stereo16Bit,
+					AudioFormat.Mono16bitLPCM,
+					AudioFormat.Stereo16bitLPCM
 				};
 			}
 		}
@@ -70,6 +67,8 @@ namespace Gablarski.Tests.Mocks.Audio
 
 		#region Implementation of IAudioCaptureProvider
 
+		public event EventHandler<SamplesAvailableEventArgs> SamplesAvailable;
+
 		public IAudioDevice Device
 		{
 			get; set;
@@ -77,7 +76,7 @@ namespace Gablarski.Tests.Mocks.Audio
 
 		public bool IsCapturing { get; private set; }
 
-		public void BeginCapture (int frequency, AudioFormat format)
+		public void BeginCapture (AudioFormat format, int frameSize)
 		{
 			this.IsCapturing = true;
 		}
@@ -85,11 +84,6 @@ namespace Gablarski.Tests.Mocks.Audio
 		public void EndCapture()
 		{
 			this.IsCapturing = false;
-		}
-
-		public byte[] ReadSamples()
-		{
-			return new byte[this.frameSize];
 		}
 
 		public byte[] ReadSamples(int samples)

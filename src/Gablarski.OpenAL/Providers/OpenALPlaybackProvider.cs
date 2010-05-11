@@ -76,6 +76,9 @@ namespace Gablarski.OpenAL.Providers
 		{
 			if (this.device == null)
 				throw new InvalidOperationException ("Device is not set");
+
+			OpenALRunner.AddUser();
+			OpenALRunner.AddPlaybackProvider (this);
 		}
 
 		private bool isOpen;
@@ -113,9 +116,9 @@ namespace Gablarski.OpenAL.Providers
 				RequireBuffers (bufferStack, source, bufferLen);
 				for (int i = 0; i < bufferLen; ++i)
 				{
-					OpenALAudioFormat format = audioSource.Format.ToOpenALFormat();
+					OpenALAudioFormat format = audioSource.ToOpenALFormat();
 					SourceBuffer wait = bufferStack.Pop();
-					wait.Buffer (new byte[format.GetBytesPerSample()], format, (uint)audioSource.Frequency);
+					wait.Buffer (new byte[format.GetBytesPerSample()], format, (uint)audioSource.SampleRate);
 					source.QueueAndPlay (wait);
 				}
 			}
@@ -123,7 +126,7 @@ namespace Gablarski.OpenAL.Providers
 			RequireBuffers (bufferStack, source, 1);
 			SourceBuffer buffer = bufferStack.Pop ();
 
-			buffer.Buffer (data, audioSource.Format.ToOpenALFormat(), (uint)audioSource.Frequency);
+			buffer.Buffer (data, audioSource.ToOpenALFormat(), (uint)audioSource.SampleRate);
 			source.QueueAndPlay (buffer);
 		}
 
@@ -164,19 +167,39 @@ namespace Gablarski.OpenAL.Providers
 
 		#region IDisposable Members
 
-		public void Dispose ()
+		public void Dispose()
 		{
+			GC.SuppressFinalize (this);
+			Dispose (true);
+		}
+
+		~OpenALPlaybackProvider()
+		{
+			Dispose (false);
+		}
+
+		protected void Dispose (bool disposing)
+		{
+			if (this.isDisposed)
+				return;
+
 			OpenAL.Debug ("Freeing OpenALPlaybackProvider");
 
-			if (this.device != null)
+			if (disposing)
 			{
-				this.device.Dispose ();
-				this.device = null;
+				if (this.device != null)
+					this.device.Dispose ();
 			}
+
+			this.device = null;
+			OpenALRunner.RemoveUser();
+			OpenALRunner.RemovePlaybackProvider (this);
+			this.isDisposed = true;
 		}
 
 		#endregion
 
+		private bool isDisposed;
 		private PlaybackDevice device;
 		private readonly SourcePool<AudioSource> pool = new SourcePool<AudioSource>();
 		private readonly object bufferLock = new object ();

@@ -169,28 +169,26 @@ namespace Gablarski.Client
 		#endregion
 
 		/// <summary>
-		/// Requests a channel with <paramref name="channels"/> and a default bitrate.
+		/// Requests a source.
 		/// </summary>
-		/// <param name="channels">The number of channels to request. 1-2 is the valid range.</param>
 		/// <param name="name">The user-local name of the source, used to identify the source later.</param>
 		public void Request (string name, AudioFormat format, short frameSize)
 		{
-			Request (name, format, 44100, frameSize, 0);
+			Request (name, format, frameSize, 0);
 		}
 
 		/// <summary>
-		/// Requests a channel with <paramref name="channels"/> and a <paramref name="targetBitrate"/>
+		/// Requests a source.
 		/// </summary>
-		/// <param name="channels">The number of channels to request. 1-2 is the valid range.</param>
 		/// <param name="targetBitrate">The target bitrate to request.</param>
 		/// <param name="name">The user-local name of the source, used to identify the source later.</param>
 		/// <remarks>
 		/// The server may not agree with the bitrate you request, do not set up audio based on this
 		/// target, but on the bitrate of the source you actually receive.
 		/// </remarks>
-		public void Request (string name, AudioFormat format, int frequency, short frameSize, int targetBitrate)
+		public void Request (string name, AudioFormat format, short frameSize, int targetBitrate)
 		{
-			this.context.Connection.Send (new RequestSourceMessage (name, new AudioCodecArgs (format, targetBitrate, frequency, frameSize, 10)));
+			this.context.Connection.Send (new RequestSourceMessage (name, new AudioCodecArgs (format, targetBitrate, frameSize, 10)));
 		}
 
 		/// <summary>
@@ -303,7 +301,7 @@ namespace Gablarski.Client
 				if (!sources.TryGetValue (updatedSource.Id, out source))
 					sources[updatedSource.Id] = updatedSource;
 				else
-					CopySource (source, updatedSource);
+					updatedSource.CopyTo (source);
 			}
 		}
 
@@ -471,20 +469,6 @@ namespace Gablarski.Client
 		}
 
 		#endregion
-
-		private static void CopySource (AudioSource target, AudioSource updatedSource)
-		{
-			target.Name = updatedSource.Name;
-			target.Id = updatedSource.Id;
-			target.OwnerId = updatedSource.OwnerId;
-			target.IsMuted = updatedSource.IsMuted;
-
-			target.Bitrate = updatedSource.Bitrate;
-			target.Format = updatedSource.Format;
-			target.Frequency = updatedSource.Frequency;
-			target.FrameSize = updatedSource.FrameSize;
-			target.Complexity = updatedSource.Complexity;
-		}
 	}
 
 	#region Event Args

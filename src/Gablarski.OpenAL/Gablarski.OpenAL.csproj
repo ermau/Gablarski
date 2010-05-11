@@ -100,6 +100,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\OpenALCaptureProvider.cs" />
     <Compile Include="Providers\OpenALPlaybackProvider.cs" />
+    <Compile Include="Providers\OpenALRunner.cs" />
     <Compile Include="Source.cs" />
     <Compile Include="SourceBuffer.cs" />
     <Compile Include="SourcePool.cs" />

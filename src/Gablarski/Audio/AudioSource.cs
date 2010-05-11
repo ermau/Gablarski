@@ -57,24 +57,32 @@ namespace Gablarski.Audio
 		{
 		}
 
-		internal AudioSource (string name, int sourceId, int ownerId, AudioFormat format, int bitrate, int frequency, short frameSize, byte complexity)
-			: this(name, sourceId, ownerId, format, bitrate, frequency, frameSize, complexity, false)
+		internal AudioSource (string name, int sourceId, int ownerId, AudioFormat format, int bitrate, short frameSize, byte complexity)
+			: this(name, sourceId, ownerId, format, bitrate, frameSize, complexity, false)
 		{
 		}
 
-		internal AudioSource (string name, int sourceId, int ownerId, AudioFormat format, int bitrate, int frequency, short frameSize, byte complexity, bool isMuted)
-			: this (name, sourceId, ownerId, isMuted, new AudioCodecArgs (format, bitrate, frequency, frameSize, complexity))
+		internal AudioSource (string name, int sourceId, int ownerId, AudioFormat format, int bitrate, short frameSize, byte complexity, bool isMuted)
+			: this (name, sourceId, ownerId, isMuted, new AudioCodecArgs (format, bitrate, frameSize, complexity))
 		{
 		}
 
-		internal AudioSource (string name, int sourceId, int ownerId, bool isMuted, AudioCodecArgs args)
+		/// <summary>
+		/// Constructs a new audio source.
+		/// </summary>
+		/// <param name="name"></param>
+		/// <param name="sourceId">If sourceId &lt; 0, the audio source is local.</param>
+		/// <param name="ownerId"></param>
+		/// <param name="isMuted"></param>
+		/// <param name="args"></param>
+		public AudioSource (string name, int sourceId, int ownerId, bool isMuted, AudioCodecArgs args)
 			: base (args)
 		{
 			if (name == null)
 				throw new ArgumentNullException ("name");
 			if (ownerId == 0)
 				throw new ArgumentException ("ownerId");			
-			if (sourceId <= 0)
+			if (sourceId == 0)
 				throw new ArgumentOutOfRangeException ("sourceId");
 
 			this.Name = name;
@@ -170,6 +178,22 @@ namespace Gablarski.Audio
 					return (base.GetHashCode() * 397) ^ this.Id;
 				}
 			}
+		}
+
+		internal void CopyTo (AudioSource targetSource)
+		{
+			targetSource.Name = this.Name;
+			targetSource.Id = this.Id;
+			targetSource.OwnerId = this.OwnerId;
+			targetSource.IsMuted = this.IsMuted;
+
+			targetSource.WaveEncoding = WaveEncoding;
+			targetSource.BitsPerSample = BitsPerSample;
+			targetSource.Channels = Channels;
+			targetSource.Bitrate = Bitrate;
+			targetSource.SampleRate = SampleRate;
+			targetSource.FrameSize = FrameSize;
+			targetSource.Complexity = Complexity;
 		}
 
 		public static bool operator == (AudioSource left, AudioSource right)

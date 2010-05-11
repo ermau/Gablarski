@@ -44,9 +44,11 @@ namespace Gablarski.Audio
 		{
 			if (source == null)
 				throw new ArgumentNullException ("source");
+			if (source.Channels != 1 || source.WaveEncoding != WaveFormatEncoding.LPCM)
+				throw new ArgumentException ("Can not perform voice activation on a non-mono or non-LPCM source.");
 
 			this.source = source;
-			this.length = (double) this.source.FrameSize / source.Frequency;
+			this.length = (double) this.source.FrameSize / source.SampleRate;
 
 			this.startVol = startVolume;
 			this.contVol = continueVolume;
@@ -56,9 +58,9 @@ namespace Gablarski.Audio
 		public bool IsTalking (byte[] samples)
 		{
 			int avg;
-			switch (this.source.Format)
+			switch (this.source.BitsPerSample)
 			{
-				case AudioFormat.Mono16Bit:
+				case 16:
 				{
 					int total = 0;
 					for (int i = 0; i < samples.Length; i += 2)
@@ -78,7 +80,7 @@ namespace Gablarski.Audio
 					break;
 				}
 					
-				case AudioFormat.Mono8Bit:
+				case 8:
 				{
 					int total = 0;
 					for (int i = 0; i < samples.Length; ++i)
@@ -89,7 +91,7 @@ namespace Gablarski.Audio
 				}
 					
 				default:
-					throw new NotSupportedException ("Format " + this.source.Format + " is unsupported for VoiceActivation");
+					throw new NotSupportedException ("BitsPerSample " + this.source.BitsPerSample + " is unsupported for VoiceActivation");
 			}
 
 			time += length;

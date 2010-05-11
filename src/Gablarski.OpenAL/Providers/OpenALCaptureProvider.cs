@@ -38,7 +38,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Text;
 using Gablarski.Audio;
 
 namespace Gablarski.OpenAL.Providers
@@ -47,16 +46,17 @@ namespace Gablarski.OpenAL.Providers
 	public class OpenALCaptureProvider
 		: IAudioCaptureProvider
 	{
+		public OpenALCaptureProvider()
+		{
+			OpenALRunner.AddUser();
+		}
+
 		#region IAudioCaptureProvider Members
+		public event EventHandler<SamplesAvailableEventArgs> SamplesAvailable;
+
 		public int AvailableSampleCount
 		{
-			get
-			{
-				if (!this.device.IsOpen)
-					return 0;
-
-				return this.device.AvailableSamples;
-			}
+			get { return (!this.device.IsOpen) ? 0 : this.device.AvailableSamples; }
 		}
 
 		public IEnumerable<AudioFormat> SupportedFormats
@@ -65,10 +65,10 @@ namespace Gablarski.OpenAL.Providers
 			{
 				return new[]
 				{
-					AudioFormat.Mono8Bit,
-					AudioFormat.Mono16Bit,
-					AudioFormat.Stereo8Bit,
-					AudioFormat.Stereo16Bit,
+					new AudioFormat (WaveFormatEncoding.LPCM, 1, 8, 44100),
+					new AudioFormat (WaveFormatEncoding.LPCM, 1, 16, 44100), 
+					new AudioFormat (WaveFormatEncoding.LPCM, 2, 8, 44100), 
+					new AudioFormat (WaveFormatEncoding.LPCM, 2, 16, 44100),
 				};
 			}
 		}
@@ -81,7 +81,7 @@ namespace Gablarski.OpenAL.Providers
 				var cdevice = (value as CaptureDevice);
 
 				if (cdevice == null)
-					throw new ArgumentException ("Device must be a OpenAL.CaptureDevice", "value");
+					throw new ArgumentException ("Device must be a non-null OpenAL.CaptureDevice", "value");
 
 				this.device = cdevice;
 			}
@@ -94,26 +94,43 @@ namespace Gablarski.OpenAL.Providers
 		}
 
 		private bool isOpened;
-		public void BeginCapture (int frequency, AudioFormat format)
+		public void BeginCapture (AudioFormat format, int captureFrameSize)
 		{
-			CheckDevice();
+			CheckState();
 
 			if (!this.isOpened)
 			{
-				this.device.Open ((uint)frequency, format.ToOpenALFormat());
+				this.device.Open ((uint)format.SampleRate, format.ToOpenALFormat());
 				this.isOpened = true;
 			}
 
 			if (!this.device.IsOpen)
 				return;
 
+			this.frameSize = captureFrameSize;
+			OpenALRunner.AddCaptureProvider (this);
 			this.IsCapturing = true;
 			this.device.StartCapture();
 		}
 
+		private void OnSamplesAvailable (int samplesAvailable)
+		{
+			var available = this.SamplesAvailable;
+			if (available != null)
+				available (this, new SamplesAvailableEventArgs (this, samplesAvailable));
+		}
+
+		public byte[] ReadSamples (int samples)
+		{
+			CheckState();
+
+			return this.device.GetSamples (samples);
+		}
+
 		public void EndCapture ()
 		{
-			CheckDevice();
+			CheckState();
+			OpenALRunner.RemoveUser();
 
 			if (!this.isOpened)
 				return;
@@ -123,20 +140,7 @@ namespace Gablarski.OpenAL.Providers
 
 			this.IsCapturing = false;
 			this.device.StopCapture();
-		}
-
-		public byte[] ReadSamples ()
-		{
-			CheckDevice();
-
-			return this.device.GetSamples();
-		}
-
-		public byte[] ReadSamples (int samples)
-		{
-			CheckDevice();
-
-			return this.device.GetSamples (samples);
+			OpenALRunner.RemoveCaptureProvider (this);
 		}
 
 		#endregion
@@ -164,16 +168,53 @@ namespace Gablarski.OpenAL.Providers
 
 		public void Dispose ()
 		{
-			if (this.device != null)
-				this.device.Dispose ();
+			GC.SuppressFinalize (this);
+			Dispose (true);
 		}
 
 		#endregion
 
 		private CaptureDevice device;
+		private bool disposed;
+		private int frameSize;
 
-		private void CheckDevice()
+		protected void Dispose (bool disposing)
 		{
+			if (this.disposed)
+				return;
+
+			if (IsCapturing)
+				EndCapture();
+
+			if (disposing)
+			{
+				if (this.device != null)
+					this.device.Dispose();
+			}
+
+			this.device = null;
+
+			OpenALRunner.RemoveUser();
+
+			this.disposed = true;
+		}
+
+		~OpenALCaptureProvider()
+		{
+			Dispose (false);
+		}
+
+		internal void Tick()
+		{
+			int samples = this.device.AvailableSamples;
+			if (samples < this.frameSize)
+				OnSamplesAvailable (samples);
+		}
+
+		private void CheckState()
+		{
+			if (this.disposed)
+				throw new ObjectDisposedException ("OpenALCaptureProvider");
 			if (this.device == null)
 				throw new InvalidOperationException ("No device set.");
 		}

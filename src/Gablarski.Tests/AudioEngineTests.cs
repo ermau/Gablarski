@@ -57,7 +57,7 @@ namespace Gablarski.Tests
 		public void Setup()
 		{
 			this.provider = new MockAudioCaptureProvider();
-			this.source = new AudioSource ("mockSource", 1, 1, AudioFormat.Mono16Bit, 64000, 44100, 256, 10, false);
+			this.source = new AudioSource ("mockSource", 1, 1, AudioFormat.Mono16bitLPCM, 64000, 256, 10, false);
 
 			var client = new GablarskiClient (new MockClientConnection (new MockConnectionProvider().EstablishConnection()));
 			this.context = client;

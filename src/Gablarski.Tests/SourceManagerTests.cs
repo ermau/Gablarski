@@ -17,7 +17,7 @@ namespace Gablarski.Tests
 		[SetUp]
 		public void Setup()
 		{
-			source = new AudioSource ("SourceName", 2, 3, AudioFormat.Mono16Bit, 64000, 44100, 512, 10, true);
+			source = new AudioSource ("SourceName", 2, 3, AudioFormat.Mono16bitLPCM, 64000, 512, 10, true);
 			manager = new MockSourceManager();
 		}
 

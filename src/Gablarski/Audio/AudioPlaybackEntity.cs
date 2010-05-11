@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -35,14 +35,12 @@
 // DAMAGE.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Gablarski.Audio.Speex;
 
 namespace Gablarski.Audio
 {
 	internal class AudioPlaybackEntity
+		: IDisposable
 	{
 		public AudioPlaybackEntity (IAudioPlaybackProvider audioPlayback, AudioSource source, AudioEnginePlaybackOptions options)
 		{
@@ -80,5 +78,17 @@ namespace Gablarski.Audio
 		private readonly IAudioPlaybackProvider audioPlayback;
 		private readonly AudioSource source;
 		private readonly AudioEnginePlaybackOptions options;
+		private bool isDisposed;
+
+		public void Dispose()
+		{
+			if (this.isDisposed)
+				return;
+
+			if (audioPlayback != null)
+				audioPlayback.Dispose();
+
+			this.isDisposed = true;
+		}
 	}
 }

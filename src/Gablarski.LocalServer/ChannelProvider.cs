@@ -1,4 +1,4 @@
-// Copyright (c) 2010, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -35,89 +35,60 @@
 // DAMAGE.
 
 using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Linq;
-using Gablarski.CELT;
+using Gablarski.Server;
+using NHibernate;
 
-namespace Gablarski.Audio
+namespace Gablarski.LocalServer
 {
-	public class AudioCodec
-		: AudioCodecArgs
+	public class ChannelProvider
+		: IChannelProvider
 	{
-		private readonly object codecLock = new object();
-		private CeltEncoder encoder;
-		private CeltDecoder decoder;
-		private CeltMode mode;
+		public event EventHandler ChannelsUpdated;
 
-		public AudioCodec (AudioCodecArgs args)
-			: base (args)
+		public bool UpdateSupported
 		{
+			get { return true; }
 		}
 
-		public AudioCodec (AudioFormat format, int bitrate, short frameSize, byte complexity)
-			: base (format, bitrate, frameSize, complexity)
+		public ChannelInfo DefaultChannel
 		{
+			get { throw new NotImplementedException(); }
+			set { throw new NotImplementedException(); }
 		}
 
-		protected AudioCodec()
+		public IEnumerable<ChannelInfo> GetChannels()
 		{
+			throw new NotImplementedException();
 		}
 
-		internal AudioCodec (IValueReader reader)
-			: base (reader)
+		public ChannelEditResult SaveChannel (ChannelInfo channel)
 		{
-		}
-
-		public byte[] Encode (byte[] data)
-		{
-#if DEBUG
-			if (data == null)
-				throw new ArgumentNullException("data");
-#endif
-
-			if (this.encoder == null)
+			using (ISession session = Persistance.SessionFactory.OpenSession())
+			using (ITransaction transaction = session.BeginTransaction(IsolationLevel.Serializable))
 			{
-				lock (this.codecLock)
-				{
-					if (this.mode == null)
-						this.mode = CeltMode.Create (SampleRate, Channels, FrameSize);
+				//session.SaveOrUpdateCopy (channel);
 
-					if (this.encoder == null)
-						this.encoder = CeltEncoder.Create (this.mode);
-				}
+				transaction.Commit();
+				return ChannelEditResult.Success;
 			}
-
-			int len;
-			byte[] encoded = this.encoder.Encode (data, this.Bitrate, out len);
-			if (encoded.Length != len)
-			{
-				byte[] final = new byte[len];
-				Array.Copy (encoded, final, len);
-				encoded = final;
-			}
-
-			return encoded;
 		}
 
-		public byte[] Decode (byte[] data)
+		public ChannelEditResult DeleteChannel (ChannelInfo channel)
 		{
-#if DEBUG
-			if (data == null)
-				throw new ArgumentNullException("data");
-#endif
-			
-			if (this.decoder == null)
+			using (ISession session = Persistance.SessionFactory.OpenSession())
+			using (ITransaction transaction = session.BeginTransaction (IsolationLevel.Serializable))
 			{
-				lock (this.codecLock)
-				{
-					if (this.mode == null)
-						this.mode = CeltMode.Create (SampleRate, Channels, FrameSize);
+				var real = session.Load<ChannelInfo> (channel.ChannelId);
+				if (real == null)
+					return ChannelEditResult.FailedChannelDoesntExist;
 
-					if (this.decoder == null)
-						this.decoder = CeltDecoder.Create (this.mode);
-				}
+				session.Delete (channel);
+				transaction.Commit();
+				return ChannelEditResult.Success;
 			}
-
-			return this.decoder.Decode (data);
 		}
 	}
 }
