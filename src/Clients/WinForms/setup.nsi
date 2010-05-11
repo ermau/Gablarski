@@ -93,8 +93,8 @@ Section -Main SEC0000
     File ..\..\Gablarski.iTunes\bin\{config}\Gablarski.iTunes.dll
     File ..\..\Gablarski.iTunes\bin\{config}\Gablarski.iTunes.pdb
     File ..\..\..\lib\Interop.iTunesLib.dll
-    File ..\..\Gablarski.OpenAL\bin\{config}\Gablarski.OpenAL.dll
-    File ..\..\Gablarski.OpenAL\bin\{config}\Gablarski.OpenAL.pdb
+    File ..\..\Gablarski.OpenAL\bin\x86\{config}\Gablarski.OpenAL.dll
+    File ..\..\Gablarski.OpenAL\bin\x86\{config}\Gablarski.OpenAL.pdb
     File ..\..\Gablarski.SpeechNotifier\bin\{config}\Gablarski.SpeechNotifier.dll
     File ..\..\Gablarski.SpeechNotifier\bin\{config}\Gablarski.SpeechNotifier.pdb
     File ..\..\Gablarski.Winamp\bin\{config}\Gablarski.Winamp.dll
