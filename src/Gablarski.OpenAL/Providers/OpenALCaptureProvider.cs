@@ -207,7 +207,7 @@ namespace Gablarski.OpenAL.Providers
 		internal void Tick()
 		{
 			int samples = this.device.AvailableSamples;
-			if (samples < this.frameSize)
+			if (samples > this.frameSize)
 				OnSamplesAvailable (samples);
 		}
 
