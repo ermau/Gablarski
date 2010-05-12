@@ -24,13 +24,10 @@ namespace Gablarski.Clients.Windows
 			var builder = new SQLiteConnectionStringBuilder();
 			builder.DataSource = DbFile.FullName;
 
-			bool create = !DbFile.Exists;
-
 			db = new SQLiteConnection(builder.ToString());
 			db.Open();
 
-			if (create)
-				CreateDbs();
+			CreateDbs();
 		}
 
 		public static IEnumerable<SettingEntry> GetSettings()
@@ -132,15 +129,54 @@ namespace Gablarski.Clients.Windows
 			}
 		}
 
+		public static void SaveOrUpdate (VolumeEntry volumeEntry)
+		{
+			if (volumeEntry == null)
+				throw new ArgumentNullException ("volumeEntry");
+
+			using (var cmd = db.CreateCommand())
+			{
+				cmd.CommandText = (volumeEntry.VolumeId > 0)
+				                  	? "UPDATE volumes SET volumeServerId=?, volumeUsername=?, volumeGain=? WHERE volumeId=?"
+				                  	: "INSERT INTO volumes (volumeServerId,volumeUsername,volumeGain) VALUES (?,?,?)";
+
+				cmd.Parameters.Add (new SQLiteParameter ("serverId", volumeEntry.ServerId));
+				cmd.Parameters.Add (new SQLiteParameter ("username", volumeEntry.Username));
+				cmd.Parameters.Add (new SQLiteParameter ("gain", volumeEntry.Gain));
+
+				if (volumeEntry.VolumeId > 0)
+					cmd.Parameters.Add (new SQLiteParameter ("id", volumeEntry.VolumeId));
+
+				cmd.ExecuteNonQuery();
+			}
+		}
+
+		public static void Delete (VolumeEntry volumeEntry)
+		{
+			if (volumeEntry == null)
+				throw new ArgumentNullException ("volumeEntry");
+			if (volumeEntry.VolumeId < 1)
+				throw new ArgumentException ("Can't delete a non-existant server", "volumeEntry");
+
+			using (var cmd = db.CreateCommand ("DELETE FROM volumes WHERE (volumerId=?)"))
+			{
+				cmd.Parameters.Add (new SQLiteParameter ("id", volumeEntry.VolumeId));
+				cmd.ExecuteNonQuery();
+			}
+		}
+
 		private static readonly DbConnection db;
 		private static readonly FileInfo DbFile;
 
 		private static void CreateDbs()
 		{
-			using (var cmd = db.CreateCommand ("CREATE TABLE servers (serverId integer primary key autoincrement, serverName varchar(255), serverHost varchar(255), serverPort integer, serverPassword varchar(255), serverUserNickname varchar(255), serverUserPhonetic varchar(255), serverUserName varchar(255), serverUserPassword varchar(255))"))
+			using (var cmd = db.CreateCommand ("CREATE TABLE IF NOT EXISTS servers (serverId integer primary key autoincrement, serverName varchar(255), serverHost varchar(255), serverPort integer, serverPassword varchar(255), serverUserNickname varchar(255), serverUserPhonetic varchar(255), serverUserName varchar(255), serverUserPassword varchar(255))"))
 				cmd.ExecuteNonQuery();
 
-			using (var cmd = db.CreateCommand ("CREATE TABLE settings (settingId integer primary key autoincrement, settingName varchar(255), settingValue varchar(255))"))
+			using (var cmd = db.CreateCommand ("CREATE TABLE IF NOT EXISTS settings (settingId integer primary key autoincrement, settingName varchar(255), settingValue varchar(255))"))
+				cmd.ExecuteNonQuery();
+
+			using (var cmd = db.CreateCommand ("CREATE TABLE IF NOT EXISTS volumes (volumeId integer primary key autoincrement, volumeServerId integer, volumeUsername varchar(255), volumeGain float)"))
 				cmd.ExecuteNonQuery();
 		}
 	}
