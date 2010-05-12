@@ -52,7 +52,7 @@ namespace Gablarski.Audio
 
 			this.startVol = startVolume;
 			this.contVol = continueVolume;
-			this.threshold = threshold.TotalMilliseconds;
+			this.threshold = threshold.TotalSeconds;
 		}
 
 		public bool IsTalking (byte[] samples)
