@@ -149,6 +149,7 @@ namespace Gablarski.Audio
 				audioCapture.SamplesAvailable += OnSamplesAvailable;
 				audioCapture.BeginCapture (source, source.FrameSize);
 				captures[source] = new AudioCaptureEntity (audioCapture, source, options);
+				captureToSourceLookup[audioCapture] = source;
 
 				if (this.captureMuted || mutedCaptures.Contains (audioCapture))
 					captures[source].Muted = true;
@@ -243,6 +244,7 @@ namespace Gablarski.Audio
 			{
 				foreach (var entity in playbacks.Values.Where (e => e.AudioPlayback == provider).ToList())
 				{
+					entity.AudioPlayback.FreeSource (entity.Source);
 					playbacks.Remove (entity.Source);
 					removed = true;
 				}
@@ -265,6 +267,7 @@ namespace Gablarski.Audio
 				foreach (var entity in captures.Values.Where (e => e.AudioCapture == provider).ToList())
 				{
 					captures.Remove (entity.Source);
+					captureToSourceLookup.Remove (provider);
 					removed = true;
 				}
 
@@ -282,7 +285,15 @@ namespace Gablarski.Audio
 			bool removed;
 			lock (captures)
 			{
-				removed = captures.Remove (source);
+				AudioCaptureEntity entity;
+				if (captures.TryGetValue (source, out entity))
+				{
+					removed = true;
+					captures.Remove (source);
+					captureToSourceLookup.Remove (entity.AudioCapture);
+				}
+				else
+					removed = false;
 			}
 
 			if (!removed)
@@ -488,7 +499,7 @@ namespace Gablarski.Audio
 			{
 				AudioSource source;
 				AudioCaptureEntity entity;
-				if (!captureToSourceLookup.TryGetValue (e.Provider, out source) || captures.TryGetValue (source, out entity))
+				if (!captureToSourceLookup.TryGetValue (e.Provider, out source) || !captures.TryGetValue (source, out entity))
 					return;
 
 				bool muted = (entity.Muted || this.captureMuted);
