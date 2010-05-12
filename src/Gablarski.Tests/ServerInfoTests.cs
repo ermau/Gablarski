@@ -41,7 +41,7 @@ namespace Gablarski.Tests
 			Assert.AreEqual (desc, info.Description);
 			Assert.AreEqual (true, info.Passworded);
 			Assert.AreEqual (UserRegistrationMode.None, info.RegistrationMode);
-			//Assert.AreEqual (decryption.PublicParameters, info.PublicRSAParameters);
+			Assert.AreEqual (decryption.PublicParameters, info.PublicRSAParameters);
 			Assert.IsNull (info.RegistrationContent);
 		}
 
@@ -77,7 +77,7 @@ namespace Gablarski.Tests
 			Assert.AreEqual (desc, info.Description);
 			Assert.AreEqual (true, info.Passworded);
 			Assert.AreEqual (UserRegistrationMode.None, info.RegistrationMode);
-			//Assert.AreEqual (decryption.PublicParameters, info.PublicRSAParameters);
+			Assert.AreEqual (decryption.PublicParameters, info.PublicRSAParameters);
 			Assert.IsNull (info.RegistrationContent);
 		}
 	}

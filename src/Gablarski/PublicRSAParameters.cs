@@ -35,15 +35,61 @@
 // DAMAGE.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Gablarski
 {
-	public struct PublicRSAParameters
+	public class PublicRSAParameters
+		: IEquatable<PublicRSAParameters>
 	{
 		public byte[] Exponent;
 		public byte[] Modulus;
+		
+		public bool Equals (PublicRSAParameters other)
+		{
+			if (other == null)
+				return false;
+			
+			if ((Exponent == null && other.Exponent != null) || (Exponent != null && other.Exponent == null))
+				return false;
+			if ((Modulus == null && other.Modulus != null) || (Modulus != null && other.Modulus == null))
+				return false;
+
+			if (Exponent != null && other.Exponent != null)
+			{
+				if (Exponent.Length != other.Exponent.Length)
+					return false;
+
+				for (int i = 0; i < Exponent.Length; ++i)
+				{
+					if (Exponent[i] != other.Exponent[i])
+						return false;
+				}
+			}
+
+			if (Modulus != null && other.Modulus != null)
+			{
+				if (Modulus.Length != other.Modulus.Length)
+					return false;
+
+				for (int i = 0; i < Modulus.Length; ++i)
+				{
+					if (Modulus[i] != other.Modulus[i])
+						return false;
+				}
+			}
+
+			return true;
+		}
+
+		public override bool Equals (object obj)
+		{
+			if (ReferenceEquals (null, obj))
+				return false;
+			if (obj.GetType() != typeof (PublicRSAParameters))
+				return false;
+			return Equals ((PublicRSAParameters)obj);
+		}
 
 		internal void Serialize (IValueWriter writer)
 		{
