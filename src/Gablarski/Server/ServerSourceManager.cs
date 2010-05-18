@@ -42,7 +42,7 @@ using Gablarski.Audio;
 namespace Gablarski.Server
 {
 	public class ServerSourceManager
-		: SourceManager, IServerSourceManager
+		: AudioSourceManager, IServerSourceManager
 	{
 		private readonly IServerContext context;
 

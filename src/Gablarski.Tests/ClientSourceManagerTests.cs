@@ -66,13 +66,8 @@ namespace Gablarski.Tests
 
 		private void CreateSources()
 		{
-			manager.OnSourceListReceivedMessage (new MessageReceivedEventArgs (this.client, 
-			                                                                   new SourceListMessage (new []
-			                                                                   {
-																				   AudioSourceTests.GetTestSource (1, 0),
-																				   AudioSourceTests.GetTestSource (2, 1),
-			                                                                   })
-			                                     	));
+			manager.Add (AudioSourceTests.GetTestSource (1, 0));
+			manager.Add (AudioSourceTests.GetTestSource (2, 1));
 		}
 
 		private ClientSourceManager manager;
@@ -87,35 +82,7 @@ namespace Gablarski.Tests
 		}
 
 		[Test]
-		public void RequestDefaultBitrate()
-		{
-			this.manager.Request ("voice", AudioFormat.Mono16bitLPCM, 512);
-
-			var msg = this.server.DequeueAndAssertMessage<RequestSourceMessage>();
-			Assert.AreEqual ("voice", msg.Name);
-			Assert.AreEqual (AudioFormat.Mono16bitLPCM.BitsPerSample, msg.AudioSettings.BitsPerSample);
-			Assert.AreEqual (AudioFormat.Mono16bitLPCM.Channels, msg.AudioSettings.Channels);
-			Assert.AreEqual (AudioFormat.Mono16bitLPCM.SampleRate, msg.AudioSettings.SampleRate);
-			Assert.AreEqual (AudioFormat.Mono16bitLPCM.WaveEncoding, msg.AudioSettings.WaveEncoding);
-			Assert.AreEqual (0,	msg.AudioSettings.Bitrate);
-		}
-
-		[Test]
-		public void RequestFrequencyAndBitRate()
-		{
-			this.manager.Request ("voice", new AudioFormat (WaveFormatEncoding.LPCM, 1, 16, 48000), 512, 64000);
-
-			var msg = this.server.DequeueAndAssertMessage<RequestSourceMessage>();
-			Assert.AreEqual ("voice", msg.Name);
-			Assert.AreEqual (AudioFormat.Mono16bitLPCM.BitsPerSample, msg.AudioSettings.BitsPerSample);
-			Assert.AreEqual (AudioFormat.Mono16bitLPCM.Channels, msg.AudioSettings.Channels);
-			Assert.AreEqual (AudioFormat.Mono16bitLPCM.WaveEncoding, msg.AudioSettings.WaveEncoding);
-			Assert.AreEqual (48000, msg.AudioSettings.SampleRate);
-			Assert.AreEqual (64000, msg.AudioSettings.Bitrate);
-		}
-
-		[Test]
-		public void SourceListReceived()
+		public void Add()
 		{
 			CreateSources();
 

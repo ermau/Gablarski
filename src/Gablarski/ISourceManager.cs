@@ -57,15 +57,17 @@ namespace Gablarski
 		/// Removes the audio <paramref name="source"/>.
 		/// </summary>
 		/// <param name="source">The source to remove.</param>
+		/// <returns><c>true</c> if the source was found and removed, <c>false otherwise.</c></returns>
 		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
-		void Remove (AudioSource source);
+		bool Remove (AudioSource source);
 
 		/// <summary>
 		/// Removes all audio sources for <paramref name="user"/>.
 		/// </summary>
 		/// <param name="user">The user to remove all sources for.</param>
+		/// <returns><c>true</c> if any sources belonging to <paramref name="user"/> were found.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
-		void Remove (UserInfo user);
+		bool Remove (UserInfo user);
 
 		/// <summary>
 		/// Toggles mute for the <paramref name="source"/>.
@@ -74,5 +76,10 @@ namespace Gablarski
 		/// <returns><c>true</c> if <paramref name="source"/> was muted, <c>false</c> if not or not found.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
 		bool ToggleMute (AudioSource source);
+
+		/// <summary>
+		/// Clears the manager of all sources.
+		/// </summary>
+		void Clear();
 	}
 }

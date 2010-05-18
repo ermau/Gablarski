@@ -1,5 +1,5 @@
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski", "src\Gablarski\Gablarski.csproj", "{7347052B-DA5B-4CCA-AB28-3963766E3CDB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.Clients", "src\Gablarski.Clients\Gablarski.Clients.csproj", "{F8A695AA-8BC9-46D4-8B7A-BDBD7B74401F}"

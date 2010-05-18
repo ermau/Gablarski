@@ -75,7 +75,7 @@ namespace Gablarski.Server
 			get { return manager[key]; }
 		}
 
-		IEnumerable<AudioSource> IServerSourceHandler.this [UserInfo user]
+		public IEnumerable<AudioSource> this [UserInfo user]
 		{
 			get { return manager[user]; }
 		}

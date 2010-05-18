@@ -72,8 +72,9 @@ namespace Gablarski.Client
 
 		private ClientUserHandler users;
 		private string originalHost;
+		private ClientSourceHandler sourceHandler;
 
-		protected void Setup (ClientUserHandler userMananger, ClientChannelManager channelManager, ClientSourceManager sourceManager, CurrentUser currentUser, IAudioEngine audioEngine)
+		protected void Setup (ClientUserHandler userMananger, ClientChannelManager channelManager, ClientSourceHandler sourceHandler, CurrentUser currentUser, IAudioEngine audioEngine)
 		{
 			if (this.Handlers != null)
 				return;
@@ -82,7 +83,8 @@ namespace Gablarski.Client
 			this.CurrentUser = currentUser;
 			this.users = userMananger;
 			this.Channels = channelManager;
-			this.Sources = sourceManager;
+			this.Sources = sourceHandler;
+			this.sourceHandler = sourceHandler;
 
 			this.Handlers = new Dictionary<ServerMessageType, Action<MessageReceivedEventArgs>>
 			{
@@ -92,8 +94,8 @@ namespace Gablarski.Client
 				{ ServerMessageType.ServerInfoReceived, OnServerInfoReceivedMessage },
 				{ ServerMessageType.UserInfoList, this.users.OnUserListReceivedMessage },
 				{ ServerMessageType.UserUpdated, this.users.OnUserUpdatedMessage },
-				{ ServerMessageType.SourceList, this.Sources.OnSourceListReceivedMessage },
-				{ ServerMessageType.SourcesRemoved, this.Sources.OnSourcesRemovedMessage },
+				{ ServerMessageType.SourceList, sourceHandler.OnSourceListReceivedMessage },
+				{ ServerMessageType.SourcesRemoved, sourceHandler.OnSourcesRemovedMessage },
 				
 				{ ServerMessageType.ChannelList, this.Channels.OnChannelListReceivedMessage },
 				{ ServerMessageType.UserChangedChannel, this.users.OnUserChangedChannelMessage },
@@ -109,9 +111,9 @@ namespace Gablarski.Client
 				{ ServerMessageType.UserDisconnected, this.users.OnUserDisconnectedMessage },
 				{ ServerMessageType.Muted, OnMuted },
 				
-				{ ServerMessageType.SourceResult, this.Sources.OnSourceResultMessage },
-				{ ServerMessageType.AudioData, this.Sources.OnAudioDataReceivedMessage },
-				{ ServerMessageType.AudioSourceStateChange, this.Sources.OnAudioSourceStateChangedMessage },
+				{ ServerMessageType.SourceResult, sourceHandler.OnSourceResultMessage },
+				{ ServerMessageType.AudioData, sourceHandler.OnAudioDataReceivedMessage },
+				{ ServerMessageType.AudioSourceStateChange, sourceHandler.OnAudioSourceStateChangedMessage },
 			};
 		}
 
@@ -189,7 +191,7 @@ namespace Gablarski.Client
 			if (msg.Type == MuteType.User)
 				this.users.OnMutedMessage ((string)msg.Target, msg.Unmuted);
 			else if (msg.Type == MuteType.AudioSource)
-				this.Sources.OnMutedMessage ((int)msg.Target, msg.Unmuted);
+				this.sourceHandler.OnMutedMessage ((int)msg.Target, msg.Unmuted);
 		}
 
 		private void OnConnectionRejectedMessage (MessageReceivedEventArgs e)
@@ -261,7 +263,7 @@ namespace Gablarski.Client
 			
 			this.Users.Reset();
 			this.Channels.Clear();
-			this.Sources.Clear();
+			this.Sources.Reset();
 
 			this.Audio.Stop();
 

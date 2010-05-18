@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2010, Eric Maupin
+// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -41,39 +41,46 @@ using Gablarski.Audio;
 
 namespace Gablarski.Client
 {
-	/// <summary>
-	/// Contract for client-side AudioSource state managers.
-	/// </summary>
-	public interface IClientSourceManager
-		: ISourceManager
+	public interface IClientSourceHandler
+		: ISourceHandler<AudioSource>, IAudioReceiver, IAudioSender
 	{
 		/// <summary>
-		/// Adds <paramref name="source"/> to the manager.
+		/// A new  or updated source list has been received.
 		/// </summary>
-		/// <param name="source"></param>
-		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
-		void Add (AudioSource source);
+		event EventHandler<ReceivedListEventArgs<AudioSource>> ReceivedSourceList;
 
 		/// <summary>
-		/// Updates the manager with a new list of sources.
+		/// A new audio source has been received.
 		/// </summary>
-		/// <param name="sources">The new list of sources.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="sources"/> is <c>null</c>.</exception>
-		void Update (IEnumerable<AudioSource> sources);
+		event EventHandler<ReceivedAudioSourceEventArgs> ReceivedAudioSource;
 
 		/// <summary>
-		/// Updates the manager with new state for a source.
+		/// An audio source was removed.
 		/// </summary>
-		/// <param name="source">The source to update.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
-		void Update (AudioSource source);
+		event EventHandler<ReceivedListEventArgs<AudioSource>> AudioSourcesRemoved;
 
 		/// <summary>
-		/// Gets whether the source is ignored or not..
+		/// Get's the current user's audio sources.
+		/// </summary>
+		IEnumerable<AudioSource> Mine { get; }
+
+		/// <summary>
+		/// Requests a source.
+		/// </summary>
+		/// <param name="targetBitrate">The target bitrate to request.</param>
+		/// <param name="name">The user-local name of the source, used to identify the source later.</param>
+		/// <remarks>
+		/// The server may not agree with the bitrate you request, do not set up audio based on this
+		/// target, but on the bitrate of the source you actually receive.
+		/// </remarks>
+		void Request (string name, AudioFormat format, short frameSize, int targetBitrate);
+
+		/// <summary>
+		/// Gets whether or not the source is muted.
 		/// </summary>
 		/// <param name="source">The source to check.</param>
-		/// <returns><c>true</c> if the source is ignored.</returns>
-		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
+		/// <returns><c>true</c> if ignored, <c>false</c> if not.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c></exception>
 		bool GetIsIgnored (AudioSource source);
 
 		/// <summary>
@@ -83,5 +90,28 @@ namespace Gablarski.Client
 		/// <returns>The new state of ignore on <paramref name="source"/>.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
 		bool ToggleIgnore (AudioSource source);
+
+		/// <summary>
+		/// Toggles mute for the source.
+		/// </summary>
+		/// <param name="source">The source to mute.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
+		void ToggleMute (AudioSource source);
+
+		/// <summary>
+		/// Resets the handler back to the starting state.
+		/// </summary>
+		void Reset();
+	}
+
+	public static class ClientSourceHandlerExtensions
+	{
+		public static void Request (this IClientSourceHandler self, string name, AudioFormat format, short frameSize)
+		{
+			if (self == null)
+				throw new ArgumentNullException ("self");
+
+			self.Request (name, format, frameSize, 0);
+		}
 	}
 }

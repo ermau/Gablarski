@@ -42,10 +42,8 @@ using Gablarski.Audio;
 namespace Gablarski.Server
 {
 	public interface IServerSourceHandler
-		: IIndexedEnumerable<int, AudioSource>
+		: ISourceHandler<AudioSource>
 	{
-		IEnumerable<AudioSource> this[UserInfo user] { get; }
-
 		/// <summary>
 		/// Removes the audio source and notifies clients.
 		/// </summary>

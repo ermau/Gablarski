@@ -137,7 +137,7 @@ namespace Gablarski.Tests
 		public void StartWithoutReceiver()
 		{
 			var engine = new AudioEngine();
-			engine.AudioSender = new ClientSourceManager (context);
+			engine.AudioSender = sender;
 			engine.Context = context;
 			Assert.Throws<InvalidOperationException> (engine.Start);
 		}

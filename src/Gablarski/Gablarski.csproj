@@ -102,6 +102,7 @@
     <Compile Include="Audio\CELT\CeltDecoder.cs" />
     <Compile Include="Audio\CELT\CeltEncoder.cs" />
     <Compile Include="Audio\CELT\CeltMode.cs" />
+    <Compile Include="Client\ClientSourceHandler.cs" />
     <Compile Include="Audio\IAudioEngine.cs" />
     <Compile Include="Audio\IAudioReceiver.cs" />
     <Compile Include="Audio\Speex\SpeexPreprocessor.cs" />
@@ -112,6 +113,7 @@
     <Compile Include="ByteArrayValueReader.cs" />
     <Compile Include="Audio\AudioEngine.cs" />
     <Compile Include="Audio\IAudioSender.cs" />
+    <Compile Include="Client\IClientSourceHandler.cs" />
     <Compile Include="Client\IClientSourceManager.cs" />
     <Compile Include="Client\IClientUserHandler.cs" />
     <Compile Include="Encryption.cs" />
@@ -119,6 +121,7 @@
     <Compile Include="IEncryption.cs" />
     <Compile Include="IIndexedEnumerable.cs" />
     <Compile Include="Client\IClientUserManager.cs" />
+    <Compile Include="ISourceHandler.cs" />
     <Compile Include="ISourceManager.cs" />
     <Compile Include="IUser.cs" />
     <Compile Include="Messages\AudioSourceStateChangeMessage.cs" />

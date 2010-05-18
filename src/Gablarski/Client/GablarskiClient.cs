@@ -65,7 +65,7 @@ namespace Gablarski.Client
 			DebugLogging = Log.IsDebugEnabled;
 
 			this.Connection = connection;
-			Setup (new ClientUserHandler (this, new ClientUserManager()), new ClientChannelManager (this), new ClientSourceManager (this), new CurrentUser (this), audioEngine);
+			Setup (new ClientUserHandler (this, new ClientUserManager()), new ClientChannelManager (this), new ClientSourceHandler (this, new ClientSourceManager (this)), new CurrentUser (this), audioEngine);
 		}
 
 		#region Events
@@ -120,7 +120,7 @@ namespace Gablarski.Client
 		/// <summary>
 		/// Gets the source manager for this client.
 		/// </summary>
-		public ClientSourceManager Sources
+		public IClientSourceHandler Sources
 		{
 			get;
 			private set;

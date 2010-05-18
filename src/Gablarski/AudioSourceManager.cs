@@ -43,12 +43,13 @@ using Gablarski.Audio;
 
 namespace Gablarski
 {
-	public class SourceManager
+	public class AudioSourceManager
 		: ISourceManager
 	{
 		public IEnumerator<AudioSource> GetEnumerator()
 		{
-			return this.Sources.Values.ToList().GetEnumerator();
+			lock (SyncRoot)
+				return this.Sources.Values.ToList().GetEnumerator();
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
@@ -61,7 +62,11 @@ namespace Gablarski
 			get
 			{
 				AudioSource source;
-				Sources.TryGetValue (key, out source);
+				lock (SyncRoot)
+				{
+					if (!Sources.TryGetValue (key, out source))
+						return null;
+				}
 
 				return source;
 			}
@@ -71,49 +76,69 @@ namespace Gablarski
 		{
 			get
 			{
-				return OwnedSources[user.UserId];
+				lock (SyncRoot)
+					return OwnedSources[user.UserId];
 			}
 		}
-
 
 		public bool ToggleMute (AudioSource source)
 		{
 			if (source == null)
 				throw new ArgumentNullException ("source");
 
-			AudioSource actual;
-			if (!Sources.TryGetValue (source.Id, out actual))
-				return false;
+			lock (SyncRoot)
+			{
+				AudioSource actual;
+				if (!Sources.TryGetValue (source.Id, out actual))
+					return false;
 
-			AudioSource newSource = new AudioSource (actual);
-			newSource.IsMuted = !actual.IsMuted;
+				AudioSource newSource = new AudioSource (actual);
+				newSource.IsMuted = !actual.IsMuted;
 
-			OwnedSources.Remove (source.OwnerId, source);
-			Sources[newSource.Id] = newSource;
-			OwnedSources.Add (source.OwnerId, source);
+				OwnedSources.Remove (source.OwnerId, source);
+				Sources[newSource.Id] = newSource;
+				OwnedSources.Add (source.OwnerId, source);
 
-			return newSource.IsMuted;
+				return newSource.IsMuted;
+			}
 		}
 
-		public void Remove (AudioSource source)
+		public virtual void Clear()
+		{
+			lock (SyncRoot)
+			{
+				Sources.Clear();
+				OwnedSources.Clear();
+			}
+		}
+
+		public virtual bool Remove (AudioSource source)
 		{
 			if (source == null)
 				throw new ArgumentNullException ("source");
 
-			OwnedSources.Remove (source.OwnerId, source);
-			Sources.Remove (source.Id);
+			lock (SyncRoot)
+			{
+				OwnedSources.Remove (source.OwnerId, source);
+				return Sources.Remove (source.Id);
+			}
 		}
 
-		public void Remove (UserInfo user)
+		public virtual bool Remove (UserInfo user)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
 
-			foreach (AudioSource source in OwnedSources[user.UserId])
-				Sources.Remove (source.Id);
+			lock (SyncRoot)
+			{
+				foreach (AudioSource source in OwnedSources[user.UserId])
+					Sources.Remove (source.Id);
 
-			OwnedSources.Remove (user.UserId);
+				return OwnedSources.Remove (user.UserId);
+			}
 		}
+
+		protected readonly object SyncRoot = new object();
 
 		protected readonly MutableLookup<int, AudioSource> OwnedSources = new MutableLookup<int, AudioSource>();
 		protected readonly Dictionary<int, AudioSource> Sources = new Dictionary<int, AudioSource>();

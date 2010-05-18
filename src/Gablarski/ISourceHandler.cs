@@ -37,22 +37,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Gablarski.Audio;
 
-namespace Gablarski.Tests.Mocks
+namespace Gablarski
 {
-	public class MockSourceManager
-		: AudioSourceManager
+	public interface ISourceHandler<TSource>
+		: IIndexedEnumerable<int, TSource>
 	{
-		public void Add (AudioSource source)
-		{
-			if (source == null)
-				throw new ArgumentNullException ("source");
-
-			var nsource = new AudioSource (source);
-
-			OwnedSources.Add (source.OwnerId, nsource);
-			Sources.Add (source.Id, nsource);
-		}
+		IEnumerable<TSource> this[UserInfo user] { get; }
 	}
 }
