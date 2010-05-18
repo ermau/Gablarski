@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Gablarski.Audio;
 using Gablarski.Client;
 
@@ -25,9 +24,9 @@ namespace Gablarski.Tests
 		public IIndexedEnumerable<int, ChannelInfo> Channels { get; set; }
 
 		/// <summary>
-		/// Gets teh source manager in this context
+		/// Gets the source handler in this context
 		/// </summary>
-		public IIndexedEnumerable<int, AudioSource> Sources { get; set; }
+		public IClientSourceHandler Sources { get; set; }
 
 		/// <summary>
 		/// Gets the user associated with this context

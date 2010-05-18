@@ -263,34 +263,6 @@ namespace Gablarski.Tests
 		}
 		
 		[Test]
-		public void TryGetValueFound()
-		{
-			var user = new UserInfo ("Nickname", "Phonetic", "Username", 1, 2, true);
-			var user2 = new UserInfo ("Nickname2", "Username2", 2, 3, false);
-			
-			var manager = new ClientUserManager();
-			manager.Join (user);
-			
-			UserInfo foundUser;
-			Assert.IsTrue (manager.TryGetUser (user.UserId, out foundUser));
-			Assert.AreEqual (user, foundUser);
-		}
-		
-		[Test]
-		public void TryGetValueNotFound()
-		{
-			var user = new UserInfo ("Nickname", "Phonetic", "Username", 1, 2, true);
-			var user2 = new UserInfo ("Nickname2", "Phonetic2", "Username2", 2, 3, false);
-			
-			var manager = new ClientUserManager();
-			manager.Join (user2);
-			
-			UserInfo foundUser;
-			Assert.IsFalse (manager.TryGetUser (user.UserId, out foundUser));
-			Assert.AreEqual (null, foundUser);
-		}
-		
-		[Test]
 		public void IndexerNotPresent()
 		{
 			var user = new UserInfo ("Nickname", "Phonetic", "Username", 1, 2, true);

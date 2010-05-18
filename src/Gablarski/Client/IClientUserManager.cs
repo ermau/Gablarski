@@ -45,6 +45,11 @@ namespace Gablarski.Client
 		: IIndexedEnumerable<int, UserInfo>
 	{
 		/// <summary>
+		/// Gets the synchronization root for the manager.
+		/// </summary>
+		object SyncRoot { get; }
+
+		/// <summary>
 		/// Joins <paramref name="user"/>.
 		/// </summary>
 		/// <param name="user">
@@ -60,6 +65,14 @@ namespace Gablarski.Client
 		/// <returns><c>true</c> if <paramref name="user"/> is in the manager, <c>false</c> otherwise.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
 		bool GetIsJoined (UserInfo user);
+
+		/// <summary>
+		/// Gets whether or not <paramref name="user"/> is currently ignored.
+		/// </summary>
+		/// <param name="user">The user to check.</param>
+		/// <returns><c>true</c> if ignored, <c>false</c> if not.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
+		bool GetIsIgnored (UserInfo user);
 		
 		/// <summary>
 		/// Departs a user.
@@ -80,14 +93,6 @@ namespace Gablarski.Client
 		/// <param name="user">The new set of properties for the user.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
 		void Update (UserInfo user);
-		
-		/// <summary>
-		/// Tries to get <parmref name="user"/> from <paramref name="userId"/>.
-		/// </summary>
-		/// <param name="userId">The id of the user to try to get.</param>
-		/// <param name="user">The user, if found.</param>
-		/// <returns><c>true</c> if the user was found, <c>false</c> otherwise.</returns>
-		bool TryGetUser (int userId, out UserInfo user);
 
 		/// <summary>
 		/// Gets the users in the given channel.
@@ -101,9 +106,17 @@ namespace Gablarski.Client
 		/// <summary>
 		/// Toggles mute on <paramref name="user"/>.
 		/// </summary>
-		/// <param name="user"></param>
+		/// <param name="user">The user to toggle mute for.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
 		void ToggleMute (UserInfo user);
+
+		/// <summary>
+		/// Toggles ignore on <paramref name="user"/>.
+		/// </summary>
+		/// <param name="user">The user to toggle ignore for.</param>
+		/// <returns>The new ignore state.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
+		bool ToggleIgnore (UserInfo user);
 	}
 
 	public static class UserManagerExtensions

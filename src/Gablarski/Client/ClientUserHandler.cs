@@ -57,7 +57,7 @@ namespace Gablarski.Client
 				throw new ArgumentNullException ("manager");
 
 			this.context = context;
-			this.users = manager;
+			this.manager = manager;
 		}
 
 		#region Events
@@ -120,53 +120,16 @@ namespace Gablarski.Client
 			this.context.Connection.Send (new ChannelChangeMessage (user.UserId, targetChannel.ChannelId));
 		}
 
-		/// <summary>
-		/// Gets whether or not <paramref name="user"/> is currently ignored.
-		/// </summary>
-		/// <param name="user">The user to check.</param>
-		/// <returns><c>true</c> if ignored, <c>false</c> if not.</returns>
-		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
 		public bool GetIsIgnored (UserInfo user)
 		{
-			if (user == null)
-				throw new ArgumentNullException ("user");
-
-			lock (SyncRoot)
-			{
-				return ignores.Contains (user.UserId);
-			}
+			return this.manager.GetIsIgnored (user);
 		}
 
-		/// <summary>
-		/// Toggles <paramref name="user"/>'s ignored status.
-		/// </summary>
-		/// <param name="user">The user to toggle ignored status.</param>
-		/// <returns><c>true</c> if the user is now ignored, <c>false</c> if now unignored.</returns>
-		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
 		public bool ToggleIgnore (UserInfo user)
 		{
-			if (user == null)
-				throw new ArgumentNullException ("user");
-
-			bool ignored;
-			lock (SyncRoot)
-			{
-				ignored = ignores.Contains (user.UserId);
-
-				if (ignored)
-					ignores.Remove (user.UserId);
-				else
-					ignores.Add (user.UserId);
-			}
-
-			return !ignored;
+			return this.manager.ToggleIgnore (user);
 		}
 
-		/// <summary>
-		/// Requests a mute toggle for <paramref name="user"/>.
-		/// </summary>
-		/// <param name="user">The user to attempt to mute or unmute.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
 		public void ToggleMute (UserInfo user)
 		{
 			if (user == null)
@@ -183,34 +146,16 @@ namespace Gablarski.Client
 			}
 		}
 
-		public bool TryGetUser (int userId, out UserInfo user)
+		public UserInfo this[int userId]
 		{
-			lock (SyncRoot)
-			{
-				return users.TryGetUser (userId, out user);
-			}
-		}
-
-		public UserInfo this[int key]
-		{
-			get
-			{
-				UserInfo user;
-				lock (SyncRoot)
-				{
-					this.users.TryGetUser (key, out user);
-				}
-
-				return user;
-			}
+			get { return this.manager[userId]; }
 		}
 
 		public void Reset()
 		{
 			lock (SyncRoot)
 			{
-				users.Clear();
-				ignores.Clear();
+				this.manager.Clear();
 				channels.Clear();
 			}
 		}
@@ -220,7 +165,7 @@ namespace Gablarski.Client
 			IEnumerable<UserInfo> returnUsers;
 			lock (SyncRoot)
 			{
-				 returnUsers = this.users.ToList();
+				 returnUsers = this.manager.ToList();
 			}
 
 			return returnUsers.GetEnumerator ();
@@ -231,12 +176,13 @@ namespace Gablarski.Client
 			return GetEnumerator ();
 		}
 
-		protected readonly object SyncRoot = new object ();
+		protected object SyncRoot
+		{
+			get { return this.manager.SyncRoot; }
+		}
 
-		private readonly IClientUserManager users;
+		private readonly IClientUserManager manager;
 		private readonly MutableLookup<int, UserInfo> channels = new MutableLookup<int, UserInfo> ();
-
-		private readonly HashSet<int> ignores = new HashSet<int> ();
 		private readonly IClientContext context;
 
 		#region Message handlers
@@ -247,11 +193,8 @@ namespace Gablarski.Client
 			IEnumerable<UserInfo> userlist;
 			lock (SyncRoot)
 			{
-				users.Update (msg.Users);
+				this.manager.Update (msg.Users);
 				userlist = msg.Users.ToList();
-
-				foreach (int ignoredId in this.ignores.Where (id => !GetIsIgnored (this[id])).ToList ())
-					this.ignores.Remove (ignoredId);
 			}
 
 			OnReceivedUserList (new ReceivedListEventArgs<UserInfo> (userlist));
@@ -263,7 +206,7 @@ namespace Gablarski.Client
 
 			lock (SyncRoot)
 			{
-				users.Update (msg.User);
+				this.manager.Update (msg.User);
 
 				if (msg.User.Equals (context.CurrentUser))
 				{
@@ -299,11 +242,10 @@ namespace Gablarski.Client
 			UserInfo user;
 			lock (SyncRoot)
 			{
-				if (!this.TryGetUser (msg.UserId, out user))
+				if ((user = this[msg.UserId]) == null)
 					return;
 
-				users.Depart (user);
-				ignores.Remove (msg.UserId);
+				this.manager.Depart (user);
 			}
 
 			OnUserDisconnected (new UserEventArgs (user));
@@ -315,7 +257,7 @@ namespace Gablarski.Client
 
 			UserInfo user = new UserInfo (msg.UserInfo);
 			
-			users.Join (user);
+			this.manager.Join (user);
 
 			OnUserJoined (new UserEventArgs (user));
 		}
@@ -335,17 +277,17 @@ namespace Gablarski.Client
 			UserInfo movedBy = null;
 			lock (SyncRoot)
 			{
-				if (!TryGetUser (msg.ChangeInfo.TargetUserId, out old))
+				if ((old = this[msg.ChangeInfo.TargetUserId]) == null)
 					return;
 
 				user = new UserInfo (old.Nickname, old.Phonetic, old.Username, old.UserId, msg.ChangeInfo.TargetChannelId, old.IsMuted);
-				users.Update (user);
+				this.manager.Update (user);
 				
 				if (user.Equals (context.CurrentUser))
 					context.CurrentUser.CurrentChannelId = msg.ChangeInfo.TargetChannelId;
 
 				if (msg.ChangeInfo.RequestingUserId != 0)
-					TryGetUser (msg.ChangeInfo.RequestingUserId, out movedBy);
+					movedBy = this[msg.ChangeInfo.RequestingUserId];
 			}
 
 			OnUserChangedChannnel (new ChannelChangedEventArgs (user, channel, previous, movedBy));

@@ -267,16 +267,6 @@ namespace Gablarski.Client
 		{
 			get { return this.Channels; }
 		}
-
-		IIndexedEnumerable<int, AudioSource> IClientContext.Sources
-		{
-			get { return this.Sources; }
-		}
-
-		IClientUserHandler IClientContext.Users
-		{
-			get { return this.Users; }
-		}
 		#endregion
 
 		#region Statics

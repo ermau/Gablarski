@@ -1,4 +1,4 @@
-// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -37,7 +37,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Gablarski.Audio;
 
 namespace Gablarski.Client
@@ -65,12 +64,12 @@ namespace Gablarski.Client
 		IIndexedEnumerable<int, ChannelInfo> Channels { get; }
 
 		/// <summary>
-		/// Gets the sources in this context.
+		/// Gets the source handler associated with this context.
 		/// </summary>
-		IIndexedEnumerable<int, AudioSource> Sources { get; }
+		IClientSourceHandler Sources { get; }
 
 		/// <summary>
-		/// Gets the user manager associated with this context.
+		/// Gets the user handler associated with this context.
 		/// </summary>
 		IClientUserHandler Users { get; }
 

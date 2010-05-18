@@ -54,6 +54,11 @@ namespace Gablarski.Server
 			this.log = LogManager.GetLogger (context.Settings.Name.Remove (" ") + ".ServerUserHandler");
 		}
 
+		public UserInfo this[int userId]
+		{
+			get { return Manager[userId]; }
+		}
+
 		public void Disconnect (IConnection connection)
 		{
 			if (connection == null)
@@ -148,17 +153,7 @@ namespace Gablarski.Server
 			c.DisconnectAsync();
 		}
 
-		#region IIndexedEnumerable<int,UserInfo> Members
-
-		public UserInfo this[int key]
-		{
-			get
-			{
-				return Manager[key];
-			}
-		}
-
-		#endregion
+		
 
 		#region IEnumerable<UserInfo> Members
 

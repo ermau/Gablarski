@@ -80,10 +80,11 @@ namespace Gablarski.Client
 		CurrentUser Current { get; }
 
 		/// <summary>
-		/// Gets whether the user has been ignored by the current user.
+		/// Gets whether or not <paramref name="user"/> is currently ignored.
 		/// </summary>
 		/// <param name="user">The user to check.</param>
-		/// <returns><c>true</c> if the user is ignored, <c>false</c> if not.</returns>
+		/// <returns><c>true</c> if ignored, <c>false</c> if not.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
 		bool GetIsIgnored (UserInfo user);
 
 		/// <summary>
@@ -92,14 +93,6 @@ namespace Gablarski.Client
 		/// <param name="user">The user to ignore or unignore.</param>
 		/// <returns><c>true</c> if the user is now ignored, <c>false</c> if the user is now unignored.</returns>
 		bool ToggleIgnore (UserInfo user);
-		
-		/// <summary>
-		/// Tries to get <parmref name="user"/> from <paramref name="userId"/>.
-		/// </summary>
-		/// <param name="userId">The id of the user to try to get.</param>
-		/// <param name="user">The user, if found.</param>
-		/// <returns><c>true</c> if the user was found, <c>false</c> otherwise.</returns>
-		bool TryGetUser (int userId, out UserInfo user);
 
 		/// <summary>
 		/// Gets the users in the given channel.
