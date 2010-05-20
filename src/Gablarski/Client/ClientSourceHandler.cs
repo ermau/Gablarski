@@ -55,6 +55,12 @@ namespace Gablarski.Client
 
 			this.context = context;
 			this.manager = manager;
+
+			this.context.RegisterMessageHandler (ServerMessageType.SourceList, OnSourceListReceivedMessage);
+			this.context.RegisterMessageHandler (ServerMessageType.SourcesRemoved, OnSourcesRemovedMessage);
+			this.context.RegisterMessageHandler (ServerMessageType.SourceResult, OnSourceResultMessage);
+			this.context.RegisterMessageHandler (ServerMessageType.AudioData, OnAudioDataReceivedMessage);
+			this.context.RegisterMessageHandler (ServerMessageType.AudioSourceStateChange, OnAudioSourceStateChangedMessage);
 		}
 
 		public event EventHandler<ReceivedListEventArgs<AudioSource>> ReceivedSourceList;

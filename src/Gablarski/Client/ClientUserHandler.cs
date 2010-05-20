@@ -58,6 +58,13 @@ namespace Gablarski.Client
 
 			this.context = context;
 			this.manager = manager;
+
+			this.context.RegisterMessageHandler (ServerMessageType.UserInfoList, OnUserListReceivedMessage);
+			this.context.RegisterMessageHandler (ServerMessageType.UserUpdated, OnUserUpdatedMessage);
+			this.context.RegisterMessageHandler (ServerMessageType.UserChangedChannel, OnUserChangedChannelMessage);
+			this.context.RegisterMessageHandler (ServerMessageType.ChangeChannelResult, OnChannelChangeResultMessage);
+			this.context.RegisterMessageHandler (ServerMessageType.UserLoggedIn, OnUserJoinedMessage);
+			this.context.RegisterMessageHandler (ServerMessageType.UserDisconnected, OnUserDisconnectedMessage);
 		}
 
 		#region Events

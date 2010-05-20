@@ -35,9 +35,9 @@
 // DAMAGE.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Gablarski.Audio;
+using Gablarski.Messages;
 
 namespace Gablarski.Client
 {
@@ -77,6 +77,15 @@ namespace Gablarski.Client
 		/// Gets the current logged in user.
 		/// </summary>
 		CurrentUser CurrentUser { get; }
+
+		/// <summary>
+		/// Registers a message handler.
+		/// </summary>
+		/// <param name="messageType">The message type to register a handler for.</param>
+		/// <param name="handler">The handler to register for the message type.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="handler"/> is <c>null</c>.</exception>
+		/// <exception cref="InvalidOperationException"><paramref name="messageType"/> already has a registered handler.</exception>
+		void RegisterMessageHandler (ServerMessageType messageType, Action<MessageReceivedEventArgs> handler);
 	}
 
 	public static class ContextExtensions

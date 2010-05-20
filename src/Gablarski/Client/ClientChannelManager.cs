@@ -53,6 +53,9 @@ namespace Gablarski.Client
 				throw new ArgumentNullException ("context");
 
 			this.context = context;
+
+			this.context.RegisterMessageHandler (ServerMessageType.ChannelList, OnChannelListReceivedMessage);
+			this.context.RegisterMessageHandler (ServerMessageType.ChannelEditResult, OnChannelEditResultMessage);
 		}
 
 		#region Events

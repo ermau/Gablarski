@@ -56,16 +56,29 @@ namespace Gablarski.Client
 		// ReSharper restore ConvertToConstant.Global
 
 		public GablarskiClient (IClientConnection connection)
-			: this (connection, null)
+			: this (connection, new AudioEngine())
 		{
 		}
 
 		public GablarskiClient (IClientConnection connection, IAudioEngine audioEngine)
 		{
-			DebugLogging = Log.IsDebugEnabled;
+			if (connection == null)
+				throw new ArgumentNullException ("connection");
+			if (audioEngine == null)
+				throw new ArgumentNullException ("audioEngine");
 
-			this.Connection = connection;
-			Setup (new ClientUserHandler (this, new ClientUserManager()), new ClientChannelManager (this), new ClientSourceHandler (this, new ClientSourceManager (this)), new CurrentUser (this), audioEngine);
+			DebugLogging = Log.IsDebugEnabled;
+			Setup (connection, audioEngine, null, null, null);
+		}
+
+		public GablarskiClient (IClientConnection connection, IAudioEngine audioEngine, IClientUserHandler userHandler, IClientSourceHandler sourceHandler, ClientChannelManager channelManager)
+		{
+			if (connection == null)
+				throw new ArgumentNullException ("connection");
+			if (audioEngine == null)
+				throw new ArgumentNullException ("audioEngine");
+
+			Setup (connection, audioEngine, userHandler, sourceHandler, channelManager);
 		}
 
 		#region Events
@@ -98,6 +111,11 @@ namespace Gablarski.Client
 		public bool IsConnected
 		{
 			get { return (this.Connection.IsConnected && this.formallyConnected); }
+		}
+
+		public IClientConnection Connection
+		{
+			get; protected set;
 		}
 
 		/// <summary>
@@ -207,6 +225,23 @@ namespace Gablarski.Client
 		}
 
 		/// <summary>
+		/// Registers a message handler.
+		/// </summary>
+		/// <param name="messageType">The message type to register a handler for.</param>
+		/// <param name="handler">The handler to register for the message type.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="handler"/> is <c>null</c>.</exception>
+		/// <exception cref="InvalidOperationException"><paramref name="messageType"/> already has a registered handler.</exception>
+		public void RegisterMessageHandler (ServerMessageType messageType, Action<MessageReceivedEventArgs> handler)
+		{
+			if (handler == null)
+				throw new ArgumentNullException ("handler");
+			if (this.handlers.ContainsKey (messageType))
+				throw new InvalidOperationException (messageType + " has already been registered.");
+
+			this.handlers.Add (messageType, handler);
+		}
+
+		/// <summary>
 		/// Disconnects from the current server.
 		/// </summary>
 		public void Disconnect()
@@ -256,18 +291,30 @@ namespace Gablarski.Client
 		}
 		#endregion
 
-		#region IClientContext Members
-
-		IClientConnection IClientContext.Connection
-		{
-			get { return this.Connection; }
-		}
-
 		IIndexedEnumerable<int, ChannelInfo> IClientContext.Channels
 		{
 			get { return this.Channels; }
 		}
-		#endregion
+
+		private IClientUserHandler users;
+		private IClientSourceHandler sources;
+
+		private readonly Dictionary<ServerMessageType, Action<MessageReceivedEventArgs>> handlers = new Dictionary<ServerMessageType, Action<MessageReceivedEventArgs>>();
+		private void Setup (IClientConnection connection, IAudioEngine audioEngine, IClientUserHandler userHandler, IClientSourceHandler sourceHandler, ClientChannelManager channelManager)
+		{
+			this.Connection = connection;
+			this.Audio = (audioEngine ?? new AudioEngine());
+			this.users = (userHandler ?? new ClientUserHandler (this, new ClientUserManager()));
+			this.sources = (sourceHandler ?? new ClientSourceHandler (this, new ClientSourceManager (this)));
+			this.Channels = (channelManager ?? new ClientChannelManager (this));
+
+			RegisterMessageHandler (ServerMessageType.PermissionDenied, OnPermissionDeniedMessage);
+			RegisterMessageHandler (ServerMessageType.Redirect, OnRedirectMessage);
+			RegisterMessageHandler (ServerMessageType.ServerInfoReceived, OnServerInfoReceivedMessage);
+			RegisterMessageHandler (ServerMessageType.ConnectionRejected, OnConnectionRejectedMessage);
+			RegisterMessageHandler (ServerMessageType.Disconnect, OnDisconnectedMessage);
+			RegisterMessageHandler (ServerMessageType.Muted, OnMuted);
+		}
 
 		#region Statics
 		public static void QueryServer (IPEndPoint endpoint, IClientConnection connection)

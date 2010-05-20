@@ -52,6 +52,10 @@ namespace Gablarski.Client
 				throw new ArgumentNullException ("context");
 
 			this.context = context;
+
+			this.context.RegisterMessageHandler (ServerMessageType.LoginResult, OnLoginResultMessage);
+			this.context.RegisterMessageHandler (ServerMessageType.JoinResult, OnJoinResultMessage);
+			this.context.RegisterMessageHandler (ServerMessageType.Permissions, OnPermissionsMessage);
 		}
 
 		internal CurrentUser (IClientContext context, int userId, string nickname, int currentChannelId)

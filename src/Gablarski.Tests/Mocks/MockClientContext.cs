@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Gablarski.Audio;
 using Gablarski.Client;
+using Gablarski.Messages;
 
 namespace Gablarski.Tests
 {
@@ -39,6 +40,10 @@ namespace Gablarski.Tests
 		public CurrentUser CurrentUser { get; set; }
 
 		public ServerInfo ServerInfo { get; set; }
+
+		public void RegisterMessageHandler (ServerMessageType messageType, Action<MessageReceivedEventArgs> handler)
+		{
+		}
 
 		#endregion
 	}

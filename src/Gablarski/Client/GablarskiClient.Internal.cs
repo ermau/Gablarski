@@ -53,12 +53,6 @@ namespace Gablarski.Client
 		protected readonly log4net.ILog Log = log4net.LogManager.GetLogger ("GablarskiClient");
 		protected readonly bool DebugLogging;
 
-		protected Dictionary<ServerMessageType, Action<MessageReceivedEventArgs>> Handlers;
-		protected internal IClientConnection Connection
-		{
-			get;
-			private set;
-		}
 
 		private int redirectLimit = 20;
 		private int redirectCount;
@@ -70,52 +64,25 @@ namespace Gablarski.Client
 		private IPEndPoint originalEndPoint;
 		private int disconnectedInChannelId;
 
-		private ClientUserHandler users;
 		private string originalHost;
-		private ClientSourceHandler sourceHandler;
 
-		protected void Setup (ClientUserHandler userMananger, ClientChannelManager channelManager, ClientSourceHandler sourceHandler, CurrentUser currentUser, IAudioEngine audioEngine)
+		/*protected void Setup (ClientUserHandler userMananger, ClientChannelManager channelManager, ClientSourceHandler sourceHandler, CurrentUser currentUser, IAudioEngine audioEngine)
 		{
-			if (this.Handlers != null)
-				return;
-
-			this.Audio = (audioEngine ?? new AudioEngine());
-			this.CurrentUser = currentUser;
-			this.users = userMananger;
-			this.Channels = channelManager;
-			this.Sources = sourceHandler;
-			this.sourceHandler = sourceHandler;
-
-			this.Handlers = new Dictionary<ServerMessageType, Action<MessageReceivedEventArgs>>
+			this.handlers = new Dictionary<ServerMessageType, Action<MessageReceivedEventArgs>>
 			{
 				{ ServerMessageType.PermissionDenied, OnPermissionDeniedMessage },
 
-				{ ServerMessageType.Redirect, OnRedirectReceived },
+				{ ServerMessageType.Redirect, OnRedirectMessage },
 				{ ServerMessageType.ServerInfoReceived, OnServerInfoReceivedMessage },
-				{ ServerMessageType.UserInfoList, this.users.OnUserListReceivedMessage },
-				{ ServerMessageType.UserUpdated, this.users.OnUserUpdatedMessage },
-				{ ServerMessageType.SourceList, sourceHandler.OnSourceListReceivedMessage },
-				{ ServerMessageType.SourcesRemoved, sourceHandler.OnSourcesRemovedMessage },
 				
 				{ ServerMessageType.ChannelList, this.Channels.OnChannelListReceivedMessage },
-				{ ServerMessageType.UserChangedChannel, this.users.OnUserChangedChannelMessage },
 				{ ServerMessageType.ChannelEditResult, this.Channels.OnChannelEditResultMessage },
-				{ ServerMessageType.ChangeChannelResult, this.users.OnChannelChangeResultMessage },
 
 				{ ServerMessageType.ConnectionRejected, OnConnectionRejectedMessage },
 				{ ServerMessageType.Disconnect, OnDisconnectedMessage },
-				{ ServerMessageType.LoginResult, this.CurrentUser.OnLoginResultMessage },
-				{ ServerMessageType.JoinResult, this.CurrentUser.OnJoinResultMessage },
-				{ ServerMessageType.Permissions, this.CurrentUser.OnPermissionsMessage },
-				{ ServerMessageType.UserLoggedIn, this.users.OnUserJoinedMessage },
-				{ ServerMessageType.UserDisconnected, this.users.OnUserDisconnectedMessage },
 				{ ServerMessageType.Muted, OnMuted },
-				
-				{ ServerMessageType.SourceResult, sourceHandler.OnSourceResultMessage },
-				{ ServerMessageType.AudioData, sourceHandler.OnAudioDataReceivedMessage },
-				{ ServerMessageType.AudioSourceStateChange, sourceHandler.OnAudioSourceStateChangedMessage },
 			};
-		}
+		}*/
 
 		private void OnDisconnectedMessage (MessageReceivedEventArgs e)
 		{
@@ -164,7 +131,7 @@ namespace Gablarski.Client
 					if (this.running)
 					{
 						Action<MessageReceivedEventArgs> handler;
-						if (this.Handlers.TryGetValue (msg.MessageType, out handler))
+						if (this.handlers.TryGetValue (msg.MessageType, out handler))
 							handler (e);
 					}
 				}
@@ -188,10 +155,10 @@ namespace Gablarski.Client
 		{
 			var msg = (MutedMessage)obj.Message;
 
-			if (msg.Type == MuteType.User)
+			/*if (msg.Type == MuteType.User)
 				this.users.OnMutedMessage ((string)msg.Target, msg.Unmuted);
 			else if (msg.Type == MuteType.AudioSource)
-				this.sourceHandler.OnMutedMessage ((int)msg.Target, msg.Unmuted);
+				this.sourceHandler.OnMutedMessage ((int)msg.Target, msg.Unmuted);*/
 		}
 
 		private void OnConnectionRejectedMessage (MessageReceivedEventArgs e)
@@ -210,7 +177,7 @@ namespace Gablarski.Client
 			OnConnected (this, EventArgs.Empty);
 		}
 
-		private void OnRedirectReceived (MessageReceivedEventArgs e)
+		private void OnRedirectMessage (MessageReceivedEventArgs e)
 		{
 			var msg = (RedirectMessage) e.Message;
 
