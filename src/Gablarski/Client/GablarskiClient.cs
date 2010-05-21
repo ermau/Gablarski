@@ -132,7 +132,8 @@ namespace Gablarski.Client
 		/// </summary>
 		public IClientUserHandler Users
 		{
-			get { return users; }
+			get;
+			private set;
 		}
 
 		/// <summary>
@@ -296,16 +297,13 @@ namespace Gablarski.Client
 			get { return this.Channels; }
 		}
 
-		private IClientUserHandler users;
-		private IClientSourceHandler sources;
-
 		private readonly Dictionary<ServerMessageType, Action<MessageReceivedEventArgs>> handlers = new Dictionary<ServerMessageType, Action<MessageReceivedEventArgs>>();
 		private void Setup (IClientConnection connection, IAudioEngine audioEngine, IClientUserHandler userHandler, IClientSourceHandler sourceHandler, ClientChannelManager channelManager)
 		{
 			this.Connection = connection;
 			this.Audio = (audioEngine ?? new AudioEngine());
-			this.users = (userHandler ?? new ClientUserHandler (this, new ClientUserManager()));
-			this.sources = (sourceHandler ?? new ClientSourceHandler (this, new ClientSourceManager (this)));
+			this.Users = (userHandler ?? new ClientUserHandler (this, new ClientUserManager()));
+			this.Sources = (sourceHandler ?? new ClientSourceHandler (this, new ClientSourceManager (this)));
 			this.Channels = (channelManager ?? new ClientChannelManager (this));
 
 			RegisterMessageHandler (ServerMessageType.PermissionDenied, OnPermissionDeniedMessage);
