@@ -449,33 +449,33 @@ namespace Gablarski.Tests
 			c.Client.AssertNoMessage();
 		}
 
-		[Test]
-		public void RequestMuteWithPermission()
-		{
-			var u = UserInfoTests.GetTestUser (2);
-			var c = new MockServerConnection();
-			context.UserManager.Connect (c);
-			context.UserManager.Join (c, u);
-			permissions.SetPermissions (u.UserId, new[] { new Permission (PermissionName.MuteAudioSource, true) });
-
-			var source = GetSourceFromRequest();
-			Assert.AreEqual (SourceResult.NewSource, c.Client.DequeueAndAssertMessage<SourceResultMessage>().SourceResult);
-
-			handler.RequestMuteSourceMessage (new MessageReceivedEventArgs (c,
-				new RequestMuteSourceMessage (source, true)));
-
-			var mute = c.Client.DequeueAndAssertMessage<MutedMessage>();
-			Assert.AreEqual (false, mute.Unmuted);
-			Assert.AreEqual (source.Id, mute.Target);
-			Assert.AreEqual (MuteType.AudioSource, mute.Type);
-			c.Client.AssertNoMessage();
-
-			mute = server.Client.DequeueAndAssertMessage<MutedMessage>();
-			Assert.AreEqual (false, mute.Unmuted);
-			Assert.AreEqual (source.Id, mute.Target);
-			Assert.AreEqual (MuteType.AudioSource, mute.Type);
-			c.Client.AssertNoMessage();
-		}
+//		[Test]
+//		public void RequestMuteWithPermission()
+//		{
+//			var u = UserInfoTests.GetTestUser (2);
+//			var c = new MockServerConnection();
+//			context.UserManager.Connect (c);
+//			context.UserManager.Join (c, u);
+//			permissions.SetPermissions (u.UserId, new[] { new Permission (PermissionName.MuteAudioSource, true) });
+//
+//			var source = GetSourceFromRequest();
+//			Assert.AreEqual (SourceResult.NewSource, c.Client.DequeueAndAssertMessage<SourceResultMessage>().SourceResult);
+//
+//			handler.RequestMuteSourceMessage (new MessageReceivedEventArgs (c,
+//				new RequestMuteSourceMessage (source, true)));
+//
+//			var mute = c.Client.DequeueAndAssertMessage<MutedMessage>();
+//			Assert.AreEqual (false, mute.Unmuted);
+//			Assert.AreEqual (source.Id, mute.Target);
+//			Assert.AreEqual (MuteType.AudioSource, mute.Type);
+//			c.Client.AssertNoMessage();
+//
+//			mute = server.Client.DequeueAndAssertMessage<MutedMessage>();
+//			Assert.AreEqual (false, mute.Unmuted);
+//			Assert.AreEqual (source.Id, mute.Target);
+//			Assert.AreEqual (MuteType.AudioSource, mute.Type);
+//			c.Client.AssertNoMessage();
+//		}
 		#endregion
 
 		#region ClientAudioSourceStateChangeMessage
