@@ -48,7 +48,7 @@ namespace Gablarski
 	{
 		public IEnumerator<AudioSource> GetEnumerator()
 		{
-			lock (SyncRoot)
+			lock (this.syncRoot)
 				return this.Sources.Values.ToList().GetEnumerator();
 		}
 
@@ -62,7 +62,7 @@ namespace Gablarski
 			get
 			{
 				AudioSource source;
-				lock (SyncRoot)
+				lock (this.syncRoot)
 				{
 					if (!Sources.TryGetValue (key, out source))
 						return null;
@@ -76,7 +76,7 @@ namespace Gablarski
 		{
 			get
 			{
-				lock (SyncRoot)
+				lock (this.syncRoot)
 					return OwnedSources[user.UserId];
 			}
 		}
@@ -86,7 +86,7 @@ namespace Gablarski
 			if (source == null)
 				throw new ArgumentNullException ("source");
 
-			lock (SyncRoot)
+			lock (this.syncRoot)
 			{
 				AudioSource actual;
 				if (!Sources.TryGetValue (source.Id, out actual))
@@ -105,7 +105,7 @@ namespace Gablarski
 
 		public virtual void Clear()
 		{
-			lock (SyncRoot)
+			lock (this.syncRoot)
 			{
 				Sources.Clear();
 				OwnedSources.Clear();
@@ -117,7 +117,7 @@ namespace Gablarski
 			if (source == null)
 				throw new ArgumentNullException ("source");
 
-			lock (SyncRoot)
+			lock (this.syncRoot)
 			{
 				OwnedSources.Remove (source.OwnerId, source);
 				return Sources.Remove (source.Id);
@@ -129,7 +129,7 @@ namespace Gablarski
 			if (user == null)
 				throw new ArgumentNullException ("user");
 
-			lock (SyncRoot)
+			lock (this.syncRoot)
 			{
 				foreach (AudioSource source in OwnedSources[user.UserId])
 					Sources.Remove (source.Id);
@@ -138,7 +138,7 @@ namespace Gablarski
 			}
 		}
 
-		protected readonly object SyncRoot = new object();
+		protected readonly object syncRoot = new object();
 
 		protected readonly MutableLookup<int, AudioSource> OwnedSources = new MutableLookup<int, AudioSource>();
 		protected readonly Dictionary<int, AudioSource> Sources = new Dictionary<int, AudioSource>();

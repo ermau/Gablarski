@@ -34,14 +34,11 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Gablarski.Messages
 {
-	// Next: 53
+	// Next: 54
 
 	public enum ClientMessageType
 		: ushort
@@ -98,6 +95,7 @@ namespace Gablarski.Messages
 		AudioData = 10,
 		AudioSourceStateChange = 29,
 		SourcesRemoved = 25,
+		SourceMuted = 53,
 	
 		UserLoggedIn = 24,
 		Permissions = 33,
@@ -105,13 +103,14 @@ namespace Gablarski.Messages
 		UserList = 49,
 		UserDisconnected = 17,
 		UserChangedChannel = 27,
+		UserMuted = 31,
+		UserUpdated = 46,
 
 		ChannelList = 19,
 		ChangeChannelResult = 21,
 		ChannelEditResult = 23,
 
-		Muted = 31,
-		UserUpdated = 46
+		
 	}
 
 	public abstract class Message<TMessage>

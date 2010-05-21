@@ -170,7 +170,7 @@ namespace Gablarski.Server
 				return;
 
 			bool muted = manager.ToggleMute (source);
-			context.Connections.Send (new MutedMessage { Target = source.Id, Type = MuteType.AudioSource, Unmuted = !muted });
+			context.Connections.Send (new SourceMutedMessage { SourceId = source.Id, Unmuted = !muted });
 		}
 
 		internal void RequestSourceListMessage (MessageReceivedEventArgs e)

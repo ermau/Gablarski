@@ -47,6 +47,8 @@ namespace Gablarski.Client
 	public interface IClientSourceManager
 		: ISourceManager
 	{
+		object SyncRoot { get; }
+
 		/// <summary>
 		/// Adds <paramref name="source"/> to the manager.
 		/// </summary>

@@ -55,6 +55,11 @@ namespace Gablarski.Client
 			this.context = context;
 		}
 
+		public object SyncRoot
+		{
+			get { return this.syncRoot; }
+		}
+
 		/// <summary>
 		/// Gets a listing of the sources that belong to the current user.
 		/// </summary>
@@ -62,7 +67,7 @@ namespace Gablarski.Client
 		{
 			get
 			{
-				lock (SyncRoot)
+				lock (syncRoot)
 				{
 					return this.Where (s => s.OwnerId == context.CurrentUser.UserId).ToList();
 				}
@@ -81,7 +86,7 @@ namespace Gablarski.Client
 
 			IEnumerable<AudioSource> updatedAndNew;
 
-			lock (SyncRoot)
+			lock (syncRoot)
 			{
 				updatedAndNew = updatedSources.Where (s => !Sources.ContainsValue (s));
 				updatedAndNew = updatedAndNew.Concat (Sources.Values.Intersect (updatedSources)).ToList();
@@ -105,7 +110,7 @@ namespace Gablarski.Client
 			if (source == null)
 				throw new ArgumentNullException ("source");
 
-			lock (SyncRoot)
+			lock (syncRoot)
 			{
 				AudioSource oldSource;
 				if (!Sources.TryGetValue (source.Id, out oldSource))
@@ -117,7 +122,7 @@ namespace Gablarski.Client
 
 		public bool GetIsIgnored (AudioSource source)
 		{
-			lock (SyncRoot)
+			lock (syncRoot)
 			{
 				return ignoredSources.Contains (source);
 			}
@@ -128,7 +133,7 @@ namespace Gablarski.Client
 			if (source == null)
 				throw new ArgumentNullException ("source");
 
-			lock (SyncRoot)
+			lock (syncRoot)
 			{
 				bool ignored = ignoredSources.Contains (source);
 
@@ -143,7 +148,7 @@ namespace Gablarski.Client
 
 		public override void Clear()
 		{
-			lock (SyncRoot)
+			lock (syncRoot)
 			{
 				ignoredSources.Clear();
 				base.Clear();

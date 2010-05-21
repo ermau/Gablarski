@@ -136,7 +136,8 @@
     <Compile Include="Messages\RedirectMessage.cs" />
     <Compile Include="Messages\RegisterMessage.cs" />
     <Compile Include="Messages\RequestMuteMessage.cs" />
-    <Compile Include="Messages\MutedMessage.cs" />
+    <Compile Include="Messages\SourceMutedMessage.cs" />
+    <Compile Include="Messages\UserMutedMessage.cs" />
     <Compile Include="Messages\RequestMuteSourceMessage.cs" />
     <Compile Include="Messages\RequestMuteUserMessage.cs" />
     <Compile Include="Messages\SetCommentMessage.cs" />
@@ -271,6 +272,7 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

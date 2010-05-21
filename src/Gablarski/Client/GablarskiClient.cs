@@ -313,7 +313,6 @@ namespace Gablarski.Client
 			RegisterMessageHandler (ServerMessageType.ServerInfoReceived, OnServerInfoReceivedMessage);
 			RegisterMessageHandler (ServerMessageType.ConnectionRejected, OnConnectionRejectedMessage);
 			RegisterMessageHandler (ServerMessageType.Disconnect, OnDisconnectedMessage);
-			RegisterMessageHandler (ServerMessageType.Muted, OnMuted);
 		}
 
 		#region Statics

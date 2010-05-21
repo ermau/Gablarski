@@ -61,6 +61,7 @@ namespace Gablarski.Client
 			this.context.RegisterMessageHandler (ServerMessageType.SourceResult, OnSourceResultMessage);
 			this.context.RegisterMessageHandler (ServerMessageType.AudioData, OnAudioDataReceivedMessage);
 			this.context.RegisterMessageHandler (ServerMessageType.AudioSourceStateChange, OnAudioSourceStateChangedMessage);
+			this.context.RegisterMessageHandler (ServerMessageType.SourceMuted, OnSourceMutedMessage);
 		}
 
 		public event EventHandler<ReceivedListEventArgs<AudioSource>> ReceivedSourceList;
@@ -200,6 +201,26 @@ namespace Gablarski.Client
 		private readonly IClientContext context;
 		private readonly IClientSourceManager manager;
 		private readonly Dictionary<AudioSource, int> sequences = new Dictionary<AudioSource, int>();
+
+		private void OnSourceMutedMessage (MessageReceivedEventArgs e)
+		{
+			var msg = (SourceMutedMessage) e.Message;
+
+			bool fire = false;
+			AudioSource s;
+			lock (this.manager.SyncRoot)
+			{
+				s = this.manager[msg.SourceId];
+				if (s != null && msg.Unmuted == s.IsMuted)
+				{
+					this.manager.ToggleMute (s);
+					fire = true;
+				}
+			}
+
+			if (fire)
+				OnAudioSourceMuted (new AudioSourceMutedEventArgs (s, msg.Unmuted));
+		}
 
 		internal void OnSourceListReceivedMessage (MessageReceivedEventArgs e)
 		{

@@ -40,18 +40,11 @@ using System.Linq;
 
 namespace Gablarski.Messages
 {
-	public enum MuteType
-		: byte
-	{
-		User = 1,
-		AudioSource = 2,
-	}
-
-	public class MutedMessage
+	public class UserMutedMessage
 		: ServerMessage
 	{
-		public MutedMessage()
-			: base (ServerMessageType.Muted)
+		public UserMutedMessage()
+			: base (ServerMessageType.UserMuted)
 		{
 		}
 
@@ -60,36 +53,21 @@ namespace Gablarski.Messages
 			get; set;
 		}
 
-		public object Target
+		public int UserId
 		{
 			get; set;
 		}
-
-		public MuteType Type
-		{
-			get; set;
-		}
-
+		
 		public override void WritePayload (IValueWriter writer)
 		{
-			writer.WriteByte ((byte)this.Type);
 			writer.WriteBool (this.Unmuted);
-			
-			if (Type == MuteType.User)
-				writer.WriteString ((string)this.Target);
-			else
-				writer.WriteInt32 ((int)this.Target);
+			writer.WriteInt32 (this.UserId);
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
-			this.Type = (MuteType)reader.ReadByte();
 			this.Unmuted = reader.ReadBool();
-
-			if (Type == MuteType.User)
-				this.Target = reader.ReadString();
-			else
-				this.Target = reader.ReadInt32();
+			this.UserId = reader.ReadInt32();
 		}
 	}
 }

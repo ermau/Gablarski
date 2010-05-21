@@ -359,7 +359,7 @@ namespace Gablarski.Server
 			else
 				return;
 
-			this.Send (new MutedMessage { Type = MuteType.User, Target = user.Username, Unmuted = msg.Unmute });
+			this.Send (new UserMutedMessage { UserId = user.UserId, Unmuted = msg.Unmute });
 		}
 
 		internal void SetCommentMessage (MessageReceivedEventArgs e)

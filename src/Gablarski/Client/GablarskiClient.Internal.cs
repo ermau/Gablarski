@@ -80,7 +80,7 @@ namespace Gablarski.Client
 
 				{ ServerMessageType.ConnectionRejected, OnConnectionRejectedMessage },
 				{ ServerMessageType.Disconnect, OnDisconnectedMessage },
-				{ ServerMessageType.Muted, OnMuted },
+				{ ServerMessageType.UserMuted, OnMuted },
 			};
 		}*/
 
@@ -149,16 +149,6 @@ namespace Gablarski.Client
 			}
 
 			incomingWait.Set ();
-		}
-
-		private void OnMuted (MessageReceivedEventArgs obj)
-		{
-			var msg = (MutedMessage)obj.Message;
-
-			/*if (msg.Type == MuteType.User)
-				this.users.OnMutedMessage ((string)msg.Target, msg.Unmuted);
-			else if (msg.Type == MuteType.AudioSource)
-				this.sourceHandler.OnMutedMessage ((int)msg.Target, msg.Unmuted);*/
 		}
 
 		private void OnConnectionRejectedMessage (MessageReceivedEventArgs e)

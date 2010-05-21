@@ -65,6 +65,7 @@ namespace Gablarski.Client
 			this.context.RegisterMessageHandler (ServerMessageType.ChangeChannelResult, OnChannelChangeResultMessage);
 			this.context.RegisterMessageHandler (ServerMessageType.UserLoggedIn, OnUserJoinedMessage);
 			this.context.RegisterMessageHandler (ServerMessageType.UserDisconnected, OnUserDisconnectedMessage);
+			this.context.RegisterMessageHandler (ServerMessageType.UserMuted, OnUserMutedMessage);
 		}
 
 		#region Events
@@ -193,6 +194,26 @@ namespace Gablarski.Client
 		private readonly IClientContext context;
 
 		#region Message handlers
+		internal void OnUserMutedMessage (MessageReceivedEventArgs e)
+		{
+			var msg = (UserMutedMessage) e.Message;
+
+			bool fire = false;
+			UserInfo user;
+			lock (this.manager.SyncRoot)
+			{
+				user = this.manager[msg.UserId];
+				if (user != null && msg.Unmuted == user.IsMuted)
+				{
+					this.manager.ToggleMute (user);
+					fire = true;
+				}
+			}
+
+			if (fire)
+				OnUserMuted (new UserMutedEventArgs (user, msg.Unmuted));
+		}
+
 		internal void OnUserListReceivedMessage (MessageReceivedEventArgs e)
 		{
 			var msg = (UserInfoListMessage)e.Message;
@@ -223,23 +244,6 @@ namespace Gablarski.Client
 			}
 
 			OnUserUpdated (new UserEventArgs (msg.User));
-		}
-
-		internal void OnMutedMessage (string username, bool unmuted)
-		{
-			UserInfo user;
-
-			lock (SyncRoot)
-			{
-				user = this.SingleOrDefault (u => u.Username == username);
-				if (user == null)
-					return;
-
-				user.IsMuted = true;
-			}
-
-			OnUserMuted (new UserMutedEventArgs (user, unmuted));
-			OnUserUpdated (new UserEventArgs (user));
 		}
 
 		internal void OnUserDisconnectedMessage (MessageReceivedEventArgs e)
