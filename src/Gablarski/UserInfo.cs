@@ -129,6 +129,8 @@ namespace Gablarski
 			UserId = userId;
 			CurrentChannelId = currentChannelId;
 			IsMuted = muted;
+			Comment = comment;
+			Status = status;
 		}
 
 		internal UserInfo (string username, int userId, int currentChannelId, bool muted)
