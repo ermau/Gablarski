@@ -72,7 +72,7 @@ namespace Gablarski
 			}
 		}
 
-		public IEnumerable<AudioSource> this [UserInfo user]
+		public IEnumerable<AudioSource> this [IUserInfo user]
 		{
 			get
 			{
@@ -124,7 +124,7 @@ namespace Gablarski
 			}
 		}
 
-		public virtual bool Remove (UserInfo user)
+		public virtual bool Remove (IUserInfo user)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");

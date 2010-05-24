@@ -54,7 +54,7 @@ namespace Gablarski.Server
 			this.log = LogManager.GetLogger (context.Settings.Name.Remove (" ") + ".ServerUserHandler");
 		}
 
-		public UserInfo this[int userId]
+		public IUserInfo this[int userId]
 		{
 			get { return Manager[userId]; }
 		}
@@ -64,7 +64,7 @@ namespace Gablarski.Server
 			if (connection == null)
 				throw new ArgumentNullException ("connection");
 
-			UserInfo user = Manager.GetUser (connection);
+			IUserInfo user = Manager.GetUser (connection);
 			if (user != null)
 				context.Users.Send (new UserDisconnectedMessage (user.UserId));
 
@@ -78,7 +78,7 @@ namespace Gablarski.Server
 
 			foreach (IConnection c in Manager.GetConnections().Where (predicate))
 			{
-				UserInfo user = Manager.GetUser (c);
+				IUserInfo user = Manager.GetUser (c);
 				if (user != null)
 					context.Users.Send (new UserDisconnectedMessage (user.UserId));
 
@@ -88,7 +88,7 @@ namespace Gablarski.Server
 			Manager.Disconnect (predicate);
 		}
 
-		public void Move (UserInfo user, ChannelInfo channel)
+		public void Move (IUserInfo user, ChannelInfo channel)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
@@ -124,7 +124,7 @@ namespace Gablarski.Server
 				c.Send (message);
 		}
 
-		public void Send (MessageBase message, Func<IConnection, UserInfo, bool> predicate)
+		public void Send (MessageBase message, Func<IConnection, IUserInfo, bool> predicate)
 		{
 			if (message == null)
 				throw new ArgumentNullException ("message");
@@ -140,7 +140,7 @@ namespace Gablarski.Server
 				c.Send (message);
 		}
 
-		public void Disconnect (UserInfo user, DisconnectionReason reason)
+		public void Disconnect (IUserInfo user, DisconnectionReason reason)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
@@ -153,11 +153,9 @@ namespace Gablarski.Server
 			c.DisconnectAsync();
 		}
 
-		
-
 		#region IEnumerable<UserInfo> Members
 
-		public IEnumerator<UserInfo> GetEnumerator()
+		public IEnumerator<IUserInfo> GetEnumerator()
 		{
 			return Manager.GetEnumerator();
 		}
@@ -220,7 +218,7 @@ namespace Gablarski.Server
 				return;
 			}
 
-			UserInfo info = GetJoiningUserInfo (e.Connection, join);
+			IUserInfo info = GetJoiningUserInfo (e.Connection, join);
 			if (info == null)
 				return;
 
@@ -312,9 +310,9 @@ namespace Gablarski.Server
 			if (targetChannel == null)
 				resultState = ChannelChangeResult.FailedUnknownChannel;
 
-			UserInfo requestingPlayer = context.UserManager.GetUser (e.Connection);
+			IUserInfo requestingPlayer = context.UserManager.GetUser (e.Connection);
 
-			UserInfo targetPlayer = context.Users[change.TargetUserId];
+			IUserInfo targetPlayer = context.Users[change.TargetUserId];
 			if (targetPlayer == null || targetPlayer.CurrentChannelId == change.TargetChannelId)
 				return;
 
@@ -350,7 +348,7 @@ namespace Gablarski.Server
 			if (!context.GetPermission (PermissionName.MuteUser, e.Connection))
 				return;
 
-			UserInfo user = Manager.FirstOrDefault (u => u.UserId == msg.TargetId);
+			IUserInfo user = Manager.FirstOrDefault (u => u.UserId == msg.TargetId);
 			if (user == null)
 				return;
 
@@ -366,7 +364,7 @@ namespace Gablarski.Server
 		{
 			var msg = (SetCommentMessage)e.Message;
 
-			UserInfo user = Manager.GetUser (e.Connection);
+			IUserInfo user = Manager.GetUser (e.Connection);
 			if (user == null || user.Comment == msg.Comment)
 				return;
 
@@ -379,7 +377,7 @@ namespace Gablarski.Server
 		{
 			var msg = (SetStatusMessage) e.Message;
 
-			UserInfo user = Manager.GetUser (e.Connection);
+			IUserInfo user = Manager.GetUser (e.Connection);
 			if (user == null || user.Status == msg.Status)
 				return;
 
@@ -415,7 +413,7 @@ namespace Gablarski.Server
 
 			context.PermissionsProvider.SetPermissions (msg.UserId, perms);
 
-			UserInfo target = Manager[msg.UserId];
+			IUserInfo target = Manager[msg.UserId];
 			if (target == null)
 				return;
 
@@ -424,7 +422,7 @@ namespace Gablarski.Server
 				c.Send (new PermissionsMessage (msg.UserId, context.PermissionsProvider.GetPermissions (msg.UserId)));
 		}
 
-		private UserInfo GetJoiningUserInfo (IConnection connection, JoinMessage join)
+		private IUserInfo GetJoiningUserInfo (IConnection connection, JoinMessage join)
 		{
 			if (!Manager.GetIsConnected (connection))
 			{
@@ -432,7 +430,7 @@ namespace Gablarski.Server
 				return null;
 			}
 
-			UserInfo info = this.Manager.GetUser (connection);
+			IUserInfo info = this.Manager.GetUser (connection);
 
 			if (info == null)
 			{
@@ -465,7 +463,7 @@ namespace Gablarski.Server
 		}
 
 		/// <returns><c>true</c> if the nickname is now free, <c>false</c> otherwise.</returns>
-		private bool AttemptNicknameRecovery (UserInfo info, string nickname)
+		private bool AttemptNicknameRecovery (IUserInfo info, string nickname)
 		{
 			if (info == null)
 				throw new ArgumentNullException ("info");
@@ -476,7 +474,7 @@ namespace Gablarski.Server
 
 			nickname = nickname.ToLower().Trim();
 
-			UserInfo current = Manager.Single (u => u.Nickname.ToLower().Trim() == nickname);
+			IUserInfo current = Manager.Single (u => u.Nickname.ToLower().Trim() == nickname);
 			if (info.UserId == current.UserId)
 			{
 				this.log.DebugFormat ("Recovery attempt succeeded, disconnecting current '{0}'", current.Nickname);

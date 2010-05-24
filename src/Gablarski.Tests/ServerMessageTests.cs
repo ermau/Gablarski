@@ -123,7 +123,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void UserList()
 		{
-			List<UserInfo> users = new List<UserInfo>
+			List<IUserInfo> users = new List<IUserInfo>
 			{
 				UserInfoTests.GetTestUser(1),
 				UserInfoTests.GetTestUser(2)
@@ -146,7 +146,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void EmptyUserList()
 		{
-			var msg = new UserInfoListMessage(new List<UserInfo>());
+			var msg = new UserInfoListMessage(new List<IUserInfo>());
 			Assert.AreEqual (0, msg.Users.Count());
 			msg.WritePayload (writer);
 			long length = stream.Position;

@@ -120,7 +120,7 @@ namespace Gablarski.Clients.CLI
 						return true;
 					}
 
-					UserInfo user = FindUser (parts[2]);
+					IUserInfo user = FindUser (parts[2]);
 					if (user == null)
 					{
 						Writer.WriteLine ("User {0} not found.", parts[2]);

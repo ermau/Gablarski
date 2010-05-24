@@ -1,4 +1,4 @@
-// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -38,7 +38,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using Gablarski.Client;
 
 namespace Gablarski.Clients.CLI
@@ -65,7 +64,7 @@ namespace Gablarski.Clients.CLI
 			get { return this.writer; }
 		}
 
-		protected UserInfo FindUser (string part)
+		protected IUserInfo FindUser (string part)
 		{
 			int userId;
 			return (Int32.TryParse (part, out userId))

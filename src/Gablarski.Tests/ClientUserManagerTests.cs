@@ -55,7 +55,7 @@ namespace Gablarski.Tests
 			manager.Join (user);
 
 			Assert.IsTrue (manager.GetIsJoined (user));
-			Assert.IsTrue (((IEnumerable<UserInfo>)manager).Contains (user));
+			Assert.IsTrue (((IEnumerable<IUserInfo>)manager).Contains (user));
 			Assert.AreEqual (user, manager[user.UserId]);
 		}
 		
@@ -75,13 +75,13 @@ namespace Gablarski.Tests
 			manager.Join (user);
 			
 			Assert.IsTrue (manager.GetIsJoined (user));
-			Assert.IsTrue (((IEnumerable<UserInfo>)manager).Contains (user));
+			Assert.IsTrue (((IEnumerable<IUserInfo>)manager).Contains (user));
 			Assert.AreEqual (user, manager[user.UserId]);
 			
 			Assert.IsTrue (manager.Depart (user));
 			
 			Assert.IsFalse (manager.GetIsJoined (user));
-			Assert.IsFalse (((IEnumerable<UserInfo>)manager).Contains (user));
+			Assert.IsFalse (((IEnumerable<IUserInfo>)manager).Contains (user));
 			Assert.AreEqual (null, manager[user.UserId]);
 		}
 		
@@ -107,7 +107,7 @@ namespace Gablarski.Tests
 		public void UpdateNullUsers()
 		{
 			var manager = new ClientUserManager();
-			Assert.Throws<ArgumentNullException> (() => manager.Update ((IEnumerable<UserInfo>)null));
+			Assert.Throws<ArgumentNullException> (() => manager.Update ((IEnumerable<IUserInfo>)null));
 		}
 		
 		[Test]
@@ -160,7 +160,7 @@ namespace Gablarski.Tests
 		public void UpdateNullUser()
 		{
 			var manager = new ClientUserManager();
-			Assert.Throws<ArgumentNullException> (() => manager.Update ((UserInfo)null));
+			Assert.Throws<ArgumentNullException> (() => manager.Update ((IUserInfo)null));
 		}
 		
 		[Test]
@@ -259,7 +259,7 @@ namespace Gablarski.Tests
 		public void GetIsJoinedNullUser ()
 		{
 			var manager = new ClientUserManager ();
-			Assert.Throws<ArgumentNullException> (() => manager.GetIsJoined ((UserInfo)null));
+			Assert.Throws<ArgumentNullException> (() => manager.GetIsJoined ((IUserInfo)null));
 		}
 		
 		[Test]

@@ -1,4 +1,4 @@
-// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -44,7 +44,7 @@ namespace Gablarski.Client
 	internal class ClientUserManager
 		: IClientUserManager
 	{
-		public UserInfo this[int userId]
+		public IUserInfo this[int userId]
 		{
 			get
 			{
@@ -58,63 +58,72 @@ namespace Gablarski.Client
 			}
 		}
 
-		public void Join (UserInfo user)
+		public void Join (IUserInfo user)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
 
+			var u = new UserInfo (user);
 			lock (syncRoot)
 			{
-				users.Add (user.UserId, user);
-				channels.Add (user.CurrentChannelId, user);
+				users.Add (user.UserId, u);
+				channels.Add (user.CurrentChannelId, u);
 			}
 		}
 
-		public bool GetIsJoined (UserInfo user)
+		public bool GetIsJoined (IUserInfo user)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
 
 			lock (syncRoot)
-				return users.ContainsValue (user);
+				return users.ContainsKey (user.UserId);
 		}
 
-		public bool GetIsIgnored (UserInfo user)
+		public bool GetIsIgnored (IUserInfo user)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
 
 			lock (this.syncRoot)
-				return this.ignores.Contains (user);
+				return this.ignores.Contains (user.UserId);
 		}
 
-		public bool Depart (UserInfo user)
+		public bool Depart (IUserInfo user)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
 
 			lock (this.syncRoot)
 			{
-				this.ignores.Remove (user);
-				this.users.Remove (user.UserId);
-				return this.channels.Remove (user.CurrentChannelId, user);
+				this.ignores.Remove (user.UserId);
+
+				UserInfo realUser;
+				if (this.users.TryGetValue (user.UserId, out realUser))
+				{
+					this.users.Remove (user.UserId);
+					return this.channels.Remove (user.CurrentChannelId, realUser);
+				}
+				else
+					return false;
 			}
 		}
 		
-		public void Update (IEnumerable<UserInfo> userUpdate)
+		public void Update (IEnumerable<IUserInfo> userUpdate)
 		{
 			if (userUpdate == null)
 				throw new ArgumentNullException ("userUpdate");
 				
 			lock (this.syncRoot)
 			{
-				this.ignores = new HashSet<UserInfo> (this.ignores.Intersect (userUpdate));
-				this.users = userUpdate.ToDictionary (u => u.UserId);
-				this.channels = new MutableLookup<int, UserInfo> (userUpdate.ToLookup (u => u.CurrentChannelId));
+				this.ignores = new HashSet<int> (this.ignores.Intersect (userUpdate.Select (u => u.UserId)));
+				this.users = userUpdate.ToDictionary (u => u.UserId, u => new UserInfo (u));
+				this.channels =
+					new MutableLookup<int, UserInfo> (userUpdate.ToLookup (u => u.CurrentChannelId, u => new UserInfo (u)));
 			}
 		}
 		
-		public void Update (UserInfo user)
+		public void Update (IUserInfo user)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
@@ -139,15 +148,15 @@ namespace Gablarski.Client
 			}
 		}
 
-		public IEnumerable<UserInfo> GetUsersInChannel (int channelId)
+		public IEnumerable<IUserInfo> GetUsersInChannel (int channelId)
 		{
 			lock (this.syncRoot)
 			{
-				return this.channels[channelId].ToList();
+				return this.channels[channelId].Cast<IUserInfo>().ToList();
 			}
 		}
 
-		public bool ToggleIgnore (UserInfo user)
+		public bool ToggleIgnore (IUserInfo user)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
@@ -155,18 +164,14 @@ namespace Gablarski.Client
 			bool ignored;
 			lock (this.syncRoot)
 			{
-				ignored = ignores.Contains (user);
-
-				if (ignored)
-					ignores.Remove (user);
-				else
-					ignores.Add (user);
+				if (!(ignored = ignores.Remove (user.UserId)))
+					ignores.Add (user.UserId);
 			}
 
 			return !ignored;
 		}
 
-		public void ToggleMute (UserInfo user)
+		public void ToggleMute (IUserInfo user)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
@@ -175,18 +180,18 @@ namespace Gablarski.Client
 			{
 				UserInfo oldUser;
 				if (!users.TryGetValue (user.UserId, out oldUser))
-					oldUser = user;
+					oldUser = new UserInfo (user);
 				
 				users[user.UserId] = new UserInfo (oldUser.Nickname, user.Phonetic, user.Username, user.UserId, user.CurrentChannelId, !user.IsMuted);
 			}
 		}
 
-		public IEnumerator<UserInfo> GetEnumerator ()
+		public IEnumerator<IUserInfo> GetEnumerator ()
 		{
-			IEnumerable<UserInfo> returnUsers;
+			IEnumerable<IUserInfo> returnUsers;
 			lock (this.syncRoot)
 			{
-				 returnUsers = this.users.Values.ToList();
+				 returnUsers = this.users.Values.Cast<IUserInfo>().ToList();
 			}
 
 			return returnUsers.GetEnumerator ();
@@ -204,7 +209,7 @@ namespace Gablarski.Client
 
 		private readonly object syncRoot = new object ();
 
-		private HashSet<UserInfo> ignores = new HashSet<UserInfo>();
+		private HashSet<int> ignores = new HashSet<int>();
 		private Dictionary<int, UserInfo> users = new Dictionary<int, UserInfo> ();
 		private MutableLookup<int, UserInfo> channels = new MutableLookup<int, UserInfo> ();
 	}

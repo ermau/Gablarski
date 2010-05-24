@@ -48,7 +48,7 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public RequestMuteUserMessage (UserInfo user, bool mute)
+		public RequestMuteUserMessage (IUser user, bool mute)
 			: this()
 		{
 			if (user == null)

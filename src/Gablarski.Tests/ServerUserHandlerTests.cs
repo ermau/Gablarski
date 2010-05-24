@@ -107,7 +107,7 @@ namespace Gablarski.Tests
 			Connect();
 			JoinAsGuest();
 
-			UserInfo user = handler.First();
+			IUserInfo user = handler.First();
 
 			handler.Move (user, new ChannelInfo());
 
@@ -120,7 +120,7 @@ namespace Gablarski.Tests
 			Connect();
 			JoinAsGuest();
 
-			UserInfo user = handler.First();
+			IUserInfo user = handler.First();
 
 			handler.Move (user, context.Channels[user.CurrentChannelId]);
 
@@ -137,7 +137,7 @@ namespace Gablarski.Tests
 		    Connect();
 		    JoinAsGuest();
 
-		    UserInfo user = handler.First();
+		    IUserInfo user = handler.First();
 
 			handler.Move (user, altChannel);
 
@@ -153,7 +153,7 @@ namespace Gablarski.Tests
 		{
 			Assert.Throws<ArgumentNullException> (() => handler.Send (new ConnectMessage(), (Func<IConnection, bool>)null));
 			Assert.Throws<ArgumentNullException> (() => handler.Send (null, c => false));
-			Assert.Throws<ArgumentNullException> (() => handler.Send (new ConnectMessage(), (Func<IConnection, UserInfo, bool>)null));
+			Assert.Throws<ArgumentNullException> (() => handler.Send (new ConnectMessage(), (Func<IConnection, IUserInfo, bool>)null));
 			Assert.Throws<ArgumentNullException> (() => handler.Send (null, (c, u) => false));
 		}
 
@@ -272,17 +272,17 @@ namespace Gablarski.Tests
 			JoinAsGuest (server, false, true, "pass", "Nickname", "wrong");
 		}
 
-		public UserInfo JoinAsGuest (MockServerConnection connection, string nickname)
+		public IUserInfo JoinAsGuest (MockServerConnection connection, string nickname)
 		{
 			return JoinAsGuest (connection, true, true, null, nickname, null);
 		}
 
-		public UserInfo JoinAsGuest (MockServerConnection connection, bool shouldWork, bool allowGuests, string serverPassword, string nickname, string userServerpassword)
+		public IUserInfo JoinAsGuest (MockServerConnection connection, bool shouldWork, bool allowGuests, string serverPassword, string nickname, string userServerpassword)
 		{
 			return JoinAsGuest (connection, true, shouldWork, allowGuests, serverPassword, nickname, userServerpassword);
 		}
 
-		public UserInfo JoinAsGuest (MockServerConnection connection, bool connect, bool shouldWork, bool allowGuests, string serverPassword, string nickname, string userServerpassword)
+		public IUserInfo JoinAsGuest (MockServerConnection connection, bool connect, bool shouldWork, bool allowGuests, string serverPassword, string nickname, string userServerpassword)
 		{
 			context.Settings.AllowGuestLogins = allowGuests;
 			context.Settings.ServerPassword = serverPassword;

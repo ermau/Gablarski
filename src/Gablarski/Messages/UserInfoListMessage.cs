@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -37,7 +37,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Gablarski.Messages
 {
@@ -49,13 +48,16 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public UserInfoListMessage (IEnumerable<UserInfo> users)
+		public UserInfoListMessage (IEnumerable<IUserInfo> users)
 			: this()
 		{
+			if (users == null)
+				throw new ArgumentNullException ("users");
+
 			this.Users = users;
 		}
 
-		public IEnumerable<UserInfo> Users
+		public IEnumerable<IUserInfo> Users
 		{
 			get;
 			set;
@@ -64,7 +66,7 @@ namespace Gablarski.Messages
 		public override void WritePayload (IValueWriter writer)
 		{
 			writer.WriteInt32 (this.Users.Count());
-			foreach (UserInfo info in this.Users)
+			foreach (var info in this.Users)
 				info.Serialize (writer);
 		}
 

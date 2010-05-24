@@ -77,7 +77,7 @@ namespace Gablarski.Client
 			get { return manager[id]; }
 		}
 
-		public IEnumerable<AudioSource> this[UserInfo user]
+		public IEnumerable<AudioSource> this[IUserInfo user]
 		{
 			get { return manager[user]; }
 		}

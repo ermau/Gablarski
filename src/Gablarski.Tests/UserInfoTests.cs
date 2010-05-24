@@ -32,14 +32,10 @@ namespace Gablarski.Tests
 		public static UserInfo GetTestUser (int increment, int channelId, bool muted)
 		{
 			return new UserInfo (Nickname + increment, Phonetic + increment, Username + increment, UserId + increment,
-			                     channelId, muted)
-			{
-				Comment = Comment,
-				Status = Status
-			};
+			                     channelId, muted, Comment, Status);
 		}
 
-		public static void AssertUserInfosMatch (UserInfo expected, UserInfo actual)
+		public static void AssertUserInfosMatch (IUserInfo expected, IUserInfo actual)
 		{
 			Assert.AreEqual (expected.UserId, actual.UserId);
 			Assert.AreEqual (expected.CurrentChannelId, actual.CurrentChannelId);
@@ -53,7 +49,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void InvalidCtor()
 		{
-			Assert.Throws<ArgumentNullException> (() => new UserInfo ((UserInfo)null));
+			Assert.Throws<ArgumentNullException> (() => new UserInfo ((IUserInfo)null));
 			Assert.Throws<ArgumentNullException> (() => new UserInfo ((StreamValueReader)null));
 
 			Assert.Throws<ArgumentNullException> (() => new UserInfo (null, UserId, ChanId, Muted));
@@ -94,9 +90,7 @@ namespace Gablarski.Tests
 			var writer = new StreamValueWriter (stream);
 			var reader = new StreamValueReader (stream);
 
-			var info = new UserInfo (Nickname, Phonetic, Username, UserId, ChanId, Muted);
-			info.Comment = Comment;
-			info.Status = Status;
+			IUserInfo info = new UserInfo (Nickname, Phonetic, Username, UserId, ChanId, Muted, Comment, Status);
 
 			info.Serialize (writer);
 			long length = stream.Position;
@@ -116,8 +110,8 @@ namespace Gablarski.Tests
 		[Test]
 		public void Equals()
 		{
-			UserInfo foo = new UserInfo (Nickname, Phonetic, Username, 1, 2, Muted);
-			UserInfo bar = new UserInfo (Nickname, Phonetic, Username, 1, 2, Muted);
+			IUserInfo foo = new UserInfo (Nickname, Phonetic, Username, 1, 2, Muted);
+			IUserInfo bar = new UserInfo (Nickname, Phonetic, Username, 1, 2, Muted);
 
 			Assert.AreEqual (foo, bar);
 		}

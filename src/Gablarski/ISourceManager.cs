@@ -51,7 +51,7 @@ namespace Gablarski
 		/// </summary>
 		/// <param name="user">The owner to find sources for.</param>
 		/// <returns>An empty enumerable if <paramref name="user"/> doesn't own any sources, otherwise the owned sources.</returns>
-		IEnumerable<AudioSource> this[UserInfo user] { get; }
+		IEnumerable<AudioSource> this[IUserInfo user] { get; }
 
 		/// <summary>
 		/// Removes the audio <paramref name="source"/>.
@@ -67,7 +67,7 @@ namespace Gablarski
 		/// <param name="user">The user to remove all sources for.</param>
 		/// <returns><c>true</c> if any sources belonging to <paramref name="user"/> were found.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
-		bool Remove (UserInfo user);
+		bool Remove (IUserInfo user);
 
 		/// <summary>
 		/// Toggles mute for the <paramref name="source"/>.

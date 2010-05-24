@@ -49,7 +49,7 @@ namespace Gablarski.Tests
 			VerifyDefaultUsers (handler);
 		}
 
-		private static void VerifyDefaultUsers (IEnumerable<UserInfo> manager)
+		private static void VerifyDefaultUsers (IEnumerable<IUserInfo> manager)
 		{
 			Assert.AreEqual (1, manager.Count (u => u.UserId == 1 && u.Nickname == "Foo" && !u.IsMuted && u.CurrentChannelId == 1));
 			Assert.AreEqual (1, manager.Count (u => u.UserId == 2 && u.Nickname == "Bar" && !u.IsMuted && u.CurrentChannelId == 1));

@@ -37,12 +37,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
-using System.Text;
 using Cadenza.Collections;
 using Gablarski.Messages;
-using System.Threading;
 
 namespace Gablarski.Client
 {
@@ -72,7 +69,7 @@ namespace Gablarski.Client
 		/// <summary>
 		/// An new or updated user list has been received.
 		/// </summary>
-		public event EventHandler<ReceivedListEventArgs<UserInfo>> ReceivedUserList;
+		public event EventHandler<ReceivedListEventArgs<IUserInfo>> ReceivedUserList;
 
 		/// <summary>
 		/// A new user has joined.
@@ -108,7 +105,7 @@ namespace Gablarski.Client
 		/// <summary>
 		/// Gets the current user.
 		/// </summary>
-		public CurrentUser Current
+		public IUserInfo Current
 		{
 			get { return this.context.CurrentUser; }
 		}
@@ -118,7 +115,7 @@ namespace Gablarski.Client
 		/// </summary>
 		/// <param name="user">The user to move.</param>
 		/// <param name="targetChannel">The target channel to move the user to.</param>
-		public void Move (UserInfo user, ChannelInfo targetChannel)
+		public void Move (IUserInfo user, ChannelInfo targetChannel)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
@@ -128,17 +125,17 @@ namespace Gablarski.Client
 			this.context.Connection.Send (new ChannelChangeMessage (user.UserId, targetChannel.ChannelId));
 		}
 
-		public bool GetIsIgnored (UserInfo user)
+		public bool GetIsIgnored (IUserInfo user)
 		{
 			return this.manager.GetIsIgnored (user);
 		}
 
-		public bool ToggleIgnore (UserInfo user)
+		public bool ToggleIgnore (IUserInfo user)
 		{
 			return this.manager.ToggleIgnore (user);
 		}
 
-		public void ToggleMute (UserInfo user)
+		public void ToggleMute (IUserInfo user)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
@@ -146,15 +143,15 @@ namespace Gablarski.Client
 			context.Connection.Send (new RequestMuteUserMessage (user, !user.IsMuted));
 		}
 
-		public IEnumerable<UserInfo> GetUsersInChannel (int channelId)
+		public IEnumerable<IUserInfo> GetUsersInChannel (int channelId)
 		{
 			lock (SyncRoot)
 			{
-				return this.channels[channelId].ToList();
+				return this.channels[channelId].Cast<IUserInfo>().ToList();
 			}
 		}
 
-		public UserInfo this[int userId]
+		public IUserInfo this[int userId]
 		{
 			get { return this.manager[userId]; }
 		}
@@ -168,9 +165,9 @@ namespace Gablarski.Client
 			}
 		}
 
-		public IEnumerator<UserInfo> GetEnumerator ()
+		public IEnumerator<IUserInfo> GetEnumerator ()
 		{
-			IEnumerable<UserInfo> returnUsers;
+			IEnumerable<IUserInfo> returnUsers;
 			lock (SyncRoot)
 			{
 				 returnUsers = this.manager.ToList();
@@ -190,7 +187,7 @@ namespace Gablarski.Client
 		}
 
 		private readonly IClientUserManager manager;
-		private readonly MutableLookup<int, UserInfo> channels = new MutableLookup<int, UserInfo> ();
+		private readonly MutableLookup<int, IUserInfo> channels = new MutableLookup<int, IUserInfo> ();
 		private readonly IClientContext context;
 
 		#region Message handlers
@@ -199,7 +196,7 @@ namespace Gablarski.Client
 			var msg = (UserMutedMessage) e.Message;
 
 			bool fire = false;
-			UserInfo user;
+			IUserInfo user;
 			lock (this.manager.SyncRoot)
 			{
 				user = this.manager[msg.UserId];
@@ -218,14 +215,14 @@ namespace Gablarski.Client
 		{
 			var msg = (UserInfoListMessage)e.Message;
 
-			IEnumerable<UserInfo> userlist;
+			IEnumerable<IUserInfo> userlist;
 			lock (SyncRoot)
 			{
 				this.manager.Update (msg.Users);
 				userlist = msg.Users.ToList();
 			}
 
-			OnReceivedUserList (new ReceivedListEventArgs<UserInfo> (userlist));
+			OnReceivedUserList (new ReceivedListEventArgs<IUserInfo> (userlist));
 		}
 
 		internal void OnUserUpdatedMessage (MessageReceivedEventArgs e)
@@ -233,15 +230,7 @@ namespace Gablarski.Client
 			var msg = (UserUpdatedMessage) e.Message;
 
 			lock (SyncRoot)
-			{
 				this.manager.Update (msg.User);
-
-				if (msg.User.Equals (context.CurrentUser))
-				{
-					context.CurrentUser.Comment = msg.User.Comment;
-					context.CurrentUser.Status = msg.User.Status;
-				}
-			}
 
 			OnUserUpdated (new UserEventArgs (msg.User));
 		}
@@ -250,7 +239,7 @@ namespace Gablarski.Client
 		{
 			var msg = (UserDisconnectedMessage) e.Message;
 
-			UserInfo user;
+			IUserInfo user;
 			lock (SyncRoot)
 			{
 				if ((user = this[msg.UserId]) == null)
@@ -266,7 +255,7 @@ namespace Gablarski.Client
 		{
 			var msg = (UserJoinedMessage)e.Message;
 
-			UserInfo user = new UserInfo (msg.UserInfo);
+			IUserInfo user = new UserInfo (msg.UserInfo);
 			
 			this.manager.Join (user);
 
@@ -283,9 +272,9 @@ namespace Gablarski.Client
 
 			var previous = this.context.Channels[msg.ChangeInfo.PreviousChannelId];
 
-			UserInfo old;
-			UserInfo user;
-			UserInfo movedBy = null;
+			IUserInfo old;
+			IUserInfo user;
+			IUserInfo movedBy = null;
 			lock (SyncRoot)
 			{
 				if ((old = this[msg.ChangeInfo.TargetUserId]) == null)
@@ -293,9 +282,6 @@ namespace Gablarski.Client
 
 				user = new UserInfo (old.Nickname, old.Phonetic, old.Username, old.UserId, msg.ChangeInfo.TargetChannelId, old.IsMuted);
 				this.manager.Update (user);
-				
-				if (user.Equals (context.CurrentUser))
-					context.CurrentUser.CurrentChannelId = msg.ChangeInfo.TargetChannelId;
 
 				if (msg.ChangeInfo.RequestingUserId != 0)
 					movedBy = this[msg.ChangeInfo.RequestingUserId];
@@ -335,7 +321,7 @@ namespace Gablarski.Client
 				disconnected (this, e);
 		}
 
-		protected virtual void OnReceivedUserList (ReceivedListEventArgs<UserInfo> e)
+		protected virtual void OnReceivedUserList (ReceivedListEventArgs<IUserInfo> e)
 		{
 			var received = this.ReceivedUserList;
 			if (received != null)
@@ -369,7 +355,7 @@ namespace Gablarski.Client
 	public class UserMutedEventArgs
 		: UserEventArgs
 	{
-		public UserMutedEventArgs (UserInfo userInfo, bool unmuted)
+		public UserMutedEventArgs (IUserInfo userInfo, bool unmuted)
 			: base (userInfo)
 		{
 			this.Unmuted = unmuted;
@@ -381,7 +367,7 @@ namespace Gablarski.Client
 	public class UserEventArgs
 		: EventArgs
 	{
-		public UserEventArgs (UserInfo userInfo)
+		public UserEventArgs (IUserInfo userInfo)
 		{
 			if (userInfo == null)
 				throw new ArgumentNullException ("userInfo");
@@ -392,7 +378,7 @@ namespace Gablarski.Client
 		/// <summary>
 		/// Gets the user target of the event.
 		/// </summary>
-		public UserInfo User
+		public IUserInfo User
 		{
 			get;
 			private set;
@@ -402,7 +388,7 @@ namespace Gablarski.Client
 	public class ChannelChangedEventArgs
 		: UserEventArgs
 	{
-		public ChannelChangedEventArgs (UserInfo target, ChannelInfo targetChannel, ChannelInfo previousChannel, UserInfo movedBy)
+		public ChannelChangedEventArgs (IUserInfo target, ChannelInfo targetChannel, ChannelInfo previousChannel, IUserInfo movedBy)
 			: base (target)
 		{
 			if (targetChannel == null)
@@ -433,7 +419,7 @@ namespace Gablarski.Client
 		/// <summary>
 		/// Gets the user the target user was moved by
 		/// </summary>
-		public UserInfo MovedBy
+		public IUserInfo MovedBy
 		{
 			get; private set;
 		}

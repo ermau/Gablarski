@@ -43,7 +43,7 @@ using Gablarski.Messages;
 namespace Gablarski.Server
 {
 	public interface IServerUserHandler
-		: IConnectionHandler, IIndexedEnumerable<int, UserInfo>
+		: IConnectionHandler, IIndexedEnumerable<int, IUserInfo>
 	{
 		/// <summary>
 		/// Moves <paramref name="user"/> to the <paramref name="targetChannel"/>.
@@ -54,9 +54,9 @@ namespace Gablarski.Server
 		/// <remarks>
 		/// The main reasons for a failed move are that the user or channel no longer exists.
 		/// </remarks>
-		void Move (UserInfo user, ChannelInfo targetChannel);
+		void Move (IUserInfo user, ChannelInfo targetChannel);
 
-		void Send (MessageBase message, Func<IConnection, UserInfo, bool> predicate);
+		void Send (MessageBase message, Func<IConnection, IUserInfo, bool> predicate);
 
 		/// <summary>
 		/// Disconnects a user for a specific reason.
@@ -64,12 +64,12 @@ namespace Gablarski.Server
 		/// <param name="user">The user to disconnect.</param>
 		/// <param name="reason">The reason to disconnect the user.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
-		void Disconnect (UserInfo user, DisconnectionReason reason);
+		void Disconnect (IUserInfo user, DisconnectionReason reason);
 	}
 
 	public static class ServerUserHandlerExtensions
 	{
-		public static void Send (this IServerUserHandler self, MessageBase message, Func<UserInfo, bool> predicate)
+		public static void Send (this IServerUserHandler self, MessageBase message, Func<IUserInfo, bool> predicate)
 		{
 			if (self == null)
 				throw new ArgumentNullException ("self");

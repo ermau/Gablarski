@@ -41,6 +41,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Threading;
+using Cadenza.Collections;
 using Gablarski.Audio;
 using Gablarski.Messages;
 using Gablarski.Network;
@@ -156,7 +157,7 @@ namespace Gablarski.Client
 		/// <summary>
 		/// Gets the current user.
 		/// </summary>
-		public CurrentUser CurrentUser
+		public ICurrentUserHandler CurrentUser
 		{
 			get;
 			private set;
@@ -236,8 +237,6 @@ namespace Gablarski.Client
 		{
 			if (handler == null)
 				throw new ArgumentNullException ("handler");
-			if (this.handlers.ContainsKey (messageType))
-				throw new InvalidOperationException (messageType + " has already been registered.");
 
 			this.handlers.Add (messageType, handler);
 		}
@@ -297,9 +296,11 @@ namespace Gablarski.Client
 			get { return this.Channels; }
 		}
 
-		private readonly Dictionary<ServerMessageType, Action<MessageReceivedEventArgs>> handlers = new Dictionary<ServerMessageType, Action<MessageReceivedEventArgs>>();
+		private readonly MutableLookup<ServerMessageType, Action<MessageReceivedEventArgs>> handlers = new MutableLookup<ServerMessageType, Action<MessageReceivedEventArgs>>();
 		private void Setup (IClientConnection connection, IAudioEngine audioEngine, IClientUserHandler userHandler, IClientSourceHandler sourceHandler, ClientChannelManager channelManager)
 		{
+			this.CurrentUser = new CurrentUser (this);
+
 			this.Connection = connection;
 			this.Audio = (audioEngine ?? new AudioEngine());
 			this.Users = (userHandler ?? new ClientUserHandler (this, new ClientUserManager()));

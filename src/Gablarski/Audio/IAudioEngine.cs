@@ -157,7 +157,7 @@ namespace Gablarski.Audio
 		/// <param name="users">The new target users.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="source"/> or <paramref name="users"/> are <c>null</c>.</exception>
 		/// <exception cref="ArgumentException"><paramref name="source"/> is not attached.</exception>
-		void Update (AudioSource source, IEnumerable<UserInfo> users);
+		void Update (AudioSource source, IEnumerable<IUserInfo> users);
 
 		/// <summary>
 		/// Updates <paramref name="source"/> with <paramref name="options"/>.
@@ -242,7 +242,7 @@ namespace Gablarski.Audio
 		/// <exception cref="ArgumentNullException"><paramref name="source"/> or <paramref name="channels"/> are <c>null</c>.</exception>
 		void BeginCapture (AudioSource source, IEnumerable<ChannelInfo> channels);
 		/// <exception cref="ArgumentNullException"><paramref name="source"/> or <paramref name="users"/> are <c>null</c>.</exception>
-		void BeginCapture (AudioSource source, IEnumerable<UserInfo> users);
+		void BeginCapture (AudioSource source, IEnumerable<IUserInfo> users);
 		
 		void EndCapture (AudioSource source);
 	}
@@ -257,7 +257,7 @@ namespace Gablarski.Audio
 			self.BeginCapture (source, new[] { channel });
 		}
 
-		public static void BeginCapture (this IAudioEngine self, AudioSource source, UserInfo user)
+		public static void BeginCapture (this IAudioEngine self, AudioSource source, IUserInfo user)
 		{
 			if (self == null)
 				throw new ArgumentNullException ("self");

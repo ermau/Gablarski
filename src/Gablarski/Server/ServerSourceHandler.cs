@@ -75,7 +75,7 @@ namespace Gablarski.Server
 			get { return manager[key]; }
 		}
 
-		public IEnumerable<AudioSource> this [UserInfo user]
+		public IEnumerable<AudioSource> this [IUserInfo user]
 		{
 			get { return manager[user]; }
 		}
@@ -87,7 +87,7 @@ namespace Gablarski.Server
 			manager.Remove (source);
 		}
 
-		public void Remove (UserInfo user)
+		public void Remove (IUserInfo user)
 		{
 			IEnumerable<AudioSource> sources = manager[user];
 			if (sources == null)
@@ -103,7 +103,7 @@ namespace Gablarski.Server
 
 			SourceResult result = SourceResult.FailedUnknown;
 
-			UserInfo requestingUser = context.UserManager.GetUser (e.Connection);
+			IUserInfo requestingUser = context.UserManager.GetUser (e.Connection);
 			if (requestingUser == null)
 				return;
 
@@ -185,7 +185,7 @@ namespace Gablarski.Server
 		{
 			var msg = (ClientAudioSourceStateChangeMessage)e.Message;
 
-			UserInfo speaker;
+			IUserInfo speaker;
 			if (!CanSendFromSource (e.Connection, msg.SourceId, out speaker))
 				return;
 
@@ -197,7 +197,7 @@ namespace Gablarski.Server
 		{
 			var msg = (ClientAudioDataMessage)e.Message;
 
-			UserInfo speaker;
+			IUserInfo speaker;
 			if (!CanSendFromSource (e.Connection, msg.SourceId, out speaker))
 				return;
 
@@ -226,7 +226,7 @@ namespace Gablarski.Server
 			}
 		}
 
-		private bool CanSendFromSource (IConnection connection, int sourceId, out UserInfo speaker)
+		private bool CanSendFromSource (IConnection connection, int sourceId, out IUserInfo speaker)
 		{
 			speaker = null;
 

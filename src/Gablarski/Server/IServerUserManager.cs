@@ -35,29 +35,27 @@
 // DAMAGE.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using Gablarski.Messages;
 
 namespace Gablarski.Server
 {
 	public interface IServerUserManager
-		: IConnectionManager, IIndexedEnumerable<int, UserInfo>
+		: IConnectionManager, IIndexedEnumerable<int, IUserInfo>
 	{
 		/// <exception cref="ArgumentNullException"><paramref name="connection"/> or <paramref name="user"/> is <c>null</c>.</exception>
-		void Login (IConnection connection, UserInfo user);
+		void Login (IConnection connection, IUserInfo user);
 
 		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
-		bool GetIsLoggedIn (UserInfo user);
+		bool GetIsLoggedIn (IUserInfo user);
 
 		/// <exception cref="ArgumentNullException"><paramref name="connection"/> is <c>null</c>.</exception>
 		bool GetIsLoggedIn (IConnection connection);
 
 		/// <exception cref="ArgumentNullException"><paramref name="connection"/> or <paramref name="user"/> is <c>null</c>.</exception>
-		void Join (IConnection connection, UserInfo user);
+		void Join (IConnection connection, IUserInfo user);
 		
 		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
-		bool GetIsJoined (UserInfo user);
+		bool GetIsJoined (IUserInfo user);
 
 		/// <exception cref="ArgumentNullException"><paramref name="connection"/> is <c>null</c>.</exception>
 		bool GetIsJoined (IConnection connection);
@@ -68,7 +66,7 @@ namespace Gablarski.Server
 		/// <param name="user">The user to move.</param>
 		/// <param name="channel">The channel to move the user to.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="user"/> or <paramref name="channel"/> is <c>null</c>.</exception>
-		void Move (UserInfo user, ChannelInfo channel);
+		void Move (IUserInfo user, ChannelInfo channel);
 
 		/// <summary>
 		/// Toggles mute on the <paramref name="user"/>.
@@ -76,7 +74,7 @@ namespace Gablarski.Server
 		/// <param name="user">The user to mute or unmute.</param>
 		/// <returns><c>true</c> if <paramref name="user"/> is now muted, <c>false</c> otherwise.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
-		bool ToggleMute (UserInfo user);
+		bool ToggleMute (IUserInfo user);
 
 		/// <summary>
 		/// Sets the state for the <paramref name="user"/>.
@@ -85,7 +83,7 @@ namespace Gablarski.Server
 		/// <param name="newStatus>The new state of the user.</param>
 		/// <returns>The updated <see cref="UserInfo"/>. <c>null</c> if the user was not found.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
-		UserInfo SetStatus (UserInfo user, UserStatus newStatus);
+		IUserInfo SetStatus (IUserInfo user, UserStatus newStatus);
 
 		/// <summary>
 		/// Sets the comment for the <paramref name="user"/>.
@@ -97,7 +95,7 @@ namespace Gablarski.Server
 		/// <remarks>
 		/// Passing either <c>null</c> or <c>String.Empty</c> for <paramref name="comment"/> is ok to clear it.
 		/// </remarks>
-		UserInfo SetComment (UserInfo user, string comment);
+		IUserInfo SetComment (IUserInfo user, string comment);
 
 		/// <summary>
 		/// Gets whether <paramref name="nickname"/> is currently in use or not.
@@ -117,7 +115,7 @@ namespace Gablarski.Server
 		/// <param name="user">The user to find the connection for.</param>
 		/// <returns>The associated connection, <c>null</c> if not found.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
-		IConnection GetConnection (UserInfo user);
+		IConnection GetConnection (IUserInfo user);
 
 		/// <summary>
 		/// Gets the user associated with the <paramref name="connection"/>. <c>null</c> if not found.
@@ -125,12 +123,12 @@ namespace Gablarski.Server
 		/// <param name="connection"></param>
 		/// <returns>The associated user, <c>null</c> if not found.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="connection"/> is <c>null</c>.</exception>
-		UserInfo GetUser (IConnection connection);
+		IUserInfo GetUser (IConnection connection);
 	}
 
 	public static class ServerUserManagerExtensions
 	{
-		public static void Disconnect (this IServerUserManager self, UserInfo user)
+		public static void Disconnect (this IServerUserManager self, IUserInfo user)
 		{
 			if (self == null)
 				throw new ArgumentNullException ("self");

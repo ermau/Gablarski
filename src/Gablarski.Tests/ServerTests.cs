@@ -70,14 +70,13 @@ namespace Gablarski.Tests
 			return connection;
 		}
 
-		private UserInfo Join (bool loggedIn, MockServerConnection connection, string nickname)
+		private IUserInfo Join (bool loggedIn, MockServerConnection connection, string nickname)
 		{
 			return Join (loggedIn, connection, nickname, null);
 		}
 
-		private UserInfo Join (bool loggedIn, MockServerConnection connection, string nickname, string serverPassword)
+		private IUserInfo Join (bool loggedIn, MockServerConnection connection, string nickname, string serverPassword)
 		{
-			UserInfo user;
 			connection.Client.Send (new JoinMessage (nickname, serverPassword));
 
 			var joinResultMessage = connection.Client.DequeueAndAssertMessage<JoinResultMessage>();
@@ -89,7 +88,7 @@ namespace Gablarski.Tests
 			}
 
 			var userJoinedMessage = connection.Client.DequeueAndAssertMessage<UserJoinedMessage>();
-			user = userJoinedMessage.UserInfo;
+			IUserInfo user = userJoinedMessage.UserInfo;
 			Assert.AreEqual (nickname, userJoinedMessage.UserInfo.Nickname);
 			
 			Assert.AreEqual (joinResultMessage.UserInfo.Username, userJoinedMessage.UserInfo.Username);
@@ -242,9 +241,8 @@ namespace Gablarski.Tests
 		[Test]
 		public void UserDisconnected()
 		{
-			UserInfo foo;
 			var fooc = Login (Username, Password);
-			foo = Join (true, fooc, Nickname);
+			IUserInfo foo = Join (true, fooc, Nickname);
 
 			var barc = Login (Username2, Password2);
 

@@ -76,7 +76,7 @@ namespace Gablarski.Client
 		/// <summary>
 		/// Gets the current logged in user.
 		/// </summary>
-		CurrentUser CurrentUser { get; }
+		ICurrentUserHandler CurrentUser { get; }
 
 		/// <summary>
 		/// Registers a message handler.
@@ -84,7 +84,6 @@ namespace Gablarski.Client
 		/// <param name="messageType">The message type to register a handler for.</param>
 		/// <param name="handler">The handler to register for the message type.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="handler"/> is <c>null</c>.</exception>
-		/// <exception cref="InvalidOperationException"><paramref name="messageType"/> already has a registered handler.</exception>
 		void RegisterMessageHandler (ServerMessageType messageType, Action<MessageReceivedEventArgs> handler);
 	}
 

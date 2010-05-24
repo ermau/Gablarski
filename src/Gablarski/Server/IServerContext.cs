@@ -113,14 +113,14 @@ namespace Gablarski.Server
 			if (connection == null)
 				return self.GetPermission (name);
 
-			UserInfo user = self.UserManager.GetUser (connection);
+			IUserInfo user = self.UserManager.GetUser (connection);
 			if (user == null)
 				return self.GetPermission (name);
 
 			return self.GetPermission (name, user.CurrentChannelId, user.UserId);
 		}
 
-		public static bool GetPermission (this IServerContext self, PermissionName name, UserInfo user)
+		public static bool GetPermission (this IServerContext self, PermissionName name, IUserInfo user)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
@@ -137,14 +137,14 @@ namespace Gablarski.Server
 			if (connection == null)
 				throw new ArgumentNullException ("connection");
 
-			UserInfo user = self.UserManager.GetUser (connection);
+			IUserInfo user = self.UserManager.GetUser (connection);
 			if (user == null)
 				return self.GetPermission (name);
 
 			return GetPermission (self, name, channel.ChannelId, user.UserId);
 		}
 
-		public static bool GetPermission (this IServerContext self, PermissionName name, ChannelInfo channel, UserInfo user)
+		public static bool GetPermission (this IServerContext self, PermissionName name, ChannelInfo channel, IUserInfo user)
 		{
 			if (channel == null)
 				throw new ArgumentNullException ("channel");

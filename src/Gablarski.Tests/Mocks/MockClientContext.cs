@@ -37,7 +37,7 @@ namespace Gablarski.Tests
 		/// <summary>
 		/// Gets the current logged in user.
 		/// </summary>
-		public CurrentUser CurrentUser { get; set; }
+		public ICurrentUserHandler CurrentUser { get; set; }
 
 		public ServerInfo ServerInfo { get; set; }
 

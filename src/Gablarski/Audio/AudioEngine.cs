@@ -215,7 +215,7 @@ namespace Gablarski.Audio
 			}
 		}
 
-		public void Update (AudioSource source, IEnumerable<UserInfo> users)
+		public void Update (AudioSource source, IEnumerable<IUserInfo> users)
 		{
 			if (source == null)
 				throw new ArgumentNullException ("source");
@@ -334,7 +334,7 @@ namespace Gablarski.Audio
 			}
 		}
 
-		public void BeginCapture (AudioSource source, IEnumerable<UserInfo> users)
+		public void BeginCapture (AudioSource source, IEnumerable<IUserInfo> users)
 		{
 			#if DEBUG
 			if (source == null)

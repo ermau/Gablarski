@@ -57,13 +57,13 @@ namespace Gablarski
 	/// Represents a joined user.
 	/// </summary>
 	public class UserInfo
-		: IUser, IEquatable<UserInfo>
+		: IUserInfo
 	{
 		internal UserInfo()
 		{
 		}
 		
-		internal UserInfo (UserInfo info)
+		internal UserInfo (IUserInfo info)
 		{
 			if (info == null)
 				throw new ArgumentNullException ("info");
@@ -82,12 +82,37 @@ namespace Gablarski
 		{
 		}
 
-		internal UserInfo (string nickname, string phonetic, UserInfo info)
+		internal UserInfo (IUserInfo user, bool muted)
+			: this (user.Nickname, user.Phonetic, user.Username, user.UserId, user.CurrentChannelId, muted, user.Comment, user.Status)
+		{
+		}
+
+		internal UserInfo (IUserInfo user, int currentChannelId)
+			: this (user.Nickname, user.Phonetic, user.Username, user.UserId, currentChannelId, user.IsMuted, user.Comment, user.Status)
+		{
+		}
+
+		internal UserInfo (IUserInfo user, string comment)
+			: this (user.Nickname, user.Phonetic, user.Username, user.UserId, user.CurrentChannelId, user.IsMuted, comment, user.Status)
+		{
+		}
+
+		internal UserInfo (IUserInfo user, UserStatus status)
+			: this (user.Nickname, user.Phonetic, user.Username, user.UserId, user.CurrentChannelId, user.IsMuted, user.Comment, status)
+		{
+		}
+
+		internal UserInfo (string nickname, string phonetic, IUserInfo info)
 			: this (nickname, phonetic, info.Username, info.UserId, info.CurrentChannelId, info.IsMuted)
 		{
 		}
 
 		internal UserInfo (string nickname, string phonetic, string username, int userId, int currentChannelId, bool muted)
+			: this(nickname, phonetic, username, userId, currentChannelId, muted, null, UserStatus.Normal)
+		{
+		}
+
+		internal UserInfo (string nickname, string phonetic, string username, int userId, int currentChannelId, bool muted, string comment, UserStatus status)
 		{
 			if (nickname.IsNullOrWhitespace())
 				throw new ArgumentNullException ("nickname");
@@ -126,13 +151,13 @@ namespace Gablarski
 			if (reader == null)
 				throw new ArgumentNullException("reader");
 
-			Deserialize (reader);
+			((IUserInfo)this).Deserialize (reader);
 		}
 
 		public int UserId
 		{
 			get;
-			set;
+			protected set;
 		}
 
 		/// <summary>
@@ -149,7 +174,7 @@ namespace Gablarski
 		public string Username
 		{
 			get;
-			set;
+			protected set;
 		}
 
 		/// <summary>
@@ -158,40 +183,49 @@ namespace Gablarski
 		public int CurrentChannelId
 		{
 			get;
-			set;
+			protected set;
 		}
 
+		/// <summary>
+		/// Gets the user's nickname.
+		/// </summary>
 		public string Nickname
 		{
 			get;
-			set;
+			protected set;
 		}
 		
+		/// <summary>
+		/// Gets the user's phonetic.
+		/// </summary>
 		public string Phonetic
 		{
 			get;
-			set;
+			protected set;
 		}
 
+		/// <summary>
+		/// Gets whether the user is muted or not.
+		/// </summary>
 		public bool IsMuted
 		{
 			get;
-			set;
+			protected set;
 		}
 
 		public UserStatus Status
 		{
 			get;
-			set;
+			protected set;
 		}
 
 		public string Comment
 		{
 			get;
-			set;
+			protected set;
 		}
 
-		internal void Serialize (IValueWriter writer)
+		void IUserInfo.Serialize (IValueWriter writer)
 		{
 			writer.WriteInt32 (UserId);
 			writer.WriteString (Username);
@@ -203,7 +237,7 @@ namespace Gablarski
 			writer.WriteString (Comment);
 		}
 
-		internal void Deserialize (IValueReader reader)
+		void IUserInfo.Deserialize (IValueReader reader)
 		{
 			UserId = reader.ReadInt32();
 			Username = reader.ReadString();
@@ -222,7 +256,7 @@ namespace Gablarski
 
 		public override bool Equals (object obj)
 		{
-			var info = (obj as UserInfo);
+			var info = (obj as IUserInfo);
 			if (info != null)
 				return Username == info.Username;
 
@@ -233,7 +267,7 @@ namespace Gablarski
 			return false;
 		}
 
-		public bool Equals (UserInfo other)
+		public bool Equals (IUserInfo other)
 		{
 			if (ReferenceEquals (null, other))
 				return false;

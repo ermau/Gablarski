@@ -121,7 +121,7 @@ namespace Gablarski.Tests
 			var engine = new AudioEngine();
 
 			Assert.Throws<ArgumentNullException> (() => engine.Update (null, new UserInfo[] {}));
-			Assert.Throws<ArgumentNullException> (() => engine.Update (source, (IEnumerable<UserInfo>)null));
+			Assert.Throws<ArgumentNullException> (() => engine.Update (source, (IEnumerable<IUserInfo>)null));
 			Assert.Throws<ArgumentException> (() => engine.Update (source, new UserInfo[] { }));
 		}
 

@@ -48,7 +48,7 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public SetPermissionsMessage (UserInfo user, IEnumerable<Permission> permissions)
+		public SetPermissionsMessage (IUserInfo user, IEnumerable<Permission> permissions)
 			: this()
 		{
 			if (user == null)

@@ -51,7 +51,7 @@ namespace Gablarski.Server
 			this.context = serverContext;
 		}
 
-		public AudioSource Create (string name, UserInfo owner, AudioCodecArgs audioArgs)
+		public AudioSource Create (string name, IUserInfo owner, AudioCodecArgs audioArgs)
 		{
 			if (name == null)
 				throw new ArgumentNullException ("name");
@@ -78,7 +78,7 @@ namespace Gablarski.Server
 			return source;
 		}
 
-		public bool IsSourceNameTaken (UserInfo user, string sourceName)
+		public bool IsSourceNameTaken (IUserInfo user, string sourceName)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");

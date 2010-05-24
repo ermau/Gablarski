@@ -118,14 +118,14 @@ namespace Gablarski.Clients.Windows
 			this.channelNodes.Add (channel, node);
 		}
 
-		public void AddUser (UserInfo user, IEnumerable<AudioSource> sources)
+		public void AddUser (IUserInfo user, IEnumerable<AudioSource> sources)
 		{
 			if (user == null)
 				return;
 
 			if (this.InvokeRequired)
 			{
-				this.BeginInvoke ((Action<UserInfo, IEnumerable<AudioSource>>)this.AddUser, user, sources);
+				this.BeginInvoke ((Action<IUserInfo, IEnumerable<AudioSource>>)this.AddUser, user, sources);
 				return;
 			}
 
@@ -195,14 +195,14 @@ namespace Gablarski.Clients.Windows
 			userNode.Expand();
 		}
 
-		public void RemoveUser (UserInfo user)
+		public void RemoveUser (IUserInfo user)
 		{
 			if (user == null)
 				return;
 
 			if (this.InvokeRequired)
 			{
-				this.BeginInvoke ((Action<UserInfo>)this.RemoveUser, user);
+				this.BeginInvoke ((Action<IUserInfo>)this.RemoveUser, user);
 				return;
 			}
 
@@ -217,14 +217,14 @@ namespace Gablarski.Clients.Windows
 				sourceNodes.Remove (kvp.Key);
 		}
 
-		public void MarkTalking (UserInfo user)
+		public void MarkTalking (IUserInfo user)
 		{
 			if (user == null)
 				return;
 
 			if (this.InvokeRequired)
 			{
-				this.BeginInvoke ((Action<UserInfo>)this.MarkTalking, user);
+				this.BeginInvoke ((Action<IUserInfo>)this.MarkTalking, user);
 				return;
 			}
 
@@ -261,14 +261,14 @@ namespace Gablarski.Clients.Windows
 			}
 		}
 
-		public void MarkMusic (UserInfo user)
+		public void MarkMusic (IUserInfo user)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
 
 			if (this.InvokeRequired)
 			{
-				this.BeginInvoke ((Action<UserInfo>)this.MarkTalking, user);
+				this.BeginInvoke ((Action<IUserInfo>)this.MarkTalking, user);
 				return;
 			}
 
@@ -299,14 +299,14 @@ namespace Gablarski.Clients.Windows
 			SetupUserContext (node.Parent);
 		}
 
-		public void MarkMuted (UserInfo user)
+		public void MarkMuted (IUserInfo user)
 		{
 			if (user == null)
 				return;
 
 			if (this.InvokeRequired)
 			{
-				this.BeginInvoke ((Action<UserInfo>)this.MarkMuted, user);
+				this.BeginInvoke ((Action<IUserInfo>)this.MarkMuted, user);
 				return;
 			}
 
@@ -337,7 +337,7 @@ namespace Gablarski.Clients.Windows
 				SetupUserContext (node.Parent);
 			else
 			{
-				UserInfo user = client.Users[source.OwnerId];
+				IUserInfo user = client.Users[source.OwnerId];
 				if (user != null && userNodes.TryGetValue (user, out node))
 					SetupUserContext (node);
 			}
@@ -346,14 +346,14 @@ namespace Gablarski.Clients.Windows
 				node.ImageKey = node.SelectedImageKey = "silent";
 		}
 
-		public void MarkSilent (UserInfo user)
+		public void MarkSilent (IUserInfo user)
 		{
 			if (user == null)
 				return;
 
 			if (this.InvokeRequired)
 			{
-				this.BeginInvoke ((Action<UserInfo>)this.MarkSilent, user);
+				this.BeginInvoke ((Action<IUserInfo>)this.MarkSilent, user);
 				return;
 			}
 
@@ -365,11 +365,11 @@ namespace Gablarski.Clients.Windows
 			SetupUserContext (node);
 		}
 
-		public void Update (IEnumerable<ChannelInfo> channels, IEnumerable<UserInfo> users, IEnumerable<AudioSource> sources)
+		public void Update (IEnumerable<ChannelInfo> channels, IEnumerable<IUserInfo> users, IEnumerable<AudioSource> sources)
 		{
 			if (InvokeRequired)
 			{
-				BeginInvoke ((Action<IEnumerable<ChannelInfo>, IEnumerable<UserInfo>, IEnumerable<AudioSource>>)Update, channels, users, sources);
+				BeginInvoke ((Action<IEnumerable<ChannelInfo>, IEnumerable<IUserInfo>, IEnumerable<AudioSource>>)Update, channels, users, sources);
 				return;
 			}
 
@@ -403,7 +403,7 @@ namespace Gablarski.Clients.Windows
 
 		private TreeNode serverNode;
 		private readonly Dictionary<ChannelInfo, TreeNode> channelNodes = new Dictionary<ChannelInfo, TreeNode>();
-		private readonly Dictionary<UserInfo, TreeNode> userNodes = new Dictionary<UserInfo, TreeNode>();
+		private readonly Dictionary<IUserInfo, TreeNode> userNodes = new Dictionary<IUserInfo, TreeNode>();
 		private readonly Dictionary<AudioSource, TreeNode> sourceNodes = new Dictionary<AudioSource, TreeNode>();
 
 		protected override void DefWndProc (ref Message m)
@@ -422,7 +422,7 @@ namespace Gablarski.Clients.Windows
 		protected override void OnItemDrag (ItemDragEventArgs e)
 		{
 			var node = ((TreeNode)e.Item);
-			if (node.Tag is UserInfo)
+			if (node.Tag is IUserInfo)
 				DoDragDrop (node, DragDropEffects.Move);
 
 			base.OnItemDrag (e);
@@ -444,7 +444,7 @@ namespace Gablarski.Clients.Windows
 				if (destinationNode != null)
 				{
 					var channel = destinationNode.Tag as ChannelInfo;
-					var user = movedNode.Tag as UserInfo;
+					var user = movedNode.Tag as IUserInfo;
 					if (channel != null && user != null)
 					{
 						if (user.CurrentChannelId.Equals (channel.ChannelId))
@@ -509,7 +509,7 @@ namespace Gablarski.Clients.Windows
 
 		private void ContextIgnoreUserClick (object sender, EventArgs e)
 		{
-			var u = (UserInfo)this.SelectedNode.Tag;
+			var u = (IUserInfo)this.SelectedNode.Tag;
 			if (Client.Users.ToggleIgnore (u))
 				MarkMuted (u);
 			else if (!u.IsMuted)
@@ -533,7 +533,7 @@ namespace Gablarski.Clients.Windows
 
 		private void ContextMuteUserClick (object sender, EventArgs e)
 		{
-			Client.Users.ToggleMute ((UserInfo)this.SelectedNode.Tag);
+			Client.Users.ToggleMute ((IUserInfo)this.SelectedNode.Tag);
 		}
 
 		private void ContextMuteSourceClick (object sender, EventArgs e)
@@ -613,7 +613,7 @@ namespace Gablarski.Clients.Windows
 
 			un.ContextMenuStrip = new ContextMenuStrip();
 			
-			var target = (UserInfo)un.Tag;
+			var target = (IUserInfo)un.Tag;
 
 			if (!target.Comment.IsNullOrWhitespace())
 			{
@@ -686,7 +686,7 @@ namespace Gablarski.Clients.Windows
 
 		private void ContextGotoUrlUserCommentClick(object sender, EventArgs e)
 		{
-			string url = ((UserInfo) this.SelectedNode.Tag).Comment.Trim();
+			string url = ((IUserInfo) this.SelectedNode.Tag).Comment.Trim();
 
 			if (url.StartsWith ("www."))
 				url = "http://" + url;
@@ -696,7 +696,7 @@ namespace Gablarski.Clients.Windows
 
 		private void ContextCopyUserCommentClick (object sender, EventArgs e)
 		{
-			Clipboard.SetText (((UserInfo)this.SelectedNode.Tag).Comment);
+			Clipboard.SetText (((IUserInfo)this.SelectedNode.Tag).Comment);
 		}
 		
 		private void SetupChannelContext (TreeNode cn)

@@ -34,54 +34,23 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 
-namespace Gablarski.Messages
+namespace Gablarski
 {
-	public class JoinResultMessage
-		: ServerMessage
+	public class UserEqualityComparer
+		: IEqualityComparer<IUserInfo>
 	{
-		public JoinResultMessage()
-			: base (ServerMessageType.JoinResult)
+		public bool Equals (IUserInfo x, IUserInfo y)
 		{
+			return (x.Username == y.Username);
 		}
 
-		public JoinResultMessage (LoginResultState state, IUserInfo user)
-			: this()
+		public int GetHashCode (IUserInfo obj)
 		{
-			this.Result = state;
-			this.UserInfo = user;
+			return obj.Username.GetHashCode();
 		}
-
-		public LoginResultState Result
-		{
-			get; set;
-		}
-		
-		public IUserInfo UserInfo
-		{
-			get;
-			set;
-		}
-
-		#region Overrides of MessageBase
-
-		public override void WritePayload (IValueWriter writer)
-		{
-			writer.WriteInt32 ((int)this.Result);
-			
-			if (this.UserInfo != null)
-				this.UserInfo.Serialize (writer);
-		}
-
-		public override void ReadPayload (IValueReader reader)
-		{
-			this.Result = (LoginResultState)reader.ReadInt32();
-
-			if (this.Result == LoginResultState.Success)
-				this.UserInfo = new UserInfo (reader);
-		}
-
-		#endregion
 	}
 }

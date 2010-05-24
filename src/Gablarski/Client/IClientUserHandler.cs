@@ -42,12 +42,12 @@ using System.Text;
 namespace Gablarski.Client
 {
 	public interface IClientUserHandler
-		: IIndexedEnumerable<int, UserInfo>
+		: IIndexedEnumerable<int, IUserInfo>
 	{
 		/// <summary>
 		/// An new or updated user list has been received.
 		/// </summary>
-		event EventHandler<ReceivedListEventArgs<UserInfo>> ReceivedUserList;
+		event EventHandler<ReceivedListEventArgs<IUserInfo>> ReceivedUserList;
 		
 		/// <summary>
 		/// A new user has joined.
@@ -77,7 +77,7 @@ namespace Gablarski.Client
 		/// <summary>
 		/// Gets the current user.
 		/// </summary>
-		CurrentUser Current { get; }
+		IUserInfo Current { get; }
 
 		/// <summary>
 		/// Gets whether or not <paramref name="user"/> is currently ignored.
@@ -85,14 +85,14 @@ namespace Gablarski.Client
 		/// <param name="user">The user to check.</param>
 		/// <returns><c>true</c> if ignored, <c>false</c> if not.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
-		bool GetIsIgnored (UserInfo user);
+		bool GetIsIgnored (IUserInfo user);
 
 		/// <summary>
 		/// Toggles ignore on <paramref name="user"/>.
 		/// </summary>
 		/// <param name="user">The user to ignore or unignore.</param>
 		/// <returns><c>true</c> if the user is now ignored, <c>false</c> if the user is now unignored.</returns>
-		bool ToggleIgnore (UserInfo user);
+		bool ToggleIgnore (IUserInfo user);
 
 		/// <summary>
 		/// Gets the users in the given channel.
@@ -101,14 +101,14 @@ namespace Gablarski.Client
 		/// <returns>
 		/// A <see cref="IEnumerable{UserInfo}"/> of the users in the channel. <c>null</c> if the channel was not found.
 		/// </returns>
-		IEnumerable<UserInfo> GetUsersInChannel (int channelId);
+		IEnumerable<IUserInfo> GetUsersInChannel (int channelId);
 
 		/// <summary>
 		/// Requests to move <paramref name="user"/> to <paramref name="targetChannel"/>.
 		/// </summary>
 		/// <param name="user">The user to move.</param>
 		/// <param name="targetChannel">The target channel to move the user to.</param>
-		void Move (UserInfo user, ChannelInfo targetChannel);
+		void Move (IUserInfo user, ChannelInfo targetChannel);
 
 		/// <summary>
 		/// Attempts to toggle mute on <paramref name="user"/>.
@@ -119,7 +119,7 @@ namespace Gablarski.Client
 		/// Since muting is server-side and permissions restricted, this will return immediately without
 		/// new state information, that'll come later.
 		/// </remarks>
-		void ToggleMute (UserInfo user);
+		void ToggleMute (IUserInfo user);
 
 		/// <summary>
 		/// Resets the handler to it's initial state.

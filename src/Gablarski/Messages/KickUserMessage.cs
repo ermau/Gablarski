@@ -48,17 +48,17 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public KickUserMessage (UserInfo user, bool fromServer)
+		public KickUserMessage (IUser user, bool fromServer)
 			: this()
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
 
-			User = user;
+			UserId = user.UserId;
 			FromServer = fromServer;
 		}
 
-		public UserInfo User
+		public int UserId
 		{
 			get;
 			set;
@@ -72,13 +72,13 @@ namespace Gablarski.Messages
 
 		public override void ReadPayload (IValueReader reader)
 		{
-			User = new UserInfo (reader);
+			UserId = reader.ReadInt32();
 			FromServer = reader.ReadBool();
 		}
 
 		public override void WritePayload (IValueWriter writer)
 		{
-			User.Serialize (writer);
+			writer.WriteInt32 (UserId);
 			writer.WriteBool (FromServer);
 		}
 	}

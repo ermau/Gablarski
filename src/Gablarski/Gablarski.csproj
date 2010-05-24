@@ -116,6 +116,7 @@
     <Compile Include="Client\IClientSourceHandler.cs" />
     <Compile Include="Client\IClientSourceManager.cs" />
     <Compile Include="Client\IClientUserHandler.cs" />
+    <Compile Include="Client\ICurrentUserHandler.cs" />
     <Compile Include="Encryption.cs" />
     <Compile Include="IConnectionHandler.cs" />
     <Compile Include="IEncryption.cs" />
@@ -124,6 +125,7 @@
     <Compile Include="ISourceHandler.cs" />
     <Compile Include="ISourceManager.cs" />
     <Compile Include="IUser.cs" />
+    <Compile Include="IUserInfo.cs" />
     <Compile Include="Messages\AudioSourceStateChangeMessage.cs" />
     <Compile Include="Messages\ClientAudioSourceStateChangeMessage.cs" />
     <Compile Include="Messages\JoinMessage.cs" />
@@ -200,6 +202,7 @@
     <Compile Include="AudioSourceManager.cs" />
     <Compile Include="Server\ServerUserHandler.cs" />
     <Compile Include="Server\ServerUserManager.cs" />
+    <Compile Include="UserEqualityComparer.cs" />
     <Compile Include="UserInfo.cs" />
     <Compile Include="ServerInfo.cs" />
     <Compile Include="Server\GuestPermissionProvider.cs" />

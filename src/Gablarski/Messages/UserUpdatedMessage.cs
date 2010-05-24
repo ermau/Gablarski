@@ -48,13 +48,16 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public UserUpdatedMessage (UserInfo user)
+		public UserUpdatedMessage (IUserInfo user)
 			: this()
 		{
+			if (user == null)
+				throw new ArgumentNullException ("user");
+
 			User = user;
 		}
 
-		public UserInfo User
+		public IUserInfo User
 		{
 			get;
 			private set;

@@ -244,7 +244,7 @@ namespace Gablarski.Clients.Windows
 			switch (e.PropertyName)
 			{
 				case "DisplaySources":
-					this.users.Update (this.gablarski.Channels, this.gablarski.Users.Cast<UserInfo>(), this.gablarski.Sources);
+					this.users.Update (this.gablarski.Channels, this.gablarski.Users, this.gablarski.Sources);
 					break;
 
 				case Settings.UsePushToTalkSettingName:
@@ -480,7 +480,7 @@ namespace Gablarski.Clients.Windows
 			this.users.AddUser (e.User, Enumerable.Empty<AudioSource>());
 		}
 
-		void UsersReceivedUserList (object sender, ReceivedListEventArgs<UserInfo> e)
+		void UsersReceivedUserList (object sender, ReceivedListEventArgs<IUserInfo> e)
 		{
 			this.users.Update (this.gablarski.Channels, e.Data, this.gablarski.Sources);
 		}

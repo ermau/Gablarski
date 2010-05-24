@@ -130,9 +130,12 @@ namespace Gablarski.Client
 
 					if (this.running)
 					{
-						Action<MessageReceivedEventArgs> handler;
-						if (this.handlers.TryGetValue (msg.MessageType, out handler))
-							handler (e);
+						IEnumerable<Action<MessageReceivedEventArgs>> mhandlers;
+						if (this.handlers.TryGetValues (msg.MessageType, out mhandlers))
+						{
+							foreach (var h in mhandlers)
+								h (e);
+						}
 					}
 				}
 

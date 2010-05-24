@@ -53,7 +53,7 @@ namespace Gablarski.Server
 		/// <returns>The newly created audio source.</returns>
 		/// <exception cref="ArgumentException"><paramref name="name"/> is in use by the user already.</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="name"/>, <paramref name="owner"/> or <paramref name="audioArgs"/> is <c>null</c>.</exception>
-		AudioSource Create (string name, UserInfo owner, AudioCodecArgs audioArgs);
+		AudioSource Create (string name, IUserInfo owner, AudioCodecArgs audioArgs);
 
 		/// <summary>
 		/// Gets whether the <paramref name="sourceName"/> is in use by <paramref name="user"/>.
@@ -62,6 +62,6 @@ namespace Gablarski.Server
 		/// <param name="sourceName">The name to check for.</param>
 		/// <returns><c>true</c> if the source name is in use, <c>false</c> if not or <paramref name="user"/> wasn't found.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="user"/> or <paramref name="sourceName"/> is <c>null</c>.</exception>
-		bool IsSourceNameTaken (UserInfo user, string sourceName);
+		bool IsSourceNameTaken (IUserInfo user, string sourceName);
 	}
 }

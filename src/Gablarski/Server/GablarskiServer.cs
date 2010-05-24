@@ -408,7 +408,7 @@ namespace Gablarski.Server
 
 		private void OnPermissionsChanged (object sender, PermissionsChangedEventArgs e)
 		{
-			UserInfo user = Users[e.UserId];
+			IUserInfo user = Users[e.UserId];
 			if (user != null)
 				UserManager.GetConnection (user).Send (new PermissionsMessage (e.UserId, this.context.PermissionsProvider.GetPermissions (e.UserId)));
 		}
@@ -427,7 +427,7 @@ namespace Gablarski.Server
 			e.Connection.MessageReceived -= this.OnMessageReceived;
 			e.Connection.Disconnected -= this.OnClientDisconnected;
 
-			UserInfo user = UserManager.GetUser (e.Connection);
+			IUserInfo user = UserManager.GetUser (e.Connection);
 			if (user != null)
 			{
 				Sources.Remove (user);

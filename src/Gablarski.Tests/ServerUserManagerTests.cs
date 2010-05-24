@@ -50,7 +50,7 @@ namespace Gablarski.Tests
 		private IServerUserManager manager;
 		private MockServerConnection server;
 		private MockClientConnection client;
-		private UserInfo user;
+		private IUserInfo user;
 
 		[SetUp]
 		public void Setup()
@@ -181,7 +181,7 @@ namespace Gablarski.Tests
 			Assert.IsTrue (manager.GetIsJoined (client));
 			Assert.IsTrue (manager.GetIsJoined (user));
 
-			UserInfo joinedUser = manager.GetUser (client);
+			IUserInfo joinedUser = manager.GetUser (client);
 			Assert.AreEqual (user.UserId, joinedUser.UserId);
 			Assert.AreEqual (user.Username, joinedUser.Username);
 			Assert.AreEqual (user.Nickname, joinedUser.Nickname);
@@ -200,7 +200,7 @@ namespace Gablarski.Tests
 			Assert.IsTrue (manager.GetIsJoined (client));
 			Assert.IsTrue (manager.GetIsJoined (user));
 
-			UserInfo joinedUser = manager.GetUser (client);
+			IUserInfo joinedUser = manager.GetUser (client);
 			Assert.AreEqual (user.UserId, joinedUser.UserId);
 			Assert.AreEqual (user.Username, joinedUser.Username);
 			Assert.AreEqual (user.Nickname, joinedUser.Nickname);
@@ -292,7 +292,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void MoveSameChannel()
 		{
-			var c = new ChannelInfo(2);
+			var c = new ChannelInfo (2);
 
 			manager.Connect (client);
 			manager.Join (client, user);
@@ -337,7 +337,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void ToggleMuteUnmuted()
 		{
-			user.IsMuted = false;
+			user = new UserInfo (user, true);
 			Assert.IsFalse (user.IsMuted);
 
 			manager.Connect (client);
@@ -356,7 +356,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void ToggleMuteMuted()
 		{
-			user.IsMuted = true;
+			user = new UserInfo (user, true);
 			Assert.IsTrue (user.IsMuted);
 
 			manager.Connect (client);

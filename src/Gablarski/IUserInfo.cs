@@ -34,54 +34,51 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 
-namespace Gablarski.Messages
+namespace Gablarski
 {
-	public class JoinResultMessage
-		: ServerMessage
+	public interface IUserInfo
+		: IUser, IEquatable<IUserInfo>
 	{
-		public JoinResultMessage()
-			: base (ServerMessageType.JoinResult)
-		{
-		}
+		/// <summary>
+		/// Gets whether the user is registered or is a guest.
+		/// </summary>
+		bool IsRegistered { get; }
 
-		public JoinResultMessage (LoginResultState state, IUserInfo user)
-			: this()
-		{
-			this.Result = state;
-			this.UserInfo = user;
-		}
+		/// <summary>
+		/// Gets the user's current channel id.
+		/// </summary>
+		int CurrentChannelId { get; }
 
-		public LoginResultState Result
-		{
-			get; set;
-		}
-		
-		public IUserInfo UserInfo
-		{
-			get;
-			set;
-		}
+		/// <summary>
+		/// Gets the user's nickname.
+		/// </summary>
+		string Nickname { get; }
 
-		#region Overrides of MessageBase
+		/// <summary>
+		/// Gets the user's phonetic.
+		/// </summary>
+		string Phonetic { get; }
 
-		public override void WritePayload (IValueWriter writer)
-		{
-			writer.WriteInt32 ((int)this.Result);
-			
-			if (this.UserInfo != null)
-				this.UserInfo.Serialize (writer);
-		}
+		/// <summary>
+		/// Gets the user's current 
+		/// </summary>
+		UserStatus Status { get; }
 
-		public override void ReadPayload (IValueReader reader)
-		{
-			this.Result = (LoginResultState)reader.ReadInt32();
+		/// <summary>
+		/// Gets whether the user is muted or not.
+		/// </summary>
+		bool IsMuted { get; }
 
-			if (this.Result == LoginResultState.Success)
-				this.UserInfo = new UserInfo (reader);
-		}
+		/// <summary>
+		/// Gets the user's current comment.
+		/// </summary>
+		string Comment { get; }
 
-		#endregion
+		void Serialize (IValueWriter writer);
+		void Deserialize (IValueReader reader);
 	}
 }

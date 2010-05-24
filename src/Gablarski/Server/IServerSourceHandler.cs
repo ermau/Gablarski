@@ -56,6 +56,6 @@ namespace Gablarski.Server
 		/// </summary>
 		/// <param name="user">The user to remove all sources for.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
-		void Remove (UserInfo user);
+		void Remove (IUserInfo user);
 	}
 }

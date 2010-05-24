@@ -43,6 +43,6 @@ namespace Gablarski
 	public interface ISourceHandler<TSource>
 		: IIndexedEnumerable<int, TSource>
 	{
-		IEnumerable<TSource> this[UserInfo user] { get; }
+		IEnumerable<TSource> this[IUserInfo user] { get; }
 	}
 }

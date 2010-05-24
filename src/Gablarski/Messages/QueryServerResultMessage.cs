@@ -54,7 +54,7 @@ namespace Gablarski.Messages
 			get { return false; }
 		}
 
-		public IEnumerable<UserInfo> Users
+		public IEnumerable<IUserInfo> Users
 		{
 			get; set;
 		}

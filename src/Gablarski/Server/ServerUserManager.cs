@@ -45,7 +45,7 @@ namespace Gablarski.Server
 	public class ServerUserManager
 		: IServerUserManager
 	{
-		public UserInfo	this [int userId]
+		public IUserInfo this [int userId]
 		{
 			get
 			{
@@ -76,7 +76,7 @@ namespace Gablarski.Server
 			return connections.Contains (connection);
 		}
 
-		public bool GetIsConnected (UserInfo user)
+		public bool GetIsConnected (IUserInfo user)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
@@ -88,7 +88,7 @@ namespace Gablarski.Server
 			return false;
 		}
 
-		public void Join (IConnection connection, UserInfo user)
+		public void Join (IConnection connection, IUserInfo user)
 		{
 			if (connection == null)
 				throw new ArgumentNullException ("connection");
@@ -110,7 +110,7 @@ namespace Gablarski.Server
 			return joined.Contains (connection);
 		}
 
-		public bool GetIsJoined (UserInfo user)
+		public bool GetIsJoined (IUserInfo user)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
@@ -122,7 +122,7 @@ namespace Gablarski.Server
 			return false;
 		}
 
-		public void Move (UserInfo user, ChannelInfo channel)
+		public void Move (IUserInfo user, ChannelInfo channel)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
@@ -133,17 +133,15 @@ namespace Gablarski.Server
 			if (connection == null)
 				return;
 
-			UserInfo old;
+			IUserInfo old;
 			if (!connectedUsers.TryGetKey (connection, out old))
 				return;
 
-			UserInfo newUser = new UserInfo (old);
-			newUser.CurrentChannelId = channel.ChannelId;
-
+			UserInfo newUser = new UserInfo (old, channel.ChannelId);
 			connectedUsers.Inverse[connection] = newUser;
 		}
 
-		public bool ToggleMute (UserInfo user)
+		public bool ToggleMute (IUserInfo user)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
@@ -152,19 +150,17 @@ namespace Gablarski.Server
 			if (connection == null)
 				return false;
 
-			UserInfo old;
+			IUserInfo old;
 			if (!connectedUsers.TryGetKey (connection, out old))
 				return false;
 
-			UserInfo newUser = new UserInfo (old);
-			newUser.IsMuted = !old.IsMuted;
-
+			UserInfo newUser = new UserInfo (old, !old.IsMuted);
 			connectedUsers.Inverse[connection] = newUser;
 
 			return newUser.IsMuted;
 		}
 
-		public UserInfo SetStatus (UserInfo user, UserStatus newStatus)
+		public IUserInfo SetStatus (IUserInfo user, UserStatus newStatus)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
@@ -173,19 +169,17 @@ namespace Gablarski.Server
 			if (connection == null)
 				return null;
 
-			UserInfo old;
+			IUserInfo old;
 			if (!connectedUsers.TryGetKey (connection, out old))
 				return null;
 
-			UserInfo newUser = new UserInfo (old);
-			newUser.Status = newStatus;
-
+			UserInfo newUser = new UserInfo (old, newStatus);
 			connectedUsers.Inverse[connection] = newUser;
 
 			return newUser;
 		}
 
-		public UserInfo SetComment (UserInfo user, string comment)
+		public IUserInfo SetComment (IUserInfo user, string comment)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
@@ -194,19 +188,17 @@ namespace Gablarski.Server
 			if (connection == null)
 				return null;
 
-			UserInfo old;
+			IUserInfo old;
 			if (!connectedUsers.TryGetKey (connection, out old))
 				return null;
 
-			UserInfo newUser = new UserInfo (old);
-			newUser.Comment = comment;
-
+			UserInfo newUser = new UserInfo (old, comment);
 			connectedUsers.Inverse[connection] = newUser;
 
 			return newUser;
 		}
 
-		public void Login (IConnection connection, UserInfo user)
+		public void Login (IConnection connection, IUserInfo user)
 		{
 			if (connection == null)
 				throw new ArgumentNullException ("connection");
@@ -237,7 +229,7 @@ namespace Gablarski.Server
 			return loggedIn.Contains (connection);
 		}
 
-		public bool GetIsLoggedIn (UserInfo user)
+		public bool GetIsLoggedIn (IUserInfo user)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
@@ -287,18 +279,18 @@ namespace Gablarski.Server
 			}
 		}
 
-		public UserInfo GetUser (IConnection connection)
+		public IUserInfo GetUser (IConnection connection)
 		{
 			if (connection == null)
 				throw new ArgumentNullException ("connection");
 
-			UserInfo user;
+			IUserInfo user;
 			connectedUsers.TryGetKey (connection, out user);
 
 			return user;
 		}
 
-		public IConnection GetConnection (UserInfo user)
+		public IConnection GetConnection (IUserInfo user)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
@@ -314,11 +306,11 @@ namespace Gablarski.Server
 		private readonly HashSet<IConnection> joined = new HashSet<IConnection>();
 		private readonly HashSet<IConnection> loggedIn = new HashSet<IConnection>();
 		private readonly HashSet<IConnection> connections = new HashSet<IConnection>();
-		private readonly BidirectionalDictionary<UserInfo, IConnection> connectedUsers = new BidirectionalDictionary<UserInfo, IConnection>();
+		private readonly BidirectionalDictionary<IUserInfo, IConnection> connectedUsers = new BidirectionalDictionary<IUserInfo, IConnection> (10, new UserEqualityComparer(), EqualityComparer<IConnection>.Default);
 
 		#region IEnumerable Members
 
-		public IEnumerator<UserInfo> GetEnumerator()
+		public IEnumerator<IUserInfo> GetEnumerator()
 		{
 			return connectedUsers.Keys.ToList().GetEnumerator();
 		}

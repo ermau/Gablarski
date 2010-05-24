@@ -38,35 +38,51 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Gablarski.Messages;
-using Gablarski.Server;
 using Cadenza;
 
 namespace Gablarski.Client
 {
 	public class CurrentUser
-		: UserInfo
+		: UserInfo, ICurrentUserHandler
 	{
-		internal CurrentUser (IClientContext context)
+		public CurrentUser (IClientContext context)
 		{
 			if (context == null)
 				throw new ArgumentNullException ("context");
 
 			this.context = context;
 
+			this.context.RegisterMessageHandler (ServerMessageType.UserChangedChannel, OnUserChangedChannelMessage);
+			this.context.RegisterMessageHandler (ServerMessageType.UserUpdated, OnUserUpdatedMessage);
 			this.context.RegisterMessageHandler (ServerMessageType.LoginResult, OnLoginResultMessage);
 			this.context.RegisterMessageHandler (ServerMessageType.JoinResult, OnJoinResultMessage);
 			this.context.RegisterMessageHandler (ServerMessageType.Permissions, OnPermissionsMessage);
+		}
+
+		private void OnUserChangedChannelMessage (MessageReceivedEventArgs e)
+		{
+			var msg = (UserChangedChannelMessage) e.Message;
+
+			var channel = this.context.Channels[msg.ChangeInfo.TargetChannelId];
+			if (channel == null)
+				return;
+
+			var user = this.context.Users[msg.ChangeInfo.TargetUserId];
+			if (user == null || !user.Equals (this))
+				return;
+
+			this.CurrentChannelId = msg.ChangeInfo.TargetChannelId;
 		}
 
 		internal CurrentUser (IClientContext context, int userId, string nickname, int currentChannelId)
 			: this (context)
 		{
 			if (userId == 0)
-				throw new ArgumentException("userId");
+				throw new ArgumentException ("userId");
 			if (nickname.IsNullOrWhitespace())
-				throw new ArgumentNullException("nickname", "nickname is null or empty.");
+				throw new ArgumentNullException ("nickname", "nickname is null or empty.");
 			if (currentChannelId < 0)
-				throw new ArgumentOutOfRangeException("currentChannelId");
+				throw new ArgumentOutOfRangeException ("currentChannelId");
 
 			this.UserId = userId;
 			this.Nickname = nickname;
@@ -95,13 +111,6 @@ namespace Gablarski.Client
 		public event EventHandler PermissionsChanged;
 		#endregion
 
-		/// <summary>
-		/// Logs into the connected server
-		/// </summary>
-		/// <param name="username">The username to log in with.</param>
-		/// <param name="password">The password to log in with.</param>
-		/// <exception cref="System.ArgumentNullException"><paramref name="username"/> is null or empty.</exception>
-		/// <exception cref="System.ArgumentNullException"><paramref name="password"/> is null.</exception>
 		public void Login (string username, string password)
 		{
 			if (username.IsNullOrWhitespace())
@@ -116,22 +125,11 @@ namespace Gablarski.Client
 			});
 		}
 		
-		/// <summary>
-		/// Joins the connected server with the specified nickname and password.
-		/// </summary>
-		/// <param name="nickname">The nickname to use when in the server.</param>
-		/// <param name="serverPassword">The password to join the server.</param>
 		public void Join (string nickname, string serverPassword)
 		{
 			Join (nickname, null, serverPassword);
 		}
 
-		/// <summary>
-		/// Joins the connected server with the specified nickname and password.
-		/// </summary>
-		/// <param name="nickname">The nickname to use when in the server.</param>
-		/// <param name="phonetic">The phonetic spelling for the nickname.</param>
-		/// <param name="serverPassword">The password to join the server.</param>
 		public void Join (string nickname, string phonetic, string serverPassword)
 		{
 			if (nickname.IsNullOrWhitespace())
@@ -232,6 +230,17 @@ namespace Gablarski.Client
 			var join = this.ReceivedJoinResult;
 			if (join != null)
 				join (this, e);
+		}
+
+		private void OnUserUpdatedMessage (MessageReceivedEventArgs e)
+		{
+			var msg = (UserUpdatedMessage) e.Message;
+
+			if (!msg.User.Equals (this))
+				return;
+
+			this.Comment = msg.User.Comment;
+			this.Status = msg.User.Status;
 		}
 
 		internal void OnLoginResultMessage (MessageReceivedEventArgs e)

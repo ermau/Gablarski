@@ -42,7 +42,7 @@ using System.Text;
 namespace Gablarski.Client
 {
 	public interface IClientUserManager
-		: IIndexedEnumerable<int, UserInfo>
+		: IIndexedEnumerable<int, IUserInfo>
 	{
 		/// <summary>
 		/// Gets the synchronization root for the manager.
@@ -56,7 +56,7 @@ namespace Gablarski.Client
 		/// A <see cref="UserInfo"/>
 		/// </param>
 		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
-		void Join (UserInfo user);
+		void Join (IUserInfo user);
 
 		/// <summary>
 		/// Gets whether or not <paramref name="user"/> is currently in the manager.
@@ -64,7 +64,7 @@ namespace Gablarski.Client
 		/// <param name="user">The user to check for.</param>
 		/// <returns><c>true</c> if <paramref name="user"/> is in the manager, <c>false</c> otherwise.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
-		bool GetIsJoined (UserInfo user);
+		bool GetIsJoined (IUserInfo user);
 
 		/// <summary>
 		/// Gets whether or not <paramref name="user"/> is currently ignored.
@@ -72,27 +72,27 @@ namespace Gablarski.Client
 		/// <param name="user">The user to check.</param>
 		/// <returns><c>true</c> if ignored, <c>false</c> if not.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
-		bool GetIsIgnored (UserInfo user);
+		bool GetIsIgnored (IUserInfo user);
 		
 		/// <summary>
 		/// Departs a user.
 		/// </summary>
 		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c></exception>
-		bool Depart (UserInfo user);
+		bool Depart (IUserInfo user);
 		
 		/// <summary>
 		/// Updates the manager using <paramref name="users"/> as the new list of users.
 		/// </summary>
 		/// <param name="users">The new list of users.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="users"/> is <c>null</c></exception>
-		void Update (IEnumerable<UserInfo> users);
+		void Update (IEnumerable<IUserInfo> users);
 		
 		/// <summary>
 		/// Updates the user internally to match the properties of <paramref name="user"/>.
 		/// </summary>
 		/// <param name="user">The new set of properties for the user.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
-		void Update (UserInfo user);
+		void Update (IUserInfo user);
 
 		/// <summary>
 		/// Gets the users in the given channel.
@@ -101,14 +101,14 @@ namespace Gablarski.Client
 		/// <returns>
 		/// A <see cref="IEnumerable{UserInfo}"/> of the users in the channel. <c>null</c> if the channel was not found.
 		/// </returns>
-		IEnumerable<UserInfo> GetUsersInChannel (int channelId);
+		IEnumerable<IUserInfo> GetUsersInChannel (int channelId);
 
 		/// <summary>
 		/// Toggles mute on <paramref name="user"/>.
 		/// </summary>
 		/// <param name="user">The user to toggle mute for.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
-		void ToggleMute (UserInfo user);
+		void ToggleMute (IUserInfo user);
 
 		/// <summary>
 		/// Toggles ignore on <paramref name="user"/>.
@@ -116,7 +116,7 @@ namespace Gablarski.Client
 		/// <param name="user">The user to toggle ignore for.</param>
 		/// <returns>The new ignore state.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
-		bool ToggleIgnore (UserInfo user);
+		bool ToggleIgnore (IUserInfo user);
 	}
 
 	public static class UserManagerExtensions
@@ -126,7 +126,7 @@ namespace Gablarski.Client
 			if (self == null)
 				throw new ArgumentNullException ("self");
 
-			self.Update (Enumerable.Empty<UserInfo>());
+			self.Update (Enumerable.Empty<IUserInfo>());
 		}
 	}
 }

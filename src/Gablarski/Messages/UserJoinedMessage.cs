@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -35,9 +35,7 @@
 // DAMAGE.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Gablarski.Messages
 {
@@ -49,13 +47,16 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public UserJoinedMessage (UserInfo userInfo)
+		public UserJoinedMessage (IUserInfo userInfo)
 			: base (ServerMessageType.UserLoggedIn)
 		{
+			if (userInfo == null)
+				throw new ArgumentNullException ("userInfo");
+
 			this.UserInfo = userInfo;
 		}
 
-		public UserInfo UserInfo
+		public IUserInfo UserInfo
 		{
 			get;
 			set;
