@@ -337,7 +337,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void ToggleMuteUnmuted()
 		{
-			user = new UserInfo (user, true);
+			user = new UserInfo (user, false);
 			Assert.IsFalse (user.IsMuted);
 
 			manager.Connect (client);
