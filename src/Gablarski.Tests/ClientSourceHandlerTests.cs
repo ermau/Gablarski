@@ -18,23 +18,50 @@ namespace Gablarski.Tests
 			this.server = this.provider.EstablishConnection();
 			this.client = this.server.Client;
 
-			var context = new MockClientContext { Connection = this.server.Client };
+			MockClientContext c;
+			this.context = c = new MockClientContext { Connection = this.server.Client };
 			var channels = new ClientChannelManager (context);
 			ClientChannelManagerTests.PopulateChannels (channels, server);
 
-			context.Users = new ClientUserHandler (context, new ClientUserManager());
-			context.Channels = channels;
-			context.CurrentUser = new CurrentUser (context, 1, "Foo", channels.First().ChannelId);
+			c.Users = new ClientUserHandler (context, new ClientUserManager());
+			c.Channels = channels;
+			c.CurrentUser = new CurrentUser (context, 1, "Foo", channels.First().ChannelId);
 
 			this.manager = new ClientSourceManager (context);
 			this.handler = new ClientSourceHandler (context, manager);
 		}
 
+		private IClientContext context;
 		private ClientSourceHandler handler;
 		private ClientSourceManager manager;
 		private MockConnectionProvider provider;
 		private MockServerConnection server;
 		private MockClientConnection client;
+
+		[Test]
+		public void CtorNull()
+		{
+			Assert.Throws<ArgumentNullException> (() => new ClientSourceHandler (null, manager));
+			Assert.Throws<ArgumentNullException> (() => new ClientSourceHandler (context, null));
+		}
+
+		[Test]
+		public void GetIsIgnoredNull()
+		{
+			Assert.Throws<ArgumentNullException> (() => handler.GetIsIgnored (null));
+		}
+
+		[Test]
+		public void ToggleIgnoreNull()
+		{
+			Assert.Throws<ArgumentNullException> (() => handler.ToggleIgnore (null));
+		}
+
+		[Test]
+		public void ToggleMuteNull()
+		{
+			Assert.Throws<ArgumentNullException> (() => handler.ToggleMute (null));
+		}
 
 		[Test]
 		public void RequestDefaultBitrate()

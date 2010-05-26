@@ -155,6 +155,9 @@ namespace Gablarski.Client
 
 		public void ToggleMute (AudioSource source)
 		{
+			if (source == null)
+				throw new ArgumentNullException ("source");
+
 			context.Connection.Send (new RequestMuteSourceMessage (source, !source.IsMuted));
 		}
 

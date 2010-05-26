@@ -122,6 +122,9 @@ namespace Gablarski.Client
 
 		public bool GetIsIgnored (AudioSource source)
 		{
+			if (source == null)
+				throw new ArgumentNullException ("source");
+
 			lock (syncRoot)
 			{
 				return ignoredSources.Contains (source);
