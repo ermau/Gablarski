@@ -64,6 +64,16 @@ namespace Gablarski.Tests
 		}
 
 		[Test]
+		public void RequestNull()
+		{
+			Assert.Throws<ArgumentNullException> (() => handler.Request (null, AudioFormat.Mono16bitLPCM, 512));
+			Assert.Throws<ArgumentNullException> (() => handler.Request ("name", null, 512));
+
+			Assert.Throws<ArgumentNullException> (() => handler.Request (null, AudioFormat.Mono16bitLPCM, 512, 64000));
+			Assert.Throws<ArgumentNullException> (() => handler.Request ("name", null, 512, 64000));
+		}
+
+		[Test]
 		public void RequestDefaultBitrate()
 		{
 			this.handler.Request ("voice", AudioFormat.Mono16bitLPCM, 512);

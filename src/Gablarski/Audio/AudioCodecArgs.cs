@@ -62,8 +62,17 @@ namespace Gablarski.Audio
 		}
 
 		public AudioCodecArgs (AudioFormat format, int bitrate, short frameSize, byte complexity)
-			: this (format.WaveEncoding, format.Channels, format.BitsPerSample, format.SampleRate, bitrate, frameSize, complexity)
 		{
+			if (format == null)
+				throw new ArgumentNullException ("format");
+
+			WaveEncoding = format.WaveEncoding;
+			Channels = format.Channels;
+			BitsPerSample = format.BitsPerSample;
+			SampleRate = format.SampleRate;
+			Bitrate = bitrate;
+			FrameSize = frameSize;
+			Complexity = complexity;
 		}
 
 		public AudioCodecArgs (WaveFormatEncoding waveEnconding, int channels, int bitsPerChannel, int frequency, int bitrate, short frameSize, byte complexity)

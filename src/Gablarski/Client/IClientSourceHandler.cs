@@ -73,6 +73,7 @@ namespace Gablarski.Client
 		/// The server may not agree with the bitrate you request, do not set up audio based on this
 		/// target, but on the bitrate of the source you actually receive.
 		/// </remarks>
+		/// <exception cref="ArgumentNullException"><paramref name="name"/> or <paramref name="format"/> are <c>null</c>.</exception>
 		void Request (string name, AudioFormat format, short frameSize, int targetBitrate);
 
 		/// <summary>
