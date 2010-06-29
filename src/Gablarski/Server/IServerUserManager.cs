@@ -45,6 +45,9 @@ namespace Gablarski.Server
 		: IConnectionManager, IIndexedEnumerable<int, UserInfo>
 	{
 		/// <exception cref="ArgumentNullException"><paramref name="connection"/> or <paramref name="user"/> is <c>null</c>.</exception>
+		/// <remarks>
+		/// If <paramref name="user" /> is already logged in, the new <paramref name="connection"/> should be associated with it.
+		/// </remarks>
 		void Login (IConnection connection, UserInfo user);
 
 		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
