@@ -98,7 +98,6 @@ namespace Gablarski.Clients.CLI
 					string[] hostParts = parts[2].Split (':');
 					int port = (hostParts.Length == 1) ? 6112 : Int32.Parse (hostParts[1]);
 
-				Console.WriteLine("monkeys");
 					Client.Connect (hostParts[0], port);
 
 					return true;
