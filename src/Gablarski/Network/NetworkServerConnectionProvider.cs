@@ -313,13 +313,14 @@ namespace Gablarski.Network
 
 				var stream = client.GetStream ();
 				var tendpoint = (IPEndPoint)client.Client.RemoteEndPoint;
-				log.Info ("Accepted TCP Connection from " + tendpoint);
 
 				uint nid = 0;
 				NetworkServerConnection connection;
 				lock (connections)
 				{
 					while (connections.ContainsKey (++nid)) ;
+
+					log.InfoFormat ("Accepted TCP Connection from {0}. Given NID: {1}", tendpoint, nid);
 
 					connection = new NetworkServerConnection (this, nid, client, tendpoint, new SocketValueWriter (this.udp, tendpoint));
 					connections.Add (nid, connection);
@@ -371,7 +372,7 @@ namespace Gablarski.Network
 					if (MessageBase.GetMessage (type, out msg))
 					{
 						if (this.debugLogging)
-							this.log.DebugFormat ("Message type {0} received", msg.MessageTypeCode);
+							this.log.DebugFormat ("Message type {0} received from {1}", msg.MessageTypeCode, connection.EndPoint);
 
 						msg.ReadPayload (connection.ReliableReader);
 
