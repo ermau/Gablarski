@@ -74,7 +74,7 @@ namespace Gablarski.Client
 		/// Gets whether the source is ignored or not..
 		/// </summary>
 		/// <param name="source">The source to check.</param>
-		/// <returns><c>true</c> if the source is ignored.</returns>
+		/// <returns><c>true</c> if the source is ignored, <c>false</c> if it's not ignored or is unknown.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
 		bool GetIsIgnored (AudioSource source);
 
@@ -82,7 +82,7 @@ namespace Gablarski.Client
 		/// Toggles ignore for the source.
 		/// </summary>
 		/// <param name="source">The source to ignore.</param>
-		/// <returns>The new state of ignore on <paramref name="source"/>.</returns>
+		/// <returns>The new state of ignore on <paramref name="source"/>, or <c>false</c> if it's .</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
 		bool ToggleIgnore (AudioSource source);
 	}

@@ -259,6 +259,7 @@ namespace Gablarski.Server
 		protected readonly ILog Log;
 
 		private Dictionary<ClientMessageType, Action<MessageReceivedEventArgs>> handlers;
+		private Dictionary<ClientMessageType, Action<IEnumerable<MessageReceivedEventArgs>>> setHandlers;
 
 		private readonly Thread messageRunnerThread;
 		private readonly Queue<MessageReceivedEventArgs> mqueue = new Queue<MessageReceivedEventArgs> (1000);
@@ -337,6 +338,11 @@ namespace Gablarski.Server
 				{ ClientMessageType.ChannelChange, userHandler.ChannelChangeMessage },
 				{ ClientMessageType.ChannelEdit, channelHandler.ChannelEditMessage },
 			};
+
+			this.setHandlers = new Dictionary<ClientMessageType, Action<IEnumerable<MessageReceivedEventArgs>>>
+			{
+				{ ClientMessageType.AudioData, sourceHandler.SendAudioDataMessage }
+			};
 		}
 
 		private void MessageRunner ()
@@ -349,9 +355,13 @@ namespace Gablarski.Server
 				while (mqueue.Count > 0)
 				{
 					MessageReceivedEventArgs e;
+					MessageReceivedEventArgs next = null;
 					lock (mqueue)
 					{
 						e = mqueue.Dequeue();
+
+						if (mqueue.Count > 0)
+							next = mqueue.Peek();
 					}
 
 					var msg = (e.Message as ClientMessage);
@@ -361,9 +371,33 @@ namespace Gablarski.Server
 						return;
 					}
 
-					Action<MessageReceivedEventArgs> handler;
-					if (this.handlers.TryGetValue (msg.MessageType, out handler))
-						handler (e);
+					if (next != null && next.Message.MessageTypeCode == e.Message.MessageTypeCode)
+					{
+						Action<IEnumerable<MessageReceivedEventArgs>> setHandler;
+						if (this.setHandlers.TryGetValue (msg.MessageType, out setHandler))
+						{
+							var messages = new List<MessageReceivedEventArgs> (mqueue.Count);
+							lock (mqueue)
+							{
+								while (next != null && next.Message.MessageTypeCode == msg.MessageTypeCode)
+								{
+									e = mqueue.Dequeue();
+
+									messages.Add (e);
+
+									next = mqueue.Peek();
+								}
+
+								setHandler (messages);
+							}
+						}
+					}
+					else
+					{
+						Action<MessageReceivedEventArgs> handler;
+						if (this.handlers.TryGetValue (msg.MessageType, out handler))
+							handler (e);
+					}
 				}
 			}
 		}
