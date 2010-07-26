@@ -144,6 +144,8 @@ namespace Gablarski.Network
 
 		internal void Disconnect (NetworkServerConnection connection)
 		{
+			log.DebugFormat ("Disconnecting connection {0} with NID: {1}", connection.EndPoint, connection.NetworkId);
+
 			lock (connections)
 			{
 				connections.Remove (connection.NetworkId);
