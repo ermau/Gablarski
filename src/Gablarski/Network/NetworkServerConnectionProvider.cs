@@ -230,7 +230,7 @@ namespace Gablarski.Network
 						}
 						else
 						{
-							this.log.WarnFormat ("{0} attempted to send message {1} connectionlessly", tendpoint, mtype);
+							this.log.WarnFormat ("NID {2} ({0}) attempted to send message {1} connectionlessly", tendpoint, mtype, nid);
 						}
 					}
 					else
