@@ -68,9 +68,9 @@ namespace Gablarski.Server
 				Disconnect (ic => ic != connection);
 			else
 			{
-				Manager.Disconnect (connection);
-
 				IUserInfo user = Manager.GetUser (connection);
+				Manager.Disconnect (connection);
+				
 				if (user != null)
 					context.Users.Send (new UserDisconnectedMessage (user.UserId));
 			}
