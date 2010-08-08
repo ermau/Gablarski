@@ -121,7 +121,12 @@ namespace Gablarski.Server
 				throw new ArgumentNullException ("predicate");
 
 			foreach (IConnection c in Manager.GetConnections().Where (predicate))
+			{
+				if (!c.IsConnected)
+					continue;
+
 				c.Send (message);
+			}
 		}
 
 		public void Send (MessageBase message, Func<IConnection, UserInfo, bool> predicate)
@@ -137,7 +142,12 @@ namespace Gablarski.Server
 			                  select c;
 
 			foreach (IConnection c in connections)
+			{
+				if (!c.IsConnected)
+					continue;
+
 				c.Send (message);
+			}
 		}
 
 		#region IIndexedEnumerable<int,UserInfo> Members
