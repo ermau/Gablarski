@@ -354,6 +354,7 @@ namespace Gablarski.Network
 		private void ReliableReceive (IAsyncResult result)
 		{
 			NetworkServerConnection connection = null;
+			MessageBase msg = null;
 
 			try
 			{
@@ -370,7 +371,6 @@ namespace Gablarski.Network
 				if (state.Item2[0] == 0x2A)
 				{
 					ushort type = connection.ReliableReader.ReadUInt16 ();
-					MessageBase msg;
 					if (MessageBase.GetMessage (type, out msg))
 					{
 						if (this.debugLogging)
@@ -387,9 +387,31 @@ namespace Gablarski.Network
 				else
 					connection.Disconnect ();
 			}
-			catch (Exception)
+			catch (IOException)
 			{
-				connection.Disconnect ();
+				if (connection != null)
+					connection.Disconnect();
+			}
+			catch (SocketException)
+			{
+				if (connection != null)
+					connection.Disconnect();
+			}
+			catch (Exception ex)
+			{
+				if (connection != null)
+				{
+					if (msg != null)
+						log.Warn ("Error receiving message " + msg.MessageTypeCode + " from NID " + connection.NetworkId + " (" + connection.EndPoint + ")", ex);
+					else
+						log.Warn ("Error receiving from NID " + connection.NetworkId + " (" + connection.EndPoint + ")", ex);
+				
+					connection.Disconnect();
+				}
+				else
+				{
+					log.Warn ("Error receiving", ex);
+				}
 			}
 		}
 
@@ -405,8 +427,11 @@ namespace Gablarski.Network
 				message.WritePayload (clWriter);
 				clWriter.Flush ();
 			}
-			catch
+			catch (IOException) { }
+			catch (SocketException) { }
+			catch (Exception ex)
 			{
+				log.Warn ("Error sending to " + endpoint, ex);
 			}
 		}
 
@@ -426,8 +451,17 @@ namespace Gablarski.Network
 				message.WritePayload (iwriter);
 				iwriter.Flush ();
 			}
-			catch
+			catch (IOException)
 			{
+				connection.Disconnect();
+			}
+			catch (SocketException)
+			{
+				connection.Disconnect();
+			}
+			catch (Exception ex)
+			{
+				log.Warn ("Error sending " + message.MessageTypeCode + " to NID " + connection.NetworkId + "(" + connection.EndPoint + ")", ex);
 				connection.Disconnect ();
 			}
 		}

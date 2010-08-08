@@ -59,11 +59,16 @@ namespace Gablarski.Server
 			if (connection == null)
 				throw new ArgumentNullException ("connection");
 
-			UserInfo user = Manager.GetUser (connection);
-			if (user != null)
-				context.Users.Send (new UserDisconnectedMessage (user.UserId));
+			if (connection.IsConnected)
+				Disconnect (ic => ic != connection);
+			else
+			{
+				Manager.Disconnect (connection);
 
-			Manager.Disconnect (connection);
+				UserInfo user = Manager.GetUser (connection);
+				if (user != null)
+					context.Users.Send (new UserDisconnectedMessage (user.UserId));
+			}			
 		}
 
 		public void Disconnect (Func<IConnection, bool> predicate)
