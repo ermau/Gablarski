@@ -144,6 +144,8 @@ namespace Gablarski.Network
 
 		internal void Disconnect (NetworkServerConnection connection)
 		{
+			log.DebugFormat ("Disconnecting connection {0} with NID: {1}", connection.EndPoint, connection.NetworkId);
+
 			lock (connections)
 			{
 				connections.Remove (connection.NetworkId);
@@ -233,13 +235,13 @@ namespace Gablarski.Network
 						if (msg.AcceptedConnectionless)
 						{
 							if (this.debugLogging)
-								this.log.DebugFormat ("Connectionless message received {0}", msg.MessageTypeCode);
+								this.log.DebugFormat ("Connectionless message received {0} from {1}", mtype, tendpoint);
 
 							OnConnectionlessMessageReceived (new ConnectionlessMessageReceivedEventArgs (this, msg, tendpoint));
 						}
 						else
 						{
-							this.log.WarnFormat ("{0} attempted to send message {1} connectionlessly", tendpoint, msg.MessageTypeCode);
+							this.log.WarnFormat ("NID {2} ({0}) attempted to send message {1} connectionlessly", tendpoint, mtype, nid);
 						}
 					}
 					else
@@ -255,7 +257,7 @@ namespace Gablarski.Network
 						else
 						{
 							if (this.debugLogging)
-								this.log.DebugFormat ("Message received {0}", msg.MessageTypeCode);
+								this.log.DebugFormat ("Message received {0}", mtype);
 
 							connection.Receive (msg);
 						}
@@ -336,13 +338,14 @@ namespace Gablarski.Network
 
 				var stream = client.GetStream ();
 				var tendpoint = (IPEndPoint)client.Client.RemoteEndPoint;
-				log.Info ("Accepted TCP Connection from " + tendpoint);
 
 				uint nid = 0;
 				NetworkServerConnection connection;
 				lock (connections)
 				{
 					while (connections.ContainsKey (++nid)) ;
+
+					log.InfoFormat ("Accepted TCP Connection from {0}. Given NID: {1}", tendpoint, nid);
 
 					connection = new NetworkServerConnection (this, nid, client, tendpoint, new SocketValueWriter (this.udp, tendpoint));
 					connections.Add (nid, connection);
@@ -374,6 +377,7 @@ namespace Gablarski.Network
 		private void ReliableReceive (IAsyncResult result)
 		{
 			NetworkServerConnection connection = null;
+			MessageBase msg = null;
 
 			try
 			{
@@ -390,11 +394,10 @@ namespace Gablarski.Network
 				if (state.Item2[0] == 0x2A)
 				{
 					ushort type = connection.ReliableReader.ReadUInt16 ();
-					MessageBase msg;
 					if (MessageBase.GetMessage (type, out msg))
 					{
 						if (this.debugLogging)
-							this.log.DebugFormat ("Message type {0} received", msg.MessageTypeCode);
+							this.log.DebugFormat ("Message type {0} received from {1}", msg.MessageTypeCode, connection.EndPoint);
 
 						msg.ReadPayload (connection.ReliableReader);
 
@@ -407,12 +410,31 @@ namespace Gablarski.Network
 				else
 					connection.Disconnect ();
 			}
+			catch (IOException)
+			{
+				if (connection != null)
+					connection.Disconnect();
+			}
+			catch (SocketException)
+			{
+				if (connection != null)
+					connection.Disconnect();
+			}
 			catch (Exception ex)
 			{
-				log.Fatal ("Error during reliable receive, disconnecting.", ex);
-
 				if (connection != null)
-					connection.Disconnect ();
+				{
+					if (msg != null)
+						log.Warn ("Error receiving message " + msg.MessageTypeCode + " from NID " + connection.NetworkId + " (" + connection.EndPoint + ")", ex);
+					else
+						log.Warn ("Error receiving from NID " + connection.NetworkId + " (" + connection.EndPoint + ")", ex);
+				
+					connection.Disconnect();
+				}
+				else
+				{
+					log.Warn ("Error receiving", ex);
+				}
 			}
 		}
 
@@ -428,9 +450,11 @@ namespace Gablarski.Network
 				message.WritePayload (clWriter);
 				clWriter.Flush ();
 			}
+			catch (IOException) { }
+			catch (SocketException) { }
 			catch (Exception ex)
 			{
-				log.Fatal ("Error during connectionless send", ex);
+				log.Warn ("Error sending to " + endpoint, ex);
 			}
 		}
 
@@ -465,8 +489,17 @@ namespace Gablarski.Network
 
 				iwriter.Flush ();
 			}
-			catch
+			catch (IOException)
 			{
+				connection.Disconnect();
+			}
+			catch (SocketException)
+			{
+				connection.Disconnect();
+			}
+			catch (Exception ex)
+			{
+				log.Warn ("Error sending " + message.MessageTypeCode + " to NID " + connection.NetworkId + "(" + connection.EndPoint + ")", ex);
 				connection.Disconnect ();
 			}
 		}
