@@ -52,6 +52,7 @@ namespace Gablarski.Network
 			this.Tcp = tcp;
 			this.ReliableStream = tcp.GetStream ();
 			this.provider = provider;
+			this.EndPoint = endPoint;
 			this.UnreliableWriter = uwriter;
 			this.ReliableReader = new StreamValueReader (ReliableStream);
 			this.ReliableWriter = new StreamValueWriter (ReliableStream);
@@ -110,6 +111,7 @@ namespace Gablarski.Network
 		internal readonly uint NetworkId;
 		internal readonly TcpClient Tcp;
 		internal readonly Stream ReliableStream;
+		internal readonly IPEndPoint EndPoint;
 		internal readonly IValueWriter UnreliableWriter;
 		internal readonly IValueReader ReliableReader;
 		internal readonly IValueWriter ReliableWriter;
@@ -121,7 +123,7 @@ namespace Gablarski.Network
 				received (this, new MessageReceivedEventArgs (this, message));
 		}
 
-		private readonly NetworkServerConnectionProvider provider;		
+		private readonly NetworkServerConnectionProvider provider;
 
 		private void OnDisconnected ()
 		{
