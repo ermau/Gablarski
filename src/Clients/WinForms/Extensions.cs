@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Gablarski.Clients.Windows.Properties;
 
 namespace Gablarski.Clients.Windows
 {
@@ -13,6 +14,18 @@ namespace Gablarski.Clients.Windows
 		public static Icon ToIcon (this Bitmap self)
 		{
 			return Icon.FromHandle (self.GetHicon());
+		}
+
+		public static Image ToErrorIcon (this Image self)
+		{
+			if (self == null)
+				throw new ArgumentNullException ("self");
+
+			var e = Resources.bullet_error;
+			using (var g = Graphics.FromImage (self))
+				g.DrawImage (e, self.Width - e.Width, self.Height - e.Height);
+
+			return self;
 		}
 
 		public static string ToDisplayString (this Exception self)

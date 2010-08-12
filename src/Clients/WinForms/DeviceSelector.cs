@@ -59,6 +59,8 @@ namespace Gablarski
 				return;
 
 			provider.SelectedItem = provider.Items.Cast<IAudioDeviceProvider>().FirstOrDefault (p => p.GetType().AssemblyQualifiedName.Contains (providerName));
+			if (provider.SelectedItem == null)
+				provider.SelectedItem = provider.Items.Cast<IAudioDeviceProvider>().FirstOrDefault();
 		}
 
 		public void SetDevice (string deviceName)

@@ -143,18 +143,52 @@ namespace Gablarski.Clients.Windows
 		{
 			DisablePlayback();
 
-			this.playback = (IPlaybackProvider)Activator.CreateInstance (Type.GetType (Settings.PlaybackProvider));
-
-			if (Settings.PlaybackDevice.IsNullOrWhitespace ())
-				this.playback.Device = this.playback.DefaultDevice;
-			else
+			try
 			{
-				this.playback.Device = this.playback.GetDevices ().FirstOrDefault (d => d.Name == Settings.PlaybackDevice) ??
-										this.playback.DefaultDevice;
-			}
+				if (Settings.PlaybackProvider == null)
+					throw new Exception ("Playback provider is not set");
 
-			this.playback.Open();
-			this.gablarski.Audio.Attach (this.playback, this.gablarski.Sources.Where (s => s.OwnerId != gablarski.CurrentUser.UserId), new AudioEnginePlaybackOptions());
+				this.playback = (IPlaybackProvider) Activator.CreateInstance (Type.GetType (Settings.PlaybackProvider));
+
+				if (Settings.PlaybackDevice.IsNullOrWhitespace())
+					this.playback.Device = this.playback.DefaultDevice;
+				else
+				{
+					this.playback.Device = this.playback.GetDevices().FirstOrDefault (d => d.Name == Settings.PlaybackDevice) ??
+					                       this.playback.DefaultDevice;
+				}
+
+				this.playback.Open();
+				this.gablarski.Audio.Attach (this.playback,
+				                             this.gablarski.Sources.Where (s => s.OwnerId != gablarski.CurrentUser.UserId),
+				                             new AudioEnginePlaybackOptions());
+
+				BeginInvoke ((Action)(() =>
+				{
+					if (!btnMute.Checked)
+					{
+						btnMute.Image = Resources.SoundMuteImage;
+						btnMute.Checked = false;
+						btnMute.Enabled = true;
+						btnMute.ToolTipText = "Mute Sound";
+					}
+				}));
+			}
+			catch (Exception ex)
+			{
+				if (this.playback != null)
+					this.playback.Dispose();
+
+				this.playback = null;
+
+				BeginInvoke ((Action) (() =>
+				{
+					btnMute.Image = Resources.SoundMuteImage.ToErrorIcon();
+					btnMute.Checked = true;
+					btnMute.Enabled = false;
+					btnMute.ToolTipText = "Playback Initialization error: " + ex.Message;
+				}));
+			}
 		}
 
 		private void DisablePlayback()
@@ -168,9 +202,12 @@ namespace Gablarski.Clients.Windows
 
 		private void SetupVoiceCapture ()
 		{
+			DisableVoiceCapture();
+
 			try
 			{
-				DisableVoiceCapture();
+				if (Settings.VoiceProvider == null)
+					throw new Exception ("Capture provider is not set");
 
 				this.voiceCapture = (ICaptureProvider)Activator.CreateInstance (Type.GetType (Settings.VoiceProvider));
 
@@ -178,6 +215,7 @@ namespace Gablarski.Clients.Windows
 					this.voiceCapture.Device = this.voiceCapture.DefaultDevice;
 				else
 				{
+					this.voiceCapture.GetDevices().FirstOrDefault (d => d.Name == Settings.VoiceDevice).Name.ToString();
 					this.voiceCapture.Device = this.voiceCapture.GetDevices().FirstOrDefault (d => d.Name == Settings.VoiceDevice) ??
 					                           this.voiceCapture.DefaultDevice;
 				}
@@ -197,20 +235,26 @@ namespace Gablarski.Clients.Windows
 				{
 					if (!btnMute.Checked)
 					{
+						btnMuteMic.Image = Resources.CaptureMuteImage;
 						btnMuteMic.Checked = false;
 						btnMuteMic.Enabled = true;
+						btnMuteMic.ToolTipText = "Mute Microphone";
 					}
 				}));
 			}
 			catch (Exception ex)
 			{
+				if (this.voiceCapture != null)
+					this.voiceCapture.Dispose();
+
 				this.voiceCapture = null;
 
 				BeginInvoke ((Action) (() =>
 				{
-					MessageBox.Show (this, "An error occured initializing capture. ", "Capture Initialization", MessageBoxButtons.OK, MessageBoxIcon.Error);
+					btnMuteMic.Image = Resources.CaptureMuteImage.ToErrorIcon();
 					btnMuteMic.Checked = true;
 					btnMuteMic.Enabled = false;
+					btnMuteMic.ToolTipText = "Capture Initialization error: " + ex.Message;
 				}));
 			}
 		}
