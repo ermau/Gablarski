@@ -36,7 +36,7 @@
 
 using System;
 using System.Linq;
-using Gablarski.Audio.Speex;
+//using Gablarski.Audio.Speex;
 using Gablarski.Messages;
 
 namespace Gablarski.Audio
@@ -88,10 +88,10 @@ namespace Gablarski.Audio
 			get { return this.options; }
 		}
 
-		public SpeexPreprocessor Preprocessor
-		{
-			get { return this.preprocessor; }
-		}
+		//public SpeexPreprocessor Preprocessor
+		//{
+		//    get { return this.preprocessor; }
+		//}
 
 		public VoiceActivation VoiceActivation
 		{
@@ -107,7 +107,7 @@ namespace Gablarski.Audio
 		private bool isDisposed;
 		private readonly VoiceActivation activation;
 		private readonly int frameLength;
-		private readonly SpeexPreprocessor preprocessor;
+		//private readonly SpeexPreprocessor preprocessor;
 		private readonly IAudioCaptureProvider audioCapture;
 		private readonly AudioSource source;
 		private readonly AudioEngineCaptureOptions options;
@@ -129,8 +129,8 @@ namespace Gablarski.Audio
 			if (this.isDisposed)
 				return;
 
-			if (this.preprocessor != null)
-				preprocessor.Dispose();
+			//if (this.preprocessor != null)
+			//    preprocessor.Dispose();
 			if (audioCapture != null)
 				audioCapture.Dispose();
 

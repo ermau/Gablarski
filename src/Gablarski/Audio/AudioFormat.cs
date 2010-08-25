@@ -177,6 +177,8 @@ namespace Gablarski.Audio
 		}
 
 		public static readonly AudioFormat Mono16bitLPCM = new AudioFormat (WaveFormatEncoding.LPCM, 1, 16, 44100);
+		public static readonly AudioFormat Mono8bitLPCLM = new AudioFormat (WaveFormatEncoding.LPCM, 1, 8, 44100);
+		public static readonly AudioFormat Stereo8bitLPCM = new AudioFormat (WaveFormatEncoding.LPCM, 2, 8, 44100);
 		public static readonly AudioFormat Stereo16bitLPCM = new AudioFormat (WaveFormatEncoding.LPCM, 2, 16, 44100);
 	}
 }
