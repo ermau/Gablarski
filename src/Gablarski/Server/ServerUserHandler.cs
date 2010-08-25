@@ -70,7 +70,7 @@ namespace Gablarski.Server
 			{
 				IUserInfo user = Manager.GetUser (connection);
 				Manager.Disconnect (connection);
-				
+
 				if (user != null)
 					context.Users.Send (new UserDisconnectedMessage (user.UserId));
 			}
@@ -126,7 +126,12 @@ namespace Gablarski.Server
 				throw new ArgumentNullException ("predicate");
 
 			foreach (IConnection c in Manager.GetConnections().Where (predicate))
+			{
+				if (!c.IsConnected)
+					continue;
+
 				c.Send (message);
+			}
 		}
 
 		public void Send (MessageBase message, Func<IConnection, IUserInfo, bool> predicate)
@@ -142,7 +147,12 @@ namespace Gablarski.Server
 			                  select c;
 
 			foreach (IConnection c in connections)
+			{
+				if (!c.IsConnected)
+					continue;
+
 				c.Send (message);
+			}
 		}
 
 		public void Disconnect (IUserInfo user, DisconnectionReason reason)
