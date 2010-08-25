@@ -138,8 +138,11 @@ namespace Gablarski.Client
 
 			lock (syncRoot)
 			{
-				bool ignored = ignoredSources.Contains (source);
+				if (!Sources.ContainsKey (source.Id))
+					return false;
 
+				bool ignored = ignoredSources.Contains (source);
+				
 				if (ignored)
 					ignoredSources.Remove (source);
 				else

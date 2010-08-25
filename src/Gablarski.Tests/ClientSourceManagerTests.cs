@@ -35,6 +35,7 @@
 // DAMAGE.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Gablarski.Audio;
 using Gablarski.Client;
@@ -64,10 +65,15 @@ namespace Gablarski.Tests
 			this.manager = new ClientSourceManager (context);
 		}
 
-		private void CreateSources()
+		private IEnumerable<AudioSource> CreateSources()
 		{
-			manager.Add (AudioSourceTests.GetTestSource (1, 0));
-			manager.Add (AudioSourceTests.GetTestSource (2, 1));
+			var source = AudioSourceTests.GetTestSource (1, 0);
+			manager.Add (source);
+
+			var source2 = AudioSourceTests.GetTestSource (2, 1);
+			manager.Add (source2);
+
+			return new[] { source, source2 };
 		}
 
 		private ClientSourceManager manager;
@@ -79,6 +85,12 @@ namespace Gablarski.Tests
 		public void NullContext()
 		{
 			Assert.Throws<ArgumentNullException> (() => new ClientSourceManager (null));
+		}
+
+		[Test]
+		public void AddNull()
+		{
+			Assert.Throws<ArgumentNullException> (() => manager.Add (null));
 		}
 
 		[Test]
@@ -96,6 +108,32 @@ namespace Gablarski.Tests
 		}
 
 		[Test]
+		public void UpdateSourceNull()
+		{
+			Assert.Throws<ArgumentNullException> (() => manager.Update ((AudioSource) null));
+		}
+
+		[Test]
+		public void UpdateSourcesNull()
+		{
+			Assert.Throws<ArgumentNullException> (() => manager.Update ((IEnumerable<AudioSource>) null));
+		}
+		
+		[Test]
+		public void UpdateSourcesRemove()
+		{
+			CreateSources();
+
+
+		}
+
+		[Test]
+		public void ToggleIgnoreNull()
+		{
+			Assert.Throws<ArgumentNullException> (() => manager.ToggleIgnore (null));
+		}
+
+		[Test]
 		public void ToggleIgnore()
 		{
 			CreateSources();
@@ -104,6 +142,15 @@ namespace Gablarski.Tests
 			Assert.IsFalse (manager.GetIsIgnored (source));
 			Assert.IsTrue (manager.ToggleIgnore (source));
 			Assert.IsTrue (manager.GetIsIgnored (source));
+			Assert.IsFalse (manager.ToggleIgnore (source));
+			Assert.IsFalse (manager.GetIsIgnored (source));
+		}
+
+		[Test]
+		public void ToggleIgnoreUnknownSource()
+		{
+			var source = AudioSourceTests.GetTestSource();
+			Assert.IsFalse (manager.GetIsIgnored (source));
 			Assert.IsFalse (manager.ToggleIgnore (source));
 			Assert.IsFalse (manager.GetIsIgnored (source));
 		}
@@ -123,6 +170,12 @@ namespace Gablarski.Tests
 			Assert.IsTrue (manager.GetIsIgnored (source));
 			Assert.IsFalse (manager.ToggleIgnore (source));
 			Assert.IsFalse (manager.GetIsIgnored (source));
+		}
+
+		[Test]
+		public void ToggleMuteNull()
+		{
+			Assert.Throws<ArgumentNullException> (() => manager.ToggleMute (null));
 		}
 	}
 }
