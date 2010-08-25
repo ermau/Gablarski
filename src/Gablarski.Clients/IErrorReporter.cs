@@ -49,7 +49,7 @@ namespace Gablarski.Clients
 		/// <summary>
 		/// Gets the assembly that this reports errors for.
 		/// </summary>
-		Assembly AssemblyHandled { get; }
+		IEnumerable<Assembly> AssembliesHandled { get; }
 
 		/// <summary>
 		/// Report an error.

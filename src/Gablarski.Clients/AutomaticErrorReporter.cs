@@ -58,8 +58,14 @@ namespace Gablarski.Clients
 		{
 			lock (reporters)
 			{
-				reporters.Add (reporter.AssemblyHandled, reporter);
+				foreach (var asm in reporter.AssembliesHandled)
+					reporters.Add (asm, reporter);
 			}
+		}
+
+		public void Test (string message, Exception inner)
+		{
+			throw new Exception (message, inner);
 		}
 
 		private readonly MutableLookup<Assembly, IErrorReporter> reporters = new MutableLookup<Assembly, IErrorReporter>();

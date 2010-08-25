@@ -55,9 +55,9 @@ namespace Gablarski.Clients
 			OperatingSystemIdentifier = GetOS();
 		}
 
-		public Assembly AssemblyHandled
+		public IEnumerable<Assembly> AssembliesHandled
 		{
-			get { return typeof (GablarskiClient).Assembly; }
+			get { return new[] { typeof (GablarskiClient).Assembly, typeof (GablarskiErrorReporter).Assembly }; }
 		}
 
 		public void ReportError (Exception ex)

@@ -98,6 +98,11 @@ namespace Gablarski.Clients.Windows
 				                 "Unexpected error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			};
 
+			AutomaticErrorReporter errors = new AutomaticErrorReporter();
+			errors.Add (new GablarskiErrorReporter());
+
+			//errors.Test ("test", new Exception ("test inner"));
+
 			log4net.Config.XmlConfigurator.Configure ();
 
 			log4net.LogManager.GetLogger ("Gablarski WinForms").Info ("Program Start");
