@@ -91,13 +91,13 @@ namespace Gablarski.OpenAL
 			lock (owners)
 			{
 				var source = owners.FirstOrDefault (kvp => kvp.Value == sourceOwner).Key;
-				if (source != null)
-				{
-					owners[source] = default (T);
+				if (source == null)
+					return;
 
-					if (source == lastSource)
-						lastSource = null;
-				}
+				owners[source] = default (T);
+
+				if (source == lastSource)
+					lastSource = null;
 			}
 		}
 
@@ -129,26 +129,19 @@ namespace Gablarski.OpenAL
 		public void Tick()
 		{
 			OpenAL.Debug ("SourcePool: Tick");
-		
-			Source[] tofree = new Source[owners.Count];
-			int i = 0;
 
+			List<KeyValuePair<Source, T>> finished;
 			lock (owners)
-			{
-				foreach (Source s in owners.Keys)
-				{
-					if (!s.IsStopped)
-						continue;
+				finished = owners.Where (kvp => kvp.Key.IsStopped && kvp.Value != null).ToList();
 
-					OpenAL.DebugFormat ("SourcePool: {0} is stopped, freeing", s);
-					
-					tofree[i++] = s;
-	
-					OnSourceFinished (new SourceFinishedEventArgs<T> (owners[s], s));
-				}
-	
-				for (i = 0; i < tofree.Length && tofree[i] != null; ++i)
-				    FreeSource (tofree[i]);
+			for (int i = 0; i < finished.Count; ++i)
+			{
+				var s = finished[i].Key;
+				var o = finished[i].Value;
+
+				OpenAL.DebugFormat ("SourcePool: {0} is stopped, freeing", s);
+				FreeSource (s);
+				OnSourceFinished (new SourceFinishedEventArgs<T> (o, s));
 			}
 		}
 
