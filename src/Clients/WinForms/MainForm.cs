@@ -53,7 +53,8 @@ namespace Gablarski.Clients.Windows
 			{
 				NormalVolume = Settings.NormalMusicVolume,
 				TalkingVolume = Settings.TalkingMusicVolume,
-				UserTalkingCounts = !Settings.MediaVolumeControlIgnoresYou
+				UserTalkingCounts = !Settings.MediaVolumeControlIgnoresYou,
+				UseCurrentPlayerVolume = Settings.UseMusicCurrentVolume
 			};
 
 			if (Settings.EnableNotifications)
@@ -289,6 +290,10 @@ namespace Gablarski.Clients.Windows
 			{
 				case "DisplaySources":
 					this.users.Update (this.gablarski.Channels, this.gablarski.Users, this.gablarski.Sources);
+					break;
+
+				case Settings.UseMusicCurrentVolumeName:
+					this.mediaPlayerIntegration.UseCurrentPlayerVolume = Settings.UseMusicCurrentVolume;
 					break;
 
 				case Settings.UsePushToTalkSettingName:

@@ -70,6 +70,7 @@
 			this.tabNotifications = new System.Windows.Forms.TabPage();
 			this.enableNotifications = new System.Windows.Forms.CheckBox();
 			this.notifiers = new System.Windows.Forms.ListView();
+			this.inUseCurrentVolume = new System.Windows.Forms.CheckBox();
 			columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.tabs.SuspendLayout();
 			this.generalTab.SuspendLayout();
@@ -380,6 +381,7 @@
 			// 
 			// musicTab
 			// 
+			this.musicTab.Controls.Add(this.inUseCurrentVolume);
 			this.musicTab.Controls.Add(this.musicIgnoreYou);
 			this.musicTab.Controls.Add(this.label9);
 			this.musicTab.Controls.Add(this.label8);
@@ -543,6 +545,17 @@
 			this.notifiers.UseCompatibleStateImageBehavior = false;
 			this.notifiers.View = System.Windows.Forms.View.Details;
 			// 
+			// inUseCurrentVolume
+			// 
+			this.inUseCurrentVolume.AutoSize = true;
+			this.inUseCurrentVolume.Location = new System.Drawing.Point(92, 180);
+			this.inUseCurrentVolume.Name = "inUseCurrentVolume";
+			this.inUseCurrentVolume.Size = new System.Drawing.Size(97, 17);
+			this.inUseCurrentVolume.TabIndex = 13;
+			this.inUseCurrentVolume.Text = "Music\'s current";
+			this.inUseCurrentVolume.UseVisualStyleBackColor = true;
+			this.inUseCurrentVolume.CheckedChanged += new System.EventHandler(this.inUseCurrentVolume_CheckedChanged);
+			// 
 			// SettingsForm
 			// 
 			this.AcceptButton = this.btnOk;
@@ -622,5 +635,6 @@
 		private System.Windows.Forms.CheckBox enableNotifications;
 		private System.Windows.Forms.ListView notifiers;
 		private DeviceSelector playbackSelector;
+		private System.Windows.Forms.CheckBox inUseCurrentVolume;
 	}
 }

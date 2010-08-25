@@ -52,6 +52,7 @@ namespace Gablarski.Clients.Windows
 			this.dispThreshold.Text = String.Format ("{0:N1}s", (double)this.threshold.Value / 10);
 			this.vadSensitivity.Value = Settings.VoiceActivationLevel;
 
+			this.inUseCurrentVolume.Checked = Settings.UseMusicCurrentVolume;
 			this.volumeControl.Checked = Settings.EnableMediaVolumeControl;
 			this.musicIgnoreYou.Checked = Settings.MediaVolumeControlIgnoresYou;
 			this.talkingVolume.Value = Settings.TalkingMusicVolume;
@@ -126,6 +127,7 @@ namespace Gablarski.Clients.Windows
 			Settings.VoiceActivationLevel = this.vadSensitivity.Value;
 
 			Settings.EnableMediaVolumeControl = this.volumeControl.Checked;
+			Settings.UseMusicCurrentVolume = this.inUseCurrentVolume.Checked;
 			Settings.TalkingMusicVolume = this.talkingVolume.Value;
 			Settings.NormalMusicVolume = this.normalVolume.Value;
 			Settings.MediaVolumeControlIgnoresYou = this.musicIgnoreYou.Checked;
@@ -233,6 +235,11 @@ namespace Gablarski.Clients.Windows
 		{
 			if (DialogResult != DialogResult.OK)
 				DisableInput();
+		}
+
+		private void inUseCurrentVolume_CheckedChanged(object sender, EventArgs e)
+		{
+			this.normalVolume.Enabled = !this.inUseCurrentVolume.Checked;
 		}
 	}
 }

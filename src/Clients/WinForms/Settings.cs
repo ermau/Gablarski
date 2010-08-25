@@ -24,6 +24,17 @@ namespace Gablarski.Clients.Windows
 			}
 		}
 
+		public const string UseMusicCurrentVolumeName = "UseMusicCurrentVolume";
+		public static bool UseMusicCurrentVolume
+		{
+			get { return GetSetting (UseMusicCurrentVolumeName, true); }
+			set
+			{
+				if (SetSetting (UseMusicCurrentVolumeName, value))
+					OnSettingsChanged (UseMusicCurrentVolumeName);
+			}
+		}
+
 		public const string UsePushToTalkSettingName = "UsePushToTalk";
 		public static bool UsePushToTalk
 		{

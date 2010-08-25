@@ -38,6 +38,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Cadenza.Collections;
 using Gablarski.Audio;
 using Gablarski.Client;
 
@@ -67,7 +68,7 @@ namespace Gablarski.Clients.Media
 			get { return this.mediaPlayers; }
 			set
 			{
-				SetVolume (NormalVolume);
+				SetVolume (VolumeType.Normal);
 
 				lock (this.attachedPlayers)
 				{
@@ -76,6 +77,15 @@ namespace Gablarski.Clients.Media
 
 				this.mediaPlayers = value;
 			}
+		}
+
+		/// <summary>
+		/// Gets or sets whether to use the media player's original volume instead of <see cref="VolumeType.Normal"/>.
+		/// </summary>
+		public bool UseCurrentPlayerVolume
+		{
+			get;
+			set;
 		}
 
 		/// <summary>
@@ -110,7 +120,7 @@ namespace Gablarski.Clients.Media
 			if (Interlocked.Increment (ref this.playing) > 1 || playingSources.Count > 0)
 				return;
 
-			SetVolume (TalkingVolume);
+			SetVolume (VolumeType.Talking);
 		}
 
 		public void AddTalker (AudioSource source)
@@ -126,7 +136,7 @@ namespace Gablarski.Clients.Media
 			if (this.playing > 0 || playingSources.Count > 1)
 				return;
 
-			SetVolume (TalkingVolume);
+			SetVolume (VolumeType.Talking);
 		}
 
 		public void RemoveTalker ()
@@ -134,7 +144,7 @@ namespace Gablarski.Clients.Media
 			if (Interlocked.Decrement (ref this.playing) > 0 || playingSources.Count > 0)
 				return;
 
-			SetVolume (NormalVolume);
+			SetVolume (VolumeType.Normal);
 		}
 
 		public void RemoveTalker (AudioSource source)
@@ -148,7 +158,7 @@ namespace Gablarski.Clients.Media
 			if (this.playing > 0 || playingSources.Count > 0)
 				return;
 
-			SetVolume (NormalVolume);
+			SetVolume (VolumeType.Normal);
 		}
 
 		public void Reset()
@@ -158,7 +168,7 @@ namespace Gablarski.Clients.Media
 			lock (playingSources)
 				playingSources.Clear();
 
-			SetVolume (NormalVolume);
+			SetVolume (VolumeType.Normal);
 		}
 
 		private int talkingVolume = 30;
@@ -169,9 +179,15 @@ namespace Gablarski.Clients.Media
 
 		private readonly IClientContext context;
 		private readonly IAudioReceiver receiver;
-		private readonly HashSet<IMediaPlayer> attachedPlayers = new HashSet<IMediaPlayer>();
+		private readonly Dictionary<IMediaPlayer, int> attachedPlayers = new Dictionary<IMediaPlayer, int>();
 		private readonly HashSet<AudioSource> playingSources = new HashSet<AudioSource>();
 		private readonly Timer playerTimer;
+
+		private enum VolumeType
+		{
+			Normal,
+			Talking
+		}
 
 		private void Pulse (object state)
 		{
@@ -181,10 +197,12 @@ namespace Gablarski.Clients.Media
 
 				lock (attachedPlayers)
 				{
-					if (!running && attachedPlayers.Contains (mp))
+					bool attached = attachedPlayers.ContainsKey (mp);
+
+					if (!running && attached)
 						attachedPlayers.Remove (mp);
-					else if (running && !attachedPlayers.Contains (mp))
-						attachedPlayers.Add (mp);
+					else if (running && !attached)
+						attachedPlayers.Add (mp, mp.Volume);
 				}
 			}
 		}
@@ -213,26 +231,24 @@ namespace Gablarski.Clients.Media
 			AddTalker (e.Source);
 		}
 
-		private void SetVolume (int volume)
+		private void SetVolume (VolumeType type)
 		{
-			IEnumerable<IMediaPlayer> attached; 
+			Dictionary<IMediaPlayer, int> attached;
 			lock (attachedPlayers)
-			{
-				attached = attachedPlayers.ToList();
-			}
+				attached = new Dictionary<IMediaPlayer, int> (attachedPlayers);
 			
-			foreach (var mp in attached)
+			foreach (var kvp in attached)
 			{
+				int volume = (type == VolumeType.Talking) ? TalkingVolume : (!UseCurrentPlayerVolume) ? NormalVolume : kvp.Value;
+
 				try
 				{
-					mp.Volume = volume;
+					kvp.Key.Volume = volume;
 				}
 				catch
 				{
 					lock (attachedPlayers)
-					{
-						attachedPlayers.Remove (mp);
-					}
+						attachedPlayers.Remove (kvp.Key);
 				}
 			}
 		}
