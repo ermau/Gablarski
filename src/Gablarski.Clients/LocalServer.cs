@@ -73,7 +73,7 @@ namespace Gablarski.Clients
 		public static void Start()
 		{
 			channels = new LobbyChannelProvider();
-			authorization = new GuestUserProvider();
+			authorization = new GuestUserProvider { FirstUserIsAdmin = true };
 			permissions = new GuestPermissionProvider();
 			settings = new ServerSettings();
 			server = new GablarskiServer (settings, authorization, permissions, channels);

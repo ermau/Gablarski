@@ -44,7 +44,12 @@ namespace Gablarski.Server
 	public class GuestUserProvider
 		: IUserProvider
 	{
-		#region IUserProvider Members
+		public bool FirstUserIsAdmin
+		{
+			get;
+			set;
+		}
+
 		public bool UpdateSupported
 		{
 			get { return false; }
@@ -77,15 +82,17 @@ namespace Gablarski.Server
 
 		public LoginResult Login (string username, string password)
 		{
-			return new LoginResult (Interlocked.Decrement (ref this.nextUserId), LoginResultState.Success);
+			int next = Interlocked.Decrement (ref this.nextUserId);
+			if (FirstUserIsAdmin && next == -1)
+				next = 1;
+			
+			return new LoginResult (next, LoginResultState.Success);
 		}
 
 		public LoginResult Register (string username, string password)
 		{
 			throw new NotSupportedException ();
 		}
-
-		#endregion
 
 		private int nextUserId = 0;
 	}
