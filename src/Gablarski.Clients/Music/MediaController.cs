@@ -53,6 +53,7 @@ namespace Gablarski.Clients.Media
 
 			this.receiver = audioReceiver;
 			this.receiver.ReceivedAudio += OnReceivedAudio;
+			this.receiver.AudioSourceStarted +=	OnAudioSourceStarted;
 			this.receiver.AudioSourceStopped += OnAudioSourceStopped;
 
 			playerTimer = new Timer (Pulse, null, 0, 2500);
@@ -186,6 +187,14 @@ namespace Gablarski.Clients.Media
 						attachedPlayers.Add (mp);
 				}
 			}
+		}
+
+		private void OnAudioSourceStarted (object sender, AudioSourceEventArgs e)
+		{
+			if (!UserTalkingCounts && e.Source.OwnerId == context.CurrentUser.UserId)
+				return;
+
+			AddTalker (e.Source);
 		}
 
 		private void OnAudioSourceStopped (object sender, AudioSourceEventArgs e)
