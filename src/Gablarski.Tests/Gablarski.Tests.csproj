@@ -86,6 +86,7 @@
   <ItemGroup>
     <Compile Include="AudioCodecArgsTests.cs" />
     <Compile Include="AudioEngineTests.cs" />
+    <Compile Include="AudioFormatTests.cs" />
     <Compile Include="AudioSourceTests.cs" />
     <Compile Include="ChannelInfoTests.cs" />
     <Compile Include="ClientChannelManagerTests.cs" />

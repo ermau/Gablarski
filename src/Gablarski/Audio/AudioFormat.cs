@@ -47,7 +47,8 @@ namespace Gablarski.Audio
 		LPCM = 1,
 	}
 
-	public class AudioFormat : IEquatable<AudioFormat>
+	public class AudioFormat
+		: IEquatable<AudioFormat>
 	{
 		public AudioFormat (IValueReader reader)
 		{
