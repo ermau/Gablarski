@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Data.Common;
 using System.Data.SQLite;
 using System.IO;
+using Gablarski.Clients.Input;
 using Gablarski.Clients.Windows.Entities;
 
 namespace Gablarski.Clients.Windows
@@ -158,9 +159,59 @@ namespace Gablarski.Clients.Windows
 			if (volumeEntry.VolumeId < 1)
 				throw new ArgumentException ("Can't delete a non-existant server", "volumeEntry");
 
-			using (var cmd = db.CreateCommand ("DELETE FROM volumes WHERE (volumerId=?)"))
+			using (var cmd = db.CreateCommand ("DELETE FROM volumes WHERE (volumeId=?)"))
 			{
 				cmd.Parameters.Add (new SQLiteParameter ("id", volumeEntry.VolumeId));
+				cmd.ExecuteNonQuery();
+			}
+		}
+
+		public static IEnumerable<CommandBindingEntry> GetCommandBindings()
+		{
+			using (var cmd = db.CreateCommand ("SELECT * FROM commandbindings"))
+			using (var reader = cmd.ExecuteReader())
+			{
+				while (reader.Read())
+				{
+					yield return new CommandBindingEntry (Convert.ToInt32 (reader[0]))
+					{
+						ProviderType = Convert.ToString (reader[1]),
+						Command = (Command)Convert.ToInt32 (reader[2]),
+						Input = Convert.ToString (reader[3])
+					};
+				}
+			}
+		}
+
+		public static void CreateOrDelete (CommandBindingEntry bindingEntry)
+		{
+			if (bindingEntry == null)
+				throw new ArgumentNullException ("bindingEntry");
+
+			using (var cmd = db.CreateCommand())
+			{
+				cmd.CommandText = bindingEntry.Id > 0 ? "UPDATE commandbindings SET commandbindingProvider=?,commandbindingCommand=?,commandproviderInput=? WHERE (commandbindingId=?)" 
+					: "INSERT INTO commandbindings (commandbindingProvider,commandbindingCommand,commandproviderInput) VALUES (?,?,?)";
+
+				cmd.Parameters.Add (new SQLiteParameter ("provider", bindingEntry.ProviderType));
+				cmd.Parameters.Add (new SQLiteParameter ("command", (int)bindingEntry.Command));
+				cmd.Parameters.Add (new SQLiteParameter ("input", bindingEntry.Input));
+
+				if (bindingEntry.Id > 0)
+					cmd.Parameters.Add (new SQLiteParameter ("id", bindingEntry.Id));
+
+				cmd.ExecuteNonQuery();
+			}
+		}
+
+		public static void Delete (CommandBindingEntry bindingEntry)
+		{
+			if (bindingEntry == null)
+				throw new ArgumentNullException ("bindingEntry");
+
+			using (var cmd = db.CreateCommand("DELETE FROM commandbindings WHERE (commandbindingId=?"))
+			{
+				cmd.Parameters.Add (new SQLiteParameter ("id", bindingEntry.Id));
 				cmd.ExecuteNonQuery();
 			}
 		}
@@ -177,6 +228,9 @@ namespace Gablarski.Clients.Windows
 				cmd.ExecuteNonQuery();
 
 			using (var cmd = db.CreateCommand ("CREATE TABLE IF NOT EXISTS volumes (volumeId integer primary key autoincrement, volumeServerId integer, volumeUsername varchar(255), volumeGain float)"))
+				cmd.ExecuteNonQuery();
+
+			using (var cmd = db.CreateCommand ("CREATE TABLE IF NOT EXISTS commandbindings (commandbindingId integer primary key autoincrement, commandbindingProvider string, commandbindingCommand integer, commandbindingInput varchar(255)"))
 				cmd.ExecuteNonQuery();
 		}
 	}
