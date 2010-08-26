@@ -47,16 +47,16 @@ namespace Gablarski.Clients.Media
 	public class MediaController
 		: IMediaController
 	{
-		public MediaController (IClientContext context, IAudioReceiver audioReceiver, IEnumerable<IMediaPlayer> mediaPlayers)
+		public MediaController (IClientContext context, IEnumerable<IMediaPlayer> mediaPlayers)
 		{
 			this.context = context;
 			this.mediaPlayers = mediaPlayers;
 
-			this.receiver = audioReceiver;
-			this.receiver.ReceivedAudio += OnReceivedAudio;
-			this.receiver.AudioSourceStarted +=	OnAudioSourceStarted;
-			this.receiver.AudioSourceStopped += OnAudioSourceStopped;
-
+			this.context.Audio.SourceFinished += OnSourceFinished;
+			this.context.Sources.ReceivedAudio += OnReceivedAudio;
+			this.context.Sources.AudioSourceStarted += OnAudioSourceStarted;
+			this.context.Sources.AudioSourceStopped += OnAudioSourceStopped;
+			
 			playerTimer = new Timer (Pulse, null, 0, 2500);
 		}
 
@@ -215,9 +215,17 @@ namespace Gablarski.Clients.Media
 			AddTalker (e.Source);
 		}
 
+		private void OnSourceFinished (object sender, AudioSourceEventArgs e)
+		{
+			if (!UserTalkingCounts && e.Source.Id > 0 && e.Source.OwnerId == context.CurrentUser.UserId)
+				return;
+
+			RemoveTalker (e.Source);
+		}
+
 		private void OnAudioSourceStopped (object sender, AudioSourceEventArgs e)
 		{
-			if (!UserTalkingCounts && e.Source.OwnerId == context.CurrentUser.UserId)
+			if (!UserTalkingCounts || !(e.Source.Id > 0 && e.Source.OwnerId == context.CurrentUser.UserId))
 				return;
 
 			RemoveTalker (e.Source);
@@ -225,7 +233,7 @@ namespace Gablarski.Clients.Media
 
 		private void OnReceivedAudio (object sender, ReceivedAudioEventArgs e)
 		{
-			if (!UserTalkingCounts && e.Source.OwnerId == context.CurrentUser.UserId)
+			if (!UserTalkingCounts && e.Source.Id > 0 && e.Source.OwnerId == context.CurrentUser.UserId)
 				return;
 
 			AddTalker (e.Source);

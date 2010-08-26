@@ -502,8 +502,6 @@ namespace Gablarski.Audio
 		private readonly HashSet<IAudioPlaybackProvider> mutedPlayers = new HashSet<IAudioPlaybackProvider>();
 		private readonly HashSet<IAudioCaptureProvider> mutedCaptures = new HashSet<IAudioCaptureProvider>();
 
-		private Thread engineThread;
-
 		private IClientContext context;
 		private IAudioSender audioSender;
 		private IAudioReceiver audioReceiver;

@@ -50,7 +50,7 @@ namespace Gablarski.Clients.Windows
 			if (Settings.EnableMediaVolumeControl)
 				players = Settings.EnabledMediaPlayerIntegrations.Select (s => (IMediaPlayer)Activator.CreateInstance (Type.GetType (s))).ToList ();
 
-			this.mediaPlayerIntegration = new MediaController (this.gablarski, this.gablarski.Sources, players)
+			this.mediaPlayerIntegration = new MediaController (this.gablarski, players)
 			{
 				NormalVolume = Settings.NormalMusicVolume,
 				TalkingVolume = Settings.TalkingMusicVolume,

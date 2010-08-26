@@ -90,6 +90,11 @@ namespace Gablarski.Audio
 	public interface IAudioEngine
 	{
 		/// <summary>
+		/// Raised when a source finishes playing.
+		/// </summary>
+		event EventHandler<AudioSourceEventArgs> SourceFinished;
+
+		/// <summary>
 		/// Gets whether the engine is currently running or not.
 		/// </summary>
 		bool IsRunning { get; }
