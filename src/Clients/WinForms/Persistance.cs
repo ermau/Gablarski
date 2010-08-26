@@ -17,7 +17,9 @@ namespace Gablarski.Clients.Windows
 			if (!gablarskiData.Exists)
 				gablarskiData.Create();
 
-			if (Boolean.Parse (ConfigurationManager.AppSettings["useLocalDatabase"]))
+			string useLocal = ConfigurationManager.AppSettings["useLocalDatabase"];
+
+			if (useLocal != null && Boolean.Parse (useLocal))
 				DbFile = new FileInfo ("gablarski.db");
 			else
 				DbFile = new FileInfo (Path.Combine (gablarskiData.FullName, "gablarski.db"));
@@ -230,7 +232,7 @@ namespace Gablarski.Clients.Windows
 			using (var cmd = db.CreateCommand ("CREATE TABLE IF NOT EXISTS volumes (volumeId integer primary key autoincrement, volumeServerId integer, volumeUsername varchar(255), volumeGain float)"))
 				cmd.ExecuteNonQuery();
 
-			using (var cmd = db.CreateCommand ("CREATE TABLE IF NOT EXISTS commandbindings (commandbindingId integer primary key autoincrement, commandbindingProvider string, commandbindingCommand integer, commandbindingInput varchar(255)"))
+			using (var cmd = db.CreateCommand ("CREATE TABLE IF NOT EXISTS commandbindings (commandbindingId integer primary key autoincrement, commandbindingProvider string, commandbindingCommand integer, commandbindingInput varchar(255))"))
 				cmd.ExecuteNonQuery();
 		}
 	}
