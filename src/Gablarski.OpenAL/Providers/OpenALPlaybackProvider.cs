@@ -187,11 +187,12 @@ namespace Gablarski.OpenAL.Providers
 
 			if (disposing)
 			{
+				this.pool.Dispose();
+
 				if (this.device != null)
 					this.device.Dispose ();
 			}
 			
-			this.pool.Dispose();
 			this.device = null;
 			OpenALRunner.RemoveUser();
 			OpenALRunner.RemovePlaybackProvider (this);

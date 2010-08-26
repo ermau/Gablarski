@@ -160,7 +160,12 @@ namespace Gablarski.OpenAL
 		public void Dispose()
 		{
 			lock (owners)
+			{
+				foreach (Source s in owners.Keys)
+					s.Dispose();
+
 				owners.Clear();
+			}
 		}
 	}
 
