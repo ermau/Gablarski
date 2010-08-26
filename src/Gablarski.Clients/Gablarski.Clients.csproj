@@ -79,6 +79,7 @@
     <Compile Include="AutomaticErrorReporter.cs" />
     <Compile Include="GablarskiErrorReporter.cs" />
     <Compile Include="IErrorReporter.cs" />
+    <Compile Include="INamedComponent.cs" />
     <Compile Include="INotifier.cs" />
     <Compile Include="ITextToSpeech.cs" />
     <Compile Include="LocalServer.cs" />

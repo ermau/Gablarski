@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
+using Cadenza.Collections;
 using Gablarski.Audio;
 using Gablarski.Client;
 using Gablarski.Clients.Input;
@@ -57,9 +58,6 @@ namespace Gablarski.Clients.Windows
 				UseCurrentPlayerVolume = Settings.UseMusicCurrentVolume
 			};
 
-			if (Settings.EnableNotifications)
-				SetupNotifications ();
-
 			Settings.SettingChanged += SettingsSettingChanged;
 
 			this.InitializeComponent ();
@@ -76,8 +74,26 @@ namespace Gablarski.Clients.Windows
 		private void SetupNotifications ()
 		{
 			this.notifications = new NotificationHandler (this.gablarski);
+			
+			var notifiers = Settings.EnabledNotifiers.Select (n => Activator.CreateInstance (Type.GetType (n))).ToList();
+			this.notifications.Notifiers = notifiers.OfType<INotifier>();
+
+			var speech = notifiers.OfType<ITextToSpeech>().Select (n => { n.Media = this.mediaPlayerIntegration; return n; }).ToList();
+			if (speech.Any())
+			{
+				foreach (var s in speech)
+				{
+					var source = this.gablarski.Sources.CreateFake ("speech", s.SupportedFormats.OrderByDescending (af => af.SampleRate).First(), 512);
+					this.speechSources.Add (s, source);
+					s.AudioSource = source;
+					this.gablarski.Audio.Attach (this.audioPlayback, source, new AudioEnginePlaybackOptions());
+				}
+				
+				this.notifications.SpeechNotifiers = speech;
+				this.notifications.SpeechReceiver = this.gablarski.Sources;
+			}
+
 			this.notifications.MediaController = this.mediaPlayerIntegration;
-			this.notifications.Notifiers = Settings.EnabledNotifiers.Select (n => ((INotifier)Activator.CreateInstance (Type.GetType (n))));
 		}
 
 		private void SourcesOnReceivedSourceList(object sender, ReceivedListEventArgs<AudioSource> args)
@@ -190,6 +206,12 @@ namespace Gablarski.Clients.Windows
 					btnMute.Enabled = false;
 					btnMute.ToolTipText = "Playback Initialization error: " + ex.Message;
 				}));
+			}
+
+			if (this.audioPlayback != null && Settings.EnableNotifications)
+			{
+				SetupNotifications();
+				this.notifications.Notify (NotificationType.Connected, "Connected");
 			}
 		}
 
@@ -801,6 +823,7 @@ namespace Gablarski.Clients.Windows
 		private IAudioCaptureProvider musicprovider;
 		private readonly MediaController mediaPlayerIntegration;
 		private NotificationHandler notifications;
+		private readonly Dictionary<ITextToSpeech, AudioSource> speechSources = new Dictionary<ITextToSpeech, AudioSource>();
 
 		private void musicButton_Click (object sender, EventArgs e)
 		{

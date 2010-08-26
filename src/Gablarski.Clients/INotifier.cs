@@ -43,9 +43,8 @@ using Gablarski.Clients.Media;
 namespace Gablarski.Clients
 {
 	public interface INotifier
+		: INamedComponent
 	{
-		string Name { get; }
-
 		/// <summary>
 		/// Sets media player integration for use with audio notifications.
 		/// </summary>

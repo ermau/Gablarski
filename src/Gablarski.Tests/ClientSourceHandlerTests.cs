@@ -176,5 +176,20 @@ namespace Gablarski.Tests
 			Assert.AreEqual (48000, msg.AudioSettings.SampleRate);
 			Assert.AreEqual (64000, msg.AudioSettings.Bitrate);
 		}
+
+		[Test]
+		public void CreateFake()
+		{
+			string name = "fakeMonkeys";
+			AudioFormat format = AudioFormat.Stereo16bitLPCM;
+			short frameSize = 512;
+
+			var s = this.handler.CreateFake (name, format, frameSize);
+
+			Assert.AreEqual (name, s.Name);
+			AudioCodecArgsTests.AssertAreEqual (new AudioCodecArgs(format, 0, frameSize, 10), s);
+			
+			Assert.AreSame (s, this.handler[s.Id]);
+		}
 	}
 }

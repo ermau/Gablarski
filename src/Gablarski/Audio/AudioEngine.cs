@@ -581,7 +581,7 @@ namespace Gablarski.Audio
 
 			for (int i = 0; i < e.AudioData.Length; ++i)
 			{
-				byte[] decoded = e.Source.Decode (e.AudioData[i]);
+				byte[] decoded = (e.Encoded) ? e.Source.Decode (e.AudioData[i]): e.AudioData[i];
 
 				lock (playbacks)
 				{

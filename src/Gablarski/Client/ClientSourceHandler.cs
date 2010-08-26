@@ -87,6 +87,14 @@ namespace Gablarski.Client
 			get { return manager.Where (s => s.OwnerId == context.CurrentUser.UserId); }
 		}
 
+		public void Receive (AudioSource source, byte[] audio)
+		{
+			byte[][] data = new byte[1][];
+			data[0] = audio;
+
+			OnReceivedAudio (new ReceivedAudioEventArgs (source, data, false));
+		}
+
 		public void BeginSending (AudioSource source)
 		{
 			if (source == null)
@@ -175,6 +183,21 @@ namespace Gablarski.Client
 			this.context.Connection.Send (new RequestSourceMessage (name, new AudioCodecArgs (format, targetBitrate, frameSize, 10)));
 		}
 
+		public AudioSource CreateFake (string name, AudioFormat format, short frameSize)
+		{
+			if (name == null)
+				throw new ArgumentNullException ("name");
+			if (format == null)
+				throw new ArgumentNullException ("format");
+			if (frameSize <= 0)
+				throw new ArgumentOutOfRangeException ("frameSize", frameSize, "frameSize must be greater than 0");
+
+			var s = new AudioSource (name, this.nextFakeAudioId--, context.CurrentUser.UserId, format, 0, frameSize, 10);
+			manager.Add (s);
+
+			return s;
+		}
+
 		public bool GetIsIgnored (AudioSource source)
 		{
 			return this.manager.GetIsIgnored (source);
@@ -201,6 +224,7 @@ namespace Gablarski.Client
 			return GetEnumerator();
 		}
 
+		private int nextFakeAudioId = -1;
 		private readonly IClientContext context;
 		private readonly IClientSourceManager manager;
 		private readonly Dictionary<AudioSource, int> sequences = new Dictionary<AudioSource, int>();

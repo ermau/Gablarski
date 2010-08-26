@@ -41,6 +41,7 @@ using System.Linq;
 namespace Gablarski.OpenAL
 {
 	public class SourcePool<T>
+		: IDisposable
 		where T : class
 	{
 		public event EventHandler<SourceFinishedEventArgs<T>> SourceFinished;
@@ -154,6 +155,12 @@ namespace Gablarski.OpenAL
 			var finished = this.SourceFinished;
 			if (finished != null)
 				finished (this, e);
+		}
+
+		public void Dispose()
+		{
+			lock (owners)
+				owners.Clear();
 		}
 	}
 

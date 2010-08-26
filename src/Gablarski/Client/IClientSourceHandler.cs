@@ -77,6 +77,18 @@ namespace Gablarski.Client
 		void Request (string name, AudioFormat format, short frameSize, int targetBitrate);
 
 		/// <summary>
+		/// Creates a fake audio source for playing audio locally through the Gablarski audio engine.
+		/// </summary>
+		/// <param name="name">The user-local name of the source, used to identify the source later.</param>
+		/// <param name="format">The format of the audio.</param>
+		/// <param name="frameSize">The frame size of the audio.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="name"/> or <paramref name="format"/> are <c>null</c>.</exception>
+		/// <remarks>
+		/// Fake audio sources do not trigger or show up in <see cref="ReceivedSourceList"/> or <see cref="ReceivedAudioSource"/>
+		/// </remarks>
+		AudioSource CreateFake (string name, AudioFormat format, short frameSize);
+
+		/// <summary>
 		/// Gets whether or not the source is muted.
 		/// </summary>
 		/// <param name="source">The source to check.</param>

@@ -37,30 +37,76 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.IO;
 using System.Linq;
+using System.Speech.AudioFormat;
 using System.Text;
 using System.Threading;
+using Gablarski.Audio;
 using Gablarski.Clients;
 using System.Speech.Synthesis;
 using Gablarski.Clients.Media;
 
 namespace Gablarski.SpeechNotifier
 {
-	[Export (typeof(INotifier))]
 	[Export (typeof(ITextToSpeech))]
 	public class EventSpeech
-		: INotifier, ITextToSpeech
+		:  ITextToSpeech
 	{
+		public EventSpeech()
+		{
+			this.formats = this.speech.Voice.SupportedAudioFormats
+				.ToDictionary (af => new AudioFormat (GetWaveEncodingFormat (af.EncodingFormat),
+				                                      af.ChannelCount, af.BitsPerSample,
+				                                      af.SamplesPerSecond), af => af);
+		}
+
 		public string Name
 		{
-			get { return "Text to Speech"; }
+			get { return "SAPI Text to Speech"; }
+		}
+
+		public AudioSource AudioSource
+		{
+			get { return this.audioSource; }
+			set
+			{
+				if (!SupportedFormats.Contains (value))
+					throw new ArgumentException ("The audio source's format is unsupported", "value");
+
+				this.audioSource = value;
+			}
+		}
+
+		public IEnumerable<AudioFormat> SupportedFormats
+		{
+			get { return this.formats.Keys; }
+		}
+
+		public byte[] GetSpeech (string say, AudioSource source)
+		{
+			if (say == null)
+				throw new ArgumentNullException ("say");
+			if (source == null)
+				throw new ArgumentNullException ("source");
+
+			using (MemoryStream stream = new MemoryStream (120000))
+			{
+				lock (speech)
+				{
+					speech.SetOutputToAudioStream (stream, this.formats[source]);
+					speech.Speak (say);
+				}
+
+				return stream.ToArray();
+			}
 		}
 
 		public void Say (string say)
 		{
 			if (say == null)
 				throw new ArgumentNullException ("say");
-
+			
 			ThreadPool.QueueUserWorkItem (o =>
 			{
 				lock (sync)
@@ -79,24 +125,15 @@ namespace Gablarski.SpeechNotifier
 
 		public IMediaController Media
 		{
-			get
-			{
-				return media;
-			}
+			get { return media; }
 
 			set
 			{
 				lock (sync)
-				{
 					media = value;
-				}
 			}
 		}
-
-		private readonly object sync = new object();
-		private IMediaController media;
-		private static readonly SpeechSynthesizer speech = new SpeechSynthesizer ();
-
+		
 		public void Notify (NotificationType type, string say, NotifyPriority priority)
 		{
 			Say (say);
@@ -112,6 +149,29 @@ namespace Gablarski.SpeechNotifier
 				throw new ArgumentNullException ("phonetic");
 
 			Notify (type, String.Format (say, phonetic), priority);
+		}
+
+		public void Dispose()
+		{
+			speech.Dispose();
+		}
+
+		private readonly object sync = new object();
+		private IMediaController media;
+		private readonly SpeechSynthesizer speech = new SpeechSynthesizer ();
+		private AudioSource audioSource;
+		private Dictionary<AudioFormat, SpeechAudioFormatInfo> formats;
+
+		private static WaveFormatEncoding GetWaveEncodingFormat (EncodingFormat encoding)
+		{
+			switch (encoding)
+			{
+				case EncodingFormat.Pcm:
+					return WaveFormatEncoding.LPCM;
+
+				default:
+					return WaveFormatEncoding.Unknown;
+			}
 		}
 	}
 }

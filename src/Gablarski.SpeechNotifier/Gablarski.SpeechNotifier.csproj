@@ -67,6 +67,10 @@
       <Project>{F8A695AA-8BC9-46D4-8B7A-BDBD7B74401F}</Project>
       <Name>Gablarski.Clients</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Gablarski\Gablarski.csproj">
+      <Project>{7347052B-DA5B-4CCA-AB28-3963766E3CDB}</Project>
+      <Name>Gablarski</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

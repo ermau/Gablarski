@@ -37,6 +37,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Gablarski.Audio;
+using Gablarski.Clients.Media;
 
 namespace Gablarski.Clients
 {
@@ -44,16 +46,33 @@ namespace Gablarski.Clients
 	/// TTS Contract
 	/// </summary>
 	public interface ITextToSpeech
+		: INamedComponent, IDisposable
 	{
 		/// <summary>
-		/// Gets the name of the text to speech engine.
+		/// Gets the supported audio formats of this TTS engine.
 		/// </summary>
-		string Name { get; }
+		IEnumerable<AudioFormat> SupportedFormats { get; }
+
+		/// <summary>
+		/// Sets the media controller to use for this TTS engine.
+		/// </summary>
+		IMediaController Media { set; }
+
+		/// <summary>
+		/// Sets the audio source to use for this TTS engine.
+		/// </summary>
+		/// <exception cref="ArgumentException">The audio format of the source is not compatible with any in <see cref="SupportedFormats"/>.</exception>
+		AudioSource AudioSource { get; set; }
 
 		/// <summary>
 		/// Tells the text to speech engine what to say.
 		/// </summary>
 		/// <param name="say"></param>
 		void Say (string say);
+
+		/// <summary>
+		/// Gets the audio for <paramref name="say"/> in <paramref name="source"/>'s format.
+		/// </summary>
+		byte[] GetSpeech (string say, AudioSource source);
 	}
 }

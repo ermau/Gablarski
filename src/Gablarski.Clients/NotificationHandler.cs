@@ -38,6 +38,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Gablarski.Audio;
 using Gablarski.Client;
 using Gablarski.Clients.Media;
 
@@ -55,7 +56,6 @@ namespace Gablarski.Clients
 		public NotificationHandler (GablarskiClient client)
 		{
 			this.client = client;
-			this.client.Connected += OnClientConnected;
 			this.client.Disconnected += OnClientDisconnected;
 			this.client.Users.UserJoined += OnUserJoined;
 			this.client.Users.UserDisconnected += OnUserDisconnected;
@@ -68,6 +68,24 @@ namespace Gablarski.Clients
 		public bool Muted
 		{
 			get; set;
+		}
+
+		public IAudioReceiver SpeechReceiver
+		{
+			get;
+			set;
+		}
+
+		public IEnumerable<ITextToSpeech> SpeechNotifiers
+		{
+			set
+			{
+				lock (notifiers)
+				{
+					ClearSpeech();
+					Attach (value);
+				}
+			}
 		}
 
 		/// <summary>
@@ -106,6 +124,15 @@ namespace Gablarski.Clients
 				foreach (var n in notifiers)
 					n.Notify (type, notification, priority);
 			}
+
+			if (SpeechReceiver != null)
+			{
+				lock (notifiers)
+				{
+					foreach (var n in speechNotifiers)
+						SpeechReceiver.Receive (n.AudioSource, n.GetSpeech (notification, n.AudioSource));
+				}
+			}
 		}
 
 		public void Notify (NotificationType type, string notification, string nickname, string phonetic)
@@ -123,6 +150,15 @@ namespace Gablarski.Clients
 				foreach (var n in notifiers)
 					n.Notify (type, notification, nickname, phonetic, priority);
 			}
+
+			if (SpeechReceiver != null)
+			{
+				lock (notifiers)
+				{
+					foreach (var n in speechNotifiers)
+						SpeechReceiver.Receive (n.AudioSource, n.GetSpeech (notification, n.AudioSource));
+				}
+			}
 		}
 
 		public void Close ()
@@ -131,7 +167,6 @@ namespace Gablarski.Clients
 
 			MediaController.Reset();
 
-			this.client.Connected -= OnClientConnected;
 			this.client.Disconnected -= OnClientDisconnected;
 			this.client.Users.UserJoined -= OnUserJoined;
 			this.client.Users.UserDisconnected -= OnUserDisconnected;
@@ -140,16 +175,12 @@ namespace Gablarski.Clients
 
 		private bool isDisposed;
 		private readonly HashSet<INotifier> notifiers = new HashSet<INotifier> ();
+		private readonly HashSet<ITextToSpeech> speechNotifiers = new HashSet<ITextToSpeech>();
 		private readonly GablarskiClient client;
 
 		private void OnClientDisconnected (object sender, EventArgs e)
 		{
 			Notify (NotificationType.Disconnected, "Disconnected");
-		}
-
-		private void OnClientConnected (object sender, EventArgs e)
-		{
-			Notify (NotificationType.Connected, "Connected");
 		}
 
 		private void OnUserDisconnected (object sender, UserEventArgs e)
@@ -197,6 +228,39 @@ namespace Gablarski.Clients
 			{
 				notifier.Media = null;
 				this.notifiers.Remove (notifier);
+			}
+		}
+
+		private void ClearSpeech()
+		{
+			lock (notifiers)
+			{
+				foreach (var n in speechNotifiers.ToList())
+					Detatch (n);
+			}
+		}
+
+		private void Attach (IEnumerable<ITextToSpeech> sNotifiers)
+		{
+			lock (notifiers)
+			{
+				foreach (var n in sNotifiers)
+					Attach (n);
+			}
+		}
+
+		private void Attach (ITextToSpeech notifier)
+		{
+			lock (notifiers)
+				this.speechNotifiers.Add (notifier);
+		}
+
+		private void Detatch (ITextToSpeech notifier)
+		{
+			lock (notifier)
+			{
+				notifier.Media = null;
+				this.speechNotifiers.Remove (notifier);
 			}
 		}
 

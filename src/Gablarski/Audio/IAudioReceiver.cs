@@ -64,6 +64,12 @@ namespace Gablarski.Audio
 		/// Audio data was received.
 		/// </summary>
 		event EventHandler<ReceivedAudioEventArgs> ReceivedAudio;
+
+		/// <summary>
+		/// Forces an unencoded audio receive from <paramref name="source"/> with <paramref name="audio"/>
+		/// </summary>
+		/// <param name="audio">Unencoded audio in the <paramref name="source"/>'s format.</param>
+		void Receive (AudioSource source, byte[] audio);
 	}
 
 	public class AudioSourceEventArgs
@@ -88,9 +94,21 @@ namespace Gablarski.Audio
 		: AudioSourceEventArgs
 	{
 		public ReceivedAudioEventArgs (AudioSource source, byte[][] data)
+			: this(source, data, true)
+		{
+		}
+
+		public ReceivedAudioEventArgs (AudioSource source, byte[][] data, bool encoded)
 			: base (source)
 		{
 			this.AudioData = data;
+			Encoded = encoded;
+		}
+
+		public bool Encoded
+		{
+			get;
+			private set;
 		}
 
 		/// <summary>

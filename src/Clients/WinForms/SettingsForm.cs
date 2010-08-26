@@ -64,7 +64,7 @@ namespace Gablarski.Clients.Windows
 			}
 
 			this.enableNotifications.Checked = Settings.EnableNotifications;
-			foreach (INotifier n in Modules.Notifiers)
+			foreach (var n in Modules.Notifiers.Cast<INamedComponent>().Concat (Modules.TextToSpeech.Cast<INamedComponent>()))
 			{
 				try
 				{
