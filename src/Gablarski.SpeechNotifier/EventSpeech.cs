@@ -58,7 +58,7 @@ namespace Gablarski.SpeechNotifier
 			this.formats = this.speech.Voice.SupportedAudioFormats
 				.ToDictionary (af => new AudioFormat (GetWaveEncodingFormat (af.EncodingFormat),
 				                                      af.ChannelCount, af.BitsPerSample,
-				                                      af.SamplesPerSecond), af => af);
+				                                      af.SamplesPerSecond), af => af, AudioFormatEqualityComparer.Comparer);
 		}
 
 		public string Name
@@ -71,7 +71,7 @@ namespace Gablarski.SpeechNotifier
 			get { return this.audioSource; }
 			set
 			{
-				if (!SupportedFormats.Contains (value))
+				if (!SupportedFormats.Contains (value, AudioFormatEqualityComparer.Comparer))
 					throw new ArgumentException ("The audio source's format is unsupported", "value");
 
 				this.audioSource = value;

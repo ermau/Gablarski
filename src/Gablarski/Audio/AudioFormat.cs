@@ -47,6 +47,29 @@ namespace Gablarski.Audio
 		LPCM = 1,
 	}
 
+	public class AudioFormatEqualityComparer
+		: EqualityComparer<AudioFormat>
+	{
+		public override bool Equals (AudioFormat x, AudioFormat y)
+		{
+			return x.Equals (y);
+		}
+
+		public override int GetHashCode (AudioFormat format)
+		{
+			unchecked
+			{
+				int result = format.Channels;
+				result = (result * 397) ^ format.BitsPerSample;
+				result = (result * 397) ^ format.SampleRate;
+				result = (result * 397) ^ format.WaveEncoding.GetHashCode();
+				return result;
+			}
+		}
+
+		public static readonly AudioFormatEqualityComparer Comparer = new AudioFormatEqualityComparer();
+	}
+
 	public class AudioFormat
 		: IEquatable<AudioFormat>
 	{
