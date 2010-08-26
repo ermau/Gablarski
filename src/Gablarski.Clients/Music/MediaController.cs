@@ -247,7 +247,18 @@ namespace Gablarski.Clients.Media
 			
 			foreach (var kvp in attached)
 			{
-				int volume = (type == VolumeType.Talking) ? TalkingVolume : (!UseCurrentPlayerVolume) ? NormalVolume : kvp.Value;
+				int volume;
+				if (type == VolumeType.Talking)
+				{
+					volume = TalkingVolume;
+					if (UseCurrentPlayerVolume)
+					{
+						lock (attachedPlayers)
+							attachedPlayers[kvp.Key] = kvp.Key.Volume;
+					}
+				}
+				else
+					volume = (!UseCurrentPlayerVolume) ? NormalVolume : kvp.Value;
 
 				try
 				{
