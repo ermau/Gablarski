@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Cadenza.Collections;
+using Gablarski.Clients.Input;
 using Gablarski.Clients.Windows.Entities;
 using Cadenza;
 
@@ -129,6 +132,11 @@ namespace Gablarski.Clients.Windows
 				if (SetSetting ("InputProvider", value))
 					OnSettingsChanged ("InputProvider");
 			}
+		}
+
+		public static ICollection<CommandBinding> CommandBindings
+		{
+			get { return commandBindings; }
 		}
 
 		public static string InputSettings
@@ -271,11 +279,14 @@ namespace Gablarski.Clients.Windows
 					Persistance.SaveOrUpdate (entry);
 
 				settings = null;
+				commandBindings.CollectionChanged -= OnCommandBindingsChanged;
+				commandBindings = null;
 			}
 		}
 
 		private readonly static object SettingLock = new object();
 
+		private static ObservableCollection<CommandBinding> commandBindings;
 		private static Dictionary<string, SettingEntry> settings;
 		private static void LoadSettings ()
 		{
@@ -285,7 +296,27 @@ namespace Gablarski.Clients.Windows
 					return;
 
 				settings = Persistance.GetSettings().ToDictionary (s => s.Name);
+				commandBindings = new ObservableCollection<CommandBinding>();
+				commandBindings.CollectionChanged += OnCommandBindingsChanged;
+				foreach (var cbe in Persistance.GetCommandBindings())
+				{
+					try
+					{
+						Type providerType = Type.GetType(cbe.ProviderType);
+						commandBindings.Add (new CommandBinding ((IInputProvider)Activator.CreateInstance (providerType), cbe.Command,
+						                                         cbe.Input));
+					}
+					catch
+					{
+						continue;
+					}
+				}
 			}
+		}
+
+		private static void OnCommandBindingsChanged (object sender, NotifyCollectionChangedEventArgs e)
+		{
+			OnSettingsChanged ("CommandBindings");
 		}
 
 		private static string GetSetting (string settingName, string defaultValue)
