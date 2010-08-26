@@ -53,7 +53,7 @@ namespace Gablarski.OpenAL.Providers
 		}
 
 		#region IAudioPlaybackProvider Members
-		public event EventHandler<SourceFinishedEventArgs> SourceFinished;
+		public event EventHandler<AudioSourceEventArgs> SourceFinished;
 
 		public float Gain
 		{
@@ -234,7 +234,7 @@ namespace Gablarski.OpenAL.Providers
 				bufferStack.Push (sbuffers[i]);
 		}
 
-		private void OnSourceFinished (SourceFinishedEventArgs e)
+		private void OnSourceFinished (AudioSourceEventArgs e)
 		{
 			var finished = this.SourceFinished;
 			if (finished != null)
@@ -243,7 +243,7 @@ namespace Gablarski.OpenAL.Providers
 		
 		private void PoolSourceFinished (object sender, SourceFinishedEventArgs<AudioSource> e)
 		{
-			OnSourceFinished (new SourceFinishedEventArgs (e.Owner));
+			OnSourceFinished (new AudioSourceEventArgs (e.Owner));
 		}
 	}
 }

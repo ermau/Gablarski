@@ -46,7 +46,7 @@ namespace Gablarski.CoreAudio
 	public class CoreAudioPlaybackProvider
 		: IAudioPlaybackProvider
 	{
-		public event EventHandler<SourceFinishedEventArgs> SourceFinished;
+		public event EventHandler<AudioSourceEventArgs> SourceFinished;
 
 		public IAudioDevice Device
 		{

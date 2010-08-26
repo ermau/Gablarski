@@ -47,7 +47,7 @@ namespace Gablarski.Audio
 		/// Fired when a source finishes playing.
 		/// </summary>
 		/// <exception cref="ObjectDisposedException">Ths playback provider has already been disposed.</exception>
-		event EventHandler<SourceFinishedEventArgs> SourceFinished;
+		event EventHandler<AudioSourceEventArgs> SourceFinished;
 
 		/// <summary>
 		/// Gets or sets the playback device.
@@ -102,30 +102,6 @@ namespace Gablarski.Audio
 
 			self.Device = device;
 			self.Open();
-		}
-	}
-
-	public class SourceFinishedEventArgs
-		: EventArgs
-	{
-		/// <summary>
-		/// Initializes a new instance of <see cref="SourceFinishedEventArgs"/>
-		/// </summary>
-		/// <param name="source"></param>
-		public SourceFinishedEventArgs (AudioSource source)
-		{
-			if (source == null)
-				throw new ArgumentNullException("source");
-
-			this.Source = source;
-		}
-
-		/// <summary>
-		/// Gets the source that finished playing.
-		/// </summary>
-		public AudioSource Source
-		{
-			get; private set;
 		}
 	}
 }

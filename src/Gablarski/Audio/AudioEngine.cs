@@ -46,6 +46,8 @@ namespace Gablarski.Audio
 	public class AudioEngine
 		: IAudioEngine
 	{
+		public event EventHandler<AudioSourceEventArgs> SourceFinished;
+
 		/// <summary>
 		/// Gets or sets the client context.
 		/// </summary>
@@ -104,6 +106,12 @@ namespace Gablarski.Audio
 
 			lock (playbacks)
 			{
+				if (!this.playbackProviders.Contains (audioPlayback))
+				{
+					audioPlayback.SourceFinished += OnSourceFinished;
+					this.playbackProviders.Add (audioPlayback);
+				}
+
 				foreach (var s in sources.Where (s => !playbacks.ContainsKey (s) && s.OwnerId != Context.CurrentUser.UserId))
 				{
 					playbacks[s] = new AudioPlaybackEntity (audioPlayback, s, options);
@@ -125,6 +133,12 @@ namespace Gablarski.Audio
 
 			lock (playbacks)
 			{
+				if (!this.playbackProviders.Contains (audioPlayback))
+				{
+					audioPlayback.SourceFinished += OnSourceFinished;
+					this.playbackProviders.Add (audioPlayback);
+				}
+
 				playbacks[source] = new AudioPlaybackEntity (audioPlayback, source, options);
 
 				if (this.playbackMuted || mutedPlayers.Contains (audioPlayback))
@@ -242,6 +256,9 @@ namespace Gablarski.Audio
 
 			lock (playbacks)
 			{
+				this.playbackProviders.Remove (provider);
+				provider.SourceFinished -= OnSourceFinished;
+
 				foreach (var entity in playbacks.Values.Where (e => e.AudioPlayback == provider).ToList())
 				{
 					entity.AudioPlayback.FreeSource (entity.Source);
@@ -480,7 +497,7 @@ namespace Gablarski.Audio
 		private readonly Dictionary<IAudioCaptureProvider, AudioSource> captureToSourceLookup = new Dictionary<IAudioCaptureProvider, AudioSource>();
 		private readonly Dictionary<AudioSource, AudioCaptureEntity> captures = new Dictionary<AudioSource, AudioCaptureEntity>();
 		private readonly Dictionary<AudioSource, AudioPlaybackEntity> playbacks = new Dictionary<AudioSource, AudioPlaybackEntity>();
-		private readonly List<IAudioPlaybackProvider> playbackProviders = new List<IAudioPlaybackProvider>();
+		private readonly HashSet<IAudioPlaybackProvider> playbackProviders = new HashSet<IAudioPlaybackProvider>();
 
 		private readonly HashSet<IAudioPlaybackProvider> mutedPlayers = new HashSet<IAudioPlaybackProvider>();
 		private readonly HashSet<IAudioCaptureProvider> mutedCaptures = new HashSet<IAudioCaptureProvider>();
@@ -492,6 +509,13 @@ namespace Gablarski.Audio
 		private IAudioReceiver audioReceiver;
 		private bool captureMuted;
 		private bool playbackMuted;
+
+		private void OnSourceFinished (object sender, AudioSourceEventArgs e)
+		{
+			var stopped = SourceFinished;
+			if (stopped != null)
+				stopped (sender, new AudioSourceEventArgs (e.Source));
+		}
 
 		private void OnSamplesAvailable (object sender, SamplesAvailableEventArgs e)
 		{
