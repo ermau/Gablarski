@@ -385,7 +385,7 @@ namespace Gablarski.Server
 
 									messages.Add (e);
 
-									next = mqueue.Peek();
+									next = (mqueue.Count > 0) ? mqueue.Peek() : null;
 								}
 
 								setHandler (messages);
