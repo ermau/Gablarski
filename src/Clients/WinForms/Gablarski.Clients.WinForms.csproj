@@ -159,6 +159,7 @@
       <DependentUpon>DeviceSelector.cs</DependentUpon>
     </Compile>
     <Compile Include="Entities\IgnoreEntry.cs" />
+    <Compile Include="Entities\CommandBindingEntry.cs" />
     <Compile Include="Entities\ServerEntry.cs" />
     <Compile Include="Entities\SettingEntry.cs" />
     <Compile Include="Entities\VolumeEntry.cs" />
@@ -251,6 +252,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="GablarskiClient.exe.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
