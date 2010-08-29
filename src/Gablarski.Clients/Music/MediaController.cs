@@ -191,8 +191,11 @@ namespace Gablarski.Clients.Media
 
 		private void OnAudioSourceStarted (object sender, AudioSourceEventArgs e)
 		{
-			if (!UserTalkingCounts && e.Source.OwnerId == context.CurrentUser.UserId)
+			if ((!UserTalkingCounts && e.Source.OwnerId == context.CurrentUser.UserId) 
+				|| this.context.Users[e.Source.OwnerId].CurrentChannelId != this.context.CurrentUser.CurrentChannelId)
+			{
 				return;
+			}
 
 			AddTalker (e.Source);
 		}
