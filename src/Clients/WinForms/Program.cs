@@ -94,13 +94,14 @@ namespace Gablarski.Clients.Windows
 		{
 			AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
 			{
+				log4net.LogManager.GetLogger ("Gablarski WinForms").Fatal ("BAYSPLOSION", (Exception)e.ExceptionObject);
 				MessageBox.Show ("Unexpected error" + Environment.NewLine + (e.ExceptionObject as Exception).ToDisplayString(),
 				                 "Unexpected error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			};
 
 			log4net.Config.XmlConfigurator.Configure ();
 
-			log4net.LogManager.GetLogger ("Gablarski WinForms").Info ("Program Start");
+			log4net.LogManager.GetLogger ("Gablarski WinForms").InfoFormat ("Program Start: {0}", typeof(Gablarski.Client.GablarskiClient).Assembly.GetName().Version);
 
 			FileInfo program = new FileInfo (Process.GetCurrentProcess().MainModule.FileName);
 			Environment.CurrentDirectory = program.Directory.FullName;
