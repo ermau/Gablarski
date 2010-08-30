@@ -280,7 +280,7 @@ namespace Gablarski.Clients.Windows
 			this.Entry = new ServerEntry (0)
 			{
 				Host = "localhost",
-				Port = 6112,
+				Port = 42912,
 				UserName = nick,
 				UserNickname = nick,
 				UserPassword = "password"

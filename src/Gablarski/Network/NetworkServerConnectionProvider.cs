@@ -163,7 +163,7 @@ namespace Gablarski.Network
 		}
 
 		private volatile bool listening;
-		private int port = 6112;
+		private int port = 42912;
 		private Socket udp;
 		private TcpListener tcpListener;
 		private readonly Dictionary<uint, NetworkServerConnection> connections = new Dictionary<uint, NetworkServerConnection> (20);

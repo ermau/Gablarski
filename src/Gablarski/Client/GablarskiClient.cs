@@ -359,7 +359,7 @@ namespace Gablarski.Client
 				{
 					var msg = new QueryServerMessage { ServerInfoOnly = true };
 
-					SocketValueWriter writer = new SocketValueWriter (s, new IPEndPoint (IPAddress.Broadcast, 6112));
+					SocketValueWriter writer = new SocketValueWriter (s, new IPEndPoint (IPAddress.Broadcast, 42912));
 					writer.WriteByte (42);
 					writer.WriteUInt32 (0);
 					writer.WriteUInt16 (msg.MessageTypeCode);

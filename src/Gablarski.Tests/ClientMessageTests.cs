@@ -70,7 +70,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void Connect()
 		{
-			var msg = new ConnectMessage { ProtocolVersion = 42, Host = "monkeys.com", Port = 6112 };
+			var msg = new ConnectMessage { ProtocolVersion = 42, Host = "monkeys.com", Port = 42912 };
 
 			msg.WritePayload (writer);
 			long length = stream.Position;
@@ -82,7 +82,7 @@ namespace Gablarski.Tests
 			Assert.AreEqual (length, stream.Position);
 			Assert.AreEqual (42, msg.ProtocolVersion);
 			Assert.AreEqual ("monkeys.com", msg.Host);
-			Assert.AreEqual (6112, msg.Port);
+			Assert.AreEqual (42912, msg.Port);
 		}
 
 		[Test]

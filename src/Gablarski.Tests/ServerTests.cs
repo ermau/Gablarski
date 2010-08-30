@@ -65,7 +65,7 @@ namespace Gablarski.Tests
 		private MockServerConnection Connect()
 		{
 			var connection = this.provider.EstablishConnection ();
-			connection.Client.Send (new ConnectMessage { ProtocolVersion = GablarskiServer.ProtocolVersion, Host = "test", Port = 6112 });
+			connection.Client.Send (new ConnectMessage { ProtocolVersion = GablarskiServer.ProtocolVersion, Host = "test", Port = 42912 });
 			connection.Client.DequeueAndAssertMessage<ServerInfoMessage>();
 			return connection;
 		}
@@ -135,7 +135,7 @@ namespace Gablarski.Tests
 			
 			var connection = provider.EstablishConnection();
 			connection.Client.Send (new ConnectMessage { ProtocolVersion = GablarskiServer.ProtocolVersion,
-				Host = "monkeys.com", Port = 6112 });
+				Host = "monkeys.com", Port = 42912 });
 				
 			var msg = connection.Client.DequeueAndAssertMessage<RedirectMessage>();
 			Assert.AreEqual (IPAddress.Any.ToString(), msg.Host);
@@ -149,7 +149,7 @@ namespace Gablarski.Tests
 			
 			var connection = provider.EstablishConnection();
 			connection.Client.Send (new ConnectMessage { ProtocolVersion = GablarskiServer.ProtocolVersion,
-				Host = "monkeys2.com", Port = 6112 });
+				Host = "monkeys2.com", Port = 42912 });
 
 			var msg = connection.Client.DequeueAndAssertMessage<ServerInfoMessage>();
 			Assert.AreEqual (this.settings.Name, msg.ServerInfo.Name);

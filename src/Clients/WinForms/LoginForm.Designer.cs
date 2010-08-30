@@ -183,7 +183,7 @@
 			this.inPort.Name = "inPort";
 			this.inPort.Size = new System.Drawing.Size(145, 20);
 			this.inPort.TabIndex = 2;
-			this.inPort.Text = "6112";
+			this.inPort.Text = "42912";
 			// 
 			// labelNickname
 			// 
