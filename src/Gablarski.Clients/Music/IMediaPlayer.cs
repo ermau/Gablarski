@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -69,7 +69,7 @@ namespace Gablarski.Clients.Media
 		/// <summary>
 		/// Sets the volume	for the media player. 0 - 100.
 		/// </summary>
-		/// <exception cref="ArgumentOutOfRangeException">When value is < 0 or > 100.</exception>
+		/// <exception cref="ArgumentOutOfRangeException">When value is &lt; 0 or &gt; 100.</exception>
 		int Volume { get; set; }
 	}
 

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -34,13 +34,11 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 namespace Gablarski.Clients.Media
 {
+	/// <summary>
+	/// Contract for a media controller.
+	/// </summary>
 	public interface IMediaController
 	{
 		/// <summary>
