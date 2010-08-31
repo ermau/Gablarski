@@ -51,7 +51,12 @@ namespace Gablarski.Clients.Input
 		/// <summary>
 		/// Wax off.
 		/// </summary>
-		Off
+		Off,
+
+		/// <summary>
+		/// Karatee.
+		/// </summary>
+		Axis
 	}
 
 	public class InputStateChangedEventArgs
@@ -59,15 +64,50 @@ namespace Gablarski.Clients.Input
 	{
 		public InputStateChangedEventArgs (InputState state)
 		{
+			if (state == InputState.Axis)
+				throw new ArgumentException ("State can not be axis without percentage setting", "state");
+
 			this.State = state;
 		}
 
+		public InputStateChangedEventArgs (InputState state, double axisPercent)
+		{
+			State = state;
+			AxisPercent = axisPercent;
+		}
+
+		/// <summary>
+		/// Gets the command that state has changed for.
+		/// </summary>
+		public Command Command
+		{
+			get;
+			private set;
+		}
+
+		/// <summary>
+		/// Gets the input state for the <see cref="Command"/>.
+		/// </summary>
 		public InputState State
 		{
-			get; private set;
+			get;
+			private set;
+		}
+
+		/// <summary>
+		/// Gets the percentage of an axis.
+		/// </summary>
+		public double AxisPercent
+		{
+			get;
+			private set;
 		}
 	}
 
+
+	/// <summary>
+	/// Contract for input providers
+	/// </summary>
 	public interface IInputProvider
 		: IDisposable
 	{
@@ -82,13 +122,19 @@ namespace Gablarski.Clients.Input
 		string DisplayName { get; }
 
 		/// <summary>
-		/// Attaches the input provider to listen for the given settings.
+		/// Attaches the input provider to the <paramref name="window"/>.
 		/// </summary>
 		/// <param name="window">Application window handle.</param>
-		/// <param name="settings">The settings provided by <see cref="EndRecord()"/>. <c>null</c> or <c>String.Empty</c> if not yet set.</param>
 		/// <exception cref="ArgumentException">If <paramref name="window"/> is equal to <see cref="IntPtr.Zero"/>.</exception>
 		/// <exception cref="InvalidOperationException">If it's already attached.</exception>
-		void Attach (IntPtr window, string settings);
+		void Attach (IntPtr window);
+
+		/// <summary>
+		/// Sets the bindings to listen for.
+		/// </summary>
+		/// <param name="bindings"></param>
+		/// <exception cref="ArgumentNullException"><paramref name="bindings"/> is <c>null</c>.</exception>
+		void SetBindings (IEnumerable<CommandBinding> bindings);
 
 		/// <summary>
 		/// Shuts down and detatches the input provider.
@@ -102,11 +148,11 @@ namespace Gablarski.Clients.Input
 		void BeginRecord();
 
 		/// <summary>
-		/// Gets a nice display name for the given <paramref name="inputSettings"/>.
+		/// Gets a nice display name for the given <paramref name="input"/>.
 		/// </summary>
-		/// <param name="inputSettings">The input settings to beautify.</param>
-		/// <returns>The nice display name for <paramref name="inputSettings"/>.</returns>
-		string GetNiceInputName (string inputSettings);
+		/// <param name="input">The input combination to beautify.</param>
+		/// <returns>The nice display name for <paramref name="input"/>.</returns>
+		string GetNiceInputName (string input);
 
 		/// <summary>
 		/// Stops recording input combinations and returns the latest combination.

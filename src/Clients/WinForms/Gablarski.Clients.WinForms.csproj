@@ -135,17 +135,25 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Deployment" />
+    <Reference Include="UIAutomationProvider" />
     <Reference Include="WindowsBase">
       <RequiredTargetFramework>3.0</RequiredTargetFramework>
     </Reference>
+    <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AnonymousCommand.cs" />
+    <Compile Include="BindingList.xaml.cs">
+      <DependentUpon>BindingList.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="BindingListViewModel.cs" />
     <Compile Include="ChannelForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="ChannelForm.Designer.cs">
       <DependentUpon>ChannelForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="CommandBindingTemplateSelector.cs" />
     <Compile Include="CommentForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -318,6 +326,12 @@
     <None Include="Resources\comment.png" />
     <None Include="Resources\microphone--minus.png" />
     <None Include="Resources\Headphones.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="BindingList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

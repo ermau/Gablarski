@@ -29,6 +29,7 @@
 		private void InitializeComponent ()
 		{
 			System.Windows.Forms.ColumnHeader columnHeader1;
+			System.Windows.Forms.Label label1;
 			this.btnOk = new System.Windows.Forms.Button();
 			this.btnCancel = new System.Windows.Forms.Button();
 			this.tabs = new System.Windows.Forms.TabControl();
@@ -49,13 +50,12 @@
 			this.vadSensitivity = new System.Windows.Forms.TrackBar();
 			this.voiceSelector = new Gablarski.DeviceSelector();
 			this.controlsTab = new System.Windows.Forms.TabPage();
-			this.label10 = new System.Windows.Forms.Label();
-			this.linkClear = new System.Windows.Forms.LinkLabel();
-			this.linkSet = new System.Windows.Forms.LinkLabel();
-			this.dispInput = new System.Windows.Forms.Label();
+			this.elementHost1 = new System.Windows.Forms.Integration.ElementHost();
+			this.bindingList1 = new Gablarski.Clients.Windows.BindingList();
 			this.inInputProvider = new System.Windows.Forms.ComboBox();
 			this.lblInputProvider = new System.Windows.Forms.Label();
 			this.musicTab = new System.Windows.Forms.TabPage();
+			this.inUseCurrentVolume = new System.Windows.Forms.CheckBox();
 			this.musicIgnoreYou = new System.Windows.Forms.CheckBox();
 			this.label9 = new System.Windows.Forms.Label();
 			this.label8 = new System.Windows.Forms.Label();
@@ -70,8 +70,9 @@
 			this.tabNotifications = new System.Windows.Forms.TabPage();
 			this.enableNotifications = new System.Windows.Forms.CheckBox();
 			this.notifiers = new System.Windows.Forms.ListView();
-			this.inUseCurrentVolume = new System.Windows.Forms.CheckBox();
+			this.addBinding = new System.Windows.Forms.LinkLabel();
 			columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			label1 = new System.Windows.Forms.Label();
 			this.tabs.SuspendLayout();
 			this.generalTab.SuspendLayout();
 			this.voiceTab.SuspendLayout();
@@ -89,6 +90,15 @@
 			// 
 			columnHeader1.Text = "Notifier";
 			columnHeader1.Width = 266;
+			// 
+			// label1
+			// 
+			label1.AutoSize = true;
+			label1.Location = new System.Drawing.Point(8, 38);
+			label1.Name = "label1";
+			label1.Size = new System.Drawing.Size(50, 13);
+			label1.TabIndex = 7;
+			label1.Text = "Bindings:";
 			// 
 			// btnOk
 			// 
@@ -304,10 +314,9 @@
 			// 
 			// controlsTab
 			// 
-			this.controlsTab.Controls.Add(this.label10);
-			this.controlsTab.Controls.Add(this.linkClear);
-			this.controlsTab.Controls.Add(this.linkSet);
-			this.controlsTab.Controls.Add(this.dispInput);
+			this.controlsTab.Controls.Add(this.addBinding);
+			this.controlsTab.Controls.Add(label1);
+			this.controlsTab.Controls.Add(this.elementHost1);
 			this.controlsTab.Controls.Add(this.inInputProvider);
 			this.controlsTab.Controls.Add(this.lblInputProvider);
 			this.controlsTab.Location = new System.Drawing.Point(4, 22);
@@ -318,45 +327,14 @@
 			this.controlsTab.Text = "Controls";
 			this.controlsTab.UseVisualStyleBackColor = true;
 			// 
-			// label10
+			// elementHost1
 			// 
-			this.label10.AutoSize = true;
-			this.label10.Location = new System.Drawing.Point(8, 43);
-			this.label10.Name = "label10";
-			this.label10.Size = new System.Drawing.Size(70, 13);
-			this.label10.TabIndex = 12;
-			this.label10.Text = "Push to Talk:";
-			// 
-			// linkClear
-			// 
-			this.linkClear.AutoSize = true;
-			this.linkClear.Location = new System.Drawing.Point(143, 43);
-			this.linkClear.Name = "linkClear";
-			this.linkClear.Size = new System.Drawing.Size(31, 13);
-			this.linkClear.TabIndex = 10;
-			this.linkClear.TabStop = true;
-			this.linkClear.Text = "Clear";
-			this.linkClear.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkClear_LinkClicked);
-			// 
-			// linkSet
-			// 
-			this.linkSet.AutoSize = true;
-			this.linkSet.Location = new System.Drawing.Point(106, 43);
-			this.linkSet.Name = "linkSet";
-			this.linkSet.Size = new System.Drawing.Size(23, 13);
-			this.linkSet.TabIndex = 9;
-			this.linkSet.TabStop = true;
-			this.linkSet.Text = "Set";
-			this.linkSet.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkSet_LinkClicked);
-			// 
-			// dispInput
-			// 
-			this.dispInput.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-						| System.Windows.Forms.AnchorStyles.Right)));
-			this.dispInput.Location = new System.Drawing.Point(180, 43);
-			this.dispInput.Name = "dispInput";
-			this.dispInput.Size = new System.Drawing.Size(123, 13);
-			this.dispInput.TabIndex = 8;
+			this.elementHost1.Location = new System.Drawing.Point(11, 54);
+			this.elementHost1.Name = "elementHost1";
+			this.elementHost1.Size = new System.Drawing.Size(292, 218);
+			this.elementHost1.TabIndex = 6;
+			this.elementHost1.Text = "elementHost1";
+			this.elementHost1.Child = this.bindingList1;
 			// 
 			// inInputProvider
 			// 
@@ -400,6 +378,17 @@
 			this.musicTab.TabIndex = 3;
 			this.musicTab.Text = "Music";
 			this.musicTab.UseVisualStyleBackColor = true;
+			// 
+			// inUseCurrentVolume
+			// 
+			this.inUseCurrentVolume.AutoSize = true;
+			this.inUseCurrentVolume.Location = new System.Drawing.Point(92, 180);
+			this.inUseCurrentVolume.Name = "inUseCurrentVolume";
+			this.inUseCurrentVolume.Size = new System.Drawing.Size(97, 17);
+			this.inUseCurrentVolume.TabIndex = 13;
+			this.inUseCurrentVolume.Text = "Music\'s current";
+			this.inUseCurrentVolume.UseVisualStyleBackColor = true;
+			this.inUseCurrentVolume.CheckedChanged += new System.EventHandler(this.inUseCurrentVolume_CheckedChanged);
 			// 
 			// musicIgnoreYou
 			// 
@@ -545,16 +534,15 @@
 			this.notifiers.UseCompatibleStateImageBehavior = false;
 			this.notifiers.View = System.Windows.Forms.View.Details;
 			// 
-			// inUseCurrentVolume
+			// addBinding
 			// 
-			this.inUseCurrentVolume.AutoSize = true;
-			this.inUseCurrentVolume.Location = new System.Drawing.Point(92, 180);
-			this.inUseCurrentVolume.Name = "inUseCurrentVolume";
-			this.inUseCurrentVolume.Size = new System.Drawing.Size(97, 17);
-			this.inUseCurrentVolume.TabIndex = 13;
-			this.inUseCurrentVolume.Text = "Music\'s current";
-			this.inUseCurrentVolume.UseVisualStyleBackColor = true;
-			this.inUseCurrentVolume.CheckedChanged += new System.EventHandler(this.inUseCurrentVolume_CheckedChanged);
+			this.addBinding.AutoSize = true;
+			this.addBinding.Location = new System.Drawing.Point(231, 275);
+			this.addBinding.Name = "addBinding";
+			this.addBinding.Size = new System.Drawing.Size(72, 13);
+			this.addBinding.TabIndex = 8;
+			this.addBinding.TabStop = true;
+			this.addBinding.Text = "Add binding...";
 			// 
 			// SettingsForm
 			// 
@@ -603,9 +591,6 @@
 		private System.Windows.Forms.ComboBox inInputProvider;
 		private System.Windows.Forms.Label lblInputProvider;
 		private System.Windows.Forms.CheckBox inConnectOnStart;
-		private System.Windows.Forms.LinkLabel linkClear;
-		private System.Windows.Forms.LinkLabel linkSet;
-		private System.Windows.Forms.Label dispInput;
 		private System.Windows.Forms.TabPage voiceTab;
 		private DeviceSelector voiceSelector;
 		private System.Windows.Forms.TrackBar vadSensitivity;
@@ -630,11 +615,13 @@
 		private System.Windows.Forms.CheckBox gablarskiURLs;
 		private System.Windows.Forms.GroupBox groupBox1;
 		private System.Windows.Forms.CheckBox voiceActivation;
-		private System.Windows.Forms.Label label10;
 		private System.Windows.Forms.TabPage tabNotifications;
 		private System.Windows.Forms.CheckBox enableNotifications;
 		private System.Windows.Forms.ListView notifiers;
 		private DeviceSelector playbackSelector;
 		private System.Windows.Forms.CheckBox inUseCurrentVolume;
+		private System.Windows.Forms.Integration.ElementHost elementHost1;
+		private BindingList bindingList1;
+		private System.Windows.Forms.LinkLabel addBinding;
 	}
 }

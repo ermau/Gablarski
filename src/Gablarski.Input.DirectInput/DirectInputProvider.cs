@@ -36,414 +36,309 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using Cadenza.Collections;
 using Gablarski.Clients.Input;
 using Microsoft.DirectX.DirectInput;
 
 namespace Gablarski.Input.DirectInput
 {
-	[Export (typeof (IInputProvider))]
 	public class DirectInputProvider
 		: IInputProvider
 	{
-		#region Implementation of IInputProvider
-
 		public event EventHandler<InputStateChangedEventArgs> InputStateChanged;
 
-		/// <summary>
-		/// The displayable name of the input provider.
-		/// </summary>
 		public string DisplayName
 		{
 			get { return "DirectInput"; }
 		}
 
-		public void Attach (IntPtr window, string settings)
+		public void Attach (IntPtr window)
 		{
-			if (this.running)
-				throw new InvalidOperationException ("Already attached");
-			if (window == IntPtr.Zero)
-				throw new ArgumentException ("Invalid window", "window");
-
+			int index = 2;
 			this.running = true;
 
-			if (!String.IsNullOrEmpty (settings))
+			lock (this.syncRoot)
 			{
-				if (settings.Contains ("m"))
-					this.mouseButton = ParseMouseSettings (settings);
-				else
-					this.keys = ParseKeySettings (settings);
+				foreach (DeviceInstance di in Manager.GetDevices (DeviceClass.GameControl, EnumDevicesFlags.AttachedOnly))
+				{
+					AutoResetEvent reset = new AutoResetEvent (false);
+
+					var d = new Device (di.InstanceGuid);
+					d.Properties.BufferSize = 10;
+					d.SetCooperativeLevel (window, CooperativeLevelFlags.Background | CooperativeLevelFlags.NonExclusive);
+					d.SetDataFormat (DeviceDataFormat.Joystick);
+					d.SetEventNotification (reset);
+					d.Acquire();
+
+					this.joysticks.Add (di.InstanceGuid, d);
+					this.joystickIndexes.Add (index++, di.InstanceGuid);
+				}
+
+				this.waits = new AutoResetEvent[this.joysticks.Count + 2];
+				this.waits[0] = new AutoResetEvent (false);
+				this.keyboard = new Device (SystemGuid.Keyboard);
+				this.keyboard.Properties.BufferSize = 10;
+				this.keyboard.SetCooperativeLevel (window, CooperativeLevelFlags.Background | CooperativeLevelFlags.NonExclusive);
+				this.keyboard.SetDataFormat (DeviceDataFormat.Keyboard);
+				this.keyboard.SetEventNotification (this.waits[0]);
+				this.keyboard.Acquire();
+
+				this.waits[1] = new AutoResetEvent (false);
+				this.mouse = new Device (SystemGuid.Mouse);
+				this.mouse.Properties.BufferSize = 10;
+				this.mouse.SetCooperativeLevel (window, CooperativeLevelFlags.Background | CooperativeLevelFlags.NonExclusive);
+				this.mouse.SetDataFormat (DeviceDataFormat.Mouse);
+				this.mouse.SetEventNotification (this.waits[1]);
+				this.mouse.Acquire();
 			}
-
-			this.keyboardWait = new AutoResetEvent (false);
-			this.keyboard = new Device (SystemGuid.Keyboard);
-			this.keyboard.SetCooperativeLevel (window, CooperativeLevelFlags.Background | CooperativeLevelFlags.NonExclusive);
-			this.keyboard.SetDataFormat (DeviceDataFormat.Keyboard);
-			this.keyboard.SetEventNotification (this.keyboardWait);
-			this.keyboard.Acquire();
-
-			this.mouseWait = new AutoResetEvent (false);
-			this.mouse = new Device (SystemGuid.Mouse);
-			this.mouse.SetCooperativeLevel (window, CooperativeLevelFlags.Background | CooperativeLevelFlags.NonExclusive);
-			this.mouse.SetDataFormat (DeviceDataFormat.Mouse);
-			this.mouse.SetEventNotification (this.mouseWait);
-			this.mouse.Acquire ();
-
-			this.pollThread = new Thread (Poller);
-			this.pollThread.IsBackground = true;
-			this.pollThread.Name = "DirectInput Poller";
-			this.pollThread.Start();
 		}
 
-		/// <summary>
-		/// Shuts down and detatches the input provider.
-		/// </summary>
+		public void SetBindings (IEnumerable<CommandBinding> bindings)
+		{
+			lock (this.syncRoot)
+			{
+				this.joystickBindings = new Dictionary<Guid, Dictionary<int, Command>>();
+				foreach (CommandBinding binding in bindings)
+				{
+					string[] parts = binding.Input.Split ('|');
+					Guid deviceGuid = new Guid (parts[0]);
+					if (deviceGuid == SystemGuid.Keyboard || deviceGuid == SystemGuid.Mouse)
+					{
+						//TODO
+					}
+					else
+					{
+						Dictionary<int, Command> jbindings;
+						if (!this.joystickBindings.TryGetValue (deviceGuid, out jbindings))
+							this.joystickBindings[deviceGuid] = jbindings = new Dictionary<int, Command>();
+
+						string[] bindingParts = parts[1].Split (';');
+						jbindings.Add (Int32.Parse (bindingParts[0]), binding.Command);
+					}
+				}
+			}
+		}
+
 		public void Detach()
 		{
 			this.running = false;
 
-			if (this.pollThread != null)
+			this.waits[0].Set(); // Keyboard wait always present, forces out of possible deadlock.
+			lock (this.syncRoot)
 			{
-				this.keyboardWait.Set();
-				this.mouseWait.Set();
+				for (int i = 0; i < this.waits.Length; ++i)
+					this.waits[i].Set();
 
-				this.pollThread.Join();
-				this.pollThread = null;
+				this.mouse.Unacquire();
+				this.mouse.Dispose();
+
+				this.keyboard.Unacquire();
+				this.keyboard.Dispose();
+
+				foreach (Device d in joysticks.Values)
+				{
+					d.Unacquire();
+					d.Dispose();
+				}
+
+				this.joysticks.Clear();
+				this.joystickIndexes.Clear();
+				this.waits = null;
 			}
-
-			ShutdownDevice (ref this.keyboard, ref this.keyboardWait);
-			ShutdownDevice (ref this.mouse, ref this.mouseWait);
 		}
 
-		/// <summary>
-		/// Starts recording input combinations for saving.
-		/// </summary>
 		public void BeginRecord()
 		{
 			if (!this.running)
-				throw new InvalidOperationException ("Must be attached before recording.");
+				throw new InvalidOperationException ("Not attached");
 
 			this.recording = true;
 		}
 
-		/// <summary>
-		/// Gets a nice display name for the given <paramref name="inputSettings"/>.
-		/// </summary>
-		/// <param name="inputSettings">The input settings to beautify.</param>
-		/// <returns>The nice display name for <paramref name="inputSettings"/>.</returns>
-		public string GetNiceInputName (string inputSettings)
+		public string GetNiceInputName (string input)
 		{
-			if (String.IsNullOrEmpty (inputSettings))
-				return String.Empty;
+			if (input == null || input.Trim() == String.Empty)
+				throw new ArgumentNullException ("input");
+			if (!input.Contains ("|"))
+				throw new FormatException ("Input was in an unrecognized format.");
 
-			if (inputSettings.Contains ("m"))
-			{
-				int mouseb;
-				if (Int32.TryParse (inputSettings.Substring (1).Substring (0, inputSettings.Length - 2), out mouseb))
-					return "Mouse " + (mouseb + 1);
-				else
-					return String.Empty;
-			}
-			else
-				return GetNiceString (ParseKeySettings (inputSettings));
+			string[] parts = input.Split ('|');
+			Guid deviceGuid = new Guid (parts[0]);
+			
+			return GetNiceInputName (parts[0], new Device (deviceGuid));
 		}
 
-		/// <summary>
-		/// Stops recording input combinations and returns the latest combination.
-		/// </summary>
-		/// <returns>The latest input combination, <c>null</c> if no input was gathered.</returns>
 		public string EndRecord()
 		{
-			this.recording = false;
-
-			return GetSettings();
+			string garbage;
+			return EndRecord (out garbage);
 		}
 
-		/// <summary>
-		/// Stops recording input combinations and returns the latest combination.
-		/// </summary>
-		/// <param name="niceName">A human-readable string for for the input combination.</param>
-		/// <returns>The latest input combination, <c>null</c> if not input was gathered.</returns>
 		public string EndRecord (out string niceName)
 		{
+			if (!this.recording)
+				throw new InvalidOperationException ("Not recording");
+
 			this.recording = false;
-
-			string settings = GetSettings();
-			niceName = GetNiceInputName (settings);
-
-			return settings;
+			lock (this.syncRoot)
+			{
+				niceName = GetNiceInputName (this.lastRecording);
+				return this.lastRecording;
+			}
 		}
 
-		#endregion
-
-		#region Implementation of IDisposable
-
-		/// <summary>
-		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-		/// </summary>
-		/// <filterpriority>2</filterpriority>
 		public void Dispose()
 		{
 			Detach();
 		}
 
-		#endregion
-
-		private volatile bool running;
+		private bool running;
+		
 		private bool recording;
+		//private readonly Stack<string> recordings = new Stack<string>();
+		private string lastRecording;
 
-		private Key[] keys;
-		private KeyboardState keyboardState;
-		private AutoResetEvent keyboardWait;
+		private readonly Dictionary<Guid, Device> joysticks = new Dictionary<Guid, Device>();
+		private readonly Dictionary<int, Guid> joystickIndexes = new Dictionary<int, Guid>();
+		private Dictionary<Guid, Dictionary<int, Command>> joystickBindings;
+
+		private readonly object syncRoot = new object();
+		private MutableLookup<Guid, string> currentStates = new MutableLookup<Guid,string>();
+
+		private AutoResetEvent[] waits;
+		
 		private Device keyboard;
-
-		private int mouseButton = -1;
-		private MouseState mouseState;
-		private AutoResetEvent mouseWait;
 		private Device mouse;
 
-		private Thread pollThread;
+		private Thread inputRunnerThread;
+		
 
-		private void ShutdownDevice (ref Device d, ref AutoResetEvent wait)
+		private string GetNiceInputName (string input, Device device)
 		{
-			if (d != null)
+			switch (device.DeviceInformation.DeviceType)
 			{
-				d.Unacquire ();
-				d.SetEventNotification (null);
-				d.Dispose ();
-				d = null;
-			}
+				case DeviceType.Keyboard:
+					return input;
 
-			if (wait != null)
-			{
-				wait.Close ();
-				wait = null;
+				case DeviceType.Mouse:
+					return "Mouse " + input;
+
+				case DeviceType.Joystick:
+				case DeviceType.Gamepad:
+					string[] parts = input.Split (';');
+
+					string r = device.Properties.ProductName + " " +
+					           device.GetObjectInformation (Int32.Parse (parts[0]), ParameterHow.ByOffset).Name;
+					if (parts.Length == 2)
+						r += parts[1];
+
+					return r;
+
+				default:
+					return "Unknown";
 			}
 		}
 
-		private string GetSettings ()
+		private void OnInputStateChanged (InputStateChangedEventArgs e)
 		{
-			string settings = null;
+			EventHandler<InputStateChangedEventArgs> handler = InputStateChanged;
+			if (handler != null)
+				handler (this, e);
+		}
 
-			if (this.keyboardState != null)
+		private void InputRunner()
+		{
+			Dictionary<Device, Dictionary<int, int>> objectInitial = new Dictionary<Device, Dictionary<int, int>>();
+			Dictionary<Device, Dictionary<int, InputRange>> objectRanges = new Dictionary<Device, Dictionary<int, InputRange>>();
+			Dictionary<Device, HashSet<int>> buttons = new Dictionary<Device, HashSet<int>>();
+
+			lock (this.syncRoot)
 			{
-				StringBuilder builder = new StringBuilder ();
-				foreach (var kvp in EnumerateKeyboardState (this.keyboardState).Where (kvp => kvp.Value))
+				foreach (Device d in this.joysticks.Values)
 				{
-					builder.Append ("k");
-					builder.Append ((int)kvp.Key);
-					builder.Append (";");
+					objectInitial.Add (d, new Dictionary<int, int>());
+					objectRanges.Add (d, new Dictionary<int, InputRange>());
+					buttons.Add (d, new HashSet<int>());
+
+					var ranges = objectRanges[d];
+					foreach (DeviceObjectInstance o in d.GetObjects (DeviceObjectTypeFlags.Axis))
+						ranges.Add (o.Offset, d.Properties.GetRange (ParameterHow.ByOffset, o.Offset));
+
+					foreach (DeviceObjectInstance o in d.GetObjects(DeviceObjectTypeFlags.Button))
+						buttons[d].Add (o.Offset);
 				}
-
-				settings = builder.ToString ();
 			}
-			else
-			{
-				byte[] buttons = this.mouseState.GetMouseButtons();
-
-				int button = -1;
-				for (int i = 0; i < buttons.Length; ++i)
-				{
-					if (buttons[i] != 0)
-					{
-						button = i;
-						break;
-					}
-				}
-
-				if (button == -1)
-					return null;
-
-				settings = "m" + button + ";";
-			}
-
-			this.keyboardState = null;
-			return settings;
-		}
-
-		private static int ParseMouseSettings (string settings)
-		{
-			string[] pieces = settings.Split (';');
-
-			int button;
-			if (pieces.Length > 0 && Int32.TryParse (pieces[0].Substring (1), out button))
-				return button;
-			else
-				return -1;
-		}
-
-		private static Key[] ParseKeySettings (string settings)
-		{
-			string[] pieces = settings.Split (';');
-
-			var ksettings = pieces.Where (s => s.Length > 0 && s[0] == 'k').ToList();
-			Key[] keys = new Key[ksettings.Count];
-			for (int i = 0; i < ksettings.Count; ++i)
-			{
-				int kval;
-				if (Int32.TryParse (ksettings[i].Substring (1), out kval))
-					keys[i] = (Key)kval;
-			}
-
-			return keys;
-		}
-
-		private static IEnumerable<KeyValuePair<Key, bool>> EnumerateKeyboardState (KeyboardState s)
-		{
-			string[] names = Enum.GetNames (typeof (Key));
-			for (int i = 0; i < names.Length; ++i)
-			{
-				string name = names[i];
-
-				Key k = (Key)Enum.Parse (typeof (Key), name);
-
-				yield return new KeyValuePair<Key, bool> (k, s[k]);
-			}
-		}
-
-		private bool CheckKeyboardState (bool any)
-		{
-			if ((this.keys == null || this.keys.Length == 0) && !any)
-			{
-				this.keyboardState = null;
-				return false;
-			}
-
-			KeyboardState s = this.keyboardState;
-
-			if (!any)
-			{
-				Key[] k = this.keys;
-				if (k == null)
-					return false;
-
-				if (k.Length == 0)
-					return false;
-
-				for (int i = 0; i < k.Length; ++i)
-				{
-					if (s[k[i]])
-						return true;
-				}
-
-				return false;
-			}
-			else
-			{
-				return EnumerateKeyboardState (s).Any (kvp => kvp.Value);
-			}
-		}
-
-		private bool CheckMouseState (bool any)
-		{
-			if (this.mouseButton == -1 && !any)
-				return false;
-
-			byte[] buttons = this.mouseState.GetMouseButtons ();
-			if (!any)
-				return (buttons[this.mouseButton] != 0);
-			else
-				return buttons.Any (i => i != 0);
-		}
-
-		private static string GetNiceString (Key[] ks)
-		{
-			StringBuilder nice = new StringBuilder();
-
-			for (int i = 0; i < ks.Length; ++i)
-			{
-				if (nice.Length != 0)
-					nice.Append (" + ");
-
-				nice.Append (ks[i].ToString());
-			}
-
-			return nice.ToString();
-		}
-
-		private static string SpaceCamel (string s)
-		{
-			StringBuilder builder = new StringBuilder (s.Length * 2);
-			for (int i = 0; i < s.Length; ++i)
-			{
-				if (Char.IsUpper (s[i]))
-					builder.Append (" ");
-
-				builder.Append (s[i]);
-			}
-
-			return builder.ToString();
-		}
-
-		private void Poller()
-		{
-			bool previous = false;
-
-			WaitHandle[] waits = new[] { keyboardWait, mouseWait };
 
 			while (this.running)
 			{
-				switch (AutoResetEvent.WaitAny (waits))
+				int waited = WaitHandle.WaitAny (this.waits);
+				lock (this.syncRoot)
 				{
-					case 0:
+					switch (waited)
 					{
-						this.keyboard.Poll ();
-						if ((this.keys == null || this.keys.Length == 0) && !recording)
-							continue;
+						case 0: // Keyboard
+							break;
 
-						try
-						{
-							this.keyboardState = this.keyboard.GetCurrentKeyboardState ();
+						case 1: // Mouse
+							break;
 
-							bool state = CheckKeyboardState (this.recording);
-							bool changed = (state != previous);
-							previous = state;
+						default:
+							var d = this.joysticks[this.joystickIndexes[waited]];
+							var currentButtons = buttons[d];
+							var currentInitials = objectInitial[d];
+							var currentRanges = objectRanges[d];
 
-							if (changed)
-								OnStateChanged (new InputStateChangedEventArgs ((state) ? InputState.On : InputState.Off));
-						}
-						catch (NotAcquiredException)
-						{
-						}
+							BufferedDataCollection buffer = d.GetBufferedData();
+							for (int i = 0; i < buffer.Count; i++)
+							{
+								BufferedData bd = buffer[i];
 
-						break;
-					}
+								if (this.recording)
+								{
+									int initial;
+									if (!currentInitials.TryGetValue (bd.Offset, out initial))
+									{
+										if (!currentButtons.Contains (bd.Offset))
+											currentInitials[bd.Offset] = bd.Data;
+										else
+											this.lastRecording = String.Format ("{0}|{1}", d.DeviceInformation.InstanceGuid, bd.Offset);
+									}
+									else
+									{
+										InputRange range = currentRanges[bd.Offset];
+										int delta = Math.Abs (initial - bd.Data);
+										if (((float)delta / (range.Max - range.Min)) > 0.15) // >15% change
+											this.lastRecording = String.Format ("{0}|{1};{2}", d.DeviceInformation.InstanceGuid, bd.Offset, ((initial > bd.Data) ? "+" : "-"));
+									}
+								}
+								else
+								{
+									Dictionary<int, Command> binds;
+									if (!this.joystickBindings.TryGetValue (d.DeviceInformation.InstanceGuid, out binds) || binds.Count == 0)
+										continue;
 
-					case 1:
-					{
-						this.mouse.Poll ();
-						if (this.mouseButton == -1 && !this.recording)
-							continue;
+									var di = d.GetObjectInformation (bd.Offset, ParameterHow.ByOffset);
+									Command c;
+									if (!binds.TryGetValue (di.Offset, out c))
+										continue;
 
-						try
-						{
-							this.mouseState = this.mouse.CurrentMouseState;
+									if (currentButtons.Contains (di.Offset))
+										OnInputStateChanged (new InputStateChangedEventArgs ((bd.Data == 128) ? InputState.On : InputState.Off));
+									else
+									{
+										InputRange range = currentRanges[di.Offset];
+										OnInputStateChanged (new InputStateChangedEventArgs (InputState.Axis, ((double)bd.Data / (range.Max - range.Min)) * 100));
+									}
+								}
+							}
 
-							bool state = CheckMouseState (this.recording);
-							bool changed = (state != previous);
-							previous = state;
-
-							if (changed)
-								OnStateChanged (new InputStateChangedEventArgs ((state) ? InputState.On : InputState.Off));
-						}
-						catch (NotAcquiredException)
-						{
-						}
-
-						break;
+							break;
 					}
 				}
 			}
-		}
-
-		private void OnStateChanged (InputStateChangedEventArgs e)
-		{
-			var changed = this.InputStateChanged;
-			if (changed != null)
-				changed (this, e);
 		}
 	}
 }

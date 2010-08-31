@@ -42,11 +42,8 @@ namespace Gablarski.Clients.Windows
 			this.voiceSelector.ProviderSource = Modules.Capture.Cast<IAudioDeviceProvider>();
 			this.voiceSelector.SetProvider (Settings.VoiceProvider);
 			this.voiceSelector.SetDevice (Settings.VoiceDevice);
-			
-			this.inputSettings = Settings.InputSettings;
 
-			if (currentInputProvider != null)
-				this.dispInput.Text = currentInputProvider.GetNiceInputName (this.inputSettings);
+			this.bindingViewModel = new BindingListViewModel (this.Handle);
 
 			this.threshold.Value = Settings.VoiceActivationContinueThreshold / 100;
 			this.dispThreshold.Text = String.Format ("{0:N1}s", (double)this.threshold.Value / 10);
@@ -160,70 +157,19 @@ namespace Gablarski.Clients.Windows
 		}
 
 		private string inputSettings;
-		private IInputProvider currentInputProvider;
-
-		void OnInputStateChanged (object sender, InputStateChangedEventArgs e)
-		{
-			if (e.State == InputState.Off)
-				return;
-
-			string nice;
-			this.inputSettings = this.currentInputProvider.EndRecord (out nice);
-
-			BeginInvoke ((Action<string>)(s =>
-			{
-				this.dispInput.Text = s;
-				this.linkSet.Enabled = true;
-				this.linkSet.Text = "Set";
-			}), nice);
-		}
+		private BindingListViewModel bindingViewModel;
 
 		private void inInputProvider_SelectedValueChanged(object sender, EventArgs e)
 		{
-			DisableInput();
-
 			if (this.inInputProvider.SelectedItem == null)
 				return;
 
-			currentInputProvider = (IInputProvider)this.inInputProvider.SelectedItem;
-			currentInputProvider.InputStateChanged += OnInputStateChanged;
-			currentInputProvider.Attach (this.Handle, null);
+			this.bindingViewModel.InputProvider = (IInputProvider)this.inInputProvider.SelectedItem;
 		}
 
 		private void DisableInput()
 		{
-			if (currentInputProvider == null)
-				return;
-
-			currentInputProvider.Detach();
-			currentInputProvider.InputStateChanged -= OnInputStateChanged;
-			//currentInputProvider.Dispose();
-			//currentInputProvider = null;
-		}
-
-		private void linkSet_LinkClicked (object sender, LinkLabelLinkClickedEventArgs e)
-		{
-			if (this.currentInputProvider == null)
-				return;
-
-			if (this.linkSet.Text == "Set")
-			{
-				this.dispInput.Text = "Press a key";
-				this.linkSet.Text = "Cancel";
-				this.currentInputProvider.BeginRecord();
-			}
-			else
-			{
-				this.dispInput.Text = currentInputProvider.GetNiceInputName (this.inputSettings);
-				this.linkSet.Text = "Set";
-				this.currentInputProvider.EndRecord();
-			}
-		}
-
-		private void linkClear_LinkClicked (object sender, LinkLabelLinkClickedEventArgs e)
-		{
-			this.dispInput.Text = String.Empty;
-			this.inputSettings = null;
+			this.bindingViewModel.InputProvider = null;
 		}
 
 		private void threshold_Scroll (object sender, EventArgs e)

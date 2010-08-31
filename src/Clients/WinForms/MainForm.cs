@@ -438,8 +438,8 @@ namespace Gablarski.Clients.Windows
 				Settings.UsePushToTalk = false;
 			else
 			{
-				this.inputProvider.InputStateChanged += OnInputStateChanged;
-				this.inputProvider.Attach (this.Handle, Settings.InputSettings);
+				this.inputProvider.Attach (this.Handle);
+				this.inputProvider.SetBindings (Settings.CommandBindings);
 			}
 		}
 

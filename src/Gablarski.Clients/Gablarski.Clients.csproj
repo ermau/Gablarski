@@ -81,6 +81,7 @@
     <Compile Include="IErrorReporter.cs" />
     <Compile Include="INamedComponent.cs" />
     <Compile Include="INotifier.cs" />
+    <Compile Include="Input\Command.cs" />
     <Compile Include="Input\CommandBinding.cs" />
     <Compile Include="ITextToSpeech.cs" />
     <Compile Include="LocalServer.cs" />

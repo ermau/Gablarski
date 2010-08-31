@@ -1,0 +1,30 @@
+﻿<ListView x:Class="Gablarski.Clients.Windows.BindingList" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:Windows="clr-namespace:Gablarski.Clients.Windows" mc:Ignorable="d">
+	<ListView.Resources>
+		<DataTemplate x:Key="newCommandTemplate">
+			<ComboBox></ComboBox>
+		</DataTemplate>
+		<DataTemplate x:Key="existingCommandTemplate">
+			<Label Content="{Binding Command}" />
+		</DataTemplate>
+		
+		
+		
+		<Windows:CommandBindingTemplateSelector x:Key="commandSelector" NewTemplate="{DynamicResource newCommandTemplate}" ExistingTemplate="{DynamicResource existingCommandTemplate}" />
+		<Windows:CommandBindingTemplateSelector x:Key="inputSelector" NewTemplate="{DynamicResource newInputTemplate}" ExistingTemplate="{DynamicResource existingInputTemplate}" />
+	</ListView.Resources>
+	<ListView.View>
+		<GridView>
+			<GridViewColumn Header="Command"  />
+			<GridViewColumn Header="Binding" />
+			<GridViewColumn>
+				<GridViewColumn.CellTemplate>
+					<DataTemplate>
+						<Label Foreground="Blue"><Underline>
+							<Hyperlink Command="{Binding RemoveCommand}" CommandParameter="{Binding}">Remove</Hyperlink>
+						</Underline></Label>
+					</DataTemplate>
+				</GridViewColumn.CellTemplate>
+			</GridViewColumn>
+		</GridView>
+	</ListView.View>
+</ListView>

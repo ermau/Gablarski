@@ -42,51 +42,39 @@ using System.Text;
 namespace Gablarski.Clients.Input
 {
 	/// <summary>
-	/// Represents a keybinding
+	/// Represents the action that a keybinding is meant to execute.
 	/// </summary>
-	public class CommandBinding
+	public enum Command
 	{
 		/// <summary>
-		/// Creates a new keybinding.
+		/// Push to talk.
 		/// </summary>
-		/// <exception cref="ArgumentNullException"><paramref name="provider"/> or <paramref name="input"/> is <c>null</c>.</exception>
-		public CommandBinding (IInputProvider provider, Command action, string input)
-		{
-			if (provider == null)
-				throw new ArgumentNullException ("provider");
-			if (input == null)
-				throw new ArgumentNullException ("input");
-
-			Provider = provider;
-			Command = action;
-			Input = input;
-		}
+		Talk = 0,
 
 		/// <summary>
-		/// Gets the provider the keybind is registered for.
+		/// Mutes the user's mic.
 		/// </summary>
-		public IInputProvider Provider
-		{
-			get;
-			private set;
-		}
+		MuteMic = 1,
 
 		/// <summary>
-		/// Gets the action the keybind is to execute.
+		/// Mutes the user's sound.
 		/// </summary>
-		public Command Command
-		{
-			get;
-			private set;
-		}
+		MuteAll = 2,
 
 		/// <summary>
-		/// Gets the <see cref="Provider"/>'s recognized input.
+		/// Controls the global volume.
 		/// </summary>
-		public string Input
-		{
-			get;
-			private set;
-		}
+		[Axis] GlobalVolume = 3,
+
+		/// <summary>
+		/// Invokes a notification for the current song.
+		/// </summary>
+		SayCurrentSong = 4
+	}
+
+	[AttributeUsage(AttributeTargets.Field)]
+	public class AxisAttribute
+		: Attribute
+	{
 	}
 }

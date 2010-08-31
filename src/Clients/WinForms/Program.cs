@@ -156,7 +156,7 @@ namespace Gablarski.Clients.Windows
 				else
 				{
 					Uri server = new Uri (args[0]);
-					m.Connect (server.Host, (server.Port != -1) ? server.Port : 6112);
+					m.Connect (server.Host, (server.Port != -1) ? server.Port : 42912);
 				}
 			}
 			else if (Settings.ShowConnectOnStart)
