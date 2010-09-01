@@ -113,6 +113,7 @@ namespace Gablarski.Input.DirectInput
 
 			lock (this.syncRoot)
 			{
+				this.mouseBindings = new Dictionary<int, Command>();
 				this.keyboardBindings = new Dictionary<Key[], Command>();
 				this.joystickBindings = new Dictionary<Guid, Dictionary<int, Command>>();
 				foreach (CommandBinding binding in bindings.Where (cb => cb.Provider == this))
@@ -131,7 +132,11 @@ namespace Gablarski.Input.DirectInput
 					}
 					else if (deviceGuid == SystemGuid.Mouse)
 					{
-						// TODO
+						int button;
+						if (!Int32.TryParse (parts[1], out button))
+							continue;
+
+						this.mouseBindings.Add (button, binding.Command);
 					}
 					else
 					{
@@ -171,8 +176,10 @@ namespace Gablarski.Input.DirectInput
 					d.Dispose();
 				}
 
+				this.mouseBindings.Clear();
 				this.keyboardBindings.Clear();
 				this.joystickBindings.Clear();
+
 				this.joysticks.Clear();
 				this.joystickIndexes.Clear();
 				this.waits = null;
@@ -233,6 +240,7 @@ namespace Gablarski.Input.DirectInput
 		private readonly Dictionary<int, Guid> joystickIndexes = new Dictionary<int, Guid>();
 		private Dictionary<Guid, Dictionary<int, Command>> joystickBindings;
 		private Dictionary<Key[], Command> keyboardBindings;
+		private Dictionary<int, Command> mouseBindings;
 
 		private readonly object syncRoot = new object();
 
@@ -242,7 +250,6 @@ namespace Gablarski.Input.DirectInput
 		private Device mouse;
 
 		private Thread inputRunnerThread;
-		
 
 		private string GetNiceInputName (string input, Device device)
 		{
@@ -252,7 +259,7 @@ namespace Gablarski.Input.DirectInput
 					return input;
 
 				case DeviceType.Mouse:
-					return "Mouse " + input;
+					return "Mouse " + (Int32.Parse(input) + 1);
 
 				case DeviceType.Joystick:
 				case DeviceType.Gamepad:
@@ -300,6 +307,7 @@ namespace Gablarski.Input.DirectInput
 			}
 
 			Dictionary<Key[], bool> keybindingStates = new Dictionary<Key[], bool>();
+			Dictionary<int, bool> mousebindingStates = new Dictionary<int, bool>();
 
 			while (this.running)
 			{
@@ -371,10 +379,58 @@ namespace Gablarski.Input.DirectInput
 
 						case 1: // Mouse
 						{
+							if (!this.recording && this.mouseBindings.Count == 0)
+								continue;
+
+							byte[] state = this.mouse.CurrentMouseState.GetMouseButtons();
+							
+							if (!this.recording)
+							{
+								for (int i = 0; i < state.Length; ++i)
+								{
+									Command c;
+									if (!this.mouseBindings.TryGetValue (i, out c))
+										continue;
+
+									bool newState = (state[i] != 0);
+									bool currentState;
+									if (mousebindingStates.TryGetValue (i, out currentState))
+									{
+										if (currentState != newState)
+										{
+											OnInputStateChanged (new InputStateChangedEventArgs (c, (newState) ? InputState.On : InputState.Off));
+											mousebindingStates[i] = newState;
+										}
+									}
+									else if (newState)
+									{
+										OnInputStateChanged (new InputStateChangedEventArgs (c, InputState.On));
+										mousebindingStates[i] = true;
+									}
+								}
+							}
+							else
+							{
+								if (this.lastRecording != null)
+									continue;
+
+								for (int i = 0; i < state.Length; ++i)
+								{
+									if (state[i] == 0)
+										continue;
+
+									this.lastRecording = SystemGuid.Mouse + "|" + i;
+									break;
+								}
+							}
+
 							break;
 						}
 
 						default:
+							if (!this.recording && this.joystickBindings.Count == 0)
+								continue;
+
 							var d = this.joysticks[this.joystickIndexes[waited]];
 							var currentButtons = buttons[d];
 							var currentInitials = objectInitial[d];
@@ -398,10 +454,10 @@ namespace Gablarski.Input.DirectInput
 											currentInitials[bd.Offset] = bd.Data;
 											currentRanges.Add (bd.Offset, d.Properties.GetRange (ParameterHow.ByOffset, bd.Offset));
 										}
-										else
+										else if (this.lastRecording == null)
 											this.lastRecording = String.Format ("{0}|{1}", d.DeviceInformation.InstanceGuid, bd.Offset);
 									}
-									else
+									else if (this.lastRecording == null)
 									{
 										InputRange range = currentRanges[bd.Offset];
 										int delta = Math.Abs (initial - bd.Data);
@@ -411,9 +467,6 @@ namespace Gablarski.Input.DirectInput
 								}
 								else
 								{
-									if (this.joystickBindings == null)
-										continue;
-
 									Dictionary<int, Command> binds;
 									if (!this.joystickBindings.TryGetValue (d.DeviceInformation.InstanceGuid, out binds) || binds.Count == 0)
 										continue;
