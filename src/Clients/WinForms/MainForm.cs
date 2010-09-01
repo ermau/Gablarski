@@ -856,12 +856,16 @@ namespace Gablarski.Clients.Windows
 
 				this.btnMuteMic.Enabled = false;
 
-				notifications.Muted = true;
+				if (notifications != null)
+					notifications.Muted = true;
+
 				gablarski.CurrentUser.MutePlayback();
 			}
 			else
 			{
-				notifications.Muted = false;
+				if (notifications != null)
+					notifications.Muted = false;
+
 				gablarski.CurrentUser.UnmutePlayback();
 
 				this.btnMuteMic.Enabled = true;
