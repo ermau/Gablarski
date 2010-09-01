@@ -575,7 +575,11 @@ namespace Gablarski.Audio
 							if (entity.CurrentTargets == null || entity.CurrentTargets.Length == 0)
 							{
 								entity.TargetType = TargetType.Channel;
-								entity.CurrentTargets = new[] { Context.GetCurrentChannel().ChannelId };
+								var currentChannel = Context.GetCurrentChannel();
+								if (currentChannel == null)
+									continue;
+
+								entity.CurrentTargets = new[] { currentChannel.ChannelId };
 							}
 
 							while (entity.Capture.AvailableSampleCount > source.FrameSize)
