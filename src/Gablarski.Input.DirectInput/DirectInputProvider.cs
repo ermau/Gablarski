@@ -62,6 +62,7 @@ namespace Gablarski.Input.DirectInput
 
 			lock (this.syncRoot)
 			{
+				List<AutoResetEvent> resets = new List<AutoResetEvent>();
 				foreach (DeviceInstance di in Manager.GetDevices (DeviceClass.GameControl, EnumDevicesFlags.AttachedOnly))
 				{
 					AutoResetEvent reset = new AutoResetEvent (false);
@@ -73,6 +74,7 @@ namespace Gablarski.Input.DirectInput
 					d.SetEventNotification (reset);
 					d.Acquire();
 
+					resets.Add (reset);
 					this.joysticks.Add (di.InstanceGuid, d);
 					this.joystickIndexes.Add (index++, di.InstanceGuid);
 				}
@@ -93,7 +95,15 @@ namespace Gablarski.Input.DirectInput
 				this.mouse.SetDataFormat (DeviceDataFormat.Mouse);
 				this.mouse.SetEventNotification (this.waits[1]);
 				this.mouse.Acquire();
+
+				resets.CopyTo (this.waits, 2);
 			}
+
+			(this.inputRunnerThread = new Thread (InputRunner)
+			{
+				Name = "DirectInput Runner",
+				IsBackground = true
+			}).Start();
 		}
 
 		public void SetBindings (IEnumerable<CommandBinding> bindings)
@@ -132,6 +142,9 @@ namespace Gablarski.Input.DirectInput
 				for (int i = 0; i < this.waits.Length; ++i)
 					this.waits[i].Set();
 
+				this.inputRunnerThread.Join();
+				this.inputRunnerThread = null;
+
 				this.mouse.Unacquire();
 				this.mouse.Dispose();
 
@@ -153,7 +166,7 @@ namespace Gablarski.Input.DirectInput
 		public void BeginRecord()
 		{
 			if (!this.running)
-				throw new InvalidOperationException ("Not attached");
+				throw new InvalidOperationException ("Not attached.");
 
 			this.recording = true;
 		}
@@ -168,7 +181,7 @@ namespace Gablarski.Input.DirectInput
 			string[] parts = input.Split ('|');
 			Guid deviceGuid = new Guid (parts[0]);
 			
-			return GetNiceInputName (parts[0], new Device (deviceGuid));
+			return GetNiceInputName (parts[1], new Device (deviceGuid));
 		}
 
 		public string EndRecord()
@@ -185,7 +198,7 @@ namespace Gablarski.Input.DirectInput
 			this.recording = false;
 			lock (this.syncRoot)
 			{
-				niceName = GetNiceInputName (this.lastRecording);
+				niceName = (this.lastRecording != null) ? GetNiceInputName (this.lastRecording) : null;
 				return this.lastRecording;
 			}
 		}
@@ -263,10 +276,6 @@ namespace Gablarski.Input.DirectInput
 					objectRanges.Add (d, new Dictionary<int, InputRange>());
 					buttons.Add (d, new HashSet<int>());
 
-					var ranges = objectRanges[d];
-					foreach (DeviceObjectInstance o in d.GetObjects (DeviceObjectTypeFlags.Axis))
-						ranges.Add (o.Offset, d.Properties.GetRange (ParameterHow.ByOffset, o.Offset));
-
 					foreach (DeviceObjectInstance o in d.GetObjects(DeviceObjectTypeFlags.Button))
 						buttons[d].Add (o.Offset);
 				}
@@ -292,6 +301,9 @@ namespace Gablarski.Input.DirectInput
 							var currentRanges = objectRanges[d];
 
 							BufferedDataCollection buffer = d.GetBufferedData();
+							if (buffer == null)
+								continue;
+
 							for (int i = 0; i < buffer.Count; i++)
 							{
 								BufferedData bd = buffer[i];
@@ -302,7 +314,10 @@ namespace Gablarski.Input.DirectInput
 									if (!currentInitials.TryGetValue (bd.Offset, out initial))
 									{
 										if (!currentButtons.Contains (bd.Offset))
+										{
 											currentInitials[bd.Offset] = bd.Data;
+											currentRanges.Add (bd.Offset, d.Properties.GetRange (ParameterHow.ByOffset, bd.Offset));
+										}
 										else
 											this.lastRecording = String.Format ("{0}|{1}", d.DeviceInformation.InstanceGuid, bd.Offset);
 									}
@@ -310,27 +325,31 @@ namespace Gablarski.Input.DirectInput
 									{
 										InputRange range = currentRanges[bd.Offset];
 										int delta = Math.Abs (initial - bd.Data);
-										if (((float)delta / (range.Max - range.Min)) > 0.15) // >15% change
+										if (((float)delta / (range.Max - range.Min)) > 0.25) // >25% change
 											this.lastRecording = String.Format ("{0}|{1};{2}", d.DeviceInformation.InstanceGuid, bd.Offset, ((initial > bd.Data) ? "+" : "-"));
 									}
 								}
 								else
 								{
+									if (this.joystickBindings == null)
+										continue;
+
 									Dictionary<int, Command> binds;
 									if (!this.joystickBindings.TryGetValue (d.DeviceInformation.InstanceGuid, out binds) || binds.Count == 0)
 										continue;
-
-									var di = d.GetObjectInformation (bd.Offset, ParameterHow.ByOffset);
+									 
 									Command c;
-									if (!binds.TryGetValue (di.Offset, out c))
+									if (!binds.TryGetValue (bd.Offset, out c))
 										continue;
 
-									if (currentButtons.Contains (di.Offset))
+									if (currentButtons.Contains (bd.Offset))
 										OnInputStateChanged (new InputStateChangedEventArgs ((bd.Data == 128) ? InputState.On : InputState.Off));
 									else
 									{
-										InputRange range = currentRanges[di.Offset];
-										OnInputStateChanged (new InputStateChangedEventArgs (InputState.Axis, ((double)bd.Data / (range.Max - range.Min)) * 100));
+										InputRange range = currentRanges[bd.Offset];
+
+										double value = (bd.Data != -1) ? bd.Data : range.Max;
+										OnInputStateChanged (new InputStateChangedEventArgs (InputState.Axis, (value / (range.Max - range.Min)) * 100));
 									}
 								}
 							}
