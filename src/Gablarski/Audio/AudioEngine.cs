@@ -543,7 +543,11 @@ namespace Gablarski.Audio
 				if (entity.CurrentTargets == null || entity.CurrentTargets.Length == 0)
 				{
 					entity.TargetType = TargetType.Channel;
-					entity.CurrentTargets = new[] { this.Context.GetCurrentChannel().ChannelId };
+					var currentChannel = Context.GetCurrentChannel();
+					if (currentChannel == null)
+						return;
+
+					entity.CurrentTargets = new[] { currentChannel.ChannelId };
 				}
 
 				AudioEngineCaptureMode mode = entity.Options.Mode;
