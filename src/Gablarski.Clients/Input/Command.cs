@@ -46,30 +46,23 @@ namespace Gablarski.Clients.Input
 	/// </summary>
 	public enum Command
 	{
-		/// <summary>
-		/// Push to talk.
-		/// </summary>
-		Talk = 0,
+		/// <summary>Blargle?</summary>
+		Unknown = 0,
 
-		/// <summary>
-		/// Mutes the user's mic.
-		/// </summary>
-		MuteMic = 1,
+		/// <summary>Push to talk.</summary>
+		Talk = 1,
 
-		/// <summary>
-		/// Mutes the user's sound.
-		/// </summary>
-		MuteAll = 2,
+		/// <summary>Mutes the user's mic.</summary>
+		MuteMic = 2,
 
-		/// <summary>
-		/// Controls the global volume.
-		/// </summary>
-		[Axis] GlobalVolume = 3,
+		/// <summary>Mutes the user's sound.</summary>
+		MuteAll = 3,
 
-		/// <summary>
-		/// Invokes a notification for the current song.
-		/// </summary>
-		SayCurrentSong = 4
+		/// <summary>Controls the global volume.</summary>
+		[Axis] GlobalVolume = 4,
+
+		/// <summary>Invokes a notification for the current song.</summary>
+		SayCurrentSong = 5
 	}
 
 	[AttributeUsage(AttributeTargets.Field)]

@@ -62,18 +62,20 @@ namespace Gablarski.Clients.Input
 	public class InputStateChangedEventArgs
 		: EventArgs
 	{
-		public InputStateChangedEventArgs (InputState state)
+		public InputStateChangedEventArgs (Command command, InputState state)
 		{
 			if (state == InputState.Axis)
 				throw new ArgumentException ("State can not be axis without percentage setting", "state");
 
+			this.Command = command;
 			this.State = state;
 		}
 
-		public InputStateChangedEventArgs (InputState state, double axisPercent)
+		public InputStateChangedEventArgs (Command command, InputState state, double axisPercent)
 		{
-			State = state;
-			AxisPercent = axisPercent;
+			this.Command = command;
+			this.State = state;
+			this.AxisPercent = axisPercent;
 		}
 
 		/// <summary>

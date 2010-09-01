@@ -108,16 +108,30 @@ namespace Gablarski.Input.DirectInput
 
 		public void SetBindings (IEnumerable<CommandBinding> bindings)
 		{
+			if (bindings == null)
+				throw new ArgumentNullException ("bindings");
+
 			lock (this.syncRoot)
 			{
+				this.keyboardBindings = new Dictionary<Key[], Command>();
 				this.joystickBindings = new Dictionary<Guid, Dictionary<int, Command>>();
-				foreach (CommandBinding binding in bindings)
+				foreach (CommandBinding binding in bindings.Where (cb => cb.Provider == this))
 				{
 					string[] parts = binding.Input.Split ('|');
 					Guid deviceGuid = new Guid (parts[0]);
-					if (deviceGuid == SystemGuid.Keyboard || deviceGuid == SystemGuid.Mouse)
+					if (deviceGuid == SystemGuid.Keyboard)
 					{
-						//TODO
+						string[] keys = parts[1].Split ('+');
+						Key[] boundKeys = new Key[keys.Length];
+
+						for (int i = 0; i < boundKeys.Length; ++i)
+							boundKeys[i] = (Key)Enum.Parse (typeof (Key), keys[i]);
+
+						this.keyboardBindings.Add (boundKeys, binding.Command);
+					}
+					else if (deviceGuid == SystemGuid.Mouse)
+					{
+						// TODO
 					}
 					else
 					{
@@ -157,6 +171,8 @@ namespace Gablarski.Input.DirectInput
 					d.Dispose();
 				}
 
+				this.keyboardBindings.Clear();
+				this.joystickBindings.Clear();
 				this.joysticks.Clear();
 				this.joystickIndexes.Clear();
 				this.waits = null;
@@ -211,15 +227,14 @@ namespace Gablarski.Input.DirectInput
 		private bool running;
 		
 		private bool recording;
-		//private readonly Stack<string> recordings = new Stack<string>();
 		private string lastRecording;
 
 		private readonly Dictionary<Guid, Device> joysticks = new Dictionary<Guid, Device>();
 		private readonly Dictionary<int, Guid> joystickIndexes = new Dictionary<int, Guid>();
 		private Dictionary<Guid, Dictionary<int, Command>> joystickBindings;
+		private Dictionary<Key[], Command> keyboardBindings;
 
 		private readonly object syncRoot = new object();
-		private MutableLookup<Guid, string> currentStates = new MutableLookup<Guid,string>();
 
 		private AutoResetEvent[] waits;
 		
@@ -268,6 +283,9 @@ namespace Gablarski.Input.DirectInput
 			Dictionary<Device, Dictionary<int, InputRange>> objectRanges = new Dictionary<Device, Dictionary<int, InputRange>>();
 			Dictionary<Device, HashSet<int>> buttons = new Dictionary<Device, HashSet<int>>();
 
+			Key[] modifierKeyValues = new [] { Key.LeftControl, Key.RightControl, Key.LeftAlt, Key.RightAlt, Key.LeftShift, Key.RightShift };
+			Key[] keyValues = ((Key[])Enum.GetValues (typeof (Key))).Except (modifierKeyValues).ToArray();
+
 			lock (this.syncRoot)
 			{
 				foreach (Device d in this.joysticks.Values)
@@ -281,6 +299,8 @@ namespace Gablarski.Input.DirectInput
 				}
 			}
 
+			Dictionary<Key[], bool> keybindingStates = new Dictionary<Key[], bool>();
+
 			while (this.running)
 			{
 				int waited = WaitHandle.WaitAny (this.waits);
@@ -289,10 +309,70 @@ namespace Gablarski.Input.DirectInput
 					switch (waited)
 					{
 						case 0: // Keyboard
+						{
+							KeyboardState state = this.keyboard.GetCurrentKeyboardState();
+
+							if (!this.recording && this.keyboardBindings != null)
+							{
+								foreach (var kvp in this.keyboardBindings)
+								{
+									int match = 0;
+									for (int i = 0; i < kvp.Key.Length; ++i)
+									{
+										if (state[kvp.Key[i]])
+											match++;
+									}
+
+									bool nowState = (match == kvp.Key.Length);
+									bool currentState;
+									if (keybindingStates.TryGetValue (kvp.Key, out currentState))
+									{
+										if (nowState != currentState)
+										{
+											OnInputStateChanged (new InputStateChangedEventArgs (kvp.Value, (nowState) ? InputState.On : InputState.Off));
+											keybindingStates[kvp.Key] = nowState;
+										}
+									}
+									else if (nowState)
+									{
+										OnInputStateChanged (new InputStateChangedEventArgs (kvp.Value, InputState.On));
+										keybindingStates[kvp.Key] = true;
+									}
+								}
+							}
+							else
+							{
+								if (this.lastRecording != null)
+									continue;
+
+								this.lastRecording = SystemGuid.Keyboard + "|";
+								for (int i = 0; i < modifierKeyValues.Length; ++i)
+								{
+									if (state[modifierKeyValues[i]])
+										this.lastRecording += modifierKeyValues[i] + "+";
+								}
+
+								bool nonModifier = false;
+								for (int i = 0; i < keyValues.Length; ++i)
+								{
+									if (!state[keyValues[i]])
+										continue;
+
+									nonModifier = true;
+									this.lastRecording += keyValues[i].ToString().ToUpper();
+									break;
+								}
+								
+								this.lastRecording = (!nonModifier) ? null : this.lastRecording;
+							}
+
 							break;
+						}
 
 						case 1: // Mouse
+						{
 							break;
+						}
 
 						default:
 							var d = this.joysticks[this.joystickIndexes[waited]];
@@ -343,13 +423,13 @@ namespace Gablarski.Input.DirectInput
 										continue;
 
 									if (currentButtons.Contains (bd.Offset))
-										OnInputStateChanged (new InputStateChangedEventArgs ((bd.Data == 128) ? InputState.On : InputState.Off));
+										OnInputStateChanged (new InputStateChangedEventArgs (c, (bd.Data == 128) ? InputState.On : InputState.Off));
 									else
 									{
 										InputRange range = currentRanges[bd.Offset];
 
 										double value = (bd.Data != -1) ? bd.Data : range.Max;
-										OnInputStateChanged (new InputStateChangedEventArgs (InputState.Axis, (value / (range.Max - range.Min)) * 100));
+										OnInputStateChanged (new InputStateChangedEventArgs (c, InputState.Axis, (value / (range.Max - range.Min)) * 100));
 									}
 								}
 							}
