@@ -353,12 +353,12 @@ namespace Gablarski.Clients.Windows
 					break;
 
 				case Settings.EnableNotificationsSettingName:
-					if (!Settings.EnableNotifications)
+					if (!Settings.EnableNotifications && this.notifications != null)
 					{
 						this.notifications.Close ();
 						this.notifications = null;
 					}
-					else
+					else if (this.audioPlayback != null)
 						SetupNotifications ();
 
 					break;
