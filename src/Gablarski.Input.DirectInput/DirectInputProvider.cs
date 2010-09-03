@@ -368,7 +368,8 @@ namespace Gablarski.Input.DirectInput
 									break;
 								}
 
-								OnNewRecording (new RecordingEventArgs (this, (!nonModifier) ? null : recording));
+								if (nonModifier)
+									OnNewRecording (new RecordingEventArgs (this, recording));
 							}
 
 							break;
