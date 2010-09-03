@@ -208,7 +208,7 @@ namespace Gablarski.Clients.Windows
 				}));
 			}
 
-			if (this.gablarski.Sources.Any() && Settings.EnableNotifications)
+			if (this.gablarski.CurrentUser.UserId != 0 && Settings.EnableNotifications)
 			{
 				SetupNotifications();
 				this.notifications.Notify (NotificationType.Connected, "Connected");
