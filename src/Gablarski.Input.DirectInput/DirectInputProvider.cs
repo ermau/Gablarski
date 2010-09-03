@@ -254,8 +254,7 @@ namespace Gablarski.Input.DirectInput
 				case DeviceType.Mouse:
 					return "Mouse " + (Int32.Parse(input) + 1);
 
-				case DeviceType.Joystick:
-				case DeviceType.Gamepad:
+				default:
 					string[] parts = input.Split (';');
 
 					string r = device.Properties.ProductName + " " +
@@ -264,9 +263,6 @@ namespace Gablarski.Input.DirectInput
 						r += parts[1];
 
 					return r;
-
-				default:
-					return "Unknown";
 			}
 		}
 
