@@ -96,7 +96,7 @@ namespace Gablarski.Clients.Windows
 			this.notifications.MediaController = this.mediaPlayerIntegration;
 		}
 
-		private void SourcesOnReceivedSourceList(object sender, ReceivedListEventArgs<AudioSource> args)
+		private void SourcesOnReceivedSourceList (object sender, ReceivedListEventArgs<AudioSource> args)
 		{
 			SetupPlayback();
 		}
@@ -160,6 +160,9 @@ namespace Gablarski.Clients.Windows
 		private void SetupPlayback ()
 		{
 			DisablePlayback();
+
+			if (!this.gablarski.Sources.Any())
+				return;
 
 			try
 			{
@@ -410,7 +413,7 @@ namespace Gablarski.Clients.Windows
 				return;
 
 			this.inputProvider.Detach();
-			this.inputProvider.CommandStateChanged -= OnInputStateChanged;
+			this.inputProvider.CommandStateChanged -= OnCommandStateChanged;
 			this.inputProvider.Dispose();
 			this.inputProvider = null;
 		}
@@ -425,9 +428,6 @@ namespace Gablarski.Clients.Windows
 
 			DisableInput();
 
-			if (!Settings.UsePushToTalk)
-				return;
-
 			Type settingType;
 			if (Settings.InputProvider.IsNullOrWhitespace() || (settingType = Type.GetType (Settings.InputProvider)) == null)
 				this.inputProvider = Modules.Input.FirstOrDefault();
@@ -438,20 +438,27 @@ namespace Gablarski.Clients.Windows
 				Settings.UsePushToTalk = false;
 			else
 			{
+				this.inputProvider.CommandStateChanged += OnCommandStateChanged;
 				this.inputProvider.Attach (this.Handle);
 				this.inputProvider.SetBindings (Settings.CommandBindings);
 			}
 		}
 
-		private void OnInputStateChanged (object sender, CommandStateChangedEventArgs e)
+		private void OnCommandStateChanged (object sender, CommandStateChangedEventArgs e)
 		{
-			if (this.voiceSource == null || this.voiceCapture == null)
-				return;
+			switch (e.Command)
+			{
+				case Command.Talk:
+					if (!Settings.UsePushToTalk || this.voiceSource == null || this.voiceCapture == null)
+						return;
 
-			if (e.State == InputState.On)
-				this.gablarski.Audio.BeginCapture (voiceSource, this.gablarski.CurrentChannel);
-			else
-				this.gablarski.Audio.EndCapture (voiceSource);
+					if (e.State == InputState.On)
+						this.gablarski.Audio.BeginCapture (voiceSource, this.gablarski.CurrentChannel);
+					else
+						this.gablarski.Audio.EndCapture (voiceSource);
+
+					break;
+			}
 		}
 
 		void SourceStarted (object sender, AudioSourceEventArgs e)

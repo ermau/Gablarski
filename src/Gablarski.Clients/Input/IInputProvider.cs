@@ -91,9 +91,10 @@ namespace Gablarski.Clients.Input
 		/// <summary>
 		/// Gets a nice display name for the given <paramref name="input"/>.
 		/// </summary>
+		/// <param name="command">The command the input is for.</param>
 		/// <param name="input">The input combination to beautify.</param>
 		/// <returns>The nice display name for <paramref name="input"/>.</returns>
-		string GetNiceInputName (string input);
+		string GetNiceInputName (Command command, string input);
 
 		/// <summary>
 		/// Stops recording input combinations.

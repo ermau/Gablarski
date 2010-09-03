@@ -1,27 +1,36 @@
-﻿<ListView x:Class="Gablarski.Clients.Windows.BindingList" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:Windows="clr-namespace:Gablarski.Clients.Windows" mc:Ignorable="d">
+﻿<ListView ItemsSource="{Binding Bindings}" x:Class="Gablarski.Clients.Windows.BindingList" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:Windows="clr-namespace:Gablarski.Clients.Windows" mc:Ignorable="d" d:DesignHeight="218" d:DesignWidth="292">
 	<ListView.Resources>
-		<DataTemplate x:Key="newCommandTemplate">
-			<ComboBox></ComboBox>
-		</DataTemplate>
-		<DataTemplate x:Key="existingCommandTemplate">
-			<Label Content="{Binding Command}" />
+		<DataTemplate x:Key="recordingInputTemplate">
+			<Label>Do something already..</Label>
 		</DataTemplate>
 		
-		
-		
-		<Windows:CommandBindingTemplateSelector x:Key="commandSelector" NewTemplate="{DynamicResource newCommandTemplate}" ExistingTemplate="{DynamicResource existingCommandTemplate}" />
-		<Windows:CommandBindingTemplateSelector x:Key="inputSelector" NewTemplate="{DynamicResource newInputTemplate}" ExistingTemplate="{DynamicResource existingInputTemplate}" />
+		<DataTemplate x:Key="inputTemplate">
+			<Label>
+				<Hyperlink ToolTip="Click to set" Command="{Binding DataContext.RecordCommand,RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=ListView}}" CommandParameter="{Binding}">
+					<TextBlock Text="{Binding NiceInput}" />
+				</Hyperlink>
+			</Label>
+		</DataTemplate>
+
+		<DataTemplate x:Key="commandTemplate">
+			<ComboBox Width="130" DisplayMemberPath="Key" ItemsSource="{Binding DataContext.Commands,RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=ListView}}" SelectedItem="{Binding BoundCommand,Mode=TwoWay}" />
+		</DataTemplate>
+
+		<Windows:CommandBindingTemplateSelector x:Key="commandSelector" RecordingTemplate="{StaticResource commandTemplate}" ExistingTemplate="{StaticResource commandTemplate}" />
+		<Windows:CommandBindingTemplateSelector x:Key="inputSelector" RecordingTemplate="{StaticResource recordingInputTemplate}" ExistingTemplate="{StaticResource inputTemplate}" />
 	</ListView.Resources>
 	<ListView.View>
 		<GridView>
-			<GridViewColumn Header="Command"  />
-			<GridViewColumn Header="Binding" />
-			<GridViewColumn>
+			<GridViewColumn Width="150" Header="Command" CellTemplateSelector="{StaticResource commandSelector}"  />
+			<GridViewColumn Width="240" Header="Binding" CellTemplateSelector="{StaticResource inputSelector}" />
+			<GridViewColumn Width="82">
 				<GridViewColumn.CellTemplate>
 					<DataTemplate>
-						<Label Foreground="Blue"><Underline>
-							<Hyperlink Command="{Binding RemoveCommand}" CommandParameter="{Binding}">Remove</Hyperlink>
-						</Underline></Label>
+						<TextBlock>
+							<Underline>
+								<Hyperlink Command="{Binding DataContext.RemoveCommand,RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=ListView}}" CommandParameter="{Binding}">Remove</Hyperlink>
+							</Underline>
+						</TextBlock>
 					</DataTemplate>
 				</GridViewColumn.CellTemplate>
 			</GridViewColumn>

@@ -8,15 +8,18 @@ namespace Gablarski.Clients.Windows.Entities
 {
 	public class CommandBindingEntry
 	{
-		public CommandBindingEntry (int id)
+		public CommandBindingEntry()
 		{
-			Id = id;
 		}
 
-		public virtual int Id
+		public CommandBindingEntry (CommandBinding binding)
 		{
-			get;
-			private set;
+			if (binding == null)
+				throw new ArgumentNullException ("binding");
+
+			ProviderType = binding.Provider.GetType().Name;
+			Command = binding.Command;
+			Input = binding.Input;
 		}
 
 		public string ProviderType

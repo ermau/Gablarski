@@ -50,8 +50,9 @@
 			this.vadSensitivity = new System.Windows.Forms.TrackBar();
 			this.voiceSelector = new Gablarski.DeviceSelector();
 			this.controlsTab = new System.Windows.Forms.TabPage();
-			this.elementHost1 = new System.Windows.Forms.Integration.ElementHost();
-			this.bindingList1 = new Gablarski.Clients.Windows.BindingList();
+			this.addBinding = new System.Windows.Forms.LinkLabel();
+			this.bindignListHost = new System.Windows.Forms.Integration.ElementHost();
+			this.bindingList = new Gablarski.Clients.Windows.BindingList();
 			this.inInputProvider = new System.Windows.Forms.ComboBox();
 			this.lblInputProvider = new System.Windows.Forms.Label();
 			this.musicTab = new System.Windows.Forms.TabPage();
@@ -70,7 +71,6 @@
 			this.tabNotifications = new System.Windows.Forms.TabPage();
 			this.enableNotifications = new System.Windows.Forms.CheckBox();
 			this.notifiers = new System.Windows.Forms.ListView();
-			this.addBinding = new System.Windows.Forms.LinkLabel();
 			columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			label1 = new System.Windows.Forms.Label();
 			this.tabs.SuspendLayout();
@@ -103,7 +103,7 @@
 			// btnOk
 			// 
 			this.btnOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnOk.Location = new System.Drawing.Point(151, 327);
+			this.btnOk.Location = new System.Drawing.Point(354, 355);
 			this.btnOk.Name = "btnOk";
 			this.btnOk.Size = new System.Drawing.Size(75, 23);
 			this.btnOk.TabIndex = 2;
@@ -115,7 +115,7 @@
 			// 
 			this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.btnCancel.Location = new System.Drawing.Point(232, 327);
+			this.btnCancel.Location = new System.Drawing.Point(435, 355);
 			this.btnCancel.Name = "btnCancel";
 			this.btnCancel.Size = new System.Drawing.Size(75, 23);
 			this.btnCancel.TabIndex = 3;
@@ -135,7 +135,7 @@
 			this.tabs.Location = new System.Drawing.Point(0, 0);
 			this.tabs.Name = "tabs";
 			this.tabs.SelectedIndex = 0;
-			this.tabs.Size = new System.Drawing.Size(319, 321);
+			this.tabs.Size = new System.Drawing.Size(522, 349);
 			this.tabs.TabIndex = 4;
 			// 
 			// generalTab
@@ -146,7 +146,7 @@
 			this.generalTab.Location = new System.Drawing.Point(4, 22);
 			this.generalTab.Name = "generalTab";
 			this.generalTab.Padding = new System.Windows.Forms.Padding(3);
-			this.generalTab.Size = new System.Drawing.Size(311, 295);
+			this.generalTab.Size = new System.Drawing.Size(514, 323);
 			this.generalTab.TabIndex = 0;
 			this.generalTab.Text = "General";
 			this.generalTab.UseVisualStyleBackColor = true;
@@ -189,7 +189,7 @@
 			this.voiceTab.Location = new System.Drawing.Point(4, 22);
 			this.voiceTab.Name = "voiceTab";
 			this.voiceTab.Padding = new System.Windows.Forms.Padding(3);
-			this.voiceTab.Size = new System.Drawing.Size(311, 295);
+			this.voiceTab.Size = new System.Drawing.Size(514, 323);
 			this.voiceTab.TabIndex = 2;
 			this.voiceTab.Text = "Voice";
 			this.voiceTab.UseVisualStyleBackColor = true;
@@ -200,7 +200,7 @@
 			this.playbackSelector.Location = new System.Drawing.Point(6, 6);
 			this.playbackSelector.Name = "playbackSelector";
 			this.playbackSelector.ProviderLabel = "Playback Provider:";
-			this.playbackSelector.Size = new System.Drawing.Size(295, 50);
+			this.playbackSelector.Size = new System.Drawing.Size(500, 50);
 			this.playbackSelector.TabIndex = 9;
 			// 
 			// groupBox1
@@ -215,7 +215,7 @@
 			this.groupBox1.Controls.Add(this.vadSensitivity);
 			this.groupBox1.Location = new System.Drawing.Point(6, 118);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(295, 168);
+			this.groupBox1.Size = new System.Drawing.Size(500, 168);
 			this.groupBox1.TabIndex = 8;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "                                ";
@@ -232,17 +232,20 @@
 			// 
 			// dispThreshold
 			// 
+			this.dispThreshold.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+						| System.Windows.Forms.AnchorStyles.Right)));
 			this.dispThreshold.Location = new System.Drawing.Point(260, 145);
 			this.dispThreshold.Name = "dispThreshold";
-			this.dispThreshold.Size = new System.Drawing.Size(35, 15);
+			this.dispThreshold.Size = new System.Drawing.Size(240, 15);
 			this.dispThreshold.TabIndex = 7;
 			this.dispThreshold.Text = "0.6s";
 			this.dispThreshold.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// label3
 			// 
+			this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(260, 69);
+			this.label3.Location = new System.Drawing.Point(470, 69);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(24, 13);
 			this.label3.TabIndex = 5;
@@ -259,11 +262,13 @@
 			// 
 			// threshold
 			// 
+			this.threshold.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+						| System.Windows.Forms.AnchorStyles.Right)));
 			this.threshold.BackColor = System.Drawing.SystemColors.Window;
 			this.threshold.Location = new System.Drawing.Point(6, 115);
 			this.threshold.Maximum = 30;
 			this.threshold.Name = "threshold";
-			this.threshold.Size = new System.Drawing.Size(283, 45);
+			this.threshold.Size = new System.Drawing.Size(488, 45);
 			this.threshold.TabIndex = 3;
 			this.threshold.TickStyle = System.Windows.Forms.TickStyle.TopLeft;
 			this.threshold.Value = 6;
@@ -296,7 +301,7 @@
 			this.vadSensitivity.Location = new System.Drawing.Point(6, 37);
 			this.vadSensitivity.Maximum = 8000;
 			this.vadSensitivity.Name = "vadSensitivity";
-			this.vadSensitivity.Size = new System.Drawing.Size(283, 45);
+			this.vadSensitivity.Size = new System.Drawing.Size(488, 45);
 			this.vadSensitivity.SmallChange = 100;
 			this.vadSensitivity.TabIndex = 1;
 			this.vadSensitivity.TickFrequency = 100;
@@ -309,32 +314,47 @@
 			this.voiceSelector.Location = new System.Drawing.Point(6, 62);
 			this.voiceSelector.Name = "voiceSelector";
 			this.voiceSelector.ProviderLabel = "Capture Provider:";
-			this.voiceSelector.Size = new System.Drawing.Size(295, 50);
+			this.voiceSelector.Size = new System.Drawing.Size(500, 50);
 			this.voiceSelector.TabIndex = 0;
 			// 
 			// controlsTab
 			// 
 			this.controlsTab.Controls.Add(this.addBinding);
 			this.controlsTab.Controls.Add(label1);
-			this.controlsTab.Controls.Add(this.elementHost1);
+			this.controlsTab.Controls.Add(this.bindignListHost);
 			this.controlsTab.Controls.Add(this.inInputProvider);
 			this.controlsTab.Controls.Add(this.lblInputProvider);
 			this.controlsTab.Location = new System.Drawing.Point(4, 22);
 			this.controlsTab.Name = "controlsTab";
 			this.controlsTab.Padding = new System.Windows.Forms.Padding(3);
-			this.controlsTab.Size = new System.Drawing.Size(311, 295);
+			this.controlsTab.Size = new System.Drawing.Size(514, 323);
 			this.controlsTab.TabIndex = 1;
 			this.controlsTab.Text = "Controls";
 			this.controlsTab.UseVisualStyleBackColor = true;
 			// 
-			// elementHost1
+			// addBinding
 			// 
-			this.elementHost1.Location = new System.Drawing.Point(11, 54);
-			this.elementHost1.Name = "elementHost1";
-			this.elementHost1.Size = new System.Drawing.Size(292, 218);
-			this.elementHost1.TabIndex = 6;
-			this.elementHost1.Text = "elementHost1";
-			this.elementHost1.Child = this.bindingList1;
+			this.addBinding.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.addBinding.AutoSize = true;
+			this.addBinding.Location = new System.Drawing.Point(434, 307);
+			this.addBinding.Name = "addBinding";
+			this.addBinding.Size = new System.Drawing.Size(72, 13);
+			this.addBinding.TabIndex = 8;
+			this.addBinding.TabStop = true;
+			this.addBinding.Text = "Add binding...";
+			this.addBinding.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.addBinding_LinkClicked);
+			// 
+			// bindignListHost
+			// 
+			this.bindignListHost.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+						| System.Windows.Forms.AnchorStyles.Left)
+						| System.Windows.Forms.AnchorStyles.Right)));
+			this.bindignListHost.Location = new System.Drawing.Point(11, 54);
+			this.bindignListHost.Name = "bindignListHost";
+			this.bindignListHost.Size = new System.Drawing.Size(495, 250);
+			this.bindignListHost.TabIndex = 6;
+			this.bindignListHost.Text = "elementHost1";
+			this.bindignListHost.Child = this.bindingList;
 			// 
 			// inInputProvider
 			// 
@@ -344,7 +364,7 @@
 			this.inInputProvider.FormattingEnabled = true;
 			this.inInputProvider.Location = new System.Drawing.Point(109, 7);
 			this.inInputProvider.Name = "inInputProvider";
-			this.inInputProvider.Size = new System.Drawing.Size(194, 21);
+			this.inInputProvider.Size = new System.Drawing.Size(397, 21);
 			this.inInputProvider.TabIndex = 5;
 			this.inInputProvider.SelectedValueChanged += new System.EventHandler(this.inInputProvider_SelectedValueChanged);
 			// 
@@ -374,15 +394,16 @@
 			this.musicTab.Location = new System.Drawing.Point(4, 22);
 			this.musicTab.Name = "musicTab";
 			this.musicTab.Padding = new System.Windows.Forms.Padding(3);
-			this.musicTab.Size = new System.Drawing.Size(311, 295);
+			this.musicTab.Size = new System.Drawing.Size(514, 323);
 			this.musicTab.TabIndex = 3;
 			this.musicTab.Text = "Music";
 			this.musicTab.UseVisualStyleBackColor = true;
 			// 
 			// inUseCurrentVolume
 			// 
+			this.inUseCurrentVolume.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.inUseCurrentVolume.AutoSize = true;
-			this.inUseCurrentVolume.Location = new System.Drawing.Point(92, 180);
+			this.inUseCurrentVolume.Location = new System.Drawing.Point(92, 255);
 			this.inUseCurrentVolume.Name = "inUseCurrentVolume";
 			this.inUseCurrentVolume.Size = new System.Drawing.Size(97, 17);
 			this.inUseCurrentVolume.TabIndex = 13;
@@ -392,10 +413,11 @@
 			// 
 			// musicIgnoreYou
 			// 
+			this.musicIgnoreYou.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.musicIgnoreYou.AutoSize = true;
 			this.musicIgnoreYou.Checked = true;
 			this.musicIgnoreYou.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.musicIgnoreYou.Location = new System.Drawing.Point(189, 6);
+			this.musicIgnoreYou.Location = new System.Drawing.Point(387, 6);
 			this.musicIgnoreYou.Name = "musicIgnoreYou";
 			this.musicIgnoreYou.Size = new System.Drawing.Size(119, 17);
 			this.musicIgnoreYou.TabIndex = 12;
@@ -404,8 +426,9 @@
 			// 
 			// label9
 			// 
+			this.label9.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.label9.AutoSize = true;
-			this.label9.Location = new System.Drawing.Point(6, 181);
+			this.label9.Location = new System.Drawing.Point(6, 256);
 			this.label9.Name = "label9";
 			this.label9.Size = new System.Drawing.Size(80, 13);
 			this.label9.TabIndex = 11;
@@ -413,8 +436,9 @@
 			// 
 			// label8
 			// 
+			this.label8.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.label8.AutoSize = true;
-			this.label8.Location = new System.Drawing.Point(275, 229);
+			this.label8.Location = new System.Drawing.Point(473, 304);
 			this.label8.Name = "label8";
 			this.label8.Size = new System.Drawing.Size(33, 13);
 			this.label8.TabIndex = 10;
@@ -423,7 +447,7 @@
 			// label7
 			// 
 			this.label7.AutoSize = true;
-			this.label7.Location = new System.Drawing.Point(8, 229);
+			this.label7.Location = new System.Drawing.Point(8, 304);
 			this.label7.Name = "label7";
 			this.label7.Size = new System.Drawing.Size(21, 13);
 			this.label7.TabIndex = 9;
@@ -431,8 +455,9 @@
 			// 
 			// label6
 			// 
+			this.label6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.label6.AutoSize = true;
-			this.label6.Location = new System.Drawing.Point(6, 109);
+			this.label6.Location = new System.Drawing.Point(6, 184);
 			this.label6.Name = "label6";
 			this.label6.Size = new System.Drawing.Size(82, 13);
 			this.label6.TabIndex = 8;
@@ -440,8 +465,9 @@
 			// 
 			// label5
 			// 
+			this.label5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.label5.AutoSize = true;
-			this.label5.Location = new System.Drawing.Point(275, 156);
+			this.label5.Location = new System.Drawing.Point(473, 231);
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(33, 13);
 			this.label5.TabIndex = 7;
@@ -450,7 +476,7 @@
 			// label4
 			// 
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(8, 156);
+			this.label4.Location = new System.Drawing.Point(8, 231);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(21, 13);
 			this.label4.TabIndex = 6;
@@ -458,22 +484,26 @@
 			// 
 			// normalVolume
 			// 
+			this.normalVolume.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
+						| System.Windows.Forms.AnchorStyles.Right)));
 			this.normalVolume.BackColor = System.Drawing.SystemColors.Window;
-			this.normalVolume.Location = new System.Drawing.Point(9, 197);
+			this.normalVolume.Location = new System.Drawing.Point(9, 272);
 			this.normalVolume.Maximum = 100;
 			this.normalVolume.Name = "normalVolume";
-			this.normalVolume.Size = new System.Drawing.Size(294, 45);
+			this.normalVolume.Size = new System.Drawing.Size(497, 45);
 			this.normalVolume.TabIndex = 5;
 			this.normalVolume.TickFrequency = 10;
 			this.normalVolume.Value = 100;
 			// 
 			// talkingVolume
 			// 
+			this.talkingVolume.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
+						| System.Windows.Forms.AnchorStyles.Right)));
 			this.talkingVolume.BackColor = System.Drawing.SystemColors.Window;
-			this.talkingVolume.Location = new System.Drawing.Point(9, 124);
+			this.talkingVolume.Location = new System.Drawing.Point(9, 199);
 			this.talkingVolume.Maximum = 100;
 			this.talkingVolume.Name = "talkingVolume";
-			this.talkingVolume.Size = new System.Drawing.Size(294, 45);
+			this.talkingVolume.Size = new System.Drawing.Size(497, 45);
 			this.talkingVolume.TabIndex = 4;
 			this.talkingVolume.TickFrequency = 10;
 			this.talkingVolume.Value = 30;
@@ -492,10 +522,13 @@
 			// 
 			// musicPlayers
 			// 
+			this.musicPlayers.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+						| System.Windows.Forms.AnchorStyles.Left)
+						| System.Windows.Forms.AnchorStyles.Right)));
 			this.musicPlayers.FormattingEnabled = true;
 			this.musicPlayers.Location = new System.Drawing.Point(9, 26);
 			this.musicPlayers.Name = "musicPlayers";
-			this.musicPlayers.Size = new System.Drawing.Size(294, 79);
+			this.musicPlayers.Size = new System.Drawing.Size(497, 154);
 			this.musicPlayers.TabIndex = 1;
 			// 
 			// tabNotifications
@@ -505,7 +538,7 @@
 			this.tabNotifications.Location = new System.Drawing.Point(4, 22);
 			this.tabNotifications.Name = "tabNotifications";
 			this.tabNotifications.Padding = new System.Windows.Forms.Padding(3);
-			this.tabNotifications.Size = new System.Drawing.Size(311, 295);
+			this.tabNotifications.Size = new System.Drawing.Size(514, 323);
 			this.tabNotifications.TabIndex = 4;
 			this.tabNotifications.Text = "Notifications";
 			this.tabNotifications.UseVisualStyleBackColor = true;
@@ -524,25 +557,17 @@
 			// 
 			// notifiers
 			// 
+			this.notifiers.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+						| System.Windows.Forms.AnchorStyles.Right)));
 			this.notifiers.CheckBoxes = true;
 			this.notifiers.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             columnHeader1});
 			this.notifiers.Location = new System.Drawing.Point(8, 27);
 			this.notifiers.Name = "notifiers";
-			this.notifiers.Size = new System.Drawing.Size(295, 97);
+			this.notifiers.Size = new System.Drawing.Size(498, 97);
 			this.notifiers.TabIndex = 0;
 			this.notifiers.UseCompatibleStateImageBehavior = false;
 			this.notifiers.View = System.Windows.Forms.View.Details;
-			// 
-			// addBinding
-			// 
-			this.addBinding.AutoSize = true;
-			this.addBinding.Location = new System.Drawing.Point(231, 275);
-			this.addBinding.Name = "addBinding";
-			this.addBinding.Size = new System.Drawing.Size(72, 13);
-			this.addBinding.TabIndex = 8;
-			this.addBinding.TabStop = true;
-			this.addBinding.Text = "Add binding...";
 			// 
 			// SettingsForm
 			// 
@@ -550,7 +575,7 @@
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.CancelButton = this.btnCancel;
-			this.ClientSize = new System.Drawing.Size(319, 362);
+			this.ClientSize = new System.Drawing.Size(522, 390);
 			this.Controls.Add(this.tabs);
 			this.Controls.Add(this.btnCancel);
 			this.Controls.Add(this.btnOk);
@@ -620,8 +645,8 @@
 		private System.Windows.Forms.ListView notifiers;
 		private DeviceSelector playbackSelector;
 		private System.Windows.Forms.CheckBox inUseCurrentVolume;
-		private System.Windows.Forms.Integration.ElementHost elementHost1;
-		private BindingList bindingList1;
+		private System.Windows.Forms.Integration.ElementHost bindignListHost;
+		private BindingList bindingList;
 		private System.Windows.Forms.LinkLabel addBinding;
 	}
 }

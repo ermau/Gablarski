@@ -18,6 +18,11 @@ namespace Gablarski.Clients.Windows
 			new CompositionContainer(new DirectoryCatalog (".")).ComposeParts (this);
 		}
 
+		public static void Reload()
+		{
+			modules.Recompose();
+		}
+
 		public static IEnumerable<IInputProvider> Input
 		{
 			get { return modules.input; }
@@ -55,53 +60,57 @@ namespace Gablarski.Clients.Windows
 
 		private static readonly Modules modules = new Modules();
 
-		[ImportMany]
+		[ImportMany (AllowRecomposition = true)]
 		private IEnumerable<ITextToSpeech> tts
 		{
 			get;
 			set;
 		}
 
-		[ImportMany]
+		[ImportMany (AllowRecomposition = true)]
 		private IEnumerable<IInputProvider> input
 		{
 			get;
 			set;
 		}
 
-		[ImportMany]
+		[ImportMany (AllowRecomposition = true)]
 		private IEnumerable<IAudioEngine> audioEngines
 		{
 			get;
 			set;
 		}
 
-		[ImportMany (typeof (INotifier))]
+		[ImportMany (AllowRecomposition = true)]
 		private IEnumerable<INotifier> notifiers
 		{
 			get;
 			set;
 		}
 
-		[ImportMany]
+		[ImportMany (AllowRecomposition = true)]
 		private IEnumerable<IMediaPlayer> mediaPlayers
 		{
 			get;
 			set;
 		}
 
-		[ImportMany]
+		[ImportMany (AllowRecomposition = true)]
 		private IEnumerable<IAudioCaptureProvider> capture
 		{
 			get;
 			set;
 		}
 
-		[ImportMany]
+		[ImportMany (AllowRecomposition = true)]
 		private IEnumerable<IAudioPlaybackProvider> playback
 		{
 			get;
 			set;
+		}
+
+		private void Recompose()
+		{
 		}
 	}
 }

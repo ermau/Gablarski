@@ -1,22 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using Gablarski.Clients.Windows.Entities;
+using Cadenza;
 
 namespace Gablarski.Clients.Windows
 {
 	public class CommandBindingTemplateSelector
 		: DataTemplateSelector
 	{
-		public DataTemplate NewTemplate
-		{
-			get;
-			set;
-		}
-
 		public DataTemplate RecordingTemplate
 		{
 			get;
@@ -37,10 +28,8 @@ namespace Gablarski.Clients.Windows
 
 			if (binding.Recording)
 				return RecordingTemplate;
-			else if (binding.Id != 0)
-				return ExistingTemplate;
 			else
-				return NewTemplate;
+				return ExistingTemplate;
 		}
 	}
 }

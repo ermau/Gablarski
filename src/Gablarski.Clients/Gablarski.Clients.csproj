@@ -83,6 +83,7 @@
     <Compile Include="INotifier.cs" />
     <Compile Include="Input\Command.cs" />
     <Compile Include="Input\CommandBinding.cs" />
+    <Compile Include="Input\CommandStateChangedEventArgs.cs" />
     <Compile Include="ITextToSpeech.cs" />
     <Compile Include="LocalServer.cs" />
     <Compile Include="Music\IControlMediaPlayer.cs" />

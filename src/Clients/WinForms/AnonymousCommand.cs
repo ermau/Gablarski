@@ -34,5 +34,12 @@ namespace Gablarski.Clients.Windows
 		{
 			return this.canExecute (parameter);
 		}
+
+		public void ChangeCanExecute()
+		{
+			var changed = CanExecuteChanged;
+			if (changed != null)
+				changed (this, EventArgs.Empty);
+		}
 	}
 }

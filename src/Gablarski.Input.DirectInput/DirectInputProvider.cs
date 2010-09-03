@@ -200,7 +200,7 @@ namespace Gablarski.Input.DirectInput
 			this.recording = true;
 		}
 
-		public string GetNiceInputName (string input)
+		public string GetNiceInputName (Command command, string input)
 		{
 			if (input == null || input.Trim() == String.Empty)
 				throw new ArgumentNullException ("input");

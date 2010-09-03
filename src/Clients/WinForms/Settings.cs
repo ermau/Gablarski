@@ -139,16 +139,6 @@ namespace Gablarski.Clients.Windows
 			get { return commandBindings; }
 		}
 
-		public static string InputSettings
-		{
-			get { return GetSetting ("InputSettings", "k45"); }
-			set
-			{
-				if (SetSetting ("InputSettings", value))
-					OnSettingsChanged ("InputSettings");
-			}
-		}
-
 		public static bool DisplaySources
 		{
 			get { return GetSetting ("DisplaySources", false); }
@@ -280,6 +270,10 @@ namespace Gablarski.Clients.Windows
 
 				settings = null;
 				commandBindings.CollectionChanged -= OnCommandBindingsChanged;
+				Persistance.DeleteAllBindings();
+				foreach (var binding in CommandBindings)
+					Persistance.Create (new CommandBindingEntry (binding));
+
 				commandBindings = null;
 			}
 		}
@@ -300,16 +294,11 @@ namespace Gablarski.Clients.Windows
 				commandBindings.CollectionChanged += OnCommandBindingsChanged;
 				foreach (var cbe in Persistance.GetCommandBindings())
 				{
-					try
-					{
-						Type providerType = Type.GetType(cbe.ProviderType);
-						commandBindings.Add (new CommandBinding ((IInputProvider)Activator.CreateInstance (providerType), cbe.Command,
-						                                         cbe.Input));
-					}
-					catch
-					{
+					IInputProvider provider = Modules.Input.FirstOrDefault (ip => ip.GetType().Name == cbe.ProviderType);
+					if (provider == null)
 						continue;
-					}
+
+					commandBindings.Add (new CommandBinding (provider, cbe.Command, cbe.Input));
 				}
 			}
 		}
