@@ -161,9 +161,6 @@ namespace Gablarski.Clients.Windows
 		{
 			DisablePlayback();
 
-			if (!this.gablarski.Sources.Any())
-				return;
-
 			try
 			{
 				if (Settings.PlaybackProvider == null)
@@ -211,7 +208,7 @@ namespace Gablarski.Clients.Windows
 				}));
 			}
 
-			if (this.audioPlayback != null && Settings.EnableNotifications)
+			if (this.gablarski.Sources.Any() && Settings.EnableNotifications)
 			{
 				SetupNotifications();
 				this.notifications.Notify (NotificationType.Connected, "Connected");
