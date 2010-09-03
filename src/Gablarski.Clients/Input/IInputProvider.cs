@@ -41,72 +41,6 @@ using System.Linq;
 
 namespace Gablarski.Clients.Input
 {
-	public enum InputState
-	{
-		///<summary>
-		/// Wax on.
-		///</summary>
-		On,
-		
-		/// <summary>
-		/// Wax off.
-		/// </summary>
-		Off,
-
-		/// <summary>
-		/// Karatee.
-		/// </summary>
-		Axis
-	}
-
-	public class InputStateChangedEventArgs
-		: EventArgs
-	{
-		public InputStateChangedEventArgs (Command command, InputState state)
-		{
-			if (state == InputState.Axis)
-				throw new ArgumentException ("State can not be axis without percentage setting", "state");
-
-			this.Command = command;
-			this.State = state;
-		}
-
-		public InputStateChangedEventArgs (Command command, InputState state, double axisPercent)
-		{
-			this.Command = command;
-			this.State = state;
-			this.AxisPercent = axisPercent;
-		}
-
-		/// <summary>
-		/// Gets the command that state has changed for.
-		/// </summary>
-		public Command Command
-		{
-			get;
-			private set;
-		}
-
-		/// <summary>
-		/// Gets the input state for the <see cref="Command"/>.
-		/// </summary>
-		public InputState State
-		{
-			get;
-			private set;
-		}
-
-		/// <summary>
-		/// Gets the percentage of an axis.
-		/// </summary>
-		public double AxisPercent
-		{
-			get;
-			private set;
-		}
-	}
-
-
 	/// <summary>
 	/// Contract for input providers
 	/// </summary>
@@ -114,9 +48,14 @@ namespace Gablarski.Clients.Input
 		: IDisposable
 	{
 		/// <summary>
-		/// Fired when the settings attached with <see cref="Attach"/> are matched.
+		/// Fired when a bound command state has changed.
 		/// </summary>
-		event EventHandler<InputStateChangedEventArgs> InputStateChanged;
+		event EventHandler<CommandStateChangedEventArgs> CommandStateChanged;
+
+		/// <summary>
+		/// Fired when a new input recording is made.
+		/// </summary>
+		event EventHandler<RecordingEventArgs> NewRecording;
 
 		/// <summary>
 		/// The displayable name of the input provider.
@@ -139,7 +78,7 @@ namespace Gablarski.Clients.Input
 		void SetBindings (IEnumerable<CommandBinding> bindings);
 
 		/// <summary>
-		/// Shuts down and detatches the input provider.
+		/// Shuts down and detaches the input provider.
 		/// </summary>
 		void Detach();
 
@@ -157,16 +96,8 @@ namespace Gablarski.Clients.Input
 		string GetNiceInputName (string input);
 
 		/// <summary>
-		/// Stops recording input combinations and returns the latest combination.
+		/// Stops recording input combinations.
 		/// </summary>
-		/// <returns>The latest input combination, <c>null</c> if no input was gathered.</returns>
-		string EndRecord();
-
-		/// <summary>
-		/// Stops recording input combinations and returns the latest combination.
-		/// </summary>
-		/// <param name="niceName">A human-readable string for for the input combination.</param>
-		/// <returns>The latest input combination, <c>null</c> if not input was gathered.</returns>
-		string EndRecord (out string niceName);
+		void EndRecord();
 	}
 }

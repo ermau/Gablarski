@@ -410,7 +410,7 @@ namespace Gablarski.Clients.Windows
 				return;
 
 			this.inputProvider.Detach();
-			this.inputProvider.InputStateChanged -= OnInputStateChanged;
+			this.inputProvider.CommandStateChanged -= OnInputStateChanged;
 			this.inputProvider.Dispose();
 			this.inputProvider = null;
 		}
@@ -443,7 +443,7 @@ namespace Gablarski.Clients.Windows
 			}
 		}
 
-		private void OnInputStateChanged (object sender, InputStateChangedEventArgs e)
+		private void OnInputStateChanged (object sender, CommandStateChangedEventArgs e)
 		{
 			if (this.voiceSource == null || this.voiceCapture == null)
 				return;

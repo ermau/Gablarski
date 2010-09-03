@@ -36,6 +36,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -45,10 +46,12 @@ using Microsoft.DirectX.DirectInput;
 
 namespace Gablarski.Input.DirectInput
 {
+	[Export (typeof (IInputProvider))]
 	public class DirectInputProvider
 		: IInputProvider
 	{
-		public event EventHandler<InputStateChangedEventArgs> InputStateChanged;
+		public event EventHandler<CommandStateChangedEventArgs> CommandStateChanged;
+		public event EventHandler<RecordingEventArgs> NewRecording;
 
 		public string DisplayName
 		{
@@ -207,23 +210,12 @@ namespace Gablarski.Input.DirectInput
 			return GetNiceInputName (parts[1], new Device (deviceGuid));
 		}
 
-		public string EndRecord()
-		{
-			string garbage;
-			return EndRecord (out garbage);
-		}
-
-		public string EndRecord (out string niceName)
+		public void EndRecord()
 		{
 			if (!this.recording)
 				throw new InvalidOperationException ("Not recording");
 
 			this.recording = false;
-			lock (this.syncRoot)
-			{
-				niceName = (this.lastRecording != null) ? GetNiceInputName (this.lastRecording) : null;
-				return this.lastRecording;
-			}
 		}
 
 		public void Dispose()
@@ -232,9 +224,7 @@ namespace Gablarski.Input.DirectInput
 		}
 
 		private bool running;
-		
 		private bool recording;
-		private string lastRecording;
 
 		private readonly Dictionary<Guid, Device> joysticks = new Dictionary<Guid, Device>();
 		private readonly Dictionary<int, Guid> joystickIndexes = new Dictionary<int, Guid>();
@@ -277,9 +267,16 @@ namespace Gablarski.Input.DirectInput
 			}
 		}
 
-		private void OnInputStateChanged (InputStateChangedEventArgs e)
+		private void OnInputStateChanged (CommandStateChangedEventArgs e)
 		{
-			EventHandler<InputStateChangedEventArgs> handler = InputStateChanged;
+			EventHandler<CommandStateChangedEventArgs> handler = CommandStateChanged;
+			if (handler != null)
+				handler (this, e);
+		}
+
+		private void OnNewRecording (RecordingEventArgs e)
+		{
+			EventHandler<RecordingEventArgs> handler = NewRecording;
 			if (handler != null)
 				handler (this, e);
 		}
@@ -337,27 +334,24 @@ namespace Gablarski.Input.DirectInput
 									{
 										if (nowState != currentState)
 										{
-											OnInputStateChanged (new InputStateChangedEventArgs (kvp.Value, (nowState) ? InputState.On : InputState.Off));
+											OnInputStateChanged (new CommandStateChangedEventArgs (kvp.Value, (nowState) ? InputState.On : InputState.Off));
 											keybindingStates[kvp.Key] = nowState;
 										}
 									}
 									else if (nowState)
 									{
-										OnInputStateChanged (new InputStateChangedEventArgs (kvp.Value, InputState.On));
+										OnInputStateChanged (new CommandStateChangedEventArgs (kvp.Value, InputState.On));
 										keybindingStates[kvp.Key] = true;
 									}
 								}
 							}
 							else
 							{
-								if (this.lastRecording != null)
-									continue;
-
-								this.lastRecording = SystemGuid.Keyboard + "|";
+								string recording = SystemGuid.Keyboard + "|";
 								for (int i = 0; i < modifierKeyValues.Length; ++i)
 								{
 									if (state[modifierKeyValues[i]])
-										this.lastRecording += modifierKeyValues[i] + "+";
+										recording += modifierKeyValues[i] + "+";
 								}
 
 								bool nonModifier = false;
@@ -367,11 +361,11 @@ namespace Gablarski.Input.DirectInput
 										continue;
 
 									nonModifier = true;
-									this.lastRecording += keyValues[i].ToString().ToUpper();
+									recording += keyValues[i].ToString().ToUpper();
 									break;
 								}
-								
-								this.lastRecording = (!nonModifier) ? null : this.lastRecording;
+
+								OnNewRecording (new RecordingEventArgs (this, (!nonModifier) ? null : recording));
 							}
 
 							break;
@@ -398,28 +392,26 @@ namespace Gablarski.Input.DirectInput
 									{
 										if (currentState != newState)
 										{
-											OnInputStateChanged (new InputStateChangedEventArgs (c, (newState) ? InputState.On : InputState.Off));
+											OnInputStateChanged (new CommandStateChangedEventArgs (c, (newState) ? InputState.On : InputState.Off));
 											mousebindingStates[i] = newState;
 										}
 									}
 									else if (newState)
 									{
-										OnInputStateChanged (new InputStateChangedEventArgs (c, InputState.On));
+										OnInputStateChanged (new CommandStateChangedEventArgs (c, InputState.On));
 										mousebindingStates[i] = true;
 									}
 								}
 							}
 							else
 							{
-								if (this.lastRecording != null)
-									continue;
 
 								for (int i = 0; i < state.Length; ++i)
 								{
 									if (state[i] == 0)
 										continue;
 
-									this.lastRecording = SystemGuid.Mouse + "|" + i;
+									OnNewRecording (new RecordingEventArgs (this, SystemGuid.Mouse + "|" + i));
 									break;
 								}
 							}
@@ -454,15 +446,15 @@ namespace Gablarski.Input.DirectInput
 											currentInitials[bd.Offset] = bd.Data;
 											currentRanges.Add (bd.Offset, d.Properties.GetRange (ParameterHow.ByOffset, bd.Offset));
 										}
-										else if (this.lastRecording == null)
-											this.lastRecording = String.Format ("{0}|{1}", d.DeviceInformation.InstanceGuid, bd.Offset);
+										else
+											OnNewRecording (new RecordingEventArgs (this, String.Format ("{0}|{1}", d.DeviceInformation.InstanceGuid, bd.Offset)));
 									}
-									else if (this.lastRecording == null)
+									else
 									{
 										InputRange range = currentRanges[bd.Offset];
 										int delta = Math.Abs (initial - bd.Data);
 										if (((float)delta / (range.Max - range.Min)) > 0.25) // >25% change
-											this.lastRecording = String.Format ("{0}|{1};{2}", d.DeviceInformation.InstanceGuid, bd.Offset, ((initial > bd.Data) ? "+" : "-"));
+											OnNewRecording (new RecordingEventArgs (this, String.Format ("{0}|{1};{2}", d.DeviceInformation.InstanceGuid, bd.Offset, ((initial > bd.Data) ? "+" : "-"))));
 									}
 								}
 								else
@@ -476,13 +468,13 @@ namespace Gablarski.Input.DirectInput
 										continue;
 
 									if (currentButtons.Contains (bd.Offset))
-										OnInputStateChanged (new InputStateChangedEventArgs (c, (bd.Data == 128) ? InputState.On : InputState.Off));
+										OnInputStateChanged (new CommandStateChangedEventArgs (c, (bd.Data == 128) ? InputState.On : InputState.Off));
 									else
 									{
 										InputRange range = currentRanges[bd.Offset];
 
 										double value = (bd.Data != -1) ? bd.Data : range.Max;
-										OnInputStateChanged (new InputStateChangedEventArgs (c, InputState.Axis, (value / (range.Max - range.Min)) * 100));
+										OnInputStateChanged (new CommandStateChangedEventArgs (c, InputState.Axis, (value / (range.Max - range.Min)) * 100));
 									}
 								}
 							}
