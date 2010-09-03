@@ -116,9 +116,6 @@ namespace Gablarski.Input.DirectInput
 
 			lock (this.syncRoot)
 			{
-				this.mouseBindings = new Dictionary<int, Command>();
-				this.keyboardBindings = new Dictionary<Key[], Command>();
-				this.joystickBindings = new Dictionary<Guid, Dictionary<int, Command>>();
 				foreach (CommandBinding binding in bindings.Where (cb => cb.Provider == this))
 				{
 					string[] parts = binding.Input.Split ('|');
@@ -156,16 +153,22 @@ namespace Gablarski.Input.DirectInput
 
 		public void Detach()
 		{
+			if (!this.running)
+				return;
+
 			this.running = false;
 
 			this.waits[0].Set(); // Keyboard wait always present, forces out of possible deadlock.
+			this.inputRunnerThread.Join();
+			this.inputRunnerThread = null;
+
 			lock (this.syncRoot)
 			{
-				for (int i = 0; i < this.waits.Length; ++i)
-					this.waits[i].Set();
-
-				this.inputRunnerThread.Join();
-				this.inputRunnerThread = null;
+				if (this.waits != null)
+				{
+					for (int i = 0; i < this.waits.Length; ++i)
+						this.waits[i].Close();
+				}
 
 				this.mouse.Unacquire();
 				this.mouse.Dispose();
@@ -228,9 +231,9 @@ namespace Gablarski.Input.DirectInput
 
 		private readonly Dictionary<Guid, Device> joysticks = new Dictionary<Guid, Device>();
 		private readonly Dictionary<int, Guid> joystickIndexes = new Dictionary<int, Guid>();
-		private Dictionary<Guid, Dictionary<int, Command>> joystickBindings;
-		private Dictionary<Key[], Command> keyboardBindings;
-		private Dictionary<int, Command> mouseBindings;
+		private readonly Dictionary<Guid, Dictionary<int, Command>> joystickBindings = new Dictionary<Guid, Dictionary<int, Command>>();
+		private readonly Dictionary<Key[], Command> keyboardBindings = new Dictionary<Key[], Command>();
+		private readonly Dictionary<int, Command> mouseBindings = new Dictionary<int, Command>();
 
 		private readonly object syncRoot = new object();
 
