@@ -46,35 +46,42 @@ namespace Gablarski.Audio
 		/// <summary>
 		/// Fired when a source finishes playing.
 		/// </summary>
-		/// <exception cref="ObjectDisposedException">Ths playback provider has already been disposed.</exception>
+		/// <exception cref="ObjectDisposedException">This playback provider has already been disposed.</exception>
 		event EventHandler<AudioSourceEventArgs> SourceFinished;
 
 		/// <summary>
 		/// Gets or sets the playback device.
 		/// </summary>
-		/// <exception cref="ObjectDisposedException">Ths playback provider has already been disposed.</exception>
+		/// <exception cref="ObjectDisposedException">This playback provider has already been disposed.</exception>
 		IAudioDevice Device { get; set; }
 
 		/// <summary>
 		/// Overall gain.
 		/// </summary>
-		/// <exception cref="ObjectDisposedException">Ths playback provider has already been disposed.</exception>
+		/// <exception cref="ObjectDisposedException">This playback provider has already been disposed.</exception>
 		float Gain { get; set; }
+
+		/// <summary>
+		/// Sets the gain for <paramref name="source"/>.
+		/// </summary>
+		/// <param name="source">The source to set the gain for.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
+		void SetGain (AudioSource source, float gain);
 
 		/// <summary>
 		/// Opens the playback provider doing any one time initialization required.
 		/// </summary>
 		/// <exception cref="InvalidOperationException"><see cref="Device"/> is not set.</exception>
-		/// <exception cref="ObjectDisposedException">Ths playback provider has already been disposed.</exception>
+		/// <exception cref="ObjectDisposedException">This playback provider has already been disposed.</exception>
 		void Open();
 		
 		/// <summary>
-		/// Queues LPCM <paramref name="data"/> to be played back, owned by <paramref name="source"/>.
+		/// Queues audio <paramref name="data"/> to be played back, owned by <paramref name="source"/>.
 		/// </summary>
 		/// <param name="source">The <see cref="AudioSource"/> the audio came from.</param>
 		/// <param name="data">LPCM data.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
-		/// <exception cref="ObjectDisposedException">Ths playback provider has already been disposed.</exception>
+		/// <exception cref="ObjectDisposedException">This playback provider has already been disposed.</exception>
 		void QueuePlayback (AudioSource source, byte[] data);
 
 		/// <summary>
@@ -82,7 +89,7 @@ namespace Gablarski.Audio
 		/// </summary>
 		/// <param name="source">The source to free any resources for.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
-		/// <exception cref="ObjectDisposedException">Ths playback provider has already been disposed.</exception>
+		/// <exception cref="ObjectDisposedException">This playback provider has already been disposed.</exception>
 		void FreeSource (AudioSource source);
 	}
 

@@ -57,8 +57,15 @@ namespace Gablarski.OpenAL.Providers
 
 		public float Gain
 		{
-			get { return Listener.Gain; }
-			set { Listener.Gain = value; }
+			get { return this.globalGain; }
+			set
+			{
+				if (this.globalGain == value)
+					return;
+
+				this.globalGain = value;
+				RecalculateGains();
+			}
 		}
 		
 		public IAudioDevice Device
@@ -70,6 +77,17 @@ namespace Gablarski.OpenAL.Providers
 				if (this.device == null)
 					throw new ArgumentException ("Can only accept OpenAL PlaybackDevice devices");
 			}
+		}
+		
+		public void SetGain (AudioSource source, float gain)
+		{
+			if (source == null)
+				throw new ArgumentNullException ("source");
+
+			var realGains = this.gains.ToDictionary (kvp => kvp.Key, kvp => kvp.Value.Item1);
+			realGains[source] = gain;
+
+			RecalculateGains (realGains);
 		}
 
 		public void Open()
@@ -103,6 +121,12 @@ namespace Gablarski.OpenAL.Providers
 				this.buffers[audioSource] = bufferStack = new Stack<SourceBuffer>();
 
 			Source source = this.pool.RequestSource (audioSource);
+
+			Tuple<float,float> gain;
+			if (this.gains.TryGetValue (audioSource, out gain))
+				source.Gain = gain.Item2;
+			else
+				source.Gain = this.realGlobalGain;
 
 			const int bufferLen = 6;
 
@@ -203,9 +227,37 @@ namespace Gablarski.OpenAL.Providers
 
 		private bool isDisposed;
 		private PlaybackDevice device;
+		private float globalGain = 1.0f;
+		private float realGlobalGain = 1.0f;
 		private readonly SourcePool<AudioSource> pool = new SourcePool<AudioSource>();
-		private readonly object bufferLock = new object ();
+
+		/// <summary>
+		/// Gain storage. Tuple Item1 is client gain, Item2 is OpenAL gain.
+		/// </summary>
+		private Dictionary<AudioSource, Tuple<float, float>> gains = new Dictionary<AudioSource, Tuple<float,float>>();
 		private readonly Dictionary<AudioSource, Stack<SourceBuffer>> buffers = new Dictionary<AudioSource, Stack<SourceBuffer>> ();
+
+		private void RecalculateGains (IDictionary<AudioSource, float> realGains)
+		{
+			lock (this.gains)
+			{
+				float h = realGains.Values.Max();
+				float v = this.globalGain;
+				float p = v / h;
+
+				Dictionary<AudioSource, Tuple<float, float>> newGains = new Dictionary<AudioSource, Tuple<float, float>>();
+				foreach (var kvp in realGains)
+					newGains[kvp.Key] = new Tuple<float, float> (kvp.Value, kvp.Value * p);
+
+				this.gains = newGains;
+				this.realGlobalGain = Listener.Gain = p;
+			}
+		}
+
+		private void RecalculateGains()
+		{
+			RecalculateGains (this.gains.ToDictionary (kvp => kvp.Key, kvp => kvp.Value.Item1));
+		}
 
 		private static void RequireBuffers (Stack<SourceBuffer> bufferStack, Source source, int num)
 		{
