@@ -52,6 +52,18 @@ namespace Gablarski.OpenAL
 			this.bufferID = bufferID;
 		}
 
+		public int Frequency
+		{
+			get
+			{
+				int fs;
+				alGetBufferi (this.bufferID, ALEnum.AL_FREQUENCY, out fs);
+				OpenAL.ErrorCheck();
+
+				return fs;
+			}
+		}
+
 		public void Buffer (byte[] data, OpenALAudioFormat format, uint frequency)
 		{
 			alBufferData (this.bufferID, format, data, data.Length, frequency);
@@ -166,6 +178,10 @@ namespace Gablarski.OpenAL
 		//}
 
 		#region Imports
+
+		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
+		private static extern void alGetBufferi (uint bufferID, ALEnum property, out int value);
+
 		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
 		private static extern void alGenBuffers (int count, uint[] bufferIDs);
 
@@ -176,7 +192,7 @@ namespace Gablarski.OpenAL
 		private static extern void alDeleteBuffers (int numBuffers, uint[] bufferIDs);
 		#endregion
 
-		private static object lck = new object ();
+		private static readonly object lck = new object ();
 
 		private static Dictionary<uint, SourceBuffer> Buffers
 		{
