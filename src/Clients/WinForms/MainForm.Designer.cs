@@ -113,7 +113,7 @@
 			this.btnMute.Name = "btnMute";
 			this.btnMute.Size = new System.Drawing.Size(23, 22);
 			this.btnMute.Text = "Mute Sound";
-			this.btnMute.Click += new System.EventHandler(this.btnMute_Click);
+			this.btnMute.CheckedChanged += new System.EventHandler(this.btnMute_CheckedChanged);
 			// 
 			// btnMuteMic
 			// 
@@ -125,7 +125,7 @@
 			this.btnMuteMic.Name = "btnMuteMic";
 			this.btnMuteMic.Size = new System.Drawing.Size(23, 22);
 			this.btnMuteMic.Text = "Mute Microphone";
-			this.btnMuteMic.Click += new System.EventHandler(this.btnMuteMic_Click);
+			this.btnMuteMic.CheckStateChanged += new System.EventHandler(this.btnMuteMic_CheckStateChanged);
 			// 
 			// btnAFK
 			// 

@@ -455,6 +455,18 @@ namespace Gablarski.Clients.Windows
 						this.gablarski.Audio.EndCapture (voiceSource);
 
 					break;
+
+				case Command.MuteMic:
+					if (e.State == InputState.On)
+						BeginInvoke ((Action)(() => this.btnMuteMic.Checked = !this.btnMuteMic.Checked));
+
+					break;
+
+				case Command.MuteAll:
+					if (e.State == InputState.On)
+						BeginInvoke ((Action)(() => this.btnMute.Checked = !this.btnMute.Checked));
+
+					break;
 			}
 		}
 
@@ -848,7 +860,27 @@ namespace Gablarski.Clients.Windows
 			}
 		}
 
-		private void btnMute_Click (object sender, EventArgs e)
+		private void btnComment_Click (object sender, EventArgs e)
+		{
+			var changeComment = new CommentForm (this.gablarski.CurrentUser.Comment);
+			if (changeComment.ShowDialog() == DialogResult.OK)
+				this.gablarski.CurrentUser.SetComment (changeComment.Comment);
+		}
+
+		private void btnRegister_Click (object sender, EventArgs e)
+		{
+
+		}
+
+		private void btnAFK_CheckedChanged (object sender, EventArgs e)
+		{
+			if (this.btnAFK.Checked)
+				this.gablarski.CurrentUser.SetStatus (this.gablarski.CurrentUser.Status | UserStatus.AFK);
+			else
+				this.gablarski.CurrentUser.SetStatus (this.gablarski.CurrentUser.Status ^ UserStatus.AFK);
+		}
+
+		private void btnMute_CheckedChanged(object sender, EventArgs e)
 		{
 			if (gablarski == null)
 				return;
@@ -876,7 +908,7 @@ namespace Gablarski.Clients.Windows
 			}
 		}
 
-		private void btnMuteMic_Click (object sender, EventArgs e)
+		private void btnMuteMic_CheckStateChanged(object sender, EventArgs e)
 		{
 			if (gablarski == null)
 				return;
@@ -885,26 +917,6 @@ namespace Gablarski.Clients.Windows
 				gablarski.CurrentUser.MuteCapture();
 			else
 				gablarski.CurrentUser.UnmuteCapture();
-		}
-
-		private void btnComment_Click (object sender, EventArgs e)
-		{
-			var changeComment = new CommentForm (this.gablarski.CurrentUser.Comment);
-			if (changeComment.ShowDialog() == DialogResult.OK)
-				this.gablarski.CurrentUser.SetComment (changeComment.Comment);
-		}
-
-		private void btnRegister_Click (object sender, EventArgs e)
-		{
-
-		}
-
-		private void btnAFK_CheckedChanged(object sender, EventArgs e)
-		{
-			if (this.btnAFK.Checked)
-				this.gablarski.CurrentUser.SetStatus (this.gablarski.CurrentUser.Status | UserStatus.AFK);
-			else
-				this.gablarski.CurrentUser.SetStatus (this.gablarski.CurrentUser.Status ^ UserStatus.AFK);
 		}
 	}
 }
