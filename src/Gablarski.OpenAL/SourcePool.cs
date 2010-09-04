@@ -129,8 +129,6 @@ namespace Gablarski.OpenAL
 
 		public void Tick()
 		{
-			OpenAL.Debug ("SourcePool: Tick");
-
 			List<KeyValuePair<Source, T>> finished;
 			lock (owners)
 				finished = owners.Where (kvp => kvp.Key.IsStopped && kvp.Value != null).ToList();

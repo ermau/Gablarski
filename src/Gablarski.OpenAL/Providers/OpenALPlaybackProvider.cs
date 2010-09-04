@@ -94,9 +94,19 @@ namespace Gablarski.OpenAL.Providers
 		{
 			if (this.device == null)
 				throw new InvalidOperationException ("Device is not set");
+			if (this.isOpen)
+				throw new InvalidOperationException ("Already open");
 
 			OpenALRunner.AddUser();
 			OpenALRunner.AddPlaybackProvider (this);
+
+			if (!this.device.IsOpen)
+				this.device.Open();
+
+			if (Context.CurrentContext == null || Context.CurrentContext.Device != this.device)
+				Context.CreateAndActivate (this.device);
+
+			isOpen = true;
 		}
 
 		private bool isOpen;
@@ -105,17 +115,6 @@ namespace Gablarski.OpenAL.Providers
 			if (audioSource == null)
 				throw new ArgumentNullException ("audioSource");
 			
-			if (!isOpen)
-			{
-				if (!this.device.IsOpen)
-					this.device.Open();
-
-				if (Context.CurrentContext == null || Context.CurrentContext.Device != this.device)
-					Context.CreateAndActivate (this.device);
-
-				isOpen = true;
-			}
-
 			Stack<SourceBuffer> bufferStack;
 			if (!this.buffers.TryGetValue (audioSource, out bufferStack))
 				this.buffers[audioSource] = bufferStack = new Stack<SourceBuffer>();
@@ -126,7 +125,7 @@ namespace Gablarski.OpenAL.Providers
 			if (this.gains.TryGetValue (audioSource, out gain))
 				source.Gain = gain.Item2;
 			else
-				source.Gain = this.realGlobalGain;
+				source.Gain = this.normalGain;
 
 			const int bufferLen = 6;
 
@@ -135,16 +134,16 @@ namespace Gablarski.OpenAL.Providers
 
 			if (!source.IsPlaying)
 			{
-				OpenAL.DebugFormat ("{0} bound to {1} isn't playing, inserting silent buffers", audioSource, source);
+			    OpenAL.DebugFormat ("{0} bound to {1} isn't playing, inserting silent buffers", audioSource, source);
 
-				RequireBuffers (bufferStack, source, bufferLen);
-				for (int i = 0; i < bufferLen; ++i)
-				{
-					OpenALAudioFormat format = audioSource.ToOpenALFormat();
-					SourceBuffer wait = bufferStack.Pop();
-					wait.Buffer (new byte[format.GetBytesPerSample()], format, (uint)audioSource.SampleRate);
-					source.QueueAndPlay (wait);
-				}
+			    RequireBuffers (bufferStack, source, bufferLen);
+			    for (int i = 0; i < bufferLen; ++i)
+			    {
+			        OpenALAudioFormat format = audioSource.ToOpenALFormat();
+			        SourceBuffer wait = bufferStack.Pop();
+			        wait.Buffer (new byte[format.GetBytesPerSample()], format, (uint)audioSource.SampleRate);
+			        source.QueueAndPlay (wait);
+			    }
 			}
 
 			RequireBuffers (bufferStack, source, 1);
@@ -172,8 +171,6 @@ namespace Gablarski.OpenAL.Providers
 
 		public void Tick()
 		{
-			OpenAL.Debug ("Tick");
-
 			pool.Tick();
 		}
 
@@ -228,7 +225,7 @@ namespace Gablarski.OpenAL.Providers
 		private bool isDisposed;
 		private PlaybackDevice device;
 		private float globalGain = 1.0f;
-		private float realGlobalGain = 1.0f;
+		private float normalGain = 1.0f;
 		private readonly SourcePool<AudioSource> pool = new SourcePool<AudioSource>();
 
 		/// <summary>
@@ -243,14 +240,15 @@ namespace Gablarski.OpenAL.Providers
 			{
 				float h = realGains.Values.Max();
 				float v = this.globalGain;
-				float p = v / h;
+				float p = 1 / h;
 
 				Dictionary<AudioSource, Tuple<float, float>> newGains = new Dictionary<AudioSource, Tuple<float, float>>();
 				foreach (var kvp in realGains)
 					newGains[kvp.Key] = new Tuple<float, float> (kvp.Value, kvp.Value * p);
 
 				this.gains = newGains;
-				this.realGlobalGain = Listener.Gain = p;
+				this.normalGain = p;
+				Listener.Gain = h * v;
 			}
 		}
 

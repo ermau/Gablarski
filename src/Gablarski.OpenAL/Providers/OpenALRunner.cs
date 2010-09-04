@@ -45,6 +45,8 @@ namespace Gablarski.OpenAL.Providers
 	{
 		internal static void AddUser()
 		{
+			OpenAL.Debug ("Adding OpenAL user");
+
 			int now = Interlocked.Increment (ref counter);
 
 			if (now != 1 || running)
@@ -66,6 +68,8 @@ namespace Gablarski.OpenAL.Providers
 
 		internal static void RemoveUser()
 		{
+			OpenAL.Debug ("Removing OpenAL user");
+
 			int now = Interlocked.Decrement (ref counter);
 
 			if (now != 0 || !running)
@@ -83,6 +87,8 @@ namespace Gablarski.OpenAL.Providers
 
 		internal static void AddPlaybackProvider (OpenALPlaybackProvider provider)
 		{
+			OpenAL.Debug ("Adding OpenAL Playback Provider");
+
 			if (provider == null)
 				throw new ArgumentNullException ("provider");
 
@@ -92,6 +98,8 @@ namespace Gablarski.OpenAL.Providers
 
 		internal static void RemovePlaybackProvider (OpenALPlaybackProvider provider)
 		{
+			OpenAL.Debug ("Removing OpenAL Playback Provider");
+
 			if (provider == null)
 				throw new ArgumentNullException ("provider");
 
@@ -101,6 +109,8 @@ namespace Gablarski.OpenAL.Providers
 
 		internal static void AddCaptureProvider (OpenALCaptureProvider provider)
 		{
+			OpenAL.Debug ("Adding OpenAL Capture Provider");
+
 			if (provider == null)
 				throw new ArgumentNullException ("provider");
 
@@ -110,6 +120,8 @@ namespace Gablarski.OpenAL.Providers
 
 		internal static void RemoveCaptureProvider (OpenALCaptureProvider provider)
 		{
+			OpenAL.Debug ("Removing OpenAL Capture Provider");
+
 			if (provider == null)
 				throw new ArgumentNullException ("provider");
 

@@ -193,9 +193,8 @@ namespace Gablarski.OpenAL.Providers
 			}
 
 			this.device = null;
-
 			OpenALRunner.RemoveUser();
-
+			OpenALRunner.RemoveCaptureProvider (this);
 			this.disposed = true;
 		}
 

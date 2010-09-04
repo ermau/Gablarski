@@ -133,7 +133,7 @@ namespace Gablarski.OpenAL
 		private static Dictionary<IntPtr, Context> contexts;
 		private static readonly object lck = new object ();
 
-		internal static Context Create (PlaybackDevice device)
+		public static Context Create (PlaybackDevice device)
 		{
 			OpenAL.DebugFormat ("Creating context for {0}", device.Name);
 			
@@ -154,7 +154,7 @@ namespace Gablarski.OpenAL
 			return c;
 		}
 
-		internal static Context CreateAndActivate (PlaybackDevice device)
+		public static Context CreateAndActivate (PlaybackDevice device)
 		{
 			Context c = Create (device);
 			c.Activate ();
