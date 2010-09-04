@@ -467,6 +467,26 @@ namespace Gablarski.Clients.Windows
 						BeginInvoke ((Action)(() => this.btnMute.Checked = !this.btnMute.Checked));
 
 					break;
+
+				case Command.SayCurrentSong:
+					if (e.State != InputState.On)
+						return;
+
+					if (this.notifications != null && this.mediaPlayerIntegration != null)
+					{
+						var attached = this.mediaPlayerIntegration.AttachedMediaPlayers;
+						if (attached.Count() == 0)
+							return;
+						else if (attached.Count() == 1)
+							this.notifications.Say (attached.First().SongName + " by " + attached.First().ArtistName);
+						else
+						{
+							foreach (var media in attached)
+								this.notifications.Say (String.Format ("{0} is playing {1} by {2}", media.Name, media.SongName, media.ArtistName));
+						}
+					}
+
+					break;
 			}
 		}
 

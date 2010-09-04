@@ -70,12 +70,19 @@ namespace Gablarski.Clients
 			get; set;
 		}
 
+		/// <summary>
+		/// Gets or sets the <see cref="IAudioReceiver"/> that speech is coming through.
+		/// </summary>
+		/// <remarks>99.9% of the time, this will be <see cref="GablarskiClient.Sources"/>.</remarks>
 		public IAudioReceiver SpeechReceiver
 		{
 			get;
 			set;
 		}
 
+		/// <summary>
+		/// Sets the speech notifiers.
+		/// </summary>
 		public IEnumerable<ITextToSpeech> SpeechNotifiers
 		{
 			set
@@ -103,10 +110,29 @@ namespace Gablarski.Clients
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets the <see cref="IMediaController"/> to use with the <see cref="SpeechNotifiers"/>.
+		/// </summary>
 		public IMediaController MediaController
 		{
 			get;
 			set;
+		}
+
+		/// <summary>
+		/// Sends <paramref name="contents"/> directly to the <see cref="SpeechNotifiers"/> only.
+		/// </summary>
+		/// <param name="contents">Well what do you want to say?</param>
+		public void Say (string contents)
+		{
+			if (Muted || SpeechReceiver == null)
+				return;
+
+			lock (notifiers)
+			{
+				foreach (var n in speechNotifiers)
+					SpeechReceiver.Receive (n.AudioSource, n.GetSpeech (contents, n.AudioSource));
+			}
 		}
 
 		public void Notify (NotificationType type, string notification)

@@ -59,6 +59,11 @@ namespace Gablarski.iTunes
 			get { return Process.GetProcessesByName ("itunes").Any(); }
 		}
 
+		public string Name
+		{
+			get { return "iTunes"; }
+		}
+
 		public string SongName
 		{
 			get

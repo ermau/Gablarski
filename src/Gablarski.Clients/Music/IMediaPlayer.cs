@@ -45,6 +45,7 @@ namespace Gablarski.Clients.Media
 	/// Provides a media-player integration contract.
 	/// </summary>
 	public interface IMediaPlayer
+		: INamedComponent
 	{
 		/// <summary>
 		/// Gets whether or not the media player is currently running.

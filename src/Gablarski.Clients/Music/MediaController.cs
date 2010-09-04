@@ -80,6 +80,18 @@ namespace Gablarski.Clients.Media
 		}
 
 		/// <summary>
+		/// Gets the currently attached media players.
+		/// </summary>
+		public IEnumerable<IMediaPlayer> AttachedMediaPlayers
+		{
+			get
+			{
+				lock (this.attachedPlayers)
+					return this.attachedPlayers.Keys.ToList();
+			}
+		}
+
+		/// <summary>
 		/// Gets or sets whether to use the media player's original volume instead of <see cref="VolumeType.Normal"/>.
 		/// </summary>
 		public bool UseCurrentPlayerVolume

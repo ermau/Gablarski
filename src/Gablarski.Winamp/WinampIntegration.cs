@@ -51,6 +51,11 @@ namespace Gablarski.Winamp
 	{
 		#region Implementation of IMediaPlayer
 
+		public string Name
+		{
+			get { return "WinAmp"; }
+		}
+
 		/// <summary>
 		/// Gets whether or not the media player is currently running.
 		/// </summary>
