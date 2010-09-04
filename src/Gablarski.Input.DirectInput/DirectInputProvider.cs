@@ -443,8 +443,14 @@ namespace Gablarski.Input.DirectInput
 									{
 										if (!currentButtons.Contains (bd.Offset))
 										{
-											currentInitials[bd.Offset] = bd.Data;
-											currentRanges.Add (bd.Offset, d.Properties.GetRange (ParameterHow.ByOffset, bd.Offset));
+											try
+											{
+												currentRanges.Add (bd.Offset, d.Properties.GetRange (ParameterHow.ByOffset, bd.Offset));
+												currentInitials[bd.Offset] = bd.Data;
+											}
+											catch (UnsupportedException)
+											{
+											}
 										}
 										else
 											OnNewRecording (new RecordingEventArgs (this, String.Format ("{0}|{1}", d.DeviceInformation.InstanceGuid, bd.Offset)));
