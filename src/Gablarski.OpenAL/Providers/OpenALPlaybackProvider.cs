@@ -241,7 +241,7 @@ namespace Gablarski.OpenAL.Providers
 		{
 			lock (this.gains)
 			{
-				float h = realGains.Values.Max();
+				float h = (realGains.Count > 0) ? realGains.Values.Max() : 1.0f;
 				float v = this.globalGain;
 				float p = 1 / h;
 
