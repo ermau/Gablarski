@@ -46,6 +46,11 @@ namespace Gablarski.OpenAL
 	{
 		public event EventHandler<SourceFinishedEventArgs<T>> SourceFinished;
 
+		public object SyncRoot
+		{
+			get { return this.owners; }
+		}
+
 		public Source RequestSource (T owner)
 		{
 			OpenAL.DebugFormat ("SourcePool: Requesting source for {0}", owner);
@@ -89,6 +94,8 @@ namespace Gablarski.OpenAL
 
 		public void FreeSource (T sourceOwner)
 		{
+			OpenAL.DebugFormat ("SourcePool: Freeing source for owner {0}", sourceOwner);
+
 			lock (owners)
 			{
 				var source = owners.FirstOrDefault (kvp => kvp.Value == sourceOwner).Key;
@@ -104,6 +111,8 @@ namespace Gablarski.OpenAL
 
 		public void FreeSource (Source source)
 		{
+			OpenAL.DebugFormat ("SourcePool: Freeing source {0}", source);
+
 			lock (owners)
 			{
 				owners[source] = default(T);
@@ -119,6 +128,7 @@ namespace Gablarski.OpenAL
 			{
 				foreach (Source csource in sources)
 				{
+					OpenAL.DebugFormat ("SourcePool: Freeing source {0}", csource);
 					owners[csource] = default (T);
 
 					if (csource == lastSource)

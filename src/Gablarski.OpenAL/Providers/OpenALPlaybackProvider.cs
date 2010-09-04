@@ -119,38 +119,41 @@ namespace Gablarski.OpenAL.Providers
 			if (!this.buffers.TryGetValue (audioSource, out bufferStack))
 				this.buffers[audioSource] = bufferStack = new Stack<SourceBuffer>();
 
-			Source source = this.pool.RequestSource (audioSource);
-
-			Tuple<float,float> gain;
-			if (this.gains.TryGetValue (audioSource, out gain))
-				source.Gain = gain.Item2;
-			else
-				source.Gain = this.normalGain;
-
-			const int bufferLen = 6;
-
-			if (data.Length == 0)
-				return;
-
-			if (!source.IsPlaying)
+			lock (this.pool.SyncRoot)
 			{
-			    OpenAL.DebugFormat ("{0} bound to {1} isn't playing, inserting silent buffers", audioSource, source);
+				Source source = this.pool.RequestSource (audioSource);
 
-			    RequireBuffers (bufferStack, source, bufferLen);
-			    for (int i = 0; i < bufferLen; ++i)
-			    {
-			        OpenALAudioFormat format = audioSource.ToOpenALFormat();
-			        SourceBuffer wait = bufferStack.Pop();
-			        wait.Buffer (new byte[format.GetBytesPerSample()], format, (uint)audioSource.SampleRate);
-			        source.QueueAndPlay (wait);
-			    }
+				Tuple<float, float> gain;
+				if (this.gains.TryGetValue (audioSource, out gain))
+					source.Gain = gain.Item2;
+				else
+					source.Gain = this.normalGain;
+
+				const int bufferLen = 6;
+
+				if (data.Length == 0)
+					return;
+
+				if (!source.IsPlaying)
+				{
+					OpenAL.DebugFormat ("{0} bound to {1} isn't playing, inserting silent buffers", audioSource, source);
+
+					RequireBuffers (bufferStack, source, bufferLen);
+					for (int i = 0; i < bufferLen; ++i)
+					{
+						OpenALAudioFormat format = audioSource.ToOpenALFormat();
+						SourceBuffer wait = bufferStack.Pop();
+						wait.Buffer (new byte[format.GetBytesPerSample()], format, (uint)audioSource.SampleRate);
+						source.QueueAndPlay (wait);
+					}
+				}
+
+				RequireBuffers (bufferStack, source, 1);
+				SourceBuffer buffer = bufferStack.Pop();
+
+				buffer.Buffer (data, audioSource.ToOpenALFormat(), (uint)audioSource.SampleRate);
+				source.QueueAndPlay (buffer);
 			}
-
-			RequireBuffers (bufferStack, source, 1);
-			SourceBuffer buffer = bufferStack.Pop ();
-
-			buffer.Buffer (data, audioSource.ToOpenALFormat(), (uint)audioSource.SampleRate);
-			source.QueueAndPlay (buffer);
 		}
 
 		public IEnumerable<IAudioDevice> GetDevices ()
@@ -265,9 +268,7 @@ namespace Gablarski.OpenAL.Providers
 				for (int i = 0; i < freeBuffers.Length; ++i)
 				{
 					lock (bufferStack)
-					{
 						bufferStack.Push (freeBuffers[i]);
-					}
 				}
 			}
 
