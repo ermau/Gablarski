@@ -84,7 +84,21 @@ namespace Gablarski.Audio
 
 	public class AudioEnginePlaybackOptions
 	{
-		
+		public AudioEnginePlaybackOptions ()
+			: this (1.0f)
+		{
+		}
+
+		public AudioEnginePlaybackOptions (float gain)
+		{
+			Gain = gain;
+		}
+
+		public float Gain
+		{
+			get;
+			private set;
+		}
 	}
 
 	public interface IAudioEngine

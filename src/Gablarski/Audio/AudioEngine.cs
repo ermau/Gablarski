@@ -114,6 +114,7 @@ namespace Gablarski.Audio
 
 				foreach (var s in sources.Where (s => !playbacks.ContainsKey (s) && s.OwnerId != Context.CurrentUser.UserId))
 				{
+					audioPlayback.SetGain (s, options.Gain);
 					playbacks[s] = new AudioPlaybackEntity (audioPlayback, s, options);
 
 					if (this.playbackMuted || mutedPlayers.Contains (audioPlayback))
@@ -139,6 +140,7 @@ namespace Gablarski.Audio
 					this.playbackProviders.Add (audioPlayback);
 				}
 
+				audioPlayback.SetGain (source, options.Gain);
 				playbacks[source] = new AudioPlaybackEntity (audioPlayback, source, options);
 
 				if (this.playbackMuted || mutedPlayers.Contains (audioPlayback))
@@ -207,6 +209,7 @@ namespace Gablarski.Audio
 				if (!playbacks.TryGetValue (source, out p))
 					throw new ArgumentException ("source is not attached", "source");
 
+				p.AudioPlayback.SetGain (source, options.Gain);
 				playbacks[source] = new AudioPlaybackEntity (p.AudioPlayback, source, options);
 			}
 		}
