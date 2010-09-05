@@ -60,6 +60,9 @@ namespace Gablarski.OpenAL.Providers
 			get { return this.globalGain; }
 			set
 			{
+				if (this.isDisposed)
+					throw new ObjectDisposedException ("OpenALPlaybackProvider");
+
 				if (this.globalGain == value)
 					return;
 
@@ -73,6 +76,9 @@ namespace Gablarski.OpenAL.Providers
 			get { return this.device; }
 			set
 			{
+				if (this.isDisposed)
+					throw new ObjectDisposedException ("OpenALPlaybackProvider");
+
 				this.device = (value as PlaybackDevice);
 				if (this.device == null)
 					throw new ArgumentException ("Can only accept OpenAL PlaybackDevice devices");
@@ -81,6 +87,8 @@ namespace Gablarski.OpenAL.Providers
 		
 		public void SetGain (AudioSource source, float gain)
 		{
+			if (this.isDisposed)
+				throw new ObjectDisposedException ("OpenALPlaybackProvider");
 			if (source == null)
 				throw new ArgumentNullException ("source");
 
@@ -92,6 +100,8 @@ namespace Gablarski.OpenAL.Providers
 
 		public void Open()
 		{
+			if (this.isDisposed)
+				throw new ObjectDisposedException ("OpenALPlaybackProvider");
 			if (this.device == null)
 				throw new InvalidOperationException ("Device is not set");
 			if (this.isOpen)
@@ -112,6 +122,8 @@ namespace Gablarski.OpenAL.Providers
 		private bool isOpen;
 		public void QueuePlayback (AudioSource audioSource, byte[] data)
 		{
+			if (this.isDisposed)
+				throw new ObjectDisposedException ("OpenALPlaybackProvider");
 			if (audioSource == null)
 				throw new ArgumentNullException ("audioSource");
 			
@@ -163,10 +175,15 @@ namespace Gablarski.OpenAL.Providers
 
 		public void FreeSource (AudioSource source)
 		{
+			if (this.isDisposed)
+				throw new ObjectDisposedException ("OpenALPlaybackProvider");
 			if (source == null)
 				throw new ArgumentNullException ("source");
 
 			OpenAL.DebugFormat ("Freeing source {0}", source);
+
+			lock (this.gains)
+				this.gains = this.gains.Where (kvp => kvp.Key != source).ToDictionary (kvp => kvp.Key, kvp => kvp.Value);
 
 			buffers.Remove (source);
 			pool.FreeSource (source);
