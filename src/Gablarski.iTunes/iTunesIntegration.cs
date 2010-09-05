@@ -73,6 +73,10 @@ namespace Gablarski.iTunes
 					var track = iTunes.CurrentTrack;
 					return track != null ? track.Name : String.Empty;
 				}
+				catch (InvalidCastException)
+				{
+					return String.Empty;
+				}
 				catch (COMException)
 				{
 					return String.Empty;
@@ -88,6 +92,10 @@ namespace Gablarski.iTunes
 				{
 					var track = iTunes.CurrentTrack;
 					return track != null ? track.Artist : String.Empty;
+				}
+				catch (InvalidCastException)
+				{
+					return String.Empty;
 				}
 				catch (COMException)
 				{
@@ -105,6 +113,10 @@ namespace Gablarski.iTunes
 					var track = iTunes.CurrentTrack;
 					return track != null ? track.Album : String.Empty;
 				}
+				catch (InvalidCastException)
+				{
+					return String.Empty;
+				}
 				catch (COMException)
 				{
 					return String.Empty;
@@ -120,6 +132,10 @@ namespace Gablarski.iTunes
 				{
 					return iTunes.SoundVolume;
 				}
+				catch (InvalidCastException)
+				{
+					return 0;
+				}
 				catch (COMException)
 				{
 					return 0;
@@ -131,6 +147,9 @@ namespace Gablarski.iTunes
 				try
 				{
 					iTunes.SoundVolume = value;
+				}
+				catch (InvalidCastException)
+				{
 				}
 				catch (COMException)
 				{
@@ -148,6 +167,9 @@ namespace Gablarski.iTunes
 			{
 				iTunes.Play();
 			}
+			catch (InvalidCastException)
+			{
+			}
 			catch (COMException)
 			{
 			}
@@ -158,6 +180,9 @@ namespace Gablarski.iTunes
 			try
 			{
 				iTunes.Pause();
+			}
+			catch (InvalidCastException)
+			{
 			}
 			catch (COMException)
 			{
@@ -170,6 +195,9 @@ namespace Gablarski.iTunes
 			{
 				iTunes.Stop();
 			}
+			catch (InvalidCastException)
+			{
+			}
 			catch (COMException)
 			{
 			}
@@ -181,6 +209,9 @@ namespace Gablarski.iTunes
 			{
 				iTunes.NextTrack();
 			}
+			catch (InvalidCastException)
+			{
+			}
 			catch (COMException)
 			{
 			}
@@ -191,6 +222,9 @@ namespace Gablarski.iTunes
 			try
 			{
 				iTunes.PreviousTrack();
+			}
+			catch (InvalidCastException)
+			{
 			}
 			catch (COMException)
 			{
