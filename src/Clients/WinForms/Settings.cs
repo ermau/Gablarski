@@ -27,6 +27,17 @@ namespace Gablarski.Clients.Windows
 			}
 		}
 
+		public const string GlobalVolumeName = "GlobalVolume";
+		public static float GlobalVolume
+		{
+			get { return GetSetting (GlobalVolumeName, 1.0f); }
+			set
+			{
+				if (SetSetting (GlobalVolumeName, value))
+					OnSettingsChanged (GlobalVolumeName);
+			}
+		}
+
 		public const string UseMusicCurrentVolumeName = "UseMusicCurrentVolume";
 		public static bool UseMusicCurrentVolume
 		{
@@ -326,9 +337,14 @@ namespace Gablarski.Clients.Windows
 			return (GetSetting (settingName, (defaultValue) ? "1" : "0") == "1");
 		}
 
-		private static int GetSetting (string settingName, int defautlValue)
+		private static int GetSetting (string settingName, int defaultValue)
 		{
-			return Int32.Parse (GetSetting (settingName, defautlValue.ToString()));
+			return Int32.Parse (GetSetting (settingName, defaultValue.ToString()));
+		}
+
+		private static float GetSetting (string settingName, float defaultValue)
+		{
+			return Single.Parse (GetSetting (settingName, defaultValue.ToString()));
 		}
 
 		private static bool SetSetting (string settingName, string value)

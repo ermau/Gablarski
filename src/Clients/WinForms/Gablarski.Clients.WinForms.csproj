@@ -208,6 +208,12 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VolumeForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VolumeForm.Designer.cs">
+      <DependentUpon>VolumeForm.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="ChannelForm.resx">
       <DependentUpon>ChannelForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -247,6 +253,9 @@
     </Compile>
     <EmbeddedResource Include="SettingsForm.resx">
       <DependentUpon>SettingsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VolumeForm.resx">
+      <DependentUpon>VolumeForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

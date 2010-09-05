@@ -45,6 +45,8 @@ namespace Gablarski.Clients.Windows
 			this.voiceSelector.SetProvider (Settings.VoiceProvider);
 			this.voiceSelector.SetDevice (Settings.VoiceDevice);
 
+			this.playbackVolume.Value = (int)(Settings.GlobalVolume * 100);
+
 			this.voiceActivation.Checked = !Settings.UsePushToTalk;
 			this.threshold.Value = Settings.VoiceActivationContinueThreshold / 100;
 			this.dispThreshold.Text = String.Format ("{0:N1}s", (double)this.threshold.Value / 10);
@@ -133,6 +135,8 @@ namespace Gablarski.Clients.Windows
 				Settings.VoiceProvider = null;
 				Settings.VoiceDevice = null;
 			}
+
+			Settings.GlobalVolume = this.playbackVolume.Value / (float)100;
 
 			Settings.VoiceActivationContinueThreshold = this.threshold.Value * 100;
 			Settings.VoiceActivationLevel = this.vadSensitivity.Value;

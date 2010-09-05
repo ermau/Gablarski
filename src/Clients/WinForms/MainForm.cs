@@ -177,6 +177,8 @@ namespace Gablarski.Clients.Windows
 				}
 
 				this.audioPlayback.Open();
+				this.audioPlayback.Gain = Settings.GlobalVolume;
+
 				this.gablarski.Audio.Attach (this.audioPlayback,
 				                             this.gablarski.Sources.Where (s => s.OwnerId != gablarski.CurrentUser.UserId),
 				                             new AudioEnginePlaybackOptions());
@@ -312,6 +314,11 @@ namespace Gablarski.Clients.Windows
 			{
 				case "DisplaySources":
 					this.users.Update (this.gablarski.Channels, this.gablarski.Users, this.gablarski.Sources);
+					break;
+
+				case Settings.GlobalVolumeName:
+					if (this.audioPlayback != null)
+						this.audioPlayback.Gain = Settings.GlobalVolume;
 					break;
 
 				case Settings.UseMusicCurrentVolumeName:

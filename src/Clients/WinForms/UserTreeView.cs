@@ -634,6 +634,14 @@ namespace Gablarski.Clients.Windows
 				un.ContextMenuStrip.Items.Add (new ToolStripSeparator());
 			}
 
+			if (!target.Equals (Client.CurrentUser))
+			{
+				var volume = new ToolStripMenuItem ("Adjust volume", Resources.SoundLowImage);
+				volume.ToolTipText = "Allows you to set gain for the user";
+				volume.Click += VolumeOnClick;
+				un.ContextMenuStrip.Items.Add (volume);
+			}
+
 			if (!Client.Users.GetIsIgnored (target))
 			{
 				var ignore = new ToolStripMenuItem ("Ignore user", Resources.SoundMuteImage);
@@ -682,6 +690,16 @@ namespace Gablarski.Clients.Windows
 
 				AddSourceContext (menu.DropDown.Items, source);
 			}
+		}
+
+		private void VolumeOnClick (object sender, EventArgs eventArgs)
+		{
+			VolumeForm volume = new VolumeForm (v =>
+			{
+				foreach (var s in Client.Sources[((IUserInfo)this.SelectedNode.Tag)])
+					Client.Audio.Update (s, new AudioEnginePlaybackOptions (v));
+			});
+			volume.ShowDialog (this.Parent);
 		}
 
 		private void ContextGotoUrlUserCommentClick(object sender, EventArgs e)
