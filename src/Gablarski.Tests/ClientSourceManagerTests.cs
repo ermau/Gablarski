@@ -54,7 +54,7 @@ namespace Gablarski.Tests
 			this.server = this.provider.EstablishConnection();
 			this.client = this.server.Client;
 
-			var context = new MockClientContext { Connection = this.server.Client };
+			context = new MockClientContext { Connection = this.server.Client };
 			var channels = new ClientChannelManager (context);
 			ClientChannelManagerTests.PopulateChannels (channels, server);
 
@@ -80,6 +80,7 @@ namespace Gablarski.Tests
 		private MockConnectionProvider provider;
 		private MockServerConnection server;
 		private MockClientConnection client;
+		private MockClientContext context;
 
 		[Test]
 		public void NullContext()
@@ -101,6 +102,7 @@ namespace Gablarski.Tests
 			var csource = manager.FirstOrDefault (s => s.Id == 1);
 			Assert.IsNotNull (csource, "Source not found");
 			AudioSourceTests.AssertSourcesMatch (AudioSourceTests.GetTestSource (1, 0), csource);
+			Assert.IsTrue (manager[context.CurrentUser].Contains (csource), "Owned sources did not contain source");
 
 			var source = manager.FirstOrDefault (s => s.Id == 2);
 			Assert.IsNotNull (source, "Source not found");
@@ -119,13 +121,13 @@ namespace Gablarski.Tests
 			Assert.Throws<ArgumentNullException> (() => manager.Update ((IEnumerable<AudioSource>) null));
 		}
 		
-		[Test]
-		public void UpdateSourcesRemove()
-		{
-			CreateSources();
+		//[Test]
+		//public void UpdateSourcesRemove()
+		//{
+		//    CreateSources();
 
 
-		}
+		//}
 
 		[Test]
 		public void ToggleIgnoreNull()

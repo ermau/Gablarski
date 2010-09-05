@@ -98,9 +98,7 @@ namespace Gablarski.Client
 				foreach (var d in deleted)
 				{
 					lock (Sources)
-					{
 						Sources.Remove (d.Id);
-					}
 				}
 			}
 		}
@@ -114,9 +112,12 @@ namespace Gablarski.Client
 			{
 				AudioSource oldSource;
 				if (!Sources.TryGetValue (source.Id, out oldSource))
+				{
 					Sources[source.Id] = source;
+					OwnedSources.Add (source.OwnerId, source);
+				}
 				else
-					source.CopyTo (source);
+					source.CopyTo (oldSource);
 			}
 		}
 
