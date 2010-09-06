@@ -1,4 +1,4 @@
-// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -34,14 +34,14 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Gablarski.Clients.Media;
 
 namespace Gablarski.Clients
 {
+	/// <summary>
+	/// Contract for notification receivers.
+	/// </summary>
 	public interface INotifier
 		: INamedComponent
 	{
@@ -50,25 +50,74 @@ namespace Gablarski.Clients
 		/// </summary>
 		IMediaController Media { set; }
 
+		/// <summary>
+		/// Notifies the <see cref="INotifier"/> of a <paramref name="type"/> event.
+		/// </summary>
+		/// <param name="type">What happened?</param>
+		/// <param name="contents">Notification contents.</param>
+		/// <param name="priority">Priority of notification.</param>
 		void Notify (NotificationType type, string contents, NotifyPriority priority);
-		void Notify (NotificationType type, string contents, string nickname, string phonetic, NotifyPriority priority);
 	}
 
+	/// <summary>
+	/// Notification type.
+	/// </summary>
 	public enum NotificationType
 	{
+		/// <summary>
+		/// You connected to a server.
+		/// </summary>
 		Connected,
+
+		/// <summary>
+		/// You disconnected from a server.
+		/// </summary>
 		Disconnected,
+
+		/// <summary>
+		/// Someone joined the server.
+		/// </summary>
 		UserJoinedServer,
+
+		/// <summary>
+		/// Someone left the server.
+		/// </summary>
 		UserLeftServer,
+
+		/// <summary>
+		/// You switched channels.
+		/// </summary>
 		SwitchedChannel,
+
+		/// <summary>
+		/// Someone joined your channel.
+		/// </summary>
 		UserJoinedChannel,
+
+		/// <summary>
+		/// Someone left your channel.
+		/// </summary>
 		UserLeftChannel,
+
+		/// <summary>
+		/// A media source has started playing.
+		/// </summary>
 		SourceStartsPlaying,
+
+		/// <summary>
+		/// A media source has stopped playing.
+		/// </summary>
 		SourceStopsPlaying,
 	}
 
+	/// <summary>
+	/// Notification priorities
+	/// </summary>
 	public enum NotifyPriority
 	{
+		/// <summary>
+		/// General information.
+		/// </summary>
 		Info
 	}
 }

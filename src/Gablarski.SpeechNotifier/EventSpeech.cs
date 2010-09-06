@@ -133,23 +133,6 @@ namespace Gablarski.SpeechNotifier
 					media = value;
 			}
 		}
-		
-		public void Notify (NotificationType type, string say, NotifyPriority priority)
-		{
-			Say (say);
-		}
-		
-		public void Notify (NotificationType type, string say, string nickname, string phonetic, NotifyPriority priority)
-		{
-			if (say == null)
-				throw new ArgumentNullException ("say");
-			if (nickname == null)
-				throw new ArgumentNullException ("nickname");
-			if (phonetic == null)
-				throw new ArgumentNullException ("phonetic");
-
-			Notify (type, String.Format (say, phonetic), priority);
-		}
 
 		public void Dispose()
 		{

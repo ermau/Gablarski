@@ -38,6 +38,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cadenza;
 using Gablarski.Audio;
 using Gablarski.Client;
 using Gablarski.Clients.Media;
@@ -174,7 +175,7 @@ namespace Gablarski.Clients
 			lock (notifiers)
 			{
 				foreach (var n in notifiers)
-					n.Notify (type, notification, nickname, phonetic, priority);
+					n.Notify (type, String.Format (notification, nickname), priority);
 			}
 
 			if (SpeechReceiver != null)
@@ -182,7 +183,7 @@ namespace Gablarski.Clients
 				lock (notifiers)
 				{
 					foreach (var n in speechNotifiers)
-						SpeechReceiver.Receive (n.AudioSource, n.GetSpeech (notification, n.AudioSource));
+						SpeechReceiver.Receive (n.AudioSource, n.GetSpeech (String.Format (notification, (!phonetic.IsNullOrWhitespace()) ? phonetic : nickname), n.AudioSource));
 				}
 			}
 		}
@@ -221,7 +222,7 @@ namespace Gablarski.Clients
 				Notify (NotificationType.UserJoinedServer, "{0} has joined the server.", e.User.Nickname, e.User.Phonetic);
 		}
 
-		void OnUserChangedChannel (object sender, ChannelChangedEventArgs e)
+		private void OnUserChangedChannel (object sender, ChannelChangedEventArgs e)
 		{
 			if (e.User.Equals (client.CurrentUser))
 				Notify (NotificationType.SwitchedChannel, "Switched to channel " + e.TargetChannel.Name);
