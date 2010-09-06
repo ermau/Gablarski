@@ -6,24 +6,39 @@ namespace Gablarski.Clients.Windows.Entities
 {
 	public class VolumeEntry
 	{
-		public virtual int VolumeId
+		public VolumeEntry ()
+			: this (0)
 		{
-			get; set;
+			Gain = 1.0f;
 		}
 
-		public virtual int ServerId
+		public VolumeEntry (int id)
 		{
-			get; set;
+			VolumeId = id;
 		}
 
-		public virtual string Username
+		public int VolumeId
 		{
-			get; set;
+			get;
+			private set;
 		}
 
-		public virtual float Gain
+		public int ServerId
 		{
-			get; set;
+			get;
+			set;
+		}
+
+		public string Username
+		{
+			get;
+			set;
+		}
+
+		public float Gain
+		{
+			get;
+			set;
 		}
 	}
 }

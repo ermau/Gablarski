@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Data.Common;
 using System.Data.SQLite;
 using System.IO;
+using System.Linq;
 using Gablarski.Clients.Input;
 using Gablarski.Clients.Windows.Entities;
 
@@ -49,6 +50,7 @@ namespace Gablarski.Clients.Windows
 			}
 		}
 
+		#region Servers
 		public static void SaveOrUpdate (SettingEntry setting)
 		{
 			if (setting == null)
@@ -131,6 +133,32 @@ namespace Gablarski.Clients.Windows
 				cmd.ExecuteNonQuery();
 			}
 		}
+		#endregion
+
+		#region Volume
+		public static IEnumerable<VolumeEntry> GetVolumes (ServerEntry server)
+		{
+			if (server == null)
+				throw new ArgumentNullException ("server");
+
+			using (var cmd = db.CreateCommand())
+			{
+				cmd.CommandText = "SELECT * FROM volumes WHERE (volumeServerId=?)";
+				cmd.Parameters.Add (new SQLiteParameter ("serverId", server.Id));
+				using (var reader = cmd.ExecuteReader())
+				{
+					while (reader.Read())
+					{
+						yield return new VolumeEntry (Convert.ToInt32 (reader[0]))
+						{
+							ServerId = Convert.ToInt32 (reader[1]),
+							Username = Convert.ToString (reader[2]),
+							Gain = Convert.ToSingle (reader[3])
+						};
+					}
+				}
+			}
+		}
 
 		public static void SaveOrUpdate (VolumeEntry volumeEntry)
 		{
@@ -159,7 +187,7 @@ namespace Gablarski.Clients.Windows
 			if (volumeEntry == null)
 				throw new ArgumentNullException ("volumeEntry");
 			if (volumeEntry.VolumeId < 1)
-				throw new ArgumentException ("Can't delete a non-existant server", "volumeEntry");
+				throw new ArgumentException ("Can't delete a non-existent server", "volumeEntry");
 
 			using (var cmd = db.CreateCommand ("DELETE FROM volumes WHERE (volumeId=?)"))
 			{
@@ -167,7 +195,9 @@ namespace Gablarski.Clients.Windows
 				cmd.ExecuteNonQuery();
 			}
 		}
+		#endregion
 
+		#region Bindings
 		public static IEnumerable<CommandBindingEntry> GetCommandBindings()
 		{
 			using (var cmd = db.CreateCommand ("SELECT * FROM commandbindings"))
@@ -208,6 +238,7 @@ namespace Gablarski.Clients.Windows
 				cmd.ExecuteNonQuery();
 			}
 		}
+		#endregion
 
 		private static readonly DbConnection db;
 		private static readonly FileInfo DbFile;

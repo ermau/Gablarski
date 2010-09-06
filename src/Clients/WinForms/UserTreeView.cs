@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using Cadenza;
 using Gablarski.Audio;
 using Gablarski.Client;
+using Gablarski.Clients.Windows.Entities;
 using Gablarski.Clients.Windows.Properties;
 
 namespace Gablarski.Clients.Windows
@@ -56,6 +57,14 @@ namespace Gablarski.Clients.Windows
 				this.client.Users.UserMuted += OnUserMuted;
 				this.client.Sources.AudioSourceMuted += OnSourceMuted;
 			}
+		}
+
+		[Browsable (false)]
+		[DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+		public ServerEntry Server
+		{
+			get;
+			set;
 		}
 
 		private void OnUserMuted (object sender, UserEventArgs e)
@@ -694,10 +703,20 @@ namespace Gablarski.Clients.Windows
 
 		private void VolumeOnClick (object sender, EventArgs eventArgs)
 		{
-			VolumeForm volume = new VolumeForm (v =>
+			var user = (IUserInfo)this.SelectedNode.Tag;
+			VolumeEntry entry = Persistance.GetVolumes (Server).FirstOrDefault (ve => ve.Username == user.Username)
+				                    ?? new VolumeEntry { Username = user.Username, ServerId = Server.Id };
+
+			VolumeForm volume = new VolumeForm (entry.Gain, v =>
 			{
-				foreach (var s in Client.Sources[((IUserInfo)this.SelectedNode.Tag)])
+				foreach (var s in Client.Sources[user])
 					Client.Audio.Update (s, new AudioEnginePlaybackOptions (v));
+			},
+			
+			v =>
+			{
+				entry.Gain = v;
+				Persistance.SaveOrUpdate (entry);
 			});
 			volume.ShowDialog (this.Parent);
 		}

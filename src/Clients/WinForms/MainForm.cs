@@ -119,6 +119,7 @@ namespace Gablarski.Clients.Windows
 			}
 
 			this.server = connectTo;
+			this.users.Server = connectTo;
 			Connect ();
 		}
 
@@ -138,6 +139,7 @@ namespace Gablarski.Clients.Windows
 				}
 
 				this.server = login.Entry;
+				this.users.Server = login.Entry;
 				Connect();
 			}
 			else if (cancelExits)
@@ -179,9 +181,8 @@ namespace Gablarski.Clients.Windows
 				this.audioPlayback.Open();
 				this.audioPlayback.Gain = Settings.GlobalVolume;
 
-				this.gablarski.Audio.Attach (this.audioPlayback,
-				                             this.gablarski.Sources.Where (s => s.OwnerId != gablarski.CurrentUser.UserId),
-				                             new AudioEnginePlaybackOptions());
+				this.gablarski.Sources.Where (s => s.OwnerId != gablarski.CurrentUser.UserId)
+					.ForEach (AttachSource);
 
 				BeginInvoke ((Action)(() =>
 				{
@@ -536,11 +537,7 @@ namespace Gablarski.Clients.Windows
 			}
 			else if (e.Result == SourceResult.NewSource)
 			{
-				this.gablarski.Audio.Attach (this.audioPlayback, e.Source, new AudioEnginePlaybackOptions ());
-
-				var user = gablarski.Users[e.Source.OwnerId];
-				users.RemoveUser (user);
-				users.AddUser (user, gablarski.Sources[user]);
+				AttachSource (e.Source);
 			}
 			else
 			{
@@ -562,6 +559,20 @@ namespace Gablarski.Clients.Windows
 
 				MessageBox.Show (this, "Source '" + e.SourceName + "' request failed: " + reason, "Source Request", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
+		}
+
+		private void AttachSource (AudioSource source)
+		{
+			var user = gablarski.Users[source.OwnerId];
+			users.RemoveUser (user);
+			users.AddUser (user, gablarski.Sources[user]);
+
+			float gain = 1.0f;
+			VolumeEntry volume = Persistance.GetVolumes (this.server).FirstOrDefault (ve => ve.Username == user.Username);
+			if (volume != null)
+				gain = volume.Gain;
+
+			this.gablarski.Audio.Attach (this.audioPlayback, source, new AudioEnginePlaybackOptions (gain));
 		}
 
 		private void UsersUserChangedChannel (object sender, ChannelChangedEventArgs e)
@@ -729,7 +740,10 @@ namespace Gablarski.Clients.Windows
 			});
 
 			if (this.server == null)
+			{
 				this.server = new ServerEntry (0);
+				this.users.Server = this.server;
+			}
 
 			string userpassword = this.server.UserPassword;
 

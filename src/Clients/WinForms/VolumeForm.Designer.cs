@@ -31,7 +31,7 @@
 			System.Windows.Forms.Label label1;
 			this.volume = new System.Windows.Forms.TrackBar();
 			this.label2 = new System.Windows.Forms.Label();
-			this.label3 = new System.Windows.Forms.Label();
+			this.normal = new System.Windows.Forms.LinkLabel();
 			label1 = new System.Windows.Forms.Label();
 			((System.ComponentModel.ISupportInitialize)(this.volume)).BeginInit();
 			this.SuspendLayout();
@@ -67,28 +67,31 @@
 			this.label2.TabIndex = 2;
 			this.label2.Text = "500%";
 			// 
-			// label3
+			// normal
 			// 
-			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(49, 29);
-			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(33, 13);
-			this.label3.TabIndex = 3;
-			this.label3.Text = "100%";
+			this.normal.AutoSize = true;
+			this.normal.Location = new System.Drawing.Point(50, 29);
+			this.normal.Name = "normal";
+			this.normal.Size = new System.Drawing.Size(33, 13);
+			this.normal.TabIndex = 3;
+			this.normal.TabStop = true;
+			this.normal.Text = "100%";
+			this.normal.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.normal_LinkClicked);
 			// 
 			// VolumeForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(284, 45);
-			this.Controls.Add(this.label3);
+			this.Controls.Add(this.normal);
 			this.Controls.Add(this.label2);
 			this.Controls.Add(label1);
 			this.Controls.Add(this.volume);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
 			this.Name = "VolumeForm";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-			this.Text = "VolumeForm";
+			this.Text = "Volume";
+			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.VolumeForm_FormClosed);
 			((System.ComponentModel.ISupportInitialize)(this.volume)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
@@ -99,6 +102,6 @@
 
 		private System.Windows.Forms.TrackBar volume;
 		private System.Windows.Forms.Label label2;
-		private System.Windows.Forms.Label label3;
+		private System.Windows.Forms.LinkLabel normal;
 	}
 }
