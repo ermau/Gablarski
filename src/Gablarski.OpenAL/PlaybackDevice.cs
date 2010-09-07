@@ -83,7 +83,7 @@ namespace Gablarski.OpenAL
 		}
 
 		/// <summary>
-		/// Creats, activates and returns a new device context.
+		/// Creates, activates and returns a new device context.
 		/// </summary>
 		/// <returns></returns>
 		public Context CreateAndActivateContext ()
@@ -103,6 +103,8 @@ namespace Gablarski.OpenAL
 			alcCloseDevice (this.Handle);
 			this.Handle = IntPtr.Zero;
 			this.disposed = true;
+
+			OpenAL.DebugFormat ("Destroyed playback device {0}", Name);
 		}
 
 		#region Imports

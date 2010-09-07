@@ -563,6 +563,9 @@ namespace Gablarski.Clients.Windows
 
 		private void AttachSource (AudioSource source)
 		{
+			if (this.audioPlayback == null)
+				return;
+
 			var user = gablarski.Users[source.OwnerId];
 			users.RemoveUser (user);
 			users.AddUser (user, gablarski.Sources[user]);
@@ -677,8 +680,12 @@ namespace Gablarski.Clients.Windows
 			}
 		}
 
-		void GablarskiDisconnected (object sender, EventArgs e)
+		private void GablarskiDisconnected (object sender, EventArgs e)
 		{
+			DisableInput();
+			DisablePlayback();
+			DisableVoiceCapture();
+
 			if (this.IsDisposed || this.Disposing || this.shuttingDown)
 				return;
 
@@ -841,6 +848,10 @@ namespace Gablarski.Clients.Windows
 		private void MainForm_FormClosing (object sender, FormClosingEventArgs e)
 		{
 			this.shuttingDown = true;
+			
+			DisableInput();
+			DisablePlayback();
+			DisableVoiceCapture();
 
 			if (this.notifications != null)
 				this.notifications.Close ();

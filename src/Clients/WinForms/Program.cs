@@ -105,7 +105,7 @@ namespace Gablarski.Clients.Windows
 
 			log4net.Config.XmlConfigurator.Configure ();
 
-			log4net.LogManager.GetLogger ("Gablarski WinForms").Info ("Program Start");
+			log4net.LogManager.GetLogger ("Gablarski WinForms").InfoFormat ("Program Start. PID: {0}", Process.GetCurrentProcess().Id);
 
 			FileInfo program = new FileInfo (Process.GetCurrentProcess().MainModule.FileName);
 			Environment.CurrentDirectory = program.Directory.FullName;

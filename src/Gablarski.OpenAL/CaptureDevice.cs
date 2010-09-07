@@ -34,13 +34,10 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Security;
-using Gablarski.OpenAL;
 
 namespace Gablarski.OpenAL
 {
@@ -194,13 +191,15 @@ namespace Gablarski.OpenAL
 			if (this.Handle == IntPtr.Zero)
 				return;
 
+			OpenAL.DebugFormat ("Destroying capture device {0}", Name);		
+
 			alcCaptureCloseDevice (this.Handle);
 			this.Handle = IntPtr.Zero;
 			this.pcm = null;
 			
 			this.disposed = true;
 			
-			OpenAL.DebugFormat ("Destroying capture device {0}", Name);		
+			OpenAL.DebugFormat ("Destroyed capture device {0}", Name);
 		}
 
 		#region Imports

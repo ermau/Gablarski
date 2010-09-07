@@ -183,18 +183,18 @@ namespace Gablarski.OpenAL.Providers
 			if (this.disposed)
 				return;
 
-			if (IsCapturing)
-				EndCapture();
+			OpenAL.DebugFormat ("Freeing OpenALCaptureProvider. Disposing: {0}", disposing);
 
 			if (disposing)
 			{
+				if (IsCapturing)
+					EndCapture();
+			
 				if (this.device != null)
 					this.device.Dispose();
 			}
 
 			this.device = null;
-			OpenALRunner.RemoveUser();
-			OpenALRunner.RemoveCaptureProvider (this);
 			this.disposed = true;
 		}
 

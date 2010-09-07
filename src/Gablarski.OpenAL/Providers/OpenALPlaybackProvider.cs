@@ -224,16 +224,17 @@ namespace Gablarski.OpenAL.Providers
 			if (this.isDisposed)
 				return;
 
-			OpenAL.Debug ("Freeing OpenALPlaybackProvider");
+			OpenAL.DebugFormat ("Freeing OpenALPlaybackProvider. Disposing: ", disposing);
 
 			if (disposing)
 			{
 				this.pool.Dispose();
 
 				if (this.device != null)
-					this.device.Dispose ();
+					this.device.Dispose();
 			}
-			
+
+			this.pool = null;
 			this.device = null;
 			OpenALRunner.RemoveUser();
 			OpenALRunner.RemovePlaybackProvider (this);
@@ -246,7 +247,7 @@ namespace Gablarski.OpenAL.Providers
 		private PlaybackDevice device;
 		private float globalGain = 1.0f;
 		private float normalGain = 1.0f;
-		private readonly SourcePool<AudioSource> pool = new SourcePool<AudioSource>();
+		private SourcePool<AudioSource> pool = new SourcePool<AudioSource>();
 
 		/// <summary>
 		/// Gain storage. Tuple Item1 is client gain, Item2 is OpenAL gain.

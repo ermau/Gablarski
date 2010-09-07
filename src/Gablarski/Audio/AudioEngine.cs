@@ -479,10 +479,6 @@ namespace Gablarski.Audio
 			lock (captures)
 			{
 				captureToSourceLookup.Clear();
-
-				foreach (var kvp in captures)
-					kvp.Value.Dispose();
-
 				captures.Clear();
 				mutedCaptures.Clear();
 			}
