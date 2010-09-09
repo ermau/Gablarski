@@ -127,26 +127,26 @@ namespace Gablarski.Tests
 			return new LoginResult ((user != null) ? user.UserId : Interlocked.Decrement (ref nextGuestId), state);
 		}
 		
-		public LoginResult Register (string username, string password)
+		public RegisterResult Register (string username, string password)
 		{
 			if (RegistrationMode != UserRegistrationMode.Normal)
-				throw new NotSupportedException();
+				return RegisterResult.FailedUnsupported;
 			if (username == null)
 				throw new ArgumentNullException ("username");
-			
-			int userId = 0;
-			
-			LoginResultState state = LoginResultState.FailedUnknown;
-			if (username.Trim() == String.Empty || UserExists (username))
-				state = LoginResultState.FailedUsername;
+
+			RegisterResult state = RegisterResult.FailedUnknown;
+			if (username.Trim() == String.Empty)
+				state = RegisterResult.FailedUsername;
+			else if (UserExists (username))
+				state = RegisterResult.FailedUsernameInUse;
 			else
 			{
-				state = LoginResultState.Success;
-				userId = users.Max (u => u.UserId) + 1;
+				state = RegisterResult.Success;
+				int userId = ((users.Any()) ? users.Max (u => u.UserId) : 0) + 1;
 				users.Add (new MockUser (userId, username, password));
 			}
-			
-			return new LoginResult (userId, state);
+
+			return state;
 		}
 		
 		public IEnumerable<IUser> GetUsers()

@@ -89,9 +89,9 @@ namespace Gablarski.Server
 			return new LoginResult (next, LoginResultState.Success);
 		}
 
-		public LoginResult Register (string username, string password)
+		public RegisterResult Register (string username, string password)
 		{
-			throw new NotSupportedException ();
+			return RegisterResult.FailedUnsupported;
 		}
 
 		private int nextUserId = 0;

@@ -404,9 +404,18 @@ namespace Gablarski.Server
 		internal void RegisterMessage (MessageReceivedEventArgs e)
 		{
 			var msg = (RegisterMessage)e.Message;
-			
-			if (context.UserProvider.RegistrationMode == UserRegistrationMode.None || !Manager.GetIsConnected (e.Connection))
+
+			if (!Manager.GetIsConnected (e.Connection))
 				return;
+			
+			if (this.context.UserProvider.UpdateSupported || this.context.UserProvider.RegistrationMode != UserRegistrationMode.Normal)
+			{
+				e.Connection.Send (new RegisterResultMessage { Result = RegisterResult.FailedUnsupported });
+				return;
+			}
+
+			var result = this.context.UserProvider.Register (msg.Username, msg.Password);
+			e.Connection.Send (new RegisterResultMessage { Result = result });
 		}
 
 		internal void SetPermissionsMessage (MessageReceivedEventArgs e)

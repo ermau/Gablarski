@@ -35,9 +35,7 @@
 // DAMAGE.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Cadenza;
 
 namespace Gablarski.Messages
@@ -64,6 +62,11 @@ namespace Gablarski.Messages
 
 			Username = username;
 			Password = password;
+		}
+
+		public override bool Encrypted
+		{
+			get { return true; }
 		}
 
 		public string Username

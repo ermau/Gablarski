@@ -100,6 +100,7 @@ namespace Gablarski.Server
 		/// <param name="username">The username to register.</param>
 		/// <param name="password">The password to register <paramref name="username"/> with.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="username"/> or <paramref name="password"/> is <c>null</c>.</exception>
-		LoginResult Register (string username, string password);
+		/// <returns>The result of registration.</returns>
+		RegisterResult Register (string username, string password);
 	}
 }

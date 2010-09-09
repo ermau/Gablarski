@@ -502,34 +502,6 @@ namespace Gablarski.Tests
 			Assert.AreEqual (ClientMessageType.RequestUserList,
 				server.Client.DequeueAndAssertMessage<PermissionDeniedMessage>().DeniedMessage);
 		}
-		
-		[Test]
-		public void RegisterNotSupported()
-		{
-			users.RegistrationMode = UserRegistrationMode.None;
-
-			var c = new MockServerConnection();
-			context.UserManager.Connect (c);
-
-			handler.RegisterMessage (new MessageReceivedEventArgs (c,
-				new RegisterMessage ("Username", "Password")));
-
-			c.Client.AssertNoMessage();
-		}
-
-		[Test]
-		public void RegisterNotConnected()
-		{
-			users.RegistrationMode = UserRegistrationMode.Normal;
-
-			var c = new MockServerConnection();
-			c.Disconnect();
-
-			handler.RegisterMessage (new MessageReceivedEventArgs (c,
-				new RegisterMessage ("Username", "Password")));
-
-			c.Client.AssertNoMessage();
-		}
 
 		[Test]
 		public void SetPermissionsNotConnected()
@@ -655,5 +627,96 @@ namespace Gablarski.Tests
 		//{
 			
 		//}
+
+		[Test]
+		public void RegisterNotConnected()
+		{
+			var c1 = new MockServerConnection();
+
+			handler.RegisterMessage (new MessageReceivedEventArgs (c1, 
+				new RegisterMessage ("username", "password")));
+
+			c1.Client.AssertNoMessage();
+		}
+
+		[Test]
+		public void RegisterUnsupported()
+		{
+			var c1 = new MockServerConnection();
+			var u1 = JoinAsGuest (c1, "nick");
+
+			users.UpdateSupported = false;
+			users.RegistrationMode = UserRegistrationMode.Normal;
+
+			handler.RegisterMessage (new MessageReceivedEventArgs (c1, 
+				new RegisterMessage ("username", "password")));
+
+			var msg = c1.Client.DequeueAndAssertMessage<RegisterResultMessage>();
+			Assert.AreEqual (RegisterResult.FailedUnsupported, msg.Result);
+		}
+
+		[Test]
+		public void RegisterNoRegistration()
+		{
+			var c1 = new MockServerConnection();
+			var u1 = JoinAsGuest (c1, "nick");
+
+			users.UpdateSupported = true;
+			users.RegistrationMode = UserRegistrationMode.None;
+
+			handler.RegisterMessage (new MessageReceivedEventArgs (c1, 
+				new RegisterMessage ("username", "password")));
+
+			var msg = c1.Client.DequeueAndAssertMessage<RegisterResultMessage>();
+			Assert.AreEqual (RegisterResult.FailedUnsupported, msg.Result);
+		}
+
+		[Test]
+		public void RegisterWebpage()
+		{
+			var c1 = new MockServerConnection();
+			var u1 = JoinAsGuest (c1, "nick");
+
+			users.UpdateSupported = true;
+			users.RegistrationMode = UserRegistrationMode.WebPage;
+
+			handler.RegisterMessage (new MessageReceivedEventArgs (c1, 
+				new RegisterMessage ("username", "password")));
+
+			var msg = c1.Client.DequeueAndAssertMessage<RegisterResultMessage>();
+			Assert.AreEqual (RegisterResult.FailedUnsupported, msg.Result);
+		}
+
+		[Test]
+		public void RegisterMessage()
+		{
+			var c1 = new MockServerConnection();
+			var u1 = JoinAsGuest (c1, "nick");
+
+			users.UpdateSupported = true;
+			users.RegistrationMode = UserRegistrationMode.Message;
+
+			handler.RegisterMessage (new MessageReceivedEventArgs (c1, 
+				new RegisterMessage ("username", "password")));
+
+			var msg = c1.Client.DequeueAndAssertMessage<RegisterResultMessage>();
+			Assert.AreEqual (RegisterResult.FailedUnsupported, msg.Result);
+		}
+
+		[Test]
+		public void Register()
+		{
+			var c1 = new MockServerConnection();
+			var u1 = JoinAsGuest (c1, "nick");
+
+			users.UpdateSupported = true;
+			users.RegistrationMode = UserRegistrationMode.Normal;
+
+			handler.RegisterMessage (new MessageReceivedEventArgs (c1, 
+				new RegisterMessage ("username", "password")));
+
+			var msg = c1.Client.DequeueAndAssertMessage<RegisterResultMessage>();
+			Assert.AreEqual (RegisterResult.Success, msg.Result);
+		}
 	}
 }
