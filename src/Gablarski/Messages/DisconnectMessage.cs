@@ -51,7 +51,15 @@ namespace Gablarski.Messages
 		/// <remarks>
 		/// Do not reconnect.
 		/// </remarks>
-		LoggedInElsewhere = 1
+		LoggedInElsewhere = 1,
+
+		/// <summary>
+		/// Disconnected because the user requested it.
+		/// </summary>
+		/// <remarks>
+		/// Do not reconnect.
+		/// </remarks>
+		Requested = 2
 	}
 
 	public class DisconnectMessage

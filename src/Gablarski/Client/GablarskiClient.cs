@@ -246,7 +246,7 @@ namespace Gablarski.Client
 		/// </summary>
 		public void Disconnect()
 		{
-			ThreadPool.QueueUserWorkItem (s => DisconnectCore (DisconnectionReason.Unknown, DisconnectHandling.None, this.Connection));
+			ThreadPool.QueueUserWorkItem (s => DisconnectCore (DisconnectionReason.Requested, DisconnectHandling.None, this.Connection));
 		}
 		#endregion
 
