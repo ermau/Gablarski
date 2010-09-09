@@ -408,7 +408,7 @@ namespace Gablarski.Server
 			if (!Manager.GetIsConnected (e.Connection))
 				return;
 			
-			if (this.context.UserProvider.UpdateSupported || this.context.UserProvider.RegistrationMode != UserRegistrationMode.Normal)
+			if (!this.context.UserProvider.UpdateSupported || this.context.UserProvider.RegistrationMode != UserRegistrationMode.Normal)
 			{
 				e.Connection.Send (new RegisterResultMessage { Result = RegisterResult.FailedUnsupported });
 				return;
