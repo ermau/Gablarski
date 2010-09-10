@@ -314,6 +314,263 @@ namespace Gablarski.Client
 			RegisterMessageHandler (ServerMessageType.Disconnect, OnDisconnectedMessage);
 		}
 
+		protected ServerInfo serverInfo;
+
+		protected readonly log4net.ILog Log = log4net.LogManager.GetLogger ("GablarskiClient");
+		protected readonly bool DebugLogging;
+
+
+		private int redirectLimit = 20;
+		private int redirectCount;
+		private volatile bool running;
+		private readonly AutoResetEvent incomingWait = new AutoResetEvent (false);
+		private readonly Queue<MessageReceivedEventArgs> mqueue = new Queue<MessageReceivedEventArgs> (100);
+		private Thread messageRunnerThread;
+
+		private IPEndPoint originalEndPoint;
+		private int disconnectedInChannelId;
+
+		private string originalHost;
+
+		/*protected void Setup (ClientUserHandler userMananger, ClientChannelManager channelManager, ClientSourceHandler sourceHandler, CurrentUser currentUser, IAudioEngine audioEngine)
+		{
+			this.handlers = new Dictionary<ServerMessageType, Action<MessageReceivedEventArgs>>
+			{
+				{ ServerMessageType.PermissionDenied, OnPermissionDeniedMessage },
+
+				{ ServerMessageType.Redirect, OnRedirectMessage },
+				{ ServerMessageType.ServerInfoReceived, OnServerInfoReceivedMessage },
+				
+				{ ServerMessageType.ChannelList, this.Channels.OnChannelListReceivedMessage },
+				{ ServerMessageType.ChannelEditResult, this.Channels.OnChannelEditResultMessage },
+
+				{ ServerMessageType.ConnectionRejected, OnConnectionRejectedMessage },
+				{ ServerMessageType.Disconnect, OnDisconnectedMessage },
+				{ ServerMessageType.UserMuted, OnMuted },
+			};
+		}*/
+
+		private void OnDisconnectedMessage (MessageReceivedEventArgs e)
+		{
+			var msg = (DisconnectMessage) e.Message;
+
+			DisconnectHandling handling = DisconnectHandling.Reconnect;
+
+			switch (msg.Reason)
+			{
+				case DisconnectionReason.LoggedInElsewhere:
+					handling = DisconnectHandling.None;
+					break;
+			}
+
+			DisconnectCore (msg.Reason, handling, e.Connection, true);
+		}
+
+		private void OnPermissionDeniedMessage (MessageReceivedEventArgs obj)
+		{
+			OnPermissionDenied (new PermissionDeniedEventArgs (((PermissionDeniedMessage)obj.Message).DeniedMessage));
+		}
+
+		private void MessageRunner ()
+		{
+			while (this.running)
+			{
+				while (mqueue.Count > 0)
+				{
+					MessageReceivedEventArgs e;
+					lock (mqueue)
+					{
+						e = mqueue.Dequeue ();
+					}
+
+					var msg = (e.Message as ServerMessage);
+					if (msg == null)
+					{
+						this.Log.Error ("Non ServerMessage received (" + e.Message.MessageTypeCode + "), disconnecting.");
+						Connection.Disconnect ();
+						return;
+					}
+
+					if (DebugLogging)
+						this.Log.Debug ("Message Received: " + msg.MessageType);
+
+					if (this.running)
+					{
+						IEnumerable<Action<MessageReceivedEventArgs>> mhandlers;
+						if (this.handlers.TryGetValues (msg.MessageType, out mhandlers))
+						{
+							foreach (var h in mhandlers)
+								h (e);
+						}
+					}
+				}
+
+				if (mqueue.Count == 0)
+					incomingWait.WaitOne ();
+			}
+		}
+
+		private void OnMessageReceived (object sender, MessageReceivedEventArgs e)
+		{
+			lock (mqueue)
+			{
+				mqueue.Enqueue (e);
+			}
+
+			incomingWait.Set ();
+		}
+
+		private void OnConnectionRejectedMessage (MessageReceivedEventArgs e)
+		{
+			var msg = (ConnectionRejectedMessage)e.Message;
+
+			OnConnectionRejected (new RejectedConnectionEventArgs (msg.Reason));
+		}
+
+		private void OnServerInfoReceivedMessage (MessageReceivedEventArgs e)
+		{
+			this.serverInfo = ((ServerInfoMessage)e.Message).ServerInfo;
+			this.Connection.Encryption = new Encryption (this.serverInfo.PublicRSAParameters);
+			this.formallyConnected = true;
+
+			OnConnected (this, EventArgs.Empty);
+		}
+
+		private void OnRedirectMessage (MessageReceivedEventArgs e)
+		{
+			var msg = (RedirectMessage) e.Message;
+
+			int count = Interlocked.Increment (ref this.redirectCount);
+
+			DisconnectCore (DisconnectionReason.Unknown, DisconnectHandling.None, this.Connection);
+			
+			if (count > redirectLimit)
+				return;
+
+			Connect (msg.Host, msg.Port);
+		}
+
+		private enum DisconnectHandling
+		{
+			None,
+			Reconnect
+		}
+
+		private void DisconnectCore (DisconnectionReason reason, DisconnectHandling handling, IConnection connection)
+		{
+			DisconnectCore (reason, handling, connection, true);
+		}
+
+		private void DisconnectCore (DisconnectionReason reason, DisconnectHandling handling, IConnection connection, bool fireEvent)
+		{
+			disconnectedInChannelId = CurrentUser.CurrentChannelId;
+
+			this.running = false;
+			this.formallyConnected = false;
+
+			connection.Disconnected -= this.OnDisconnectedInternal;
+			connection.MessageReceived -= this.OnMessageReceived;
+
+			this.incomingWait.Set ();
+
+			lock (this.mqueue)
+			{
+				this.mqueue.Clear();
+			}
+
+			if (this.messageRunnerThread != null)
+			{
+				this.messageRunnerThread.Join ();
+				this.messageRunnerThread = null;
+			}
+
+			if (fireEvent)
+				OnDisconnected (this, new DisconnectedEventArgs (reason));
+			
+			this.Users.Reset();
+			this.Channels.Clear();
+			this.Sources.Reset();
+
+			this.Audio.Stop();
+
+			connection.Disconnect();
+
+			if (handling == DisconnectHandling.Reconnect)
+				ThreadPool.QueueUserWorkItem (Reconnect);
+		}
+
+		private void OnDisconnectedInternal (object sender, ConnectionEventArgs e)
+		{
+			DisconnectCore (DisconnectionReason.Unknown, (ReconnectAutomatically) ? DisconnectHandling.Reconnect : DisconnectHandling.None, e.Connection);
+		}
+
+		private void Reconnect (object state)
+		{
+			Thread.Sleep (ReconnectAttemptFrequency);
+
+			CurrentUser.ReceivedJoinResult += ReconnectJoinedResult;
+			ConnectCore();
+		}
+
+		private void ReconnectJoinedResult (object sender, ReceivedJoinResultEventArgs e)
+		{
+			if (e.Result != LoginResultState.Success)
+				return;
+
+			ChannelInfo channel = this.Channels[this.disconnectedInChannelId];
+			if (channel != null)
+				this.Users.Move (this.CurrentUser, channel);
+
+			this.disconnectedInChannelId = 0;
+		}
+
+		private void ConnectCore (string host, int port)
+		{
+			if (host.IsNullOrWhitespace ())
+				throw new ArgumentException ("host must not be null or empty", "host");
+
+			try
+			{
+				this.originalHost = host;
+				this.originalEndPoint = new IPEndPoint (Dns.GetHostAddresses (host).First (ip => ip.AddressFamily == AddressFamily.InterNetwork), port);
+				ConnectCore();
+			}
+			catch (SocketException)
+			{
+				OnConnectionRejected (new RejectedConnectionEventArgs (ConnectionRejectedReason.CouldNotConnect));
+			}
+		}
+
+		private void ConnectCore ()
+		{
+			try
+			{
+				this.running = true;
+
+				this.messageRunnerThread = new Thread (this.MessageRunner) { Name = "Gablarski Client Message Runner" };
+				this.messageRunnerThread.SetApartmentState (ApartmentState.STA);
+				this.messageRunnerThread.Priority = ThreadPriority.Highest;
+				this.messageRunnerThread.Start ();
+
+				this.Connection.Disconnected += this.OnDisconnectedInternal;
+				this.Connection.MessageReceived += OnMessageReceived;
+				this.Connection.Connect (this.originalEndPoint);
+				this.Connection.Send (new ConnectMessage { ProtocolVersion = ProtocolVersion, Host = this.originalHost, Port = this.originalEndPoint.Port });
+
+				if (Audio.AudioSender == null)
+					Audio.AudioSender = Sources;
+				if (Audio.AudioReceiver == null)
+					Audio.AudioReceiver = Sources;
+
+				this.Audio.Context = this;
+				this.Audio.Start();
+			}
+			catch (SocketException)
+			{
+				OnConnectionRejected (new RejectedConnectionEventArgs (ConnectionRejectedReason.CouldNotConnect));
+			}
+		}
+
 		#region Statics
 		public static void QueryServer (IPEndPoint endpoint, IClientConnection connection)
 		{
