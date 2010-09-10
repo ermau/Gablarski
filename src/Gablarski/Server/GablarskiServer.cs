@@ -38,16 +38,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Gablarski.Audio;
-using Gablarski.Client;
 using Gablarski.Messages;
-using System.Diagnostics;
 using Cadenza;
 using log4net;
 
 namespace Gablarski.Server
 {
-	public partial class GablarskiServer
+	public class GablarskiServer
 		: IServerContext
 	{
 		// ReSharper disable ConvertToConstant.Global
@@ -74,11 +71,6 @@ namespace Gablarski.Server
 			SetupHandlers();
 		}
 
-		public object SyncRoot
-		{
-			get { return syncRoot; }
-		}
-
 		/// <summary>
 		/// Gets or sets whether to trace verbosely (trace audio data mostly).
 		/// </summary>
@@ -95,35 +87,6 @@ namespace Gablarski.Server
 		public ServerSettings Settings
 		{
 			get { return this.settings; }
-		}
-
-		public IServerUserHandler Users
-		{
-			get;
-			private set;
-		}
-
-		public IConnectionHandler Connections
-		{
-			get { return Users; }
-		}
-
-		public IServerUserManager UserManager
-		{
-			get;
-			private set;
-		}
-
-		public IServerSourceHandler Sources
-		{
-			get;
-			private set;
-		}
-
-		public IServerChannelHandler Channels
-		{
-			get;
-			private set;
 		}
 
 		public IEnumerable<IRedirector> Redirectors
@@ -150,7 +113,7 @@ namespace Gablarski.Server
 
 			this.Log.InfoFormat ("{0} added.", provider.GetType().Name);
 
-			// MUST provide a gaurantee of persona
+			// MUST provide a guarantee of persona
 			lock (this.availableConnections)
 			{
 				provider.ConnectionMade += OnConnectionMade;
@@ -237,7 +200,7 @@ namespace Gablarski.Server
 			this.incomingWait.Set ();
 			this.messageRunnerThread.Join();
 
-			Users.Disconnect (c => true);
+			this.users.Disconnect (c => true);
 		}
 		#endregion
 
@@ -264,20 +227,49 @@ namespace Gablarski.Server
 		private readonly Thread messageRunnerThread;
 		private readonly Queue<MessageReceivedEventArgs> mqueue = new Queue<MessageReceivedEventArgs> (1000);
 		private readonly AutoResetEvent incomingWait = new AutoResetEvent (false);
+		private IServerUserHandler users;
+		private ServerSourceHandler sources;
+		private ServerChannelHandler channels;
+		private ServerUserManager userManager;
+
+		IServerUserHandler IServerContext.Users
+		{
+			get { return this.users; }
+		}
+
+		IConnectionHandler IServerContext.Connections
+		{
+			get { return this.users; }
+		}
+
+		IServerUserManager IServerContext.UserManager
+		{
+			get { return this.userManager; }
+		}
+
+		IServerSourceHandler IServerContext.Sources
+		{
+			get { return this.sources; }
+		}
+
+		IServerChannelHandler IServerContext.Channels
+		{
+			get { return this.channels; }
+		}
 
 		IChannelProvider IServerContext.ChannelsProvider
 		{
-			get { return channelProvider; }
+			get { return this.channelProvider; }
 		}
 
 		IPermissionsProvider IServerContext.PermissionsProvider
 		{
-			get { return permissionProvider; }
+			get { return this.permissionProvider; }
 		}
 
 		IUserProvider IServerContext.UserProvider
 		{
-			get { return authProvider; }
+			get { return this.authProvider; }
 		}
 
 		PublicRSAParameters IServerContext.EncryptionParameters
@@ -303,16 +295,16 @@ namespace Gablarski.Server
 
 		private void SetupHandlers()
 		{
-			this.UserManager = new ServerUserManager();
+			this.userManager = new ServerUserManager();
 
-			var userHandler = new ServerUserHandler (this, this.UserManager);
-			this.Users = userHandler;
+			var userHandler = new ServerUserHandler (this, this.userManager);
+			this.users = userHandler;
 
 			var sourceHandler = new ServerSourceHandler (this, new ServerSourceManager (this));
-			this.Sources = sourceHandler;
+			this.sources = sourceHandler;
 			
 			var channelHandler = new ServerChannelHandler (this);
-			this.Channels = channelHandler;
+			this.channels = channelHandler;
 
 			this.handlers = new Dictionary<ClientMessageType, Action<MessageReceivedEventArgs>>
 			{
@@ -420,7 +412,7 @@ namespace Gablarski.Server
 			connection.Disconnect ();
 			connection.MessageReceived -= this.OnMessageReceived;
 			connection.Disconnected -= this.OnClientDisconnected;
-			Users.Disconnect (connection);
+			this.users.Disconnect (connection);
 		}
 
 		private void RemoveConnectionProvider (IConnectionProvider provider, bool listRemove)
@@ -442,9 +434,9 @@ namespace Gablarski.Server
 
 		private void OnPermissionsChanged (object sender, PermissionsChangedEventArgs e)
 		{
-			IUserInfo user = Users[e.UserId];
+			IUserInfo user = this.users[e.UserId];
 			if (user != null)
-				UserManager.GetConnection (user).Send (new PermissionsMessage (e.UserId, this.context.PermissionsProvider.GetPermissions (e.UserId)));
+				this.userManager.GetConnection (user).Send (new PermissionsMessage (e.UserId, this.context.PermissionsProvider.GetPermissions (e.UserId)));
 		}
 
 		protected void ClientDisconnected (MessageReceivedEventArgs e)
@@ -461,11 +453,11 @@ namespace Gablarski.Server
 			e.Connection.MessageReceived -= this.OnMessageReceived;
 			e.Connection.Disconnected -= this.OnClientDisconnected;
 
-			IUserInfo user = UserManager.GetUser (e.Connection);
+			IUserInfo user = this.userManager.GetUser (e.Connection);
 			if (user != null)
 			{
-				Sources.Remove (user);
-				Users.Disconnect (e.Connection);
+				this.sources.Remove (user);
+				this.users.Disconnect (e.Connection);
 			}
 		}
 		
@@ -505,7 +497,7 @@ namespace Gablarski.Server
 			if (!msg.ServerInfoOnly)
 			{
 				result.Channels = this.context.ChannelsProvider.GetChannels();
-				result.Users = this.Users;
+				result.Users = this.users.ToList();
 			}
 
 			result.ServerInfo = GetServerInfo();

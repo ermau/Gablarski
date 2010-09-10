@@ -41,8 +41,6 @@ namespace Gablarski.Server
 {
 	public interface IServerContext
 	{
-		object SyncRoot { get; }
-
 		/// <summary>
 		/// Gets the authentication provider for the server.
 		/// </summary>
