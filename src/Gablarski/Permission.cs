@@ -122,7 +122,9 @@ namespace Gablarski
 
 		AdminPanel = 17,
 
-		// Next: 20
+		ApproveRegistrations = 20,
+
+		// Next: 21
 	}
 
 	public class Permission

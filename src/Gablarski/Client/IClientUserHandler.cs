@@ -104,6 +104,30 @@ namespace Gablarski.Client
 		IEnumerable<IUserInfo> GetUsersInChannel (int channelId);
 
 		/// <summary>
+		/// Approves the registration of <paramref name="username"/>.
+		/// </summary>
+		/// <param name="username">The username to approve registration for.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="username"/> is <c>null</c>.</exception>
+		/// <exception cref="NotSupportedException">The server does not support either registration or approvals.</exception>
+		void ApproveRegistration (string username);
+
+		/// <summary>
+		/// Pre-approves the registration of <paramref name="user"/>.
+		/// </summary>
+		/// <param name="user">The user to pre-approve for registration.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
+		/// <exception cref="NotSupportedException">The server does not support either pre-registration or approvals.</exception>
+		void ApproveRegistration (IUserInfo user);
+
+		/// <summary>
+		/// Rejects the registration of <paramref name="username"/>.
+		/// </summary>
+		/// <param name="username">The username to reject registration for.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="username"/> is <c>null</c>.</exception>
+		/// <exception cref="NotSupportedException">The server does not support either registration or approvals.</exception>
+		void RejectRegistration (string username);
+
+		/// <summary>
 		/// Requests to move <paramref name="user"/> to <paramref name="targetChannel"/>.
 		/// </summary>
 		/// <param name="user">The user to move.</param>
@@ -125,7 +149,7 @@ namespace Gablarski.Client
 		/// Resets the handler to it's initial state.
 		/// </summary>
 		/// <remarks>
-		/// Integraters shouldn't invoke this directly, it's for the <see cref="GablarskiClient"/> to do
+		/// Integrators shouldn't invoke this directly, it's for the <see cref="GablarskiClient"/> to do
 		/// when disconnecting.
 		/// </remarks>
 		void Reset();

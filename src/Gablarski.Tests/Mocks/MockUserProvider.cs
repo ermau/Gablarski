@@ -91,7 +91,37 @@ namespace Gablarski.Tests
 		{
 			get; set;
 		}
-		
+
+		public IEnumerable<string> GetAwaitingRegistrations()
+		{
+			return this.awaitingApproval.Select (mu => mu.Username);
+		}
+
+		public void ApproveRegistration (string username)
+		{
+			if (username == null)
+				throw new ArgumentNullException ("username");
+			if (RegistrationMode != UserRegistrationMode.Approved && RegistrationMode != UserRegistrationMode.PreApproved)
+				throw new NotSupportedException();
+
+			MockUser user = this.awaitingApproval.FirstOrDefault (u => u.Username == username);
+			if (user == null)
+				return;
+
+			this.awaitingApproval.Remove (user);
+			this.users.Add (user);
+		}
+
+		public void RejectRegistration (string username)
+		{
+			if (username == null)
+				throw new ArgumentNullException ("username");
+			if (RegistrationMode != UserRegistrationMode.Approved && RegistrationMode != UserRegistrationMode.PreApproved)
+				throw new NotSupportedException();
+
+			this.awaitingApproval.RemoveAll (m => m.Username == username);
+		}
+
 		public bool UserExists (string username)
 		{
 			if (username == null)
@@ -99,7 +129,7 @@ namespace Gablarski.Tests
 			
 			username = username.Trim().ToLower();
 			
-			return users.Any (u => u.Username.Trim().ToLower() == username);
+			return users.Concat (awaitingApproval).Any (u => u.Username.Trim().ToLower() == username);
 		}
 		
 		public LoginResult Login (string username, string password)
@@ -129,7 +159,7 @@ namespace Gablarski.Tests
 		
 		public RegisterResult Register (string username, string password)
 		{
-			if (RegistrationMode != UserRegistrationMode.Normal)
+			if (RegistrationMode != UserRegistrationMode.Normal && RegistrationMode != UserRegistrationMode.Approved && RegistrationMode != UserRegistrationMode.PreApproved)
 				return RegisterResult.FailedUnsupported;
 			if (username == null)
 				throw new ArgumentNullException ("username");
@@ -143,7 +173,11 @@ namespace Gablarski.Tests
 			{
 				state = RegisterResult.Success;
 				int userId = ((users.Any()) ? users.Max (u => u.UserId) : 0) + 1;
-				users.Add (new MockUser (userId, username, password));
+
+				if (RegistrationMode != UserRegistrationMode.Approved)
+					this.users.Add (new MockUser (userId, username, password));
+				else
+					this.awaitingApproval.Add (new MockUser (userId, username, password));
 			}
 
 			return state;
@@ -154,7 +188,8 @@ namespace Gablarski.Tests
 			return this.users.Cast<IUser>();
 		}
 		
-		private List<MockUser> users = new List<MockUser>();
+		private readonly List<MockUser> awaitingApproval = new List<MockUser>();
+		private readonly List<MockUser> users = new List<MockUser>();
 		private int nextGuestId;
 	}
 }

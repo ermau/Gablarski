@@ -36,7 +36,7 @@
 
 using System.Linq;
 
-namespace Gablarski.Server
+namespace Gablarski
 {
 	public enum RegisterResult
 		: byte
@@ -47,7 +47,7 @@ namespace Gablarski.Server
 		FailedUnknown = 0,
 
 		/// <summary>
-		/// Succeeded.
+		/// Succeeded (or entered successfully for approval.)
 		/// </summary>
 		Success = 1,
 
@@ -69,6 +69,11 @@ namespace Gablarski.Server
 		/// <summary>
 		/// Failed because the user provider does not support registration or it has been disabled.
 		/// </summary>
-		FailedUnsupported = 5
+		FailedUnsupported = 5,
+
+		/// <summary>
+		/// Failed because in this pre-approval system of registration, you are not pre-approved.
+		/// </summary>
+		FailedNotApproved = 6,
 	}
 }

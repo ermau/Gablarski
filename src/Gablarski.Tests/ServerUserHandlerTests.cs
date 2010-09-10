@@ -640,6 +640,50 @@ namespace Gablarski.Tests
 		}
 
 		[Test]
+		public void RegisterNotJoinedUnsupported()
+		{
+			Connect();
+
+			users.UpdateSupported = false;
+			users.RegistrationMode = UserRegistrationMode.None;
+
+			handler.RegisterMessage (new MessageReceivedEventArgs (server,
+				new RegisterMessage ("username", "password")));
+
+			var msg = server.Client.DequeueAndAssertMessage<RegisterResultMessage>();
+			Assert.AreEqual (RegisterResult.FailedUnsupported, msg.Result);
+		}
+
+		[Test]
+		public void RegisterNotJoinedPreApproved()
+		{
+			Connect();
+
+			users.UpdateSupported = true;
+			users.RegistrationMode = UserRegistrationMode.PreApproved;
+
+			handler.RegisterMessage (new MessageReceivedEventArgs (server,
+				new RegisterMessage ("username", "password")));
+
+			server.Client.AssertNoMessage();
+		}
+
+		[Test]
+		public void RegisterNotJoined()
+		{
+			Connect();
+
+			users.UpdateSupported = true;
+			users.RegistrationMode = UserRegistrationMode.Normal;
+
+			handler.RegisterMessage (new MessageReceivedEventArgs (server,
+				new RegisterMessage ("username", "password")));
+
+			var msg = server.Client.DequeueAndAssertMessage<RegisterResultMessage>();
+			Assert.AreEqual (RegisterResult.Success, msg.Result);
+		}
+
+		[Test]
 		public void RegisterUnsupported()
 		{
 			var c1 = new MockServerConnection();
@@ -717,6 +761,127 @@ namespace Gablarski.Tests
 
 			var msg = c1.Client.DequeueAndAssertMessage<RegisterResultMessage>();
 			Assert.AreEqual (RegisterResult.Success, msg.Result);
+		}
+
+		[Test]
+		public void RegisterPreapprovedNotApproved()
+		{
+			var c1 = new MockServerConnection();
+			var u1 = JoinAsGuest (c1, "nick");
+
+			users.UpdateSupported = true;
+			users.RegistrationMode = UserRegistrationMode.PreApproved;
+
+			handler.RegisterMessage (new MessageReceivedEventArgs (c1, 
+				new RegisterMessage ("username", "password")));
+
+			var msg = c1.Client.DequeueAndAssertMessage<RegisterResultMessage>();
+			Assert.AreEqual (RegisterResult.FailedNotApproved, msg.Result);
+		}
+
+		[Test]
+		public void RegisterPreapprovedApproved()
+		{
+			var c1 = new MockServerConnection();
+			var u1 = JoinAsGuest (c1, "nick");
+
+			users.UpdateSupported = true;
+			users.RegistrationMode = UserRegistrationMode.PreApproved;
+
+			handler.ApproveRegistration (u1);
+
+			handler.RegisterMessage (new MessageReceivedEventArgs (c1, 
+				new RegisterMessage ("username", "password")));
+
+			var msg = c1.Client.DequeueAndAssertMessage<RegisterResultMessage>();
+			Assert.AreEqual (RegisterResult.Success, msg.Result);
+		}
+
+		[Test]
+		public void PreApproveRegistrationUnsupported()
+		{
+			var c1 = new MockServerConnection();
+			var u1 = JoinAsGuest (c1, "nick");
+
+			users.UpdateSupported = false;
+			users.RegistrationMode = UserRegistrationMode.None;
+			
+			Assert.Throws<NotSupportedException> (() => handler.ApproveRegistration (u1));
+		}
+
+		[Test]
+		public void PreApproveRegistrationNull()
+		{
+			Assert.Throws<ArgumentNullException> (() => handler.ApproveRegistration ((IUserInfo)null));
+		}
+
+		[Test]
+		public void ApproveRegistrationUnsupported()
+		{
+			users.UpdateSupported = false;
+			users.RegistrationMode = UserRegistrationMode.None;
+
+			Assert.Throws<NotSupportedException> (() => handler.ApproveRegistration ("monkeys"));
+		}
+
+		[Test]
+		public void ApproveRegistrationNull()
+		{
+			Assert.Throws<ArgumentNullException> (() => handler.ApproveRegistration ((string)null));
+		}
+
+		[Test]
+		public void RegistrationApprovalMessageNotSupported()
+		{
+			MockServerConnection c1 = new MockServerConnection();
+			var u1 = JoinAsGuest (c1, "nick");
+
+			users.UpdateSupported = false;
+			users.RegistrationMode = UserRegistrationMode.None;
+
+			permissions.UpdatedSupported = true;
+			permissions.EnablePermissions (u1.UserId, PermissionName.ApproveRegistrations);
+
+			handler.RegistrationApprovalMessage (new MessageReceivedEventArgs (c1,
+				new RegistrationApprovalMessage { Approved = true, UserId = 2 }));
+
+			server.Client.AssertNoMessage();
+		}
+
+		[Test]
+		public void RegistrationApprovalMessageBadUsername()
+		{
+			MockServerConnection c1 = new MockServerConnection();
+			var u1 = JoinAsGuest (c1, "nick");
+
+			users.UpdateSupported = true;
+			users.RegistrationMode = UserRegistrationMode.Approved;
+
+			permissions.UpdatedSupported = true;
+			permissions.EnablePermissions (u1.UserId, PermissionName.ApproveRegistrations);
+
+			handler.RegistrationApprovalMessage (new MessageReceivedEventArgs (c1,
+				new RegistrationApprovalMessage { Approved = true, Username = null }));
+
+			server.Client.AssertNoMessage();
+		}
+
+		[Test]
+		public void RegistrationApprovalMessageUnknownUser()
+		{
+			MockServerConnection c1 = new MockServerConnection();
+			var u1 = JoinAsGuest (c1, "nick");
+
+			users.UpdateSupported = true;
+			users.RegistrationMode = UserRegistrationMode.PreApproved;
+
+			permissions.UpdatedSupported = true;
+			permissions.EnablePermissions (u1.UserId, PermissionName.ApproveRegistrations);
+
+			handler.RegistrationApprovalMessage (new MessageReceivedEventArgs (c1,
+				new RegistrationApprovalMessage { Approved = true, UserId = 2 }));
+
+			server.Client.AssertNoMessage();
 		}
 	}
 }

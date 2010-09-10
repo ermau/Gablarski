@@ -59,6 +59,27 @@ namespace Gablarski.Server
 			get { return Manager[userId]; }
 		}
 
+		public void ApproveRegistration (string username)
+		{
+			if (username == null)
+				throw new ArgumentNullException ("username");
+			if (this.context.UserProvider.RegistrationMode != UserRegistrationMode.Approved)
+				throw new NotSupportedException();
+
+			this.context.UserProvider.ApproveRegistration (username);
+		}
+
+		public void ApproveRegistration (IUserInfo user)
+		{
+			if (user == null)
+				throw new ArgumentNullException ("user");
+			if (this.context.UserProvider.RegistrationMode != UserRegistrationMode.PreApproved)
+				throw new NotSupportedException();
+
+			lock (this.approvals)
+				this.approvals.Add (user);
+		}
+
 		public void Disconnect (IConnection connection)
 		{
 			if (connection == null)
@@ -185,6 +206,7 @@ namespace Gablarski.Server
 		internal readonly IServerUserManager Manager;
 		private readonly ILog log;
 		private readonly IServerContext context;
+		private readonly HashSet<IUserInfo> approvals = new HashSet<IUserInfo>();
 
 		internal void ConnectMessage (MessageReceivedEventArgs e)
 		{
@@ -400,6 +422,32 @@ namespace Gablarski.Server
 
 			this.Send (new UserUpdatedMessage (user));
 		}
+
+		internal void RegistrationApprovalMessage (MessageReceivedEventArgs e)
+		{
+			var msg = (RegistrationApprovalMessage)e.Message;
+
+			if (!Manager.GetIsConnected (e.Connection))
+				return;
+
+			if (!this.context.GetPermission (PermissionName.ApproveRegistrations, e.Connection))
+			{
+				e.Connection.Send (new PermissionDeniedMessage (ClientMessageType.RegistrationApproval));
+				return;
+			}
+
+			if (this.context.UserProvider.RegistrationMode == UserRegistrationMode.Approved)
+			{
+				var user = this.context.Users[msg.UserId];
+				if (user != null)
+					ApproveRegistration (user);
+			}
+			else if (this.context.UserProvider.RegistrationMode == UserRegistrationMode.PreApproved)
+			{
+				if (msg.Username != null)
+					ApproveRegistration (msg.Username);
+			}
+		}
 		
 		internal void RegisterMessage (MessageReceivedEventArgs e)
 		{
@@ -408,10 +456,40 @@ namespace Gablarski.Server
 			if (!Manager.GetIsConnected (e.Connection))
 				return;
 			
-			if (!this.context.UserProvider.UpdateSupported || this.context.UserProvider.RegistrationMode != UserRegistrationMode.Normal)
+			if (!this.context.UserProvider.UpdateSupported)
 			{
 				e.Connection.Send (new RegisterResultMessage { Result = RegisterResult.FailedUnsupported });
 				return;
+			}
+
+			switch (this.context.UserProvider.RegistrationMode)
+			{
+				case UserRegistrationMode.Approved:
+				case UserRegistrationMode.Normal:
+					break;
+
+				case UserRegistrationMode.PreApproved:
+					var user = this.context.UserManager.GetUser (e.Connection);
+					if (user == null)
+						return;
+
+					if (!this.approvals.Remove (user))
+					{
+						e.Connection.Send (new RegisterResultMessage { Result = RegisterResult.FailedNotApproved });
+						return;
+					}
+
+					break;
+
+				case UserRegistrationMode.Message:
+				case UserRegistrationMode.WebPage:
+				case UserRegistrationMode.None:
+					e.Connection.Send (new RegisterResultMessage { Result = RegisterResult.FailedUnsupported });
+					return;
+
+				default:
+					e.Connection.Send (new RegisterResultMessage { Result = RegisterResult.FailedUnknown });
+					return;
 			}
 
 			var result = this.context.UserProvider.Register (msg.Username, msg.Password);

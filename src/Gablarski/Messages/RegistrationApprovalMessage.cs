@@ -1,4 +1,4 @@
-// Copyright (c) 2010, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -34,81 +34,46 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-
-namespace Gablarski.Server
+namespace Gablarski.Messages
 {
-	public class GuestUserProvider
-		: IUserProvider
+	public class RegistrationApprovalMessage
+		: ClientMessage
 	{
-		public bool FirstUserIsAdmin
+		public RegistrationApprovalMessage()
+			: base (ClientMessageType.RegistrationApproval)
+		{
+		}
+
+		public bool Approved
 		{
 			get;
 			set;
 		}
 
-		public bool UpdateSupported
+		public string Username
 		{
-			get { return false; }
+			get;
+			set;
 		}
 
-		public UserRegistrationMode RegistrationMode
+		public int UserId
 		{
-			get { return UserRegistrationMode.None; }
+			get;
+			set;
 		}
 
-		public string RegistrationContent
+		public override void WritePayload (IValueWriter writer)
 		{
-			get { throw new NotSupportedException(); }
+			writer.WriteInt32 (UserId);
+			writer.WriteString (Username);
+			writer.WriteBool (Approved);
 		}
 
-		public Type IdentifyingType
+		public override void ReadPayload (IValueReader reader)
 		{
-			get { return typeof (Int32);}
+			UserId = reader.ReadInt32();
+			Username = reader.ReadString();
+			Approved = reader.ReadBool();
 		}
-
-		public IEnumerable<IUser> GetUsers()
-		{
-			return Enumerable.Empty<IUser>();
-		}
-
-		public IEnumerable<string> GetAwaitingRegistrations()
-		{
-			throw new NotSupportedException();
-		}
-
-		public void ApproveRegistration (string username)
-		{
-			throw new NotSupportedException();
-		}
-
-		public void RejectRegistration (string username)
-		{
-			throw new NotSupportedException();
-		}
-
-		public bool UserExists (string username)
-		{
-			return false;
-		}
-
-		public LoginResult Login (string username, string password)
-		{
-			int next = Interlocked.Decrement (ref this.nextUserId);
-			if (FirstUserIsAdmin && next == -1)
-				next = 1;
-			
-			return new LoginResult (next, LoginResultState.Success);
-		}
-
-		public RegisterResult Register (string username, string password)
-		{
-			return RegisterResult.FailedUnsupported;
-		}
-
-		private int nextUserId = 0;
 	}
 }

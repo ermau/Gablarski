@@ -38,17 +38,22 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Gablarski.Server
+namespace Gablarski
 {
 	public enum UserRegistrationMode
 		: byte
 	{
 		None = 0,
 		Normal = 1,
-		WebPage = 2,
-		Message = 3
+		Approved = 2,
+		PreApproved = 3,
+		WebPage = 4,
+		Message = 5
 	}
+}
 
+namespace Gablarski.Server
+{
 	public interface IUserProvider
 	{
 		/// <summary>
@@ -62,14 +67,14 @@ namespace Gablarski.Server
 		UserRegistrationMode RegistrationMode { get; }
 
 		/// <summary>
-		/// Gets the content for any of the various forms of <see cref="Server.UserRegistrationMode"/>.
+		/// Gets the content for any of the various forms of <see cref="UserRegistrationMode"/>.
 		/// </summary>
-		/// <exception cref="NotSupportedException"><see cref="RegistrationMode"/> is <see cref="Server.UserRegistrationMode.None"/>.</exception>
+		/// <exception cref="NotSupportedException"><see cref="RegistrationMode"/> is <see cref="UserRegistrationMode.None"/>.</exception>
 		/// <remarks>
 		/// When <see cref="RegistrationMode"/> is:
-		/// <see cref="Server.UserRegistrationMode.Normal"/>: This is the user agreement to register (<c>null</c>/<c>String.Empty</c> to skip.)
-		/// <see cref="Server.UserRegistrationMode.WebPage"/>: This is the URL.
-		/// <see cref="Server.UserRegistrationMode.Message"/>: This is the message.
+		/// <see cref="UserRegistrationMode.Normal"/>: This is the user agreement to register (<c>null</c>/<c>String.Empty</c> to skip.)
+		/// <see cref="UserRegistrationMode.WebPage"/>: This is the URL.
+		/// <see cref="UserRegistrationMode.Message"/>: This is the message.
 		/// </remarks>
 		string RegistrationContent { get; }
 
@@ -77,6 +82,29 @@ namespace Gablarski.Server
 		/// Gets all the users.
 		/// </summary>
 		IEnumerable<IUser> GetUsers();
+
+		/// <summary>
+		/// Gets the usernames for awaiting approvals.
+		/// </summary>
+		/// <returns>The usernames of awaiting approvals.</returns>
+		/// <exception cref="NotSupportedException">Approvals are not supported.</exception>
+		IEnumerable<string> GetAwaitingRegistrations();
+
+		/// <summary>
+		/// Approves the registration of <paramref name="username"/>.
+		/// </summary>
+		/// <param name="username">The username to approve.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="username"/> is <c>null</c>.</exception>
+		/// <exception cref="NotSupportedException">Approvals are not supported.</exception>
+		void ApproveRegistration (string username);
+
+		/// <summary>
+		/// Rejects the registration of <paramref name="username"/>.
+		/// </summary>
+		/// <param name="username">The username to reject.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="username"/> is <c>null</c>.</exception>
+		/// <exception cref="NotSupportedException">Approvals are not supported.</exception>
+		void RejectRegistration (string username);
 
 		/// <summary>
 		/// Gets whether a user exists or not.

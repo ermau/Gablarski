@@ -97,7 +97,7 @@ namespace Gablarski.Client
 		public event EventHandler<ChannelChangedEventArgs> UserChangedChannel;
 
 		/// <summary>
-		/// Received an unsucessful result of a change channel request.
+		/// Received an unsuccessful result of a change channel request.
 		/// </summary>
 		public event EventHandler<ReceivedChannelChannelResultEventArgs> ReceivedChannelChangeResult;
 		#endregion
@@ -123,6 +123,36 @@ namespace Gablarski.Client
 				throw new ArgumentNullException ("targetChannel");
 
 			this.context.Connection.Send (new ChannelChangeMessage (user.UserId, targetChannel.ChannelId));
+		}
+
+		public void ApproveRegistration (IUserInfo userInfo)
+		{
+			if (userInfo == null)
+				throw new ArgumentNullException ("userInfo");
+			if (context.ServerInfo.RegistrationMode != UserRegistrationMode.PreApproved)
+				throw new NotSupportedException();
+
+			this.context.Connection.Send (new RegistrationApprovalMessage { Approved = true, UserId = userInfo.UserId });
+		}
+
+		public void ApproveRegistration (string username)
+		{
+			if (username == null)
+				throw new ArgumentNullException ("username");
+			if (context.ServerInfo.RegistrationMode != UserRegistrationMode.Approved)
+				throw new NotSupportedException();
+
+			this.context.Connection.Send (new RegistrationApprovalMessage { Approved = true, Username = username });
+		}
+
+		public void RejectRegistration (string username)
+		{
+			if (username == null)
+				throw new ArgumentNullException ("username");
+			if (context.ServerInfo.RegistrationMode != UserRegistrationMode.Approved)
+				throw new NotSupportedException();
+
+			this.context.Connection.Send (new RegistrationApprovalMessage { Approved = false, Username = username });
 		}
 
 		public bool GetIsIgnored (IUserInfo user)

@@ -38,7 +38,7 @@ using System.Linq;
 
 namespace Gablarski.Messages
 {
-	// Next: 54
+	// Next: 55
 
 	public enum ClientMessageType
 		: ushort
@@ -73,6 +73,7 @@ namespace Gablarski.Messages
 		SetPermissions = 52,
 		KickUser = 50,
 		BanUser = 51,
+		RegistrationApproval = 54,
 	}
 
 	public enum ServerMessageType
@@ -109,8 +110,6 @@ namespace Gablarski.Messages
 		ChannelList = 19,
 		ChangeChannelResult = 21,
 		ChannelEditResult = 23,
-
-		
 	}
 
 	public abstract class Message<TMessage>

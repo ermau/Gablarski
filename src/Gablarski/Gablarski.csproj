@@ -138,6 +138,7 @@
     <Compile Include="Messages\RedirectMessage.cs" />
     <Compile Include="Messages\RegisterMessage.cs" />
     <Compile Include="Messages\RegisterResultMessage.cs" />
+    <Compile Include="Messages\RegistrationApprovalMessage.cs" />
     <Compile Include="Messages\RequestMuteMessage.cs" />
     <Compile Include="Messages\SourceMutedMessage.cs" />
     <Compile Include="Messages\UserMutedMessage.cs" />

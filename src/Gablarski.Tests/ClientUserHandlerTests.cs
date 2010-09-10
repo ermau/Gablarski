@@ -147,5 +147,24 @@ namespace Gablarski.Tests
 
 			Assert.IsTrue (this.handler.GetIsIgnored (user));
 		}
+
+		[Test]
+		public void ApproveRegistrationNull()
+		{
+			Assert.Throws<ArgumentNullException> (() => this.handler.ApproveRegistration ((string)null));
+			Assert.Throws<ArgumentNullException> (() => this.handler.ApproveRegistration ((IUserInfo)null));
+		}
+
+		//[Test]
+		//public void ApproveRegistrationUnsupported()
+		//{
+			
+		//}
+
+		[Test]
+		public void RejectRegistrationNull()
+		{
+			Assert.Throws<ArgumentNullException> (() => this.handler.RejectRegistration (null));
+		}
 	}
 }

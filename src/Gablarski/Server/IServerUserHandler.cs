@@ -35,9 +35,7 @@
 // DAMAGE.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Gablarski.Messages;
 
 namespace Gablarski.Server
@@ -55,6 +53,20 @@ namespace Gablarski.Server
 		/// The main reasons for a failed move are that the user or channel no longer exists.
 		/// </remarks>
 		void Move (IUserInfo user, ChannelInfo targetChannel);
+
+		/// <summary>
+		/// Pre-approves registration for <paramref name="user"/>.
+		/// </summary>
+		/// <param name="user">The user to pre-approve for registration.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
+		void ApproveRegistration (IUserInfo user);
+
+		/// <summary>
+		/// Approves the awaiting registration with the <paramref name="username"/>.
+		/// </summary>
+		/// <param name="username">The username for the awaiting registration.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="username"/> is <c>null</c>.</exception>
+		void ApproveRegistration (string username);
 
 		void Send (MessageBase message, Func<IConnection, IUserInfo, bool> predicate);
 
