@@ -234,10 +234,10 @@ namespace Gablarski.OpenAL.Providers
 					this.device.Dispose();
 			}
 
-			this.pool = null;
-			this.device = null;
 			OpenALRunner.RemoveUser();
 			OpenALRunner.RemovePlaybackProvider (this);
+			this.pool = null;
+			this.device = null;
 			this.isDisposed = true;
 		}
 
