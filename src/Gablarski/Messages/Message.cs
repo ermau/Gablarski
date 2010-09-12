@@ -106,7 +106,7 @@ namespace Gablarski.Messages
 		UserChangedChannel = 27,
 		UserMuted = 31,
 		UserUpdated = 46,
-		Kicked = 55,
+		UserKicked = 55,
 
 		ChannelList = 19,
 		ChangeChannelResult = 21,

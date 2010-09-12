@@ -42,7 +42,7 @@ namespace Gablarski.Messages
 		: ServerMessage
 	{
 		public UserKickedMessage()
-			: base (ServerMessageType.Kicked)
+			: base (ServerMessageType.UserKicked)
 		{
 		}
 

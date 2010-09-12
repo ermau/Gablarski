@@ -57,21 +57,7 @@ namespace Gablarski.Client
 			this.context.RegisterMessageHandler (ServerMessageType.LoginResult, OnLoginResultMessage);
 			this.context.RegisterMessageHandler (ServerMessageType.JoinResult, OnJoinResultMessage);
 			this.context.RegisterMessageHandler (ServerMessageType.Permissions, OnPermissionsMessage);
-		}
-
-		private void OnUserChangedChannelMessage (MessageReceivedEventArgs e)
-		{
-			var msg = (UserChangedChannelMessage) e.Message;
-
-			var channel = this.context.Channels[msg.ChangeInfo.TargetChannelId];
-			if (channel == null)
-				return;
-
-			var user = this.context.Users[msg.ChangeInfo.TargetUserId];
-			if (user == null || !user.Equals (this))
-				return;
-
-			this.CurrentChannelId = msg.ChangeInfo.TargetChannelId;
+			this.context.RegisterMessageHandler (ServerMessageType.UserKicked, OnUserKickedMessage);
 		}
 
 		internal CurrentUser (IClientContext context, int userId, string nickname, int currentChannelId)
@@ -89,6 +75,19 @@ namespace Gablarski.Client
 			this.CurrentChannelId = currentChannelId;
 		}
 
+		#region Events
+		/// <summary>
+		/// A login result has been received.
+		/// </summary>
+		public event EventHandler<ReceivedLoginResultEventArgs> ReceivedLoginResult;
+
+		public event EventHandler<ReceivedJoinResultEventArgs> ReceivedJoinResult;
+
+		public event EventHandler PermissionsChanged;
+
+		public event EventHandler Kicked;
+		#endregion
+
 		public IEnumerable<Permission> Permissions
 		{
 			get
@@ -99,17 +98,6 @@ namespace Gablarski.Client
 				}
 			}
 		}
-
-		#region Events
-		/// <summary>
-		/// A login result has been received.
-		/// </summary>
-		public event EventHandler<ReceivedLoginResultEventArgs> ReceivedLoginResult;
-
-		public event EventHandler<ReceivedJoinResultEventArgs> ReceivedJoinResult;
-
-		public event EventHandler PermissionsChanged;
-		#endregion
 
 		public void Login (string username, string password)
 		{
@@ -230,6 +218,38 @@ namespace Gablarski.Client
 			var join = this.ReceivedJoinResult;
 			if (join != null)
 				join (this, e);
+		}
+
+		protected virtual void OnKicked (EventArgs e)
+		{
+			var kicked = this.Kicked;
+			if (kicked != null)
+				kicked (this, e);
+		}
+
+		private void OnUserKickedMessage (MessageReceivedEventArgs e)
+		{
+			var msg = (UserKickedMessage)e.Message;
+
+			if (msg.UserId != UserId)
+				return;
+
+			OnKicked (EventArgs.Empty);
+		}
+
+		private void OnUserChangedChannelMessage (MessageReceivedEventArgs e)
+		{
+			var msg = (UserChangedChannelMessage) e.Message;
+
+			var channel = this.context.Channels[msg.ChangeInfo.TargetChannelId];
+			if (channel == null)
+				return;
+
+			var user = this.context.Users[msg.ChangeInfo.TargetUserId];
+			if (user == null || !user.Equals (this))
+				return;
+
+			this.CurrentChannelId = msg.ChangeInfo.TargetChannelId;
 		}
 
 		private void OnUserUpdatedMessage (MessageReceivedEventArgs e)

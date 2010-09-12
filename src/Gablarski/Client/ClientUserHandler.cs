@@ -63,7 +63,7 @@ namespace Gablarski.Client
 			this.context.RegisterMessageHandler (ServerMessageType.UserLoggedIn, OnUserJoinedMessage);
 			this.context.RegisterMessageHandler (ServerMessageType.UserDisconnected, OnUserDisconnectedMessage);
 			this.context.RegisterMessageHandler (ServerMessageType.UserMuted, OnUserMutedMessage);
-			this.context.RegisterMessageHandler (ServerMessageType.Kicked, OnUserKickedMessage);
+			this.context.RegisterMessageHandler (ServerMessageType.UserKicked, OnUserKickedMessage);
 		}
 
 		#region Events

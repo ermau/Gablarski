@@ -309,6 +309,38 @@ namespace Gablarski.Tests
 			Assert.AreEqual (UserStatus.MutedMicrophone, msg.Status);
 		}
 
+		[Test]
+		public void RegistrationApprovalUserId()
+		{
+			var msg = new RegistrationApprovalMessage { UserId = 2, Approved = true };
+
+			msg = AssertLengthMatches (msg);
+			Assert.AreEqual (2, msg.UserId);
+			Assert.AreEqual (true, msg.Approved);
+			Assert.AreEqual (String.Empty, msg.Username);
+		}
+
+		[Test]
+		public void RegistrationApprovalUsername()
+		{
+			var msg = new RegistrationApprovalMessage { Username = "blargle", Approved = true };
+
+			msg = AssertLengthMatches (msg);
+			Assert.AreEqual ("blargle", msg.Username);
+			Assert.AreEqual (true, msg.Approved);
+			Assert.AreEqual (0, msg.UserId);
+		}
+
+		[Test]
+		public void KickUser()
+		{
+			var msg = new KickUserMessage { UserId = 1, FromServer = true };
+			
+			msg = AssertLengthMatches (msg);
+			Assert.AreEqual (true, msg.FromServer);
+			Assert.AreEqual (1, msg.UserId);
+		}
+
 		private T AssertLengthMatches<T> (T msg)
 			where T : MessageBase, new()
 		{

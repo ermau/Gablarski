@@ -93,6 +93,7 @@
     <Compile Include="ClientSourceHandlerTests.cs" />
     <Compile Include="ClientSourceManagerTests.cs" />
     <Compile Include="ClientUserHandlerTests.cs" />
+    <Compile Include="CurrentUserTests.cs" />
     <Compile Include="ExtensionTests.cs" />
     <Compile Include="ClientMessageTests.cs" />
     <Compile Include="Mocks\Audio\MockAudioDevice.cs" />

@@ -46,6 +46,7 @@ namespace Gablarski.Client
 		event EventHandler PermissionsChanged;
 		event EventHandler<ReceivedJoinResultEventArgs> ReceivedJoinResult;
 		event EventHandler<ReceivedLoginResultEventArgs> ReceivedLoginResult;
+		event EventHandler Kicked;
 
 		IEnumerable<Permission> Permissions { get; }
 
