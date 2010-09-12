@@ -63,6 +63,7 @@ namespace Gablarski.Client
 			this.context.RegisterMessageHandler (ServerMessageType.UserLoggedIn, OnUserJoinedMessage);
 			this.context.RegisterMessageHandler (ServerMessageType.UserDisconnected, OnUserDisconnectedMessage);
 			this.context.RegisterMessageHandler (ServerMessageType.UserMuted, OnUserMutedMessage);
+			this.context.RegisterMessageHandler (ServerMessageType.Kicked, OnUserKickedMessage);
 		}
 
 		#region Events
@@ -95,6 +96,16 @@ namespace Gablarski.Client
 		/// A user has changed channels.
 		/// </summary>
 		public event EventHandler<ChannelChangedEventArgs> UserChangedChannel;
+
+		/// <summary>
+		/// A user was kicked from your current channel.
+		/// </summary>
+		public event EventHandler<UserEventArgs> UserKickedFromChannel;
+
+		/// <summary>
+		/// A user was kicked from the server.
+		/// </summary>
+		public event EventHandler<UserEventArgs> UserKickedFromServer;
 
 		/// <summary>
 		/// Received an unsuccessful result of a change channel request.
@@ -229,6 +240,20 @@ namespace Gablarski.Client
 		private readonly IClientContext context;
 
 		#region Message handlers
+		internal void OnUserKickedMessage (MessageReceivedEventArgs e)
+		{
+			var msg = (UserKickedMessage) e.Message;
+
+			IUserInfo user;
+			lock (this.manager.SyncRoot)
+				user = this.manager[msg.UserId];
+
+			if (msg.FromServer)
+				OnUserKickedFromServer (new UserEventArgs (user));
+			else
+				OnUserKickedFromChannel (new UserEventArgs (user));
+		}
+
 		internal void OnUserMutedMessage (MessageReceivedEventArgs e)
 		{
 			var msg = (UserMutedMessage) e.Message;
@@ -385,6 +410,20 @@ namespace Gablarski.Client
 			var result = this.ReceivedChannelChangeResult;
 			if (result != null)
 				result (this, e);
+		}
+
+		private void OnUserKickedFromServer (UserEventArgs e)
+		{
+			var kicked = UserKickedFromServer;
+			if (kicked != null)
+				kicked (this, e);
+		}
+
+		private void OnUserKickedFromChannel (UserEventArgs e)
+		{
+			var kicked = UserKickedFromChannel;
+			if (kicked != null)
+				kicked (this, e);
 		}
 		#endregion
 	}

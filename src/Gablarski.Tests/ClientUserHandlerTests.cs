@@ -183,16 +183,96 @@ namespace Gablarski.Tests
 			Assert.AreEqual (userId, msg.UserId);
 		}
 
-		//[Test]
-		//public void ApproveRegistrationUnsupported()
-		//{
-			
-		//}
+		[Test]
+		public void ApproveRegistrationUnsupported()
+		{
+			userProvider.UpdateSupported = false;
+			userProvider.RegistrationMode = UserRegistrationMode.None;
+			context = new MockClientContext { Connection = this.server.Client, ServerInfo = new ServerInfo (new ServerSettings(), userProvider, new PublicRSAParameters()) };
+			this.handler = new ClientUserHandler (context, this.userManager);
+
+			CreateUsers (this.server.Client, this.handler);
+
+			var user = this.handler.First();
+			int userId = user.UserId;
+
+			Assert.Throws<NotSupportedException>(() => this.handler.ApproveRegistration (user));
+		}
 
 		[Test]
 		public void RejectRegistrationNull()
 		{
 			Assert.Throws<ArgumentNullException> (() => this.handler.RejectRegistration (null));
+		}
+
+		[Test]
+		public void KickNull()
+		{
+			Assert.Throws<ArgumentNullException> (() => this.handler.Kick (null, true));
+		}
+
+		[Test]
+		public void KickFromServer()
+		{
+			CreateUsers (this.server.Client, this.handler);
+			var admin = this.handler.First();
+			var target = this.handler.Skip (1).First();
+
+			this.handler.Kick (target, true);
+
+			var kick = server.DequeueAndAssertMessage<KickUserMessage>();
+			Assert.AreEqual (target.UserId, kick.UserId);
+			Assert.AreEqual (true, kick.FromServer);
+		}
+
+		[Test]
+		public void KickFromChannel()
+		{
+			CreateUsers (this.server.Client, this.handler);
+			var admin = this.handler.First();
+			var target = this.handler.Skip (1).First();
+
+			this.handler.Kick (target, false);
+
+			var kick = server.DequeueAndAssertMessage<KickUserMessage>();
+			Assert.AreEqual (target.UserId, kick.UserId);
+			Assert.AreEqual (false, kick.FromServer);
+		}
+
+		[Test]
+		public void UserKickedFromChannel()
+		{
+			CreateUsers (this.server.Client, this.handler);
+			var target = this.handler.First();
+
+			handler.UserKickedFromChannel += (sender, e) =>
+			{
+				Assert.AreEqual (target.UserId, e.User.UserId);
+				Assert.Pass();
+			};
+
+			handler.OnUserKickedMessage (new MessageReceivedEventArgs (server.Client,
+				new UserKickedMessage { UserId = target.UserId, FromServer = false }));
+
+			Assert.Fail ("UserKickedFromChannel event was not fired.");
+		}
+
+		[Test]
+		public void UserKickedFromServer()
+		{
+			CreateUsers (this.server.Client, this.handler);
+			var target = this.handler.First();
+
+			handler.UserKickedFromServer += (sender, e) =>
+			{
+				Assert.AreEqual (target.UserId, e.User.UserId);
+				Assert.Pass();
+			};
+
+			handler.OnUserKickedMessage (new MessageReceivedEventArgs (server.Client,
+				new UserKickedMessage { UserId = target.UserId, FromServer = true}));
+
+			Assert.Fail ("UserKickedFromServer event was not fired.");
 		}
 	}
 }

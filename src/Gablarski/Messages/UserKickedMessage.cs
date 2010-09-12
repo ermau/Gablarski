@@ -38,10 +38,10 @@ using System.Linq;
 
 namespace Gablarski.Messages
 {
-	public class KickedMessage
+	public class UserKickedMessage
 		: ServerMessage
 	{
-		public KickedMessage()
+		public UserKickedMessage()
 			: base (ServerMessageType.Kicked)
 		{
 		}

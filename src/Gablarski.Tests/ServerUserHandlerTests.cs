@@ -964,7 +964,7 @@ namespace Gablarski.Tests
 			handler.KickUserMessage (new MessageReceivedEventArgs (c1,
 				new KickUserMessage (target, false)));
 
-			var kicked = server.Client.DequeueAndAssertMessage<KickedMessage>();
+			var kicked = server.Client.DequeueAndAssertMessage<UserKickedMessage>();
 			Assert.AreEqual (target.UserId, kicked.UserId);
 			Assert.AreEqual (false, kicked.FromServer);
 
@@ -986,11 +986,11 @@ namespace Gablarski.Tests
 			handler.KickUserMessage (new MessageReceivedEventArgs (c1,
 				new KickUserMessage (target, true)));
 
-			var kicked = server.Client.DequeueAndAssertMessage<KickedMessage>();
+			var kicked = server.Client.DequeueAndAssertMessage<UserKickedMessage>();
 			Assert.AreEqual (target.UserId, kicked.UserId);
 			Assert.AreEqual (true, kicked.FromServer);
 
-			kicked = c1.Client.DequeueAndAssertMessage<KickedMessage>();
+			kicked = c1.Client.DequeueAndAssertMessage<UserKickedMessage>();
 			Assert.AreEqual (target.UserId, kicked.UserId);
 			Assert.AreEqual (true, kicked.FromServer);
 

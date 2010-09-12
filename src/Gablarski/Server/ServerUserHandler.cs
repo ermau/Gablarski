@@ -416,7 +416,7 @@ namespace Gablarski.Server
 				return;
 			}
 
-			context.Users.Send (new KickedMessage { FromServer = msg.FromServer, UserId = msg.UserId });
+			context.Users.Send (new UserKickedMessage { FromServer = msg.FromServer, UserId = msg.UserId });
 
 			if (msg.FromServer)
 				Disconnect (user, DisconnectionReason.Kicked);

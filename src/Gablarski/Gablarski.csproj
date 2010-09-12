@@ -130,7 +130,7 @@
     <Compile Include="Messages\ClientAudioSourceStateChangeMessage.cs" />
     <Compile Include="Messages\JoinMessage.cs" />
     <Compile Include="Messages\JoinResultMessage.cs" />
-    <Compile Include="Messages\KickedMessage.cs" />
+    <Compile Include="Messages\UserKickedMessage.cs" />
     <Compile Include="Messages\KickUserMessage.cs" />
     <Compile Include="Messages\PermissionDeniedMessage.cs" />
     <Compile Include="Messages\PermissionsMessage.cs" />
