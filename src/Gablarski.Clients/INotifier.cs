@@ -100,6 +100,11 @@ namespace Gablarski.Clients
 		UserLeftChannel,
 
 		/// <summary>
+		/// Someone received a boot to the head.
+		/// </summary>
+		UserKicked,
+
+		/// <summary>
 		/// A media source has started playing.
 		/// </summary>
 		SourceStartsPlaying,
@@ -118,6 +123,11 @@ namespace Gablarski.Clients
 		/// <summary>
 		/// General information.
 		/// </summary>
-		Info
+		Info,
+
+		/// <summary>
+		/// Important information.
+		/// </summary>
+		Important
 	}
 }

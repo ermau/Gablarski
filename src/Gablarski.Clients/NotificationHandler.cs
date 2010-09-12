@@ -61,6 +61,8 @@ namespace Gablarski.Clients
 			this.client.Users.UserJoined += OnUserJoined;
 			this.client.Users.UserDisconnected += OnUserDisconnected;
 			this.client.Users.UserChangedChannel += OnUserChangedChannel;
+			this.client.Users.UserKickedFromChannel += OnUserKickedFromChannel;
+			this.client.Users.UserKickedFromServer += OnUserKickedFromServer;
 		}
 
 		/// <summary>
@@ -205,14 +207,25 @@ namespace Gablarski.Clients
 		private readonly HashSet<ITextToSpeech> speechNotifiers = new HashSet<ITextToSpeech>();
 		private readonly GablarskiClient client;
 
+		private void OnUserKickedFromServer (object sender, UserEventArgs e)
+		{
+			Notify (NotificationType.UserKicked, "{0} was kicked from the server.", e.User.Nickname, e.User.Phonetic, NotifyPriority.Important);
+		}
+
+		private void OnUserKickedFromChannel (object sender, UserEventArgs e)
+		{
+			if (e.User.CurrentChannelId == client.CurrentUser.CurrentChannelId)
+				Notify (NotificationType.UserKicked, "{0} was kicked from the channel.", e.User.Nickname, e.User.Phonetic, NotifyPriority.Important);
+		}
+
 		private void OnClientDisconnected (object sender, EventArgs e)
 		{
-			Notify (NotificationType.Disconnected, "Disconnected");
+			Notify (NotificationType.Disconnected, "Disconnected.");
 		}
 
 		private void OnUserDisconnected (object sender, UserEventArgs e)
 		{
-			if (!e.User.Equals (client.CurrentChannel))
+			if (!e.User.Equals (client.CurrentUser))
 				Notify (NotificationType.UserLeftServer, "{0} has left the server.", e.User.Nickname, e.User.Phonetic);
 		}
 
@@ -225,7 +238,7 @@ namespace Gablarski.Clients
 		private void OnUserChangedChannel (object sender, ChannelChangedEventArgs e)
 		{
 			if (e.User.Equals (client.CurrentUser))
-				Notify (NotificationType.SwitchedChannel, "Switched to channel " + e.TargetChannel.Name);
+				Notify (NotificationType.SwitchedChannel, "Switched to channel " + e.TargetChannel.Name + ".");
 			else if (e.TargetChannel.Equals (client.CurrentChannel))
 				Notify (NotificationType.UserJoinedChannel, "{0} joined the channel.", e.User.Nickname, e.User.Phonetic);
 			else if (e.PreviousChannel.Equals (client.CurrentChannel))

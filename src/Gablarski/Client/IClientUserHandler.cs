@@ -75,6 +75,16 @@ namespace Gablarski.Client
 		event EventHandler<ChannelChangedEventArgs> UserChangedChannel;
 
 		/// <summary>
+		/// A user was kicked from their current channel to the default channel.
+		/// </summary>
+		event EventHandler<UserEventArgs> UserKickedFromChannel;
+
+		/// <summary>
+		/// A user was kicked from the server.
+		/// </summary>
+		event EventHandler<UserEventArgs> UserKickedFromServer;
+
+		/// <summary>
 		/// Gets the current user.
 		/// </summary>
 		IUserInfo Current { get; }

@@ -39,6 +39,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
+using Gablarski.Clients;
 using Growl.Connector;
 using System.IO;
 using NotificationType=Growl.Connector.NotificationType;
@@ -110,6 +111,9 @@ namespace Gablarski.Growl
 		{
 			switch (priority)
 			{
+				case NotifyPriority.Important:
+					return Priority.High;
+
 				case Clients.NotifyPriority.Info:
 				default:
 					return Priority.Normal;
