@@ -146,13 +146,8 @@ namespace Gablarski.Server
 			if (predicate == null)
 				throw new ArgumentNullException ("predicate");
 
-			foreach (IConnection c in Manager.GetConnections().Where (predicate))
-			{
-				if (!c.IsConnected)
-					continue;
-
+			foreach (IConnection c in Manager.GetConnections().Where (c => c.IsConnected).Where (predicate))
 				c.Send (message);
-			}
 		}
 
 		public void Send (MessageBase message, Func<IConnection, IUserInfo, bool> predicate)
@@ -164,16 +159,11 @@ namespace Gablarski.Server
 
 			var connections = from c in Manager.GetConnections()
 			                  let u = Manager.GetUser (c)
-			                  where u != null && predicate (c, u)
+			                  where c.IsConnected && u != null && predicate (c, u)
 			                  select c;
 
 			foreach (IConnection c in connections)
-			{
-				if (!c.IsConnected)
-					continue;
-
 				c.Send (message);
-			}
 		}
 
 		public void Disconnect (IUserInfo user, DisconnectionReason reason)
@@ -187,6 +177,8 @@ namespace Gablarski.Server
 
 			c.Send (new DisconnectMessage (reason));
 			c.DisconnectAsync();
+
+			Send (new UserDisconnectedMessage (user.UserId), ic => ic != c);
 		}
 
 		#region IEnumerable<UserInfo> Members
@@ -383,7 +375,10 @@ namespace Gablarski.Server
 			var msg = (RequestMuteUserMessage)e.Message;
 
 			if (!context.GetPermission (PermissionName.MuteUser, e.Connection))
+			{
+				e.Connection.Send (new PermissionDeniedMessage (ClientMessageType.RequestMuteUser));
 				return;
+			}
 
 			IUserInfo user = Manager.FirstOrDefault (u => u.UserId == msg.TargetId);
 			if (user == null)
@@ -395,6 +390,38 @@ namespace Gablarski.Server
 				return;
 
 			this.Send (new UserMutedMessage { UserId = user.UserId, Unmuted = msg.Unmute });
+		}
+
+		internal void KickUserMessage (MessageReceivedEventArgs e)
+		{
+			var msg = (KickUserMessage)e.Message;
+
+			var kicker = context.UserManager.GetUser (e.Connection);
+			if (kicker == null)
+				return;
+
+			if (msg.FromServer && !context.GetPermission (PermissionName.KickPlayerFromServer, e.Connection))
+			{
+				e.Connection.Send (new PermissionDeniedMessage (ClientMessageType.KickUser));
+				return;
+			}
+
+			var user = this.context.Users[msg.UserId];
+			if (user == null)
+				return;
+
+			if (!msg.FromServer && !context.GetPermission (PermissionName.KickPlayerFromChannel, user.CurrentChannelId, kicker.UserId))
+			{
+				e.Connection.Send (new PermissionDeniedMessage (ClientMessageType.KickUser));
+				return;
+			}
+
+			context.Users.Send (new KickedMessage { FromServer = msg.FromServer, UserId = msg.UserId });
+
+			if (msg.FromServer)
+				Disconnect (user, DisconnectionReason.Kicked);
+			else
+				context.Users.Move (user, context.ChannelsProvider.DefaultChannel);
 		}
 
 		internal void SetCommentMessage (MessageReceivedEventArgs e)

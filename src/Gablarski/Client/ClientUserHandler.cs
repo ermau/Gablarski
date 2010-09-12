@@ -173,11 +173,19 @@ namespace Gablarski.Client
 			context.Connection.Send (new RequestMuteUserMessage (user, !user.IsMuted));
 		}
 
+		public void Kick (IUser user, bool fromServer)
+		{
+			if (user == null)
+				throw new ArgumentNullException ("user");
+
+			this.context.Connection.Send (new KickUserMessage (user, fromServer));
+		}
+
 		public IEnumerable<IUserInfo> GetUsersInChannel (int channelId)
 		{
 			lock (SyncRoot)
 			{
-				return this.channels[channelId].Cast<IUserInfo>().ToList();
+				return this.channels[channelId].ToList();
 			}
 		}
 

@@ -183,7 +183,6 @@ namespace Gablarski.Network
 		private void Incoming ()
 		{
 			var cs = this.connections;
-			var tl = this.tcpListener;
 
 			byte[] buffer = new byte[5120];
 			var reader = new ByteArrayValueReader (buffer);
@@ -214,10 +213,8 @@ namespace Gablarski.Network
 					uint nid = reader.ReadUInt32 ();
 
 					NetworkServerConnection connection;
-					lock (connections)
-					{
-						connections.TryGetValue (nid, out connection);
-					}
+					lock (cs)
+						cs.TryGetValue (nid, out connection);
 
 					ushort mtype = reader.ReadUInt16 ();
 

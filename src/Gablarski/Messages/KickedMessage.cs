@@ -34,57 +34,25 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Gablarski.Messages
 {
-	public enum DisconnectionReason
-		: byte
-	{
-		Unknown = 0,
-
-		/// <summary>
-		/// Disconnected because the user logged in elsewhere.
-		/// </summary>
-		/// <remarks>
-		/// Do not reconnect.
-		/// </remarks>
-		LoggedInElsewhere = 1,
-
-		/// <summary>
-		/// Disconnected because the user requested it.
-		/// </summary>
-		/// <remarks>
-		/// Do not reconnect.
-		/// </remarks>
-		Requested = 2,
-
-		/// <summary>
-		/// Disconnected because you were impolitely asked to leave.
-		/// </summary>
-		/// <remarks>
-		/// Do not reconnect.
-		/// </remarks>
-		Kicked = 3,
-	}
-
-	public class DisconnectMessage
+	public class KickedMessage
 		: ServerMessage
 	{
-		public DisconnectMessage ()
-			: base (ServerMessageType.Disconnect)
+		public KickedMessage()
+			: base (ServerMessageType.Kicked)
 		{
 		}
 
-		public DisconnectMessage (DisconnectionReason reason)
-			: this()
+		public int UserId
 		{
-			Reason = reason;
+			get;
+			set;
 		}
 
-		public DisconnectionReason Reason
+		public bool FromServer
 		{
 			get;
 			set;
@@ -92,12 +60,14 @@ namespace Gablarski.Messages
 
 		public override void WritePayload (IValueWriter writer)
 		{
-			writer.WriteByte ((byte)Reason);
+			writer.WriteBool (FromServer);
+			writer.WriteInt32 (UserId);
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
-			Reason = (DisconnectionReason)reader.ReadByte ();
+			FromServer = reader.ReadBool();
+			UserId = reader.ReadInt32();
 		}
 	}
 }

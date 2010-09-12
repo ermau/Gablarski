@@ -135,6 +135,14 @@ namespace Gablarski.Client
 		void Move (IUserInfo user, ChannelInfo targetChannel);
 
 		/// <summary>
+		/// Kicks a user to the default channel or from the server.
+		/// </summary>
+		/// <param name="user">The user to kick.</param>
+		/// <param name="fromServer">Whether to kick the user from the server or just from the default channel.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
+		void Kick (IUser user, bool fromServer);
+
+		/// <summary>
 		/// Attempts to toggle mute on <paramref name="user"/>.
 		/// </summary>
 		/// <param name="user">The user to attempt to mute.</param>

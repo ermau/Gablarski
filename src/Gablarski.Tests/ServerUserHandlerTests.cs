@@ -883,5 +883,118 @@ namespace Gablarski.Tests
 
 			server.Client.AssertNoMessage();
 		}
+
+		[Test]
+		public void KickUserNotConnected()
+		{
+			MockServerConnection c1 = new MockServerConnection();
+
+			handler.KickUserMessage (new MessageReceivedEventArgs (c1,
+				new KickUserMessage (JoinAsGuest (server, "nick"), true)));
+
+			c1.Client.AssertNoMessage();
+		}
+
+		[Test]
+		public void KickUserChannelNotAllowed()
+		{
+			MockServerConnection c1 = new MockServerConnection();
+			var admin = JoinAsGuest (c1, "admin");
+
+			var target = JoinAsGuest (server, "target");
+			c1.Client.DequeueAndAssertMessage<UserJoinedMessage>();
+
+			handler.KickUserMessage (new MessageReceivedEventArgs (c1,
+				new KickUserMessage (target, false)));
+
+			Assert.AreEqual (ClientMessageType.KickUser, c1.Client.DequeueAndAssertMessage<PermissionDeniedMessage>().DeniedMessage);
+
+
+			permissions.EnablePermissions (admin.UserId, PermissionName.KickPlayerFromServer);
+
+			handler.KickUserMessage (new MessageReceivedEventArgs (c1,
+				new KickUserMessage (target, false)));
+
+			Assert.AreEqual (ClientMessageType.KickUser, c1.Client.DequeueAndAssertMessage<PermissionDeniedMessage>().DeniedMessage);
+		}
+
+		[Test]
+		public void KickUserServerNotAllowed()
+		{
+			MockServerConnection c1 = new MockServerConnection();
+			var admin = JoinAsGuest (c1, "admin");
+
+			var target = JoinAsGuest (server, "target");
+			c1.Client.DequeueAndAssertMessage<UserJoinedMessage>();
+
+			handler.KickUserMessage (new MessageReceivedEventArgs (c1,
+				new KickUserMessage (target, true)));
+
+			Assert.AreEqual (ClientMessageType.KickUser, c1.Client.DequeueAndAssertMessage<PermissionDeniedMessage>().DeniedMessage);
+
+
+			permissions.EnablePermissions (admin.UserId, PermissionName.KickPlayerFromChannel);
+
+			handler.KickUserMessage (new MessageReceivedEventArgs (c1,
+				new KickUserMessage (target, true)));
+
+			Assert.AreEqual (ClientMessageType.KickUser, c1.Client.DequeueAndAssertMessage<PermissionDeniedMessage>().DeniedMessage);
+		}
+
+		[Test]
+		public void KickUserFromChannel()
+		{
+			MockServerConnection c1 = new MockServerConnection();
+			var admin = JoinAsGuest (c1, "admin");
+			permissions.EnablePermissions (admin.UserId, PermissionName.KickPlayerFromChannel);
+
+			var target = JoinAsGuest (server, "target");
+			c1.Client.DequeueAndAssertMessage<UserJoinedMessage>();
+
+			var altChannel = new ChannelInfo { Name = "Channel 2" };
+			context.ChannelsProvider.SaveChannel (altChannel);
+			c1.Client.DequeueAndAssertMessage<ChannelListMessage>();
+			server.Client.DequeueAndAssertMessage<ChannelListMessage>();
+			altChannel = context.ChannelsProvider.GetChannels().Single (c => c.Name == "Channel 2");
+			handler.Move (target, altChannel);
+			var moved = server.Client.DequeueAndAssertMessage<UserChangedChannelMessage>();
+			Assert.AreEqual (altChannel.ChannelId, moved.ChangeInfo.TargetChannelId);
+			Assert.AreEqual (target.UserId, moved.ChangeInfo.TargetUserId);
+
+			handler.KickUserMessage (new MessageReceivedEventArgs (c1,
+				new KickUserMessage (target, false)));
+
+			var kicked = server.Client.DequeueAndAssertMessage<KickedMessage>();
+			Assert.AreEqual (target.UserId, kicked.UserId);
+			Assert.AreEqual (false, kicked.FromServer);
+
+			moved = server.Client.DequeueAndAssertMessage<UserChangedChannelMessage>();
+			Assert.AreEqual (context.ChannelsProvider.DefaultChannel.ChannelId, moved.ChangeInfo.TargetChannelId);
+			Assert.AreEqual (target.UserId, moved.ChangeInfo.TargetUserId);
+		}
+
+		[Test]
+		public void KickUserFromServer()
+		{
+			MockServerConnection c1 = new MockServerConnection();
+			var admin = JoinAsGuest (c1, "admin");
+			permissions.EnablePermissions (admin.UserId, PermissionName.KickPlayerFromServer);
+
+			var target = JoinAsGuest (server, "target");
+			c1.Client.DequeueAndAssertMessage<UserJoinedMessage>();
+
+			handler.KickUserMessage (new MessageReceivedEventArgs (c1,
+				new KickUserMessage (target, true)));
+
+			var kicked = server.Client.DequeueAndAssertMessage<KickedMessage>();
+			Assert.AreEqual (target.UserId, kicked.UserId);
+			Assert.AreEqual (true, kicked.FromServer);
+
+			kicked = c1.Client.DequeueAndAssertMessage<KickedMessage>();
+			Assert.AreEqual (target.UserId, kicked.UserId);
+			Assert.AreEqual (true, kicked.FromServer);
+
+			Assert.AreEqual (target.UserId, c1.Client.DequeueAndAssertMessage<UserDisconnectedMessage>().UserId);
+		}
 	}
 }
