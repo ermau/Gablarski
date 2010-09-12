@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using Gablarski.Client;
 using Gablarski.Messages;
+using Gablarski.Server;
 using NUnit.Framework;
 
 namespace Gablarski.Tests
@@ -18,12 +19,13 @@ namespace Gablarski.Tests
 			this.provider = new MockConnectionProvider ();
 			this.server = this.provider.EstablishConnection ();
 
-			var context = new MockClientContext { Connection = this.server.Client };
+			userProvider = new MockUserProvider();
+			context = new MockClientContext { Connection = this.server.Client, ServerInfo = new ServerInfo (new ServerSettings(), userProvider, new PublicRSAParameters()) };
 
 			var channels = new ClientChannelManager (context);
 			ClientChannelManagerTests.PopulateChannels (channels, this.server);
 
-			var userManager = new ClientUserManager();
+			this.userManager = new ClientUserManager();
 			this.handler = new ClientUserHandler (context, userManager);
 			context.Users = this.handler;
 			context.Channels = channels;
@@ -32,8 +34,12 @@ namespace Gablarski.Tests
 		[TearDown]
 		public void ManagerTearDown ()
 		{
+			this.userProvider = null;
+			this.server = null;
 			this.handler = null;
+			this.userManager = null;
 			this.provider = null;
+			this.context = null;
 		}
 
 		private static void CreateUsers (IClientConnection client, ClientUserHandler handler)
@@ -59,6 +65,9 @@ namespace Gablarski.Tests
 		private MockServerConnection server;
 		private MockConnectionProvider provider;
 		private ClientUserHandler handler;
+		private MockClientContext context;
+		private MockUserProvider userProvider;
+		private ClientUserManager userManager;
 
 		[Test]
 		public void NullConnection()
@@ -153,6 +162,25 @@ namespace Gablarski.Tests
 		{
 			Assert.Throws<ArgumentNullException> (() => this.handler.ApproveRegistration ((string)null));
 			Assert.Throws<ArgumentNullException> (() => this.handler.ApproveRegistration ((IUserInfo)null));
+		}
+
+		[Test]
+		public void PreApproveRegistration()
+		{
+			userProvider.UpdateSupported = true;
+			userProvider.RegistrationMode = UserRegistrationMode.PreApproved;
+			context = new MockClientContext { Connection = this.server.Client, ServerInfo = new ServerInfo (new ServerSettings(), userProvider, new PublicRSAParameters()) };
+			this.handler = new ClientUserHandler (context, this.userManager);
+
+			CreateUsers (this.server.Client, this.handler);
+
+			var user = this.handler.First();
+			int userId = user.UserId;
+
+			this.handler.ApproveRegistration (user);
+
+			var msg = this.server.DequeueAndAssertMessage<RegistrationApprovalMessage>();
+			Assert.AreEqual (userId, msg.UserId);
 		}
 
 		//[Test]

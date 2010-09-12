@@ -227,7 +227,6 @@
     <Compile Include="Server\ServerSettings.cs" />
     <Compile Include="StreamValueReader.cs" />
     <Compile Include="StreamValueWriter.cs" />
-    <Compile Include="Client\GablarskiClient.Internal.cs" />
     <Compile Include="Messages\UserDisconnectedMessage.cs" />
     <Compile Include="Client\ClientUserHandler.cs" />
     <Compile Include="Client\ClientSourceManager.cs" />
