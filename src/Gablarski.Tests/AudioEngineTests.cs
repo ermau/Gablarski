@@ -234,20 +234,25 @@ namespace Gablarski.Tests
 			Assert.Throws<ArgumentNullException> (() => engine.Unmute ((IAudioCaptureProvider)null));
 		}
 
-		//[Test]
-		//public void InvalidBeginCapture()
-		//{
-		//    var engine = new AudioEngine();
-		//    engine.Attach (this.provider, AudioFormat.Mono16Bit, this.source, new AudioEngineCaptureOptions());
-		//    Assert.Throws<ArgumentNullException> (() => engine.BeginCapture (null));
-		//}
+		[Test]
+		public void InvalidBeginCapture()
+		{
+			var engine = new AudioEngine();
+			engine.Attach (this.provider, this.source, new AudioEngineCaptureOptions());
+			Assert.Throws<ArgumentNullException> (() => engine.BeginCapture (null, new ChannelInfo(1)));
+			Assert.Throws<ArgumentNullException> (() => engine.BeginCapture (this.source, (ChannelInfo)null));
+			Assert.Throws<ArgumentNullException> (() => engine.BeginCapture (this.source, (IEnumerable<ChannelInfo>)null));
+			Assert.Throws<ArgumentNullException> (() => engine.BeginCapture (null, UserInfoTests.GetTestUser()));
+			Assert.Throws<ArgumentNullException> (() => engine.BeginCapture (this.source, (IUserInfo)null));
+			Assert.Throws<ArgumentNullException> (() => engine.BeginCapture (this.source, (IEnumerable<IUserInfo>)null));
+		}
 
-		//[Test]
-		//public void InvalidEndCapture()
-		//{
-		//    var engine = new AudioEngine();
-		//    engine.Attach (this.provider, AudioFormat.Mono16Bit, this.source, new AudioEngineCaptureOptions());
-		//    Assert.Throws<ArgumentNullException> (() => engine.EndCapture (null));
-		//}
+		[Test]
+		public void InvalidEndCapture()
+		{
+			var engine = new AudioEngine();
+		 	engine.Attach (this.provider, this.source, new AudioEngineCaptureOptions());
+			Assert.Throws<ArgumentNullException> (() => engine.EndCapture (null));
+		}
 	}
 }

@@ -272,6 +272,8 @@ namespace Gablarski.Audio
 		{
 			if (self == null)
 				throw new ArgumentNullException ("self");
+			if (channel == null)
+				throw new ArgumentNullException ("channel");
 
 			self.BeginCapture (source, new[] { channel });
 		}
@@ -280,6 +282,8 @@ namespace Gablarski.Audio
 		{
 			if (self == null)
 				throw new ArgumentNullException ("self");
+			if (user == null)
+				throw new ArgumentNullException ("user");
 
 			self.BeginCapture (source, new[] { user });
 		}
