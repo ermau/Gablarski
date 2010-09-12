@@ -60,6 +60,13 @@ namespace Gablarski.Clients.Windows.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap BanImage {
+            get {
+                object obj = ResourceManager.GetObject("BanImage", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap bullet_error {
             get {
                 object obj = ResourceManager.GetObject("bullet_error", resourceCulture);
@@ -148,6 +155,13 @@ namespace Gablarski.Clients.Windows.Properties {
             get {
                 object obj = ResourceManager.GetObject("Headphones", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap KickImage {
+            get {
+                object obj = ResourceManager.GetObject("KickImage", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         

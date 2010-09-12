@@ -651,6 +651,20 @@ namespace Gablarski.Clients.Windows
 				un.ContextMenuStrip.Items.Add (volume);
 			}
 
+			ToolStripMenuItem menu = null;
+			foreach (var source in Client.Sources[target])
+			{
+				if (menu == null)
+				{
+					menu = new ToolStripMenuItem ("Sources");
+					un.ContextMenuStrip.Items.Add (menu);
+				}
+
+				AddSourceContext (menu.DropDown.Items, source);
+			}
+
+			un.ContextMenuStrip.Items.Add (new ToolStripSeparator());
+
 			if (!Client.Users.GetIsIgnored (target))
 			{
 				var ignore = new ToolStripMenuItem ("Ignore user", Resources.SoundMuteImage);
@@ -668,8 +682,16 @@ namespace Gablarski.Clients.Windows
 				un.ContextMenuStrip.Items.Add (ignore);
 			}
 
+			bool adminSep = false;
+
 			if (this.Client.CurrentUser.Permissions.CheckPermission (PermissionName.MuteUser))
 			{
+				if (!adminSep)
+				{
+					adminSep = true;
+					un.ContextMenuStrip.Items.Add (new ToolStripSeparator());
+				}
+
 				if (!target.IsMuted)
 				{
 					var mute = new ToolStripMenuItem ("Mute user", Resources.SoundMuteImage);
@@ -688,17 +710,45 @@ namespace Gablarski.Clients.Windows
 				}
 			}
 
-			ToolStripMenuItem menu = null;
-			foreach (var source in Client.Sources[target])
+			if (this.Client.CurrentUser.Permissions.CheckPermission (target.CurrentChannelId, PermissionName.KickPlayerFromChannel))
 			{
-				if (menu == null)
+				if (!adminSep)
 				{
-					menu = new ToolStripMenuItem ("Sources");
-					un.ContextMenuStrip.Items.Add (menu);
+					adminSep = true;
+					un.ContextMenuStrip.Items.Add (new ToolStripSeparator());
 				}
 
-				AddSourceContext (menu.DropDown.Items, source);
+				var kickChannel = new ToolStripMenuItem ("Channel kick", Resources.KickImage);
+				kickChannel.ToolTipText = "Kicks this user from the channel";
+				kickChannel.Click += ContextChannelKick;
+
+				un.ContextMenuStrip.Items.Add (kickChannel);
 			}
+
+			if (this.Client.CurrentUser.Permissions.CheckPermission (PermissionName.KickPlayerFromServer))
+			{
+				if (!adminSep)
+				{
+					adminSep = true;
+					un.ContextMenuStrip.Items.Add (new ToolStripSeparator());
+				}
+
+				var kickServer = new ToolStripMenuItem ("Server kick", Resources.KickImage);
+				kickServer.ToolTipText = "Kicks this user from the server";
+				kickServer.Click += ContextServerKick;
+
+				un.ContextMenuStrip.Items.Add (kickServer);
+			}
+		}
+
+		private void ContextServerKick (object sender, EventArgs e)
+		{
+			Client.Users.Kick ((IUserInfo)this.SelectedNode.Tag, true);
+		}
+
+		private void ContextChannelKick (object sender, EventArgs e)
+		{
+			Client.Users.Kick ((IUserInfo)this.SelectedNode.Tag, false);
 		}
 
 		private void VolumeOnClick (object sender, EventArgs eventArgs)

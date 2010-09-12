@@ -327,6 +327,8 @@
     <Content Include="Headphones.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Resources\burn.png" />
+    <None Include="Resources\bomb.png" />
     <None Include="Resources\bullet_error.png" />
     <None Include="Resources\control_play_blue.png" />
     <None Include="Resources\control_pause_blue.png" />
