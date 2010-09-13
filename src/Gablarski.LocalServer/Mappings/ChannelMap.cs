@@ -7,7 +7,7 @@ using FluentNHibernate.Mapping;
 namespace Gablarski.LocalServer.Mappings
 {
 	public class ChannelMap
-		: ClassMap<ChannelInfo>
+		: ClassMap<LocalChannelInfo>
 	{
 		public ChannelMap()
 		{
@@ -16,6 +16,7 @@ namespace Gablarski.LocalServer.Mappings
 			Map (x => x.Name, "channelName");
 			Map (x => x.Description, "channelDescription");
 			Map (x => x.UserLimit, "channelLimit");
+			Map (x => x.IsDefault, "channelDefault");
 		}
 	}
 }

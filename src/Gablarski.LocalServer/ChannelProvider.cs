@@ -40,6 +40,7 @@ using System.Data;
 using System.Linq;
 using Gablarski.Server;
 using NHibernate;
+using NHibernate.Linq;
 
 namespace Gablarski.LocalServer
 {
@@ -55,21 +56,56 @@ namespace Gablarski.LocalServer
 
 		public ChannelInfo DefaultChannel
 		{
-			get { throw new NotImplementedException(); }
-			set { throw new NotImplementedException(); }
+			get
+			{
+				using (ISession session = Persistance.SessionFactory.OpenSession())
+					return GetDefaultChannel (session);
+			}
+
+			set
+			{
+				if (value == null)
+					throw new ArgumentNullException ("value");
+
+				using (ISession session = Persistance.SessionFactory.OpenSession())
+				using (ITransaction transaction = session.BeginTransaction (IsolationLevel.Serializable))
+				{
+					var currentDefault = GetDefaultChannel (session);
+					currentDefault.IsDefault = false;
+					session.SaveOrUpdate (currentDefault);
+
+					var newDefault = session.Load<LocalChannelInfo> (value.ChannelId);
+					if (newDefault == null)
+					{
+						transaction.Rollback();
+						return;
+					}
+
+					newDefault.IsDefault = true;
+					session.SaveOrUpdate (newDefault);
+
+					transaction.Commit();
+				}
+			}
 		}
 
 		public IEnumerable<ChannelInfo> GetChannels()
 		{
-			throw new NotImplementedException();
+			using (ISession session = Persistance.SessionFactory.OpenSession())
+				return session.Linq<LocalChannelInfo>().Cast<ChannelInfo>().ToList();
 		}
 
 		public ChannelEditResult SaveChannel (ChannelInfo channel)
 		{
 			using (ISession session = Persistance.SessionFactory.OpenSession())
-			using (ITransaction transaction = session.BeginTransaction(IsolationLevel.Serializable))
+			using (ITransaction transaction = session.BeginTransaction (IsolationLevel.Serializable))
 			{
-				//session.SaveOrUpdateCopy (channel);
+				var currentChannel = session.Load<LocalChannelInfo> (channel.ChannelId);
+				if (currentChannel == null)
+				{
+					if (channel.ChannelId != 0)
+						return ChannelEditResult.FailedChannelDoesntExist;
+				}
 
 				transaction.Commit();
 				return ChannelEditResult.Success;
@@ -81,7 +117,7 @@ namespace Gablarski.LocalServer
 			using (ISession session = Persistance.SessionFactory.OpenSession())
 			using (ITransaction transaction = session.BeginTransaction (IsolationLevel.Serializable))
 			{
-				var real = session.Load<ChannelInfo> (channel.ChannelId);
+				var real = session.Load<LocalChannelInfo> (channel.ChannelId);
 				if (real == null)
 					return ChannelEditResult.FailedChannelDoesntExist;
 
@@ -89,6 +125,11 @@ namespace Gablarski.LocalServer
 				transaction.Commit();
 				return ChannelEditResult.Success;
 			}
+		}
+
+		private LocalChannelInfo GetDefaultChannel (ISession session)
+		{
+			return session.Linq<LocalChannelInfo>().SingleOrDefault (c => c.IsDefault);
 		}
 	}
 }

@@ -38,7 +38,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Gablarski.LocalServer.Entities;
 using NHibernate;
 using NHibernate.Cfg;
 using FluentNHibernate.Cfg;
