@@ -37,46 +37,32 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
-namespace Gablarski
+namespace Gablarski.Messages
 {
-	public class BanInfo
+	public class BanUserMessage
+		: ClientMessage
 	{
-		internal BanInfo (IValueReader reader)
+		public BanUserMessage()
+			: base (ClientMessageType.BanUser)
 		{
-			Deserialize (reader);
 		}
 
-		public virtual string IPMask
+		public BanInfo BanInfo
 		{
 			get;
 			set;
 		}
 
-		public virtual string Username
+		public override void WritePayload (IValueWriter writer)
 		{
-			get;
-			set;
+			BanInfo.Serialize (writer);
 		}
 
-		public virtual int Length
+		public override void ReadPayload (IValueReader reader)
 		{
-			get;
-			set;
-		}
-
-		internal void Serialize (IValueWriter writer)
-		{
-			writer.WriteString (IPMask);
-			writer.WriteString (Username);
-			writer.WriteInt32 (Length);
-		}
-
-		internal void Deserialize (IValueReader reader)
-		{
-			IPMask = reader.ReadString();
-			Username = reader.ReadString();
-			Length = reader.ReadInt32();
+			BanInfo = new BanInfo (reader);
 		}
 	}
 }

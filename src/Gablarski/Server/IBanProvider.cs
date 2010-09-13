@@ -57,13 +57,14 @@ namespace Gablarski.Server
 		/// Adds a ban.
 		/// </summary>
 		/// <param name="ban">The ban to add/persist.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="ban"/> is <c>null</c></exception>
+		/// <exception cref="ArgumentNullException"><paramref name="ban"/> is <c>null</c>.</exception>
 		void AddBan (BanInfo ban);
 
 		/// <summary>
 		/// Removes a ban.
 		/// </summary>
-		/// <param name="ban"></param>
+		/// <param name="ban">The ban to remove.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="ban"/> is <c>null</c>.</exception>
 		void RemoveBan (BanInfo ban);
 	}
 }
