@@ -68,7 +68,8 @@
   <ItemGroup>
     <Compile Include="ChannelProvider.cs" />
     <Compile Include="Config\LocalServerConfiguration.cs" />
-    <Compile Include="Entities\LocalUser.cs" />
+    <Compile Include="LocalChannelInfo.cs" />
+    <Compile Include="LocalUser.cs" />
     <Compile Include="Mappings\ChannelMap.cs" />
     <Compile Include="Mappings\UserMap.cs" />
     <Compile Include="Persistance.cs" />
