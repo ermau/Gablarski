@@ -74,7 +74,7 @@ namespace Gablarski.Winamp
 		/// </summary>
 		public string SongName
 		{
-			get { throw new NotSupportedException(); }
+			get { return "Not supported."; }
 		}
 
 		/// <summary>
@@ -82,7 +82,7 @@ namespace Gablarski.Winamp
 		/// </summary>
 		public string ArtistName
 		{
-			get { throw new NotSupportedException(); }
+			get { return "Not supported."; }
 		}
 
 		/// <summary>
@@ -90,7 +90,7 @@ namespace Gablarski.Winamp
 		/// </summary>
 		public string AlbumName
 		{
-			get { throw new NotSupportedException(); }
+			get { return "Not supported."; }
 		}
 
 		/// <summary>
