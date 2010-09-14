@@ -153,8 +153,8 @@ namespace Gablarski.Client
 
 				this.context.Connection.Send (new RequestChannelListMessage ());
 
-				while (this.channels == null)
-					Thread.Sleep (1);
+				if (this.channels == null)
+					return Enumerable.Empty<ChannelInfo>().GetEnumerator();
 			}
 
 			if (this.channels.Count == 0)
