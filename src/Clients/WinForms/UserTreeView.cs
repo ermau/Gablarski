@@ -49,12 +49,14 @@ namespace Gablarski.Clients.Windows
 				{
 					this.client.CurrentUser.PermissionsChanged -= OnPermissionsChanged;
 					this.client.Users.UserMuted -= OnUserMuted;
+					this.client.Users.UserIgnored -= OnUserMuted;
 					this.client.Sources.AudioSourceMuted -= OnSourceMuted;
 				}
 
 				this.client = value;
 				this.client.CurrentUser.PermissionsChanged += OnPermissionsChanged;
 				this.client.Users.UserMuted += OnUserMuted;
+				this.client.Users.UserIgnored += OnUserMuted;
 				this.client.Sources.AudioSourceMuted += OnSourceMuted;
 			}
 		}
@@ -69,8 +71,12 @@ namespace Gablarski.Clients.Windows
 
 		private void OnUserMuted (object sender, UserEventArgs e)
 		{
+			TreeNode node;
+			if (!this.userNodes.TryGetValue (e.User, out node))
+				return;
+
 			MarkMuted (e.User);
-			SetupUserContext (userNodes[e.User]);
+			SetupUserContext (node);
 		}
 
 		private void OnSourceMuted (object sender, AudioSourceMutedEventArgs e)
@@ -158,6 +164,8 @@ namespace Gablarski.Clients.Windows
 				imageKey = "muted";
 			else if ((user.Status & UserStatus.MutedMicrophone) == UserStatus.MutedMicrophone)
 				imageKey = "mutedmic";
+			else if (this.client.Users.GetIsIgnored (user))
+				imageKey = "muted";
 
 			node.ImageKey = node.SelectedImageKey = imageKey;
 
@@ -518,13 +526,7 @@ namespace Gablarski.Clients.Windows
 
 		private void ContextIgnoreUserClick (object sender, EventArgs e)
 		{
-			var u = (IUserInfo)this.SelectedNode.Tag;
-			if (Client.Users.ToggleIgnore (u))
-				MarkMuted (u);
-			else if (!u.IsMuted)
-				MarkSilent (u);
-
-			SetupUserContext (userNodes[u]);
+			Client.Users.ToggleIgnore ((IUserInfo)this.SelectedNode.Tag);
 		}
 
 		private void ContextIgnoreSourceClick (object sender, EventArgs e)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
+using Cadenza;
 using Cadenza.Collections;
 using Gablarski.Audio;
 using Gablarski.Client;
@@ -12,11 +13,7 @@ using Gablarski.Clients.Windows.Entities;
 using Gablarski.Clients.Windows.Properties;
 using Gablarski.Messages;
 using Gablarski.Network;
-using Gablarski.Server;
 using Microsoft.WindowsAPICodePack.Taskbar;
-using System.IO;
-using System.Diagnostics;
-using Cadenza;
 
 namespace Gablarski.Clients.Windows
 {
@@ -37,6 +34,7 @@ namespace Gablarski.Clients.Windows
 			this.gablarski.Users.UserDisconnected += UsersUserDisconnected;
 			this.gablarski.Users.UserChangedChannel += UsersUserChangedChannel;
 			this.gablarski.Users.UserUpdated += UsersUserUpdated;
+			this.gablarski.Users.UserIgnored += UsersUserIgnored;
 			this.gablarski.CurrentUser.ReceivedLoginResult += this.CurrentUserReceivedLoginResult;
 			this.gablarski.CurrentUser.ReceivedJoinResult += this.CurrentUserReceivedJoinResult;
 
@@ -65,7 +63,25 @@ namespace Gablarski.Clients.Windows
 			this.users.Client = this.gablarski;
 		}
 
-		void UsersUserUpdated (object sender, UserEventArgs e)
+		private void UsersUserIgnored (object sender, UserMutedEventArgs e)
+		{
+			lock (this.ignores)
+			{
+				string un = e.User.Username.Trim().ToLower();
+				if (this.ignores.Contains (un) && e.Unmuted)
+				{
+					Persistance.Delete (Persistance.GetIgnores().First (ie => ie.ServerId == this.server.Id && ie.Username.ToLower().Trim() == un));
+					this.ignores.Remove (un);
+				}
+				else if (!e.Unmuted)
+				{
+					Persistance.SaveOrUpdate (new IgnoreEntry (0) { ServerId = this.server.Id, Username = un });
+					this.ignores.Add (un);
+				}
+			}
+		}
+
+		private void UsersUserUpdated (object sender, UserEventArgs e)
 		{
 			this.users.RemoveUser (e.User);
 			this.users.AddUser (e.User, gablarski.Sources[e.User]);
@@ -605,20 +621,43 @@ namespace Gablarski.Clients.Windows
 
 		private void UsersUserJoined (object sender, UserEventArgs e)
 		{
+			lock (this.ignores)
+			{
+				if (this.ignores != null && this.ignores.Contains (e.User.Username.Trim().ToLower()) && !this.gablarski.Users.GetIsIgnored (e.User))
+					this.gablarski.Users.ToggleIgnore (e.User);
+			}
+
 			this.users.AddUser (e.User, Enumerable.Empty<AudioSource>());
 		}
 
-		void UsersReceivedUserList (object sender, ReceivedListEventArgs<IUserInfo> e)
+		private void UsersReceivedUserList (object sender, ReceivedListEventArgs<IUserInfo> e)
 		{
 			this.users.Update (this.gablarski.Channels, e.Data, this.gablarski.Sources);
+
+			lock (this.ignores)
+			{
+				if (this.ignores == null)
+					return;
+
+				var usernames = this.gablarski.Users.ToDictionary (u => u.Username.Trim().ToLower());
+				foreach (string username in this.ignores.ToList())
+				{
+					var user = usernames[username];
+					if (!usernames.ContainsKey (username) || this.gablarski.Users.GetIsIgnored (user))
+						continue;
+
+					this.gablarski.Users.ToggleIgnore (user);
+					usernames.Remove (username);
+				}
+			}
 		}
 
-		void ChannelsReceivedChannelList (object sender, ReceivedListEventArgs<ChannelInfo> e)
+		private void ChannelsReceivedChannelList (object sender, ReceivedListEventArgs<ChannelInfo> e)
 		{
 			this.users.Update (e.Data, this.gablarski.Users, this.gablarski.Sources);
 		}
 
-		void CurrentUserReceivedLoginResult (object sender, ReceivedLoginResultEventArgs e)
+		private void CurrentUserReceivedLoginResult (object sender, ReceivedLoginResultEventArgs e)
 		{
 			if (!e.Result.Succeeded)
 			{
@@ -682,6 +721,7 @@ namespace Gablarski.Clients.Windows
 
 		private void GablarskiDisconnected (object sender, EventArgs e)
 		{
+			ResetState();
 			DisableInput();
 			DisablePlayback();
 			DisableVoiceCapture();
@@ -713,6 +753,12 @@ namespace Gablarski.Clients.Windows
 
 				this.btnRegister.Visible = false;
 			});
+		}
+
+		private void ResetState()
+		{
+			this.ignores.Clear();
+			this.speechSources.Clear();
 		}
 
 		private void GablarskiConnected (object sender, EventArgs e)
@@ -750,6 +796,12 @@ namespace Gablarski.Clients.Windows
 			{
 				this.server = new ServerEntry (0);
 				this.users.Server = this.server;
+			}
+			
+			lock (this.ignores)
+			{
+				Persistance.GetIgnores().Where (i => i.ServerId == this.server.Id).Select (i => i.Username.Trim().ToLower()).
+					ForEach (un => this.ignores.Add (un));
 			}
 
 			string userpassword = this.server.UserPassword;
@@ -866,6 +918,7 @@ namespace Gablarski.Clients.Windows
 
 			if (this.gablarski.IsConnected)
 			{
+				ResetState();
 				DisableInput();
 				DisablePlayback();
 				DisableVoiceCapture();
@@ -892,6 +945,7 @@ namespace Gablarski.Clients.Windows
 		private readonly MediaController mediaPlayerIntegration;
 		private NotificationHandler notifications;
 		private readonly Dictionary<ITextToSpeech, AudioSource> speechSources = new Dictionary<ITextToSpeech, AudioSource>();
+		private readonly HashSet<string> ignores = new HashSet<string>();
 
 		private void musicButton_Click (object sender, EventArgs e)
 		{

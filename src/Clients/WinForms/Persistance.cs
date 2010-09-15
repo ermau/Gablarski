@@ -50,6 +50,59 @@ namespace Gablarski.Clients.Windows
 			}
 		}
 
+		#region Ignores
+		public static void SaveOrUpdate (IgnoreEntry ignore)
+		{
+			if (ignore == null)
+				throw new ArgumentNullException ("ignore");
+
+			using (var cmd = db.CreateCommand())
+			{
+				cmd.CommandText = ignore.Id > 0
+				                  	? "UPDATE ignores SET ignoreServerId=?,ignoreUsername=? WHERE (ignoreId=?)"
+				                  	: "INSERT INTO ignores (ignoreServerId,ignoreUsername) VALUES (?,?)";
+
+				cmd.Parameters.Add (new SQLiteParameter ("server", ignore.ServerId));
+				cmd.Parameters.Add (new SQLiteParameter ("username", ignore.Username));
+
+				if (ignore.Id > 0)
+					cmd.Parameters.Add (new SQLiteParameter ("id", ignore.Id));
+
+				cmd.ExecuteNonQuery();
+			}
+		}
+
+		public static IEnumerable<IgnoreEntry> GetIgnores()
+		{
+			using (var cmd = db.CreateCommand ("SELECT * FROM ignores"))
+			using (var reader = cmd.ExecuteReader())
+			{
+				while (reader.Read())
+				{
+					yield return new IgnoreEntry (Convert.ToInt32 (reader["ignoreId"]))
+					{
+						ServerId = Convert.ToInt32 (reader["ignoreServerId"]),
+						Username = Convert.ToString (reader["ignoreUsername"])
+					};
+				}
+			}
+		}
+
+		public static void Delete (IgnoreEntry ignore)
+		{
+			if (ignore == null)
+				throw new ArgumentNullException ("ignore");
+			if (ignore.Id < 1)
+				throw new ArgumentException ("Can't delete a non-existant ignore", "ignore");
+
+			using (var cmd = db.CreateCommand ("DELETE FROM ignores WHERE (ignoreId=?)"))
+			{
+				cmd.Parameters.Add (new SQLiteParameter ("id", ignore.Id));
+				cmd.ExecuteNonQuery();
+			}
+		}
+		#endregion
+
 		#region Servers
 		public static void SaveOrUpdate (SettingEntry setting)
 		{
@@ -252,6 +305,9 @@ namespace Gablarski.Clients.Windows
 				cmd.ExecuteNonQuery();
 
 			using (var cmd = db.CreateCommand ("CREATE TABLE IF NOT EXISTS volumes (volumeId integer primary key autoincrement, volumeServerId integer, volumeUsername varchar(255), volumeGain float)"))
+				cmd.ExecuteNonQuery();
+
+			using (var cmd = db.CreateCommand ("CREATE TABLE IF NOT EXISTS ignores (ignoreId integer primary key autoincrement, ignoreServerId integer, ignoreUsername varchar(255))"))
 				cmd.ExecuteNonQuery();
 
 			using (var cmd = db.CreateCommand ("CREATE TABLE IF NOT EXISTS commandbindings (commandbindingProvider string, commandbindingCommand integer, commandbindingInput varchar(255))"))

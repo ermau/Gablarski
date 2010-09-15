@@ -83,9 +83,14 @@ namespace Gablarski.Client
 		public event EventHandler<UserEventArgs> UserDisconnected;
 
 		/// <summary>
-		/// A user was muted or ignored.
+		/// A user was muted.
 		/// </summary>
 		public event EventHandler<UserMutedEventArgs> UserMuted;
+
+		/// <summary>
+		/// A user was ignored.
+		/// </summary>
+		public event EventHandler<UserMutedEventArgs> UserIgnored;
 
 		/// <summary>
 		/// A user's information was updated.
@@ -173,7 +178,13 @@ namespace Gablarski.Client
 
 		public bool ToggleIgnore (IUserInfo user)
 		{
-			return this.manager.ToggleIgnore (user);
+			if (user == null)
+				throw new ArgumentNullException ("user");
+
+			bool state = this.manager.ToggleIgnore (user);
+
+			OnUserIgnored (new UserMutedEventArgs (user, !state));
+			return state;
 		}
 
 		public void ToggleMute (IUserInfo user)
@@ -363,6 +374,13 @@ namespace Gablarski.Client
 		#endregion
 
 		#region Event Invokers
+		protected virtual void OnUserIgnored (UserMutedEventArgs e)
+		{
+			var ignored = this.UserIgnored;
+			if (ignored != null)
+				ignored (this, e);
+		}
+
 		protected virtual void OnUserMuted (UserMutedEventArgs e)
 		{
 			var muted = this.UserMuted;

@@ -60,9 +60,14 @@ namespace Gablarski.Client
 		event EventHandler<UserEventArgs> UserDisconnected;
 		
 		/// <summary>
-		/// A user was muted or ignored.
+		/// A user was muted.
 		/// </summary>
 		event EventHandler<UserMutedEventArgs> UserMuted;
+
+		/// <summary>
+		/// A user was ignored.
+		/// </summary>
+		event EventHandler<UserMutedEventArgs> UserIgnored;
 
 		/// <summary>
 		/// An existing user's information was updated.

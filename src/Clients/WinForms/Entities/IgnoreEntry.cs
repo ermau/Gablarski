@@ -7,6 +7,11 @@ namespace Gablarski.Clients.Windows.Entities
 {
 	public class IgnoreEntry
 	{
+		public IgnoreEntry (int id)
+		{
+			Id = id;
+		}
+
 		public virtual int Id
 		{
 			get;
