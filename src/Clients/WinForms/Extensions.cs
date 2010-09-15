@@ -21,7 +21,7 @@ namespace Gablarski.Clients.Windows
 			if (self == null)
 				throw new ArgumentNullException ("self");
 
-			var e = Resources.bullet_error;
+			var e = Resources.ErrorOverlay;
 			using (var g = Graphics.FromImage (self))
 				g.DrawImage (e, self.Width - e.Width, self.Height - e.Height);
 

@@ -970,5 +970,10 @@ namespace Gablarski.Clients.Windows
 			else
 				gablarski.CurrentUser.UnmuteCapture();
 		}
+
+		private void aboutButton_Click(object sender, EventArgs e)
+		{
+			new AboutForm().ShowDialog (this);
+		}
 	}
 }

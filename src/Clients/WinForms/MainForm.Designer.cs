@@ -40,6 +40,7 @@
 			this.btnMusic = new System.Windows.Forms.ToolStripButton();
 			this.btnComment = new System.Windows.Forms.ToolStripButton();
 			this.btnSettings = new System.Windows.Forms.ToolStripButton();
+			this.aboutButton = new System.Windows.Forms.ToolStripButton();
 			this.users = new Gablarski.Clients.Windows.UserTreeView();
 			toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
 			this.tools.SuspendLayout();
@@ -74,12 +75,13 @@
             this.toolStripSeparator2,
             this.btnComment,
             toolStripSeparator3,
-            this.btnSettings});
+            this.btnSettings,
+            this.aboutButton});
 			this.tools.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.HorizontalStackWithOverflow;
 			this.tools.Location = new System.Drawing.Point(0, 0);
 			this.tools.Name = "tools";
 			this.tools.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-			this.tools.Size = new System.Drawing.Size(244, 25);
+			this.tools.Size = new System.Drawing.Size(251, 25);
 			this.tools.TabIndex = 0;
 			// 
 			// btnConnect
@@ -171,6 +173,17 @@
 			this.btnSettings.Text = "Settings";
 			this.btnSettings.Click += new System.EventHandler(this.btnSettings_Click);
 			// 
+			// aboutButton
+			// 
+			this.aboutButton.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+			this.aboutButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.aboutButton.Image = global::Gablarski.Clients.Windows.Properties.Resources.HelpImage;
+			this.aboutButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.aboutButton.Name = "aboutButton";
+			this.aboutButton.Size = new System.Drawing.Size(23, 22);
+			this.aboutButton.Text = "About";
+			this.aboutButton.Click += new System.EventHandler(this.aboutButton_Click);
+			// 
 			// users
 			// 
 			this.users.AllowDrop = true;
@@ -181,14 +194,14 @@
 			this.users.Location = new System.Drawing.Point(-1, 25);
 			this.users.Name = "users";
 			this.users.SelectedImageIndex = 0;
-			this.users.Size = new System.Drawing.Size(246, 518);
+			this.users.Size = new System.Drawing.Size(253, 518);
 			this.users.TabIndex = 1;
 			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(244, 542);
+			this.ClientSize = new System.Drawing.Size(251, 542);
 			this.Controls.Add(this.tools);
 			this.Controls.Add(this.users);
 			this.MinimumSize = new System.Drawing.Size(192, 161);
@@ -216,5 +229,6 @@
 		private System.Windows.Forms.ToolStripButton btnMuteMic;
 		private System.Windows.Forms.ToolStripButton btnComment;
 		private System.Windows.Forms.ToolStripButton btnAFK;
+		private System.Windows.Forms.ToolStripButton aboutButton;
 	}
 }

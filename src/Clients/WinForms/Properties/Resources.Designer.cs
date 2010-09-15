@@ -67,13 +67,6 @@ namespace Gablarski.Clients.Windows.Properties {
             }
         }
         
-        internal static System.Drawing.Bitmap bullet_error {
-            get {
-                object obj = ResourceManager.GetObject("bullet_error", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
         internal static System.Drawing.Bitmap CaptureMuteImage {
             get {
                 object obj = ResourceManager.GetObject("CaptureMuteImage", resourceCulture);
@@ -151,10 +144,24 @@ namespace Gablarski.Clients.Windows.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap ErrorOverlay {
+            get {
+                object obj = ResourceManager.GetObject("ErrorOverlay", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Icon Headphones {
             get {
                 object obj = ResourceManager.GetObject("Headphones", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap HelpImage {
+            get {
+                object obj = ResourceManager.GetObject("HelpImage", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
