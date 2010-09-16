@@ -1,70 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<project name="Gablarski" default="everything" basedir=".">
+<project name="Gablarski" default="gablarski" basedir=".">
 	<property name="nant.settings.currentframework" value="net-3.5" />
 	<property name="gablarski.version" value="${teamcity.buildConfName}.${build.vcs.number}" />
 	<property name="gablarski.config" value="Debug" />
 
-	<target name="updatelibraryversion">
+	<target name="gablarski">
 		<exec program="tools/replace.exe">
 			<arg value='-t="src\Gablarski\Properties\AssemblyInfo.cs"' />
 			<arg value='-f=0.0.0.0' />
 			<arg value='-r=${gablarski.version}' />
-			<arg value='e=2' />
+			<arg value='-e=2' />
 		</exec>
 
 		<exec program="tools/replace.exe">
 			<arg value='-t="src\Gablarski.Clients\Properties\AssemblyInfo.cs"' />
 			<arg value='-f=0.0.0.0' />
 			<arg value='-r=${gablarski.version}' />
-			<arg value='e=2' />
+			<arg value='-e=2' />
 		</exec>
 
 		<exec program="tools/replace.exe">
 			<arg value='-t="src\Gablarski.OpenAL\Properties\AssemblyInfo.cs"' />
 			<arg value='-f=0.0.0.0' />
 			<arg value='-r=${gablarski.version}' />
-			<arg value='e=2' />
+			<arg value='-e=2' />
 		</exec>
-	</target>
-	
-	<target name="library" depends="updatelibraryversion">
-		<exec program="${DotNetFramework3.5_x86_Path}\msbuild.exe">
-			<arg value='/property:Configuration="${gablarski.config}";Platform="x86"' />
-			<arg value="Gablarski.sln" />
-		</exec>
-
-		<nunit2>
-			<test assemblyname="src\Gablarski.Tests\bin\Debug\Gablarski.Tests.dll" />
-		</nunit2>
-
-		<zip zipfile="Gablarski-Debug.zip">
-			<fileset basedir="src\Gablarski\bin\Debug">
-				<include name="*.dll" />
-				<include name="*.xml" />
-				<include name="*.pdb" />
-				<include name="..\..\..\..\Gablarski.License.txt" />
-				<include name="..\..\..\..\lib\NAudio.License.txt" />
-				<include name="..\..\..\..\lib\log4net.License.txt" />
-			</fileset>
-		</zip>
-
-		<zip zipfile="Gablarski-CLI-Debug.zip">
-			<fileset basedir="src\Clients\CLI\bin\x86\Debug">
-				<include name="*.dll" />
-				<include name="*.xml" />
-				<include name="*.pdb" />
-				<include name="*.txt" />
-			</fileset>
-		</zip>
-	</target>
-
-	<target name="everything" depends="clients,barrelserver">
-	</target>
-	
-	<target name="clients" depends="winforms">
-	</target>
-
-	<target name="winforms" depends="library,updatelibraryversion">
 		<exec program="tools\replace.exe">
 			<arg value='-t="src\Clients\WinForms\Properties\AssemblyInfo.cs"' />
 			<arg value='-f="0.0.0.0"' />
@@ -119,11 +79,36 @@
 			<arg value='-f=\{config}\' />
 			<arg value='-r=\${gablarski.config}\' />
 		</exec>
-
+		
 		<exec program="${DotNetFramework3.5_x86_Path}\msbuild.exe">
-			<arg value='/property:Configuration="Debug";Platform="x86"' />
+			<arg value='/property:Configuration="${gablarski.config}";Platform="x86"' />
 			<arg value="Gablarski.sln" />
 		</exec>
+
+		<exec program="C:\Program Files (x86)\NUnit 2.5.1\bin\net-2.0\nunit-console.exe">
+			<arg value="/xml:gablarski-tests.xml" />
+			<arg value="src\Gablarski.Tests\bin\${gablarski.config}\Gablarski.Tests.dll" />
+		</exec>
+
+		<zip zipfile="Gablarski-Debug.zip">
+			<fileset basedir="src\Gablarski\bin\Debug">
+				<include name="*.dll" />
+				<include name="*.xml" />
+				<include name="*.pdb" />
+				<include name="..\..\..\..\Gablarski.License.txt" />
+				<include name="..\..\..\..\lib\NAudio.License.txt" />
+				<include name="..\..\..\..\lib\log4net.License.txt" />
+			</fileset>
+		</zip>
+
+		<zip zipfile="Gablarski-CLI-Debug.zip">
+			<fileset basedir="src\Clients\CLI\bin\x86\Debug">
+				<include name="*.dll" />
+				<include name="*.xml" />
+				<include name="*.pdb" />
+				<include name="*.txt" />
+			</fileset>
+		</zip>
 
 		<zip zipfile="Gablarski-Win32-Debug.zip">
 			<fileset basedir="src\Clients\WinForms\bin\x86\Debug">
@@ -139,27 +124,7 @@
 		<exec program="C:\Program Files (x86)\NSIS\makensis.exe">
 			<arg value="src\Clients\WinForms\setup.nsi" />
 		</exec>
-	</target>
 
-	<target name="gtk" depends="library">
-		<exec program="${DotNetFramework3.5_x86_Path}\msbuild.exe">
-			<arg value='/property:Configuration="Mono Debug";Platform="x86"' />
-			<arg value="Gablarski.sln" />
-		</exec>
-
-		<zip zipfile="Gablarski-Gtk-Debug.zip">
-			<fileset basedir="src\Clients\Gablarski-Gtk\bin\Debug">
-				<include name="GablarskiClient.exe" />
-				<include name="Headphones.ico" />
-				<include name="*.dll" />
-				<include name="*.pdb" />
-				<include name="*.xsd" />
-				<include name="*.txt" />
-			</fileset>
-		</zip>
-	</target>
-
-	<target name="barrelserver" depends="library">
 		<exec program="${DotNetFramework3.5_x86_Path}\msbuild.exe">
 			<arg value='/property:Configuration="Debug";Platform="x86"' />
 			<arg value="Gablarski.sln" />
