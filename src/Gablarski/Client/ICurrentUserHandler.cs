@@ -46,6 +46,7 @@ namespace Gablarski.Client
 		event EventHandler PermissionsChanged;
 		event EventHandler<ReceivedJoinResultEventArgs> ReceivedJoinResult;
 		event EventHandler<ReceivedLoginResultEventArgs> ReceivedLoginResult;
+		event EventHandler<ReceivedRegisterResultEventArgs> ReceivedRegisterResult;
 		event EventHandler Kicked;
 
 		IEnumerable<Permission> Permissions { get; }
@@ -74,6 +75,15 @@ namespace Gablarski.Client
 		/// <param name="serverPassword">The password to join the server.</param>
 		void Join (string nickname, string phonetic, string serverPassword);
 
+		/// <summary>
+		/// Sends a registration to the server.
+		/// </summary>
+		/// <param name="username">The username to register with.</param>
+		/// <param name="password">The password to register with.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="username"/> or <paramref name="password"/> is null.</exception>
+		/// <exception cref="ArgumentException"><paramref name="username"/> or <paramref name="password"/> is empty.</exception>
+		void Register (string username, string password);
+
 		void MuteCapture();
 		void UnmuteCapture();
 
@@ -82,5 +92,49 @@ namespace Gablarski.Client
 
 		void SetComment (string comment);
 		void SetStatus (UserStatus status);
+	}
+
+	public class ReceivedJoinResultEventArgs
+		: EventArgs
+	{
+		public ReceivedJoinResultEventArgs (LoginResultState result)
+		{
+			this.Result = result;
+		}
+
+		public LoginResultState Result
+		{
+			get; set;
+		}
+	}
+
+	public class ReceivedLoginResultEventArgs
+		: EventArgs
+	{
+		public ReceivedLoginResultEventArgs (LoginResult result)
+		{
+			this.Result = result;
+		}
+
+		public LoginResult Result
+		{
+			get;
+			private set;
+		}
+	}
+
+	public class ReceivedRegisterResultEventArgs
+		: EventArgs
+	{
+		public ReceivedRegisterResultEventArgs (RegisterResult result)
+		{
+			Result = result;
+		}
+
+		public RegisterResult Result
+		{
+			get;
+			private set;
+		}
 	}
 }

@@ -58,6 +58,7 @@ namespace Gablarski.Client
 			this.context.RegisterMessageHandler (ServerMessageType.JoinResult, OnJoinResultMessage);
 			this.context.RegisterMessageHandler (ServerMessageType.Permissions, OnPermissionsMessage);
 			this.context.RegisterMessageHandler (ServerMessageType.UserKicked, OnUserKickedMessage);
+			this.context.RegisterMessageHandler (ServerMessageType.RegisterResult, OnRegisterResultMessage);
 		}
 
 		internal CurrentUser (IClientContext context, int userId, string nickname, int currentChannelId)
@@ -82,6 +83,8 @@ namespace Gablarski.Client
 		public event EventHandler<ReceivedLoginResultEventArgs> ReceivedLoginResult;
 
 		public event EventHandler<ReceivedJoinResultEventArgs> ReceivedJoinResult;
+
+		public event EventHandler<ReceivedRegisterResultEventArgs> ReceivedRegisterResult;
 
 		public event EventHandler PermissionsChanged;
 
@@ -127,6 +130,11 @@ namespace Gablarski.Client
 				phonetic = nickname;
 
 			this.context.Connection.Send (new JoinMessage (nickname, phonetic, serverPassword));
+		}
+
+		public void Register (string username, string password)
+		{
+			this.context.Connection.Send (new RegisterMessage (username, password));
 		}
 
 		/// <summary>
@@ -220,6 +228,13 @@ namespace Gablarski.Client
 				join (this, e);
 		}
 
+		protected virtual void OnRegisterResult (ReceivedRegisterResultEventArgs e)
+		{
+			var result = this.ReceivedRegisterResult;
+			if (result == null)
+				result (this, e);
+		}
+
 		protected virtual void OnKicked (EventArgs e)
 		{
 			var kicked = this.Kicked;
@@ -227,7 +242,7 @@ namespace Gablarski.Client
 				kicked (this, e);
 		}
 
-		private void OnUserKickedMessage (MessageReceivedEventArgs e)
+		internal void OnUserKickedMessage (MessageReceivedEventArgs e)
 		{
 			var msg = (UserKickedMessage)e.Message;
 
@@ -237,7 +252,7 @@ namespace Gablarski.Client
 			OnKicked (EventArgs.Empty);
 		}
 
-		private void OnUserChangedChannelMessage (MessageReceivedEventArgs e)
+		internal void OnUserChangedChannelMessage (MessageReceivedEventArgs e)
 		{
 			var msg = (UserChangedChannelMessage) e.Message;
 
@@ -252,7 +267,7 @@ namespace Gablarski.Client
 			this.CurrentChannelId = msg.ChangeInfo.TargetChannelId;
 		}
 
-		private void OnUserUpdatedMessage (MessageReceivedEventArgs e)
+		internal void OnUserUpdatedMessage (MessageReceivedEventArgs e)
 		{
 			var msg = (UserUpdatedMessage) e.Message;
 
@@ -288,6 +303,11 @@ namespace Gablarski.Client
 			OnJoinResult (args);
 		}
 
+		internal void OnRegisterResultMessage (MessageReceivedEventArgs e)
+		{
+			OnRegisterResult (new ReceivedRegisterResultEventArgs (((RegisterResultMessage)e.Message).Result));
+		}
+
 		internal void OnPermissionsMessage (MessageReceivedEventArgs e)
 		{
 			var msg = (PermissionsMessage)e.Message;
@@ -296,35 +316,6 @@ namespace Gablarski.Client
 
 			this.permissions = msg.Permissions;
 			OnPermissionsChanged (EventArgs.Empty);
-		}
-	}
-
-	public class ReceivedJoinResultEventArgs
-		: EventArgs
-	{
-		public ReceivedJoinResultEventArgs (LoginResultState result)
-		{
-			this.Result = result;
-		}
-
-		public LoginResultState Result
-		{
-			get; set;
-		}
-	}
-
-	public class ReceivedLoginResultEventArgs
-		: EventArgs
-	{
-		public ReceivedLoginResultEventArgs (LoginResult result)
-		{
-			this.Result = result;
-		}
-
-		public LoginResult Result
-		{
-			get;
-			private set;
 		}
 	}
 }
