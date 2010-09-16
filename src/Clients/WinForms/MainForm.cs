@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
 using Cadenza;
@@ -13,6 +14,7 @@ using Gablarski.Clients.Windows.Entities;
 using Gablarski.Clients.Windows.Properties;
 using Gablarski.Messages;
 using Gablarski.Network;
+using Microsoft.WindowsAPICodePack.Dialogs;
 using Microsoft.WindowsAPICodePack.Taskbar;
 
 namespace Gablarski.Clients.Windows
@@ -642,8 +644,8 @@ namespace Gablarski.Clients.Windows
 				var usernames = this.gablarski.Users.ToDictionary (u => u.Username.Trim().ToLower());
 				foreach (string username in this.ignores.ToList())
 				{
-					var user = usernames[username];
-					if (!usernames.ContainsKey (username) || this.gablarski.Users.GetIsIgnored (user))
+					IUserInfo user;
+					if (!usernames.TryGetValue (username, out user) || this.gablarski.Users.GetIsIgnored (user))
 						continue;
 
 					this.gablarski.Users.ToggleIgnore (user);
@@ -714,6 +716,9 @@ namespace Gablarski.Clients.Windows
 			else
 			{
 				SetupInput();
+
+				if (!this.gablarski.CurrentUser.IsRegistered && this.gablarski.ServerInfo.RegistrationMode != UserRegistrationMode.None)
+					BeginInvoke ((Action)(() => btnRegister.Visible = true ));
 
 				this.gablarski.Sources.Request ("voice", AudioFormat.Mono16bitLPCM, 512);
 			}
@@ -787,9 +792,6 @@ namespace Gablarski.Clients.Windows
 						ToolTipText = this.gablarski.ServerInfo.Description
 					}
 				);
-
-				if (this.server.UserName.IsNullOrWhitespace() && this.gablarski.ServerInfo.RegistrationMode != UserRegistrationMode.None)
-					btnRegister.Visible = true;
 			});
 
 			if (this.server == null)
@@ -975,7 +977,41 @@ namespace Gablarski.Clients.Windows
 
 		private void btnRegister_Click (object sender, EventArgs e)
 		{
+			switch (this.gablarski.ServerInfo.RegistrationMode)
+			{
+				case UserRegistrationMode.WebPage:
+					Uri url;
+					if (Uri.TryCreate (this.gablarski.ServerInfo.RegistrationContent, UriKind.Absolute, out url) && !url.IsFile)
+						Process.Start (url.AbsolutePath);
 
+					break;
+
+				case UserRegistrationMode.Message:
+					if (TaskDialog.IsPlatformSupported)
+					{
+						TaskDialog d = new TaskDialog();
+						d.Caption = "Registration";
+						d.Text = this.gablarski.ServerInfo.RegistrationContent;
+						d.Icon = TaskDialogStandardIcon.Information;
+						d.Show();
+					}
+					else
+					{
+						MessageBox.Show (this.gablarski.ServerInfo.RegistrationContent, "Registration", MessageBoxButtons.OK,
+						                 MessageBoxIcon.Information);
+					}
+
+					break;
+
+				case UserRegistrationMode.Approved:
+				case UserRegistrationMode.Normal:
+				case UserRegistrationMode.PreApproved:
+					var register = new RegisterForm (this.gablarski.CurrentUser);
+					if (register.ShowDialog (this) == DialogResult.Abort)
+						this.btnRegister.Visible = false;
+
+					break;
+			}
 		}
 
 		private void btnAFK_CheckedChanged (object sender, EventArgs e)
@@ -986,7 +1022,7 @@ namespace Gablarski.Clients.Windows
 				this.gablarski.CurrentUser.SetStatus (this.gablarski.CurrentUser.Status ^ UserStatus.AFK);
 		}
 
-		private void btnMute_CheckedChanged(object sender, EventArgs e)
+		private void btnMute_CheckedChanged (object sender, EventArgs e)
 		{
 			if (gablarski == null)
 				return;

@@ -179,6 +179,13 @@ namespace Gablarski.Clients.Windows.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap LoadingImage {
+            get {
+                object obj = ResourceManager.GetObject("LoadingImage", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap MusicImage {
             get {
                 object obj = ResourceManager.GetObject("MusicImage", resourceCulture);

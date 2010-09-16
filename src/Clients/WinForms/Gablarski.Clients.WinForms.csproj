@@ -149,6 +149,7 @@
       <DependentUpon>AboutForm.cs</DependentUpon>
     </Compile>
     <Compile Include="AnonymousCommand.cs" />
+    <Compile Include="Balloon.cs" />
     <Compile Include="BindingList.xaml.cs">
       <DependentUpon>BindingList.xaml</DependentUpon>
     </Compile>
@@ -209,6 +210,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="RegisterForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RegisterForm.Designer.cs">
+      <DependentUpon>RegisterForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="UserTreeView.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -263,6 +270,9 @@
     <Compile Include="SettingsForm.Designer.cs">
       <DependentUpon>SettingsForm.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="RegisterForm.resx">
+      <DependentUpon>RegisterForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="SettingsForm.resx">
       <DependentUpon>SettingsForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -339,6 +349,7 @@
     <Content Include="Headphones.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Resources\load.gif" />
     <None Include="Resources\help.png" />
     <None Include="Resources\burn.png" />
     <None Include="Resources\bomb.png" />
