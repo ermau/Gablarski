@@ -121,15 +121,6 @@
 			</fileset>
 		</zip>
 
-		<exec program="C:\Program Files (x86)\NSIS\makensis.exe">
-			<arg value="src\Clients\WinForms\setup.nsi" />
-		</exec>
-
-		<exec program="${DotNetFramework3.5_x86_Path}\msbuild.exe">
-			<arg value='/property:Configuration="Debug";Platform="x86"' />
-			<arg value="Gablarski.sln" />
-		</exec>
-
 		<zip zipfile="Gablarski-Server-Debug.zip">
 			<fileset basedir="src\Server\Barrel\bin\x86\Debug">
 				<include name="Barrel.exe" />
@@ -140,5 +131,9 @@
 				<include name="*.txt" />
 			</fileset>
 		</zip>
+
+		<exec program="C:\Program Files (x86)\NSIS\makensis.exe">
+			<arg value="src\Clients\WinForms\setup.nsi" />
+		</exec>
 	</target>
 </project>
