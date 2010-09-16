@@ -149,7 +149,7 @@
       <DependentUpon>AboutForm.cs</DependentUpon>
     </Compile>
     <Compile Include="AnonymousCommand.cs" />
-    <Compile Include="Balloon.cs" />
+    <Compile Include="EditBalloon.cs" />
     <Compile Include="BindingList.xaml.cs">
       <DependentUpon>BindingList.xaml</DependentUpon>
     </Compile>
