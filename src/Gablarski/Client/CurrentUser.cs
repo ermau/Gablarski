@@ -231,7 +231,7 @@ namespace Gablarski.Client
 		protected virtual void OnRegisterResult (ReceivedRegisterResultEventArgs e)
 		{
 			var result = this.ReceivedRegisterResult;
-			if (result == null)
+			if (result != null)
 				result (this, e);
 		}
 

@@ -316,6 +316,8 @@ namespace Gablarski.Server
 				{ ClientMessageType.SetStatus, userHandler.SetStatusMessage },
 				{ ClientMessageType.SetPermissions, userHandler.SetPermissionsMessage},
 				{ ClientMessageType.KickUser, userHandler.KickUserMessage },
+				{ ClientMessageType.Register, userHandler.RegisterMessage },
+				{ ClientMessageType.RegistrationApproval, userHandler.RegistrationApprovalMessage },
 
 				{ ClientMessageType.RequestSource, sourceHandler.RequestSourceMessage },
 				{ ClientMessageType.AudioData, sourceHandler.SendAudioDataMessage },

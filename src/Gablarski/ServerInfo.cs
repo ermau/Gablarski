@@ -1,4 +1,4 @@
-// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -60,10 +60,10 @@ namespace Gablarski
 			Description = settings.Description;
 			Logo = settings.ServerLogo;
 			Passworded = !String.IsNullOrEmpty (settings.ServerPassword);
-			RegistrationMode = userProvider.RegistrationMode;
+			RegistrationMode = (userProvider.UpdateSupported) ? userProvider.RegistrationMode : UserRegistrationMode.None;
 			this.PublicRSAParameters = publicRSAParameters;
 			
-			if (userProvider.RegistrationMode != UserRegistrationMode.None)
+			if (RegistrationMode != UserRegistrationMode.None)
 				RegistrationContent = userProvider.RegistrationContent;
 		}
 
