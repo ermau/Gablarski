@@ -36,6 +36,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -301,7 +302,21 @@ namespace Gablarski.Network
 
 					iwriter.WriteUInt16 (toSend.MessageTypeCode);
 
-					toSend.WritePayload (iwriter);
+					if (!toSend.Encrypted)
+						toSend.WritePayload (iwriter);
+					else
+					{
+						MemoryStream buffer;
+						if (toSend.MessageSize != 0)
+							buffer = new MemoryStream (toSend.MessageSize);
+						else
+							buffer = new MemoryStream();
+
+						toSend.WritePayload (new StreamValueWriter (buffer));
+						byte[] encrypted = Encryption.Encrypt (buffer.ToArray());
+						iwriter.WriteBytes (encrypted);
+					}
+
 					iwriter.Flush ();
 				}
 
@@ -352,13 +367,13 @@ namespace Gablarski.Network
 				MessageBase msg;
 				if (MessageBase.GetMessage (type, out msg))
 				{
-					if (msg.Encrypted)
+					if (!msg.Encrypted)
+						msg.ReadPayload (this.rreader);
+					else
 					{
 						byte[] decrypted = Decryption.Decrypt (this.rreader.ReadBytes());
 						msg.ReadPayload (new ByteArrayValueReader (decrypted));
-					}
-					else
-						msg.ReadPayload (this.rreader);
+					}					
 					
 					if (debugLogging)
 						log.DebugFormat ("Received message {0} from server", msg.MessageTypeCode);

@@ -225,7 +225,13 @@ namespace Gablarski.Network
 						return;
 					}
 					
-					msg.ReadPayload (reader);
+					if (!msg.Encrypted)
+						msg.ReadPayload (reader);
+					else if (connection != null)
+					{
+						byte[] dencrypted = connection.Decryption.Decrypt (reader.ReadBytes());
+						msg.ReadPayload (new ByteArrayValueReader (dencrypted));
+					}
 
 					if (connection == null)
 					{
@@ -396,7 +402,13 @@ namespace Gablarski.Network
 						if (this.debugLogging)
 							this.log.DebugFormat ("Message type {0} received from {1}", msg.MessageTypeCode, connection.EndPoint);
 
-						msg.ReadPayload (connection.ReliableReader);
+						if (!msg.Encrypted)
+							msg.ReadPayload (connection.ReliableReader);
+						else
+						{
+							byte[] decrypted = connection.Decryption.Decrypt (connection.ReliableReader.ReadBytes());
+							msg.ReadPayload (new ByteArrayValueReader (decrypted));
+						}
 
 						connection.Receive (msg);
 					}
@@ -478,7 +490,7 @@ namespace Gablarski.Network
 
 					message.WritePayload (new StreamValueWriter (buffer));
 
-					byte[] encrypted = connection.Encryption.Encrypt (buffer.GetBuffer());
+					byte[] encrypted = connection.Encryption.Encrypt (buffer.ToArray());
 					iwriter.WriteBytes (encrypted);
 				}
 				else
