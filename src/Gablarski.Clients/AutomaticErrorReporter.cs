@@ -63,11 +63,6 @@ namespace Gablarski.Clients
 			}
 		}
 
-		public void Test (string message, Exception inner)
-		{
-			throw new Exception (message, inner);
-		}
-
 		private readonly MutableLookup<Assembly, IErrorReporter> reporters = new MutableLookup<Assembly, IErrorReporter>();
 
 		private void CurrentDomainUnhandledException (object sender, UnhandledExceptionEventArgs e)

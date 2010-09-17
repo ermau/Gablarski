@@ -36,10 +36,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Text;
+using System.Web;
 using System.Xml.Linq;
 using Gablarski.Client;
 
@@ -62,33 +66,51 @@ namespace Gablarski.Clients
 
 		public void ReportError (Exception ex)
 		{
-			throw new NotImplementedException();
+			ReportError (ex, 0);
 		}
 
-		private const string SpaceURL = "http://www.assembla.com/spaces/gablarski/tickets";
-		private static readonly WebClient web = new WebClient();
-
-		private static XElement GetDuplicate (Exception ex)
+		private void ReportError (Exception ex, int parentId)
 		{
-			throw new NotImplementedException();
+			var builder = new StringBuilder();
+			builder.Append ("type=");
+			builder.Append (ex.GetType().Name);
+			builder.Append ("&message=");
+			builder.Append (ex.Message);
+			builder.Append ("&stack=");
+			builder.Append (ex.StackTrace);
+			builder.Append ("&os=");
+			builder.Append (GetOS());
+			builder.Append ("&version=");
+			builder.Append (typeof(GablarskiClient).Assembly.GetName().Version.ToString());
+			builder.Append ("&parent=");
+			builder.Append (parentId.ToString());
 
-			/*string description = ex.GetType();
+			byte[] data = Encoding.ASCII.GetBytes (builder.ToString());
 
-			HttpWebRequest request = (HttpWebRequest)WebRequest.Create (SpaceURL);
-			request.Accept = "Accept: application/xml";
-			
-			using (WebResponse response = request.GetResponse())
-			using (StreamReader reader = new StreamReader (response.GetResponseStream()))
+			try
 			{
-				XElement ticket = XDocument.Load (reader).Descendants ("ticket").FirstOrDefault (x => x.Attribute ("description").Value == description);
-			}*/
-		}
+				var request = (HttpWebRequest)WebRequest.Create ("http://www.gablarski.org/error.php");
+				request.Method = WebRequestMethods.Http.Post;
+				request.ContentType = "application/x-www-form-urlencoded";
+				request.ContentLength = data.Length;
+				using (var rstream = request.GetRequestStream())
+				{
+					rstream.Write (data, 0, data.Length);
+					rstream.Close();
+				}
 
-		private static string TraverseError (Exception ex)
-		{
-			throw new NotImplementedException();
+				var response = request.GetResponse();
+				string result = new StreamReader (response.GetResponseStream()).ReadToEnd();
+				
+				int id;
+				if (ex.InnerException != null && Int32.TryParse (result, out id))
+					ReportError (ex.InnerException, id);
+			}
+			catch
+			{
+			}
 		}
-
+		
 		private static string GetOS()
 		{
 			switch (Environment.OSVersion.Platform)
@@ -113,15 +135,13 @@ namespace Gablarski.Clients
 						return "Linux";
 					}
 
-					break;
-
 				default:
-					string sixtyfour = (IntPtr.Size == 8) ? " x64" : String.Empty;
+					string sixtyfour = (Environment.GetFolderPath (Environment.SpecialFolder.ProgramFiles).Contains ("x86")) ? " x64" : String.Empty;
 					if (Environment.OSVersion.Version.Major == 5)
 						return "XP" + sixtyfour;
 					else if (Environment.OSVersion.Version.Minor == 0)
 						return "Vista" + sixtyfour;
-					else if (Environment.OSVersion.Version.Major == 1)
+					else if (Environment.OSVersion.Version.Minor == 1)
 						return "Windows 7" + sixtyfour;
 
 					break;
