@@ -46,6 +46,12 @@ namespace Gablarski.Messages
 		{
 		}
 
+		public bool Removing
+		{
+			get;
+			set;
+		}
+
 		public BanInfo BanInfo
 		{
 			get;
@@ -54,11 +60,13 @@ namespace Gablarski.Messages
 
 		public override void WritePayload (IValueWriter writer)
 		{
+			writer.WriteBool (Removing);
 			BanInfo.Serialize (writer);
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
+			Removing = reader.ReadBool();
 			BanInfo = new BanInfo (reader);
 		}
 	}
