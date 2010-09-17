@@ -41,7 +41,20 @@ using System.Linq;
 namespace Gablarski
 {
 	public class BanInfo
+		: IEquatable<BanInfo>
 	{
+		public BanInfo (string ipMask, string username, int length)
+		{
+			if (ipMask == null && username == null)
+				throw new ArgumentNullException ("username", "Both ipMask and username can not be null");
+			if (length < 0)
+				throw new ArgumentOutOfRangeException("length", length, "Length must be >=0");
+
+			IPMask = ipMask;
+			Username = username;
+			Length = length;
+		}
+
 		internal BanInfo (IValueReader reader)
 		{
 			Deserialize (reader);
@@ -77,6 +90,47 @@ namespace Gablarski
 			IPMask = reader.ReadString();
 			Username = reader.ReadString();
 			Length = reader.ReadInt32();
+		}
+
+		public override bool Equals(object obj)
+		{
+			if (ReferenceEquals (null, obj))
+				return false;
+			if (ReferenceEquals (this, obj))
+				return true;
+			if (obj.GetType() != typeof (BanInfo))
+				return false;
+			return Equals ((BanInfo)obj);
+		}
+
+		public bool Equals (BanInfo other)
+		{
+			if (ReferenceEquals (null, other))
+				return false;
+			if (ReferenceEquals (this, other))
+				return true;
+			return Equals (other.IPMask, IPMask) && Equals (other.Username, Username) && other.Length == Length;
+		}
+
+		public override int GetHashCode()
+		{
+			unchecked
+			{
+				int result = (IPMask != null ? IPMask.GetHashCode() : 0);
+				result = (result * 397) ^ (Username != null ? Username.GetHashCode() : 0);
+				result = (result * 397) ^ Length;
+				return result;
+			}
+		}
+
+		public static bool operator == (BanInfo left, BanInfo right)
+		{
+			return Equals (left, right);
+		}
+
+		public static bool operator != (BanInfo left, BanInfo right)
+		{
+			return !Equals (left, right);
 		}
 	}
 }

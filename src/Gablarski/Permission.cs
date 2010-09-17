@@ -124,7 +124,10 @@ namespace Gablarski
 
 		ApproveRegistrations = 20,
 
-		// Next: 21
+		/// <summary>
+		/// Add or remove bans.
+		/// </summary>
+		BanUser = 21,
 	}
 
 	public class Permission

@@ -551,6 +551,25 @@ namespace Gablarski.Server
 				c.Send (new PermissionsMessage (msg.UserId, context.PermissionsProvider.GetPermissions (msg.UserId)));
 		}
 
+		internal void BanUserMessage (MessageReceivedEventArgs e)
+		{
+			var msg = (BanUserMessage)e.Message;
+
+			if (!Manager.GetIsConnected (e.Connection))
+				return;
+
+			if (!context.GetPermission (PermissionName.BanUser, e.Connection))
+			{
+				e.Connection.Send (new PermissionDeniedMessage (ClientMessageType.BanUser));
+				return;
+			}
+
+			if (msg.Removing)
+				context.UserProvider.RemoveBan (msg.BanInfo);
+			else
+				context.UserProvider.AddBan (msg.BanInfo);
+		}
+
 		private IUserInfo GetJoiningUserInfo (IConnection connection, JoinMessage join)
 		{
 			if (!Manager.GetIsConnected (connection))

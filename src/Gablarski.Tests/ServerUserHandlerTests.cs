@@ -996,5 +996,69 @@ namespace Gablarski.Tests
 
 			Assert.AreEqual (target.UserId, c1.Client.DequeueAndAssertMessage<UserDisconnectedMessage>().UserId);
 		}
+
+		[Test]
+		public void BanNotConnected()
+		{
+			var c1 = new MockServerConnection();
+
+			handler.BanUserMessage (new MessageReceivedEventArgs (c1,
+				new BanUserMessage { BanInfo = new BanInfo (null, "username", 2)}));
+
+			c1.Client.AssertNoMessage();
+		}
+
+		[Test]
+		public void BanUserNotAllowed()
+		{
+			var user = JoinAsGuest (server, "user");
+
+			handler.BanUserMessage (new MessageReceivedEventArgs (server,
+				new BanUserMessage { BanInfo = new BanInfo (null, "username", 2)}));
+
+			Assert.AreEqual (ClientMessageType.BanUser,
+			                 server.Client.DequeueAndAssertMessage<PermissionDeniedMessage>().DeniedMessage);
+		}
+
+		[Test]
+		public void BanUser()
+		{
+			var admin = JoinAsGuest (server, "admin");
+			permissions.EnablePermissions (admin.UserId, PermissionName.BanUser);
+
+			var ban = new BanInfo (null, "username", 2);
+			users.BansChanged += (sender, e) =>
+			{
+				Assert.IsTrue (users.GetBans().Contains (ban), "User provider did not contain the new ban.");
+				Assert.Pass();
+			};
+
+			handler.BanUserMessage (new MessageReceivedEventArgs (server,
+				new BanUserMessage { Removing = false, BanInfo = ban }));
+
+			Assert.Fail ("Ban never reached the user provider");
+		}
+
+		[Test]
+		public void BanUserRemove()
+		{
+			var admin = JoinAsGuest (server, "admin");
+			permissions.EnablePermissions (admin.UserId, PermissionName.BanUser);
+
+			var ban = new BanInfo (null, "username", 2);
+			users.AddBan (ban);
+			Assert.IsTrue (users.GetBans().Contains (ban), "User provider did not contain the new ban.");
+
+			users.BansChanged += (sender, e) =>
+			{
+				Assert.IsFalse (users.GetBans().Contains (ban), "User provider still contained the ban.");
+				Assert.Pass();
+			};
+
+			handler.BanUserMessage (new MessageReceivedEventArgs (server,
+				new BanUserMessage { Removing = true, BanInfo = ban }));
+
+			Assert.Fail ("Ban never reached the user provider");
+		}
 	}
 }

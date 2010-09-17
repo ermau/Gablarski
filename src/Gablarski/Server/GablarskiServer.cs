@@ -318,6 +318,7 @@ namespace Gablarski.Server
 				{ ClientMessageType.KickUser, userHandler.KickUserMessage },
 				{ ClientMessageType.Register, userHandler.RegisterMessage },
 				{ ClientMessageType.RegistrationApproval, userHandler.RegistrationApprovalMessage },
+				{ ClientMessageType.BanUser, userHandler.BanUserMessage },
 
 				{ ClientMessageType.RequestSource, sourceHandler.RequestSourceMessage },
 				{ ClientMessageType.AudioData, sourceHandler.SendAudioDataMessage },
