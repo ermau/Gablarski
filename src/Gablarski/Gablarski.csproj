@@ -191,7 +191,6 @@
     <Compile Include="Network\SocketValueWriter.cs" />
     <Compile Include="PublicRSAParameters.cs" />
     <Compile Include="Decryption.cs" />
-    <Compile Include="Server\IBanProvider.cs" />
     <Compile Include="Server\IConnectionProvider.cs" />
     <Compile Include="Server\IRedirector.cs" />
     <Compile Include="Server\IServerChannelHandler.cs" />

@@ -57,6 +57,11 @@ namespace Gablarski.Server
 	public interface IUserProvider
 	{
 		/// <summary>
+		/// Raised when bans change both deliberately (<see cref="AddBan"/>) or externally.
+		/// </summary>
+		event EventHandler BansChanged;
+
+		/// <summary>
 		/// Gets whether or not users can be updated.
 		/// </summary>
 		bool UpdateSupported { get; }
@@ -113,6 +118,26 @@ namespace Gablarski.Server
 		/// <returns><c>true</c> if the username exists, <c>false</c> otherwise</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="username"/> is <c>null</c>.</exception>
 		bool UserExists (string username);
+
+		/// <summary>
+		/// Gets an enumerable of bans persisted.
+		/// </summary>
+		/// <returns></returns>
+		IEnumerable<BanInfo> GetBans();
+
+		/// <summary>
+		/// Adds a ban.
+		/// </summary>
+		/// <param name="ban">The ban to add.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="ban"/> is <c>null</c>.</exception>
+		void AddBan (BanInfo ban);
+
+		/// <summary>
+		/// Removes a ban.
+		/// </summary>
+		/// <param name="ban">The ban to remove.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="ban"/> is <c>null</c>.</exception>
+		void RemoveBan (BanInfo ban);
 
 		/// <summary>
 		/// Attempts to login a user using the supplied <paramref name="username"/> and <paramref name="password"/>.

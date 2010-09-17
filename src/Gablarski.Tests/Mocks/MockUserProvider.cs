@@ -72,11 +72,8 @@ namespace Gablarski.Tests
 	public class MockUserProvider
 		: IUserProvider
 	{
-		public void AddUser (MockUser user)
-		{
-			users.Add (user);
-		}
-		
+		public event EventHandler BansChanged;
+	
 		public bool UpdateSupported
 		{
 			get; set;
@@ -90,6 +87,11 @@ namespace Gablarski.Tests
 		public string RegistrationContent
 		{
 			get; set;
+		}
+
+		public void AddUser (MockUser user)
+		{
+			users.Add (user);
 		}
 
 		public IEnumerable<string> GetAwaitingRegistrations()
@@ -131,7 +133,7 @@ namespace Gablarski.Tests
 			
 			return users.Concat (awaitingApproval).Any (u => u.Username.Trim().ToLower() == username);
 		}
-		
+
 		public LoginResult Login (string username, string password)
 		{
 			if (username == null)
@@ -187,9 +189,45 @@ namespace Gablarski.Tests
 		{
 			return this.users.Cast<IUser>();
 		}
-		
+
+		public IEnumerable<BanInfo> GetBans()
+		{
+			lock (this.bans)
+				return this.bans.ToList();
+		}
+
+		public void AddBan (BanInfo ban)
+		{
+			if (ban == null)
+				throw new ArgumentNullException ("ban");
+			
+			lock (this.bans)
+				this.bans.Add (ban);
+
+			OnBansChanged();
+		}
+
+		public void RemoveBan (BanInfo ban)
+		{
+			if (ban == null)
+				throw new ArgumentNullException ("ban");
+
+			lock (this.bans)
+				this.bans.Remove (ban);
+
+			OnBansChanged();
+		}
+
+		private readonly HashSet<BanInfo> bans = new HashSet<BanInfo>();
 		private readonly List<MockUser> awaitingApproval = new List<MockUser>();
 		private readonly List<MockUser> users = new List<MockUser>();
 		private int nextGuestId;
+
+		private void OnBansChanged()
+		{
+			var changed = BansChanged;
+			if (changed != null)
+				changed (this, EventArgs.Empty);
+		}
 	}
 }

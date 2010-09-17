@@ -44,6 +44,8 @@ namespace Gablarski.Server
 	public class GuestUserProvider
 		: IUserProvider
 	{
+		public event EventHandler BansChanged;
+
 		public bool FirstUserIsAdmin
 		{
 			get;
@@ -95,6 +97,34 @@ namespace Gablarski.Server
 			return false;
 		}
 
+		public IEnumerable<BanInfo> GetBans()
+		{
+			lock (this.bans)
+				return this.bans.ToList();
+		}
+
+		public void AddBan (BanInfo ban)
+		{
+			if (ban == null)
+				throw new ArgumentNullException ("ban");
+			
+			lock (this.bans)
+				this.bans.Add (ban);
+
+			OnBansChanged();
+		}
+
+		public void RemoveBan (BanInfo ban)
+		{
+			if (ban == null)
+				throw new ArgumentNullException ("ban");
+
+			lock (this.bans)
+				this.bans.Remove (ban);
+
+			OnBansChanged();
+		}
+
 		public LoginResult Login (string username, string password)
 		{
 			int next = Interlocked.Decrement (ref this.nextUserId);
@@ -110,5 +140,13 @@ namespace Gablarski.Server
 		}
 
 		private int nextUserId = 0;
+		private readonly HashSet<BanInfo> bans = new HashSet<BanInfo>();
+
+		private void OnBansChanged()
+		{
+			var changed = BansChanged;
+			if (changed != null)
+				changed (this, EventArgs.Empty);
+		}
 	}
 }
