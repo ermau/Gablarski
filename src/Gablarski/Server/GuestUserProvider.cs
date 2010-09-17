@@ -127,6 +127,15 @@ namespace Gablarski.Server
 
 		public LoginResult Login (string username, string password)
 		{
+			if (username == null)
+				throw new ArgumentNullException ("username");
+
+			lock (this.bans)
+			{
+				if (this.bans.Any (b => !b.IsExpired && b.Username != null && b.Username.Trim().ToLower() == username.Trim().ToLower()))
+					return new LoginResult (0, LoginResultState.FailedBanned);
+			}
+
 			int next = Interlocked.Decrement (ref this.nextUserId);
 			if (FirstUserIsAdmin && next == -1)
 				next = 1;

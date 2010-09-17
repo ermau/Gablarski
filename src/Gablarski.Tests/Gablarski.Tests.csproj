@@ -88,6 +88,7 @@
     <Compile Include="AudioEngineTests.cs" />
     <Compile Include="AudioFormatTests.cs" />
     <Compile Include="AudioSourceTests.cs" />
+    <Compile Include="BanInfoTests.cs" />
     <Compile Include="ChannelInfoTests.cs" />
     <Compile Include="ClientChannelManagerTests.cs" />
     <Compile Include="ClientSourceHandlerTests.cs" />

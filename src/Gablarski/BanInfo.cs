@@ -43,21 +43,29 @@ namespace Gablarski
 	public class BanInfo
 		: IEquatable<BanInfo>
 	{
-		public BanInfo (string ipMask, string username, int length)
+		public BanInfo (string ipMask, string username, TimeSpan length)
 		{
 			if (ipMask == null && username == null)
 				throw new ArgumentNullException ("username", "Both ipMask and username can not be null");
-			if (length < 0)
-				throw new ArgumentOutOfRangeException("length", length, "Length must be >=0");
 
 			IPMask = ipMask;
 			Username = username;
 			Length = length;
+			Created = DateTime.Now;
+		}
+
+		protected BanInfo()
+		{
 		}
 
 		internal BanInfo (IValueReader reader)
 		{
 			Deserialize (reader);
+		}
+
+		public bool IsExpired
+		{
+			get { return (Length == TimeSpan.Zero) ? false : (Created.Add (Length) < DateTime.Now); }
 		}
 
 		public virtual string IPMask
@@ -72,7 +80,13 @@ namespace Gablarski
 			set;
 		}
 
-		public virtual int Length
+		public virtual DateTime Created
+		{
+			get;
+			set;
+		}
+
+		public virtual TimeSpan Length
 		{
 			get;
 			set;
@@ -82,14 +96,16 @@ namespace Gablarski
 		{
 			writer.WriteString (IPMask);
 			writer.WriteString (Username);
-			writer.WriteInt32 (Length);
+			writer.WriteInt64 (Created.ToBinary());
+			writer.WriteInt64 (Length.Ticks);
 		}
 
 		internal void Deserialize (IValueReader reader)
 		{
 			IPMask = reader.ReadString();
 			Username = reader.ReadString();
-			Length = reader.ReadInt32();
+			Created = DateTime.FromBinary (reader.ReadInt64());
+			Length = TimeSpan.FromTicks (reader.ReadInt64());
 		}
 
 		public override bool Equals(object obj)
@@ -109,7 +125,7 @@ namespace Gablarski
 				return false;
 			if (ReferenceEquals (this, other))
 				return true;
-			return Equals (other.IPMask, IPMask) && Equals (other.Username, Username) && other.Length == Length;
+			return Equals (other.IPMask, IPMask) && Equals (other.Username, Username) && other.Created.Equals (Created) && other.Length.Equals (Length);
 		}
 
 		public override int GetHashCode()
@@ -118,7 +134,8 @@ namespace Gablarski
 			{
 				int result = (IPMask != null ? IPMask.GetHashCode() : 0);
 				result = (result * 397) ^ (Username != null ? Username.GetHashCode() : 0);
-				result = (result * 397) ^ Length;
+				result = (result * 397) ^ Created.GetHashCode();
+				result = (result * 397) ^ Length.GetHashCode();
 				return result;
 			}
 		}

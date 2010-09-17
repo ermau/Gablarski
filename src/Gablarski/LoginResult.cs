@@ -99,6 +99,11 @@ namespace Gablarski
 		/// on a transport level and not actually sent the ConnectMessage.
 		/// </remarks>
 		FailedNotConnected = 10,
+
+		/// <summary>
+		/// Failed because you have been banned.
+		/// </summary>
+		FailedBanned = 11,
 	}
 
 	/// <summary>

@@ -140,6 +140,9 @@ namespace Gablarski.Tests
 				throw new ArgumentNullException ("username");
 			
 			username = username.Trim().ToLower();
+
+			if (this.bans.Any (b => !b.IsExpired && b.Username != null && b.Username.Trim().ToLower() == username))
+				return new LoginResult (0, LoginResultState.FailedBanned);
 			
 			LoginResultState state = LoginResultState.Success;
 			MockUser user = users.FirstOrDefault (u => u.Username.Trim().ToLower() == username);

@@ -272,6 +272,22 @@ namespace Gablarski.Tests
 			JoinAsGuest (server, false, true, "pass", "Nickname", "wrong");
 		}
 
+		[Test]
+		public void JoinAsGuestBannedUsername()
+		{
+			users.AddBan (new BanInfo (null, "monkeys", TimeSpan.Zero));
+
+			JoinAsGuest (server, false, true, null, "monkeys", null);
+		}
+
+		[Test]
+		public void JoinAsGuestExpiredUsernameBan()
+		{
+			users.AddBan (new BanInfo (null, "monkeys", TimeSpan.FromSeconds (1)) { Created = new DateTime (2000, 1, 1) });
+
+			JoinAsGuest (server, true, true, null, "monkeys", null);
+		}
+
 		public IUserInfo JoinAsGuest (MockServerConnection connection, string nickname)
 		{
 			return JoinAsGuest (connection, true, true, null, nickname, null);
@@ -315,7 +331,7 @@ namespace Gablarski.Tests
 			}
 			else
 			{
-				Assert.IsFalse (handler.Manager.GetIsJoined (connection));
+				Assert.IsFalse (handler.Manager.GetIsJoined (connection), "User joined");
 				observer.AssertNoMessage();
 				
 				return null;
@@ -1003,7 +1019,7 @@ namespace Gablarski.Tests
 			var c1 = new MockServerConnection();
 
 			handler.BanUserMessage (new MessageReceivedEventArgs (c1,
-				new BanUserMessage { BanInfo = new BanInfo (null, "username", 2)}));
+				new BanUserMessage { BanInfo = new BanInfo (null, "username", TimeSpan.Zero)}));
 
 			c1.Client.AssertNoMessage();
 		}
@@ -1014,7 +1030,7 @@ namespace Gablarski.Tests
 			var user = JoinAsGuest (server, "user");
 
 			handler.BanUserMessage (new MessageReceivedEventArgs (server,
-				new BanUserMessage { BanInfo = new BanInfo (null, "username", 2)}));
+				new BanUserMessage { BanInfo = new BanInfo (null, "username", TimeSpan.Zero)}));
 
 			Assert.AreEqual (ClientMessageType.BanUser,
 			                 server.Client.DequeueAndAssertMessage<PermissionDeniedMessage>().DeniedMessage);
@@ -1026,7 +1042,7 @@ namespace Gablarski.Tests
 			var admin = JoinAsGuest (server, "admin");
 			permissions.EnablePermissions (admin.UserId, PermissionName.BanUser);
 
-			var ban = new BanInfo (null, "username", 2);
+			var ban = new BanInfo (null, "username", TimeSpan.Zero);
 			users.BansChanged += (sender, e) =>
 			{
 				Assert.IsTrue (users.GetBans().Contains (ban), "User provider did not contain the new ban.");
@@ -1045,7 +1061,7 @@ namespace Gablarski.Tests
 			var admin = JoinAsGuest (server, "admin");
 			permissions.EnablePermissions (admin.UserId, PermissionName.BanUser);
 
-			var ban = new BanInfo (null, "username", 2);
+			var ban = new BanInfo (null, "username", TimeSpan.Zero);
 			users.AddBan (ban);
 			Assert.IsTrue (users.GetBans().Contains (ban), "User provider did not contain the new ban.");
 
