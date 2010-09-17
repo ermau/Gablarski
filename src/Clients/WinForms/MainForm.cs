@@ -663,8 +663,19 @@ namespace Gablarski.Clients.Windows
 		{
 			if (!e.Result.Succeeded)
 			{
-				Action<Form, string> d = (f, m) => MessageBox.Show (f, m);
-				BeginInvoke (d, this, "Login Failed: " + e.Result.ResultState);
+				Action<string, string, MessageBoxButtons, MessageBoxIcon> d = (m, c, b, i) => MessageBox.Show (this, c, m, b, i);
+
+				switch (e.Result.ResultState)
+				{
+					case LoginResultState.FailedBanned:
+						BeginInvoke (d, "You have been banned from this server.", "Login", MessageBoxButtons.OK, MessageBoxIcon.Error);
+						break;
+
+					default:
+						BeginInvoke (d, "Login Failed: " + e.Result.ResultState, "Login", MessageBoxButtons.OK, MessageBoxIcon.Error);
+						break;
+				}
+
 				gablarski.Disconnect();
 			}
 			else
@@ -707,9 +718,13 @@ namespace Gablarski.Clients.Windows
 					case LoginResultState.FailedPassword:
 						reason = "The password for the username supplied was incorrect.";
 						break;
+
+					case LoginResultState.FailedBanned:
+						reason = "You have been banned from this server.";
+						break;
 				}
 
-				Action<Form, string> d = (f, m) => MessageBox.Show (f, m);
+				Action<Form, string> d = (f, m) => MessageBox.Show (f, m, "Joining", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				BeginInvoke (d, this, "Join failed: " + reason);
 				gablarski.Disconnect();
 			}
