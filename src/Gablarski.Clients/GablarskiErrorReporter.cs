@@ -71,6 +71,10 @@ namespace Gablarski.Clients
 
 		private void ReportError (Exception ex, int parentId)
 		{
+			string version = typeof (GablarskiClient).Assembly.GetName().Version.ToString();
+			if (version == "0.0.0.0") // skip development errors
+				return;
+
 			var builder = new StringBuilder();
 			builder.Append ("type=");
 			builder.Append (ex.GetType().Name);
@@ -81,7 +85,7 @@ namespace Gablarski.Clients
 			builder.Append ("&os=");
 			builder.Append (GetOS());
 			builder.Append ("&version=");
-			builder.Append (typeof(GablarskiClient).Assembly.GetName().Version.ToString());
+			builder.Append (version);
 			builder.Append ("&parent=");
 			builder.Append (parentId.ToString());
 
