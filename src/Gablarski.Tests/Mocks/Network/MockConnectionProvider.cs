@@ -47,11 +47,22 @@ namespace Gablarski.Tests
 	{
 		public MockServerConnection EstablishConnection ()
 		{
+			return EstablishConnection (null);
+		}
+
+		public MockServerConnection EstablishConnection (IPAddress ipAddress)
+		{
 			var connection = new MockServerConnection ();
+			connection.IPAddress = ipAddress;
+
+			var c = new ConnectionMadeEventArgs (connection);
 
 			var connectionMade = this.ConnectionMade;
 			if (connectionMade != null)
-				connectionMade (this, new ConnectionMadeEventArgs(connection));
+				connectionMade (this, c);
+
+			if (c.Cancel)
+				return null;
 
 			return connection;
 		}

@@ -469,6 +469,26 @@ namespace Gablarski.Server
 		{
 			Log.Debug ("Connection Made");
 
+			if (e.Cancel)
+				return;
+
+			foreach (BanInfo ban in this.authProvider.GetBans().Where (b => b.IPMask != null))
+			{
+				string[] parts = ban.IPMask.Split ('.');
+				string[] addressParts = e.Connection.IPAddress.ToString().Split ('.');
+				for (int i = 0; i < parts.Length; ++i)
+				{
+					if (i + 1 == parts.Length || parts[i] == "*")
+					{
+						e.Cancel = true;
+						return;
+					}
+
+					if (addressParts[i] != parts[i])
+						break;
+				}
+			}
+
 			e.Connection.Decryption = this.decryption;
 			e.Connection.MessageReceived += this.OnMessageReceived;
 			e.Connection.Disconnected += this.OnClientDisconnected;

@@ -103,6 +103,15 @@ namespace Gablarski.Server
 			get;
 			private set;
 		}
+
+		/// <summary>
+		/// Gets or sets whether to cancel and reject the connection.
+		/// </summary>
+		public bool Cancel
+		{
+			get;
+			set;
+		}
 	}
 
 	public class ConnectionlessMessageReceivedEventArgs

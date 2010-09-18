@@ -356,7 +356,13 @@ namespace Gablarski.Network
 
 				stream.Write (BitConverter.GetBytes (nid), 0, sizeof (uint));
 
-				OnConnectionMade (new ConnectionMadeEventArgs (connection));
+				var cevent = new ConnectionMadeEventArgs (connection);
+				OnConnectionMade (cevent);
+				if (cevent.Cancel)
+				{
+					client.Close();
+					return;
+				}
 
 				byte[] buffer = new byte[1];
 				client.GetStream ().BeginRead (buffer, 0, 1, ReliableReceive, new Tuple<NetworkServerConnection, byte[]> (connection, buffer));

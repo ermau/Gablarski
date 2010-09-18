@@ -104,6 +104,24 @@ namespace Gablarski.Tests
 		}
 
 		[Test]
+		public void IPBanned()
+		{
+			this.users.AddBan (new BanInfo ("192.168.1.2", null, TimeSpan.Zero));
+
+			var connection = provider.EstablishConnection (IPAddress.Parse ("192.168.1.2"));
+			Assert.IsNull (connection);
+		}
+
+		[Test]
+		public void IPMaskBanned()
+		{
+			this.users.AddBan (new BanInfo ("192.168.*.*", null, TimeSpan.Zero));
+
+			var connection = provider.EstablishConnection (IPAddress.Parse ("192.168.1.2"));
+			Assert.IsNull (connection);
+		}
+
+		[Test]
 		public void OldVersionReject ()
 		{
 			var connection = provider.EstablishConnection ();
