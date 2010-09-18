@@ -40,11 +40,12 @@ using System.Net;
 using System.Net.Sockets;
 using System.Collections.Generic;
 using Gablarski.Messages;
+using Gablarski.Server;
 
 namespace Gablarski.Network
 {
 	public class NetworkServerConnection
-		: IConnection
+		: IServerConnection
 	{
 		internal NetworkServerConnection (NetworkServerConnectionProvider provider, uint nid, TcpClient tcp, IPEndPoint endPoint, IValueWriter uwriter)
 		{
@@ -69,6 +70,11 @@ namespace Gablarski.Network
 		public bool IsAsync
 		{
 			get { return true; }
+		}
+
+		public IPAddress IPAddress
+		{
+			get { return this.EndPoint.Address; }
 		}
 
 		public IEncryption Encryption

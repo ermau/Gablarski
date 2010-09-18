@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -60,7 +60,7 @@ namespace Gablarski.WebServer
 		{
 			if (request.UriParts.Length > 0 && request.UriParts[0] == "query")
 			{
-				cmanager.ProcessSession (session, response);
+				cmanager.ProcessSession (request, session, response);
 
 				var bodyWriter = new StreamWriter (response.Body);
 				

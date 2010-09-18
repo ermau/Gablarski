@@ -37,16 +37,24 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using Gablarski.Messages;
+using Gablarski.Server;
 using HttpServer.Sessions;
 
 namespace Gablarski.WebServer
 {
 	public class WebServerConnection
-		: IConnection
+		: IServerConnection
 	{
-		public WebServerConnection (IHttpSession session)
+		public WebServerConnection (IHttpSession session, IPAddress ipAddress)
 		{
+			if (session == null)
+				throw new ArgumentNullException ("session");
+			if (ipAddress == null)
+				throw new ArgumentNullException ("ipAddress");
+
+			IPAddress = ipAddress;
 			this.IsConnected = true;
 			this.session = session;
 		}
@@ -66,6 +74,12 @@ namespace Gablarski.WebServer
 		public bool IsAsync
 		{
 			get { return true; }
+		}
+
+		public IPAddress IPAddress
+		{
+			get;
+			private set;
 		}
 
 		public IEncryption Encryption

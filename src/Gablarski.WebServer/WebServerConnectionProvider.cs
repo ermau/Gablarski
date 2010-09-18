@@ -63,9 +63,9 @@ namespace Gablarski.WebServer
 		#region Implementation of IConnectionProvider
 
 		public event EventHandler<ConnectionlessMessageReceivedEventArgs> ConnectionlessMessageReceived;
-		public event EventHandler<ConnectionEventArgs> ConnectionMade;
+		public event EventHandler<ConnectionMadeEventArgs> ConnectionMade;
 
-		public void SendConnectionlessMessage(MessageBase message, EndPoint endpoint)
+		public void SendConnectionlessMessage (MessageBase message, EndPoint endpoint)
 		{
 			throw new NotSupportedException();
 		}
@@ -101,7 +101,7 @@ namespace Gablarski.WebServer
 		private HttpServer.HttpServer server;
 		private int port = 6113;
 
-		internal protected void OnConnectionMade (ConnectionEventArgs e)
+		internal protected void OnConnectionMade (ConnectionMadeEventArgs e)
 		{
 			var made = this.ConnectionMade;
 			if (made != null)

@@ -50,7 +50,7 @@ namespace Gablarski.Server
 		/// <summary>
 		/// A connection was made.
 		/// </summary>
-		event EventHandler<ConnectionEventArgs> ConnectionMade;
+		event EventHandler<ConnectionMadeEventArgs> ConnectionMade;
 
 		/// <summary>
 		/// Sends a connectionless <paramref name="message"/> to the <paramref name="endpoint"/>.
@@ -74,6 +74,35 @@ namespace Gablarski.Server
 		/// </summary>
 		/// <see cref="StartListening"/>
 		void StopListening ();
+	}
+
+	/// <summary>
+	/// Provides data for the <see cref="IConnectionProvider.ConnectionMade"/> event.
+	/// </summary>
+	public class ConnectionMadeEventArgs
+		: EventArgs
+	{
+		/// <summary>
+		/// Creates a new instance of <see cref="ConnectionMadeEventArgs"/>.
+		/// </summary>
+		/// <param name="connection">The newly formed connection.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="connection"/> is <c>null</c>.</exception>
+		public ConnectionMadeEventArgs (IServerConnection connection)
+		{
+			if (connection == null)
+				throw new ArgumentNullException ("connection");
+
+			Connection = connection;
+		}
+
+		/// <summary>
+		/// Gets the newly formed connection.
+		/// </summary>
+		public IServerConnection Connection
+		{
+			get;
+			private set;
+		}
 	}
 
 	public class ConnectionlessMessageReceivedEventArgs

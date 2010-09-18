@@ -195,6 +195,7 @@
     <Compile Include="Server\IRedirector.cs" />
     <Compile Include="Server\IServerChannelHandler.cs" />
     <Compile Include="Server\IConnectionManager.cs" />
+    <Compile Include="Server\IServerConnection.cs" />
     <Compile Include="Server\IServerSourceHandler.cs" />
     <Compile Include="Server\IServerSourceManager.cs" />
     <Compile Include="Server\IServerUserHandler.cs" />

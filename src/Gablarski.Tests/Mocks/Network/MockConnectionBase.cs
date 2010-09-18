@@ -38,6 +38,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using Gablarski.Messages;
 using NUnit.Framework;
@@ -59,6 +60,12 @@ namespace Gablarski.Tests
 		public bool IsAsync
 		{
 			get { return true; }
+		}
+
+		public IPAddress IPAddress
+		{
+			get;
+			set;
 		}
 
 		public IEncryption Encryption

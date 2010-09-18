@@ -465,7 +465,7 @@ namespace Gablarski.Server
 			}
 		}
 		
-		private void OnConnectionMade (object sender, ConnectionEventArgs e)
+		private void OnConnectionMade (object sender, ConnectionMadeEventArgs e)
 		{
 			Log.Debug ("Connection Made");
 

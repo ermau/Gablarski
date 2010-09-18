@@ -65,7 +65,7 @@ namespace Gablarski.WebServer
 				if (part != this.sectionName)
 					return false;
 
-				if (this.Connections.ProcessSession (session, response) || !MustBeLoggedIn)
+				if (this.Connections.ProcessSession (request, session, response) || !MustBeLoggedIn)
 					return ProcessSection (request, response, session);
 				else
 					return false;

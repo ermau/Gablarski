@@ -57,7 +57,7 @@ namespace Gablarski.Network
 		}
 
 		public event EventHandler<ConnectionlessMessageReceivedEventArgs> ConnectionlessMessageReceived;
-		public event EventHandler<ConnectionEventArgs> ConnectionMade;
+		public event EventHandler<ConnectionMadeEventArgs> ConnectionMade;
 
 		public int Port
 		{
@@ -356,7 +356,7 @@ namespace Gablarski.Network
 
 				stream.Write (BitConverter.GetBytes (nid), 0, sizeof (uint));
 
-				OnConnectionMade (new ConnectionEventArgs (connection));
+				OnConnectionMade (new ConnectionMadeEventArgs (connection));
 
 				byte[] buffer = new byte[1];
 				client.GetStream ().BeginRead (buffer, 0, 1, ReliableReceive, new Tuple<NetworkServerConnection, byte[]> (connection, buffer));
@@ -513,7 +513,7 @@ namespace Gablarski.Network
 			}
 		}
 
-		private void OnConnectionMade (ConnectionEventArgs e)
+		private void OnConnectionMade (ConnectionMadeEventArgs e)
 		{
 			var connection = this.ConnectionMade;
 			if (connection != null)

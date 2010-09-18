@@ -36,23 +36,16 @@
 
 using System.Linq;
 using Gablarski.Messages;
+using Gablarski.Server;
 
 namespace Gablarski.Tests
 {
 	public class MockServerConnection
-		: MockConnectionBase
+		: MockConnectionBase, IServerConnection
 	{
 		public MockClientConnection Client
 		{
-			get
-			{
-				if (this.client == null)
-				{
-					this.client = new MockClientConnection (this);
-				}
-
-				return this.client;
-			}
+			get { return this.client ?? (this.client = new MockClientConnection (this)); }
 		}
 
 		public override void Send (MessageBase message)

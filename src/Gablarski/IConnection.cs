@@ -160,7 +160,7 @@ namespace Gablarski
 	}
 
 	/// <summary>
-	/// Provides data for the <see cref="IConnectionProvider.ConnectionMade"/> event.
+	/// Provides data for various connection-based events.
 	/// </summary>
 	public class ConnectionEventArgs
 		: EventArgs
@@ -169,7 +169,7 @@ namespace Gablarski
 		/// Initializes a new instance of the <see cref="ConnectionEventArgs"/> class.
 		/// </summary>
 		/// <param name="connection">The connection that was made.</param>
-		public ConnectionEventArgs(IConnection connection)
+		public ConnectionEventArgs (IConnection connection)
 		{
 			this.Connection = connection;
 		}

@@ -40,6 +40,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using Gablarski.Messages;
+using Gablarski.Server;
 using HttpServer;
 using HttpServer.Sessions;
 using Cadenza;
@@ -75,7 +76,7 @@ namespace Gablarski.WebServer
 		    set { timeBetweenScans = value; }
 		}
 
-		public bool ProcessSession (IHttpSession session, IHttpResponse response)
+		public bool ProcessSession (IHttpRequest request, IHttpSession session, IHttpResponse response)
 		{
 			bool newSession = false;
 			lock (connections)
@@ -93,7 +94,7 @@ namespace Gablarski.WebServer
 
 				if (newSession)
 				{
-					WebServerConnection connection = new WebServerConnection (session);
+					WebServerConnection connection = new WebServerConnection (session, request.RemoteEndPoint.Address);
 
 					session["mqueue"] = new List<MessageBase>();
 					session["connection"] = connection;
@@ -102,7 +103,7 @@ namespace Gablarski.WebServer
 
 					//response.Cookies.Add (new ResponseCookie (Server.SessionCookieName, session.Id, DateTime.Now.Add (SessionTtl)));
 
-					ConnectionProvider.OnConnectionMade (new ConnectionEventArgs (connection));
+					ConnectionProvider.OnConnectionMade (new ConnectionMadeEventArgs (connection));
 					connections.Add (session, connection);
 				}
 
