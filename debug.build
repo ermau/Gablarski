@@ -124,6 +124,7 @@
 		<zip zipfile="Gablarski-Server-Debug.zip">
 			<fileset basedir="src\Server\Barrel\bin\x86\Debug">
 				<include name="Barrel.exe" />
+				<include name="Barrel.exe.config" />
 				<include name="*.dll" />
 				<include name="*.xml" />
 				<include name="*.pdb" />
