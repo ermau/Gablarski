@@ -1,4 +1,4 @@
-// Copyright (c) 2010, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -35,18 +35,16 @@
 // DAMAGE.
 
 using System.Linq;
-using FluentNHibernate.Mapping;
 
-namespace Gablarski.LocalServer.Mappings
+namespace Gablarski.LocalServer
 {
-	public class UserMap
-		: ClassMap<LocalUser>
+	public class LocalBanInfo
+		: BanInfo
 	{
-		public UserMap()
+		public virtual int Id
 		{
-			Id (x => x.UserId, "userID");
-			Map (x => x.Username, "userName");
-			Map (x => x.HashedPassword, "userPassword");
+			get;
+			private set;
 		}
 	}
 }

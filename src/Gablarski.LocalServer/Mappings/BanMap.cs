@@ -1,4 +1,4 @@
-// Copyright (c) 2010, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -39,14 +39,18 @@ using FluentNHibernate.Mapping;
 
 namespace Gablarski.LocalServer.Mappings
 {
-	public class UserMap
-		: ClassMap<LocalUser>
+	public class BanMap
+		: ClassMap<LocalBanInfo>
 	{
-		public UserMap()
+		public BanMap()
 		{
-			Id (x => x.UserId, "userID");
-			Map (x => x.Username, "userName");
-			Map (x => x.HashedPassword, "userPassword");
+			Id (b => b.Id, "banID");
+			Map (b => b.Created, "banCreated");
+			Map (b => b.Length, "banLength");
+			Map (b => b.Username, "banUsername")
+				.Nullable();
+			Map (b => b.IPMask, "banIPMask")
+				.Nullable();
 		}
 	}
 }

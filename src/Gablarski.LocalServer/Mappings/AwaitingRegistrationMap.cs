@@ -1,5 +1,4 @@
-// Copyright (c) 2010, Eric Maupin
-// All rights reserved.
+﻿// All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
 // or without modification, are permitted provided that
@@ -39,14 +38,14 @@ using FluentNHibernate.Mapping;
 
 namespace Gablarski.LocalServer.Mappings
 {
-	public class UserMap
-		: ClassMap<LocalUser>
+	public class AwaitingRegistrationMap
+		: ClassMap<AwaitingRegistration>
 	{
-		public UserMap()
+		public AwaitingRegistrationMap()
 		{
-			Id (x => x.UserId, "userID");
-			Map (x => x.Username, "userName");
-			Map (x => x.HashedPassword, "userPassword");
+			Id (ra => ra.Id, "awaitingId");
+			Map (ra => ra.Username, "awaitingUsername");
+			Map (ra => ra.HashedPassword, "awaitingPassword");
 		}
 	}
 }

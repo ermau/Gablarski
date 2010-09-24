@@ -51,7 +51,7 @@ namespace Gablarski.LocalServer
 			set;
 		}
 
-		public virtual string EncryptedPassword
+		public virtual string HashedPassword
 		{
 			get; set;
 		}

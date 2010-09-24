@@ -97,6 +97,9 @@ namespace Gablarski.LocalServer
 
 		public ChannelEditResult SaveChannel (ChannelInfo channel)
 		{
+			if (channel == null)
+				throw new ArgumentNullException ("channel");
+
 			using (ISession session = Persistance.SessionFactory.OpenSession())
 			using (ITransaction transaction = session.BeginTransaction (IsolationLevel.Serializable))
 			{
@@ -114,6 +117,9 @@ namespace Gablarski.LocalServer
 
 		public ChannelEditResult DeleteChannel (ChannelInfo channel)
 		{
+			if (channel == null)
+				throw new ArgumentNullException ("channel");
+
 			using (ISession session = Persistance.SessionFactory.OpenSession())
 			using (ITransaction transaction = session.BeginTransaction (IsolationLevel.Serializable))
 			{

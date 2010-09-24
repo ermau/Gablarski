@@ -68,12 +68,17 @@
   <ItemGroup>
     <Compile Include="ChannelProvider.cs" />
     <Compile Include="Config\LocalServerConfiguration.cs" />
+    <Compile Include="LocalBanInfo.cs" />
     <Compile Include="LocalChannelInfo.cs" />
     <Compile Include="LocalUser.cs" />
+    <Compile Include="Mappings\BanMap.cs" />
     <Compile Include="Mappings\ChannelMap.cs" />
+    <Compile Include="Mappings\AwaitingRegistrationMap.cs" />
     <Compile Include="Mappings\UserMap.cs" />
     <Compile Include="Persistance.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="AwaitingRegistration.cs" />
+    <Compile Include="UserProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Gablarski\Gablarski.csproj">

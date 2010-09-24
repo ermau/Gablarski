@@ -1,5 +1,4 @@
-// Copyright (c) 2010, Eric Maupin
-// All rights reserved.
+﻿// All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
 // or without modification, are permitted provided that
@@ -35,18 +34,27 @@
 // DAMAGE.
 
 using System.Linq;
-using FluentNHibernate.Mapping;
 
-namespace Gablarski.LocalServer.Mappings
+namespace Gablarski.LocalServer
 {
-	public class UserMap
-		: ClassMap<LocalUser>
+	public class AwaitingRegistration
 	{
-		public UserMap()
+		public virtual int Id
 		{
-			Id (x => x.UserId, "userID");
-			Map (x => x.Username, "userName");
-			Map (x => x.HashedPassword, "userPassword");
+			get;
+			private set;
+		}
+
+		public virtual string Username
+		{
+			get;
+			set;
+		}
+
+		public virtual string HashedPassword
+		{
+			get;
+			set;
 		}
 	}
 }
