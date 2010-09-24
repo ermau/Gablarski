@@ -171,6 +171,8 @@ namespace Gablarski.LocalServer
 						return RegisterResult.FailedUsernameInUse;
 
 					CreateUser (session, username, HashPassword (password));
+
+					return RegisterResult.Success;
 				}
 				else if (RegistrationMode == UserRegistrationMode.Approved)
 				{
