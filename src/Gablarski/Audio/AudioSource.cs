@@ -72,18 +72,15 @@ namespace Gablarski.Audio
 		/// </summary>
 		/// <param name="name"></param>
 		/// <param name="sourceId">If sourceId &lt; 0, the audio source is local.</param>
-		/// <param name="ownerId"></param>
-		/// <param name="isMuted"></param>
-		/// <param name="args"></param>
 		public AudioSource (string name, int sourceId, int ownerId, bool isMuted, AudioCodecArgs args)
 			: base (args)
 		{
 			if (name == null)
 				throw new ArgumentNullException ("name");
-			if (ownerId == 0)
-				throw new ArgumentException ("ownerId");			
 			if (sourceId == 0)
 				throw new ArgumentOutOfRangeException ("sourceId");
+			if (sourceId > 0 && ownerId == 0)
+				throw new ArgumentException ("ownerId");			
 
 			this.Name = name;
 			this.Id = sourceId;
