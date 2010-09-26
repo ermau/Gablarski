@@ -88,6 +88,11 @@ namespace Gablarski.Growl
 			Notify (type, String.Format (say, nickname), priority);
 		}
 
+		public override string ToString()
+		{
+			return Name;
+		}
+
 		private readonly GrowlConnector growl = new GrowlConnector ();
 		private readonly Application gablarskiApp;
 

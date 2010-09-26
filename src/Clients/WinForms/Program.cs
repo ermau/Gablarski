@@ -111,7 +111,7 @@ namespace Gablarski.Clients.Windows
 			{
 				DialogResult result = MessageBox.Show ("Register gablarski:// urls with this client?", "Register gablarski://", MessageBoxButtons.OKCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1);
 				Settings.EnableGablarskiURLs = (result == DialogResult.OK);
-				Settings.SaveSettings ();
+				Settings.Save ();
 
 				try
 				{
@@ -119,7 +119,7 @@ namespace Gablarski.Clients.Windows
 						EnableGablarskiURIs();
 
 					Settings.FirstRun = false;
-					Settings.SaveSettings ();
+					Settings.Save ();
 				}
 				catch
 				{
@@ -164,7 +164,7 @@ namespace Gablarski.Clients.Windows
 			
 			Application.Run (m);
 
-			Settings.SaveSettings();
+			Settings.Save();
 		}
 	}
 }

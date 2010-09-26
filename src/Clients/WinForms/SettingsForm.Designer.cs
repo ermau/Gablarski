@@ -28,18 +28,9 @@
 		/// </summary>
 		private void InitializeComponent ()
 		{
-			System.Windows.Forms.ColumnHeader columnHeader1;
 			System.Windows.Forms.Label label1;
 			System.Windows.Forms.GroupBox voiceActivationGroup;
-			this.btnOk = new System.Windows.Forms.Button();
-			this.btnCancel = new System.Windows.Forms.Button();
-			this.tabs = new System.Windows.Forms.TabControl();
-			this.generalTab = new System.Windows.Forms.TabPage();
-			this.gablarskiURLs = new System.Windows.Forms.CheckBox();
-			this.inConnectOnStart = new System.Windows.Forms.CheckBox();
-			this.inDisplaySources = new System.Windows.Forms.CheckBox();
-			this.voiceTab = new System.Windows.Forms.TabPage();
-			this.playbackSelector = new Gablarski.DeviceSelector();
+			System.Windows.Forms.Label label14;
 			this.voiceActivation = new System.Windows.Forms.CheckBox();
 			this.dispThreshold = new System.Windows.Forms.Label();
 			this.label3 = new System.Windows.Forms.Label();
@@ -48,13 +39,27 @@
 			this.label2 = new System.Windows.Forms.Label();
 			this.lblVoiceSensitivity = new System.Windows.Forms.Label();
 			this.vadSensitivity = new System.Windows.Forms.TrackBar();
+			this.btnOk = new System.Windows.Forms.Button();
+			this.btnCancel = new System.Windows.Forms.Button();
+			this.tabs = new System.Windows.Forms.TabControl();
+			this.generalTab = new System.Windows.Forms.TabPage();
+			this.gablarskiURLs = new System.Windows.Forms.CheckBox();
+			this.inConnectOnStart = new System.Windows.Forms.CheckBox();
+			this.inDisplaySources = new System.Windows.Forms.CheckBox();
+			this.voiceTab = new System.Windows.Forms.TabPage();
+			this.label13 = new System.Windows.Forms.Label();
+			this.label12 = new System.Windows.Forms.Label();
+			this.label11 = new System.Windows.Forms.Label();
+			this.label10 = new System.Windows.Forms.Label();
+			this.playbackVolume = new System.Windows.Forms.TrackBar();
+			this.playbackSelector = new Gablarski.DeviceSelector();
 			this.voiceSelector = new Gablarski.DeviceSelector();
 			this.controlsTab = new System.Windows.Forms.TabPage();
 			this.addBinding = new System.Windows.Forms.LinkLabel();
-			this.bindignListHost = new System.Windows.Forms.Integration.ElementHost();
-			this.bindingList = new Gablarski.Clients.Windows.BindingList();
 			this.inInputProvider = new System.Windows.Forms.ComboBox();
 			this.lblInputProvider = new System.Windows.Forms.Label();
+			this.bindignListHost = new System.Windows.Forms.Integration.ElementHost();
+			this.bindingList = new Gablarski.Clients.Windows.BindingList();
 			this.musicTab = new System.Windows.Forms.TabPage();
 			this.inUseCurrentVolume = new System.Windows.Forms.CheckBox();
 			this.musicIgnoreYou = new System.Windows.Forms.CheckBox();
@@ -69,34 +74,25 @@
 			this.volumeControl = new System.Windows.Forms.CheckBox();
 			this.musicPlayers = new System.Windows.Forms.CheckedListBox();
 			this.tabNotifications = new System.Windows.Forms.TabPage();
+			this.notifiers = new System.Windows.Forms.CheckedListBox();
+			this.enabledNotifications = new System.Windows.Forms.CheckedListBox();
 			this.enableNotifications = new System.Windows.Forms.CheckBox();
-			this.notifiers = new System.Windows.Forms.ListView();
-			this.playbackVolume = new System.Windows.Forms.TrackBar();
-			this.label10 = new System.Windows.Forms.Label();
-			this.label11 = new System.Windows.Forms.Label();
-			this.label12 = new System.Windows.Forms.Label();
-			this.label13 = new System.Windows.Forms.Label();
-			columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			label1 = new System.Windows.Forms.Label();
 			voiceActivationGroup = new System.Windows.Forms.GroupBox();
-			this.tabs.SuspendLayout();
-			this.generalTab.SuspendLayout();
-			this.voiceTab.SuspendLayout();
+			label14 = new System.Windows.Forms.Label();
 			voiceActivationGroup.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.threshold)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.vadSensitivity)).BeginInit();
+			this.tabs.SuspendLayout();
+			this.generalTab.SuspendLayout();
+			this.voiceTab.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.playbackVolume)).BeginInit();
 			this.controlsTab.SuspendLayout();
 			this.musicTab.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.normalVolume)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.talkingVolume)).BeginInit();
 			this.tabNotifications.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.playbackVolume)).BeginInit();
 			this.SuspendLayout();
-			// 
-			// columnHeader1
-			// 
-			columnHeader1.Text = "Notifier";
-			columnHeader1.Width = 266;
 			// 
 			// label1
 			// 
@@ -106,114 +102,6 @@
 			label1.Size = new System.Drawing.Size(50, 13);
 			label1.TabIndex = 7;
 			label1.Text = "Bindings:";
-			// 
-			// btnOk
-			// 
-			this.btnOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnOk.Location = new System.Drawing.Point(354, 378);
-			this.btnOk.Name = "btnOk";
-			this.btnOk.Size = new System.Drawing.Size(75, 23);
-			this.btnOk.TabIndex = 2;
-			this.btnOk.Text = "Ok";
-			this.btnOk.UseVisualStyleBackColor = true;
-			this.btnOk.Click += new System.EventHandler(this.btnOk_Click);
-			// 
-			// btnCancel
-			// 
-			this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.btnCancel.Location = new System.Drawing.Point(435, 378);
-			this.btnCancel.Name = "btnCancel";
-			this.btnCancel.Size = new System.Drawing.Size(75, 23);
-			this.btnCancel.TabIndex = 3;
-			this.btnCancel.Text = "Cancel";
-			this.btnCancel.UseVisualStyleBackColor = true;
-			// 
-			// tabs
-			// 
-			this.tabs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-						| System.Windows.Forms.AnchorStyles.Left)
-						| System.Windows.Forms.AnchorStyles.Right)));
-			this.tabs.Controls.Add(this.generalTab);
-			this.tabs.Controls.Add(this.voiceTab);
-			this.tabs.Controls.Add(this.controlsTab);
-			this.tabs.Controls.Add(this.musicTab);
-			this.tabs.Controls.Add(this.tabNotifications);
-			this.tabs.Location = new System.Drawing.Point(0, 0);
-			this.tabs.Name = "tabs";
-			this.tabs.SelectedIndex = 0;
-			this.tabs.Size = new System.Drawing.Size(522, 372);
-			this.tabs.TabIndex = 4;
-			// 
-			// generalTab
-			// 
-			this.generalTab.Controls.Add(this.gablarskiURLs);
-			this.generalTab.Controls.Add(this.inConnectOnStart);
-			this.generalTab.Controls.Add(this.inDisplaySources);
-			this.generalTab.Location = new System.Drawing.Point(4, 22);
-			this.generalTab.Name = "generalTab";
-			this.generalTab.Padding = new System.Windows.Forms.Padding(3);
-			this.generalTab.Size = new System.Drawing.Size(514, 343);
-			this.generalTab.TabIndex = 0;
-			this.generalTab.Text = "General";
-			this.generalTab.UseVisualStyleBackColor = true;
-			// 
-			// gablarskiURLs
-			// 
-			this.gablarskiURLs.AutoSize = true;
-			this.gablarskiURLs.Location = new System.Drawing.Point(8, 52);
-			this.gablarskiURLs.Name = "gablarskiURLs";
-			this.gablarskiURLs.Size = new System.Drawing.Size(136, 17);
-			this.gablarskiURLs.TabIndex = 2;
-			this.gablarskiURLs.Text = "Enable Gablarski URLs";
-			this.gablarskiURLs.UseVisualStyleBackColor = true;
-			// 
-			// inConnectOnStart
-			// 
-			this.inConnectOnStart.AutoSize = true;
-			this.inConnectOnStart.Location = new System.Drawing.Point(8, 29);
-			this.inConnectOnStart.Name = "inConnectOnStart";
-			this.inConnectOnStart.Size = new System.Drawing.Size(146, 17);
-			this.inConnectOnStart.TabIndex = 1;
-			this.inConnectOnStart.Text = "Show Connect on startup";
-			this.inConnectOnStart.UseVisualStyleBackColor = true;
-			// 
-			// inDisplaySources
-			// 
-			this.inDisplaySources.AutoSize = true;
-			this.inDisplaySources.Location = new System.Drawing.Point(8, 6);
-			this.inDisplaySources.Name = "inDisplaySources";
-			this.inDisplaySources.Size = new System.Drawing.Size(129, 17);
-			this.inDisplaySources.TabIndex = 0;
-			this.inDisplaySources.Text = "Display audio sources";
-			this.inDisplaySources.UseVisualStyleBackColor = true;
-			// 
-			// voiceTab
-			// 
-			this.voiceTab.Controls.Add(this.label13);
-			this.voiceTab.Controls.Add(this.label12);
-			this.voiceTab.Controls.Add(this.label11);
-			this.voiceTab.Controls.Add(this.label10);
-			this.voiceTab.Controls.Add(this.playbackSelector);
-			this.voiceTab.Controls.Add(voiceActivationGroup);
-			this.voiceTab.Controls.Add(this.voiceSelector);
-			this.voiceTab.Controls.Add(this.playbackVolume);
-			this.voiceTab.Location = new System.Drawing.Point(4, 22);
-			this.voiceTab.Name = "voiceTab";
-			this.voiceTab.Padding = new System.Windows.Forms.Padding(3);
-			this.voiceTab.Size = new System.Drawing.Size(514, 346);
-			this.voiceTab.TabIndex = 2;
-			this.voiceTab.Text = "Sound";
-			this.voiceTab.UseVisualStyleBackColor = true;
-			// 
-			// playbackSelector
-			// 
-			this.playbackSelector.DeviceLabel = "Playback Device:";
-			this.playbackSelector.Location = new System.Drawing.Point(6, 6);
-			this.playbackSelector.Name = "playbackSelector";
-			this.playbackSelector.ProviderLabel = "Playback Provider:";
-			this.playbackSelector.Size = new System.Drawing.Size(500, 50);
-			this.playbackSelector.TabIndex = 9;
 			// 
 			// voiceActivationGroup
 			// 
@@ -322,6 +210,170 @@
 			this.vadSensitivity.TickStyle = System.Windows.Forms.TickStyle.TopLeft;
 			this.vadSensitivity.Value = 4000;
 			// 
+			// label14
+			// 
+			label14.AutoSize = true;
+			label14.Location = new System.Drawing.Point(5, 129);
+			label14.Name = "label14";
+			label14.Size = new System.Drawing.Size(68, 13);
+			label14.TabIndex = 4;
+			label14.Text = "Notifications:";
+			// 
+			// btnOk
+			// 
+			this.btnOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.btnOk.Location = new System.Drawing.Point(354, 378);
+			this.btnOk.Name = "btnOk";
+			this.btnOk.Size = new System.Drawing.Size(75, 23);
+			this.btnOk.TabIndex = 2;
+			this.btnOk.Text = "Ok";
+			this.btnOk.UseVisualStyleBackColor = true;
+			this.btnOk.Click += new System.EventHandler(this.btnOk_Click);
+			// 
+			// btnCancel
+			// 
+			this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+			this.btnCancel.Location = new System.Drawing.Point(435, 378);
+			this.btnCancel.Name = "btnCancel";
+			this.btnCancel.Size = new System.Drawing.Size(75, 23);
+			this.btnCancel.TabIndex = 3;
+			this.btnCancel.Text = "Cancel";
+			this.btnCancel.UseVisualStyleBackColor = true;
+			// 
+			// tabs
+			// 
+			this.tabs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+						| System.Windows.Forms.AnchorStyles.Left)
+						| System.Windows.Forms.AnchorStyles.Right)));
+			this.tabs.Controls.Add(this.generalTab);
+			this.tabs.Controls.Add(this.voiceTab);
+			this.tabs.Controls.Add(this.controlsTab);
+			this.tabs.Controls.Add(this.musicTab);
+			this.tabs.Controls.Add(this.tabNotifications);
+			this.tabs.Location = new System.Drawing.Point(0, 0);
+			this.tabs.Name = "tabs";
+			this.tabs.SelectedIndex = 0;
+			this.tabs.Size = new System.Drawing.Size(522, 372);
+			this.tabs.TabIndex = 4;
+			// 
+			// generalTab
+			// 
+			this.generalTab.Controls.Add(this.gablarskiURLs);
+			this.generalTab.Controls.Add(this.inConnectOnStart);
+			this.generalTab.Controls.Add(this.inDisplaySources);
+			this.generalTab.Location = new System.Drawing.Point(4, 22);
+			this.generalTab.Name = "generalTab";
+			this.generalTab.Padding = new System.Windows.Forms.Padding(3);
+			this.generalTab.Size = new System.Drawing.Size(514, 346);
+			this.generalTab.TabIndex = 0;
+			this.generalTab.Text = "General";
+			this.generalTab.UseVisualStyleBackColor = true;
+			// 
+			// gablarskiURLs
+			// 
+			this.gablarskiURLs.AutoSize = true;
+			this.gablarskiURLs.Location = new System.Drawing.Point(8, 52);
+			this.gablarskiURLs.Name = "gablarskiURLs";
+			this.gablarskiURLs.Size = new System.Drawing.Size(136, 17);
+			this.gablarskiURLs.TabIndex = 2;
+			this.gablarskiURLs.Text = "Enable Gablarski URLs";
+			this.gablarskiURLs.UseVisualStyleBackColor = true;
+			// 
+			// inConnectOnStart
+			// 
+			this.inConnectOnStart.AutoSize = true;
+			this.inConnectOnStart.Location = new System.Drawing.Point(8, 29);
+			this.inConnectOnStart.Name = "inConnectOnStart";
+			this.inConnectOnStart.Size = new System.Drawing.Size(146, 17);
+			this.inConnectOnStart.TabIndex = 1;
+			this.inConnectOnStart.Text = "Show Connect on startup";
+			this.inConnectOnStart.UseVisualStyleBackColor = true;
+			// 
+			// inDisplaySources
+			// 
+			this.inDisplaySources.AutoSize = true;
+			this.inDisplaySources.Location = new System.Drawing.Point(8, 6);
+			this.inDisplaySources.Name = "inDisplaySources";
+			this.inDisplaySources.Size = new System.Drawing.Size(129, 17);
+			this.inDisplaySources.TabIndex = 0;
+			this.inDisplaySources.Text = "Display audio sources";
+			this.inDisplaySources.UseVisualStyleBackColor = true;
+			// 
+			// voiceTab
+			// 
+			this.voiceTab.Controls.Add(this.label13);
+			this.voiceTab.Controls.Add(this.label12);
+			this.voiceTab.Controls.Add(this.label11);
+			this.voiceTab.Controls.Add(this.label10);
+			this.voiceTab.Controls.Add(voiceActivationGroup);
+			this.voiceTab.Controls.Add(this.playbackVolume);
+			this.voiceTab.Controls.Add(this.playbackSelector);
+			this.voiceTab.Controls.Add(this.voiceSelector);
+			this.voiceTab.Location = new System.Drawing.Point(4, 22);
+			this.voiceTab.Name = "voiceTab";
+			this.voiceTab.Padding = new System.Windows.Forms.Padding(3);
+			this.voiceTab.Size = new System.Drawing.Size(514, 346);
+			this.voiceTab.TabIndex = 2;
+			this.voiceTab.Text = "Sound";
+			this.voiceTab.UseVisualStyleBackColor = true;
+			// 
+			// label13
+			// 
+			this.label13.AutoSize = true;
+			this.label13.Location = new System.Drawing.Point(98, 99);
+			this.label13.Name = "label13";
+			this.label13.Size = new System.Drawing.Size(33, 13);
+			this.label13.TabIndex = 14;
+			this.label13.Text = "100%";
+			// 
+			// label12
+			// 
+			this.label12.AutoSize = true;
+			this.label12.Location = new System.Drawing.Point(478, 99);
+			this.label12.Name = "label12";
+			this.label12.Size = new System.Drawing.Size(33, 13);
+			this.label12.TabIndex = 13;
+			this.label12.Text = "500%";
+			// 
+			// label11
+			// 
+			this.label11.AutoSize = true;
+			this.label11.Location = new System.Drawing.Point(6, 99);
+			this.label11.Name = "label11";
+			this.label11.Size = new System.Drawing.Size(21, 13);
+			this.label11.TabIndex = 12;
+			this.label11.Text = "0%";
+			// 
+			// label10
+			// 
+			this.label10.AutoSize = true;
+			this.label10.Location = new System.Drawing.Point(3, 59);
+			this.label10.Name = "label10";
+			this.label10.Size = new System.Drawing.Size(45, 13);
+			this.label10.TabIndex = 11;
+			this.label10.Text = "Volume:";
+			// 
+			// playbackVolume
+			// 
+			this.playbackVolume.BackColor = System.Drawing.SystemColors.Window;
+			this.playbackVolume.Location = new System.Drawing.Point(6, 73);
+			this.playbackVolume.Maximum = 500;
+			this.playbackVolume.Name = "playbackVolume";
+			this.playbackVolume.Size = new System.Drawing.Size(500, 45);
+			this.playbackVolume.TabIndex = 10;
+			this.playbackVolume.TickFrequency = 50;
+			this.playbackVolume.Value = 100;
+			// 
+			// playbackSelector
+			// 
+			this.playbackSelector.DeviceLabel = "Playback Device:";
+			this.playbackSelector.Location = new System.Drawing.Point(6, 6);
+			this.playbackSelector.Name = "playbackSelector";
+			this.playbackSelector.ProviderLabel = "Playback Provider:";
+			this.playbackSelector.Size = new System.Drawing.Size(500, 50);
+			this.playbackSelector.TabIndex = 9;
+			// 
 			// voiceSelector
 			// 
 			this.voiceSelector.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -336,13 +388,13 @@
 			// 
 			this.controlsTab.Controls.Add(this.addBinding);
 			this.controlsTab.Controls.Add(label1);
-			this.controlsTab.Controls.Add(this.bindignListHost);
 			this.controlsTab.Controls.Add(this.inInputProvider);
 			this.controlsTab.Controls.Add(this.lblInputProvider);
+			this.controlsTab.Controls.Add(this.bindignListHost);
 			this.controlsTab.Location = new System.Drawing.Point(4, 22);
 			this.controlsTab.Name = "controlsTab";
 			this.controlsTab.Padding = new System.Windows.Forms.Padding(3);
-			this.controlsTab.Size = new System.Drawing.Size(514, 343);
+			this.controlsTab.Size = new System.Drawing.Size(514, 346);
 			this.controlsTab.TabIndex = 1;
 			this.controlsTab.Text = "Controls";
 			this.controlsTab.UseVisualStyleBackColor = true;
@@ -358,18 +410,6 @@
 			this.addBinding.TabStop = true;
 			this.addBinding.Text = "Add binding...";
 			this.addBinding.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.addBinding_LinkClicked);
-			// 
-			// bindignListHost
-			// 
-			this.bindignListHost.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-						| System.Windows.Forms.AnchorStyles.Left)
-						| System.Windows.Forms.AnchorStyles.Right)));
-			this.bindignListHost.Location = new System.Drawing.Point(11, 54);
-			this.bindignListHost.Name = "bindignListHost";
-			this.bindignListHost.Size = new System.Drawing.Size(495, 270);
-			this.bindignListHost.TabIndex = 6;
-			this.bindignListHost.Text = "elementHost1";
-			this.bindignListHost.Child = this.bindingList;
 			// 
 			// inInputProvider
 			// 
@@ -392,6 +432,18 @@
 			this.lblInputProvider.TabIndex = 4;
 			this.lblInputProvider.Text = "Input Provider:";
 			// 
+			// bindignListHost
+			// 
+			this.bindignListHost.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+						| System.Windows.Forms.AnchorStyles.Left)
+						| System.Windows.Forms.AnchorStyles.Right)));
+			this.bindignListHost.Location = new System.Drawing.Point(11, 54);
+			this.bindignListHost.Name = "bindignListHost";
+			this.bindignListHost.Size = new System.Drawing.Size(495, 270);
+			this.bindignListHost.TabIndex = 6;
+			this.bindignListHost.Text = "elementHost1";
+			this.bindignListHost.Child = this.bindingList;
+			// 
 			// musicTab
 			// 
 			this.musicTab.Controls.Add(this.inUseCurrentVolume);
@@ -409,7 +461,7 @@
 			this.musicTab.Location = new System.Drawing.Point(4, 22);
 			this.musicTab.Name = "musicTab";
 			this.musicTab.Padding = new System.Windows.Forms.Padding(3);
-			this.musicTab.Size = new System.Drawing.Size(514, 343);
+			this.musicTab.Size = new System.Drawing.Size(514, 346);
 			this.musicTab.TabIndex = 3;
 			this.musicTab.Text = "Music";
 			this.musicTab.UseVisualStyleBackColor = true;
@@ -548,15 +600,38 @@
 			// 
 			// tabNotifications
 			// 
-			this.tabNotifications.Controls.Add(this.enableNotifications);
+			this.tabNotifications.Controls.Add(label14);
 			this.tabNotifications.Controls.Add(this.notifiers);
+			this.tabNotifications.Controls.Add(this.enabledNotifications);
+			this.tabNotifications.Controls.Add(this.enableNotifications);
 			this.tabNotifications.Location = new System.Drawing.Point(4, 22);
 			this.tabNotifications.Name = "tabNotifications";
 			this.tabNotifications.Padding = new System.Windows.Forms.Padding(3);
-			this.tabNotifications.Size = new System.Drawing.Size(514, 343);
+			this.tabNotifications.Size = new System.Drawing.Size(514, 346);
 			this.tabNotifications.TabIndex = 4;
 			this.tabNotifications.Text = "Notifications";
 			this.tabNotifications.UseVisualStyleBackColor = true;
+			// 
+			// notifiers
+			// 
+			this.notifiers.FormattingEnabled = true;
+			this.notifiers.Location = new System.Drawing.Point(8, 29);
+			this.notifiers.Name = "notifiers";
+			this.notifiers.Size = new System.Drawing.Size(498, 94);
+			this.notifiers.TabIndex = 3;
+			this.notifiers.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.notifiers_ItemCheck);
+			this.notifiers.SelectedIndexChanged += new System.EventHandler (this.notifiers_SelectedIndexChanged);
+			// 
+			// enabledNotifications
+			// 
+			this.enabledNotifications.CheckOnClick = true;
+			this.enabledNotifications.Enabled = false;
+			this.enabledNotifications.FormattingEnabled = true;
+			this.enabledNotifications.Location = new System.Drawing.Point(8, 145);
+			this.enabledNotifications.Name = "enabledNotifications";
+			this.enabledNotifications.Size = new System.Drawing.Size(498, 184);
+			this.enabledNotifications.TabIndex = 2;
+			this.enabledNotifications.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.enabledNotifications_ItemCheck);
 			// 
 			// enableNotifications
 			// 
@@ -569,67 +644,6 @@
 			this.enableNotifications.TabIndex = 1;
 			this.enableNotifications.Text = "Enable Notifications";
 			this.enableNotifications.UseVisualStyleBackColor = true;
-			// 
-			// notifiers
-			// 
-			this.notifiers.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-						| System.Windows.Forms.AnchorStyles.Right)));
-			this.notifiers.CheckBoxes = true;
-			this.notifiers.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            columnHeader1});
-			this.notifiers.Location = new System.Drawing.Point(8, 27);
-			this.notifiers.Name = "notifiers";
-			this.notifiers.Size = new System.Drawing.Size(498, 97);
-			this.notifiers.TabIndex = 0;
-			this.notifiers.UseCompatibleStateImageBehavior = false;
-			this.notifiers.View = System.Windows.Forms.View.Details;
-			// 
-			// playbackVolume
-			// 
-			this.playbackVolume.BackColor = System.Drawing.SystemColors.Window;
-			this.playbackVolume.Location = new System.Drawing.Point(6, 73);
-			this.playbackVolume.Maximum = 500;
-			this.playbackVolume.Name = "playbackVolume";
-			this.playbackVolume.Size = new System.Drawing.Size(500, 45);
-			this.playbackVolume.TabIndex = 10;
-			this.playbackVolume.TickFrequency = 50;
-			this.playbackVolume.Value = 100;
-			// 
-			// label10
-			// 
-			this.label10.AutoSize = true;
-			this.label10.Location = new System.Drawing.Point(3, 59);
-			this.label10.Name = "label10";
-			this.label10.Size = new System.Drawing.Size(45, 13);
-			this.label10.TabIndex = 11;
-			this.label10.Text = "Volume:";
-			// 
-			// label11
-			// 
-			this.label11.AutoSize = true;
-			this.label11.Location = new System.Drawing.Point(6, 99);
-			this.label11.Name = "label11";
-			this.label11.Size = new System.Drawing.Size(21, 13);
-			this.label11.TabIndex = 12;
-			this.label11.Text = "0%";
-			// 
-			// label12
-			// 
-			this.label12.AutoSize = true;
-			this.label12.Location = new System.Drawing.Point(478, 99);
-			this.label12.Name = "label12";
-			this.label12.Size = new System.Drawing.Size(33, 13);
-			this.label12.TabIndex = 13;
-			this.label12.Text = "500%";
-			// 
-			// label13
-			// 
-			this.label13.AutoSize = true;
-			this.label13.Location = new System.Drawing.Point(98, 99);
-			this.label13.Name = "label13";
-			this.label13.Size = new System.Drawing.Size(33, 13);
-			this.label13.TabIndex = 14;
-			this.label13.Text = "100%";
 			// 
 			// SettingsForm
 			// 
@@ -647,15 +661,16 @@
 			this.Text = "Settings";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SettingsForm_FormClosing);
 			this.Load += new System.EventHandler(this.SettingsForm_Load);
+			voiceActivationGroup.ResumeLayout(false);
+			voiceActivationGroup.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.threshold)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.vadSensitivity)).EndInit();
 			this.tabs.ResumeLayout(false);
 			this.generalTab.ResumeLayout(false);
 			this.generalTab.PerformLayout();
 			this.voiceTab.ResumeLayout(false);
 			this.voiceTab.PerformLayout();
-			voiceActivationGroup.ResumeLayout(false);
-			voiceActivationGroup.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.threshold)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.vadSensitivity)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.playbackVolume)).EndInit();
 			this.controlsTab.ResumeLayout(false);
 			this.controlsTab.PerformLayout();
 			this.musicTab.ResumeLayout(false);
@@ -664,7 +679,6 @@
 			((System.ComponentModel.ISupportInitialize)(this.talkingVolume)).EndInit();
 			this.tabNotifications.ResumeLayout(false);
 			this.tabNotifications.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.playbackVolume)).EndInit();
 			this.ResumeLayout(false);
 
 		}
@@ -705,7 +719,6 @@
 		private System.Windows.Forms.CheckBox voiceActivation;
 		private System.Windows.Forms.TabPage tabNotifications;
 		private System.Windows.Forms.CheckBox enableNotifications;
-		private System.Windows.Forms.ListView notifiers;
 		private DeviceSelector playbackSelector;
 		private System.Windows.Forms.CheckBox inUseCurrentVolume;
 		private System.Windows.Forms.Integration.ElementHost bindignListHost;
@@ -716,5 +729,7 @@
 		private System.Windows.Forms.Label label11;
 		private System.Windows.Forms.Label label10;
 		private System.Windows.Forms.TrackBar playbackVolume;
+		private System.Windows.Forms.CheckedListBox enabledNotifications;
+		private System.Windows.Forms.CheckedListBox notifiers;
 	}
 }

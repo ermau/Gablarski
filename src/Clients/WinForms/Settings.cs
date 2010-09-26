@@ -5,7 +5,6 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
-using System.Windows.Forms;
 using Cadenza.Collections;
 using Gablarski.Clients.Input;
 using Gablarski.Clients.Windows.Entities;
@@ -170,7 +169,7 @@ namespace Gablarski.Clients.Windows
 			}
 		}
 
-		public const string EnableNotificationsSettingName = "EnabledNotifications";
+		public const string EnableNotificationsSettingName = "EnableNotifications";
 		public static bool EnableNotifications
 		{
 			get { return GetSetting (EnableNotificationsSettingName, true); }
@@ -181,20 +180,70 @@ namespace Gablarski.Clients.Windows
 			}
 		}
 
-		public const string EnabledNotifiersSettingName = "EnabledNotifiers";
-		public static IEnumerable<string> EnabledNotifiers
+		public const string EnabledNotificationsSettingName = "EnabledNotifications";
+		public static ILookup<string, NotificationType> EnabledNotifications
 		{
 			get
 			{
-				return GetSetting (EnabledNotifiersSettingName,
-					"Gablarski.Growl.GrowlNotifier, Gablarski.Growl;Gablarski.SpeechNotifier.EventSpeech, Gablarski.SpeechNotifier"
-					).Split (';').Where (s => !s.IsNullOrWhitespace());
+				string data = GetSetting (EnabledNotificationsSettingName, 
+					"Gablarski.Growl.GrowlNotifier, Gablarski.Growl:*;Gablarski.SpeechNotifier.EventSpeech, Gablarski.SpeechNotifier:*;");
+
+				var notifications = new	MutableLookup<string, NotificationType>();
+
+				string[] notifiers = data.Split (';');
+				for (int i = 0; i < notifiers.Length; ++i)
+				{
+					if (notifiers[i].IsNullOrWhitespace())
+						continue;
+
+					string[] parts = notifiers[i].Split (':');
+					if (parts[1] == "*")
+					{
+						foreach (NotificationType t in Enum.GetValues (typeof (NotificationType)))
+							notifications.Add (parts[0], t);
+					}
+					else
+					{
+						string[] types = parts[1].Split (',');
+						for (int t = 0; t < types.Length; ++t)
+							notifications.Add (parts[0], (NotificationType)Enum.Parse (typeof(NotificationType), types[t]));
+					}
+				}
+
+				return notifications;
 			}
 
 			set
 			{
-				if (SetSetting (EnabledNotifiersSettingName, value.Implode (";")))
-					OnSettingsChanged (EnabledNotifiersSettingName);
+				var types = Enum.GetValues (typeof (NotificationType));
+
+				StringBuilder data = new StringBuilder();
+				foreach (var group in value)
+				{
+					data.Append (group.Key);
+					data.Append (":");
+
+					if (group.Count() == types.Length)
+						data.Append ("*");
+					else
+					{
+						bool first = true;
+						foreach (NotificationType t in group)
+						{
+							if (first)
+								first = false;
+							else
+								data.Append (",");
+
+							data.Append (t);
+						}
+					}
+
+					data.Append (";");
+				}
+
+				if (SetSetting (EnabledNotificationsSettingName, data.ToString()))
+					OnSettingsChanged (EnabledNotificationsSettingName);
 			}
 		}
 
@@ -270,7 +319,7 @@ namespace Gablarski.Clients.Windows
 			}
 		}
 
-		public static void SaveSettings()
+		public static void Save()
 		{
 			LoadSettings();
 

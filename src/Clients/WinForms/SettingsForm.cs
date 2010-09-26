@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Cadenza.Collections;
 using Gablarski.Audio;
 using Gablarski.Clients.Input;
 using Gablarski.Clients.Media;
@@ -63,30 +64,13 @@ namespace Gablarski.Clients.Windows
 				this.musicPlayers.Items.Add (player.GetType().Name.Remove ("Integration", "Provider"), Settings.EnabledMediaPlayerIntegrations.Any (s => s.Contains (player.GetType().FullName)));
 			}
 
+			this.ignoreNotificationChanges = true;
+			this.notifications = new MutableLookup<string, NotificationType> (Settings.EnabledNotifications);
 			this.enableNotifications.Checked = Settings.EnableNotifications;
 			foreach (var n in Modules.Notifiers.Cast<INamedComponent>().Concat (Modules.TextToSpeech.Cast<INamedComponent>()))
-			{
-				try
-				{
-					bool enabled = false;
-					foreach (var s in Settings.EnabledNotifiers)
-					{
-						if (!n.GetType().AssemblyQualifiedName.Contains (s))
-							continue;
+				this.notifiers.Items.Add (n, Settings.EnabledNotifications.Any (ig => ig.Key == n.GetType().GetSimpleName()));
 
-						enabled = true;
-					}
-
-					this.notifiers.Items.Add (new ListViewItem (n.Name)
-					{
-						Tag = n,
-						Checked = enabled
-					});
-				}
-				catch
-				{
-				}
-			}
+			this.ignoreNotificationChanges = false;
 		}
 
 		private void btnOk_Click (object sender, EventArgs e)
@@ -161,23 +145,18 @@ namespace Gablarski.Clients.Windows
 			Settings.EnabledMediaPlayerIntegrations = enabledPlayers;
 
 			Settings.EnableNotifications = this.enableNotifications.Checked;
-			List<string> enabledNotifiers = new List<string>();
-			foreach (ListViewItem li in this.notifiers.CheckedItems.Cast<ListViewItem>().Where (li => li.Checked))
-			{
-				var t = li.Tag.GetType();
-				enabledNotifiers.Add (t.FullName + ", " + t.Assembly.GetName().Name);
-			}
-			Settings.EnabledNotifiers = enabledNotifiers;
+			Settings.EnabledNotifications = this.notifications;
 
-			Settings.SaveSettings();
+			Settings.Save();
 
 			Close();
 		}
 
-		private string inputSettings;
+		private MutableLookup<string, NotificationType> notifications;
 		private BindingListViewModel bindingViewModel;
 		private CommandBindingSettingEntry recordingEntry;
 		private readonly object inputSync = new object();
+		private bool ignoreNotificationChanges;
 
 		private void inInputProvider_SelectedValueChanged(object sender, EventArgs e)
 		{
@@ -204,8 +183,10 @@ namespace Gablarski.Clients.Windows
 
 		private void SettingsForm_FormClosing (object sender, FormClosingEventArgs e)
 		{
-			if (DialogResult != DialogResult.OK)
-				DisableInput();
+			if (DialogResult == DialogResult.OK)
+				return;
+
+			DisableInput();
 		}
 
 		private void inUseCurrentVolume_CheckedChanged(object sender, EventArgs e)
@@ -269,6 +250,48 @@ namespace Gablarski.Clients.Windows
 				((AnonymousCommand)this.bindingViewModel.RecordCommand).ChangeCanExecute();
 				this.addBinding.Enabled = true;
 			}), entry);
+		}
+
+		private void enabledNotifications_ItemCheck (object sender, ItemCheckEventArgs e)
+		{
+			string typeName = this.notifiers.SelectedItem.GetType().GetSimpleName();
+			var type = (NotificationType)this.enabledNotifications.Items[e.Index];
+			
+			if (e.NewValue == CheckState.Unchecked)
+				this.notifications.Remove (typeName, type);
+			else if (!this.notifications[typeName].Contains (type))
+				this.notifications.Add (typeName, type);
+		}
+
+		private void notifiers_ItemCheck (object sender, ItemCheckEventArgs e)
+		{
+			if (this.ignoreNotificationChanges)
+				return;
+
+			string typeName = this.notifiers.Items[e.Index].GetType().GetSimpleName();
+
+			if (e.NewValue != CheckState.Checked)
+				this.notifications.Remove (typeName);
+			else if (!this.notifications.Contains (typeName))
+				this.notifications.Add (typeName, (NotificationType[])Enum.GetValues (typeof (NotificationType)));
+
+			notifiers_SelectedIndexChanged (this.notifiers, EventArgs.Empty);
+		}
+
+		private void notifiers_SelectedIndexChanged (object sender, EventArgs e)
+		{
+			this.enabledNotifications.Items.Clear();
+
+			if (this.notifiers.SelectedItem == null)
+				this.enabledNotifications.Enabled = false;
+			else
+			{
+				this.enabledNotifications.Enabled = true;
+
+				var enabled = new HashSet<NotificationType> (this.notifications[this.notifiers.SelectedItem.GetType().GetSimpleName()]);
+				foreach (NotificationType type in Enum.GetValues (typeof(NotificationType)))
+					this.enabledNotifications.Items.Add (type, enabled.Contains (type));
+			}
 		}
 	}
 }

@@ -105,14 +105,9 @@ namespace Gablarski.Clients
 		UserKicked,
 
 		/// <summary>
-		/// A media source has started playing.
+		/// Announcing the current song.
 		/// </summary>
-		SourceStartsPlaying,
-
-		/// <summary>
-		/// A media source has stopped playing.
-		/// </summary>
-		SourceStopsPlaying,
+		Song
 	}
 
 	/// <summary>

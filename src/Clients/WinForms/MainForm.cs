@@ -93,21 +93,31 @@ namespace Gablarski.Clients.Windows
 		{
 			this.notifications = new NotificationHandler (this.gablarski);
 			
-			var notifiers = Settings.EnabledNotifiers.Select (n => Activator.CreateInstance (Type.GetType (n))).ToList();
-			this.notifications.Notifiers = notifiers.OfType<INotifier>();
+			var notifiers = Settings.EnabledNotifications.Select (g => new
+			{
+				Notifier = Activator.CreateInstance (Type.GetType (g.Key)),
+				Types = (IEnumerable<NotificationType>)g
+			}).ToList();
+			
+			foreach (var n in notifiers.Where (n => n.Notifier is INotifier))
+				this.notifications.AddNotifier ((INotifier)n.Notifier, n.Types);
 
-			var speech = notifiers.OfType<ITextToSpeech>().Select (n => { n.Media = this.mediaPlayerIntegration; return n; }).ToList();
+			var speech = notifiers.Where (n => n.Notifier is ITextToSpeech);//.Select (n => { n.Media = this.mediaPlayerIntegration; return n; }).ToList();
 			if (speech.Any())
 			{
-				foreach (var s in speech)
+				foreach (var n in speech)
 				{
-					var source = this.gablarski.Sources.CreateFake ("speech", s.SupportedFormats.OrderByDescending (af => af.SampleRate).First(), 512);
-					this.speechSources.Add (s, source);
-					s.AudioSource = source;
+					ITextToSpeech tts = (ITextToSpeech)n.Notifier;
+					tts.Media = this.mediaPlayerIntegration;
+
+					var source = this.gablarski.Sources.CreateFake ("speech", tts.SupportedFormats.OrderByDescending (af => af.SampleRate).First(), 512);
+					this.speechSources.Add (tts, source);
+					tts.AudioSource = source;
 					this.gablarski.Audio.Attach (this.audioPlayback, source, new AudioEnginePlaybackOptions());
+
+					this.notifications.AddNotifier (tts, n.Types);
 				}
 				
-				this.notifications.SpeechNotifiers = speech;
 				this.notifications.SpeechReceiver = this.gablarski.Sources;
 			}
 
@@ -181,6 +191,9 @@ namespace Gablarski.Clients.Windows
 		{
 			DisablePlayback();
 
+			if (!this.gablarski.IsConnected)
+				return;
+
 			try
 			{
 				if (Settings.PlaybackProvider == null)
@@ -248,6 +261,9 @@ namespace Gablarski.Clients.Windows
 		private void SetupVoiceCapture ()
 		{
 			DisableVoiceCapture();
+
+			if (!this.gablarski.IsConnected)
+				return;
 
 			try
 			{
@@ -378,6 +394,7 @@ namespace Gablarski.Clients.Windows
 					this.mediaPlayerIntegration.UserTalkingCounts = !Settings.MediaVolumeControlIgnoresYou;
 					break;
 
+				case Settings.EnabledNotificationsSettingName:
 				case Settings.EnableNotificationsSettingName:
 					if (!Settings.EnableNotifications && this.notifications != null)
 					{
@@ -386,12 +403,6 @@ namespace Gablarski.Clients.Windows
 					}
 					else if (this.audioPlayback != null)
 						SetupNotifications ();
-
-					break;
-
-				case Settings.EnabledNotifiersSettingName:
-					if (Settings.EnableNotifications)
-						this.notifications.Notifiers = Settings.EnabledNotifiers.Select (t => (INotifier)Activator.CreateInstance (Type.GetType (t))).ToList();
 
 					break;
 
@@ -504,11 +515,11 @@ namespace Gablarski.Clients.Windows
 						if (attached.Count() == 0)
 							return;
 						else if (attached.Count() == 1)
-							this.notifications.Say (attached.First().SongName + " by " + attached.First().ArtistName);
+							this.notifications.Notify (NotificationType.Song, attached.First().SongName + " by " + attached.First().ArtistName);
 						else
 						{
 							foreach (var media in attached)
-								this.notifications.Say (String.Format ("{0} is playing {1} by {2}", media.Name, media.SongName, media.ArtistName));
+								this.notifications.Notify (NotificationType.Song, String.Format ("{0} is playing {1} by {2}", media.Name, media.SongName, media.ArtistName));
 						}
 					}
 

@@ -39,6 +39,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Cadenza;
+using Cadenza.Collections;
 using Gablarski.Audio;
 using Gablarski.Client;
 using Gablarski.Clients.Media;
@@ -84,37 +85,7 @@ namespace Gablarski.Clients
 		}
 
 		/// <summary>
-		/// Sets the speech notifiers.
-		/// </summary>
-		public IEnumerable<ITextToSpeech> SpeechNotifiers
-		{
-			set
-			{
-				lock (notifiers)
-				{
-					ClearSpeech();
-					Attach (value);
-				}
-			}
-		}
-
-		/// <summary>
-		/// Sets the notifiers to notify.
-		/// </summary>
-		public IEnumerable<INotifier> Notifiers
-		{
-			set
-			{
-				lock (notifiers)
-				{
-					Clear ();
-					Attach (value);
-				}
-			}
-		}
-
-		/// <summary>
-		/// Gets or sets the <see cref="IMediaController"/> to use with the <see cref="SpeechNotifiers"/>.
+		/// Gets or sets the <see cref="IMediaController"/> to use with the speech notifiers.
 		/// </summary>
 		public IMediaController MediaController
 		{
@@ -123,19 +94,105 @@ namespace Gablarski.Clients
 		}
 
 		/// <summary>
-		/// Sends <paramref name="contents"/> directly to the <see cref="SpeechNotifiers"/> only.
+		/// Adds a notifier.
 		/// </summary>
-		/// <param name="contents">Well what do you want to say?</param>
-		public void Say (string contents)
+		/// <param name="notifier">The notifier to add.</param>
+		/// <param name="enabledNotifications">The notifications to enable for this <paramref name="notifier"/>.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="notifier"/> or <paramref name="enabledNotifications"/> is <c>null</c>.</exception>
+		public void AddNotifier (INotifier notifier, IEnumerable<NotificationType> enabledNotifications)
 		{
-			if (Muted || SpeechReceiver == null)
-				return;
+			if (notifier == null)
+				throw new ArgumentNullException ("notifier");
+			if (enabledNotifications == null)
+				throw new ArgumentNullException ("enabledNotifications");
 
-			lock (notifiers)
+			lock (this.notifications)
 			{
-				foreach (var n in speechNotifiers)
-					SpeechReceiver.Receive (n.AudioSource, n.GetSpeech (contents, n.AudioSource));
+				foreach (NotificationType type in enabledNotifications)
+					this.notifications.Add (type, notifier);
 			}
+		}
+
+		/// <summary>
+		/// Adds a notifier.
+		/// </summary>
+		/// <param name="notifier">The notifier to add.</param>
+		/// <param name="enabledNotifications">The notifications to enable for this <paramref name="notifier"/>.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="notifier"/> or <paramref name="enabledNotifications"/> is <c>null</c>.</exception>
+		public void AddNotifier (ITextToSpeech notifier, IEnumerable<NotificationType> enabledNotifications)
+		{
+			if (notifier == null)
+				throw new ArgumentNullException ("notifier");
+			if (enabledNotifications == null)
+				throw new ArgumentNullException ("enabledNotifications");
+
+			lock (this.speechNotifiers)
+			{
+				foreach (NotificationType type in enabledNotifications)
+					this.speechNotifiers.Add (type, notifier);
+			}
+		}
+
+		/// <summary>
+		/// Removes the notifier.
+		/// </summary>
+		/// <param name="notifier">The notifier to remove.</param>
+		/// <returns><c>true</c> if <paramref name="notifier"/> was found and removed.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="notifier"/> is <c>null</c>.</exception>
+		public bool RemoveNotifier (INotifier notifier)
+		{
+			if (notifier == null)
+				throw new ArgumentNullException ("notifier");
+			
+			bool found = false;
+
+			lock (this.notifications)
+			{
+				foreach (var g in new MutableLookup<NotificationType, INotifier> (this.notifications).Where (g => g.Contains (notifier)))
+				{
+					if (this.notifications.Remove (g.Key, notifier))
+						found = true;
+				}
+			}
+
+			return found;
+		}
+
+		/// <summary>
+		/// Removes the notifier.
+		/// </summary>
+		/// <param name="notifier">The notifier to remove.</param>
+		/// <returns><c>true</c> if <paramref name="notifier"/> was found and removed.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="notifier"/> is <c>null</c>.</exception>
+		public bool RemoveNotifier (ITextToSpeech notifier)
+		{
+			if (notifier == null)
+				throw new ArgumentNullException ("notifier");
+
+			bool found = false;
+
+			lock (this.speechNotifiers)
+			{
+				foreach (var g in new MutableLookup<NotificationType, ITextToSpeech> (this.speechNotifiers).Where (g => g.Contains (notifier)))
+				{
+					if (this.speechNotifiers.Remove (g.Key, notifier))
+						found = true;
+				}
+			}
+
+			return found;
+		}
+
+		/// <summary>
+		/// Clears all notifiers.
+		/// </summary>
+		public void Clear()
+		{
+			lock (this.notifications)
+				this.notifications.Clear();
+
+			lock (this.speechNotifiers)
+				this.speechNotifiers.Clear();
 		}
 
 		public void Notify (NotificationType type, string notification)
@@ -148,18 +205,26 @@ namespace Gablarski.Clients
 			if (Muted)
 				return;
 
-			lock (notifiers)
+			lock (notifications)
 			{
-				foreach (var n in notifiers)
-					n.Notify (type, notification, priority);
+				IEnumerable<INotifier> notifiers;
+				if (this.notifications.TryGetValues (type, out notifiers))
+				{
+					foreach (var n in notifiers)
+						n.Notify (type, notification, priority);
+				}
 			}
 
 			if (SpeechReceiver != null)
 			{
-				lock (notifiers)
+				lock (speechNotifiers)
 				{
-					foreach (var n in speechNotifiers)
-						SpeechReceiver.Receive (n.AudioSource, n.GetSpeech (notification, n.AudioSource));
+					IEnumerable<ITextToSpeech> speakers;
+					if (this.speechNotifiers.TryGetValues (type, out speakers))
+					{
+						foreach (var n in speakers)
+							SpeechReceiver.Receive (n.AudioSource, n.GetSpeech (notification, n.AudioSource));
+					}
 				}
 			}
 		}
@@ -174,18 +239,26 @@ namespace Gablarski.Clients
 			if (Muted)
 				return;
 
-			lock (notifiers)
+			lock (notifications)
 			{
-				foreach (var n in notifiers)
-					n.Notify (type, String.Format (notification, nickname), priority);
+				IEnumerable<INotifier> notifiers;
+				if (this.notifications.TryGetValues (type, out notifiers))
+				{
+					foreach (var n in notifiers)
+						n.Notify (type, String.Format (notification, nickname), priority);
+				}
 			}
 
 			if (SpeechReceiver != null)
 			{
-				lock (notifiers)
+				lock (speechNotifiers)
 				{
-					foreach (var n in speechNotifiers)
-						SpeechReceiver.Receive (n.AudioSource, n.GetSpeech (String.Format (notification, (!phonetic.IsNullOrWhitespace()) ? phonetic : nickname), n.AudioSource));
+					IEnumerable<ITextToSpeech> speakers;
+					if (this.speechNotifiers.TryGetValues (type, out speakers))
+					{
+						foreach (var n in speakers)
+							SpeechReceiver.Receive (n.AudioSource, n.GetSpeech (String.Format (notification, (!phonetic.IsNullOrWhitespace()) ? phonetic : nickname), n.AudioSource));
+					}
 				}
 			}
 		}
@@ -203,8 +276,8 @@ namespace Gablarski.Clients
 		}
 
 		private bool isDisposed;
-		private readonly HashSet<INotifier> notifiers = new HashSet<INotifier> ();
-		private readonly HashSet<ITextToSpeech> speechNotifiers = new HashSet<ITextToSpeech>();
+		private readonly MutableLookup<NotificationType, INotifier> notifications = new MutableLookup<NotificationType, INotifier>();
+		private readonly MutableLookup<NotificationType, ITextToSpeech> speechNotifiers = new MutableLookup<NotificationType, ITextToSpeech>();
 		private readonly GablarskiClient client;
 
 		private void OnUserKickedFromServer (object sender, UserEventArgs e)
@@ -243,74 +316,6 @@ namespace Gablarski.Clients
 				Notify (NotificationType.UserJoinedChannel, "{0} joined the channel.", e.User.Nickname, e.User.Phonetic);
 			else if (e.PreviousChannel.Equals (client.CurrentChannel))
 				Notify (NotificationType.UserLeftChannel, "{0} left the channel.", e.User.Nickname, e.User.Phonetic);
-		}
-
-		private void Attach (INotifier notifier)
-		{
-			lock (notifiers)
-			{
-				notifier.Media = this.MediaController;
-
-				if (!notifiers.Contains (notifier))
-					notifiers.Add (notifier);
-			}
-		}
-
-		private void Attach (IEnumerable<INotifier> attachNotifiers)
-		{
-			foreach (var n in attachNotifiers)
-				Attach (n);
-		}
-
-		private void Detatch (INotifier notifier)
-		{
-			lock (notifiers)
-			{
-				notifier.Media = null;
-				this.notifiers.Remove (notifier);
-			}
-		}
-
-		private void ClearSpeech()
-		{
-			lock (notifiers)
-			{
-				foreach (var n in speechNotifiers.ToList())
-					Detatch (n);
-			}
-		}
-
-		private void Attach (IEnumerable<ITextToSpeech> sNotifiers)
-		{
-			lock (notifiers)
-			{
-				foreach (var n in sNotifiers)
-					Attach (n);
-			}
-		}
-
-		private void Attach (ITextToSpeech notifier)
-		{
-			lock (notifiers)
-				this.speechNotifiers.Add (notifier);
-		}
-
-		private void Detatch (ITextToSpeech notifier)
-		{
-			lock (notifier)
-			{
-				notifier.Media = null;
-				this.speechNotifiers.Remove (notifier);
-			}
-		}
-
-		private void Clear ()
-		{
-			lock (notifiers)
-			{
-				foreach (var n in notifiers.ToList ())
-					Detatch (n);
-			}
 		}
 	}
 }
