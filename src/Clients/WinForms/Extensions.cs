@@ -60,6 +60,14 @@ namespace Gablarski.Clients.Windows
 			return (DialogResult)formForThread.Invoke ((Func<IWin32Window, DialogResult>)self.ShowDialog, formForThread);
 		}
 
+		public static string GetSimpleName (this Type self)
+		{
+			if (self == null)
+				throw new NullReferenceException();
+
+			return String.Format ("{0}, {1}", self.FullName, self.Assembly.GetName().Name);
+		}
+
 		public static DbCommand CreateCommand (this DbConnection self, string text)
 		{
 			if (self == null)
