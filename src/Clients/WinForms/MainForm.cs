@@ -674,7 +674,7 @@ namespace Gablarski.Clients.Windows
 		{
 			if (!e.Result.Succeeded)
 			{
-				Action<string, string, MessageBoxButtons, MessageBoxIcon> d = (m, c, b, i) => MessageBox.Show (this, c, m, b, i);
+				Action<string, string, MessageBoxButtons, MessageBoxIcon> d = (m, c, b, i) => MessageBox.Show (this, m, c, b, i);
 
 				switch (e.Result.ResultState)
 				{
@@ -1032,7 +1032,7 @@ namespace Gablarski.Clients.Windows
 				case UserRegistrationMode.Approved:
 				case UserRegistrationMode.Normal:
 				case UserRegistrationMode.PreApproved:
-					var register = new RegisterForm (this.gablarski.CurrentUser);
+					var register = new RegisterForm (this.gablarski);
 					if (register.ShowDialog (this) == DialogResult.Abort)
 						this.btnRegister.Visible = false;
 
