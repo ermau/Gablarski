@@ -586,7 +586,7 @@ namespace Gablarski.Clients.Windows
 						break;
 				}
 
-				MessageBox.Show (this, "Source '" + e.SourceName + "' request failed: " + reason, "Source Request", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				BeginInvoke ((Action)(() => MessageBox.Show (this, "Source '" + e.SourceName + "' request failed: " + reason, "Source Request", MessageBoxButtons.OK, MessageBoxIcon.Error)));
 			}
 		}
 
@@ -899,9 +899,7 @@ namespace Gablarski.Clients.Windows
 				case ConnectionRejectedReason.CouldNotConnect:
 					BeginInvoke ((Action)(() =>
 					{
-						if (
-							MessageBox.Show (this, "Could not connect to the server", "Connecting", MessageBoxButtons.RetryCancel,
-							                 MessageBoxIcon.Warning) == DialogResult.Retry)
+						if (MessageBox.Show (this, "Could not connect to the server", "Connecting", MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning) == DialogResult.Retry)
 							Connect();
 						else
 							ShowConnect (true);
