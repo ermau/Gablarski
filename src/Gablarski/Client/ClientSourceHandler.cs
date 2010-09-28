@@ -262,10 +262,12 @@ namespace Gablarski.Client
 		{
 			var msg = (SourceResultMessage)e.Message;
 
-			var source = new AudioSource (msg.Source);
-
+			AudioSource source = null;
 			if (msg.SourceResult == SourceResult.Succeeded || msg.SourceResult == SourceResult.NewSource)
+			{
+				source = new AudioSource (msg.Source);
 				this.manager.Update (source);
+			}
 
 			OnReceivedSource (new ReceivedAudioSourceEventArgs (msg.SourceName, source, msg.SourceResult));
 		}
