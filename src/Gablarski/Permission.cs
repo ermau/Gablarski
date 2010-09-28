@@ -43,11 +43,6 @@ namespace Gablarski
 	public enum PermissionName
 	{
 		/// <summary>
-		/// Login to the server.
-		/// </summary>
-		Login = 1,
-
-		/// <summary>
 		/// Kick a player from the channel (to the default channel.)
 		/// </summary>
 		KickPlayerFromChannel = 2,

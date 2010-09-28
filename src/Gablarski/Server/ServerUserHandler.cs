@@ -289,9 +289,6 @@ namespace Gablarski.Server
 
 			LoginResult result = this.context.UserProvider.Login (login.Username, login.Password);
 
-			if (!this.context.PermissionsProvider.GetPermissions (result.UserId).CheckPermission (PermissionName.Login))
-				result.ResultState = LoginResultState.FailedPermissions;
-
 			e.Connection.Send (new LoginResultMessage (result));
 
 			if (result.Succeeded)
