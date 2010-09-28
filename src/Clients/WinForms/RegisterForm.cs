@@ -46,15 +46,15 @@ namespace Gablarski.Clients.Windows
 	public partial class RegisterForm
 		: Form
 	{
-		private readonly ICurrentUserHandler currentUser;
+		private readonly GablarskiClient client;
 
-		public RegisterForm (ICurrentUserHandler currentUser)
+		public RegisterForm (GablarskiClient client)
 		{
-			if (currentUser == null)
-				throw new ArgumentNullException ("currentUser");
+			if (client == null)
+				throw new ArgumentNullException ("client");
 
-			this.currentUser = currentUser;
-
+			this.client = client;
+			this.client.Disconnected += OnDisconnected;
 			Icon = Resources.UserAddImage.ToIcon();
 			InitializeComponent();
 		}
@@ -77,8 +77,8 @@ namespace Gablarski.Clients.Windows
 			{
 				this.okButton.Enabled = false;
 				this.loading.Visible = true;
-				this.currentUser.ReceivedRegisterResult += OnReceivedRegisterResult;
-				this.currentUser.Register (this.username.Text, this.password.Text);
+				this.client.CurrentUser.ReceivedRegisterResult += OnReceivedRegisterResult;
+				this.client.CurrentUser.Register (this.username.Text, this.password.Text);
 			}
 		}
 
@@ -86,7 +86,7 @@ namespace Gablarski.Clients.Windows
 		{
 			Invoke ((Action)(() =>
 			{
-				this.currentUser.ReceivedRegisterResult -= OnReceivedRegisterResult;
+				this.client.CurrentUser.ReceivedRegisterResult -= OnReceivedRegisterResult;
 
 				this.loading.Visible = false;
 				this.okButton.Enabled = true;
@@ -134,12 +134,24 @@ namespace Gablarski.Clients.Windows
 			}));
 		}
 
+		private void OnDisconnected (object sender, DisconnectedEventArgs e)
+		{
+			Invoke ((Action)Close);
+		}
+
 		private void cancelButton_Click(object sender, EventArgs e)
 		{
-			this.currentUser.ReceivedRegisterResult -= OnReceivedRegisterResult;
+			this.client.CurrentUser.ReceivedRegisterResult -= OnReceivedRegisterResult;
 
 			DialogResult = DialogResult.Cancel;
 			Close();
+		}
+
+		protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+		{
+			this.client.Disconnected -= OnDisconnected;
+
+			base.OnClosing (e);
 		}
 	}
 }
