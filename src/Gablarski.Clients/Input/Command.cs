@@ -59,7 +59,7 @@ namespace Gablarski.Clients.Input
 		MuteAll = 3,
 
 		/// <summary>Controls the global volume.</summary>
-		[Axis] GlobalVolume = 4,
+		//[Axis] GlobalVolume = 4,
 
 		/// <summary>Invokes a notification for the current song.</summary>
 		SayCurrentSong = 5
