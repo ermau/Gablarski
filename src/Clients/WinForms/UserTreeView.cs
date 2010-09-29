@@ -687,6 +687,21 @@ namespace Gablarski.Clients.Windows
 
 			bool adminSep = false;
 
+			if (Client.CurrentUser.Permissions.CheckPermission (PermissionName.ApproveRegistrations) && Client.ServerInfo.RegistrationMode == UserRegistrationMode.PreApproved)
+			{
+				if (!adminSep)
+				{
+					adminSep = true;
+					un.ContextMenuStrip.Items.Add (new ToolStripSeparator());
+				}
+
+				var approve = new ToolStripMenuItem ("Allow registration", Resources.UserAddImage);
+				approve.ToolTipText = "Allow this user to register";
+				approve.Click += ContextAllowRegistration;
+
+				un.ContextMenuStrip.Items.Add (approve);
+			}
+
 			if (this.Client.CurrentUser.Permissions.CheckPermission (PermissionName.MuteUser))
 			{
 				if (!adminSep)
@@ -757,6 +772,11 @@ namespace Gablarski.Clients.Windows
 
 				un.ContextMenuStrip.Items.Add (banUsername);
 			}
+		}
+
+		private void ContextAllowRegistration (object sender, EventArgs eventArgs)
+		{
+			Client.Users.ApproveRegistration ((IUserInfo)this.SelectedNode.Tag);
 		}
 
 		private void ContextBanUsername (object sender, EventArgs eventArgs)
