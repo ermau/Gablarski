@@ -36,6 +36,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -525,6 +526,10 @@ namespace Gablarski.Client
 				this.originalHost = host;
 				this.originalEndPoint = new IPEndPoint (Dns.GetHostAddresses (host).First (ip => ip.AddressFamily == AddressFamily.InterNetwork), port);
 				ConnectCore();
+			}
+			catch (IOException)
+			{
+				OnConnectionRejected (new RejectedConnectionEventArgs (ConnectionRejectedReason.CouldNotConnect));
 			}
 			catch (SocketException)
 			{
