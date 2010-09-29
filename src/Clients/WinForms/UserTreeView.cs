@@ -11,6 +11,7 @@ using Gablarski.Audio;
 using Gablarski.Client;
 using Gablarski.Clients.Windows.Entities;
 using Gablarski.Clients.Windows.Properties;
+using Gablarski.Messages;
 
 namespace Gablarski.Clients.Windows
 {
@@ -741,6 +742,26 @@ namespace Gablarski.Clients.Windows
 
 				un.ContextMenuStrip.Items.Add (kickServer);
 			}
+
+			if (this.Client.CurrentUser.Permissions.CheckPermission (PermissionName.BanUser))
+			{
+				if (!adminSep)
+				{
+					adminSep = true;
+					un.ContextMenuStrip.Items.Add (new ToolStripSeparator());
+				}
+
+				var banUsername = new ToolStripMenuItem (String.Format ("Ban '{0}' ('{1}')", target.Username, target.Nickname), Resources.BanImage);
+				banUsername.ToolTipText = "Bans this username from the server";
+				banUsername.Click += ContextBanUsername;
+
+				un.ContextMenuStrip.Items.Add (banUsername);
+			}
+		}
+
+		private void ContextBanUsername (object sender, EventArgs eventArgs)
+		{
+			Client.Connection.Send (new BanUserMessage { BanInfo = new BanInfo (null, ((IUserInfo)this.SelectedNode.Tag).Username, TimeSpan.MaxValue) });
 		}
 
 		private void ContextServerKick (object sender, EventArgs e)
