@@ -133,8 +133,8 @@ namespace Gablarski.Network
 			{
 				using (ManualResetEvent mre = new ManualResetEvent (false))
 				{
-					this.pinger.Dispose(mre);
-					mre.WaitOne();
+					if (this.pinger.Dispose (mre))
+						mre.WaitOne();
 				}
 			}
 
