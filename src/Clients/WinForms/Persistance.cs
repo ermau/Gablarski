@@ -5,6 +5,7 @@ using System.Data.Common;
 using System.Data.SQLite;
 using System.IO;
 using System.Linq;
+using Cadenza;
 using Gablarski.Clients.Input;
 using Gablarski.Clients.Windows.Entities;
 
@@ -28,9 +29,23 @@ namespace Gablarski.Clients.Windows
 			var builder = new SQLiteConnectionStringBuilder();
 			builder.DataSource = DbFile.FullName;
 
+			if (DbFile.Exists)
+			{
+				db = new SQLiteConnection (builder.ToString());
+				db.Open();
+
+				if (Settings.Version.IsNullOrWhitespace())
+				{
+					db.Close();
+					DbFile.Delete();
+					DbFile.Refresh();
+					Settings.Clear();
+				}
+			}
+
 			db = new SQLiteConnection(builder.ToString());
 			db.Open();
-
+			
 			CreateDbs();
 		}
 

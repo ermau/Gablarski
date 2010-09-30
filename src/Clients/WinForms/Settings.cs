@@ -26,6 +26,17 @@ namespace Gablarski.Clients.Windows
 			}
 		}
 
+		public const string VersionName = "Version";
+		public static string Version
+		{
+			get { return GetSetting (VersionName, null); }
+			set
+			{
+				if (SetSetting (VersionName, value))
+					OnSettingsChanged (VersionName);
+			}
+		}
+
 		public const string GlobalVolumeName = "GlobalVolume";
 		public static float GlobalVolume
 		{
@@ -336,6 +347,12 @@ namespace Gablarski.Clients.Windows
 
 				commandBindings = null;
 			}
+		}
+
+		public static void Clear()
+		{
+			lock (SettingLock)
+				settings = null;
 		}
 
 		private readonly static object SettingLock = new object();
