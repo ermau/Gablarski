@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
 using System.ComponentModel;
+using Gablarski.Client;
 using Gablarski.Clients.Input;
 using Gablarski.Clients.Windows.Entities;
 using System.Linq;
@@ -112,6 +113,7 @@ namespace Gablarski.Clients.Windows
 			{
 				DialogResult result = MessageBox.Show ("Register gablarski:// urls with this client?", "Register gablarski://", MessageBoxButtons.OKCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1);
 				Settings.EnableGablarskiURLs = (result == DialogResult.OK);
+				Settings.Version = typeof (Program).Assembly.GetName().Version.ToString();
 				Settings.Save ();
 
 				IInputProvider input = Modules.Input.FirstOrDefault (p => p.GetType().GetSimpleName() == Settings.InputProvider);
