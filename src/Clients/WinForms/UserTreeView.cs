@@ -758,7 +758,7 @@ namespace Gablarski.Clients.Windows
 				un.ContextMenuStrip.Items.Add (kickServer);
 			}
 
-			if (this.Client.CurrentUser.Permissions.CheckPermission (PermissionName.BanUser))
+			if (!target.Equals (Client.CurrentUser) && this.Client.CurrentUser.Permissions.CheckPermission (PermissionName.BanUser))
 			{
 				if (!adminSep)
 				{
