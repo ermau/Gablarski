@@ -72,8 +72,6 @@ namespace Gablarski.WebServer
 
 		public void StartListening (IServerContext context)
 		{
-			WebServerConfiguration config = (WebServerConfiguration) ConfigurationManager.GetSection ("webserver");
-
 			var sstore = new MemorySessionStore { ExpireTime = 15 };
 			server = new HttpServer.HttpServer (sstore);
 
@@ -82,11 +80,17 @@ namespace Gablarski.WebServer
 			cmanager.Server = server;
 
 			server.Add (new QueryModule (cmanager));
-			server.Add (new FileResourceModule (config.Theme.Path));
-			server.Add (new LoginModule (cmanager));
-			server.Add (new ChannelModule (cmanager));
-			server.Add (new UserModule (cmanager));
 			
+			WebServerConfiguration config = (WebServerConfiguration) ConfigurationManager.GetSection ("webserver");
+
+			if (config != null && config.Theme != null)
+			{
+				server.Add (new FileResourceModule (config.Theme.Path));
+				server.Add (new LoginModule (cmanager));
+				server.Add (new ChannelModule (cmanager));
+				server.Add (new UserModule (cmanager));
+			}
+
 			server.Start (IPAddress.Any, this.Port);
 		}
 
@@ -99,7 +103,7 @@ namespace Gablarski.WebServer
 		#endregion
 
 		private HttpServer.HttpServer server;
-		private int port = 6113;
+		private int port = 42913;
 
 		internal protected void OnConnectionMade (ConnectionMadeEventArgs e)
 		{
