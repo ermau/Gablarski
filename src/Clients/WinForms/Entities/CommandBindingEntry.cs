@@ -17,7 +17,7 @@ namespace Gablarski.Clients.Windows.Entities
 			if (binding == null)
 				throw new ArgumentNullException ("binding");
 
-			ProviderType = binding.Provider.GetType().Name;
+			ProviderType = binding.Provider.GetType().GetSimpleName();
 			Command = binding.Command;
 			Input = binding.Input;
 		}

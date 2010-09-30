@@ -53,9 +53,14 @@ namespace Gablarski.Input.DirectInput
 		public event EventHandler<CommandStateChangedEventArgs> CommandStateChanged;
 		public event EventHandler<RecordingEventArgs> NewRecording;
 
-		public string DisplayName
+		public string Name
 		{
 			get { return "DirectInput"; }
+		}
+
+		public IEnumerable<CommandBinding> Defaults
+		{
+			get { yield return new CommandBinding (this, Command.Talk, String.Format ("{0}|{1}", SystemGuid.Keyboard, Key.X.ToString())); }
 		}
 
 		public void Attach (IntPtr window)

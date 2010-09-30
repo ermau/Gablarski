@@ -415,6 +415,7 @@
 			// 
 			this.inInputProvider.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
 						| System.Windows.Forms.AnchorStyles.Right)));
+			this.inInputProvider.DisplayMember = "Name";
 			this.inInputProvider.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.inInputProvider.FormattingEnabled = true;
 			this.inInputProvider.Location = new System.Drawing.Point(109, 7);
@@ -620,7 +621,7 @@
 			this.notifiers.Size = new System.Drawing.Size(498, 94);
 			this.notifiers.TabIndex = 3;
 			this.notifiers.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.notifiers_ItemCheck);
-			this.notifiers.SelectedIndexChanged += new System.EventHandler (this.notifiers_SelectedIndexChanged);
+			this.notifiers.SelectedIndexChanged += new System.EventHandler(this.notifiers_SelectedIndexChanged);
 			// 
 			// enabledNotifications
 			// 

@@ -45,7 +45,7 @@ namespace Gablarski.Clients.Input
 	/// Contract for input providers
 	/// </summary>
 	public interface IInputProvider
-		: IDisposable
+		: INamedComponent, IDisposable
 	{
 		/// <summary>
 		/// Fired when a bound command state has changed.
@@ -58,9 +58,9 @@ namespace Gablarski.Clients.Input
 		event EventHandler<RecordingEventArgs> NewRecording;
 
 		/// <summary>
-		/// The displayable name of the input provider.
+		/// Gets the default command bindings for this input provider.
 		/// </summary>
-		string DisplayName { get; }
+		IEnumerable<CommandBinding> Defaults { get; }
 
 		/// <summary>
 		/// Attaches the input provider to the <paramref name="window"/>.

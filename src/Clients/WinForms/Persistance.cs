@@ -286,7 +286,7 @@ namespace Gablarski.Clients.Windows
 
 		public static void DeleteAllBindings ()
 		{
-			using (var cmd = db.CreateCommand("DELETE FROM commandbindings"))
+			using (var cmd = db.CreateCommand ("DELETE FROM commandbindings"))
 			{
 				cmd.ExecuteNonQuery();
 			}

@@ -1,17 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using Cadenza.Collections;
 using Gablarski.Audio;
 using Gablarski.Clients.Input;
 using Gablarski.Clients.Media;
-using Gablarski.Clients.Windows.Entities;
 using Gablarski.Clients.Windows.Properties;
 using Cadenza;
 
@@ -34,9 +28,17 @@ namespace Gablarski.Clients.Windows
 
 			this.bindingViewModel = new BindingListViewModel (this.Handle, new AnonymousCommand (OnRecord, CanRecord));
 			this.bindingList.DataContext = this.bindingViewModel;
-			this.inInputProvider.DisplayMember = "DisplayName";
-			this.inInputProvider.DataSource = Modules.Input.ToList();
-			this.inInputProvider.SelectedText = Settings.InputProvider;
+			
+			IInputProvider sprovider = null;
+			foreach (IInputProvider provider in Modules.Input)
+			{
+				if (provider.GetType().GetSimpleName() == Settings.InputProvider)
+					sprovider = provider;
+
+				this.inInputProvider.Items.Add (provider);
+			}
+
+			this.inInputProvider.SelectedItem = sprovider;
 
 			this.playbackSelector.ProviderSource = Modules.Playback.Cast<IAudioDeviceProvider>();
 			this.playbackSelector.SetProvider (Settings.PlaybackProvider);
@@ -61,7 +63,7 @@ namespace Gablarski.Clients.Windows
 
 			foreach (IMediaPlayer player in Modules.MediaPlayers)
 			{
-				this.musicPlayers.Items.Add (player.GetType().Name.Remove ("Integration", "Provider"), Settings.EnabledMediaPlayerIntegrations.Any (s => s.Contains (player.GetType().FullName)));
+				this.musicPlayers.Items.Add (player.Name, Settings.EnabledMediaPlayerIntegrations.Any (s => s == player.GetType().GetSimpleName()));
 			}
 
 			this.ignoreNotificationChanges = true;
@@ -85,7 +87,7 @@ namespace Gablarski.Clients.Windows
 			var inputProvider = this.inInputProvider.SelectedItem as IInputProvider;
 			if (inputProvider != null)
 			{
-				Settings.InputProvider = inputProvider.ToString();
+				Settings.InputProvider = inputProvider.GetType().GetSimpleName();
 				Settings.CommandBindings.Clear();
 
 				foreach (var b in this.bindingViewModel.Bindings)
@@ -100,7 +102,7 @@ namespace Gablarski.Clients.Windows
 
 			if (this.playbackSelector.Provider != null)
 			{
-				Settings.PlaybackProvider = this.playbackSelector.Provider.GetType().AssemblyQualifiedName;
+				Settings.PlaybackProvider = this.playbackSelector.Provider.GetType().GetSimpleName();
 				Settings.PlaybackDevice = this.playbackSelector.Device.Name;
 			}
 			else
@@ -111,7 +113,7 @@ namespace Gablarski.Clients.Windows
 
 			if (this.voiceSelector.Provider != null)
 			{
-				Settings.VoiceProvider = this.voiceSelector.Provider.GetType().AssemblyQualifiedName;
+				Settings.VoiceProvider = this.voiceSelector.Provider.GetType().GetSimpleName();
 				Settings.VoiceDevice = this.voiceSelector.Device.Name;
 			}
 			else
@@ -132,14 +134,14 @@ namespace Gablarski.Clients.Windows
 			Settings.MediaVolumeControlIgnoresYou = this.musicIgnoreYou.Checked;
 
 			List<string> enabledPlayers = new List<string> ();
-			foreach (Type playerSupport in Modules.MediaPlayers.Select (m => m.GetType()))
+			foreach (IMediaPlayer player in Modules.MediaPlayers)
 			{
 				foreach (string enabled in this.musicPlayers.CheckedItems.Cast<string> ())
 				{
-					if (!playerSupport.Name.Contains (enabled))
+					if (player.Name != enabled)
 						continue;
 					
-					enabledPlayers.Add (playerSupport.FullName + ", " + playerSupport.Assembly.GetName().Name);
+					enabledPlayers.Add (player.GetType().GetSimpleName());
 				}
 			}
 			Settings.EnabledMediaPlayerIntegrations = enabledPlayers;

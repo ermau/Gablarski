@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Gablarski.Audio;
+using Gablarski.Clients.Windows;
 
 namespace Gablarski
 {
@@ -16,8 +17,6 @@ namespace Gablarski
 		public DeviceSelector ()
 		{
 			InitializeComponent ();
-
-			//this.provider.DisplayMember = "Name";
 		}
 
 		public string ProviderLabel
@@ -58,9 +57,10 @@ namespace Gablarski
 			if (String.IsNullOrEmpty (providerName))
 				return;
 
-			provider.SelectedItem = provider.Items.Cast<IAudioDeviceProvider>().FirstOrDefault (p => p.GetType().AssemblyQualifiedName.Contains (providerName));
-			if (provider.SelectedItem == null)
-				provider.SelectedItem = provider.Items.Cast<IAudioDeviceProvider>().FirstOrDefault();
+			provider.SelectedItem = provider.Items.Cast<IAudioDeviceProvider>().FirstOrDefault (p => p.GetType().GetSimpleName() == providerName)
+									?? provider.Items.Cast<IAudioDeviceProvider>().FirstOrDefault();
+
+			provider_SelectedIndexChanged (provider, EventArgs.Empty);
 		}
 
 		public void SetDevice (string deviceName)
@@ -68,7 +68,8 @@ namespace Gablarski
 			if (String.IsNullOrEmpty (deviceName))
 				return;
 
-			device.SelectedItem = device.Items.Cast<IAudioDevice>().FirstOrDefault (d => d.Name == deviceName);
+			device.SelectedItem = device.Items.Cast<IAudioDevice>().FirstOrDefault (d => d.Name == deviceName)
+									?? Provider.DefaultDevice;
 		}
 
 		private void provider_SelectedIndexChanged (object sender, EventArgs e)
