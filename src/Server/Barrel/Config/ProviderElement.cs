@@ -34,34 +34,18 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
-using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
-using System.Text;
 
 namespace Gablarski.Barrel.Config
 {
-	public class ProviderElementCollection
-		: ConfigurationElementCollection, IEnumerable<ProviderElement>
+	public class ProviderElement
+		: ConfigurationElement
 	{
-		protected override ConfigurationElement CreateNewElement()
+		[ConfigurationProperty ("type", IsRequired = true)]
+		public string Type
 		{
-			return new ProviderElement();
-		}
-
-		protected override object GetElementKey (ConfigurationElement element)
-		{
-			return ((ProviderElement) element).Type;
-		}
-
-		public new IEnumerator<ProviderElement> GetEnumerator()
-		{
-			var en = base.GetEnumerator();
-			en.Reset();
-
-			while (en.MoveNext ())
-				yield return (ProviderElement) en.Current;
+			get { return (string) this["type"]; }
+			set { this["type"] = value; }
 		}
 	}
 }

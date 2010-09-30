@@ -54,48 +54,46 @@ namespace Gablarski.Barrel
 
 			log4net.Config.XmlConfigurator.Configure ();
 			
-			var config = (BarrelConfiguration)ConfigurationManager.GetSection ("barrel");
-			if (config == null)
+			var serverConfig = (BarrelConfiguration)ConfigurationManager.GetSection ("barrel");
+			if (serverConfig == null)
 			{
 				LogManager.GetLogger ("Barrel").Fatal ("Section 'barrel' not found in configuration.");
 				return;
 			}
+			
+			var log = LogManager.GetLogger (serverConfig.Name);
 
-			foreach (ServerElement serverConfig in config.Servers)
+			log.Info ("Checking configuration");
+			if (!serverConfig.CheckConfiguration (log))
 			{
-				var log = LogManager.GetLogger (serverConfig.Name);
-
-				log.Info ("Checking configuration");
-				if (!serverConfig.CheckConfiguration (log))
-				{
-					log.Warn ("Errors found in configuration, skipping server");
-					continue;
-				}
-
-				ServerProviders providers = serverConfig.GetProviders (log);
-				if (providers == null)
-				{
-					log.Warn ("Errors loading server configuration, skipping server");
-					continue;
-				}
-
-				log.Info ("Setting up");
-
-				GablarskiServer server = new GablarskiServer (new ServerSettings
-				{
-					Name = serverConfig.Name,
-					Description = serverConfig.Description,
-					ServerPassword = serverConfig.Password,
-				}, providers.Users, providers.Permissions, providers.Channels);
-				server.AddConnectionProvider (new NetworkServerConnectionProvider { Port = serverConfig.Port });
-
-				foreach (IConnectionProvider provider in providers.ConnectionProviders)
-				    server.AddConnectionProvider (provider);
-
-				log.Info ("Starting server");
-
-				server.Start();
+				log.Fatal ("Errors found in configuration, shutting down.");
+				return;
 			}
+
+			ServerProviders providers = serverConfig.GetProviders (log);
+			if (providers == null)
+			{
+				log.Fatal ("Errors loading server configuration, shutting down.");
+				return;
+			}
+
+			log.Info ("Setting up");
+
+			GablarskiServer server = new GablarskiServer (new ServerSettings
+			{
+				Name = serverConfig.Name,
+				Description = serverConfig.Description,
+				ServerPassword = serverConfig.Password,
+			}, providers.Users, providers.Permissions, providers.Channels);
+
+			server.AddConnectionProvider (new NetworkServerConnectionProvider { Port = serverConfig.Port });
+
+			foreach (IConnectionProvider provider in providers.ConnectionProviders)
+				server.AddConnectionProvider (provider);
+
+			log.Info ("Starting server.");
+
+			server.Start();
 		}
 	}
 }
