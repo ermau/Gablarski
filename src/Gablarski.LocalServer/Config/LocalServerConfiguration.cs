@@ -34,16 +34,19 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
-using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
-using System.Text;
 
 namespace Gablarski.LocalServer.Config
 {
 	public class LocalServerConfiguration
 		: ConfigurationSection
 	{
+		[ConfigurationProperty ("settings", IsDefaultCollection = true)]
+		[ConfigurationCollection (typeof (SettingElementCollection), AddItemName="setting")]
+		public SettingElementCollection Settings
+		{
+			get { return (SettingElementCollection) base["settings"]; }
+		} 
 	}
 }

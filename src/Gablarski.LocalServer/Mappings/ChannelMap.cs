@@ -1,4 +1,5 @@
-﻿// All rights reserved.
+﻿// Copyright (c) 2010, Eric Maupin
+// All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
 // or without modification, are permitted provided that
@@ -43,11 +44,15 @@ namespace Gablarski.LocalServer.Mappings
 	{
 		public ChannelMap()
 		{
+			Not.LazyLoad();
+
+			Table ("channels");
+			
 			Id (x => x.ChannelId, "channelID");
-			Map (x => x.ParentChannelId, "channelParentID");
+			Map (x => x.ParentChannelId, "channelParentID").Default ("0");
 			Map (x => x.Name, "channelName");
 			Map (x => x.Description, "channelDescription");
-			Map (x => x.UserLimit, "channelLimit");
+			Map (x => x.UserLimit, "channelLimit").Default ("0");
 			Map (x => x.IsDefault, "channelDefault");
 		}
 	}

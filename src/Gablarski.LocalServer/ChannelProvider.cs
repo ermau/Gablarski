@@ -133,9 +133,29 @@ namespace Gablarski.LocalServer
 			}
 		}
 
+		public static void Setup (ISession session)
+		{
+			CreateLobby (session);
+		}
+
+		private static void CreateLobby(ISession session)
+		{
+			var lobby = new LocalChannelInfo
+			{
+				Name = "Lobby",
+				IsDefault = true,
+			};
+
+			session.SaveOrUpdate (lobby);
+		}
+
 		private LocalChannelInfo GetDefaultChannel (ISession session)
 		{
-			return session.Linq<LocalChannelInfo>().SingleOrDefault (c => c.IsDefault);
+			var channel = session.Linq<LocalChannelInfo>().SingleOrDefault (c => c.IsDefault);
+			if (channel == null && !session.Linq<LocalChannelInfo>().Any())
+				CreateLobby (session);
+
+			return channel;
 		}
 	}
 }

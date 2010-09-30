@@ -39,22 +39,18 @@ using FluentNHibernate.Mapping;
 
 namespace Gablarski.LocalServer.Mappings
 {
-	public class BanMap
-		: ClassMap<LocalBanInfo>
+	public class PermissionMapping
+		: ClassMap<Permission>
 	{
-		public BanMap()
+		public PermissionMapping()
 		{
-			Not.LazyLoad();
+			Table ("permissions");
 
-			Table ("bans");
-
-			Id (b => b.Id, "banID");
-			Map (b => b.Created, "banCreated");
-			Map (b => b.Length, "banLength");
-			Map (b => b.Username, "banUsername")
-				.Nullable();
-			Map (b => b.IPMask, "banIPMask")
-				.Nullable();
+			Id (p => p.Id, "permissionID");
+			Map (p => p.UserID, "permissionUserID");
+			Map (p => p.ChannelId, "permissionChannelID").Default ("0");
+			Map (p => p.Name, "permissionName").CustomType<PermissionName>();
+			Map (p => p.Allowed, "permissionAllowed");
 		}
 	}
 }

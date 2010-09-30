@@ -34,15 +34,12 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using NHibernate;
 using NHibernate.Cfg;
 using FluentNHibernate.Cfg;
-using FluentNHibernate.Data;
 using FluentNHibernate.Cfg.Db;
+using NHibernate.Linq;
 using NHibernate.Tool.hbm2ddl;
 
 namespace Gablarski.LocalServer
@@ -52,10 +49,22 @@ namespace Gablarski.LocalServer
 		static Persistance()
 		{
 			SessionFactory = Fluently.Configure ()
-				.Database (() => SQLiteConfiguration.Standard.UsingFile ("barrel.db"))
+				.Database (() => SQLiteConfiguration.Standard.UsingFile (Settings.DatabaseFile.FullName))
 				.Mappings (mcfg => mcfg.FluentMappings.AddFromAssemblyOf<LocalUser>())
 				.ExposeConfiguration (ExposedConfiguration)
 				.BuildSessionFactory();
+
+			using (var session = SessionFactory.OpenSession())
+			using (var trans = session.BeginTransaction())
+			{
+				if (!session.Linq<LocalChannelInfo>().Any())
+					ChannelProvider.Setup (session);
+
+				if (!session.Linq<Permission>().Any())
+					PermissionProvider.Setup (session);
+
+				trans.Commit();
+			}
 		}
 		
 		public static ISessionFactory SessionFactory
@@ -66,7 +75,7 @@ namespace Gablarski.LocalServer
 		
 		private static void ExposedConfiguration (Configuration cfg)
 		{
-			if (File.Exists ("barrel.db"))
+			if (Settings.DatabaseFile.Exists)
 				return;
 		
 			new SchemaExport (cfg).Create (false, true);

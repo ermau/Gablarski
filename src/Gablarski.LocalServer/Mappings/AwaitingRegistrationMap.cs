@@ -1,4 +1,5 @@
-﻿// All rights reserved.
+﻿// Copyright (c) 2010, Eric Maupin
+// All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
 // or without modification, are permitted provided that
@@ -43,6 +44,8 @@ namespace Gablarski.LocalServer.Mappings
 	{
 		public AwaitingRegistrationMap()
 		{
+			Table ("awaitingregistrations");
+
 			Id (ra => ra.Id, "awaitingId");
 			Map (ra => ra.Username, "awaitingUsername");
 			Map (ra => ra.HashedPassword, "awaitingPassword");

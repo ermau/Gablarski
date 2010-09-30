@@ -35,26 +35,39 @@
 // DAMAGE.
 
 using System.Linq;
-using FluentNHibernate.Mapping;
 
-namespace Gablarski.LocalServer.Mappings
+namespace Gablarski.LocalServer
 {
-	public class BanMap
-		: ClassMap<LocalBanInfo>
+	public class Permission
 	{
-		public BanMap()
+		public virtual int Id
 		{
-			Not.LazyLoad();
+			get; private set;
+		}
 
-			Table ("bans");
+		public virtual PermissionName Name
+		{
+			get; set;
+		}
 
-			Id (b => b.Id, "banID");
-			Map (b => b.Created, "banCreated");
-			Map (b => b.Length, "banLength");
-			Map (b => b.Username, "banUsername")
-				.Nullable();
-			Map (b => b.IPMask, "banIPMask")
-				.Nullable();
+		public virtual int UserID
+		{
+			get; set;
+		}
+		
+		public virtual bool Allowed
+		{
+			get; set;
+		}
+
+		public virtual int ChannelId
+		{
+			get; set;
+		}
+
+		public static implicit operator Gablarski.Permission (Permission p)
+		{
+			return new Gablarski.Permission (p.Name, p.Allowed) { ChannelId = p.ChannelId };
 		}
 	}
 }

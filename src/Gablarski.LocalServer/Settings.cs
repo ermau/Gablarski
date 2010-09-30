@@ -34,28 +34,92 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
+using System;
+using System.Configuration;
+using System.IO;
 using System.Linq;
+using Gablarski.LocalServer.Config;
+using log4net;
+using SettingElement = Gablarski.LocalServer.Config.SettingElement;
 
 namespace Gablarski.LocalServer
 {
-	public class AwaitingRegistration
+	public static class Settings
 	{
-		public virtual int Id
+		static Settings()
+		{
+			var logger = LogManager.GetLogger ("LocalServer");
+
+			AllowGuests = true;
+			Registration = UserRegistrationMode.None;
+
+			foreach (SettingElement setting in ((LocalServerConfiguration)ConfigurationManager.GetSection ("localserver")).Settings)
+			{
+				switch (setting.Key)
+				{
+					case "database":
+						try
+						{
+							DatabaseFile = new FileInfo (setting.Value);
+						}
+						catch (Exception)
+						{
+							logger.FatalFormat ("Invalid database file location: '{0}'", setting.Value);
+							Environment.Exit (1);
+						}
+
+						break;
+
+					case "registration":
+						try
+						{
+							Registration = (UserRegistrationMode)Enum.Parse (typeof (UserRegistrationMode), setting.Value, true);
+						}
+						catch
+						{
+							logger.WarnFormat ("registration {0} not understood. Setting to 'None'.", setting.Value);
+						}
+
+						break;
+
+					case "registrationContent":
+						RegistrationContent = setting.Value;
+						break;
+
+					case "allowGuests":
+						bool v;
+						if (!Boolean.TryParse (setting.Value, out v))
+							logger.WarnFormat ("allowGuests value {0} not understood. Setting to 'true'.", setting.Value);
+						else
+							AllowGuests = v;
+						
+						break;
+				}
+			}
+		}
+
+		public static FileInfo DatabaseFile
 		{
 			get;
 			private set;
 		}
 
-		public virtual string Username
+		public static bool AllowGuests
 		{
 			get;
-			set;
+			private set;
 		}
 
-		public virtual string HashedPassword
+		public static UserRegistrationMode Registration
 		{
 			get;
-			set;
+			private set;
+		}
+
+		public static string RegistrationContent
+		{
+			get;
+			private set;
 		}
 	}
 }

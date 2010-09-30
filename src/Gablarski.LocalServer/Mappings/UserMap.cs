@@ -44,6 +44,10 @@ namespace Gablarski.LocalServer.Mappings
 	{
 		public UserMap()
 		{
+			Not.LazyLoad();
+
+			Table ("users");
+
 			Id (x => x.UserId, "userID");
 			Map (x => x.Username, "userName");
 			Map (x => x.HashedPassword, "userPassword");
