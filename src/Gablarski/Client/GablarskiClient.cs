@@ -50,7 +50,7 @@ using Cadenza;
 
 namespace Gablarski.Client
 {
-	public partial class GablarskiClient
+	public class GablarskiClient
 		: IClientContext
 	{
 		// ReSharper disable ConvertToConstant.Global

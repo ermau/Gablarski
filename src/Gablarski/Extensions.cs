@@ -79,7 +79,7 @@ namespace Gablarski
 
 		private static readonly Dictionary<Type, object> CachedValues = new Dictionary<Type, object>();
 		public static object GetDefaultValue (this Type self)
-        {
+		{
 			if (!self.IsValueType)
 				return null;
 
@@ -90,6 +90,6 @@ namespace Gablarski
 
 				return CachedValues[self];
 			}
-        }
+		}
 	}
 }
