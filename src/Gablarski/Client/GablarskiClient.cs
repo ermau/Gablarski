@@ -247,7 +247,7 @@ namespace Gablarski.Client
 		/// </summary>
 		public void Disconnect()
 		{
-			ThreadPool.QueueUserWorkItem (s => DisconnectCore (DisconnectionReason.Requested, DisconnectHandling.None, this.Connection));
+			ThreadPool.QueueUserWorkItem (s => DisconnectCore (DisconnectionReason.Requested, this.Connection));
 		}
 		#endregion
 
@@ -268,7 +268,7 @@ namespace Gablarski.Client
 
 		protected void OnConnectionRejected (RejectedConnectionEventArgs e)
 		{
-			DisconnectCore (DisconnectionReason.Unknown, DisconnectHandling.None, this.Connection, false);
+			DisconnectCore ((e.Reason == ConnectionRejectedReason.CouldNotConnect) ? DisconnectionReason.Unknown : DisconnectionReason.Rejected, this.Connection, false);
 
 			var rejected = this.ConnectionRejected;
 			if (rejected != null)
@@ -346,16 +346,7 @@ namespace Gablarski.Client
 		{
 			var msg = (DisconnectMessage) e.Message;
 
-			DisconnectHandling handling = DisconnectHandling.Reconnect;
-
-			switch (msg.Reason)
-			{
-				case DisconnectionReason.LoggedInElsewhere:
-					handling = DisconnectHandling.None;
-					break;
-			}
-
-			DisconnectCore (msg.Reason, handling, e.Connection, true);
+			DisconnectCore (msg.Reason, e.Connection, true);
 		}
 
 		private void OnPermissionDeniedMessage (MessageReceivedEventArgs obj)
@@ -434,7 +425,7 @@ namespace Gablarski.Client
 
 			int count = Interlocked.Increment (ref this.redirectCount);
 
-			DisconnectCore (DisconnectionReason.Unknown, DisconnectHandling.None, this.Connection);
+			DisconnectCore (DisconnectionReason.Redirected, this.Connection);
 			
 			if (count > redirectLimit)
 				return;
@@ -448,12 +439,27 @@ namespace Gablarski.Client
 			Reconnect
 		}
 
-		private void DisconnectCore (DisconnectionReason reason, DisconnectHandling handling, IConnection connection)
+		private DisconnectHandling GetHandlingForReason (DisconnectionReason reason)
 		{
-			DisconnectCore (reason, handling, connection, true);
+			if (!ReconnectAutomatically)
+				return DisconnectHandling.None;
+
+			switch (reason)
+			{
+				case DisconnectionReason.Unknown:
+					return DisconnectHandling.Reconnect;
+
+				default:
+					return DisconnectHandling.None;
+			}
 		}
 
-		private void DisconnectCore (DisconnectionReason reason, DisconnectHandling handling, IConnection connection, bool fireEvent)
+		private void DisconnectCore (DisconnectionReason reason, IConnection connection)
+		{
+			DisconnectCore (reason, connection, true);
+		}
+
+		private void DisconnectCore (DisconnectionReason reason, IConnection connection, bool fireEvent)
 		{
 			disconnectedInChannelId = CurrentUser.CurrentChannelId;
 
@@ -467,6 +473,13 @@ namespace Gablarski.Client
 
 			lock (this.mqueue)
 			{
+				if (reason == DisconnectionReason.Unknown)
+				{
+					var msg = this.mqueue.Select (a => a.Message).OfType<DisconnectMessage>().FirstOrDefault();
+					if (msg != null)
+						reason = msg.Reason;
+				}
+
 				this.mqueue.Clear();
 			}
 
@@ -487,13 +500,13 @@ namespace Gablarski.Client
 
 			connection.Disconnect();
 
-			if (handling == DisconnectHandling.Reconnect)
+			if (GetHandlingForReason (reason) == DisconnectHandling.Reconnect)
 				ThreadPool.QueueUserWorkItem (Reconnect);
 		}
 
 		private void OnDisconnectedInternal (object sender, ConnectionEventArgs e)
 		{
-			DisconnectCore (DisconnectionReason.Unknown, (ReconnectAutomatically) ? DisconnectHandling.Reconnect : DisconnectHandling.None, e.Connection);
+			DisconnectCore (DisconnectionReason.Unknown, e.Connection);
 		}
 
 		private void Reconnect (object state)

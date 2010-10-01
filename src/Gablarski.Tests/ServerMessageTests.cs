@@ -230,6 +230,16 @@ namespace Gablarski.Tests
 		}
 
 		[Test]
+		public void Disconnect()
+		{
+			var msg = new DisconnectMessage (DisconnectionReason.Kicked);
+			Assert.AreEqual (DisconnectionReason.Kicked, msg.Reason);
+
+			msg = AssertLengthMatches (msg);
+			Assert.AreEqual (DisconnectionReason.Kicked, msg.Reason);
+		}
+
+		[Test]
 		public void SourcesRemoved()
 		{
 			var sources = new List<AudioSource>
@@ -405,6 +415,16 @@ namespace Gablarski.Tests
 			msg = AssertLengthMatches (msg);
 			Assert.AreEqual (msg.Users.First().UserId, 1);
 			Assert.AreEqual (msg.Users.Skip (1).First().UserId, 2);
+		}
+
+		[Test]
+		public void UserKickedMessage()
+		{
+			var msg = new UserKickedMessage { FromServer = true, UserId = 5 };
+
+			msg = AssertLengthMatches (msg);
+			Assert.AreEqual (true, msg.FromServer);
+			Assert.AreEqual (5, msg.UserId);
 		}
 
 		private T AssertLengthMatches<T> (T msg)

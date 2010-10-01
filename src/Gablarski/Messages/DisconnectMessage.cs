@@ -68,6 +68,16 @@ namespace Gablarski.Messages
 		/// Do not reconnect.
 		/// </remarks>
 		Kicked = 3,
+		
+		/// <summary>
+		/// Disconnected because your connection was rejected. (Local reason)
+		/// </summary>
+		Rejected = 4,
+
+		/// <summary>
+		/// Disconnected because you are redirecting. (Local reason)
+		/// </summary>
+		Redirected = 5
 	}
 
 	public class DisconnectMessage
