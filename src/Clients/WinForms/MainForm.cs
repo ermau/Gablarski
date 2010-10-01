@@ -474,7 +474,7 @@ namespace Gablarski.Clients.Windows
 			{
 				this.inputProvider.CommandStateChanged += OnCommandStateChanged;
 				this.inputProvider.Attach (this.Handle);
-				this.inputProvider.SetBindings (Settings.CommandBindings);
+				this.inputProvider.SetBindings (Settings.CommandBindings.Where (b => b.Provider.GetType().GetSimpleName() == this.inputProvider.GetType().GetSimpleName()));
 			}
 		}
 

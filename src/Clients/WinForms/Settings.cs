@@ -359,6 +359,7 @@ namespace Gablarski.Clients.Windows
 
 		private static ObservableCollection<CommandBinding> commandBindings;
 		private static Dictionary<string, SettingEntry> settings;
+
 		private static void LoadSettings ()
 		{
 			lock (SettingLock)
@@ -375,7 +376,7 @@ namespace Gablarski.Clients.Windows
 				commandBindings.CollectionChanged += OnCommandBindingsChanged;
 				foreach (var cbe in Persistance.GetCommandBindings())
 				{
-					IInputProvider provider = Modules.Input.FirstOrDefault (ip => ip.GetType().Name == cbe.ProviderType);
+					IInputProvider provider = Modules.Input.FirstOrDefault (ip => ip.GetType().GetSimpleName() == cbe.ProviderType);
 					if (provider == null)
 						continue;
 

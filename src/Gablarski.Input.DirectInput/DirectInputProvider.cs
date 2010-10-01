@@ -121,7 +121,7 @@ namespace Gablarski.Input.DirectInput
 
 			lock (this.syncRoot)
 			{
-				foreach (CommandBinding binding in bindings.Where (cb => cb.Provider == this))
+				foreach (CommandBinding binding in bindings)
 				{
 					string[] parts = binding.Input.Split ('|');
 					Guid deviceGuid = new Guid (parts[0]);
