@@ -367,6 +367,10 @@ namespace Gablarski.Clients.Windows
 					return;
 
 				settings = Persistance.GetSettings().ToDictionary (s => s.Name);
+
+				if (Persistance.CheckForUpdates())
+					settings = Persistance.GetSettings().ToDictionary (s => s.Name);
+
 				commandBindings = new ObservableCollection<CommandBinding>();
 				commandBindings.CollectionChanged += OnCommandBindingsChanged;
 				foreach (var cbe in Persistance.GetCommandBindings())

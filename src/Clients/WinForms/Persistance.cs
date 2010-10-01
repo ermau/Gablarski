@@ -29,24 +29,27 @@ namespace Gablarski.Clients.Windows
 			var builder = new SQLiteConnectionStringBuilder();
 			builder.DataSource = DbFile.FullName;
 
-			if (DbFile.Exists)
-			{
-				db = new SQLiteConnection (builder.ToString());
-				db.Open();
-
-				if (Settings.Version.IsNullOrWhitespace())
-				{
-					db.Close();
-					DbFile.Delete();
-					DbFile.Refresh();
-					Settings.Clear();
-				}
-			}
-
 			db = new SQLiteConnection(builder.ToString());
 			db.Open();
 			
 			CreateDbs();
+		}
+
+		public static bool CheckForUpdates()
+		{
+			if (!Settings.Version.IsNullOrWhitespace())
+				return false;
+
+			db.Close();
+			DbFile.Delete();
+			Settings.Clear();
+
+			DbFile.Refresh();
+			
+			db.Open();
+			CreateDbs();
+			
+			return true;
 		}
 
 		public static IEnumerable<SettingEntry> GetSettings()
