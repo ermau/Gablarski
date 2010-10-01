@@ -324,6 +324,8 @@ namespace Gablarski.Network
 					{
 						foreach (NetworkServerConnection c in disconnecting)
 							c.Disconnect();
+
+						disconnecting.Clear();
 					}
 				}
 			}
