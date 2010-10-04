@@ -295,29 +295,39 @@ namespace Gablarski.Network
 						log.DebugFormat ("Dequeued {1} message {0} for send", toSend.MessageTypeCode, (toSend.Reliable) ? "reliable" : "unreliable");
 
 					IValueWriter iwriter = (!toSend.Reliable) ? writeUnreliable : writeReliable;
-					iwriter.WriteByte (0x2A);
 
-					if (!toSend.Reliable)
-						iwriter.WriteUInt32 (this.nid);
-
-					iwriter.WriteUInt16 (toSend.MessageTypeCode);
-
-					if (!toSend.Encrypted)
-						toSend.WritePayload (iwriter);
-					else
+					try
 					{
-						MemoryStream buffer;
-						if (toSend.MessageSize != 0)
-							buffer = new MemoryStream (toSend.MessageSize);
+						iwriter.WriteByte (0x2A);
+
+						if (!toSend.Reliable)
+							iwriter.WriteUInt32 (this.nid);
+
+						iwriter.WriteUInt16 (toSend.MessageTypeCode);
+
+						if (!toSend.Encrypted)
+							toSend.WritePayload (iwriter);
 						else
-							buffer = new MemoryStream();
+						{
+							MemoryStream buffer;
+							if (toSend.MessageSize != 0)
+								buffer = new MemoryStream (toSend.MessageSize);
+							else
+								buffer = new MemoryStream();
 
-						toSend.WritePayload (new StreamValueWriter (buffer));
-						byte[] encrypted = Encryption.Encrypt (buffer.ToArray());
-						iwriter.WriteBytes (encrypted);
+							toSend.WritePayload (new StreamValueWriter (buffer));
+							byte[] encrypted = Encryption.Encrypt (buffer.ToArray());
+							iwriter.WriteBytes (encrypted);
+						}
+
+						iwriter.Flush();
 					}
-
-					iwriter.Flush ();
+					catch (Exception ex)
+					{
+						log.Debug ("Error during sending " + toSend.MessageTypeCode, ex);
+						Disconnect();
+						break;
+					}
 				}
 
 				if (disconnecting)
