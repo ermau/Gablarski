@@ -54,6 +54,7 @@
 			// cancelButton
 			// 
 			this.cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.cancelButton.CausesValidation = false;
 			this.cancelButton.Location = new System.Drawing.Point(131, 97);
 			this.cancelButton.Name = "cancelButton";
 			this.cancelButton.Size = new System.Drawing.Size(75, 23);
