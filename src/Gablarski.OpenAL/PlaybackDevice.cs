@@ -1,4 +1,4 @@
-// Copyright (c) 2009, Eric Maupin
+// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -35,11 +35,8 @@
 // DAMAGE.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Runtime.InteropServices;
-using Gablarski.OpenAL;
 
 namespace Gablarski.OpenAL
 {
@@ -49,6 +46,12 @@ namespace Gablarski.OpenAL
 		internal PlaybackDevice (string deviceName)
 			: base (deviceName)
 		{
+		}
+
+		public Context Context
+		{
+			get;
+			internal set;
 		}
 
 		/// <summary>
@@ -97,6 +100,12 @@ namespace Gablarski.OpenAL
 		{
 			if (this.Handle == IntPtr.Zero)
 				return;
+
+			if (disposing)
+			{
+				if (Context != null)
+					Context.Dispose();
+			}
 
 			OpenAL.DebugFormat ("Destroying playback device {0}", Name);
 

@@ -47,6 +47,8 @@ namespace Gablarski.OpenAL
 		{
 			this.Handle = handle;
 			this.Device = device;
+
+			OpenAL.DebugFormat ("Context {0} created for {1}", handle, device.Name);
 		}
 
 		public PlaybackDevice Device
@@ -57,9 +59,10 @@ namespace Gablarski.OpenAL
 
 		public void Activate ()
 		{
-			OpenAL.DebugFormat ("Activating context for device {0}", this.Device.Name);
+			OpenAL.DebugFormat ("Activating context {1} for device {0}", this.Device.Name, Handle);
 			
 			alcMakeContextCurrent (this.Handle);
+			CurrentContext = this;
 			OpenAL.ErrorCheck (this.Device);
 		}
 
@@ -79,14 +82,17 @@ namespace Gablarski.OpenAL
 				return;
 
 			if (this.Handle != IntPtr.Zero)
-				alcDestroyContext (this.Handle);
-			
-			lock (lck)
 			{
-				contexts.Remove (this.Handle);
+				if (CurrentContext == this)
+				{
+					alcMakeContextCurrent (IntPtr.Zero);
+					CurrentContext = null;
+				}
+
+				alcDestroyContext (this.Handle);
 			}
-			
-			OpenAL.DebugFormat ("Destroying context for {0}", Device.Name);
+
+			OpenAL.DebugFormat ("Destroying from {2} context {1} for {0}", Device.Name, Handle, (disposing) ? "Dispose()" : "finalizer");
 			
 			this.disposed = true;
 		}
@@ -100,17 +106,8 @@ namespace Gablarski.OpenAL
 
 		public static Context CurrentContext
 		{
-			get
-			{
-				IntPtr handle = alcGetCurrentContext();
-
-				Context c = null;
-				
-				if (handle != IntPtr.Zero)
-					contexts.TryGetValue (handle, out c);
-
-				return c;
-			}
+			get;
+			private set;
 		}
 
 		// ReSharper disable InconsistentNaming
@@ -129,28 +126,16 @@ namespace Gablarski.OpenAL
 		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
 		private extern static void alcDestroyContext (IntPtr context);
 		// ReSharper restore InconsistentNaming
-
-		private static Dictionary<IntPtr, Context> contexts;
-		private static readonly object lck = new object ();
-
+		
 		public static Context Create (PlaybackDevice device)
 		{
 			OpenAL.DebugFormat ("Creating context for {0}", device.Name);
 			
-			Context c = null;
-			lock (lck)
-			{
-				if (contexts == null)
-					contexts = new Dictionary<IntPtr, Context> ();
-
-				c = new Context (alcCreateContext (device.Handle, IntPtr.Zero), device);
-				OpenAL.ErrorCheck(device);
-
-				if (!contexts.ContainsKey (c.Handle))
-					contexts.Add (c.Handle, c);
-			}
-
+			Context c = new Context (alcCreateContext (device.Handle, IntPtr.Zero), device);
 			OpenAL.ErrorCheck (device);
+
+			device.Context = c;
+
 			return c;
 		}
 
