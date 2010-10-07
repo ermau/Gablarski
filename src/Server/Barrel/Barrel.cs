@@ -34,8 +34,6 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
-using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
@@ -43,6 +41,7 @@ using Gablarski.Barrel.Config;
 using Gablarski.Network;
 using Gablarski.Server;
 using log4net;
+using Cadenza;
 
 namespace Gablarski.Barrel
 {
@@ -61,7 +60,7 @@ namespace Gablarski.Barrel
 				return;
 			}
 			
-			var log = LogManager.GetLogger (serverConfig.Name);
+			var log = LogManager.GetLogger (serverConfig.Name.Remove (" "));
 
 			log.Info ("Checking configuration");
 			if (!serverConfig.CheckConfiguration (log))
@@ -91,9 +90,9 @@ namespace Gablarski.Barrel
 			foreach (IConnectionProvider provider in providers.ConnectionProviders)
 				server.AddConnectionProvider (provider);
 
-			log.Info ("Starting server.");
-
 			server.Start();
+
+			log.Info ("Server started");
 		}
 	}
 }
