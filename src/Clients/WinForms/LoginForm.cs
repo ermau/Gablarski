@@ -148,10 +148,18 @@ namespace Gablarski.Clients.Windows
 		{
 			this.pnlModServer.Visible = false;
 
+			this.inName.Clear();
+			this.inName.BackColor = Color.Empty;
+
 			this.inServer.Clear();
-			this.inPort.Clear();
+			this.inServer.BackColor = Color.Empty;
+
+			this.inPort.Text = "42912";
 			this.inServerPassword.Clear();
+			
 			this.inNickname.Clear();
+			this.inNickname.BackColor = Color.Empty;
+
 			this.inUsername.Clear();
 			this.inPassword.Clear();
 
