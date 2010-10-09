@@ -102,7 +102,7 @@ namespace Gablarski.Network
 			if (disconnecting)
 			{
 				if (debugLogging)
-					log.DebugFormat ("Rejected {1} message {0} for send since we're dsiconnecting", message.MessageTypeCode, (message.Reliable) ? "reliable" : "unreliable");
+					log.DebugFormat ("Rejected {1} message {0} for send since we're disconnecting", message.MessageTypeCode, (message.Reliable) ? "reliable" : "unreliable");
 				
 				return;
 			}

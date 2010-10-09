@@ -151,7 +151,6 @@
     <Compile Include="Messages\SetStatusMessage.cs" />
     <Compile Include="Messages\UserListMessage.cs" />
     <Compile Include="Messages\UserUpdatedMessage.cs" />
-    <Compile Include="ModuleSelectableAttribute.cs" />
     <Compile Include="ChannelInfo.cs" />
     <Compile Include="Client\ClientChannelManager.cs" />
     <Compile Include="Client\GablarskiClient.cs" />
@@ -183,7 +182,6 @@
     <Compile Include="Messages\ServerInfoMessage.cs" />
     <Compile Include="Messages\SourceListMessage.cs" />
     <Compile Include="Messages\SourceResultMessage.cs" />
-    <Compile Include="ModuleLoader.cs" />
     <Compile Include="ByteArrayExtensions.cs" />
     <Compile Include="Network\NetworkClientConnection.cs" />
     <Compile Include="Network\NetworkServerConnection.cs" />

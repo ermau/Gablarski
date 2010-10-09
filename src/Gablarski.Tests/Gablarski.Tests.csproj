@@ -108,7 +108,6 @@
     <Compile Include="Mocks\Network\MockConnectionBase.cs" />
     <Compile Include="Mocks\Network\MockConnectionProvider.cs" />
     <Compile Include="Mocks\Network\MockServerConnection.cs" />
-    <Compile Include="ModuleLoaderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServerChannelHandlerTests.cs" />
     <Compile Include="ServerInfoTests.cs" />
