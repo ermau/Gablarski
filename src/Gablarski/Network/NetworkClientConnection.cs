@@ -362,6 +362,9 @@ namespace Gablarski.Network
 		{
 			try
 			{
+				if (!this.running)
+					return;
+
 				this.rstream.EndRead (ar);
 				byte[] mbuffer = (ar.AsyncState as byte[]);
 
