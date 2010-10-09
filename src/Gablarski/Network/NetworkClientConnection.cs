@@ -135,6 +135,8 @@ namespace Gablarski.Network
 				{
 					if (this.pinger.Dispose (mre))
 						mre.WaitOne();
+
+					this.pinger = null;
 				}
 			}
 
@@ -247,7 +249,8 @@ namespace Gablarski.Network
 
 		private void Ping (object endpoint)
 		{
-			this.udp.SendTo (new byte[] { 24, 24 }, (IPEndPoint)endpoint);
+			if (this.udp != null)
+				this.udp.SendTo (new byte[] { 24, 24 }, (IPEndPoint)endpoint);
 		}
 
 		#endregion
