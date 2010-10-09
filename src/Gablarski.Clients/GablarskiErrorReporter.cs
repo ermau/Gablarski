@@ -36,15 +36,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Text;
-using System.Web;
-using System.Xml.Linq;
 using Gablarski.Client;
 
 namespace Gablarski.Clients
@@ -53,15 +50,26 @@ namespace Gablarski.Clients
 		: IErrorReporter
 	{
 		private static readonly string OperatingSystemIdentifier;
+		private readonly Assembly[] assemblies;
 
 		static GablarskiErrorReporter()
 		{
 			OperatingSystemIdentifier = GetOS();
 		}
 
+		public GablarskiErrorReporter()
+			: this (typeof (GablarskiClient).Assembly, typeof (GablarskiErrorReporter).Assembly)
+		{
+		}
+		
+		public GablarskiErrorReporter (params Assembly[] assemblies)
+		{
+			this.assemblies = assemblies;
+		}
+
 		public IEnumerable<Assembly> AssembliesHandled
 		{
-			get { return new[] { typeof (GablarskiClient).Assembly, typeof (GablarskiErrorReporter).Assembly }; }
+			get { return this.assemblies; }
 		}
 
 		public void ReportError (Exception ex)
