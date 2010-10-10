@@ -40,7 +40,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Reflection;
 using System.Threading;
 using Cadenza.Collections;
 using Gablarski.Audio;
@@ -489,9 +488,6 @@ namespace Gablarski.Client
 				this.messageRunnerThread = null;
 			}
 
-			if (fireEvent)
-				OnDisconnected (this, new DisconnectedEventArgs (reason));
-			
 			this.Users.Reset();
 			this.Channels.Clear();
 			this.Sources.Reset();
@@ -499,6 +495,9 @@ namespace Gablarski.Client
 			this.Audio.Stop();
 
 			connection.Disconnect();
+
+			if (fireEvent)
+				OnDisconnected (this, new DisconnectedEventArgs (reason));
 
 			if (GetHandlingForReason (reason) == DisconnectHandling.Reconnect)
 				ThreadPool.QueueUserWorkItem (Reconnect);
