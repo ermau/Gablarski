@@ -342,7 +342,7 @@ namespace Gablarski.Tests
 		public void JoinAsGuestAlreadyJoined()
 		{
 			JoinAsGuest (server, true, true, null, "Nickname", null);
-			JoinAsGuest (server, false, false, true, null, "Nickname", null);
+			JoinAsGuest (new MockServerConnection(), false, false, true, null, "Nickname", null);
 		}
 
 		[Test]
