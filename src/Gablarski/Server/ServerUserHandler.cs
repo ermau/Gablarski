@@ -225,7 +225,7 @@ namespace Gablarski.Server
 
 			Manager.Connect (e.Connection);
 
-			e.Connection.Send (new ServerInfoMessage { ServerInfo = new ServerInfo (context.Settings, context.UserProvider, context.EncryptionParameters) });
+			SendInfoMessages (e.Connection);
 		}
 
 		internal void JoinMessage (MessageReceivedEventArgs e)
@@ -271,7 +271,7 @@ namespace Gablarski.Server
 
 				this.Send (new UserJoinedMessage (info));
 
-				SendInfoMessages (e.Connection);
+				//SendInfoMessages (e.Connection);
 			}
 			else
 				e.Connection.Send (msg);
@@ -602,6 +602,7 @@ namespace Gablarski.Server
 
 		private void SendInfoMessages (IConnection connection)
 		{
+			connection.Send (new ServerInfoMessage { ServerInfo = new ServerInfo (context.Settings, context.UserProvider, context.EncryptionParameters) });
 			connection.Send (new ChannelListMessage (this.context.ChannelsProvider.GetChannels(), this.context.ChannelsProvider.DefaultChannel));
 			connection.Send (new UserInfoListMessage (Manager));
 			connection.Send (new SourceListMessage (this.context.Sources));

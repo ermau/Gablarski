@@ -191,6 +191,9 @@ namespace Gablarski.Tests
 			Assert.IsTrue (handler.Manager.GetIsConnected (server));
 
 			server.Client.DequeueAndAssertMessage<ServerInfoMessage>();
+			server.Client.DequeueAndAssertMessage<ChannelListMessage>();
+			server.Client.DequeueAndAssertMessage<UserInfoListMessage>();
+			server.Client.DequeueAndAssertMessage<SourceListMessage>();
 		}
 
 		[Test]
@@ -321,9 +324,9 @@ namespace Gablarski.Tests
 
 				connection.Client.DequeueAndAssertMessage<PermissionsMessage>();
 				connection.Client.DequeueAndAssertMessage<UserJoinedMessage>();
-				connection.Client.DequeueAndAssertMessage<ChannelListMessage>();
-				connection.Client.DequeueAndAssertMessage<UserInfoListMessage>();
-				connection.Client.DequeueAndAssertMessage<SourceListMessage>();
+				//connection.Client.DequeueAndAssertMessage<ChannelListMessage>();
+				//connection.Client.DequeueAndAssertMessage<UserInfoListMessage>();
+				//connection.Client.DequeueAndAssertMessage<SourceListMessage>();
 
 				observer.Client.DequeueAndAssertMessage<UserJoinedMessage>();
 				

@@ -67,6 +67,9 @@ namespace Gablarski.Tests
 			var connection = this.provider.EstablishConnection ();
 			connection.Client.Send (new ConnectMessage { ProtocolVersion = GablarskiServer.ProtocolVersion, Host = "test", Port = 42912 });
 			connection.Client.DequeueAndAssertMessage<ServerInfoMessage>();
+			connection.Client.DequeueAndAssertMessage<ChannelListMessage>();
+			connection.Client.DequeueAndAssertMessage<UserInfoListMessage>();
+			connection.Client.DequeueAndAssertMessage<SourceListMessage>();
 			return connection;
 		}
 
@@ -95,10 +98,10 @@ namespace Gablarski.Tests
 			Assert.AreEqual (joinResultMessage.UserInfo.UserId, userJoinedMessage.UserInfo.UserId);
 			Assert.AreEqual (joinResultMessage.UserInfo.CurrentChannelId, userJoinedMessage.UserInfo.CurrentChannelId);
 
-			connection.Client.DequeueAndAssertMessage<ChannelListMessage>();
-			var usermsg = connection.Client.DequeueAndAssertMessage<UserInfoListMessage>();
-			Assert.IsNotNull (usermsg.Users.FirstOrDefault (u => u.UserId == userJoinedMessage.UserInfo.UserId));
-			connection.Client.DequeueAndAssertMessage<SourceListMessage>();
+			//connection.Client.DequeueAndAssertMessage<ChannelListMessage>();
+			//var usermsg = connection.Client.DequeueAndAssertMessage<UserInfoListMessage>();
+			//Assert.IsNotNull (usermsg.Users.FirstOrDefault (u => u.UserId == userJoinedMessage.UserInfo.UserId));
+			//connection.Client.DequeueAndAssertMessage<SourceListMessage>();
 
 			return user;
 		}
