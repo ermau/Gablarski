@@ -16,16 +16,52 @@ namespace Gablarski.Clients.Windows
 			return Icon.FromHandle (self.GetHicon());
 		}
 
-		public static Image ToErrorIcon (this Image self)
+		public static Image Overlay (this Image self, Image imposing)
+		{
+			return Overlay (self, imposing, ContentAlignment.MiddleCenter);
+		}
+
+		public static Image Overlay (this Image self, Image imposing, ContentAlignment alignment)
+		{
+			return Overlay (self, imposing, imposing.Size, alignment);
+		}
+
+		public static Image Overlay (this Image self, Image imposing, Size size, ContentAlignment alignment)
 		{
 			if (self == null)
 				throw new ArgumentNullException ("self");
 
-			var e = Resources.ErrorOverlay;
+			int x, y;
+			switch (alignment)
+			{
+				case ContentAlignment.BottomCenter:
+					x = self.Size.Width - size.Width / 2;
+					y = self.Size.Height - size.Height;
+					break;
+
+				case ContentAlignment.BottomRight:
+					x = self.Size.Width - size.Width;
+					y = self.Size.Height - size.Height;
+					break;
+
+				case ContentAlignment.MiddleCenter:
+					x = self.Size.Width - size.Width / 2;
+					y = self.Size.Height - size.Height / 2;
+					break;
+
+				default:
+					throw new NotImplementedException();
+			}
+
 			using (var g = Graphics.FromImage (self))
-				g.DrawImage (e, self.Width - e.Width, self.Height - e.Height);
+				g.DrawImage (imposing, new Rectangle (new Point (x, y), size));
 
 			return self;
+		}
+
+		public static Image ToErrorIcon (this Image self)
+		{
+			return self.Overlay (Resources.ErrorOverlay, ContentAlignment.BottomRight);
 		}
 
 		public static string ToDisplayString (this Exception self)

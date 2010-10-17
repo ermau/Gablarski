@@ -349,6 +349,10 @@
     <Content Include="Headphones.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Resources\hourglass.png" />
+    <None Include="Resources\status-busy.png" />
+    <None Include="Resources\status.png" />
+    <None Include="Resources\server24.png" />
     <None Include="Resources\load.gif" />
     <None Include="Resources\help.png" />
     <None Include="Resources\burn.png" />

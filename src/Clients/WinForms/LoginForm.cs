@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -11,6 +12,7 @@ using Gablarski.Client;
 using Gablarski.Clients;
 using Gablarski.Clients.Windows.Entities;
 using Gablarski.Clients.Windows.Properties;
+using Gablarski.Messages;
 using Gablarski.Server;
 using Cadenza;
 
@@ -19,11 +21,26 @@ namespace Gablarski.Clients.Windows
 	public partial class LoginForm
 		: Form
 	{
+		private readonly static Image serverOkImage;
+		private static readonly Image serverQueryImage;
+		private static readonly Image serverConnectErrorImage;
+		private static readonly Image serverBannedImage;
+		private static readonly Image serverVersionErrorImage;
+
+		static LoginForm()
+		{
+			serverOkImage = Resources.LServerImage.Overlay (Resources.OKOverlay, ContentAlignment.BottomRight);
+			serverQueryImage = Resources.LServerImage.Overlay (Resources.HourglassImage, new Size (16, 16), ContentAlignment.BottomRight);
+			serverConnectErrorImage = Resources.LServerImage.Overlay (Resources.HaltOverlay, ContentAlignment.BottomRight);
+			serverBannedImage = Resources.LServerImage.Overlay (Resources.BanImage, new Size (16, 16), ContentAlignment.BottomRight);
+			serverVersionErrorImage = Resources.LServerImage.Overlay (Resources.ErrorOverlay, ContentAlignment.BottomRight);
+		}
+
 		public LoginForm ()
 		{
-			InitializeComponent ();
+			InitializeComponent();
 
-			this.Icon = Resources.ServerConnectImage.ToIcon ();
+			this.Icon = Resources.ServerConnectImage.ToIcon();
 		}
 
 		public ServerEntry Entry
@@ -146,6 +163,7 @@ namespace Gablarski.Clients.Windows
 
 		private void ClearEdit()
 		{
+			this.serverStatus.Image = null;
 			this.pnlModServer.Visible = false;
 
 			this.inName.Clear();
@@ -233,22 +251,93 @@ namespace Gablarski.Clients.Windows
 			{
 				var li = this.servers.Items.Add (entry.Name);
 				li.Tag = entry;
-				li.ImageIndex = 0;
+				li.ImageKey = "serverQuery";
 				saved.Items.Add (li);
+
+				GablarskiClient.QueryServer (entry.Host, entry.Port, li, ServerQueried);
 			}
 
 			this.servers.EndUpdate();
 		}
 
+		private void UpdateImage (ListViewItem li, string key)
+		{
+			if (IsDisposed || Disposing)
+				return;
+
+			li.ImageKey = key;
+		}
+
+		private void ServerQueried (ServerInfo info, ConnectionRejectedReason reason, object tag)
+		{
+			if (IsDisposed || Disposing || this.closing)
+				return;
+
+			var li = (ListViewItem)tag;
+
+			switch (reason)
+			{
+				case ConnectionRejectedReason.CouldNotConnect:
+					BeginInvoke ((Action<ListViewItem, string>)UpdateImage, li, "serverConnectError");
+					return;
+
+				case ConnectionRejectedReason.BanHammer:
+					BeginInvoke ((Action<ListViewItem, string>)UpdateImage, li, "serverBanned");
+					return;
+
+				case ConnectionRejectedReason.IncompatibleVersion:
+					BeginInvoke ((Action<ListViewItem, string>)UpdateImage, li, "serverVersionError");
+					return;
+
+				case ConnectionRejectedReason.Unknown:
+					if (!String.IsNullOrEmpty (info.Logo))
+					{
+						Uri logoUri;
+						if (Uri.TryCreate (info.Logo, UriKind.Absolute, out logoUri))
+						{
+							try
+							{
+								WebClient client = new WebClient();
+								byte[] data = client.DownloadData (info.Logo);
+
+								Image logo = Image.FromStream (new MemoryStream (data));
+								BeginInvoke ((Action<Image>)(l =>
+								{
+									if (IsDisposed || Disposing)
+										return;
+
+									int index = li.ImageList.Images.Add (l, Color.Transparent);
+									li.ImageIndex = index;
+								}), logo);
+
+								return;
+							}
+							catch
+							{
+								break;
+							}
+						}
+					}
+
+					break;
+			}
+
+			BeginInvoke ((Action)(() => li.ImageKey = "server"));
+		}
+
 		private void LoginForm_Load (object sender, EventArgs e)
 		{
-			ImageList images = new ImageList();
-			images.ColorDepth = ColorDepth.Depth24Bit;
-			images.TransparentColor = Color.Transparent;
-			images.Images.Add (Resources.ServerImage);
+			ImageList largeImageList = new ImageList();
+			largeImageList.ColorDepth = ColorDepth.Depth24Bit;
+			largeImageList.TransparentColor = Color.Transparent;
+			largeImageList.ImageSize = new Size (24, 24);
+			largeImageList.Images.Add ("server", serverOkImage);
+			largeImageList.Images.Add ("serverQuery", serverQueryImage);
+			largeImageList.Images.Add ("serverConnectError", serverConnectErrorImage);
+			largeImageList.Images.Add ("serverBanned", serverBannedImage);
+			largeImageList.Images.Add ("serverVersionError", serverVersionErrorImage);
 
-			this.servers.LargeImageList = images;
-			this.servers.SmallImageList = images;
+			this.servers.LargeImageList = largeImageList;
 
 			Settings.SettingChanged += OnSettingsChanged;
 			SetupTTS();
@@ -256,9 +345,10 @@ namespace Gablarski.Clients.Windows
 			this.LoadServerEntries();
 		}
 
-		private void LoginForm_FormClosing(object sender, FormClosingEventArgs e)
+		private void LoginForm_FormClosing (object sender, FormClosingEventArgs e)
 		{
 			Settings.SettingChanged -= OnSettingsChanged;
+			this.closing = true;
 		}
 
 		private void OnSettingsChanged(object sender, PropertyChangedEventArgs e)
@@ -303,10 +393,10 @@ namespace Gablarski.Clients.Windows
 
 		private void servers_KeyUp (object sender, KeyEventArgs e)
 		{
-			if (e.KeyCode != Keys.Delete || this.servers.SelectedItems.Count == 0)
-				return;
-
-			DeleteServers ();
+			if (e.Shift && e.Control && e.Alt && e.KeyCode == Keys.Delete)
+				throw new InvalidOperationException ("Error reporting test");
+			if (e.KeyCode == Keys.Delete && this.servers.SelectedItems.Count != 0)
+				DeleteServers ();
 		}
 
 		private void DeleteServers ()
@@ -326,6 +416,90 @@ namespace Gablarski.Clients.Windows
 			ITextToSpeech tts = Modules.TextToSpeech.FirstOrDefault (t => t.GetType().FullName.Contains (Settings.TextToSpeech));
 			if (tts != null)
 				tts.Say (this.inPhonetic.Text);
+		}
+
+		private bool lastWasPort = false;
+		private readonly object addServerQuerySync = new object();
+		private bool closing;
+
+		private void AddServerQuery (ServerInfo info, ConnectionRejectedReason reason, object tag)
+		{
+			bool port = (bool)tag;
+			lock (addServerQuerySync)
+			{
+				bool last = lastWasPort;
+				lastWasPort = port;
+				if (last && !port)
+					return;
+
+				switch (reason)
+				{
+					case ConnectionRejectedReason.BanHammer:
+						this.serverStatus.Image = serverBannedImage;
+						break;
+
+					case ConnectionRejectedReason.CouldNotConnect:
+						this.serverStatus.Image = serverConnectErrorImage;
+						break;
+
+					case ConnectionRejectedReason.IncompatibleVersion:
+						this.serverStatus.Image = serverVersionErrorImage;
+						break;
+
+					case ConnectionRejectedReason.Unknown:
+						if (info != null)
+						{
+							BeginInvoke ((Action<ServerInfo>)(serverInfo =>
+							{
+								if (this.inName.Text == String.Empty)
+									this.inName.Text = info.Name;
+
+								this.serverStatus.Image = serverOkImage;
+							}), info);
+						}
+
+						break;
+				}
+			}
+		}
+
+		private void inServer_Validated (object sender, EventArgs e)
+		{
+			lock (addServerQuerySync)
+				lastWasPort = false;
+
+			int port = (int)this.inPort.Value;
+
+			if (this.inServer.Text.IsNullOrWhitespace())
+				return;
+			if (port < IPEndPoint.MinPort || port > IPEndPoint.MaxPort)
+				return;
+
+			this.serverStatus.Image = serverQueryImage;
+			GablarskiClient.QueryServer (this.inServer.Text, port, false, AddServerQuery);
+		}
+
+		private void inPort_Validated (object sender, EventArgs e)
+		{
+			int port = (int)this.inPort.Value;
+
+			if (this.inServer.Text.IsNullOrWhitespace())
+				return;
+			if (port < IPEndPoint.MinPort || port > IPEndPoint.MaxPort)
+				return;
+
+			this.serverStatus.Image = serverQueryImage;
+			GablarskiClient.QueryServer (this.inServer.Text, port, true, AddServerQuery);
+		}
+
+		private void inPort_Leave(object sender, EventArgs e)
+		{
+
+		}
+
+		private void inServer_Leave(object sender, EventArgs e)
+		{
+
 		}
 	}
 }

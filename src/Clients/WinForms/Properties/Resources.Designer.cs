@@ -151,6 +151,13 @@ namespace Gablarski.Clients.Windows.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap HaltOverlay {
+            get {
+                object obj = ResourceManager.GetObject("HaltOverlay", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Icon Headphones {
             get {
                 object obj = ResourceManager.GetObject("Headphones", resourceCulture);
@@ -161,6 +168,13 @@ namespace Gablarski.Clients.Windows.Properties {
         internal static System.Drawing.Bitmap HelpImage {
             get {
                 object obj = ResourceManager.GetObject("HelpImage", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap HourglassImage {
+            get {
+                object obj = ResourceManager.GetObject("HourglassImage", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -186,9 +200,23 @@ namespace Gablarski.Clients.Windows.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap LServerImage {
+            get {
+                object obj = ResourceManager.GetObject("LServerImage", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap MusicImage {
             get {
                 object obj = ResourceManager.GetObject("MusicImage", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap OKOverlay {
+            get {
+                object obj = ResourceManager.GetObject("OKOverlay", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

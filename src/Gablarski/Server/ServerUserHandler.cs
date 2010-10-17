@@ -620,7 +620,7 @@ namespace Gablarski.Server
 			nickname = nickname.ToLower().Trim();
 
 			IUserInfo current = Manager.Single (u => u.Nickname.ToLower().Trim() == nickname);
-			if (info.UserId == current.UserId)
+			if (info.IsRegistered && info.UserId == current.UserId)
 			{
 				this.log.DebugFormat ("Recovery attempt succeeded, disconnecting current '{0}'", current.Nickname);
 
