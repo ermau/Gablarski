@@ -580,9 +580,9 @@ namespace Gablarski.Client
 		}
 
 		#region Statics
-		public static void QueryServer (IPEndPoint endpoint, IClientConnection connection)
+		public static void QueryServer (string host, int port, object tag, Action<ServerInfo, ConnectionRejectedReason, object > callback)
 		{
-			connection.Connect (endpoint);
+			new ServerQuery (host, port, tag, callback).Run();
 		}
 
 		/// <summary>

@@ -117,6 +117,7 @@
     <Compile Include="Client\IClientSourceManager.cs" />
     <Compile Include="Client\IClientUserHandler.cs" />
     <Compile Include="Client\ICurrentUserHandler.cs" />
+    <Compile Include="Client\ServerQuery.cs" />
     <Compile Include="Encryption.cs" />
     <Compile Include="IConnectionHandler.cs" />
     <Compile Include="IEncryption.cs" />
