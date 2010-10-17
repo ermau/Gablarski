@@ -29,6 +29,7 @@ namespace Gablarski.Clients.Windows
 				ColorDepth = ColorDepth.Depth24Bit
 			};
 
+			this.ImageList.Images.Add ("connecting", Resources.HourglassImage);
 			this.ImageList.Images.Add ("server",	Resources.ServerImage);
 			this.ImageList.Images.Add ("channel",	Resources.ChannelImage);
 			this.ImageList.Images.Add ("silent",	Resources.SoundNoneImage);
@@ -98,8 +99,13 @@ namespace Gablarski.Clients.Windows
 
 			this.Nodes.Clear();
 			this.serverNode = node;
-			this.serverNode.ImageKey = "server";
-			this.serverNode.SelectedImageKey = "server";
+
+			if (!String.IsNullOrEmpty (node.ImageKey))
+			{
+				this.serverNode.ImageKey = "server";
+				this.serverNode.SelectedImageKey = "server";
+			}
+
 			this.Nodes.Add (node);
 
 			this.EndUpdate();

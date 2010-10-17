@@ -131,6 +131,8 @@ namespace Gablarski.Clients.Windows
 
 		public void Connect (string host, int port)
 		{
+			this.users.SetServerNode (new TreeNode ("Connecting...") { ImageKey = "connecting", SelectedImageKey = "connecting" });
+			this.btnConnect.Enabled = false;
 			this.gablarski.Connect (host, port);
 		}
 
