@@ -95,8 +95,14 @@ namespace Gablarski.Client
 		{
 			get
 			{
+				if (this.permissions == null)
+					return Enumerable.Empty<Permission>();
+
 				lock (permissionLock)
 				{
+					if (this.permissions == null)
+						return Enumerable.Empty<Permission>();
+
 					return this.permissions.ToList();
 				}
 			}
