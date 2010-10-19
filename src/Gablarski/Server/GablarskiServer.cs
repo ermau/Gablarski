@@ -188,13 +188,8 @@ namespace Gablarski.Server
 			
 			lock (this.availableConnections)
 			{
-				for (int i = 0; i < this.availableConnections.Count;)
-				{
-					var provider = this.availableConnections[i];
-
-					provider.ConnectionMade -= OnConnectionMade;
-					RemoveConnectionProvider (provider);
-				}
+				while (this.availableConnections.Count > 0)
+					RemoveConnectionProvider (this.availableConnections[0]);
 			}
 
 			this.incomingWait.Set ();
