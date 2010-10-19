@@ -484,7 +484,9 @@ namespace Gablarski.Client
 
 			if (this.messageRunnerThread != null)
 			{
-				this.messageRunnerThread.Join ();
+				if (this.messageRunnerThread != Thread.CurrentThread)
+					this.messageRunnerThread.Join ();
+
 				this.messageRunnerThread = null;
 			}
 
@@ -580,7 +582,7 @@ namespace Gablarski.Client
 		}
 
 		#region Statics
-		public static void QueryServer (string host, int port, object tag, Action<ServerInfo, ConnectionRejectedReason, object > callback)
+		public static void QueryServer (string host, int port, object tag, Action<ServerQuery> callback)
 		{
 			new ServerQuery (host, port, tag, callback).Run();
 		}
