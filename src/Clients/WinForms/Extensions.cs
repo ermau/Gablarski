@@ -30,33 +30,51 @@ namespace Gablarski.Clients.Windows
 		{
 			if (self == null)
 				throw new ArgumentNullException ("self");
+			
+			using (var g = Graphics.FromImage (self))
+				g.DrawImage (imposing, new Rectangle (GetOverlayOrigin (self.Size, size, alignment), size));
 
+			return self;
+		}
+
+		public static Image Overlay (this Image self, string imposing, Font font, ContentAlignment alignment)
+		{
+			using (var g = Graphics.FromImage (self))
+			{
+				SizeF size = g.MeasureString (imposing, font);
+
+				Point p = GetOverlayOrigin (self.Size, new Size ((int)size.Width, (int)size.Height), alignment);
+				g.DrawString (imposing, font, Brushes.Black, new PointF (p.X, p.Y));
+			}
+
+			return self;
+		}
+
+		private static Point GetOverlayOrigin (Size baseSize, Size overlaySize, ContentAlignment alignment)
+		{
 			int x, y;
 			switch (alignment)
 			{
 				case ContentAlignment.BottomCenter:
-					x = self.Size.Width - size.Width / 2;
-					y = self.Size.Height - size.Height;
+					x = baseSize.Width - overlaySize.Width / 2;
+					y = baseSize.Height - overlaySize.Height;
 					break;
 
 				case ContentAlignment.BottomRight:
-					x = self.Size.Width - size.Width;
-					y = self.Size.Height - size.Height;
+					x = baseSize.Width - overlaySize.Width;
+					y = baseSize.Height - overlaySize.Height;
 					break;
 
 				case ContentAlignment.MiddleCenter:
-					x = self.Size.Width - size.Width / 2;
-					y = self.Size.Height - size.Height / 2;
+					x = baseSize.Width - overlaySize.Width / 2;
+					y = baseSize.Height - overlaySize.Height / 2;
 					break;
 
 				default:
 					throw new NotImplementedException();
 			}
 
-			using (var g = Graphics.FromImage (self))
-				g.DrawImage (imposing, new Rectangle (new Point (x, y), size));
-
-			return self;
+			return new Point (x, y);
 		}
 
 		public static Image ToErrorIcon (this Image self)

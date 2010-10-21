@@ -29,8 +29,8 @@ namespace Gablarski.Clients.Windows
 				ColorDepth = ColorDepth.Depth24Bit
 			};
 
-			this.ImageList.Images.Add ("connecting", Resources.HourglassImage);
 			this.ImageList.Images.Add ("server",	Resources.ServerImage);
+			this.ImageList.Images.Add ("connecting", Resources.HourglassImage);
 			this.ImageList.Images.Add ("channel",	Resources.ChannelImage);
 			this.ImageList.Images.Add ("silent",	Resources.SoundNoneImage);
 			this.ImageList.Images.Add ("talking",	Resources.SoundImage);

@@ -196,7 +196,7 @@ namespace Gablarski.Network
 		#region Implementation of IClientConnection
 
 		/// <summary>
-		/// The client has succesfully connected to the end point.
+		/// The client has successfully connected to the end point.
 		/// </summary>
 		public event EventHandler Connected;
 

@@ -146,17 +146,6 @@ namespace Gablarski.Client
 		#region IEnumerable<Channel> members
 		public IEnumerator<ChannelInfo> GetEnumerator ()
 		{
-			if (this.channels == null)
-			{
-				if (this.context.Connection == null || !this.context.Connection.IsConnected)
-					throw new InvalidOperationException ("Not connected");
-
-				this.context.Connection.Send (new RequestChannelListMessage ());
-
-				if (this.channels == null)
-					return Enumerable.Empty<ChannelInfo>().GetEnumerator();
-			}
-
 			if (this.channels.Count == 0)
 				return Enumerable.Empty<ChannelInfo> ().GetEnumerator();
 

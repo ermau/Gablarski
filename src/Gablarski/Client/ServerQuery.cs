@@ -35,6 +35,7 @@
 // DAMAGE.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using Gablarski.Messages;
@@ -42,9 +43,9 @@ using Gablarski.Network;
 
 namespace Gablarski.Client
 {
-	internal class ServerQuery
+	public class ServerQuery
 	{
-		public ServerQuery (string host, int port, object tag, Action<ServerInfo, ConnectionRejectedReason, object> callback)
+		internal ServerQuery (string host, int port, object tag, Action<ServerQuery> callback)
 		{
 			if (host == null)
 				throw new ArgumentNullException ("host");
@@ -59,7 +60,36 @@ namespace Gablarski.Client
 			this.callback = callback;
 		}
 
-		public void Run()
+		public object Tag
+		{
+			get { return this.tag; }
+		}
+
+		public ConnectionRejectedReason RejectedReason
+		{
+			get;
+			private set;
+		}
+
+		public ServerInfo ServerInfo
+		{
+			get;
+			private set;
+		}
+
+		public IEnumerable<ChannelInfo> Channels
+		{
+			get;
+			private set;
+		}
+
+		public IEnumerable<IUserInfo> Users
+		{
+			get;
+			private set;
+		}
+
+		internal void Run()
 		{
 			this.client.Connected += ClientOnConnected;
 			this.client.ConnectionRejected += ClientOnConnectionRejected;
@@ -70,23 +100,29 @@ namespace Gablarski.Client
 		private readonly string host;
 		private readonly int port;
 		private readonly object tag;
-		private readonly Action<ServerInfo, ConnectionRejectedReason, object> callback;
+		private readonly Action<ServerQuery> callback;
 
 		private void ClientOnConnected (object sender, EventArgs e)
 		{
 			this.client.Connected -= ClientOnConnected;
 			this.client.ConnectionRejected -= ClientOnConnectionRejected;
 
-			this.callback (this.client.ServerInfo, ConnectionRejectedReason.Unknown, this.tag);
+			Channels = this.client.Channels;
+			Users = this.client.Users;
+			ServerInfo = this.client.ServerInfo;
+
+			this.callback (this);
 			this.client.Disconnect();
 		}
 
 		private void ClientOnConnectionRejected(object sender, RejectedConnectionEventArgs e)
 		{
+			RejectedReason = e.Reason;
+
 			this.client.Connected -= ClientOnConnected;
 			this.client.ConnectionRejected -= ClientOnConnectionRejected;
 
-			this.callback (null, e.Reason, this.tag);
+			this.callback (this);
 			this.client.Disconnect();
 		}
 	}

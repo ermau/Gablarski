@@ -268,14 +268,14 @@ namespace Gablarski.Clients.Windows
 			li.ImageKey = key;
 		}
 
-		private void ServerQueried (ServerInfo info, ConnectionRejectedReason reason, object tag)
+		private void ServerQueried (ServerQuery query)
 		{
 			if (IsDisposed || Disposing || this.closing)
 				return;
 
-			var li = (ListViewItem)tag;
+			var li = (ListViewItem)query.Tag;
 
-			switch (reason)
+			switch (query.RejectedReason)
 			{
 				case ConnectionRejectedReason.CouldNotConnect:
 					BeginInvoke ((Action<ListViewItem, string>)UpdateImage, li, "serverConnectError");
@@ -290,15 +290,20 @@ namespace Gablarski.Clients.Windows
 					return;
 
 				case ConnectionRejectedReason.Unknown:
-					if (!String.IsNullOrEmpty (info.Logo))
+					BeginInvoke ((Action<ServerQuery>)(q =>
+					{
+						li.ToolTipText = String.Format ("{0}{1}Users: {2}", q.ServerInfo.Description, Environment.NewLine, q.Users.Count());
+					}), query);
+
+					if (!String.IsNullOrEmpty (query.ServerInfo.Logo))
 					{
 						Uri logoUri;
-						if (Uri.TryCreate (info.Logo, UriKind.Absolute, out logoUri))
+						if (Uri.TryCreate (query.ServerInfo.Logo, UriKind.Absolute, out logoUri))
 						{
 							try
 							{
 								WebClient client = new WebClient();
-								byte[] data = client.DownloadData (info.Logo);
+								byte[] data = client.DownloadData (query.ServerInfo.Logo);
 
 								Image logo = Image.FromStream (new MemoryStream (data));
 								BeginInvoke ((Action<Image>)(l =>
@@ -422,9 +427,9 @@ namespace Gablarski.Clients.Windows
 		private readonly object addServerQuerySync = new object();
 		private bool closing;
 
-		private void AddServerQuery (ServerInfo info, ConnectionRejectedReason reason, object tag)
+		private void AddServerQuery (ServerQuery query)
 		{
-			bool port = (bool)tag;
+			bool port = (bool)query.Tag;
 			lock (addServerQuerySync)
 			{
 				bool last = lastWasPort;
@@ -432,7 +437,7 @@ namespace Gablarski.Clients.Windows
 				if (last && !port)
 					return;
 
-				switch (reason)
+				switch (query.RejectedReason)
 				{
 					case ConnectionRejectedReason.BanHammer:
 						this.serverStatus.Image = serverBannedImage;
@@ -447,15 +452,15 @@ namespace Gablarski.Clients.Windows
 						break;
 
 					case ConnectionRejectedReason.Unknown:
-						if (info != null)
+						if (query.ServerInfo != null)
 						{
 							BeginInvoke ((Action<ServerInfo>)(serverInfo =>
 							{
 								if (this.inName.Text == String.Empty)
-									this.inName.Text = info.Name;
+									this.inName.Text = serverInfo.Name;
 
 								this.serverStatus.Image = serverOkImage;
-							}), info);
+							}), query.ServerInfo);
 						}
 
 						break;
@@ -490,16 +495,6 @@ namespace Gablarski.Clients.Windows
 
 			this.serverStatus.Image = serverQueryImage;
 			GablarskiClient.QueryServer (this.inServer.Text, port, true, AddServerQuery);
-		}
-
-		private void inPort_Leave(object sender, EventArgs e)
-		{
-
-		}
-
-		private void inServer_Leave(object sender, EventArgs e)
-		{
-
 		}
 	}
 }
