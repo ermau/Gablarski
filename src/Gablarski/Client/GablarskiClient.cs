@@ -253,6 +253,8 @@ namespace Gablarski.Client
 		#region Event Invokers
 		protected void OnConnected (object sender, EventArgs e)
 		{
+			Interlocked.Exchange (ref this.reconnectAttempt, 0);
+
 			var connected = this.Connected;
 			if (connected != null)
 				connected (this, e);
@@ -310,7 +312,6 @@ namespace Gablarski.Client
 		protected readonly log4net.ILog Log = log4net.LogManager.GetLogger ("GablarskiClient");
 		protected readonly bool DebugLogging;
 
-
 		private int redirectLimit = 20;
 		private int redirectCount;
 		private volatile bool running;
@@ -322,24 +323,7 @@ namespace Gablarski.Client
 		private int disconnectedInChannelId;
 
 		private string originalHost;
-
-		/*protected void Setup (ClientUserHandler userMananger, ClientChannelManager channelManager, ClientSourceHandler sourceHandler, CurrentUser currentUser, IAudioEngine audioEngine)
-		{
-			this.handlers = new Dictionary<ServerMessageType, Action<MessageReceivedEventArgs>>
-			{
-				{ ServerMessageType.PermissionDenied, OnPermissionDeniedMessage },
-
-				{ ServerMessageType.Redirect, OnRedirectMessage },
-				{ ServerMessageType.ServerInfoReceived, OnServerInfoReceivedMessage },
-				
-				{ ServerMessageType.ChannelList, this.Channels.OnChannelListReceivedMessage },
-				{ ServerMessageType.ChannelEditResult, this.Channels.OnChannelEditResultMessage },
-
-				{ ServerMessageType.ConnectionRejected, OnConnectionRejectedMessage },
-				{ ServerMessageType.Disconnect, OnDisconnectedMessage },
-				{ ServerMessageType.UserMuted, OnMuted },
-			};
-		}*/
+		private int reconnectAttempt;
 
 		private void OnDisconnectedMessage (MessageReceivedEventArgs e)
 		{
@@ -406,7 +390,7 @@ namespace Gablarski.Client
 		{
 			var msg = (ConnectionRejectedMessage)e.Message;
 
-			OnConnectionRejected (new RejectedConnectionEventArgs (msg.Reason));
+			OnConnectionRejected (new RejectedConnectionEventArgs (msg.Reason, this.reconnectAttempt));
 		}
 
 		private void OnServerInfoReceivedMessage (MessageReceivedEventArgs e)
@@ -512,6 +496,7 @@ namespace Gablarski.Client
 
 		private void Reconnect (object state)
 		{
+			Interlocked.Increment (ref this.reconnectAttempt);
 			Thread.Sleep (ReconnectAttemptFrequency);
 
 			CurrentUser.ReceivedJoinResult += ReconnectJoinedResult;
@@ -543,11 +528,11 @@ namespace Gablarski.Client
 			}
 			catch (IOException)
 			{
-				OnConnectionRejected (new RejectedConnectionEventArgs (ConnectionRejectedReason.CouldNotConnect));
+				OnConnectionRejected (new RejectedConnectionEventArgs (ConnectionRejectedReason.CouldNotConnect, this.reconnectAttempt));
 			}
 			catch (SocketException)
 			{
-				OnConnectionRejected (new RejectedConnectionEventArgs (ConnectionRejectedReason.CouldNotConnect));
+				OnConnectionRejected (new RejectedConnectionEventArgs (ConnectionRejectedReason.CouldNotConnect, this.reconnectAttempt));
 			}
 		}
 
@@ -577,7 +562,7 @@ namespace Gablarski.Client
 			}
 			catch (SocketException)
 			{
-				OnConnectionRejected (new RejectedConnectionEventArgs (ConnectionRejectedReason.CouldNotConnect));
+				OnConnectionRejected (new RejectedConnectionEventArgs (ConnectionRejectedReason.CouldNotConnect, this.reconnectAttempt));
 			}
 		}
 
@@ -702,9 +687,10 @@ namespace Gablarski.Client
 	public class RejectedConnectionEventArgs
 		: EventArgs
 	{
-		public RejectedConnectionEventArgs (ConnectionRejectedReason reason)
+		public RejectedConnectionEventArgs (ConnectionRejectedReason reason, int reconnectAttempt)
 		{
 			this.Reason = reason;
+			ReconnectAttempt = reconnectAttempt;
 		}
 
 		/// <summary>
@@ -714,6 +700,23 @@ namespace Gablarski.Client
 		{
 			get;
 			private set;
+		}
+
+		/// <summary>
+		/// Gets the reconnect attempt number. 0 = not an attempt.
+		/// </summary>
+		public int ReconnectAttempt
+		{
+			get;
+			private set;
+		}
+
+		/// <summary>
+		/// Gets whether this was a reconnect attempt failing or not.
+		/// </summary>
+		public bool Reconnecting
+		{
+			get { return ReconnectAttempt != 0; }
 		}
 	}
 
@@ -732,15 +735,19 @@ namespace Gablarski.Client
 		}
 	}
 
+	/// <summary>
+	/// Holds data for the <see cref="GablarskiClient.Disconnected"/> event.
+	/// </summary>
 	public class DisconnectedEventArgs
 		: EventArgs
 	{
 		public DisconnectedEventArgs (DisconnectionReason reason)
 		{
 			Reason = reason;
+			
 		}
 
-		protected DisconnectionReason Reason
+		public DisconnectionReason Reason
 		{
 			get;
 			private set;
