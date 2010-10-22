@@ -42,7 +42,6 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Text;
-using System.Windows.Forms;
 using Gablarski.Client;
 
 namespace Gablarski.Clients
