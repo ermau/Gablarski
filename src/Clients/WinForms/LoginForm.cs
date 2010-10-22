@@ -278,22 +278,25 @@ namespace Gablarski.Clients.Windows
 			switch (query.RejectedReason)
 			{
 				case ConnectionRejectedReason.CouldNotConnect:
-					BeginInvoke ((Action<ListViewItem, string>)UpdateImage, li, "serverConnectError");
+					BeginInvoke((Action<ListViewItem, string>)UpdateImage, li, "serverConnectError");
 					return;
 
 				case ConnectionRejectedReason.BanHammer:
-					BeginInvoke ((Action<ListViewItem, string>)UpdateImage, li, "serverBanned");
+					BeginInvoke((Action<ListViewItem, string>)UpdateImage, li, "serverBanned");
 					return;
 
 				case ConnectionRejectedReason.IncompatibleVersion:
-					BeginInvoke ((Action<ListViewItem, string>)UpdateImage, li, "serverVersionError");
+					BeginInvoke((Action<ListViewItem, string>)UpdateImage, li, "serverVersionError");
 					return;
 
 				case ConnectionRejectedReason.Unknown:
+				{
 					BeginInvoke ((Action<ServerQuery>)(q =>
 					{
 						li.ToolTipText = String.Format ("{0}{1}Users: {2}", q.ServerInfo.Description, Environment.NewLine, q.Users.Count());
 					}), query);
+
+					BeginInvoke ((Action<ListViewItem, string>)UpdateImage, li, "server");
 
 					if (!String.IsNullOrEmpty (query.ServerInfo.Logo))
 					{
@@ -314,20 +317,16 @@ namespace Gablarski.Clients.Windows
 									int index = li.ImageList.Images.Add (l, Color.Transparent);
 									li.ImageIndex = index;
 								}), logo);
-
-								return;
 							}
 							catch
 							{
-								break;
 							}
 						}
 					}
 
 					break;
+				}
 			}
-
-			BeginInvoke ((Action)(() => li.ImageKey = "server"));
 		}
 
 		private void LoginForm_Load (object sender, EventArgs e)
