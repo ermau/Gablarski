@@ -142,12 +142,10 @@ namespace Gablarski.Network
 
 			try
 			{
-				if (this.tcp != null)
-				{
+				if (this.rstream != null)
 					this.rstream.Close();
+				if (this.tcp != null)
 					this.tcp.Close();
-				}
-
 				if (this.udp != null)
 					this.udp.Close();
 			}
@@ -365,10 +363,18 @@ namespace Gablarski.Network
 		{
 			try
 			{
-				if (!this.running)
+				if (!this.running || !this.tcp.Connected)
+				{
+					Disconnect();
 					return;
+				}
 
-				this.rstream.EndRead (ar);
+				if (this.rstream.EndRead (ar) == 0)
+				{
+					Disconnect();
+					return;
+				}
+
 				byte[] mbuffer = (ar.AsyncState as byte[]);
 
 				if (mbuffer[0] != 0x2A)
