@@ -42,6 +42,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Text;
+using System.Windows.Forms;
 using Gablarski.Client;
 
 namespace Gablarski.Clients
@@ -58,13 +59,13 @@ namespace Gablarski.Clients
 		}
 
 		public GablarskiErrorReporter()
-			: this (typeof (GablarskiClient).Assembly, typeof (GablarskiErrorReporter).Assembly)
+			: this (new Assembly[]{})
 		{
 		}
 		
 		public GablarskiErrorReporter (params Assembly[] assemblies)
 		{
-			this.assemblies = assemblies;
+			this.assemblies = assemblies.Concat (new [] { typeof (GablarskiClient).Assembly, typeof (GablarskiErrorReporter).Assembly }).Distinct().ToArray();
 		}
 
 		public IEnumerable<Assembly> AssembliesHandled
