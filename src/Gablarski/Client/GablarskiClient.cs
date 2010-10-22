@@ -269,7 +269,19 @@ namespace Gablarski.Client
 
 		protected void OnConnectionRejected (RejectedConnectionEventArgs e)
 		{
-			DisconnectCore (DisconnectionReason.Rejected, this.Connection, false);
+			DisconnectionReason reason;
+			switch (e.Reason)
+			{
+				case ConnectionRejectedReason.CouldNotConnect:
+					reason = DisconnectionReason.Unknown;
+					break;
+
+				default:
+					reason = DisconnectionReason.Rejected;
+					break;
+			}
+
+			DisconnectCore (reason, this.Connection, false);
 
 			var rejected = this.ConnectionRejected;
 			if (rejected != null)
