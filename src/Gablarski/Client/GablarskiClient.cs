@@ -348,6 +348,9 @@ namespace Gablarski.Client
 					MessageReceivedEventArgs e;
 					lock (mqueue)
 					{
+						if (mqueue.Count == 0)
+							continue;
+
 						e = mqueue.Dequeue ();
 					}
 
