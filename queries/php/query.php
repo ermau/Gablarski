@@ -36,7 +36,7 @@
 // DAMAGE.
 
 $host = 'localhost';
-$port = 6112;
+$port = 42912;
 $serverInfoOnly = false;
 
 error_reporting (E_ALL);
