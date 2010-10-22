@@ -81,6 +81,13 @@ namespace Gablarski.Barrel.Config
 			set { this["network"] = value; }
 		}
 
+		[ConfigurationProperty ("logourl", IsRequired = false)]
+		public string LogoURL
+		{
+			get { return (string)this["logourl"]; }
+			set { this["logourl"] = value; }
+		}
+
 		[ConfigurationProperty ("providers", IsDefaultCollection = true)]
 		[ConfigurationCollection (typeof (ProviderElementCollection), AddItemName="provider")]
 		public ProviderElementCollection Providers

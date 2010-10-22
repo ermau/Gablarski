@@ -83,6 +83,7 @@ namespace Gablarski.Barrel
 				Name = serverConfig.Name,
 				Description = serverConfig.Description,
 				ServerPassword = serverConfig.Password,
+				ServerLogo = serverConfig.LogoURL
 			}, providers.Users, providers.Permissions, providers.Channels);
 
 			server.AddConnectionProvider (new NetworkServerConnectionProvider { Port = serverConfig.Port });
