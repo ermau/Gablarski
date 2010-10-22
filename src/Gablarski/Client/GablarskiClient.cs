@@ -269,23 +269,13 @@ namespace Gablarski.Client
 
 		protected void OnConnectionRejected (RejectedConnectionEventArgs e)
 		{
-			DisconnectionReason reason;
-			switch (e.Reason)
-			{
-				case ConnectionRejectedReason.CouldNotConnect:
-					reason = DisconnectionReason.Unknown;
-					break;
-
-				default:
-					reason = DisconnectionReason.Rejected;
-					break;
-			}
-
-			DisconnectCore (reason, this.Connection, false);
+			e.Reconnect = (e.Reason == ConnectionRejectedReason.CouldNotConnect || e.Reason == ConnectionRejectedReason.Unknown);
 
 			var rejected = this.ConnectionRejected;
 			if (rejected != null)
 				rejected (this, e);
+
+			DisconnectCore (DisconnectionReason.Rejected, this.Connection, e.Reconnect, false);
 		}
 
 		protected void OnPermissionDenied (PermissionDeniedEventArgs e)
@@ -451,10 +441,10 @@ namespace Gablarski.Client
 
 		private void DisconnectCore (DisconnectionReason reason, IConnection connection)
 		{
-			DisconnectCore (reason, connection, true);
+			DisconnectCore (reason, connection, GetHandlingForReason (reason) == DisconnectHandling.Reconnect, true);
 		}
 
-		private void DisconnectCore (DisconnectionReason reason, IConnection connection, bool fireEvent)
+		private void DisconnectCore (DisconnectionReason reason, IConnection connection, bool reconnect, bool fireEvent)
 		{
 			disconnectedInChannelId = CurrentUser.CurrentChannelId;
 
@@ -497,7 +487,7 @@ namespace Gablarski.Client
 			if (fireEvent)
 				OnDisconnected (this, new DisconnectedEventArgs (reason));
 
-			if (GetHandlingForReason (reason) == DisconnectHandling.Reconnect)
+			if (reconnect)
 				ThreadPool.QueueUserWorkItem (Reconnect);
 		}
 
@@ -703,6 +693,7 @@ namespace Gablarski.Client
 		{
 			this.Reason = reason;
 			ReconnectAttempt = reconnectAttempt;
+			Reconnect = true;
 		}
 
 		/// <summary>
@@ -729,6 +720,15 @@ namespace Gablarski.Client
 		public bool Reconnecting
 		{
 			get { return ReconnectAttempt != 0; }
+		}
+
+		/// <summary>
+		/// Gets or sets whether to attempt to reconnect.
+		/// </summary>
+		public bool Reconnect
+		{
+			get;
+			set;
 		}
 	}
 
