@@ -430,7 +430,7 @@ namespace Gablarski.Network
 
 				if (buffer[0] != 0x2A)
 				{
-					log.Warn ("Unreliable message failed sanity check.");
+					log.Debug ("Unreliable message failed sanity check.");
 					return;
 				}
 
