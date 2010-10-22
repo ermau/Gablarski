@@ -331,7 +331,7 @@ namespace Gablarski.Client
 		{
 			var msg = (DisconnectMessage) e.Message;
 
-			DisconnectCore (msg.Reason, e.Connection, true);
+			DisconnectCore (msg.Reason, e.Connection, (GetHandlingForReason (msg.Reason) == DisconnectHandling.Reconnect), true);
 		}
 
 		private void OnPermissionDeniedMessage (MessageReceivedEventArgs obj)
