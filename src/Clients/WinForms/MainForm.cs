@@ -765,16 +765,29 @@ namespace Gablarski.Clients.Windows
 			if (e.Reason == DisconnectionReason.Unknown)
 				this.reconnecting = true;
 
+			bool finishedWithPlayback = true;
+
 			if (e.Reason == DisconnectionReason.Unknown || (e.Reason == DisconnectionReason.Requested && !this.reconnecting))
 			{
-				ITextToSpeech tts = Modules.TextToSpeech.FirstOrDefault (t => t.GetType().GetSimpleName() == Settings.TextToSpeech);
-				if (tts != null)
-					tts.Say ("Disconnected");
+				KeyValuePair<ITextToSpeech, AudioSource> tts = this.speechSources.FirstOrDefault (kvp => kvp.Key.GetType().GetSimpleName() == Settings.TextToSpeech);
+				if (!tts.Equals(default(KeyValuePair<ITextToSpeech, AudioSource>)) && this.audioPlayback != null)
+				{
+					finishedWithPlayback = false;
+					this.audioPlayback.SourceFinished += (o, args) =>
+					{
+						if (args.Source == tts.Value)
+							DisablePlayback();
+					};
+
+					this.audioPlayback.QueuePlayback (tts.Value, tts.Key.GetSpeech ("Disconnected", tts.Value));
+				}
 			}
 
 			ResetState();
 			DisableInput();
-			DisablePlayback();
+			if (finishedWithPlayback)
+				DisablePlayback();
+
 			DisableVoiceCapture();
 
 			if (this.IsDisposed || this.Disposing || this.shuttingDown)
