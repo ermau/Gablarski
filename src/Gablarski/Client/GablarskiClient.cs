@@ -114,6 +114,14 @@ namespace Gablarski.Client
 			get { return (this.Connection.IsConnected && this.formallyConnected); }
 		}
 
+		/// <summary>
+		/// Gets whether the client is currently trying to connect or reconnect.
+		/// </summary>
+		public bool IsConnecting
+		{
+			get { return this.connecting; }
+		}
+
 		public IClientConnection Connection
 		{
 			get; protected set;
@@ -223,6 +231,7 @@ namespace Gablarski.Client
 		/// <exception cref="System.Net.Sockets.SocketException">Hostname could not be resolved.</exception>
 		public void Connect (string host, int port)
 		{
+			this.connecting = true;
 			ThreadPool.QueueUserWorkItem (o => ConnectCore (((Tuple<string, int>)o).Item1, ((Tuple<string, int>)o).Item2), new Tuple<string, int> (host, port));
 		}
 
@@ -253,6 +262,7 @@ namespace Gablarski.Client
 		#region Event Invokers
 		protected void OnConnected (object sender, EventArgs e)
 		{
+			this.connecting = false;
 			Interlocked.Exchange (ref this.reconnectAttempt, 0);
 
 			var connected = this.Connected;
@@ -262,6 +272,8 @@ namespace Gablarski.Client
 
 		protected void OnDisconnected (object sender, DisconnectedEventArgs e)
 		{
+			this.connecting = false;
+
 			var disconnected = this.Disconnected;
 			if (disconnected != null)
 				disconnected (this, e);
@@ -269,6 +281,7 @@ namespace Gablarski.Client
 
 		protected void OnConnectionRejected (RejectedConnectionEventArgs e)
 		{
+			this.connecting = false;
 			e.Reconnect = (e.Reason == ConnectionRejectedReason.CouldNotConnect || e.Reason == ConnectionRejectedReason.Unknown);
 
 			var rejected = this.ConnectionRejected;
@@ -326,6 +339,7 @@ namespace Gablarski.Client
 
 		private string originalHost;
 		private int reconnectAttempt;
+		private bool connecting;
 
 		private void OnDisconnectedMessage (MessageReceivedEventArgs e)
 		{
@@ -451,6 +465,7 @@ namespace Gablarski.Client
 		{
 			disconnectedInChannelId = CurrentUser.CurrentChannelId;
 
+			this.connecting = false;
 			this.running = false;
 			this.formallyConnected = false;
 
