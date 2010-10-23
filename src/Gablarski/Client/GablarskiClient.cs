@@ -609,8 +609,24 @@ namespace Gablarski.Client
 					this.Audio.Start();
 				}
 			}
+			catch (IOException)
+			{
+				if (!this.running)
+				{
+					Connection.Disconnect();
+					return;
+				}
+
+				OnConnectionRejected (new RejectedConnectionEventArgs (ConnectionRejectedReason.CouldNotConnect, this.reconnectAttempt));
+			}
 			catch (SocketException)
 			{
+				if (!this.running)
+				{
+					Connection.Disconnect();
+					return;
+				}
+
 				OnConnectionRejected (new RejectedConnectionEventArgs (ConnectionRejectedReason.CouldNotConnect, this.reconnectAttempt));
 			}
 		}
