@@ -64,11 +64,7 @@ namespace Gablarski.Client
 				throw new ArgumentNullException ("user");
 
 			var u = new UserInfo (user);
-			lock (syncRoot)
-			{
-				users.Add (user.UserId, u);
-				channels.Add (user.CurrentChannelId, u);
-			}
+			Update (u);
 		}
 
 		public bool GetIsJoined (IUserInfo user)
