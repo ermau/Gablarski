@@ -131,8 +131,11 @@ namespace Gablarski.Clients.Windows
 
 		public void Connect (string host, int port)
 		{
-			this.users.SetServerNode (new TreeNode ("Connecting...") { ImageKey = "connecting", SelectedImageKey = "connecting" });
-			this.btnConnect.Enabled = false;
+			this.btnConnect.Enabled = true;
+			this.btnConnect.Image = Resources.LoadingImage;
+			this.btnConnect.Text = "Cancel";
+			this.btnConnect.ToolTipText = "Cancel (Connecting)";
+
 			this.gablarski.Connect (host, port);
 		}
 
@@ -155,6 +158,11 @@ namespace Gablarski.Clients.Windows
 
 		public bool ShowConnect (bool cancelExits)
 		{
+			this.btnConnect.Enabled = false;
+			this.btnConnect.Image = Resources.DisconnectImage;
+			this.btnConnect.Text = "Connect";
+			this.btnConnect.ToolTipText = "Connect (Disconnected)";
+
 			var login = new LoginForm();
 			if (login.ShowDialog(this) == DialogResult.OK)
 			{
@@ -296,13 +304,13 @@ namespace Gablarski.Clients.Windows
 
 				BeginInvoke ((Action)(() =>
 				{
-					if (!btnMute.Checked)
-					{
-						btnMuteMic.Image = Resources.CaptureMuteImage;
-						btnMuteMic.Checked = false;
-						btnMuteMic.Enabled = true;
-						btnMuteMic.ToolTipText = "Mute Microphone";
-					}
+					if (btnMute.Checked)
+						return;
+
+					btnMuteMic.Image = Resources.CaptureMuteImage;
+					btnMuteMic.Checked = false;
+					btnMuteMic.Enabled = true;
+					btnMuteMic.ToolTipText = "Mute Microphone";
 				}));
 			}
 			catch (Exception ex)
@@ -752,8 +760,11 @@ namespace Gablarski.Clients.Windows
 			}
 		}
 
-		private void GablarskiDisconnected (object sender, EventArgs e)
+		private void GablarskiDisconnected (object sender, DisconnectedEventArgs e)
 		{
+			if (e.Reason == DisconnectionReason.Unknown)
+				this.reconnecting = true;
+
 			ResetState();
 			DisableInput();
 			DisablePlayback();
@@ -774,10 +785,18 @@ namespace Gablarski.Clients.Windows
 
 				this.users.Nodes.Clear();
 
-				this.btnConnect.Image = Resources.DisconnectImage;
-				this.btnConnect.Text = "Connect";
-				this.btnConnect.ToolTipText = "Connect (Disconnected)";
-				this.btnConnect.Enabled = true;
+				if (!this.reconnecting)
+				{
+					this.btnConnect.Image = Resources.DisconnectImage;
+					this.btnConnect.Text = "Connect";
+					this.btnConnect.ToolTipText = "Connect (Disconnected)";
+				}
+				else
+				{
+					this.btnConnect.Image = Resources.LoadingImage;
+					this.btnConnect.Text = "Disconnect";
+					this.btnConnect.ToolTipText = "Disconnect (Reconnecting)";
+				}
 
 				this.btnComment.Enabled = false;
 				this.btnMute.Enabled = false;
@@ -799,6 +818,8 @@ namespace Gablarski.Clients.Windows
 			if (this.IsDisposed || this.Disposing)
 				return;
 
+			this.reconnecting = false;
+
 			this.Invoke ((Action)delegate
 			{
 				if (TaskbarManager.IsPlatformSupported)
@@ -807,7 +828,6 @@ namespace Gablarski.Clients.Windows
 				this.btnConnect.Image = Resources.ConnectImage;
 				this.btnConnect.Text = "Disconnect";
 				this.btnConnect.ToolTipText = "Disconnect (Connected)";
-				this.btnConnect.Enabled = true;
 
 				this.btnComment.Enabled = true;
 				this.btnMute.Enabled = true;
@@ -892,20 +912,23 @@ namespace Gablarski.Clients.Windows
 
 		private void GablarskiConnectionRejected (object sender, RejectedConnectionEventArgs e)
 		{
-			//TaskDialog.Show (e.Reason.ToString(), "Connection rejected");
-
-			BeginInvoke ((Action) (() => this.btnConnect.Enabled = true));
+			e.Reconnect = false;
 
 			switch (e.Reason)
 			{
 				case ConnectionRejectedReason.CouldNotConnect:
-					BeginInvoke ((Action)(() =>
+					if (this.reconnecting)
+						e.Reconnect = true;
+					else
 					{
-						if (MessageBox.Show (this, "Could not connect to the server", "Connecting", MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning) == DialogResult.Retry)
-							Connect();
-						else
-							ShowConnect (true);
-					}));
+						Invoke ((Action)(() =>
+						{
+							if (MessageBox.Show (this, "Could not connect to the server", "Connecting", MessageBoxButtons.RetryCancel,MessageBoxIcon.Warning) == DialogResult.Retry)
+								e.Reconnect = !this.shuttingDown;
+							else
+								ShowConnect (true);
+						}));
+					}
 
 					break;
 
@@ -924,14 +947,11 @@ namespace Gablarski.Clients.Windows
 		private readonly GablarskiClient gablarski;
 		private ServerEntry server;
 		private bool shuttingDown;
+		private bool reconnecting;
 
 		private void MainForm_FormClosing (object sender, FormClosingEventArgs e)
 		{
 			this.shuttingDown = true;
-			
-			DisableInput();
-			DisablePlayback();
-			DisableVoiceCapture();
 
 			if (this.notifications != null)
 				this.notifications.Close ();
@@ -942,20 +962,14 @@ namespace Gablarski.Clients.Windows
 
 		private void btnConnect_Click (object sender, EventArgs e)
 		{
-			this.btnConnect.Enabled = false;
-
-			if (this.gablarski.IsConnected)
+			if (this.gablarski.IsConnected || this.gablarski.IsConnecting)
 			{
-				ResetState();
-				DisableInput();
-				DisablePlayback();
-				DisableVoiceCapture();
-
+				this.reconnecting = false;
 				this.gablarski.Disconnect();
 				LocalServer.Shutdown();
 			}
-			else
-				this.ShowConnect (false);
+			
+			this.ShowConnect (true);
 		}
 
 		private void btnSettings_Click (object sender, EventArgs e)
