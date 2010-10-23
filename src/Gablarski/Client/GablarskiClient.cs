@@ -495,6 +495,7 @@ namespace Gablarski.Client
 					this.messageRunnerThread = null;
 				}
 
+				CurrentUser = new CurrentUser (this);
 				this.Users.Reset();
 				this.Channels.Clear();
 				this.Sources.Reset();
