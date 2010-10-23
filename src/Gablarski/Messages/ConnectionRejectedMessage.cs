@@ -57,7 +57,12 @@ namespace Gablarski.Messages
 		/// <summary>
 		/// You were hit with a ban hammer.
 		/// </summary>
-		BanHammer = 3
+		BanHammer = 3,
+
+		/// <summary>
+		/// The client could not resolve the host name.
+		/// </summary>
+		CouldNotResolve = 4,
 	}
 
 	public class ConnectionRejectedMessage

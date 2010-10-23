@@ -558,13 +558,9 @@ namespace Gablarski.Client
 				this.originalEndPoint = new IPEndPoint (Dns.GetHostAddresses (host).First (ip => ip.AddressFamily == AddressFamily.InterNetwork), port);
 				ConnectCore();
 			}
-			catch (IOException)
-			{
-				OnConnectionRejected (new RejectedConnectionEventArgs (ConnectionRejectedReason.CouldNotConnect, this.reconnectAttempt));
-			}
 			catch (SocketException)
 			{
-				OnConnectionRejected (new RejectedConnectionEventArgs (ConnectionRejectedReason.CouldNotConnect, this.reconnectAttempt));
+				OnConnectionRejected (new RejectedConnectionEventArgs (ConnectionRejectedReason.CouldNotResolve, this.reconnectAttempt));
 			}
 		}
 
