@@ -95,7 +95,7 @@ namespace Gablarski.SpeechNotifier
 				speech.Speak (say);
 
 				byte[] output = this.voiceBuffer.ToArray();
-				this.voiceBuffer.Position = 0;
+				this.voiceBuffer.SetLength (0);
 
 				return output;
 			}
