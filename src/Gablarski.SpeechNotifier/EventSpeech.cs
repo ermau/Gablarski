@@ -89,15 +89,15 @@ namespace Gablarski.SpeechNotifier
 			if (source == null)
 				throw new ArgumentNullException ("source");
 
-			using (MemoryStream stream = new MemoryStream (120000))
+			lock (speech)
 			{
-				lock (speech)
-				{
-					speech.SetOutputToAudioStream (stream, this.formats[source]);
-					speech.Speak (say);
-				}
+				speech.SetOutputToAudioStream (this.voiceBuffer, this.formats[source]);
+				speech.Speak (say);
 
-				return stream.ToArray();
+				byte[] output = this.voiceBuffer.ToArray();
+				this.voiceBuffer.Position = 0;
+
+				return output;
 			}
 		}
 
@@ -114,7 +114,10 @@ namespace Gablarski.SpeechNotifier
 						media.AddTalker();
 
 					lock (speech)
+					{
+						speech.SetOutputToDefaultAudioDevice();
 						speech.Speak ((string)o);
+					}
 
 					if (media != null)
 						media.RemoveTalker();
@@ -144,6 +147,7 @@ namespace Gablarski.SpeechNotifier
 		}
 
 		private readonly object sync = new object();
+		private MemoryStream voiceBuffer = new MemoryStream(120000);
 		private IMediaController media;
 		private readonly SpeechSynthesizer speech = new SpeechSynthesizer ();
 		private AudioSource audioSource;
