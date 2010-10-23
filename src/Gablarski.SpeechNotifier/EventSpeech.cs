@@ -40,7 +40,6 @@ using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Speech.AudioFormat;
-using System.Text;
 using System.Threading;
 using Gablarski.Audio;
 using Gablarski.Clients;

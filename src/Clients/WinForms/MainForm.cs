@@ -252,7 +252,7 @@ namespace Gablarski.Clients.Windows
 				}));
 			}
 
-			if (this.audioPlayback != null && this.gablarski.CurrentUser.UserId != 0 && Settings.EnableNotifications)
+			if (this.audioPlayback != null && Settings.EnableNotifications)
 			{
 				SetupNotifications();
 				this.notifications.Notify (NotificationType.Connected, "Connected");
@@ -764,6 +764,13 @@ namespace Gablarski.Clients.Windows
 		{
 			if (e.Reason == DisconnectionReason.Unknown)
 				this.reconnecting = true;
+
+			if (e.Reason == DisconnectionReason.Unknown || (e.Reason == DisconnectionReason.Requested && !this.reconnecting))
+			{
+				ITextToSpeech tts = Modules.TextToSpeech.FirstOrDefault (t => t.GetType().GetSimpleName() == Settings.TextToSpeech);
+				if (tts != null)
+					tts.Say ("Disconnected");
+			}
 
 			ResetState();
 			DisableInput();
