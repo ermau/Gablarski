@@ -77,7 +77,7 @@ namespace Gablarski
 			get
 			{
 				lock (this.syncRoot)
-					return OwnedSources[user.UserId];
+					return OwnedSources[user.UserId].ToList();
 			}
 		}
 
