@@ -272,8 +272,6 @@ namespace Gablarski.Client
 
 		protected void OnDisconnected (object sender, DisconnectedEventArgs e)
 		{
-			this.connecting = false;
-
 			var disconnected = this.Disconnected;
 			if (disconnected != null)
 				disconnected (this, e);
@@ -322,6 +320,7 @@ namespace Gablarski.Client
 			RegisterMessageHandler (ServerMessageType.Disconnect, OnDisconnectedMessage);
 		}
 
+		protected readonly object StateSync = new object();
 		protected ServerInfo serverInfo;
 
 		protected readonly log4net.ILog Log = log4net.LogManager.GetLogger ("GablarskiClient");
@@ -345,7 +344,7 @@ namespace Gablarski.Client
 		{
 			var msg = (DisconnectMessage) e.Message;
 
-			DisconnectCore (msg.Reason, e.Connection, (GetHandlingForReason (msg.Reason) == DisconnectHandling.Reconnect), true);
+			DisconnectCore (msg.Reason, (IClientConnection)e.Connection, (GetHandlingForReason (msg.Reason) == DisconnectHandling.Reconnect), true);
 		}
 
 		private void OnPermissionDeniedMessage (MessageReceivedEventArgs obj)
@@ -456,68 +455,80 @@ namespace Gablarski.Client
 			}
 		}
 
-		private void DisconnectCore (DisconnectionReason reason, IConnection connection)
+		private void DisconnectCore (DisconnectionReason reason, IClientConnection connection)
 		{
 			DisconnectCore (reason, connection, GetHandlingForReason (reason) == DisconnectHandling.Reconnect, true);
 		}
 
-		private void DisconnectCore (DisconnectionReason reason, IConnection connection, bool reconnect, bool fireEvent)
+		private void DisconnectCore (DisconnectionReason reason, IClientConnection connection, bool reconnect, bool fireEvent)
 		{
-			disconnectedInChannelId = CurrentUser.CurrentChannelId;
-
-			this.connecting = false;
-			this.running = false;
-			this.formallyConnected = false;
-
-			connection.Disconnected -= this.OnDisconnectedInternal;
-			connection.MessageReceived -= this.OnMessageReceived;
-
-			this.incomingWait.Set ();
-
-			lock (this.mqueue)
+			lock (StateSync)
 			{
-				if (reason == DisconnectionReason.Unknown)
+				disconnectedInChannelId = CurrentUser.CurrentChannelId;
+
+				this.connecting = false;
+				this.running = false;
+				this.formallyConnected = false;
+
+				connection.Disconnected -= this.OnDisconnectedInternal;
+				connection.MessageReceived -= this.OnMessageReceived;
+
+				this.incomingWait.Set();
+
+				lock (this.mqueue)
 				{
-					var msg = this.mqueue.Select (a => a.Message).OfType<DisconnectMessage>().FirstOrDefault();
-					if (msg != null)
-						reason = msg.Reason;
+					if (reason == DisconnectionReason.Unknown)
+					{
+						var msg = this.mqueue.Select (a => a.Message).OfType<DisconnectMessage>().FirstOrDefault();
+						if (msg != null)
+							reason = msg.Reason;
+					}
+
+					this.mqueue.Clear();
 				}
 
-				this.mqueue.Clear();
+				if (this.messageRunnerThread != null)
+				{
+					if (this.messageRunnerThread != Thread.CurrentThread)
+						this.messageRunnerThread.Join();
+
+					this.messageRunnerThread = null;
+				}
+
+				this.Users.Reset();
+				this.Channels.Clear();
+				this.Sources.Reset();
+
+				this.Audio.Stop();
+
+				connection.Disconnect();
+
+				if (fireEvent)
+					OnDisconnected (this, new DisconnectedEventArgs (reason));
+
+				if (reconnect)
+				{
+					this.connecting = true;
+					ThreadPool.QueueUserWorkItem (Reconnect);
+				}
 			}
-
-			if (this.messageRunnerThread != null)
-			{
-				if (this.messageRunnerThread != Thread.CurrentThread)
-					this.messageRunnerThread.Join ();
-
-				this.messageRunnerThread = null;
-			}
-
-			this.Users.Reset();
-			this.Channels.Clear();
-			this.Sources.Reset();
-
-			this.Audio.Stop();
-
-			connection.Disconnect();
-
-			if (fireEvent)
-				OnDisconnected (this, new DisconnectedEventArgs (reason));
-
-			if (reconnect)
-				ThreadPool.QueueUserWorkItem (Reconnect);
 		}
 
 		private void OnDisconnectedInternal (object sender, ConnectionEventArgs e)
 		{
-			DisconnectCore (DisconnectionReason.Unknown, e.Connection);
+			DisconnectCore (DisconnectionReason.Unknown, (IClientConnection)e.Connection);
 		}
 
 		private void Reconnect (object state)
 		{
 			Interlocked.Increment (ref this.reconnectAttempt);
 			Thread.Sleep (ReconnectAttemptFrequency);
+
+			lock (StateSync)
+			{
+				if (!this.running && !this.connecting)
+					return;
+			}
 
 			CurrentUser.ReceivedJoinResult += ReconnectJoinedResult;
 			ConnectCore();
@@ -560,25 +571,42 @@ namespace Gablarski.Client
 		{
 			try
 			{
-				this.running = true;
+				lock (StateSync)
+				{
+					if (this.running)
+						throw new InvalidOperationException ("Already running");
 
-				this.messageRunnerThread = new Thread (this.MessageRunner) { Name = "Gablarski Client Message Runner" };
-				this.messageRunnerThread.SetApartmentState (ApartmentState.STA);
-				this.messageRunnerThread.Priority = ThreadPriority.Highest;
-				this.messageRunnerThread.Start ();
+					this.running = true;
 
-				this.Connection.Disconnected += this.OnDisconnectedInternal;
-				this.Connection.MessageReceived += OnMessageReceived;
+					this.messageRunnerThread = new Thread (this.MessageRunner) { Name = "Gablarski Client Message Runner" };
+					this.messageRunnerThread.SetApartmentState (ApartmentState.STA);
+					this.messageRunnerThread.Priority = ThreadPriority.Highest;
+					this.messageRunnerThread.Start();
+
+					this.Connection.Disconnected += OnDisconnectedInternal;
+					this.Connection.MessageReceived += OnMessageReceived;
+				}
+
 				this.Connection.Connect (this.originalEndPoint);
-				this.Connection.Send (new ConnectMessage { ProtocolVersion = ProtocolVersion, Host = this.originalHost, Port = this.originalEndPoint.Port });
 
-				if (Audio.AudioSender == null)
-					Audio.AudioSender = Sources;
-				if (Audio.AudioReceiver == null)
-					Audio.AudioReceiver = Sources;
+				lock (StateSync)
+				{
+					if (!this.running)
+					{
+						this.Connection.Disconnect();
+						return;
+					}
 
-				this.Audio.Context = this;
-				this.Audio.Start();
+					this.Connection.Send (new ConnectMessage { ProtocolVersion = ProtocolVersion, Host = this.originalHost, Port = this.originalEndPoint.Port });
+
+					if (Audio.AudioSender == null)
+						Audio.AudioSender = Sources;
+					if (Audio.AudioReceiver == null)
+						Audio.AudioReceiver = Sources;
+
+					this.Audio.Context = this;
+					this.Audio.Start();
+				}
 			}
 			catch (SocketException)
 			{
