@@ -51,7 +51,7 @@ namespace Gablarski.Clients.Windows
 		private HashSet<IPEndPoint> localServers = new HashSet<IPEndPoint>();
 		private void DisplayLocalServer (IEnumerable<Cadenza.Tuple<ServerInfo, IPEndPoint>> foundServers)
 		{
-			if (this.Disposing || this.IsDisposed)
+			if (this.Disposing || this.IsDisposed || this.closing)
 				return;
 
 			if (this.InvokeRequired)
@@ -262,7 +262,7 @@ namespace Gablarski.Clients.Windows
 
 		private void UpdateImage (ListViewItem li, string key)
 		{
-			if (IsDisposed || Disposing)
+			if (IsDisposed || Disposing || this.closing)
 				return;
 
 			li.ImageKey = key;
@@ -293,6 +293,9 @@ namespace Gablarski.Clients.Windows
 				{
 					BeginInvoke ((Action<ServerQuery>)(q =>
 					{
+						if (this.closing)
+							return;
+
 						li.ToolTipText = String.Format ("{0}{1}Users: {2}", q.ServerInfo.Description, Environment.NewLine, q.Users.Count());
 					}), query);
 
@@ -311,7 +314,7 @@ namespace Gablarski.Clients.Windows
 								Image logo = Image.FromStream (new MemoryStream (data));
 								BeginInvoke ((Action<Image>)(l =>
 								{
-									if (IsDisposed || Disposing)
+									if (IsDisposed || Disposing || this.closing)
 										return;
 
 									int index = li.ImageList.Images.Add (l, Color.Transparent);
@@ -426,8 +429,19 @@ namespace Gablarski.Clients.Windows
 		private readonly object addServerQuerySync = new object();
 		private bool closing;
 
+		private void SetStatusImage (Image image)
+		{
+			if (IsDisposed || Disposing || this.closing)
+				return;
+
+			this.serverStatus.Image = image;
+		}
+
 		private void AddServerQuery (ServerQuery query)
 		{
+			if (this.closing)
+				return;
+
 			bool port = (bool)query.Tag;
 			lock (addServerQuerySync)
 			{
@@ -439,15 +453,15 @@ namespace Gablarski.Clients.Windows
 				switch (query.RejectedReason)
 				{
 					case ConnectionRejectedReason.BanHammer:
-						this.serverStatus.Image = serverBannedImage;
+						BeginInvoke ((Action<Image>)SetStatusImage, serverBannedImage);
 						break;
 
 					case ConnectionRejectedReason.CouldNotConnect:
-						this.serverStatus.Image = serverConnectErrorImage;
+						BeginInvoke ((Action<Image>)SetStatusImage, serverConnectErrorImage);
 						break;
 
 					case ConnectionRejectedReason.IncompatibleVersion:
-						this.serverStatus.Image = serverVersionErrorImage;
+						BeginInvoke ((Action<Image>)SetStatusImage, serverVersionErrorImage);
 						break;
 
 					case ConnectionRejectedReason.Unknown:
@@ -455,6 +469,9 @@ namespace Gablarski.Clients.Windows
 						{
 							BeginInvoke ((Action<ServerInfo>)(serverInfo =>
 							{
+								if (IsDisposed || Disposing || this.closing)
+									return;
+
 								if (this.inName.Text == String.Empty)
 									this.inName.Text = serverInfo.Name;
 
