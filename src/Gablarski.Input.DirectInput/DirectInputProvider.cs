@@ -38,9 +38,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using Cadenza.Collections;
 using Gablarski.Clients.Input;
 using Microsoft.DirectX.DirectInput;
 
@@ -291,8 +289,9 @@ namespace Gablarski.Input.DirectInput
 			Dictionary<Device, Dictionary<int, InputRange>> objectRanges = new Dictionary<Device, Dictionary<int, InputRange>>();
 			Dictionary<Device, HashSet<int>> buttons = new Dictionary<Device, HashSet<int>>();
 
-			Key[] modifierKeyValues = new [] { Key.LeftControl, Key.RightControl, Key.LeftAlt, Key.RightAlt, Key.LeftShift, Key.RightShift };
-			Key[] keyValues = ((Key[])Enum.GetValues (typeof (Key))).Except (modifierKeyValues).ToArray();
+			//Key[] modifierKeyValues = new [] { Key.LeftControl, Key.RightControl, Key.LeftAlt, Key.RightAlt, Key.LeftShift, Key.RightShift };
+			Key[] keyValues = ((Key[])Enum.GetValues (typeof (Key))).ToArray();//.Except (modifierKeyValues).ToArray();
+			bool[] keyRecordedState = null;
 
 			lock (this.syncRoot)
 			{
@@ -351,26 +350,44 @@ namespace Gablarski.Input.DirectInput
 							}
 							else
 							{
-								string recording = SystemGuid.Keyboard + "|";
-								for (int i = 0; i < modifierKeyValues.Length; ++i)
-								{
-									if (state[modifierKeyValues[i]])
-										recording += modifierKeyValues[i] + "+";
-								}
-
-								bool nonModifier = false;
+								bool[] currentState = new bool[keyValues.Length];
 								for (int i = 0; i < keyValues.Length; ++i)
+									currentState[i] = state[keyValues[i]];
+
+								bool up = false;
+								if (keyRecordedState != null)
 								{
-									if (!state[keyValues[i]])
-										continue;
+									for (int i = 0; i < keyRecordedState.Length; ++i)
+									{
+										if (!keyRecordedState[i] || currentState[i])
+											continue;
 
-									nonModifier = true;
-									recording += keyValues[i].ToString().ToUpper();
-									break;
+										up = true;
+										break;
+									}
 								}
+								else
+									keyRecordedState = currentState;
 
-								if (nonModifier)
-									OnNewRecording (new RecordingEventArgs (this, recording));
+								if (up)
+								{
+									string currentRecording = SystemGuid.Keyboard + "|";
+									for (int i = 0; i < keyValues.Length; ++i)
+									{
+										if (!keyRecordedState[i])
+											continue;
+
+										if (currentRecording != SystemGuid.Keyboard + "|")
+											currentRecording += "+";
+
+										currentRecording += keyValues[i].ToString();
+									}
+
+									keyRecordedState = null;
+									OnNewRecording (new RecordingEventArgs (this, currentRecording));
+								}
+								else
+									keyRecordedState = currentState;
 							}
 
 							break;
