@@ -137,7 +137,7 @@ namespace Gablarski.Clients.Windows
 		public const string TextToSpeechSettingName = "TextToSpeech";
 		public static string TextToSpeech
 		{
-			get { return GetSetting (TextToSpeechSettingName, "Gablarski.SpeechNotifier.EventSpeech"); }
+			get { return GetSetting (TextToSpeechSettingName, "Gablarski.SpeechNotifier.EventSpeech, Gablarski.SpeechNotifier"); }
 			set
 			{
 				if (SetSetting (TextToSpeechSettingName, value))
@@ -340,12 +340,16 @@ namespace Gablarski.Clients.Windows
 					Persistance.SaveOrUpdate (entry);
 
 				settings = null;
-				commandBindings.CollectionChanged -= OnCommandBindingsChanged;
-				Persistance.DeleteAllBindings();
-				foreach (var binding in CommandBindings)
-					Persistance.Create (new CommandBindingEntry (binding));
+				if (commandBindings != null)
+				{
+					commandBindings.CollectionChanged -= OnCommandBindingsChanged;
 
-				commandBindings = null;
+					Persistance.DeleteAllBindings();
+					foreach (var binding in CommandBindings)
+						Persistance.Create (new CommandBindingEntry (binding));
+
+					commandBindings = null;
+				}
 			}
 		}
 

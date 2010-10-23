@@ -365,7 +365,7 @@ namespace Gablarski.Clients.Windows
 
 		private void SetupTTS ()
 		{
-			playPhonetic.Enabled = Modules.TextToSpeech.Any (tts => tts.GetType().FullName.Contains (Settings.TextToSpeech));
+			playPhonetic.Enabled = Modules.TextToSpeech.Any (tts => tts.GetType().GetSimpleName() == Settings.TextToSpeech);
 		}
 
 		private void startLocal_Click (object sender, EventArgs e)
@@ -417,7 +417,7 @@ namespace Gablarski.Clients.Windows
 
 		private void playPhonetic_Click (object sender, EventArgs e)
 		{
-			ITextToSpeech tts = Modules.TextToSpeech.FirstOrDefault (t => t.GetType().FullName.Contains (Settings.TextToSpeech));
+			ITextToSpeech tts = Modules.TextToSpeech.FirstOrDefault (t => t.GetType().GetSimpleName() == Settings.TextToSpeech);
 			if (tts != null)
 				tts.Say (this.inPhonetic.Text);
 		}
