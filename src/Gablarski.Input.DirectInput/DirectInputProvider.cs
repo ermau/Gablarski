@@ -252,7 +252,7 @@ namespace Gablarski.Input.DirectInput
 			switch (device.DeviceInformation.DeviceType)
 			{
 				case DeviceType.Keyboard:
-					return input;
+					return input.Replace ("Menu", "Alt");
 
 				case DeviceType.Mouse:
 					return "Mouse " + (Int32.Parse(input) + 1);
@@ -289,8 +289,10 @@ namespace Gablarski.Input.DirectInput
 			Dictionary<Device, Dictionary<int, InputRange>> objectRanges = new Dictionary<Device, Dictionary<int, InputRange>>();
 			Dictionary<Device, HashSet<int>> buttons = new Dictionary<Device, HashSet<int>>();
 
-			//Key[] modifierKeyValues = new [] { Key.LeftControl, Key.RightControl, Key.LeftAlt, Key.RightAlt, Key.LeftShift, Key.RightShift };
-			Key[] keyValues = ((Key[])Enum.GetValues (typeof (Key))).ToArray();//.Except (modifierKeyValues).ToArray();
+			Key[] keyValues = new Key[237];
+			for (int i = 0; i < keyValues.Length; ++i)
+				keyValues[i] = (Key)i;
+
 			bool[] keyRecordedState = null;
 
 			lock (this.syncRoot)
