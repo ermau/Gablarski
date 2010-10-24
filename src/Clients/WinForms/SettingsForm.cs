@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
 using Cadenza.Collections;
@@ -206,7 +207,9 @@ namespace Gablarski.Clients.Windows
 			this.recordingEntry.Recording = true;
 			((AnonymousCommand)this.bindingViewModel.RecordCommand).ChangeCanExecute();
 
+			this.btnOk.Enabled = false;
 			this.addBinding.Enabled = false;
+			this.CancelButton = null;
 			this.bindingViewModel.InputProvider.NewRecording += OnNewRecording;
 			this.bindingViewModel.InputProvider.BeginRecord();
 		}
@@ -250,7 +253,9 @@ namespace Gablarski.Clients.Windows
 			BeginInvoke ((Action<CommandBindingSettingEntry>)(be =>
 			{
 				((AnonymousCommand)this.bindingViewModel.RecordCommand).ChangeCanExecute();
+				this.btnOk.Enabled = true;
 				this.addBinding.Enabled = true;
+				this.CancelButton = this.btnCancel;
 			}), entry);
 		}
 

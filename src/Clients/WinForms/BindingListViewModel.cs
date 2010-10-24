@@ -7,7 +7,6 @@ using System.Text;
 using System.Windows.Input;
 using Cadenza;
 using Gablarski.Clients.Windows.Entities;
-using CommandBinding = Gablarski.Clients.Input.CommandBinding;
 using Gablarski.Clients.Input;
 
 namespace Gablarski.Clients.Windows
