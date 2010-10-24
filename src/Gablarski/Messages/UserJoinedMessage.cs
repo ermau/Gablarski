@@ -43,12 +43,12 @@ namespace Gablarski.Messages
 		: ServerMessage
 	{
 		public UserJoinedMessage()
-			: base (ServerMessageType.UserLoggedIn)
+			: base (ServerMessageType.UserJoined)
 		{
 		}
 
 		public UserJoinedMessage (IUserInfo userInfo)
-			: base (ServerMessageType.UserLoggedIn)
+			: base (ServerMessageType.UserJoined)
 		{
 			if (userInfo == null)
 				throw new ArgumentNullException ("userInfo");

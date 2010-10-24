@@ -94,7 +94,7 @@ namespace Gablarski.Messages
 
 		static MessageBase ()
 		{
-			#if SAFE
+			//#if SAFE
 
 			MessageTypes = new ReadOnlyDictionary<ushort,Func<MessageBase>> (new Dictionary<ushort, Func<MessageBase>>
 			{
@@ -102,33 +102,45 @@ namespace Gablarski.Messages
 			    { (ushort)ServerMessageType.AudioSourceStateChange, () => new AudioSourceStateChangeMessage() },
 			    { (ushort)ServerMessageType.ChangeChannelResult, () => new ChannelChangeResultMessage() },
 			    { (ushort)ServerMessageType.ChannelEditResult, () => new ChannelEditResultMessage() },
-			    { (ushort)ServerMessageType.ConnectionRejected, () => new ConnectionRejectedMessage() },
-			    { (ushort)ServerMessageType.LoginResult, () => new LoginResultMessage() },
+			    { (ushort)ServerMessageType.ChannelList, () => new ChannelListMessage() },
+				{ (ushort)ServerMessageType.ConnectionRejected, () => new ConnectionRejectedMessage() },
+				{ (ushort)ServerMessageType.Disconnect, () => new DisconnectMessage() },
 				{ (ushort)ServerMessageType.JoinResult, () => new JoinResultMessage() },
-				{ (ushort)ServerMessageType.ChannelList, () => new ChannelListMessage() },
-			    { (ushort)ServerMessageType.ServerInfoReceived, () => new ServerInfoMessage() },
+				{ (ushort)ServerMessageType.LoginResult, () => new LoginResultMessage() },
+				{ (ushort)ServerMessageType.PermissionDenied, () => new PermissionDeniedMessage() },
+				{ (ushort)ServerMessageType.Permissions, () => new PermissionsMessage() },
+				{ (ushort)ServerMessageType.PunchThroughReceived, () => new PunchThroughReceivedMessage() },
+				{ (ushort)ServerMessageType.QueryServerResult, () => new QueryServerResultMessage() },
+				{ (ushort)ServerMessageType.Redirect, () => new RedirectMessage() },
+				{ (ushort)ServerMessageType.RegisterResult, () => new RegisterResultMessage() },
+				{ (ushort)ServerMessageType.ServerInfoReceived, () => new ServerInfoMessage() },
 			    { (ushort)ServerMessageType.SourceList, () => new SourceListMessage() },
+				{ (ushort)ServerMessageType.SourceMuted, () => new SourceMutedMessage() },
 			    { (ushort)ServerMessageType.SourceResult, () => new SourceResultMessage() },
 			    { (ushort)ServerMessageType.SourcesRemoved, () => new SourcesRemovedMessage() },
 			    { (ushort)ServerMessageType.UserChangedChannel, () => new UserChangedChannelMessage() },
 			    { (ushort)ServerMessageType.UserDisconnected, () => new UserDisconnectedMessage() },
-			    { (ushort)ServerMessageType.UserList, () => new UserListMessage() },
-			    { (ushort)ServerMessageType.UserLoggedIn, () => new UserJoinedMessage() },
+			    { (ushort)ServerMessageType.UserJoined, () => new UserJoinedMessage() },
 				{ (ushort)ServerMessageType.UserInfoList, () => new UserInfoListMessage() },
-			    { (ushort)ServerMessageType.Muted, () => new MutedMessage() },
-			    { (ushort)ServerMessageType.Permissions, () => new PermissionsMessage() },
-				{ (ushort)ServerMessageType.Redirect, () => new RedirectMessage() },
-				{ (ushort)ServerMessageType.RegisterResult, () => new RegisterMessage() },
-				{ (ushort)ServerMessageType.PermissionDenied, () => new PermissionDeniedMessage() },
+				{ (ushort)ServerMessageType.UserKicked, () => new UserKickedMessage() },
+				{ (ushort)ServerMessageType.UserList, () => new UserListMessage() },
+				{ (ushort)ServerMessageType.UserMuted, () => new UserMutedMessage() },
 				{ (ushort)ServerMessageType.UserUpdated, () => new UserUpdatedMessage() },
 
-			    { (ushort)ClientMessageType.AudioData, () => new ServerAudioDataMessage() },
-			    { (ushort)ClientMessageType.ClientAudioSourceStateChange, () => new ClientAudioSourceStateChangeMessage() },
+			    { (ushort)ClientMessageType.AudioData, () => new ClientAudioDataMessage() },
+				{ (ushort)ClientMessageType.BanUser, () => new BanUserMessage() },
 			    { (ushort)ClientMessageType.ChannelChange, () => new ChannelChangeMessage() },
+				{ (ushort)ClientMessageType.ChannelEdit, () => new ChannelEditMessage() },
+				{ (ushort)ClientMessageType.ClientAudioSourceStateChange, () => new ClientAudioSourceStateChangeMessage() },
 			    { (ushort)ClientMessageType.Connect, () => new ConnectMessage() },
-			    { (ushort)ClientMessageType.Disconnect, () => new DisconnectMessage() },
-			    { (ushort)ClientMessageType.ChannelEdit, () => new ChannelEditMessage() },
+				{ (ushort)ClientMessageType.Disconnect, () => new DisconnectMessage() },
+				{ (ushort)ClientMessageType.Join, () => new JoinMessage() },
+				{ (ushort)ClientMessageType.KickUser, () => new KickUserMessage() },
 			    { (ushort)ClientMessageType.Login, () => new LoginMessage() },
+				{ (ushort)ClientMessageType.PunchThrough, () => new PunchThroughMessage() },
+				{ (ushort)ClientMessageType.QueryServer, () => new QueryServerMessage() },
+				{ (ushort)ClientMessageType.Register, () => new RegisterMessage() },
+				{ (ushort)ClientMessageType.RegistrationApproval, () => new RegistrationApprovalMessage() },
 			    { (ushort)ClientMessageType.RequestChannelList, () => new RequestChannelListMessage() },
 			    { (ushort)ClientMessageType.RequestSource, () => new RequestSourceMessage() },
 			    { (ushort)ClientMessageType.RequestSourceList, () => new RequestSourceListMessage() },
@@ -140,28 +152,28 @@ namespace Gablarski.Messages
 				{ (ushort)ClientMessageType.SetPermissions, () => new SetPermissionsMessage() }
 			});
 
-			#else
+			//#else
 
-			Type msgb = typeof(MessageBase);
-			Dictionary<ushort, Func<MessageBase>> messageTypes = new Dictionary<ushort, Func<MessageBase>>();
-			foreach (Type t in Assembly.GetExecutingAssembly ().GetTypes ().Where (t => msgb.IsAssignableFrom (t) && !t.IsAbstract))
-			{
-			    var ctor = t.GetConstructor (Type.EmptyTypes);
+			//Type msgb = typeof(MessageBase);
+			//Dictionary<ushort, Func<MessageBase>> messageTypes = new Dictionary<ushort, Func<MessageBase>>();
+			//foreach (Type t in Assembly.GetExecutingAssembly ().GetTypes ().Where (t => msgb.IsAssignableFrom (t) && !t.IsAbstract))
+			//{
+			//    var ctor = t.GetConstructor (Type.EmptyTypes);
 
-			    var dctor = new DynamicMethod (t.Name, msgb, null);
-			    var il = dctor.GetILGenerator ();
+			//    var dctor = new DynamicMethod (t.Name, msgb, null);
+			//    var il = dctor.GetILGenerator ();
 
-			    il.Emit (OpCodes.Newobj, ctor);
-			    il.Emit (OpCodes.Ret);
+			//    il.Emit (OpCodes.Newobj, ctor);
+			//    il.Emit (OpCodes.Ret);
 
-			    Func<MessageBase> dctord = (Func<MessageBase>)dctor.CreateDelegate (typeof (Func<MessageBase>));
-			    MessageBase dud = dctord();
-			    messageTypes.Add (dud.MessageTypeCode, dctord);
-			}
+			//    Func<MessageBase> dctord = (Func<MessageBase>)dctor.CreateDelegate (typeof (Func<MessageBase>));
+			//    MessageBase dud = dctord();
+			//    messageTypes.Add (dud.MessageTypeCode, dctord);
+			//}
 
-			MessageTypes = new ReadOnlyDictionary<ushort, Func<MessageBase>> (messageTypes);
+			//MessageTypes = new ReadOnlyDictionary<ushort, Func<MessageBase>> (messageTypes);
 
-			#endif
+			//#endif
 		}
 	}
 }

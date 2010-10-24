@@ -60,7 +60,7 @@ namespace Gablarski.Client
 			this.context.RegisterMessageHandler (ServerMessageType.UserUpdated, OnUserUpdatedMessage);
 			this.context.RegisterMessageHandler (ServerMessageType.UserChangedChannel, OnUserChangedChannelMessage);
 			this.context.RegisterMessageHandler (ServerMessageType.ChangeChannelResult, OnChannelChangeResultMessage);
-			this.context.RegisterMessageHandler (ServerMessageType.UserLoggedIn, OnUserJoinedMessage);
+			this.context.RegisterMessageHandler (ServerMessageType.UserJoined, OnUserJoinedMessage);
 			this.context.RegisterMessageHandler (ServerMessageType.UserDisconnected, OnUserDisconnectedMessage);
 			this.context.RegisterMessageHandler (ServerMessageType.UserMuted, OnUserMutedMessage);
 			this.context.RegisterMessageHandler (ServerMessageType.UserKicked, OnUserKickedMessage);

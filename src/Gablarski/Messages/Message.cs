@@ -98,7 +98,7 @@ namespace Gablarski.Messages
 		SourcesRemoved = 25,
 		SourceMuted = 53,
 	
-		UserLoggedIn = 24,
+		UserJoined = 24,
 		Permissions = 33,
 		UserInfoList = 14,
 		UserList = 49,
