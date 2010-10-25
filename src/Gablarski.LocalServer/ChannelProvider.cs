@@ -86,6 +86,8 @@ namespace Gablarski.LocalServer
 
 					transaction.Commit();
 				}
+
+				OnChannelsUpdated (EventArgs.Empty);
 			}
 		}
 
@@ -108,11 +110,23 @@ namespace Gablarski.LocalServer
 				{
 					if (channel.ChannelId != 0)
 						return ChannelEditResult.FailedChannelDoesntExist;
+					
+					currentChannel = new LocalChannelInfo();
 				}
 
+				currentChannel.Name = channel.Name;
+				currentChannel.Description = channel.Description;
+				currentChannel.ParentChannelId = channel.ParentChannelId;
+				currentChannel.ReadOnly = channel.ReadOnly;
+				currentChannel.UserLimit = channel.UserLimit;
+
+				session.SaveOrUpdate (currentChannel);
+
 				transaction.Commit();
-				return ChannelEditResult.Success;
 			}
+
+			OnChannelsUpdated (EventArgs.Empty);
+			return ChannelEditResult.Success;
 		}
 
 		public ChannelEditResult DeleteChannel (ChannelInfo channel)
@@ -129,8 +143,10 @@ namespace Gablarski.LocalServer
 
 				session.Delete (channel);
 				transaction.Commit();
-				return ChannelEditResult.Success;
 			}
+
+			OnChannelsUpdated (EventArgs.Empty);
+			return ChannelEditResult.Success;
 		}
 
 		public static void Setup (ISession session)
@@ -138,7 +154,7 @@ namespace Gablarski.LocalServer
 			CreateLobby (session);
 		}
 
-		private static void CreateLobby(ISession session)
+		private static void CreateLobby (ISession session)
 		{
 			var lobby = new LocalChannelInfo
 			{
@@ -156,6 +172,13 @@ namespace Gablarski.LocalServer
 				CreateLobby (session);
 
 			return channel;
+		}
+
+		private void OnChannelsUpdated (EventArgs e)
+		{
+			var updated = ChannelsUpdated;
+			if (updated != null)
+				updated (this, e);
 		}
 	}
 }
