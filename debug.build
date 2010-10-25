@@ -25,9 +25,17 @@
 			<arg value='-r=${gablarski.version}' />
 			<arg value='-e=2' />
 		</exec>
-		<exec program="tools\replace.exe">
+		
+		<exec program="tools/replace.exe">
 			<arg value='-t="src\Clients\WinForms\Properties\AssemblyInfo.cs"' />
-			<arg value='-f="0.0.0.0"' />
+			<arg value='-f=0.0.0.0' />
+			<arg value='-r=${gablarski.version}' />
+			<arg value='-e=2' />
+		</exec>
+
+		<exec program="tools/replace.exe">
+			<arg value='-t="src\Clients\CLI\Properties\AssemblyInfo.cs"' />
+			<arg value='-f=0.0.0.0' />
 			<arg value='-r=${gablarski.version}' />
 			<arg value='-e=2' />
 		</exec>
