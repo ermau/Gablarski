@@ -103,7 +103,7 @@ namespace Gablarski.LocalServer
 			using (ISession session = Persistance.SessionFactory.OpenSession())
 			using (ITransaction transaction = session.BeginTransaction (IsolationLevel.Serializable))
 			{
-				var currentChannel = session.Load<LocalChannelInfo> (channel.ChannelId);
+				var currentChannel = session.Get<LocalChannelInfo> (channel.ChannelId);
 				if (currentChannel == null)
 				{
 					if (channel.ChannelId != 0)
@@ -123,7 +123,7 @@ namespace Gablarski.LocalServer
 			using (ISession session = Persistance.SessionFactory.OpenSession())
 			using (ITransaction transaction = session.BeginTransaction (IsolationLevel.Serializable))
 			{
-				var real = session.Load<LocalChannelInfo> (channel.ChannelId);
+				var real = session.Get<LocalChannelInfo> (channel.ChannelId);
 				if (real == null)
 					return ChannelEditResult.FailedChannelDoesntExist;
 
