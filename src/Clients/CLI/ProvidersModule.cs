@@ -88,6 +88,7 @@ namespace Gablarski.Clients.CLI
 
 				this.selectedAudioPlayback = value;
 				this.selectedAudioPlayback.Device = value.DefaultDevice;
+				this.selectedAudioPlayback.Open();
 
 				var otherSources = Client.Sources.Where (s => s.OwnerId != Client.CurrentUser.UserId).ToList();
 				if (otherSources.Any())
