@@ -72,7 +72,7 @@ namespace Gablarski.CELT
 			#endif
 
 			IntPtr pcmptr;
-			byte[] pcm = new byte[this.Mode.FrameSize*2];
+			byte[] pcm = new byte[this.Mode.FrameSize * this.Mode.NumberOfChannels * 2];
 			fixed (byte* bpcm = pcm)
 				pcmptr = new IntPtr((void*)bpcm);
 
