@@ -112,7 +112,7 @@
 		<zip zipfile="Gablarski-CLI-Debug.zip">
 			<fileset basedir="src\Clients\CLI\bin\x86\Debug">
 				<include name="gablarskicli.exe" />
-				<include name="*.dll" />
+				<include name="*.dll*" />
 				<include name="*.xml" />
 				<include name="*.pdb" />
 				<include name="*.txt" />
