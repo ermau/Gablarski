@@ -15,7 +15,7 @@ RequestExecutionLevel admin
 !define MUI_STARTMENUPAGE_REGISTRY_KEY ${REGKEY}
 !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME StartMenuGroup
 !define MUI_STARTMENUPAGE_DEFAULTFOLDER Gablarski
-!define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\orange-uninstall.ico"
+!define MUI_UNICON "bin\x86\{config}\Headphones.ico"
 !define MUI_UNFINISHPAGE_NOAUTOCLOSE
 
 # Included files
