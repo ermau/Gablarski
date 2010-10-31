@@ -104,7 +104,6 @@
 				<include name="*.xml" />
 				<include name="*.pdb" />
 				<include name="..\..\..\..\Gablarski.License.txt" />
-				<include name="..\..\..\..\lib\NAudio.License.txt" />
 				<include name="..\..\..\..\lib\log4net.License.txt" />
 			</fileset>
 		</zip>
@@ -112,6 +111,7 @@
 		<zip zipfile="Gablarski-CLI-Debug.zip">
 			<fileset basedir="src\Clients\CLI\bin\x86\Debug">
 				<include name="gablarskicli.exe" />
+				<include name="..\..\..\..\..\..\Gablarski.License.txt" />
 				<include name="*.dll*" />
 				<include name="*.xml" />
 				<include name="*.pdb" />
@@ -123,6 +123,7 @@
 			<fileset basedir="src\Clients\WinForms\bin\x86\Debug">
 				<include name="GablarskiClient.exe" />
 				<include name="GablarskiClient.exe.config" />
+				<include name="..\..\..\..\..\..\Gablarski.License.txt" />
 				<include name="Headphones.ico" />
 				<include name="*.dll" />
 				<include name="*.pdb" />

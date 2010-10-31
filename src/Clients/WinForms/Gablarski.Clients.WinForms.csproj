@@ -313,6 +313,7 @@
     <None Include="Resources\music.png" />
     <None Include="Resources\group.png" />
     <None Include="Resources\cog.png" />
+    <None Include="setup.nsi" />
     <None Include="XTaskDlg.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
