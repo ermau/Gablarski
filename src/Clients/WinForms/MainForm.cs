@@ -466,7 +466,7 @@ namespace Gablarski.Clients.Windows
 		{
 			if (InvokeRequired)
 			{
-				Invoke ((Action) SetupInput);
+				BeginInvoke ((Action) SetupInput);
 				return;
 			}
 
@@ -762,6 +762,9 @@ namespace Gablarski.Clients.Windows
 
 		private void GablarskiDisconnected (object sender, DisconnectedEventArgs e)
 		{
+			if (this.shuttingDown)
+			    return;
+
 			if (e.Reason == DisconnectionReason.Unknown)
 				this.reconnecting = true;
 
@@ -976,6 +979,10 @@ namespace Gablarski.Clients.Windows
 		private void MainForm_FormClosing (object sender, FormClosingEventArgs e)
 		{
 			this.shuttingDown = true;
+
+			DisableInput();
+			DisablePlayback();
+			DisableVoiceCapture();
 
 			if (this.notifications != null)
 				this.notifications.Close ();
