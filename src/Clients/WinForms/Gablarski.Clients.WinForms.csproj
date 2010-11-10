@@ -347,6 +347,10 @@
     <None Include="Resources\user_add.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\lib\sqlite3.dll">
+      <Link>sqlite3.dll</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <Content Include="Headphones.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
