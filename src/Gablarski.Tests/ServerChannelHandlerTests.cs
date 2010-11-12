@@ -124,11 +124,13 @@ namespace Gablarski.Tests
 		[Test]
 		public void DeleteChannelUserIsIn()
 		{
-			channels.SaveChannel (new ChannelInfo { Name = "Channel 2" });
+			permissions.EnablePermissions (user.UserId, PermissionName.ChangeChannel);
+
+			Assert.AreEqual (ChannelEditResult.Success, channels.SaveChannel (new ChannelInfo { Name = "Channel 2" }));
 			server.Client.DequeueAndAssertMessage<ChannelListMessage>();
 
 			var channel = channels.GetChannels().Single (c => c.Name == "Channel 2");
-			context.Users.Move (user, channel);
+			context.Users.Move (server, user, channel);
 			server.Client.DequeueAndAssertMessage<UserChangedChannelMessage>();
 
 			permissions.EnablePermissions (user.UserId, PermissionName.DeleteChannel, PermissionName.RequestChannelList);
@@ -150,6 +152,37 @@ namespace Gablarski.Tests
 			var result = server.Client.DequeueAndAssertMessage<ChannelEditResultMessage>();
 			Assert.AreEqual (channel.ChannelId, result.ChannelId);
 			Assert.AreEqual (ChannelEditResult.Success, result.Result);
+		}
+
+		[Test]
+		public void JoinChannelAtLimit()
+		{
+			permissions.EnablePermissions (user.UserId, PermissionName.ChangeChannel);
+
+			Assert.AreEqual (ChannelEditResult.Success, channels.SaveChannel (new ChannelInfo { Name = "Channel 2", UserLimit = 1 }));
+			server.Client.DequeueAndAssertMessage<ChannelListMessage>();
+
+			var channel = channels.GetChannels().Single (c => c.Name == "Channel 2");
+			context.Users.Move (user, channel);
+			
+			var moved = server.Client.DequeueAndAssertMessage<UserChangedChannelMessage>();
+			Assert.AreEqual (user.UserId, moved.ChangeInfo.TargetUserId);
+			Assert.AreEqual (channel.ChannelId, moved.ChangeInfo.TargetChannelId);
+			Assert.AreEqual (channels.DefaultChannel.ChannelId, moved.ChangeInfo.PreviousChannelId);
+			Assert.AreEqual (0, moved.ChangeInfo.RequestingUserId);
+
+			var secondUser = UserInfoTests.GetTestUser (2, 1, false);
+			var secondServer = new MockServerConnection();
+			context.UserManager.Connect (secondServer);
+			context.UserManager.Join (secondServer, secondUser);
+			permissions.EnablePermissions (secondUser.UserId, PermissionName.ChangeChannel);
+
+			context.Users.Move (secondServer, secondUser, channel);
+			
+			server.Client.AssertNoMessage();
+
+			var result = secondServer.Client.DequeueAndAssertMessage<ChannelChangeResultMessage>();
+			Assert.AreEqual (ChannelChangeResult.FailedFull, result.Result);
 		}
 	}
 }

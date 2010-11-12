@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -33,11 +33,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
-
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Gablarski.Messages
 {
@@ -62,7 +58,12 @@ namespace Gablarski.Messages
 		/// <summary>
 		/// Failed because the target channel wasn't found.
 		/// </summary>
-		FailedUnknownChannel = 3
+		FailedUnknownChannel = 3,
+		
+		/// <summary>
+		/// Failed because the channel is at it's user limit.
+		/// </summary>
+		FailedFull = 4,
 	}
 
 	public class ChannelChangeResultMessage

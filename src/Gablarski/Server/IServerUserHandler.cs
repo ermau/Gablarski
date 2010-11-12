@@ -46,11 +46,21 @@ namespace Gablarski.Server
 		/// <summary>
 		/// Moves <paramref name="user"/> to the <paramref name="targetChannel"/>.
 		/// </summary>
+		/// <param name="mover">The connection actually moving the user.</param>
+		/// <param name="user">The user to move.</param>
+		/// <param name="targetChannel">The channel to move the user to.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="mover"/> or <paramref name="user" /> or <paramref name="targetChannel"/> is <c>null</c>.</exception>
+		void Move (IConnection mover, IUserInfo user, ChannelInfo targetChannel);
+
+		/// <summary>
+		/// Moves <paramref name="user"/> to the <paramref name="targetChannel"/>.
+		/// </summary>
 		/// <param name="user">The user to move.</param>
 		/// <param name="targetChannel">The channel to move the user to.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="user" /> or <paramref name="targetChannel"/> is <c>null</c>.</exception>
 		/// <remarks>
-		/// The main reasons for a failed move are that the user or channel no longer exists.
+		/// This should only be used by systems code that needs to forcibly move a user.
+		/// Ex. <see cref="IChannelProvider.ChannelsUpdated"/> results in a populated channel being removed.
 		/// </remarks>
 		void Move (IUserInfo user, ChannelInfo targetChannel);
 

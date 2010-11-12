@@ -122,21 +122,40 @@ namespace Gablarski.Server
 				throw new ArgumentNullException ("channel");
 
 			int previousChannel = user.CurrentChannelId;
-
 			if (previousChannel == channel.ChannelId)
 				return;
 
-			var realUser = this[user.UserId];
+			IUserInfo realUser = this[user.UserId];
 			if (realUser == null)
 				return;
 
-			var realChannel = context.Channels[channel.ChannelId];
+			ChannelInfo realChannel = context.Channels[channel.ChannelId];
 			if (realChannel == null)
 				return;
 
+			var changeInfo = new ChannelChangeInfo (user.UserId, channel.ChannelId, previousChannel);
+
+			int numUsers = context.Users.Count (u => u.CurrentChannelId == channel.ChannelId);
+			if (channel.UserLimit != 0 && numUsers >= channel.UserLimit)
+				return;
+
 			Manager.Move (realUser, realChannel);
-			this.Send (new UserChangedChannelMessage { ChangeInfo =
-				new ChannelChangeInfo (user.UserId, channel.ChannelId, previousChannel) });
+			this.Send (new UserChangedChannelMessage { ChangeInfo = changeInfo });
+		}
+
+		public void Move (IConnection mover, IUserInfo user, ChannelInfo channel)
+		{
+			if (mover == null)
+				throw new ArgumentNullException ("mover");
+			if (user == null)
+				throw new ArgumentNullException ("user");
+			if (channel == null)
+				throw new ArgumentNullException ("channel");
+
+			IUserInfo movingUser = this.context.UserManager.GetUser (mover);
+			int moverId = (movingUser != null) ? movingUser.UserId : 0;
+
+			MoveUser (moverId, user.UserId, channel.ChannelId);
 		}
 
 		public void Send (MessageBase message, Func<IConnection, bool> predicate)
@@ -330,41 +349,9 @@ namespace Gablarski.Server
 		{
 			var change = (ChannelChangeMessage)e.Message;
 
-			ChannelChangeResult resultState = ChannelChangeResult.FailedUnknown;
-
-			ChannelInfo targetChannel = context.ChannelsProvider.GetChannels().FirstOrDefault (c => c.ChannelId == change.TargetChannelId);
-			if (targetChannel == null)
-				resultState = ChannelChangeResult.FailedUnknownChannel;
-
-			IUserInfo requestingPlayer = context.UserManager.GetUser (e.Connection);
-
-			IUserInfo targetPlayer = context.Users[change.TargetUserId];
-			if (targetPlayer == null || targetPlayer.CurrentChannelId == change.TargetChannelId)
-				return;
-
-			var changeInfo = new ChannelChangeInfo (change.TargetUserId, change.TargetChannelId, targetPlayer.CurrentChannelId, requestingPlayer.UserId);
-
-			if (resultState == ChannelChangeResult.FailedUnknown)
-			{
-				if (requestingPlayer.UserId.Equals (change.TargetUserId))
-				{
-					if (!context.GetPermission (PermissionName.ChangeChannel, e.Connection))
-						resultState = ChannelChangeResult.FailedPermissions;
-				}
-				else if (!context.GetPermission (PermissionName.ChangePlayersChannel, e.Connection))
-					resultState = ChannelChangeResult.FailedPermissions;
-				
-				if (resultState == ChannelChangeResult.FailedUnknown)
-				{
-					Manager.Move (targetPlayer, targetChannel);
-						
-					this.Send (new UserChangedChannelMessage { ChangeInfo = changeInfo });
-					
-					return;
-				}
-			}
-
-			e.Connection.Send (new ChannelChangeResultMessage (resultState, changeInfo));
+			IUserInfo requestingUser = this.context.UserManager.GetUser (e.Connection);
+			
+			MoveUser ((requestingUser != null) ? requestingUser.UserId : 0, change.TargetUserId, change.TargetChannelId);
 		}
 
 		internal void RequestMuteUserMessage (MessageReceivedEventArgs e)
@@ -630,6 +617,60 @@ namespace Gablarski.Server
 			}
 
 			return false;
+		}
+
+		private void MoveUser (int moverId, int userId, int channelId)
+		{
+			IConnection requester = null;
+			IUserInfo requestingUser = (moverId == 0) ? null : this.context.Users[moverId];
+			if (requestingUser != null)
+				requester = this.context.UserManager.GetConnection (requestingUser);
+			
+			IUserInfo user = this.context.Users[userId];
+			if (user == null)
+				return;
+
+			ChannelChangeInfo info = (requestingUser != null)
+			                         	? new ChannelChangeInfo (userId, channelId, user.CurrentChannelId, requestingUser.UserId)
+			                         	: new ChannelChangeInfo (userId, channelId, user.CurrentChannelId);
+
+			ChannelInfo channel = this.context.Channels[channelId];
+			if (channel == null)
+			{
+				if (requester != null)
+					requester.Send (new ChannelChangeResultMessage (ChannelChangeResult.FailedUnknownChannel, info));
+
+				return;
+			}
+
+			if (!user.Equals (requestingUser))
+			{
+				if (!this.context.GetPermission (PermissionName.ChangePlayersChannel, channel.ChannelId, moverId))
+				{
+					if (requester != null)
+						requester.Send (new ChannelChangeResultMessage (ChannelChangeResult.FailedPermissions, info));
+
+					return;
+				}
+			}
+			else if (!this.context.GetPermission (PermissionName.ChangeChannel, channel.ChannelId, user.UserId))
+			{
+				if (requester != null)
+					requester.Send (new ChannelChangeResultMessage (ChannelChangeResult.FailedPermissions, info));
+
+				return;
+			}
+
+			if (channel.UserLimit != 0 && channel.UserLimit <= context.Users.Count (u => u.CurrentChannelId == channel.ChannelId))
+			{
+				if (requester != null)
+					requester.Send (new ChannelChangeResultMessage (ChannelChangeResult.FailedFull, info));
+
+				return;
+			}
+
+			Manager.Move (user, channel);
+			this.Send (new UserChangedChannelMessage { ChangeInfo = info });
 		}
 	}
 }
