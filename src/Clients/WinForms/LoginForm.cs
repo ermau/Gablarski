@@ -14,7 +14,6 @@ using Gablarski.Clients.Windows.Entities;
 using Gablarski.Clients.Windows.Properties;
 using Gablarski.Messages;
 using Gablarski.Server;
-using Cadenza;
 
 namespace Gablarski.Clients.Windows
 {
@@ -49,14 +48,14 @@ namespace Gablarski.Clients.Windows
 		}
 
 		private HashSet<IPEndPoint> localServers = new HashSet<IPEndPoint>();
-		private void DisplayLocalServer (IEnumerable<Cadenza.Tuple<ServerInfo, IPEndPoint>> foundServers)
+		private void DisplayLocalServer (IEnumerable<Tuple<ServerInfo, IPEndPoint>> foundServers)
 		{
 			if (this.Disposing || this.IsDisposed || this.closing)
 				return;
 
 			if (this.InvokeRequired)
 			{
-			    BeginInvoke ((Action<IEnumerable<Cadenza.Tuple<ServerInfo, IPEndPoint>>>)DisplayLocalServer, foundServers);
+			    BeginInvoke ((Action<IEnumerable<Tuple<ServerInfo, IPEndPoint>>>)DisplayLocalServer, foundServers);
 			    return;
 			}
 
@@ -491,7 +490,7 @@ namespace Gablarski.Clients.Windows
 
 			int port = (int)this.inPort.Value;
 
-			if (this.inServer.Text.IsNullOrWhitespace())
+			if (String.IsNullOrWhiteSpace (this.inServer.Text))
 				return;
 			if (port < IPEndPoint.MinPort || port > IPEndPoint.MaxPort)
 				return;
@@ -504,7 +503,7 @@ namespace Gablarski.Clients.Windows
 		{
 			int port = (int)this.inPort.Value;
 
-			if (this.inServer.Text.IsNullOrWhitespace())
+			if (String.IsNullOrWhiteSpace (this.inServer.Text))
 				return;
 			if (port < IPEndPoint.MinPort || port > IPEndPoint.MaxPort)
 				return;

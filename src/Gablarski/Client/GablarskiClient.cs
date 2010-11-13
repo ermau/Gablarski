@@ -45,7 +45,6 @@ using Cadenza.Collections;
 using Gablarski.Audio;
 using Gablarski.Messages;
 using Gablarski.Network;
-using Cadenza;
 
 namespace Gablarski.Client
 {
@@ -549,7 +548,7 @@ namespace Gablarski.Client
 
 		private void ConnectCore (string host, int port)
 		{
-			if (host.IsNullOrWhitespace ())
+			if (String.IsNullOrWhiteSpace (host))
 				throw new ArgumentException ("host must not be null or empty", "host");
 
 			try

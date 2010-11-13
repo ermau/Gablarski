@@ -211,6 +211,8 @@ namespace Gablarski.Client
 			}
 		}
 
+		
+
 		public IUserInfo this[int userId]
 		{
 			get { return this.manager[userId]; }
