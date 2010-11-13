@@ -172,11 +172,6 @@
     <Compile Include="DeviceSelector.Designer.cs">
       <DependentUpon>DeviceSelector.cs</DependentUpon>
     </Compile>
-    <Compile Include="Entities\IgnoreEntry.cs" />
-    <Compile Include="Entities\CommandBindingEntry.cs" />
-    <Compile Include="Entities\ServerEntry.cs" />
-    <Compile Include="Entities\SettingEntry.cs" />
-    <Compile Include="Entities\VolumeEntry.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="LoginForm.cs">
       <SubType>Form</SubType>
@@ -190,7 +185,6 @@
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Modules.cs" />
     <Compile Include="MusicForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -203,7 +197,6 @@
     <Compile Include="InputForm.Designer.cs">
       <DependentUpon>InputForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Persistance.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -262,7 +255,6 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Servers.cs" />
-    <Compile Include="Settings.cs" />
     <Compile Include="SettingsForm.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -43,7 +43,7 @@ namespace Gablarski.Clients.Windows
 				if (version < new Version (0, 13, 1))
 				{
 					Settings.TextToSpeech = "Gablarski.SpeechNotifier.EventSpeech, Gablarski.SpeechNotifier";
-					Settings.Version = typeof (Program).Assembly.GetName().Version.ToString();
+					Settings.Version = typeof (Persistance).Assembly.GetName().Version.ToString();
 					Settings.Save();
 
 					return true;

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Gablarski.Audio;
+using Gablarski.Clients;
 using Gablarski.Clients.Windows;
 
 namespace Gablarski
