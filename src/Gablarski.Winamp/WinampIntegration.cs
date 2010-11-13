@@ -99,7 +99,7 @@ namespace Gablarski.Winamp
 		/// <exception cref="ArgumentOutOfRangeException">When value is < 0 or > 100.</exception>
 		public int Volume
 		{
-			get { return SendMessage (0x400, -666, 0x7a); }
+			get { return (int)Math.Round (SendMessage (0x400, -666, 0x7a) / 2.55); }
 			set { SendMessage (0x400, (int) Math.Round (value * 2.55, 0), 0x7a); }
 		}
 
