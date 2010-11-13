@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Gablarski.Clients.Windows.Entities
+namespace Gablarski.Clients.Persistence
 {
 	public class VolumeEntry
 	{

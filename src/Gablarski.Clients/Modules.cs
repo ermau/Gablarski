@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
-using System.IO;
-using System.Linq;
 using Gablarski.Audio;
 using Gablarski.Clients.Input;
 using Gablarski.Clients.Media;
 
-namespace Gablarski.Clients.Windows
+namespace Gablarski.Clients
 {
 	public class Modules
 	{

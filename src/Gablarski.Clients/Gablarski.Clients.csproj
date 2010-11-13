@@ -102,7 +102,7 @@
     <Compile Include="NotificationHandler.cs" />
     <Compile Include="Persistence\CommandBindingEntry.cs" />
     <Compile Include="Persistence\IgnoreEntry.cs" />
-    <Compile Include="Persistence\Persistance.cs" />
+    <Compile Include="Persistence\Persistence.cs" />
     <Compile Include="Persistence\ServerEntry.cs" />
     <Compile Include="Persistence\SettingEntry.cs" />
     <Compile Include="Persistence\VolumeEntry.cs" />

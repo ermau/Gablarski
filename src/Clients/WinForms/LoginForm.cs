@@ -10,7 +10,7 @@ using System.Text;
 using System.Windows.Forms;
 using Gablarski.Client;
 using Gablarski.Clients;
-using Gablarski.Clients.Windows.Entities;
+using Gablarski.Clients.Persistence;
 using Gablarski.Clients.Windows.Properties;
 using Gablarski.Messages;
 using Gablarski.Server;

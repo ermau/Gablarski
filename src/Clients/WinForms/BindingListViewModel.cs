@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Input;
 using Cadenza;
-using Gablarski.Clients.Windows.Entities;
+using Gablarski.Clients.Persistence;
 using Gablarski.Clients.Input;
 
 namespace Gablarski.Clients.Windows
@@ -137,7 +137,7 @@ namespace Gablarski.Clients.Windows
 				this.inputProvider.Attach (this.window);
 				OnPropertyChanged (new PropertyChangedEventArgs ("InputProvider"));
 
-				this.bindings = new ObservableCollection<CommandBindingSettingEntry> (Persistance.GetCommandBindings()
+				this.bindings = new ObservableCollection<CommandBindingSettingEntry> (Persistence.Persistence.GetCommandBindings()
 					.Where (b => value.GetType().GetSimpleName() == b.ProviderType)
 					.Select (b => new CommandBindingSettingEntry (value, b)));
 

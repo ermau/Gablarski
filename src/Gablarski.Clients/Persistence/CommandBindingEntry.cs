@@ -38,7 +38,7 @@ using System;
 using System.Linq;
 using Gablarski.Clients.Input;
 
-namespace Gablarski.Clients.Windows.Entities
+namespace Gablarski.Clients.Persistence
 {
 	public class CommandBindingEntry
 	{

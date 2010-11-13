@@ -10,7 +10,7 @@ using Gablarski.Audio;
 using Gablarski.Client;
 using Gablarski.Clients.Input;
 using Gablarski.Clients.Media;
-using Gablarski.Clients.Windows.Entities;
+using Gablarski.Clients.Persistence;
 using Gablarski.Clients.Windows.Properties;
 using Gablarski.Messages;
 using Gablarski.Network;
@@ -72,12 +72,12 @@ namespace Gablarski.Clients.Windows
 				string un = e.User.Username.Trim().ToLower();
 				if (this.ignores.Contains (un) && e.Unmuted)
 				{
-					Persistance.Delete (Persistance.GetIgnores().First (ie => ie.ServerId == this.server.Id && ie.Username.ToLower().Trim() == un));
+					Persistence.Persistence.Delete (Persistence.Persistence.GetIgnores().First (ie => ie.ServerId == this.server.Id && ie.Username.ToLower().Trim() == un));
 					this.ignores.Remove (un);
 				}
 				else if (!e.Unmuted)
 				{
-					Persistance.SaveOrUpdate (new IgnoreEntry (0) { ServerId = this.server.Id, Username = un });
+					Persistence.Persistence.SaveOrUpdate (new IgnoreEntry (0) { ServerId = this.server.Id, Username = un });
 					this.ignores.Add (un);
 				}
 			}
@@ -610,7 +610,7 @@ namespace Gablarski.Clients.Windows
 			users.AddUser (user, gablarski.Sources[user]);
 
 			float gain = 1.0f;
-			VolumeEntry volume = Persistance.GetVolumes (this.server).FirstOrDefault (ve => ve.Username == user.Username);
+			VolumeEntry volume = Persistence.Persistence.GetVolumes (this.server).FirstOrDefault (ve => ve.Username == user.Username);
 			if (volume != null)
 				gain = volume.Gain;
 
@@ -873,7 +873,7 @@ namespace Gablarski.Clients.Windows
 			
 			lock (this.ignores)
 			{
-				Persistance.GetIgnores().Where (i => i.ServerId == this.server.Id).Select (i => i.Username.Trim().ToLower()).
+				Persistence.Persistence.GetIgnores().Where (i => i.ServerId == this.server.Id).Select (i => i.Username.Trim().ToLower()).
 					ForEach (un => this.ignores.Add (un));
 			}
 

@@ -5,7 +5,7 @@ using System.Windows.Forms;
 using System.ComponentModel;
 using Gablarski.Client;
 using Gablarski.Clients.Input;
-using Gablarski.Clients.Windows.Entities;
+using Gablarski.Clients.Persistence;
 using System.Linq;
 using Microsoft.WindowsAPICodePack.Taskbar;
 using System.Collections.Generic;

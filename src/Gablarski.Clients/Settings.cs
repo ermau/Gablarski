@@ -7,10 +7,10 @@ using System.Linq;
 using System.Text;
 using Cadenza.Collections;
 using Gablarski.Clients.Input;
-using Gablarski.Clients.Windows.Entities;
+using Gablarski.Clients.Persistence;
 using Cadenza;
 
-namespace Gablarski.Clients.Windows
+namespace Gablarski.Clients
 {
 	public static class Settings
 	{
@@ -337,16 +337,16 @@ namespace Gablarski.Clients.Windows
 			lock (SettingLock)
 			{
 				foreach (var entry in settings.Values)
-					Persistance.SaveOrUpdate (entry);
+					Persistence.Persistence.SaveOrUpdate (entry);
 
 				settings = null;
 				if (commandBindings != null)
 				{
 					commandBindings.CollectionChanged -= OnCommandBindingsChanged;
 
-					Persistance.DeleteAllBindings();
+					Persistence.Persistence.DeleteAllBindings();
 					foreach (var binding in CommandBindings)
-						Persistance.Create (new CommandBindingEntry (binding));
+						Persistence.Persistence.Create (new CommandBindingEntry (binding));
 
 					commandBindings = null;
 				}
@@ -371,16 +371,16 @@ namespace Gablarski.Clients.Windows
 				if (settings != null)
 					return;
 
-				settings = Persistance.GetSettings().ToDictionary (s => s.Name);
+				settings = Persistence.Persistence.GetSettings().ToDictionary (s => s.Name);
 
-				if (Persistance.CheckForUpdates())
-					settings = Persistance.GetSettings().ToDictionary (s => s.Name);
+				if (Persistence.Persistence.CheckForUpdates())
+					settings = Persistence.Persistence.GetSettings().ToDictionary (s => s.Name);
 
 				commandBindings = new ObservableCollection<CommandBinding>();
 				commandBindings.CollectionChanged += OnCommandBindingsChanged;
-				foreach (var cbe in Persistance.GetCommandBindings())
+				foreach (var cbe in Persistence.Persistence.GetCommandBindings())
 				{
-					IInputProvider provider = Modules.Input.FirstOrDefault (ip => ip.GetType().GetSimpleName() == cbe.ProviderType);
+					IInputProvider provider = Enumerable.FirstOrDefault<IInputProvider> (Modules.Input, ip => Extensions.GetSimpleName(ip.GetType()) == cbe.ProviderType);
 					if (provider == null)
 						continue;
 
