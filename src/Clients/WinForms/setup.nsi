@@ -113,10 +113,10 @@ Section -Main SEC0000
     SetOverwrite on
     File ..\..\..\tools\dxwebsetup.exe
     ExecWait "dxwebsetup.exe /Q"
-    File ..\..\..\tools\dotNetFx35setup.exe
-    #!insertmacro CheckDotNET "3.5"
+    File ..\..\..\tools\dotNetFx40_Full_setup.exe
+    #!insertmacro CheckDotNET
     ${If} $InstallDotNET == "Yes"
-        ExecWait "dotNetFx35setup.exe /norestart /passive"
+        ExecWait "dotNetFx40_Full_setup.exe /norestart /passive"
     ${EndIf}
 SectionEnd
 
@@ -226,10 +226,10 @@ FunctionEnd
 
 Function GetDotNETVersion
     ClearErrors
-    ReadRegStr $0 HKLM "SOFTWARE\Microsoft\NET Framework Setup\NDP\v3.5" "Version"
+    ReadRegStr $0 HKLM "SOFTWARE\Microsoft\NET Framework Setup\NDP\v4" "Version"
     IfErrors notinstalled
     
-    ${VersionCompare} $0 "3.5.21022.08" $1
+    ${VersionCompare} $0 "4.0.30319" $1
     IntCmp $1 2 notinstalled installed
     
     installed:
