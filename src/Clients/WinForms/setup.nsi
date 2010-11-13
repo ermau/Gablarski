@@ -76,6 +76,7 @@ Section -Main SEC0000
     File ..\..\..\lib\OpenAL32.dll
     File ..\..\..\lib\OpenALSoft.License.txt
     File ..\..\..\lib\System.Data.SQLite.DLL
+	File ..\..\..\lib\sqlite3.dll
     File ..\..\..\lib\System.ComponentModel.Composition.dll
     File ..\..\..\lib\System.ComponentModel.Composition.pdb
     File ..\..\..\lib\System.ComponentModel.Composition.License.txt
@@ -108,16 +109,6 @@ Section -Main SEC0000
     File bin\x86\{config}\Microsoft.WindowsAPICodePack.Shell.dll
     File bin\x86\{config}\Microsoft.WindowsAPICodePack.Shell.pdb
     WriteRegStr HKLM "${REGKEY}\Components" Main 1
-    
-    SetOutPath $TEMP
-    SetOverwrite on
-    File ..\..\..\tools\dxwebsetup.exe
-    ExecWait "dxwebsetup.exe /Q"
-    File ..\..\..\tools\dotNetFx40_Full_setup.exe
-    #!insertmacro CheckDotNET
-    ${If} $InstallDotNET == "Yes"
-        ExecWait "dotNetFx40_Full_setup.exe /norestart /passive"
-    ${EndIf}
 SectionEnd
 
 Section -post SEC0001
@@ -137,6 +128,16 @@ Section -post SEC0001
     WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" UninstallString $INSTDIR\uninstall.exe
     WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" NoModify 1
     WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" NoRepair 1
+
+	SetOutPath $TEMP
+    SetOverwrite on
+    File ..\..\..\tools\dxwebsetup.exe
+    ExecWait "dxwebsetup.exe /Q"
+    File ..\..\..\tools\dotNetFx40_Full_setup.exe
+    #!insertmacro CheckDotNET
+    ${If} $InstallDotNET == "Yes"
+        ExecWait "dotNetFx40_Full_setup.exe /passive"
+    ${EndIf}
 SectionEnd
 
 # Macro for selecting uninstaller sections
@@ -186,6 +187,7 @@ Section /o -un.Main UNSEC0000
     Delete /REBOOTOK $INSTDIR\System.ComponentModel.Composition.pdb
     Delete /REBOOTOK $INSTDIR\System.ComponentModel.Composition.License.txt
     Delete /REBOOTOK $INSTDIR\System.Data.SQLite.DLL
+	Delete /REBOOTOK $INSTDIR\sqlite3.dll
     Delete /REBOOTOK $INSTDIR\OpenALSoft.License.txt
     Delete /REBOOTOK $INSTDIR\OpenAL32.dll
     Delete /REBOOTOK $INSTDIR\log4net.License.txt
@@ -226,7 +228,7 @@ FunctionEnd
 
 Function GetDotNETVersion
     ClearErrors
-    ReadRegStr $0 HKLM "SOFTWARE\Microsoft\NET Framework Setup\NDP\v4" "Version"
+    ReadRegStr $0 HKLM "SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full" "Version"
     IfErrors notinstalled
     
     ${VersionCompare} $0 "4.0.30319" $1
