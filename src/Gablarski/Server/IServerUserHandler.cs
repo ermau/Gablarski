@@ -44,6 +44,20 @@ namespace Gablarski.Server
 		: IConnectionHandler, IIndexedEnumerable<int, IUserInfo>
 	{
 		/// <summary>
+		/// Gets the user associated with this connection.
+		/// </summary>
+		/// <param name="connection">The connection to look up a user for.</param>
+		/// <returns>The user associated with <paramref name="connection"/> or <c>null</c> if none found.</returns>
+		IUserInfo this [IConnection connection] { get; }
+
+		/// <summary>
+		/// Gets the connection associated with this user.
+		/// </summary>
+		/// <param name="user">The user to look up a connection for.</param>
+		/// <returns>The connection associated with <paramref name="user"/> or <c>null</c> if none found.</returns>
+		IServerConnection this [IUserInfo user] { get; }
+
+		/// <summary>
 		/// Moves <paramref name="user"/> to the <paramref name="targetChannel"/>.
 		/// </summary>
 		/// <param name="mover">The connection actually moving the user.</param>

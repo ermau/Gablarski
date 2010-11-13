@@ -36,7 +36,6 @@
 
 using System;
 using System.Collections.Generic;
-using Gablarski.Messages;
 
 namespace Gablarski.Server
 {

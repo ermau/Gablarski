@@ -49,6 +49,7 @@ namespace Gablarski.Tests
 	{
 		private IChannelProvider channels;
 		private IServerContext context;
+		private IServerUserManager manager;
 		private ServerChannelHandler handler;
 		private MockPermissionsProvider permissions;
 		private MockServerConnection server;
@@ -57,6 +58,7 @@ namespace Gablarski.Tests
 		[SetUp]
 		public void Setup()
 		{
+			manager = new ServerUserManager();
 			permissions = new MockPermissionsProvider();
 			channels = new LobbyChannelProvider();
 
@@ -69,22 +71,13 @@ namespace Gablarski.Tests
 				Settings = new ServerSettings { Name = "Test Server" }
 			};
 
-			mcontext.Users = new ServerUserHandler (context, context.UserManager);
+			mcontext.Users = new ServerUserHandler (context, manager);
 			mcontext.Channels = handler = new ServerChannelHandler (context);
 
 			user = UserInfoTests.GetTestUser (1, 1, false);
 			server = new MockServerConnection();
-			context.UserManager.Connect (server);
-			context.UserManager.Join (server, user);
-		}
-
-		[TearDown]
-		public void TearDown()
-		{
-			handler = null;
-			context = null;
-			user = null;
-			server = null;
+			manager.Connect (server);
+			manager.Join (server, user);
 		}
 
 		[Test]
@@ -111,7 +104,7 @@ namespace Gablarski.Tests
 			permissions.EnablePermissions (0, PermissionName.RequestChannelList);
 
 			var c = new MockServerConnection();
-			context.UserManager.Connect (c);
+			manager.Connect (c);
 
 			handler.RequestChanneListMessage (new MessageReceivedEventArgs (c,
 				new RequestChannelListMessage()));
@@ -173,8 +166,8 @@ namespace Gablarski.Tests
 
 			var secondUser = UserInfoTests.GetTestUser (2, 1, false);
 			var secondServer = new MockServerConnection();
-			context.UserManager.Connect (secondServer);
-			context.UserManager.Join (secondServer, secondUser);
+			manager.Connect (secondServer);
+			manager.Join (secondServer, secondUser);
 			permissions.EnablePermissions (secondUser.UserId, PermissionName.ChangeChannel);
 
 			context.Users.Move (secondServer, secondUser, channel);

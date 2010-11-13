@@ -59,6 +59,16 @@ namespace Gablarski.Server
 			get { return Manager[userId]; }
 		}
 
+		public IUserInfo this[IConnection connection]
+		{
+			get { return Manager.GetUser (connection); }
+		}
+
+		public IServerConnection this[IUserInfo user]
+		{
+			get { return (IServerConnection)Manager.GetConnection (user); }
+		}
+
 		public void ApproveRegistration (string username)
 		{
 			if (username == null)
@@ -152,7 +162,7 @@ namespace Gablarski.Server
 			if (channel == null)
 				throw new ArgumentNullException ("channel");
 
-			IUserInfo movingUser = this.context.UserManager.GetUser (mover);
+			IUserInfo movingUser = this.context.Users[mover];
 			int moverId = (movingUser != null) ? movingUser.UserId : 0;
 
 			MoveUser (moverId, user.UserId, channel.ChannelId);
@@ -349,7 +359,7 @@ namespace Gablarski.Server
 		{
 			var change = (ChannelChangeMessage)e.Message;
 
-			IUserInfo requestingUser = this.context.UserManager.GetUser (e.Connection);
+			IUserInfo requestingUser = this.context.Users[e.Connection];
 			
 			MoveUser ((requestingUser != null) ? requestingUser.UserId : 0, change.TargetUserId, change.TargetChannelId);
 		}
@@ -380,7 +390,7 @@ namespace Gablarski.Server
 		{
 			var msg = (KickUserMessage)e.Message;
 
-			var kicker = context.UserManager.GetUser (e.Connection);
+			var kicker = context.Users[e.Connection];
 			if (kicker == null)
 				return;
 
@@ -480,7 +490,7 @@ namespace Gablarski.Server
 					break;
 
 				case UserRegistrationMode.PreApproved:
-					var user = this.context.UserManager.GetUser (e.Connection);
+					var user = this.context.Users[e.Connection];
 					if (user == null)
 						return;
 
@@ -624,7 +634,7 @@ namespace Gablarski.Server
 			IConnection requester = null;
 			IUserInfo requestingUser = (moverId == 0) ? null : this.context.Users[moverId];
 			if (requestingUser != null)
-				requester = this.context.UserManager.GetConnection (requestingUser);
+				requester = this.context.Users[requestingUser];
 			
 			IUserInfo user = this.context.Users[userId];
 			if (user == null)

@@ -237,11 +237,6 @@ namespace Gablarski.Server
 			get { return this.users; }
 		}
 
-		IServerUserManager IServerContext.UserManager
-		{
-			get { return this.userManager; }
-		}
-
 		IServerSourceHandler IServerContext.Sources
 		{
 			get { return this.sources; }

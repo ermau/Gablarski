@@ -103,7 +103,7 @@ namespace Gablarski.Server
 
 			SourceResult result = SourceResult.FailedUnknown;
 
-			IUserInfo requestingUser = context.UserManager.GetUser (e.Connection);
+			IUserInfo requestingUser = context.Users[e.Connection];
 			if (requestingUser == null)
 				return;
 
@@ -274,7 +274,7 @@ namespace Gablarski.Server
 			if (source == null || source.IsMuted)
 				return false;
 
-			speaker = context.UserManager.GetUser (connection);
+			speaker = context.Users[connection];
 
 			return (speaker != null && !speaker.IsMuted && speaker.UserId == source.OwnerId);
 		}

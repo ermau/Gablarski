@@ -72,11 +72,6 @@ namespace Gablarski.Server
 		IServerUserHandler Users { get; }
 
 		/// <summary>
-		/// Gets the user manager for the server.
-		/// </summary>
-		IServerUserManager UserManager { get; }
-
-		/// <summary>
 		/// Gets the source handler for the server.
 		/// </summary>
 		IServerSourceHandler Sources { get; }
@@ -111,7 +106,7 @@ namespace Gablarski.Server
 			if (connection == null)
 				return self.GetPermission (name);
 
-			IUserInfo user = self.UserManager.GetUser (connection);
+			IUserInfo user = self.Users[connection];
 			if (user == null)
 				return self.GetPermission (name);
 
@@ -135,7 +130,7 @@ namespace Gablarski.Server
 			if (connection == null)
 				throw new ArgumentNullException ("connection");
 
-			IUserInfo user = self.UserManager.GetUser (connection);
+			IUserInfo user = self.Users[connection];
 			if (user == null)
 				return self.GetPermission (name);
 

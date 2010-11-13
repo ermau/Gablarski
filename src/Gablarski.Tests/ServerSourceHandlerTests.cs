@@ -50,6 +50,7 @@ namespace Gablarski.Tests
 	{
 		private IServerContext context;
 		private IServerSourceManager manager;
+		private IServerUserManager userManager;
 		private ServerSourceHandler handler;
 		private MockServerConnection server;
 		private MockPermissionsProvider permissions;
@@ -70,7 +71,7 @@ namespace Gablarski.Tests
 				Name = "Channel 2"
 			});
 
-			ServerUserManager userManager = new ServerUserManager();
+			userManager = new ServerUserManager();
 			MockServerContext c;
 			context = c = new MockServerContext
 			{
@@ -94,8 +95,8 @@ namespace Gablarski.Tests
 			user = UserInfoTests.GetTestUser (1, 1, false);
 			server = new MockServerConnection();
 
-			context.UserManager.Connect (server);
-			context.UserManager.Join (server, user);
+			userManager.Connect (server);
+			userManager.Join (server, user);
 		}
         
 		[TearDown]
@@ -142,7 +143,7 @@ namespace Gablarski.Tests
 		public void RequestSourceNotJoined()
 		{
 			var c = new MockServerConnection();
-			context.UserManager.Connect (c);
+			userManager.Connect (c);
 
 			handler.RequestSourceMessage (new MessageReceivedEventArgs (c,
 				new RequestSourceMessage ("Name", AudioCodecArgsTests.GetTestArgs())));
@@ -163,7 +164,7 @@ namespace Gablarski.Tests
 
 		public AudioSource GetSourceFromRequest (MockServerConnection connection)
 		{
-			permissions.EnablePermissions (context.UserManager.GetUser (connection).UserId,	PermissionName.RequestSource);
+			permissions.EnablePermissions (userManager.GetUser (connection).UserId,	PermissionName.RequestSource);
 
 			var audioArgs = new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 64000, 512, 10);
 			handler.RequestSourceMessage (new MessageReceivedEventArgs (connection,
@@ -263,8 +264,8 @@ namespace Gablarski.Tests
 			permissions.EnablePermissions (user.UserId, PermissionName.RequestSource);
 
 			var c = new MockServerConnection();
-			context.UserManager.Connect (c);
-			context.UserManager.Join (c, UserInfoTests.GetTestUser (2));
+			userManager.Connect (c);
+			userManager.Join (c, UserInfoTests.GetTestUser (2));
 
 			var audioArgs = AudioCodecArgsTests.GetTestArgs();
 			handler.RequestSourceMessage (new MessageReceivedEventArgs (server,
@@ -350,8 +351,8 @@ namespace Gablarski.Tests
 			server.Client.AssertNoMessage();
 
 			var c = new MockServerConnection();
-			context.UserManager.Connect (c);
-			context.UserManager.Join (c, UserInfoTests.GetTestUser (2));
+			userManager.Connect (c);
+			userManager.Join (c, UserInfoTests.GetTestUser (2));
 
 			handler.RequestSourceListMessage (new MessageReceivedEventArgs (c, new RequestSourceListMessage()));
 			var list = c.Client.DequeueAndAssertMessage<SourceListMessage>();
@@ -416,7 +417,7 @@ namespace Gablarski.Tests
 		public void RequestMuteNotJoined()
 		{
 			var c = new MockServerConnection();
-			context.UserManager.Connect (c);
+			userManager.Connect (c);
 
 			var source = GetSourceFromRequest();
 
@@ -434,8 +435,8 @@ namespace Gablarski.Tests
 		public void RequestMuteWithoutPermission()
 		{
 			var c = new MockServerConnection();
-			context.UserManager.Connect (c);
-			context.UserManager.Join (c, UserInfoTests.GetTestUser (2));
+			userManager.Connect (c);
+			userManager.Join (c, UserInfoTests.GetTestUser (2));
 
 			var source = GetSourceFromRequest();
 			Assert.AreEqual (SourceResult.NewSource, c.Client.DequeueAndAssertMessage<SourceResultMessage>().SourceResult);
@@ -454,8 +455,8 @@ namespace Gablarski.Tests
 //		{
 //			var u = UserInfoTests.GetTestUser (2);
 //			var c = new MockServerConnection();
-//			context.UserManager.Connect (c);
-//			context.UserManager.Join (c, u);
+//			userManager.Connect (c);
+//			userManager.Join (c, u);
 //			permissions.SetPermissions (u.UserId, new[] { new Permission (PermissionName.MuteAudioSource, true) });
 //
 //			var source = GetSourceFromRequest();
@@ -496,7 +497,7 @@ namespace Gablarski.Tests
 		public void ClientAudioSourceStateChangeNotJoined()
 		{
 			var c = new MockServerConnection();
-			context.UserManager.Connect (c);
+			userManager.Connect (c);
 
 			handler.ClientAudioSourceStateChangeMessage (new MessageReceivedEventArgs (c,
 				new ClientAudioSourceStateChangeMessage { SourceId = 1, Starting = true }));
@@ -510,8 +511,8 @@ namespace Gablarski.Tests
 		{
 			var u = UserInfoTests.GetTestUser (2, 1, false);
 			var c = new MockServerConnection();
-			context.UserManager.Connect (c);
-			context.UserManager.Join (c, u);
+			userManager.Connect (c);
+			userManager.Join (c, u);
 
 			var s = manager.Create ("Name", user, new AudioCodecArgs());
 
@@ -527,8 +528,8 @@ namespace Gablarski.Tests
 		{
 			var u = UserInfoTests.GetTestUser (2, 1, true);
 			var c = new MockServerConnection();
-			context.UserManager.Connect (c);
-			context.UserManager.Join (c, u);
+			userManager.Connect (c);
+			userManager.Join (c, u);
 
 			var s = manager.Create ("Name", u, new AudioCodecArgs ());
 
@@ -544,8 +545,8 @@ namespace Gablarski.Tests
 		{
 			var u = UserInfoTests.GetTestUser (2, 1, false);
 			var c = new MockServerConnection();
-			context.UserManager.Connect (c);
-			context.UserManager.Join (c, u);
+			userManager.Connect (c);
+			userManager.Join (c, u);
 
 			var s = manager.Create ("Name", u, new AudioCodecArgs ());
 			manager.ToggleMute (s);
@@ -562,8 +563,8 @@ namespace Gablarski.Tests
 		{
 			var u = UserInfoTests.GetTestUser (2, 1, false);
 			var c = new MockServerConnection();
-			context.UserManager.Connect (c);
-			context.UserManager.Join (c, u);
+			userManager.Connect (c);
+			userManager.Join (c, u);
 
 			var s = manager.Create ("Name", u, new AudioCodecArgs ());
 
@@ -582,8 +583,8 @@ namespace Gablarski.Tests
 		{
 			var u = UserInfoTests.GetTestUser (2, 2, false);
 			var c = new MockServerConnection();
-			context.UserManager.Connect (c);
-			context.UserManager.Join (c, u);
+			userManager.Connect (c);
+			userManager.Join (c, u);
 
 			var s = manager.Create ("Name", u, new AudioCodecArgs ());
 
@@ -622,7 +623,7 @@ namespace Gablarski.Tests
 		public void SendAudioDataMessageNotJoined()
 		{
 			var c = new MockServerConnection();
-			context.UserManager.Connect (c);
+			userManager.Connect (c);
 
 			handler.SendAudioDataMessage (new MessageReceivedEventArgs (c,
 				new ClientAudioDataMessage
@@ -641,8 +642,8 @@ namespace Gablarski.Tests
 		public void SendAudioDataMessageUnknownSource()
 		{
 			var c = new MockServerConnection();
-			context.UserManager.Connect (c);
-			context.UserManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
+			userManager.Connect (c);
+			userManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
 
 			handler.SendAudioDataMessage (new MessageReceivedEventArgs (server,
 				new ClientAudioDataMessage
@@ -661,8 +662,8 @@ namespace Gablarski.Tests
 		public void SendAudioDataMessageSourceNotOwned()
 		{
 			var c = new MockServerConnection();
-			context.UserManager.Connect (c);
-			context.UserManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
+			userManager.Connect (c);
+			userManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
 
 			var s = GetSourceFromRequest();
 			var result = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
@@ -686,8 +687,8 @@ namespace Gablarski.Tests
 		public void SendAudioDataMessageSourceMuted ()
 		{
 			var c = new MockServerConnection();
-			context.UserManager.Connect (c);
-			context.UserManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
+			userManager.Connect (c);
+			userManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
 
 			var s = GetSourceFromRequest();
 			manager.ToggleMute (s);
@@ -713,8 +714,8 @@ namespace Gablarski.Tests
 		public void SendAudioDataMessageUserMuted()
 		{
 			var c = new MockServerConnection();
-			context.UserManager.Connect (c);
-			context.UserManager.Join (c, UserInfoTests.GetTestUser (2, 1, true));
+			userManager.Connect (c);
+			userManager.Join (c, UserInfoTests.GetTestUser (2, 1, true));
 
 			var s = GetSourceFromRequest (c);
 			var result = server.Client.DequeueAndAssertMessage<SourceResultMessage>();
@@ -738,9 +739,9 @@ namespace Gablarski.Tests
 		public void SendAudioDataMessageToUser()
 		{
 			var c = new MockServerConnection();
-			context.UserManager.Connect (c);
+			userManager.Connect (c);
 			var u = UserInfoTests.GetTestUser (2, 2, false);
-			context.UserManager.Join (c, u);
+			userManager.Join (c, u);
 
 			var s = GetSourceFromRequest();
 			var result = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
@@ -766,9 +767,9 @@ namespace Gablarski.Tests
 		public void SendAudioDataMessageToUserWithoutPermission()
 		{
 			var c = new MockServerConnection();
-			context.UserManager.Connect (c);
+			userManager.Connect (c);
 			var u = UserInfoTests.GetTestUser (2, 2, false);
-			context.UserManager.Join (c, u);
+			userManager.Join (c, u);
 
 			var s = GetSourceFromRequest();
 			var result = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
@@ -792,8 +793,8 @@ namespace Gablarski.Tests
 		public void SendAudioDataMessageToCurrentChannel()
 		{
 			var c = new MockServerConnection();
-			context.UserManager.Connect (c);
-			context.UserManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
+			userManager.Connect (c);
+			userManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
 
 			var s = GetSourceFromRequest();
 			var result = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
@@ -819,8 +820,8 @@ namespace Gablarski.Tests
 		public void SendAudioDataMessageToCurrentChannelWithoutPermission()
 		{
 			var c = new MockServerConnection();
-			context.UserManager.Connect (c);
-			context.UserManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
+			userManager.Connect (c);
+			userManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
 
 			var s = GetSourceFromRequest();
 			var result = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
@@ -844,12 +845,12 @@ namespace Gablarski.Tests
 		public void SendAudioDataMessageToMultipleChannels()
 		{
 			var c = new MockServerConnection();
-			context.UserManager.Connect (c);
-			context.UserManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
+			userManager.Connect (c);
+			userManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
 
 			var c2 = new MockServerConnection();
-			context.UserManager.Connect (c2);
-			context.UserManager.Join (c2, UserInfoTests.GetTestUser (3, 2, false));
+			userManager.Connect (c2);
+			userManager.Join (c2, UserInfoTests.GetTestUser (3, 2, false));
 
 			var s = GetSourceFromRequest();
 			var result = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
@@ -880,12 +881,12 @@ namespace Gablarski.Tests
 		public void SendAudioDataMessageToMultipleChannelsWithoutPermission()
 		{
 			var c = new MockServerConnection();
-			context.UserManager.Connect (c);
-			context.UserManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
+			userManager.Connect (c);
+			userManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
 
 			var c2 = new MockServerConnection();
-			context.UserManager.Connect (c2);
-			context.UserManager.Join (c2, UserInfoTests.GetTestUser (3, 2, false));
+			userManager.Connect (c2);
+			userManager.Join (c2, UserInfoTests.GetTestUser (3, 2, false));
 
 			var s = GetSourceFromRequest();
 			var result = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
@@ -914,14 +915,14 @@ namespace Gablarski.Tests
 		public void SendAudioDataMessageToMultipleUsers()
 		{
 			var c = new MockServerConnection();
-			context.UserManager.Connect (c);
+			userManager.Connect (c);
 			var u1 = UserInfoTests.GetTestUser (2, 1, false);
-			context.UserManager.Join (c, u1);
+			userManager.Join (c, u1);
 
 			var c2 = new MockServerConnection();
-			context.UserManager.Connect (c2);
+			userManager.Connect (c2);
 			var u2 = UserInfoTests.GetTestUser (3, 2, false);
-			context.UserManager.Join (c2, u2);
+			userManager.Join (c2, u2);
 
 			var s = GetSourceFromRequest();
 			var result = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
@@ -952,14 +953,14 @@ namespace Gablarski.Tests
 		public void SendAudioDataMessageToMultipleUsersWithoutPermission()
 		{
 			var c = new MockServerConnection();
-			context.UserManager.Connect (c);
+			userManager.Connect (c);
 			var u1 = UserInfoTests.GetTestUser (2, 1, false);
-			context.UserManager.Join (c, u1);
+			userManager.Join (c, u1);
 
 			var c2 = new MockServerConnection();
-			context.UserManager.Connect (c2);
+			userManager.Connect (c2);
 			var u2 = UserInfoTests.GetTestUser (3, 1, false);
-			context.UserManager.Join (c2, u2);
+			userManager.Join (c2, u2);
 
 			var s = GetSourceFromRequest();
 			var result = c.Client.DequeueAndAssertMessage<SourceResultMessage>();

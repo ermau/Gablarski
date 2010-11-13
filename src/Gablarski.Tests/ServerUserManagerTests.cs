@@ -48,8 +48,8 @@ namespace Gablarski.Tests
 	public class ServerUserManagerTests
 	{
 		private IServerUserManager manager;
-		private MockServerConnection server;
 		private MockClientConnection client;
+		private MockServerConnection server;
 		private IUserInfo user;
 
 		[SetUp]
@@ -67,49 +67,49 @@ namespace Gablarski.Tests
 			user = null;
 			manager = null;
 			server = null;
-			client = null;
+			server = null;
 		}
 
 		[Test]
 		public void LoginNull()
 		{
 			Assert.Throws<ArgumentNullException> (() => manager.Login (null, user));
-			Assert.Throws<ArgumentNullException> (() => manager.Login (client, null));
+			Assert.Throws<ArgumentNullException> (() => manager.Login (server, null));
 		}
 
 		[Test]
 		public void Login()
 		{
-			manager.Connect (client);
+			manager.Connect (server);
 
-			Assert.IsFalse (manager.GetIsLoggedIn (client));
+			Assert.IsFalse (manager.GetIsLoggedIn (server));
 
-			manager.Login (client, user);
+			manager.Login (server, user);
 
-			Assert.IsTrue (manager.GetIsLoggedIn (client));
+			Assert.IsTrue (manager.GetIsLoggedIn (server));
 		}
 
 		[Test]
 		public void LoginIgnoreBeforeConnect()
 		{
-			manager.Login (client, user);
-			Assert.IsFalse (manager.GetIsLoggedIn (client));
+			manager.Login (server, user);
+			Assert.IsFalse (manager.GetIsLoggedIn (server));
 			Assert.IsFalse (manager.GetIsLoggedIn (user));
 		}
 
 		[Test]
 		public void LoginAlreadyLoggedIn()
 		{
-			manager.Connect (client);
-			manager.Login (client, user);
-			Assert.IsTrue (manager.GetIsLoggedIn (client));
+			manager.Connect (server);
+			manager.Login (server, user);
+			Assert.IsTrue (manager.GetIsLoggedIn (server));
 
 			var c = new MockServerConnection();
 			manager.Connect (c);
 			manager.Login (c, user);
 
-			Assert.IsFalse (client.IsConnected);
-			Assert.IsFalse (manager.GetIsLoggedIn (client));
+			Assert.IsFalse (server.IsConnected);
+			Assert.IsFalse (manager.GetIsLoggedIn (server));
 			Assert.IsTrue (manager.GetIsLoggedIn (user));
 			Assert.IsTrue (manager.GetIsLoggedIn (c));
 		}
@@ -117,71 +117,71 @@ namespace Gablarski.Tests
 		[Test]
 		public void GetIsLoggedInNull()
 		{
-			Assert.Throws<ArgumentNullException> (() => manager.GetIsLoggedIn ((IConnection)null));
+			Assert.Throws<ArgumentNullException> (() => manager.GetIsLoggedIn ((IServerConnection)null));
 			Assert.Throws<ArgumentNullException> (() => manager.GetIsLoggedIn ((UserInfo)null));
 		}
 
 		[Test]
 		public void GetIsLoggedInConnection()
 		{
-			manager.Connect (client);
+			manager.Connect (server);
 
-			Assert.IsFalse (manager.GetIsLoggedIn (client));
+			Assert.IsFalse (manager.GetIsLoggedIn (server));
 
-			manager.Login (client, user);
+			manager.Login (server, user);
 
-			Assert.IsTrue (manager.GetIsLoggedIn (client));
+			Assert.IsTrue (manager.GetIsLoggedIn (server));
 		}
 
 		[Test]
 		public void GetIsLoggedInConnectionNotFound()
 		{
-			Assert.IsFalse (manager.GetIsLoggedIn (client));
+			Assert.IsFalse (manager.GetIsLoggedIn (server));
 		}
 
 		[Test]
 		public void GetIsLoggedInUser()
 		{
-			manager.Connect (client);
+			manager.Connect (server);
 
-			Assert.IsFalse (manager.GetIsLoggedIn (user));
+			Assert.IsFalse (manager.GetIsLoggedIn (server));
 
-			manager.Login (client, user);
+			manager.Login (server, user);
 
-			Assert.IsTrue (manager.GetIsLoggedIn (user));
+			Assert.IsTrue (manager.GetIsLoggedIn (server));
 		}
 
 		[Test]
 		public void GetIsLoggedInUserNotFound()
 		{
-			Assert.IsFalse (manager.GetIsLoggedIn (user));
+			Assert.IsFalse (manager.GetIsLoggedIn (server));
 		}
 
 		[Test]
 		public void JoinNull()
 		{
-			Assert.Throws<ArgumentNullException> (() => manager.Join (client, null));
+			Assert.Throws<ArgumentNullException> (() => manager.Join (server, null));
 			Assert.Throws<ArgumentNullException> (() => manager.Join (null, user));
 		}
 
 		[Test]
 		public void JoinIgnoreNotConnected()
 		{
-			manager.Join (client, user);
-			Assert.IsFalse (manager.GetIsJoined (client));
+			manager.Join (server, user);
+			Assert.IsFalse (manager.GetIsJoined (server));
 			Assert.IsFalse (manager.GetIsJoined (user));
 		}
 
 		[Test]
 		public void Join()
 		{
-			manager.Connect (client);
-			manager.Join (client, user);
+			manager.Connect (server);
+			manager.Join (server, user);
 
-			Assert.IsTrue (manager.GetIsJoined (client));
+			Assert.IsTrue (manager.GetIsJoined (server));
 			Assert.IsTrue (manager.GetIsJoined (user));
 
-			IUserInfo joinedUser = manager.GetUser (client);
+			IUserInfo joinedUser = manager.GetUser (server);
 			Assert.AreEqual (user.UserId, joinedUser.UserId);
 			Assert.AreEqual (user.Username, joinedUser.Username);
 			Assert.AreEqual (user.Nickname, joinedUser.Nickname);
@@ -193,14 +193,14 @@ namespace Gablarski.Tests
 		[Test]
 		public void JoinLoggedIn()
 		{
-			manager.Connect (client);
-			manager.Login (client, new UserInfo (user.Username, user.UserId, user.CurrentChannelId, false));
-			manager.Join (client, user);
+			manager.Connect (server);
+			manager.Login (server, new UserInfo (user.Username, user.UserId, user.CurrentChannelId, false));
+			manager.Join (server, user);
 
-			Assert.IsTrue (manager.GetIsJoined (client));
+			Assert.IsTrue (manager.GetIsJoined (server));
 			Assert.IsTrue (manager.GetIsJoined (user));
 
-			IUserInfo joinedUser = manager.GetUser (client);
+			IUserInfo joinedUser = manager.GetUser (server);
 			Assert.AreEqual (user.UserId, joinedUser.UserId);
 			Assert.AreEqual (user.Username, joinedUser.Username);
 			Assert.AreEqual (user.Nickname, joinedUser.Nickname);
@@ -212,47 +212,47 @@ namespace Gablarski.Tests
 		[Test]
 		public void JoinIgnoreDupe()
 		{
-			manager.Connect (client);
-			manager.Join (client, user);
-			manager.Join (client, user);
+			manager.Connect (server);
+			manager.Join (server, user);
+			manager.Join (server, user);
 
-			Assert.IsTrue (manager.GetIsJoined (client));
+			Assert.IsTrue (manager.GetIsJoined (server));
 			Assert.IsTrue (manager.GetIsJoined (user));
 		}
 
 		[Test]
 		public void GetIsJoinedNull()
 		{
-			Assert.Throws<ArgumentNullException> (() => manager.GetIsJoined ((IConnection)null));
+			Assert.Throws<ArgumentNullException> (() => manager.GetIsJoined ((IServerConnection)null));
 			Assert.Throws<ArgumentNullException> (() => manager.GetIsJoined ((UserInfo)null));
 		}
 
 		[Test]
 		public void GetIsJoinedConnection()
 		{
-			manager.Connect (client);
+			manager.Connect (server);
 
-			Assert.IsFalse (manager.GetIsJoined (client));
+			Assert.IsFalse (manager.GetIsJoined (server));
 
-			manager.Join (client, user);
+			manager.Join (server, user);
 
-			Assert.IsTrue (manager.GetIsJoined (client));
+			Assert.IsTrue (manager.GetIsJoined (server));
 		}
 
 		[Test]
 		public void GetIsJoinedConnectionNotFound()
 		{
-			Assert.IsFalse (manager.GetIsJoined (client));
+			Assert.IsFalse (manager.GetIsJoined (server));
 		}
 
 		[Test]
 		public void GetIsJoinedUser()
 		{
-			manager.Connect (client);
+			manager.Connect (server);
 
 			Assert.IsFalse (manager.GetIsJoined (user));
 
-			manager.Join (client, user);
+			manager.Join (server, user);
 
 			Assert.IsTrue (manager.GetIsJoined (user));
 		}
@@ -276,17 +276,17 @@ namespace Gablarski.Tests
 			Assert.DoesNotThrow (() =>
 				manager.Move (user, new ChannelInfo (1)));
 
-			Assert.IsNull (manager.GetUser (client));
+			Assert.IsNull (manager.GetUser (server));
 		}
 
 		[Test]
 		public void MoveNotJoined()
 		{
-			manager.Connect (client);
+			manager.Connect (server);
 			Assert.DoesNotThrow (() =>
 				manager.Move (user, new ChannelInfo (1)));
 
-			Assert.IsNull (manager.GetUser (client));
+			Assert.IsNull (manager.GetUser (server));
 		}
 
 		[Test]
@@ -294,12 +294,12 @@ namespace Gablarski.Tests
 		{
 			var c = new ChannelInfo (2);
 
-			manager.Connect (client);
-			manager.Join (client, user);
+			manager.Connect (server);
+			manager.Join (server, user);
 
 			manager.Move (user, c);
 
-			user = manager.GetUser (client);
+			user = manager.GetUser (server);
 
 			Assert.AreEqual (c.ChannelId, user.CurrentChannelId);
 		}
@@ -309,12 +309,12 @@ namespace Gablarski.Tests
 		{
 			var c = new ChannelInfo(3);
 
-			manager.Connect (client);
-			manager.Join (client, user);
+			manager.Connect (server);
+			manager.Join (server, user);
 
 			manager.Move (user, c);
 
-			user = manager.GetUser (client);
+			user = manager.GetUser (server);
 
 			Assert.AreEqual (c.ChannelId, user.CurrentChannelId);
 		}
@@ -340,15 +340,15 @@ namespace Gablarski.Tests
 			user = new UserInfo (user, false);
 			Assert.IsFalse (user.IsMuted);
 
-			manager.Connect (client);
-			manager.Join (client, user);
-			user = manager.GetUser (client);
+			manager.Connect (server);
+			manager.Join (server, user);
+			user = manager.GetUser (server);
 			Assert.IsNotNull (user);
 			Assert.IsFalse (user.IsMuted);
 
 			Assert.IsTrue (manager.ToggleMute (user));
 
-			user = manager.GetUser (client);
+			user = manager.GetUser (server);
 			Assert.IsNotNull (user);
 			Assert.IsTrue (user.IsMuted);
 		}
@@ -359,15 +359,15 @@ namespace Gablarski.Tests
 			user = new UserInfo (user, true);
 			Assert.IsTrue (user.IsMuted);
 
-			manager.Connect (client);
-			manager.Join (client, user);
-			user = manager.GetUser (client);
+			manager.Connect (server);
+			manager.Join (server, user);
+			user = manager.GetUser (server);
 			Assert.IsNotNull (user);
 			Assert.IsTrue (user.IsMuted);
 
 			Assert.IsFalse (manager.ToggleMute (user));
 
-			user = manager.GetUser (client);
+			user = manager.GetUser (server);
 			Assert.IsNotNull (user);
 			Assert.IsFalse (user.IsMuted);
 		}
@@ -381,8 +381,8 @@ namespace Gablarski.Tests
 		[Test]
 		public void SetStatus()
 		{
-			manager.Connect (client);
-			manager.Join (client, user);
+			manager.Connect (server);
+			manager.Join (server, user);
 
 			Assert.AreEqual (UserStatus.Normal, user.Status);
 			user = manager.SetStatus (user, UserStatus.MutedSound);
@@ -413,8 +413,8 @@ namespace Gablarski.Tests
 		[Test]
 		public void SetComment()
 		{
-			manager.Connect (client);
-			manager.Join (client, user);
+			manager.Connect (server);
+			manager.Join (server, user);
 
 			Assert.AreEqual (null, user.Comment);
 
@@ -434,11 +434,11 @@ namespace Gablarski.Tests
 		[Test]
 		public void Connect()
 		{
-			Assert.IsFalse (manager.GetIsConnected (client));
+			Assert.IsFalse (manager.GetIsConnected (server));
 
-			manager.Connect (client);
+			manager.Connect (server);
 
-			Assert.IsTrue (manager.GetIsConnected (client));
+			Assert.IsTrue (manager.GetIsConnected (server));
 		}
 
 		[Test]
@@ -450,16 +450,16 @@ namespace Gablarski.Tests
 		[Test]
 		public void GetIsConnected()
 		{
-			Assert.IsFalse (manager.GetIsConnected (client));
+			Assert.IsFalse (manager.GetIsConnected (server));
 
-			manager.Connect (client);
+			manager.Connect (server);
 
-			Assert.IsTrue (manager.GetIsConnected (client));
-			Assert.IsFalse (manager.GetIsConnected (new MockClientConnection (new MockServerConnection())));
+			Assert.IsTrue (manager.GetIsConnected (server));
+			Assert.IsFalse (manager.GetIsConnected (new MockServerConnection()));
 
-			manager.Disconnect (client);
+			manager.Disconnect (server);
 
-			Assert.IsFalse (manager.GetIsConnected (client));
+			Assert.IsFalse (manager.GetIsConnected (server));
 		}
 
 		[Test]
@@ -472,56 +472,56 @@ namespace Gablarski.Tests
 		[Test]
 		public void Disconnect()
 		{
-			manager.Connect (client);
-			Assert.IsTrue (manager.GetIsConnected (client));
+			manager.Connect (server);
+			Assert.IsTrue (manager.GetIsConnected (server));
 
-			manager.Disconnect (client);
-			Assert.IsFalse (manager.GetIsConnected (client));
-			Assert.IsFalse (manager.GetIsLoggedIn (client));
+			manager.Disconnect (server);
+			Assert.IsFalse (manager.GetIsConnected (server));
+			Assert.IsFalse (manager.GetIsLoggedIn (server));
 		}
 
 		[Test]
 		public void DisconnectJoinedUser()
 		{
-			manager.Connect (client);
-			manager.Join (client, user);
+			manager.Connect (server);
+			manager.Join (server, user);
 
-			manager.Disconnect (client);
+			manager.Disconnect (server);
 
 			Assert.IsNull (manager.GetConnection (user));
-			Assert.IsNull (manager.GetUser (client));
-			Assert.IsFalse (manager.GetIsJoined (client));
+			Assert.IsNull (manager.GetUser (server));
+			Assert.IsFalse (manager.GetIsJoined (server));
 			Assert.IsFalse (manager.GetIsJoined (user));
-			Assert.IsFalse (manager.GetIsConnected (client));
+			Assert.IsFalse (manager.GetIsConnected (server));
 		}
 
 		[Test]
 		public void DisconnectLoggedInUser()
 		{
-			manager.Connect (client);
-			manager.Login (client, user);
+			manager.Connect (server);
+			manager.Login (server, user);
 
-			manager.Disconnect (client);
+			manager.Disconnect (server);
 
 			Assert.IsNull (manager.GetConnection (user));
-			Assert.IsNull (manager.GetUser (client));
+			Assert.IsNull (manager.GetUser (server));
 			Assert.IsFalse (manager.GetIsJoined (user));
 			Assert.IsFalse (manager.GetIsLoggedIn (user));
-			Assert.IsFalse (manager.GetIsConnected (client));
+			Assert.IsFalse (manager.GetIsConnected (server));
 		}
 
 		[Test]
 		public void DisconnectPredicate()
 		{
-			manager.Connect (client);
-			manager.Join (client, user);
+			manager.Connect (server);
+			manager.Join (server, user);
 
-			manager.Disconnect (c => c == client);
+			manager.Disconnect (c => c == server);
 
 			Assert.IsNull (manager.GetConnection (user));
-			Assert.IsNull (manager.GetUser (client));
+			Assert.IsNull (manager.GetUser (server));
 			Assert.IsFalse (manager.GetIsJoined (user));
-			Assert.IsFalse (manager.GetIsConnected (client));
+			Assert.IsFalse (manager.GetIsConnected (server));
 		}
 
 		[Test]
@@ -533,16 +533,16 @@ namespace Gablarski.Tests
 		[Test]
 		public void GetUser()
 		{
-			manager.Connect (client);
-			manager.Join (client, user);
+			manager.Connect (server);
+			manager.Join (server, user);
 
-			Assert.AreEqual (user, manager.GetUser (client));
+			Assert.AreEqual (user, manager.GetUser (server));
 		}
 
 		[Test]
 		public void GetUserNotFound()
 		{
-			Assert.IsNull (manager.GetUser (new MockClientConnection (server)));
+			Assert.IsNull (manager.GetUser (server));
 		}
 
 		[Test]
@@ -554,10 +554,10 @@ namespace Gablarski.Tests
 		[Test]
 		public void GetConnection()
 		{
-			manager.Connect (client);
-			manager.Join (client, user);
+			manager.Connect (server);
+			manager.Join (server, user);
 
-			Assert.AreEqual (client, manager.GetConnection (user));
+			Assert.AreEqual (server, manager.GetConnection (user));
 		}
 
 		[Test]
@@ -575,11 +575,11 @@ namespace Gablarski.Tests
 		[Test]
 		public void GetIsNicknameInUse()
 		{
-			manager.Connect (client);
+			manager.Connect (server);
 
 			Assert.IsFalse (manager.GetIsNicknameInUse (user.Nickname));
 
-			manager.Join (client, user);
+			manager.Join (server, user);
 
 			Assert.IsTrue (manager.GetIsNicknameInUse (user.Nickname));
 			Assert.IsTrue (manager.GetIsNicknameInUse (user.Nickname + " "));
@@ -592,8 +592,8 @@ namespace Gablarski.Tests
 		{
 			user = new UserInfo ("Username", 1, 2, true);
 
-			manager.Connect (client);
-			manager.Login (client, user);
+			manager.Connect (server);
+			manager.Login (server, user);
 
 			Assert.IsFalse (manager.GetIsNicknameInUse (user.Username));
 		}
