@@ -56,7 +56,7 @@ namespace Gablarski.Server
 			this.context.ChannelsProvider.ChannelsUpdated += ChannelsProviderOnChannelsUpdated;
 		}
 
-		public IEnumerator<ChannelInfo> GetEnumerator()
+		public IEnumerator<IChannelInfo> GetEnumerator()
 		{
 			return context.ChannelsProvider.GetChannels().GetEnumerator();
 		}
@@ -66,7 +66,7 @@ namespace Gablarski.Server
 			return GetEnumerator();
 		}
 
-		public ChannelInfo this [int key]
+		public IChannelInfo this [int key]
 		{
 			get { return this.FirstOrDefault (c => c.ChannelId == key); }
 		}
@@ -91,7 +91,7 @@ namespace Gablarski.Server
 				e.Connection.Send (new ChannelListMessage (GenericResult.FailedPermissions));
 			else
 			{
-				IEnumerable<ChannelInfo> channels = this.context.ChannelsProvider.GetChannels();
+				IEnumerable<IChannelInfo> channels = this.context.ChannelsProvider.GetChannels();
 				e.Connection.Send (new ChannelListMessage (channels, context.ChannelsProvider.DefaultChannel));
 			}
 		}
@@ -104,9 +104,9 @@ namespace Gablarski.Server
 
 			if (msg.Channel.ChannelId != 0)
 			{
-				List<ChannelInfo> channels = context.ChannelsProvider.GetChannels().ToList();
+				List<IChannelInfo> channels = context.ChannelsProvider.GetChannels().ToList();
 
-				ChannelInfo realChannel = channels.FirstOrDefault (c => c.ChannelId == msg.Channel.ChannelId);
+				IChannelInfo realChannel = channels.FirstOrDefault (c => c.ChannelId == msg.Channel.ChannelId);
 
 				if (realChannel == null)
 					result = ChannelEditResult.FailedChannelDoesntExist;

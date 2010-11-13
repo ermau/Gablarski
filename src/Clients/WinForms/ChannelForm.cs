@@ -21,7 +21,7 @@ namespace Gablarski.Clients.Windows
 			this.Icon = Resources.ChannelAddImage.ToIcon();
 		}
 
-		public ChannelForm (ChannelInfo channel)
+		public ChannelForm (IChannelInfo channel)
 		{
 			InitializeComponent ();
 

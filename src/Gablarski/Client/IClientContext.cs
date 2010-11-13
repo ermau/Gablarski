@@ -61,7 +61,7 @@ namespace Gablarski.Client
 		/// <summary>
 		/// Gets the channels in this context
 		/// </summary>
-		IIndexedEnumerable<int, ChannelInfo> Channels { get; }
+		IIndexedEnumerable<int, IChannelInfo> Channels { get; }
 
 		/// <summary>
 		/// Gets the source handler associated with this context.
@@ -89,7 +89,7 @@ namespace Gablarski.Client
 
 	public static class ContextExtensions
 	{
-		public static ChannelInfo GetCurrentChannel (this IClientContext self)
+		public static IChannelInfo GetCurrentChannel (this IClientContext self)
 		{
 			return self.Channels[self.CurrentUser.CurrentChannelId];
 		}

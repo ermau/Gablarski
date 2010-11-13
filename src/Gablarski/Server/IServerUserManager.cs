@@ -69,7 +69,7 @@ namespace Gablarski.Server
 		/// <param name="user">The user to move.</param>
 		/// <param name="channel">The channel to move the user to.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="user"/> or <paramref name="channel"/> is <c>null</c>.</exception>
-		void Move (IUserInfo user, ChannelInfo channel);
+		void Move (IUserInfo user, IChannelInfo channel);
 
 		/// <summary>
 		/// Toggles mute on the <paramref name="user"/>.

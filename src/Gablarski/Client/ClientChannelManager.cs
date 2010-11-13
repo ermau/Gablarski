@@ -43,7 +43,7 @@ using System.Threading;
 namespace Gablarski.Client
 {
 	public class ClientChannelManager
-		: IIndexedEnumerable<int, ChannelInfo>
+		: IIndexedEnumerable<int, IChannelInfo>
 	{
 		protected internal ClientChannelManager (IClientContext context)
 		{
@@ -65,13 +65,13 @@ namespace Gablarski.Client
 		/// <summary>
 		/// A new or updated player list has been received.
 		/// </summary>
-		public event EventHandler<ReceivedListEventArgs<ChannelInfo>> ReceivedChannelList;
+		public event EventHandler<ReceivedListEventArgs<IChannelInfo>> ReceivedChannelList;
 		#endregion
 
 		/// <summary>Gets the channel with id <paramref name="channelId"/></summary>
 		/// <param name="channelId">The id of the channel.</param>
 		/// <returns><c>null</c> if no channel exists by the identifier.</returns>
-		public ChannelInfo this[int channelId]
+		public IChannelInfo this[int channelId]
 		{
 			get
 			{
@@ -80,7 +80,7 @@ namespace Gablarski.Client
 
 				lock (channelLock)
 				{
-					ChannelInfo channel;
+					IChannelInfo channel;
 					this.channels.TryGetValue (channelId, out channel);
 					return channel;
 				}
@@ -143,11 +143,11 @@ namespace Gablarski.Client
 			}
 		}
 
-		#region IEnumerable<Channel> members
-		public IEnumerator<ChannelInfo> GetEnumerator ()
+		#region IEnumerable<IChannelInfo> members
+		public IEnumerator<IChannelInfo> GetEnumerator ()
 		{
 			if (this.channels.Count == 0)
-				return Enumerable.Empty<ChannelInfo> ().GetEnumerator();
+				return Enumerable.Empty<IChannelInfo> ().GetEnumerator();
 
 			lock (channelLock)
 			{
@@ -164,7 +164,7 @@ namespace Gablarski.Client
 		private readonly IClientContext context;
 
 		private readonly object channelLock = new object ();
-		private Dictionary<int, ChannelInfo> channels;
+		private Dictionary<int, IChannelInfo> channels;
 
 		internal void OnChannelListReceivedMessage (MessageReceivedEventArgs e)
 		{
@@ -175,14 +175,14 @@ namespace Gablarski.Client
 				this.channels = msg.Channels.ToDictionary (c => c.ChannelId);
 			}
 
-			OnReceivedChannelList (new ReceivedListEventArgs<ChannelInfo> (msg.Channels));
+			OnReceivedChannelList (new ReceivedListEventArgs<IChannelInfo> (msg.Channels));
 		}
 
 		internal void OnChannelEditResultMessage (MessageReceivedEventArgs e)
 		{
 			var msg = (ChannelEditResultMessage)e.Message;
 
-			ChannelInfo channel;
+			IChannelInfo channel;
 			lock (this.channelLock)
 			{
 				this.channels.TryGetValue (msg.ChannelId, out channel);
@@ -191,7 +191,7 @@ namespace Gablarski.Client
 			OnReceivedChannelEditResult (new ChannelEditResultEventArgs (channel, msg.Result));
 		}
 
-		protected internal virtual void OnReceivedChannelList (ReceivedListEventArgs<ChannelInfo> e)
+		protected internal virtual void OnReceivedChannelList (ReceivedListEventArgs<IChannelInfo> e)
 		{
 			var received = this.ReceivedChannelList;
 			if (received != null)
@@ -210,7 +210,7 @@ namespace Gablarski.Client
 	public class ChannelEditResultEventArgs
 		: EventArgs
 	{
-		public ChannelEditResultEventArgs (ChannelInfo channel, ChannelEditResult result)
+		public ChannelEditResultEventArgs (IChannelInfo channel, ChannelEditResult result)
 		{
 			this.Channel = channel;
 			this.Result = result;
@@ -219,7 +219,7 @@ namespace Gablarski.Client
 		/// <summary>
 		/// Gets the channel the edit request was for.
 		/// </summary>
-		public ChannelInfo Channel
+		public IChannelInfo Channel
 		{
 			get;
 			private set;

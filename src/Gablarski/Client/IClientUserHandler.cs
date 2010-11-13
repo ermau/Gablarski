@@ -147,7 +147,7 @@ namespace Gablarski.Client
 		/// </summary>
 		/// <param name="user">The user to move.</param>
 		/// <param name="targetChannel">The target channel to move the user to.</param>
-		void Move (IUserInfo user, ChannelInfo targetChannel);
+		void Move (IUserInfo user, IChannelInfo targetChannel);
 
 		/// <summary>
 		/// Kicks a user to the default channel or from the server.

@@ -72,7 +72,7 @@ namespace Gablarski.Clients.CLI
 			       	: Client.Users.FirstOrDefault (u => u.Nickname.Trim().ToLower() == part.Trim().ToLower());
 		}
 
-		protected ChannelInfo FindChannel (string part)
+		protected IChannelInfo FindChannel (string part)
 		{
 			int channelId;
 			return (Int32.TryParse (part, out channelId))

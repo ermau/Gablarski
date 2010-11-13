@@ -22,7 +22,7 @@ namespace Gablarski.Tests
 		/// <summary>
 		/// Gets the channels in this context
 		/// </summary>
-		public IIndexedEnumerable<int, ChannelInfo> Channels { get; set; }
+		public IIndexedEnumerable<int, IChannelInfo> Channels { get; set; }
 
 		/// <summary>
 		/// Gets the source handler in this context

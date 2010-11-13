@@ -102,7 +102,7 @@ namespace Gablarski.Clients.CLI
 						return true;
 					}
 
-					ChannelInfo channel = FindChannel (parts[2]);
+					IChannelInfo channel = FindChannel (parts[2]);
 
 					if (channel != null)
 						Client.Users.Move (Client.CurrentUser, channel);
@@ -127,7 +127,7 @@ namespace Gablarski.Clients.CLI
 						return true;
 					}
 
-					ChannelInfo channel = FindChannel (parts[3]);
+					IChannelInfo channel = FindChannel (parts[3]);
 					if (channel == null)
 					{
 						Writer.WriteLine ("Channel {0} not found.", parts[3]);

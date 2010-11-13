@@ -332,7 +332,7 @@ namespace Gablarski.Audio
 			return removed;
 		}
 
-		public void BeginCapture (AudioSource source, IEnumerable<ChannelInfo> channels)
+		public void BeginCapture (AudioSource source, IEnumerable<IChannelInfo> channels)
 		{
 			#if DEBUG
 			if (source == null)

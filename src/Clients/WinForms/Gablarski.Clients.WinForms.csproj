@@ -148,6 +148,10 @@
     <Compile Include="AboutForm.Designer.cs">
       <DependentUpon>AboutForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="AdminViewModel.cs" />
+    <Compile Include="AdminWindow.xaml.cs">
+      <DependentUpon>AdminWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="AnonymousCommand.cs" />
     <Compile Include="EditBalloon.cs" />
     <Compile Include="BindingList.xaml.cs">
@@ -372,6 +376,10 @@
     <None Include="Resources\Headphones.ico" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="AdminWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="BindingList.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

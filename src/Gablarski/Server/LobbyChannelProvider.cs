@@ -68,13 +68,13 @@ namespace Gablarski.Server
 			get { return true; }
 		}
 
-		public ChannelInfo DefaultChannel
+		public IChannelInfo DefaultChannel
 		{
 			get;
 			set;
 		}
 
-		public IEnumerable<ChannelInfo> GetChannels ()
+		public IEnumerable<IChannelInfo> GetChannels ()
 		{
 			yield return this.lobby;
 
@@ -82,7 +82,7 @@ namespace Gablarski.Server
 				yield return c;
 		}
 
-		public ChannelEditResult SaveChannel (ChannelInfo channel)
+		public ChannelEditResult SaveChannel (IChannelInfo channel)
 		{
 			lock (this.channels)
 			{
@@ -95,7 +95,7 @@ namespace Gablarski.Server
 					channels.Add (id, new ChannelInfo (id, channel));
 				}
 				else if (channels.ContainsKey (channel.ChannelId))
-					channels[channel.ChannelId] = channel;
+					channels[channel.ChannelId] = new ChannelInfo (channel);
 				else
 					return ChannelEditResult.FailedChannelDoesntExist;
 			}
@@ -104,7 +104,7 @@ namespace Gablarski.Server
 			return ChannelEditResult.Success;
 		}
 
-		public ChannelEditResult DeleteChannel (ChannelInfo channel)
+		public ChannelEditResult DeleteChannel (IChannelInfo channel)
 		{
 			ChannelEditResult result;
 

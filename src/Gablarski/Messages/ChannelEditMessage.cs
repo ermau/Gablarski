@@ -48,19 +48,19 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public ChannelEditMessage (ChannelInfo channel)
+		public ChannelEditMessage (IChannelInfo channel)
 			: this()
 		{
 			if (channel == null)
 				throw new ArgumentNullException ("channel");
 
-			Channel = channel;
+			this.channel = new ChannelInfo (channel);
 		}
 
-		public ChannelInfo Channel
+		public IChannelInfo Channel
 		{
-			get;
-			set;
+			get { return this.channel; }
+			set { this.channel = new ChannelInfo (value); }
 		}
 
 		public bool MakeDefault
@@ -77,16 +77,18 @@ namespace Gablarski.Messages
 
 		public override void WritePayload (IValueWriter writer)
 		{
-			Channel.Serialize (writer);
+			this.channel.Serialize (writer);
 			writer.WriteBool (Delete);
 			writer.WriteBool (MakeDefault);
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
-			Channel = new ChannelInfo (reader);
+			this.channel = new ChannelInfo (reader);
 			Delete = reader.ReadBool ();
 			MakeDefault = reader.ReadBool();
 		}
+
+		private ChannelInfo channel;
 	}
 }

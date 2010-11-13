@@ -114,7 +114,7 @@ namespace Gablarski.Server
 			Manager.Disconnect (predicate);
 		}
 
-		public void Move (IUserInfo user, ChannelInfo channel)
+		public void Move (IUserInfo user, IChannelInfo channel)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
@@ -129,7 +129,7 @@ namespace Gablarski.Server
 			if (realUser == null)
 				return;
 
-			ChannelInfo realChannel = context.Channels[channel.ChannelId];
+			IChannelInfo realChannel = context.Channels[channel.ChannelId];
 			if (realChannel == null)
 				return;
 
@@ -143,7 +143,7 @@ namespace Gablarski.Server
 			this.Send (new UserChangedChannelMessage { ChangeInfo = changeInfo });
 		}
 
-		public void Move (IConnection mover, IUserInfo user, ChannelInfo channel)
+		public void Move (IConnection mover, IUserInfo user, IChannelInfo channel)
 		{
 			if (mover == null)
 				throw new ArgumentNullException ("mover");
@@ -634,7 +634,7 @@ namespace Gablarski.Server
 			                         	? new ChannelChangeInfo (userId, channelId, user.CurrentChannelId, requestingUser.UserId)
 			                         	: new ChannelChangeInfo (userId, channelId, user.CurrentChannelId);
 
-			ChannelInfo channel = this.context.Channels[channelId];
+			IChannelInfo channel = this.context.Channels[channelId];
 			if (channel == null)
 			{
 				if (requester != null)

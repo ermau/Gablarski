@@ -130,7 +130,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void Move()
 		{
-			var altChannel = new ChannelInfo { Name = "Channel 2" };
+			IChannelInfo altChannel = new ChannelInfo { Name = "Channel 2" };
 			context.ChannelsProvider.SaveChannel (altChannel);
 			altChannel = context.ChannelsProvider.GetChannels().Single (c => c.Name == "Channel 2");
 
@@ -970,7 +970,7 @@ namespace Gablarski.Tests
 			var target = JoinAsGuest (server, "target");
 			c1.Client.DequeueAndAssertMessage<UserJoinedMessage>();
 
-			var altChannel = new ChannelInfo { Name = "Channel 2" };
+			IChannelInfo altChannel = new ChannelInfo { Name = "Channel 2" };
 			context.ChannelsProvider.SaveChannel (altChannel);
 			c1.Client.DequeueAndAssertMessage<ChannelListMessage>();
 			server.Client.DequeueAndAssertMessage<ChannelListMessage>();

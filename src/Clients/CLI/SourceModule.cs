@@ -144,7 +144,7 @@ namespace Gablarski.Clients.CLI
 					{
 						lastTalkedId = source.Id;
 
-						ChannelInfo channel = null;
+						IChannelInfo channel = null;
 						if (parts.Count == 4)
 						{
 							int channelId;

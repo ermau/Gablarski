@@ -54,7 +54,7 @@ namespace Gablarski.LocalServer
 			get { return true; }
 		}
 
-		public ChannelInfo DefaultChannel
+		public IChannelInfo DefaultChannel
 		{
 			get
 			{
@@ -91,13 +91,13 @@ namespace Gablarski.LocalServer
 			}
 		}
 
-		public IEnumerable<ChannelInfo> GetChannels()
+		public IEnumerable<IChannelInfo> GetChannels()
 		{
 			using (ISession session = Persistance.SessionFactory.OpenSession())
-				return session.Linq<LocalChannelInfo>().Cast<ChannelInfo>().ToList();
+				return session.Linq<LocalChannelInfo>().Cast<IChannelInfo>().ToList();
 		}
 
-		public ChannelEditResult SaveChannel (ChannelInfo channel)
+		public ChannelEditResult SaveChannel (IChannelInfo channel)
 		{
 			if (channel == null)
 				throw new ArgumentNullException ("channel");
@@ -129,7 +129,7 @@ namespace Gablarski.LocalServer
 			return ChannelEditResult.Success;
 		}
 
-		public ChannelEditResult DeleteChannel (ChannelInfo channel)
+		public ChannelEditResult DeleteChannel (IChannelInfo channel)
 		{
 			if (channel == null)
 				throw new ArgumentNullException ("channel");

@@ -131,7 +131,7 @@ namespace Gablarski.Client
 		/// </summary>
 		/// <param name="user">The user to move.</param>
 		/// <param name="targetChannel">The target channel to move the user to.</param>
-		public void Move (IUserInfo user, ChannelInfo targetChannel)
+		public void Move (IUserInfo user, IChannelInfo targetChannel)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
@@ -483,7 +483,7 @@ namespace Gablarski.Client
 	public class ChannelChangedEventArgs
 		: UserEventArgs
 	{
-		public ChannelChangedEventArgs (IUserInfo target, ChannelInfo targetChannel, ChannelInfo previousChannel, IUserInfo movedBy)
+		public ChannelChangedEventArgs (IUserInfo target, IChannelInfo targetChannel, IChannelInfo previousChannel, IUserInfo movedBy)
 			: base (target)
 		{
 			if (targetChannel == null)
@@ -497,7 +497,7 @@ namespace Gablarski.Client
 		/// <summary>
 		/// Gets the channel the user is being moved to.
 		/// </summary>
-		public ChannelInfo TargetChannel
+		public IChannelInfo TargetChannel
 		{
 			get; private set;
 		}
@@ -505,7 +505,7 @@ namespace Gablarski.Client
 		/// <summary>
 		/// Gets the channel the user is being moved from.
 		/// </summary>
-		public ChannelInfo PreviousChannel
+		public IChannelInfo PreviousChannel
 		{
 			get;
 			private set;

@@ -41,6 +41,7 @@ using System.Linq;
 namespace Gablarski
 {
 	public class ChannelInfo
+		: IChannelInfo
 	{
 		public ChannelInfo ()
 			: this (0)
@@ -60,7 +61,7 @@ namespace Gablarski
 			this.ChannelId = channelId;
 		}
 
-		public ChannelInfo (ChannelInfo channelInfo)
+		public ChannelInfo (IChannelInfo channelInfo)
 		{
 			if (channelInfo == null)
 				throw new ArgumentNullException ("channelInfo");
@@ -73,7 +74,7 @@ namespace Gablarski
 			ReadOnly = channelInfo.ReadOnly;
 		}
 
-		public ChannelInfo (int channelId, ChannelInfo channelInfo)
+		public ChannelInfo (int channelId, IChannelInfo channelInfo)
 			: this (channelId)
 		{
 			if (channelInfo == null)

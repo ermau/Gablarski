@@ -106,7 +106,7 @@ namespace Gablarski.Tests
 				new ChannelInfo (ChannelId2)
 			};
 
-			var msg = new ChannelListMessage (channels, channels[0]);
+			var msg = new ChannelListMessage (channels.Cast<IChannelInfo>(), channels[0]);
 			Assert.AreEqual(1, msg.Channels.Count (c => c.ChannelId.Equals (channels[0].ChannelId) && c.ReadOnly == channels[0].ReadOnly));
 			Assert.AreEqual(1, msg.Channels.Count (c => c.ChannelId.Equals (channels[1].ChannelId) && c.ReadOnly == channels[1].ReadOnly));
 			msg.WritePayload (writer);

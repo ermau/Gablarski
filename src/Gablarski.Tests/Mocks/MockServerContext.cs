@@ -38,6 +38,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Gablarski.Server;
 
 namespace Gablarski.Tests.Mocks
@@ -45,9 +46,9 @@ namespace Gablarski.Tests.Mocks
 	public class MockServerContext
 		: IServerContext
 	{
-		public object SyncRoot
+		public ReaderWriterLockSlim Synchronization
 		{
-			get { return syncRoot; }
+			get { return this.syncRoot; }
 		}
 
 		public IUserProvider UserProvider
@@ -120,6 +121,6 @@ namespace Gablarski.Tests.Mocks
 			set;
 		}
 
-		private readonly object syncRoot = new object();
+		private readonly ReaderWriterLockSlim syncRoot = new ReaderWriterLockSlim();
 	}
 }

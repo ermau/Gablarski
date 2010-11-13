@@ -49,7 +49,7 @@ namespace Gablarski.Messages
 		{
 		}
 
-		public ChannelEditResultMessage (ChannelInfo channel, ChannelEditResult result)
+		public ChannelEditResultMessage (IChannelInfo channel, ChannelEditResult result)
 			: this ()
 		{
 			this.ChannelId = channel.ChannelId;

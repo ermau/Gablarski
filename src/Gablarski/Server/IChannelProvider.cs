@@ -61,25 +61,25 @@ namespace Gablarski.Server
 		/// <remarks>
 		/// If no default channel is set or supported, the first channel returned from GetChannels will be used.
 		/// </remarks>
-		ChannelInfo DefaultChannel { get; set; }
+		IChannelInfo DefaultChannel { get; set; }
 
 		/// <summary>
 		/// Gets a listing channels from the underlying source.
 		/// </summary>
 		/// <returns>The listing of channels.</returns>
-		IEnumerable<ChannelInfo> GetChannels ();
+		IEnumerable<IChannelInfo> GetChannels ();
 
 		/// <summary>
 		/// Creates or updates the <paramref name="channel"/>.
 		/// </summary>
 		/// <param name="channel">The channel to create or update.</param>
-		ChannelEditResult SaveChannel (ChannelInfo channel);
+		ChannelEditResult SaveChannel (IChannelInfo channel);
 
 		/// <summary>
 		/// Deletes the <paramref name="channel"/>.
 		/// </summary>
 		/// <param name="channel">The channel to delete.</param>
-		ChannelEditResult DeleteChannel (ChannelInfo channel);
+		ChannelEditResult DeleteChannel (IChannelInfo channel);
 	}
 
 	public static class ChannelProviderExtensions
@@ -89,7 +89,7 @@ namespace Gablarski.Server
 		/// </summary>
 		/// <param name="self">The <c>IChannelProvider</c> to retrieve the channels from.</param>
 		/// <returns>The default channel, the first channel if no default set or <c>null</c> if no channels.</returns>
-		public static ChannelInfo GetDefaultOrFirst (this IChannelProvider self)
+		public static IChannelInfo GetDefaultOrFirst (this IChannelProvider self)
 		{
 			return (self.DefaultChannel ?? self.GetChannels ().FirstOrDefault ());
 		}

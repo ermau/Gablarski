@@ -146,19 +146,19 @@ namespace Gablarski.OpenAL.Providers
 				if (data.Length == 0)
 					return;
 
-				if (!source.IsPlaying)
-				{
-					OpenAL.DebugFormat ("{0} bound to {1} isn't playing, inserting silent buffers", audioSource, source);
+				//if (!source.IsPlaying)
+				//{
+				//    OpenAL.DebugFormat ("{0} bound to {1} isn't playing, inserting silent buffers", audioSource, source);
 
-					RequireBuffers (bufferStack, source, bufferLen);
-					for (int i = 0; i < bufferLen; ++i)
-					{
-						OpenALAudioFormat format = audioSource.ToOpenALFormat();
-						SourceBuffer wait = bufferStack.Pop();
-						wait.Buffer (new byte[format.GetBytesPerSample()], format, (uint)audioSource.SampleRate);
-						source.QueueAndPlay (wait);
-					}
-				}
+				//    RequireBuffers (bufferStack, source, bufferLen);
+				//    for (int i = 0; i < bufferLen; ++i)
+				//    {
+				//        OpenALAudioFormat format = audioSource.ToOpenALFormat();
+				//        SourceBuffer wait = bufferStack.Pop();
+				//        wait.Buffer (new byte[format.GetBytesPerSample()], format, (uint)audioSource.SampleRate);
+				//        source.QueueAndPlay (wait);
+				//    }
+				//}
 
 				RequireBuffers (bufferStack, source, 1);
 				SourceBuffer buffer = bufferStack.Pop();

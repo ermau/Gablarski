@@ -111,7 +111,7 @@ namespace Gablarski.Clients.Windows
 			this.EndUpdate();
 		}
 
-		public void AddChannel (ChannelInfo channel)
+		public void AddChannel (IChannelInfo channel)
 		{
 			if (channel == null)
 				return;
@@ -389,11 +389,11 @@ namespace Gablarski.Clients.Windows
 			SetupUserContext (node);
 		}
 
-		public void Update (IEnumerable<ChannelInfo> channels, IEnumerable<IUserInfo> users, IEnumerable<AudioSource> sources)
+		public void Update (IEnumerable<IChannelInfo> channels, IEnumerable<IUserInfo> users, IEnumerable<AudioSource> sources)
 		{
 			if (InvokeRequired)
 			{
-				BeginInvoke ((Action<IEnumerable<ChannelInfo>, IEnumerable<IUserInfo>, IEnumerable<AudioSource>>)Update, channels, users, sources);
+				BeginInvoke ((Action<IEnumerable<IChannelInfo>, IEnumerable<IUserInfo>, IEnumerable<AudioSource>>)Update, channels, users, sources);
 				return;
 			}
 
@@ -426,7 +426,7 @@ namespace Gablarski.Clients.Windows
 		}
 
 		private TreeNode serverNode;
-		private readonly Dictionary<ChannelInfo, TreeNode> channelNodes = new Dictionary<ChannelInfo, TreeNode>();
+		private readonly Dictionary<IChannelInfo, TreeNode> channelNodes = new Dictionary<IChannelInfo, TreeNode>();
 		private readonly Dictionary<IUserInfo, TreeNode> userNodes = new Dictionary<IUserInfo, TreeNode>();
 		private readonly Dictionary<AudioSource, TreeNode> sourceNodes = new Dictionary<AudioSource, TreeNode>();
 
@@ -494,7 +494,7 @@ namespace Gablarski.Clients.Windows
 			Client.Users.Move (Client.CurrentUser, channel);
 		}
 
-		private void AddChannels (IEnumerable<ChannelInfo> channels, ChannelInfo parent)
+		private void AddChannels (IEnumerable<IChannelInfo> channels, IChannelInfo parent)
 		{
 			foreach (var c in channels.Where (c => c.ParentChannelId == parent.ChannelId))
 			{
@@ -510,7 +510,7 @@ namespace Gablarski.Clients.Windows
 
 		private void ContextEditChannelClick (object sender, EventArgs e)
 		{
-			ChannelForm editChannel = new ChannelForm (this.SelectedNode.Tag as ChannelInfo);
+			ChannelForm editChannel = new ChannelForm (this.SelectedNode.Tag as IChannelInfo);
 			if (editChannel.ShowDialog() == DialogResult.OK)
 				Client.Channels.Update (editChannel.Channel);
 		}

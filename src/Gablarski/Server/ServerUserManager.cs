@@ -122,7 +122,7 @@ namespace Gablarski.Server
 			return false;
 		}
 
-		public void Move (IUserInfo user, ChannelInfo channel)
+		public void Move (IUserInfo user, IChannelInfo channel)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");

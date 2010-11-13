@@ -44,6 +44,8 @@ namespace Gablarski.Messages
 	public class QueryServerResultMessage
 		: ServerMessage
 	{
+		private List<ChannelInfo> channels;
+
 		public QueryServerResultMessage()
 			: base (ServerMessageType.QueryServerResult)
 		{
@@ -59,9 +61,10 @@ namespace Gablarski.Messages
 			get; set;
 		}
 
-		public IEnumerable<ChannelInfo> Channels
+		public IEnumerable<IChannelInfo> Channels
 		{
-			get; set;
+			get { return this.channels.Cast<IChannelInfo>(); }
+			set { this.channels = value.Select (c => new ChannelInfo (c)).ToList(); }
 		}
 
 		public ServerInfo ServerInfo
@@ -85,7 +88,7 @@ namespace Gablarski.Messages
 			if (this.Channels != null)
 			{
 				writer.WriteInt32 (this.Channels.Count());
-				foreach (var c in this.Channels)
+				foreach (var c in this.channels)
 					c.Serialize (writer);
 			}
 			else
@@ -102,11 +105,10 @@ namespace Gablarski.Messages
 			
 			this.Users = users;
 
-			ChannelInfo[] channels = new ChannelInfo[reader.ReadInt32()];
-			for (int i = 0; i < channels.Length; ++i)
-				channels[i] = new ChannelInfo(reader);
-
-			this.Channels = channels;
+			int nchannels = reader.ReadInt32();
+			this.channels = new List<ChannelInfo> (nchannels);
+			for (int i = 0; i < nchannels; ++i)
+				this.channels.Add (new ChannelInfo (reader));
 
 			this.ServerInfo = new ServerInfo (reader);
 		}

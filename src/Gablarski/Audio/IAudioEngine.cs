@@ -259,7 +259,7 @@ namespace Gablarski.Audio
 		/// <param name="source"></param>
 		/// <param name="channels"></param>
 		/// <exception cref="ArgumentNullException"><paramref name="source"/> or <paramref name="channels"/> are <c>null</c>.</exception>
-		void BeginCapture (AudioSource source, IEnumerable<ChannelInfo> channels);
+		void BeginCapture (AudioSource source, IEnumerable<IChannelInfo> channels);
 		/// <exception cref="ArgumentNullException"><paramref name="source"/> or <paramref name="users"/> are <c>null</c>.</exception>
 		void BeginCapture (AudioSource source, IEnumerable<IUserInfo> users);
 		
@@ -268,7 +268,7 @@ namespace Gablarski.Audio
 
 	public static class AudioEngineExtensions
 	{
-		public static void BeginCapture (this IAudioEngine self, AudioSource source, ChannelInfo channel)
+		public static void BeginCapture (this IAudioEngine self, AudioSource source, IChannelInfo channel)
 		{
 			if (self == null)
 				throw new ArgumentNullException ("self");

@@ -45,7 +45,7 @@ namespace Gablarski.Tests
 	[TestFixture]
 	public class ChannelInfoTests
 	{
-		public static void AssertChanelsAreEqual (ChannelInfo expected, ChannelInfo actual)
+		public static void AssertChanelsAreEqual (IChannelInfo expected, IChannelInfo actual)
 		{
 			Assert.AreEqual (expected.ChannelId, actual.ChannelId);
 			Assert.AreEqual (expected.ParentChannelId, actual.ParentChannelId);

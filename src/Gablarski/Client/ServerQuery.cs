@@ -77,7 +77,7 @@ namespace Gablarski.Client
 			private set;
 		}
 
-		public IEnumerable<ChannelInfo> Channels
+		public IEnumerable<IChannelInfo> Channels
 		{
 			get;
 			private set;

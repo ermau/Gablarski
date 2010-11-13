@@ -675,7 +675,7 @@ namespace Gablarski.Clients.Windows
 			}
 		}
 
-		private void ChannelsReceivedChannelList (object sender, ReceivedListEventArgs<ChannelInfo> e)
+		private void ChannelsReceivedChannelList (object sender, ReceivedListEventArgs<IChannelInfo> e)
 		{
 			this.users.Update (e.Data, this.gablarski.Users, this.gablarski.Sources);
 		}

@@ -174,7 +174,7 @@ namespace Gablarski.Client
 		/// <summary>
 		/// Gets the current channel the user is in.
 		/// </summary>
-		public ChannelInfo CurrentChannel
+		public IChannelInfo CurrentChannel
 		{
 			get { return this.Channels[this.CurrentUser.CurrentChannelId]; }
 		}
@@ -297,7 +297,7 @@ namespace Gablarski.Client
 		}
 		#endregion
 
-		IIndexedEnumerable<int, ChannelInfo> IClientContext.Channels
+		IIndexedEnumerable<int, IChannelInfo> IClientContext.Channels
 		{
 			get { return this.Channels; }
 		}
@@ -540,7 +540,7 @@ namespace Gablarski.Client
 			if (e.Result != LoginResultState.Success)
 				return;
 
-			ChannelInfo channel = this.Channels[this.disconnectedInChannelId];
+			IChannelInfo channel = this.Channels[this.disconnectedInChannelId];
 			if (channel != null)
 				this.Users.Move (this.CurrentUser, channel);
 

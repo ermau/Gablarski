@@ -119,6 +119,7 @@
     <Compile Include="Client\ICurrentUserHandler.cs" />
     <Compile Include="Client\ServerQuery.cs" />
     <Compile Include="Encryption.cs" />
+    <Compile Include="IChannelInfo.cs" />
     <Compile Include="IConnectionHandler.cs" />
     <Compile Include="IEncryption.cs" />
     <Compile Include="IIndexedEnumerable.cs" />

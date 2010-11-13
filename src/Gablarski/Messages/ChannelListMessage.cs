@@ -50,7 +50,7 @@ namespace Gablarski.Messages
 
 		}
 
-		public ChannelListMessage (IEnumerable<ChannelInfo> channels, ChannelInfo defaultChannel)
+		public ChannelListMessage (IEnumerable<IChannelInfo> channels, IChannelInfo defaultChannel)
 			: this()
 		{
 			if (channels == null)
@@ -90,10 +90,10 @@ namespace Gablarski.Messages
 		/// <summary>
 		/// Gets or sets the channels in the message, <c>null</c> if request failed.
 		/// </summary>
-		public IEnumerable<ChannelInfo> Channels
+		public IEnumerable<IChannelInfo> Channels
 		{
-			get;
-			set;
+			get { return this.channels.Cast<IChannelInfo>(); }
+			set { this.channels = value.Select (c => new ChannelInfo (c)).ToList(); }
 		}
 
 		public override void WritePayload (IValueWriter writer)
@@ -105,7 +105,7 @@ namespace Gablarski.Messages
 			writer.WriteInt32 (DefaultChannelId);
 
 			writer.WriteInt32 (this.Channels.Count ());
-			foreach (var c in this.Channels)
+			foreach (var c in this.channels)
 				c.Serialize (writer);
 		}
 
@@ -116,12 +116,13 @@ namespace Gablarski.Messages
 				return;
 
 			DefaultChannelId = reader.ReadInt32();
-			
-			ChannelInfo[] channels = new ChannelInfo[reader.ReadInt32 ()];
-			for (int i = 0; i < channels.Length; ++i)
-				channels[i] = new ChannelInfo (reader);
 
-			this.Channels = channels;
+			int nchannels = reader.ReadInt32();
+			this.channels = new List<ChannelInfo> (nchannels);
+			for (int i = 0; i < nchannels; ++i)
+				this.channels.Add (new ChannelInfo (reader));
 		}
+		
+		private List<ChannelInfo> channels;
 	}
 }

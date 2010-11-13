@@ -126,7 +126,7 @@ namespace Gablarski.Server
 			return GetPermission (self, name, user.CurrentChannelId, user.UserId);
 		}
 
-		public static bool GetPermission (this IServerContext self, PermissionName name, ChannelInfo channel, IConnection connection)
+		public static bool GetPermission (this IServerContext self, PermissionName name, IChannelInfo channel, IConnection connection)
 		{
 			if (self == null)
 				throw new ArgumentNullException ("self");
@@ -142,7 +142,7 @@ namespace Gablarski.Server
 			return GetPermission (self, name, channel.ChannelId, user.UserId);
 		}
 
-		public static bool GetPermission (this IServerContext self, PermissionName name, ChannelInfo channel, IUserInfo user)
+		public static bool GetPermission (this IServerContext self, PermissionName name, IChannelInfo channel, IUserInfo user)
 		{
 			if (channel == null)
 				throw new ArgumentNullException ("channel");

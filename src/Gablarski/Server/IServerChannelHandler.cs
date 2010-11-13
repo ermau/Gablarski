@@ -39,7 +39,7 @@ using System.Linq;
 namespace Gablarski.Server
 {
 	public interface IServerChannelHandler
-		: IIndexedEnumerable<int, ChannelInfo>
+		: IIndexedEnumerable<int, IChannelInfo>
 	{
 	}
 }
