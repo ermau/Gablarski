@@ -59,24 +59,25 @@ namespace Gablarski.Messages
 
 		public IEnumerable<IUserInfo> Users
 		{
-			get;
-			set;
+			get { return this.users.Cast<IUserInfo>(); }
+			set { this.users = value.Select (u => new UserInfo (u)).ToList(); }
 		}
 
 		public override void WritePayload (IValueWriter writer)
 		{
-			writer.WriteInt32 (this.Users.Count());
-			foreach (var info in this.Users)
+			writer.WriteInt32 (this.users.Count);
+			foreach (var info in this.users)
 				info.Serialize (writer);
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
-			UserInfo[] users = new UserInfo[reader.ReadInt32()];
-			for (int i = 0; i < users.Length; ++i)
-				users[i] = new UserInfo (reader);
-
-			this.Users = users;
+			int nusers = reader.ReadInt32();
+			this.users = new List<UserInfo> (nusers);
+			for (int i = 0; i < nusers; ++i)
+				this.users.Add (new UserInfo (reader));
 		}
+
+		private List<UserInfo> users;
 	}
 }

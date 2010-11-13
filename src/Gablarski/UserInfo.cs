@@ -75,6 +75,7 @@ namespace Gablarski
 			CurrentChannelId = info.CurrentChannelId;
 			IsMuted = info.IsMuted;
 			Status = info.Status;
+			Comment = info.Comment;
 		}
 		
 		internal UserInfo (string nickname, string username, int userId, int currentChannelId, bool muted)
@@ -153,7 +154,7 @@ namespace Gablarski
 			if (reader == null)
 				throw new ArgumentNullException("reader");
 
-			((IUserInfo)this).Deserialize (reader);
+			Deserialize (reader);
 		}
 
 		public int UserId
@@ -227,7 +228,7 @@ namespace Gablarski
 			protected set;
 		}
 
-		void IUserInfo.Serialize (IValueWriter writer)
+		public void Serialize (IValueWriter writer)
 		{
 			writer.WriteInt32 (UserId);
 			writer.WriteString (Username);
@@ -239,7 +240,7 @@ namespace Gablarski
 			writer.WriteString (Comment);
 		}
 
-		void IUserInfo.Deserialize (IValueReader reader)
+		public void Deserialize (IValueReader reader)
 		{
 			UserId = reader.ReadInt32();
 			Username = reader.ReadString();

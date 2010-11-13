@@ -90,7 +90,7 @@ namespace Gablarski.Tests
 			var writer = new StreamValueWriter (stream);
 			var reader = new StreamValueReader (stream);
 
-			IUserInfo info = new UserInfo (Nickname, Phonetic, Username, UserId, ChanId, Muted, Comment, Status);
+			var info = new UserInfo (Nickname, Phonetic, Username, UserId, ChanId, Muted, Comment, Status);
 
 			info.Serialize (writer);
 			long length = stream.Position;

@@ -50,18 +50,22 @@ namespace Gablarski.Messages
 			: this()
 		{
 			this.Result = state;
-			this.UserInfo = user;
+
+			if (user != null)
+				UserInfo = user;
 		}
 
 		public LoginResultState Result
 		{
 			get; set;
 		}
-		
+
+		private UserInfo user;
+
 		public IUserInfo UserInfo
 		{
-			get;
-			set;
+			get { return this.user; }
+			set { this.user = new UserInfo (value); }
 		}
 
 		#region Overrides of MessageBase
@@ -70,8 +74,8 @@ namespace Gablarski.Messages
 		{
 			writer.WriteInt32 ((int)this.Result);
 			
-			if (this.UserInfo != null)
-				this.UserInfo.Serialize (writer);
+			if (this.user != null)
+				this.user.Serialize (writer);
 		}
 
 		public override void ReadPayload (IValueReader reader)

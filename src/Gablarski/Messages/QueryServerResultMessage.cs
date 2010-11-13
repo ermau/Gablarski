@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2010, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -33,19 +33,14 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
-
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Gablarski.Messages
 {
 	public class QueryServerResultMessage
 		: ServerMessage
 	{
-		private List<ChannelInfo> channels;
-
 		public QueryServerResultMessage()
 			: base (ServerMessageType.QueryServerResult)
 		{
@@ -58,7 +53,8 @@ namespace Gablarski.Messages
 
 		public IEnumerable<IUserInfo> Users
 		{
-			get; set;
+			get { return this.users.Cast<IUserInfo>(); }
+			set { this.users = value.Select (u => new UserInfo (u)).ToList(); }
 		}
 
 		public IEnumerable<IChannelInfo> Channels
@@ -72,14 +68,12 @@ namespace Gablarski.Messages
 			get; set;
 		}
 
-		#region Overrides of MessageBase
-
-		public override void WritePayload(IValueWriter writer)
+		public override void WritePayload (IValueWriter writer)
 		{
 			if (this.Users != null)
 			{
-				writer.WriteInt32 (this.Users.Count());
-				foreach (var u in this.Users)
+				writer.WriteInt32 (this.users.Count);
+				foreach (var u in this.users)
 					u.Serialize (writer);
 			}
 			else
@@ -97,14 +91,13 @@ namespace Gablarski.Messages
 			this.ServerInfo.Serialize (writer);
 		}
 
-		public override void ReadPayload(IValueReader reader)
+		public override void ReadPayload (IValueReader reader)
 		{
-			UserInfo[] users = new UserInfo[reader.ReadInt32()];
-			for (int i = 0; i < users.Length; ++i)
-				users[i] = new UserInfo(reader);
+			int nusers = reader.ReadInt32();
+			this.users = new List<UserInfo> (nusers);
+			for (int i = 0; i < nusers; ++i)
+				this.users.Add (new UserInfo (reader));
 			
-			this.Users = users;
-
 			int nchannels = reader.ReadInt32();
 			this.channels = new List<ChannelInfo> (nchannels);
 			for (int i = 0; i < nchannels; ++i)
@@ -113,6 +106,7 @@ namespace Gablarski.Messages
 			this.ServerInfo = new ServerInfo (reader);
 		}
 
-		#endregion
+		private List<ChannelInfo> channels;
+		private List<UserInfo> users;
 	}
 }

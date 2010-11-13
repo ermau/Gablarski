@@ -77,8 +77,5 @@ namespace Gablarski
 		/// Gets the user's current comment.
 		/// </summary>
 		string Comment { get; }
-
-		void Serialize (IValueWriter writer);
-		void Deserialize (IValueReader reader);
 	}
 }

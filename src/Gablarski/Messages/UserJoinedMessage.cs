@@ -55,21 +55,23 @@ namespace Gablarski.Messages
 
 			this.UserInfo = userInfo;
 		}
-
+		
 		public IUserInfo UserInfo
 		{
-			get;
-			set;
+			get { return this.user; }
+			set { this.user = new UserInfo (value); }
 		}
 
 		public override void WritePayload (IValueWriter writer)
 		{
-			this.UserInfo.Serialize (writer);
+			this.user.Serialize (writer);
 		}
 
 		public override void ReadPayload (IValueReader reader)
 		{
-			this.UserInfo = new UserInfo (reader);
+			this.user = new UserInfo (reader);
 		}
+
+		private UserInfo user;
 	}
 }
