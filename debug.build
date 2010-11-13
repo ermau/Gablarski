@@ -88,12 +88,13 @@
 			<arg value='-r=\${gablarski.config}\' />
 		</exec>
 		
-		<exec program="${DotNetFramework3.5_x86_Path}\msbuild.exe">
+		<exec program="${DotNetFramework4.0_x86_Path}\msbuild.exe">
 			<arg value='/property:Configuration="${gablarski.config}";Platform="x86"' />
 			<arg value="Gablarski.sln" />
 		</exec>
 
-		<exec program="C:\Program Files (x86)\NUnit 2.5.1\bin\net-2.0\nunit-console.exe">
+		<exec program="C:\Program Files (x86)\NUnit 2.5.8\bin\net-2.0\nunit-console.exe">
+			<arg value="/framework=4.0.30319" />
 			<arg value="/xml:gablarski-tests.xml" />
 			<arg value="src\Gablarski.Tests\bin\${gablarski.config}\Gablarski.Tests.dll" />
 		</exec>
