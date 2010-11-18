@@ -200,6 +200,7 @@
     <Compile Include="Server\IServerSourceManager.cs" />
     <Compile Include="Server\IServerUserHandler.cs" />
     <Compile Include="Server\IServerUserManager.cs" />
+    <Compile Include="Server\ISettingsProvider.cs" />
     <Compile Include="Server\RegisterResult.cs" />
     <Compile Include="Server\ServerChannelHandler.cs" />
     <Compile Include="Server\ServerSourceHandler.cs" />
@@ -207,6 +208,7 @@
     <Compile Include="AudioSourceManager.cs" />
     <Compile Include="Server\ServerUserHandler.cs" />
     <Compile Include="Server\ServerUserManager.cs" />
+    <Compile Include="ISetting.cs" />
     <Compile Include="UserEqualityComparer.cs" />
     <Compile Include="UserInfo.cs" />
     <Compile Include="ServerInfo.cs" />
