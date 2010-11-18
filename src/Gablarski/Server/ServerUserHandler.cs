@@ -52,6 +52,20 @@ namespace Gablarski.Server
 			this.context = context;
 			this.Manager = manager;
 			this.log = LogManager.GetLogger (context.Settings.Name.Remove (" ") + ".ServerUserHandler");
+
+			this.context.RegisterMessageHandler (ClientMessageType.Connect, ConnectMessage);
+			this.context.RegisterMessageHandler (ClientMessageType.Login, LoginMessage);
+			this.context.RegisterMessageHandler (ClientMessageType.Join, JoinMessage);
+			this.context.RegisterMessageHandler (ClientMessageType.SetComment, SetCommentMessage);
+			this.context.RegisterMessageHandler (ClientMessageType.SetStatus, SetStatusMessage);
+			this.context.RegisterMessageHandler (ClientMessageType.SetPermissions, SetPermissionsMessage);
+			this.context.RegisterMessageHandler (ClientMessageType.KickUser, KickUserMessage);
+			this.context.RegisterMessageHandler (ClientMessageType.Register, RegisterMessage);
+			this.context.RegisterMessageHandler (ClientMessageType.RegistrationApproval, RegistrationApprovalMessage);
+			this.context.RegisterMessageHandler (ClientMessageType.BanUser, BanUserMessage);
+			this.context.RegisterMessageHandler (ClientMessageType.RequestMuteUser, RequestMuteUserMessage);
+			this.context.RegisterMessageHandler (ClientMessageType.RequestUserList, RequestUserListMessage);
+			this.context.RegisterMessageHandler (ClientMessageType.ChannelChange, ChannelChangeMessage);
 		}
 
 		public IUserInfo this[int userId]

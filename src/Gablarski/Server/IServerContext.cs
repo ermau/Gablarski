@@ -36,6 +36,7 @@
 
 using System;
 using System.Collections.Generic;
+using Gablarski.Messages;
 
 namespace Gablarski.Server
 {
@@ -95,6 +96,14 @@ namespace Gablarski.Server
 		/// Gets the settings for this server.
 		/// </summary>
 		ServerSettings Settings { get; }
+
+		/// <summary>
+		/// Registers a message handler.
+		/// </summary>
+		/// <param name="messageType">The message type to register a handler for.</param>
+		/// <param name="handler">The handler to register for the message type.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="handler"/> is <c>null</c>.</exception>
+		void RegisterMessageHandler (ClientMessageType messageType, Action<MessageReceivedEventArgs> handler);
 	}
 
 	public static class ServerContextExtensions

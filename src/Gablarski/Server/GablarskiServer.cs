@@ -35,9 +35,11 @@
 // DAMAGE.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Cadenza.Collections;
 using Gablarski.Messages;
 using Cadenza;
 using log4net;
@@ -197,6 +199,15 @@ namespace Gablarski.Server
 
 			this.users.Disconnect (c => true);
 		}
+
+		public void RegisterMessageHandler (ClientMessageType messageType, Action<MessageReceivedEventArgs> handler)
+		{
+			if (handler == null)
+				throw new ArgumentNullException ("handler");
+
+			this.handlers.Add (messageType, handler);
+		}
+
 		#endregion
 
 		private readonly ServerSettings settings;
@@ -216,7 +227,7 @@ namespace Gablarski.Server
 
 		protected readonly ILog Log;
 
-		private Dictionary<ClientMessageType, Action<MessageReceivedEventArgs>> handlers;
+		private readonly MutableLookup<ClientMessageType, Action<MessageReceivedEventArgs>> handlers = new MutableLookup<ClientMessageType, Action<MessageReceivedEventArgs>>();
 		private Dictionary<ClientMessageType, Action<IEnumerable<MessageReceivedEventArgs>>> setHandlers;
 
 		private readonly Thread messageRunnerThread;
@@ -296,39 +307,8 @@ namespace Gablarski.Server
 			var channelHandler = new ServerChannelHandler (this);
 			this.channels = channelHandler;
 
-			this.handlers = new Dictionary<ClientMessageType, Action<MessageReceivedEventArgs>>
-			{
-				{ ClientMessageType.Connect, userHandler.ConnectMessage },
-				{ ClientMessageType.Disconnect, ClientDisconnected },
-				{ ClientMessageType.Login, userHandler.LoginMessage },
-				{ ClientMessageType.Join, userHandler.JoinMessage },
-				{ ClientMessageType.SetComment, userHandler.SetCommentMessage },
-				{ ClientMessageType.SetStatus, userHandler.SetStatusMessage },
-				{ ClientMessageType.SetPermissions, userHandler.SetPermissionsMessage},
-				{ ClientMessageType.KickUser, userHandler.KickUserMessage },
-				{ ClientMessageType.Register, userHandler.RegisterMessage },
-				{ ClientMessageType.RegistrationApproval, userHandler.RegistrationApprovalMessage },
-				{ ClientMessageType.BanUser, userHandler.BanUserMessage },
-
-				{ ClientMessageType.RequestSource, sourceHandler.RequestSourceMessage },
-				{ ClientMessageType.AudioData, sourceHandler.SendAudioDataMessage },
-				{ ClientMessageType.ClientAudioSourceStateChange, sourceHandler.ClientAudioSourceStateChangeMessage },
-				{ ClientMessageType.RequestMuteUser, userHandler.RequestMuteUserMessage },
-				{ ClientMessageType.RequestMuteSource, sourceHandler.RequestMuteSourceMessage },
-
-				{ ClientMessageType.QueryServer, ClientQueryServer },
-				{ ClientMessageType.RequestChannelList, channelHandler.RequestChanneListMessage },
-				{ ClientMessageType.RequestUserList, userHandler.RequestUserListMessage },
-				{ ClientMessageType.RequestSourceList, sourceHandler.RequestSourceListMessage },
-
-				{ ClientMessageType.ChannelChange, userHandler.ChannelChangeMessage },
-				{ ClientMessageType.ChannelEdit, channelHandler.ChannelEditMessage },
-			};
-
-			this.setHandlers = new Dictionary<ClientMessageType, Action<IEnumerable<MessageReceivedEventArgs>>>
-			{
-				{ ClientMessageType.AudioData, sourceHandler.SendAudioDataMessage }
-			};
+			RegisterMessageHandler (ClientMessageType.Disconnect, ClientDisconnected);
+			RegisterMessageHandler (ClientMessageType.QueryServer, ClientQueryServer);
 		}
 
 		private void MessageRunner ()
@@ -380,9 +360,12 @@ namespace Gablarski.Server
 					}
 					else
 					{
-						Action<MessageReceivedEventArgs> handler;
-						if (this.handlers.TryGetValue (msg.MessageType, out handler))
-							handler (e);
+						IEnumerable<Action<MessageReceivedEventArgs>> ehandlers;
+						if (this.handlers.TryGetValues (msg.MessageType, out ehandlers))
+						{
+							foreach (var handler in ehandlers)
+								handler (e);
+						}
 					}
 				}
 			}

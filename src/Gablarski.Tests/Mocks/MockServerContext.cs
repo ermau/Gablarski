@@ -39,6 +39,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Gablarski.Messages;
 using Gablarski.Server;
 
 namespace Gablarski.Tests.Mocks
@@ -113,6 +114,10 @@ namespace Gablarski.Tests.Mocks
 		{
 			get;
 			set;
+		}
+
+		public void RegisterMessageHandler (ClientMessageType messageType, Action<MessageReceivedEventArgs> handler)
+		{
 		}
 
 		public PublicRSAParameters EncryptionParameters

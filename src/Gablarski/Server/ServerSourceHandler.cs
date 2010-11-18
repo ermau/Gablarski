@@ -58,6 +58,12 @@ namespace Gablarski.Server
 
 			this.context = context;
 			this.manager = manager;
+
+			this.context.RegisterMessageHandler (ClientMessageType.RequestSource, RequestSourceMessage);
+			this.context.RegisterMessageHandler (ClientMessageType.AudioData, SendAudioDataMessage);
+			this.context.RegisterMessageHandler (ClientMessageType.ClientAudioSourceStateChange, ClientAudioSourceStateChangeMessage);
+			this.context.RegisterMessageHandler (ClientMessageType.RequestMuteSource, RequestMuteSourceMessage);
+			this.context.RegisterMessageHandler (ClientMessageType.RequestSourceList, RequestSourceListMessage);
 		}
 
 		public IEnumerator<AudioSource> GetEnumerator()
@@ -191,43 +197,6 @@ namespace Gablarski.Server
 
 			context.Users.Send (new AudioSourceStateChangeMessage { Starting = msg.Starting, SourceId = msg.SourceId },
 			                    (con, user) => con != e.Connection);
-		}
-
-		internal void SendAudioDataMessage (IEnumerable<MessageReceivedEventArgs> es)
-		{
-			var set = new HashSet<MessageReceivedEventArgs> (es);
-			foreach (MessageReceivedEventArgs e in es)
-			{
-				var msg = (ClientAudioDataMessage) e.Message;
-
-				IUserInfo speaker;
-				if (!CanSendFromSource (e.Connection, msg.SourceId, out speaker))
-					return;
-
-				if (!context.GetPermission (PermissionName.SendAudio, speaker))
-				{
-					e.Connection.Send (new PermissionDeniedMessage (ClientMessageType.AudioData));
-					return;
-				}
-
-				if (msg.TargetIds.Length > 1 && !context.GetPermission (PermissionName.SendAudioToMultipleTargets, speaker))
-				{
-					e.Connection.Send (new PermissionDeniedMessage (ClientMessageType.AudioData));
-					return;
-				}
-
-				var sendMessage = new ServerAudioDataMessage { Data = msg.Data, Sequence = msg.Sequence, SourceId = msg.SourceId };
-
-				if (msg.TargetType == TargetType.Channel)
-				{
-					for (int i = 0; i < msg.TargetIds.Length; ++i)
-						context.Users.Send (sendMessage, (con, user) => con != e.Connection && user.CurrentChannelId == msg.TargetIds[i]);
-				}
-				else if (msg.TargetType == TargetType.User)
-				{
-					context.Users.Send (sendMessage, (con, user) => con != e.Connection && msg.TargetIds.Contains (user.UserId));
-				}
-			}
 		}
 
 		internal void SendAudioDataMessage (MessageReceivedEventArgs e)
