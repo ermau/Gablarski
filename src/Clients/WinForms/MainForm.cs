@@ -110,7 +110,11 @@ namespace Gablarski.Clients.Windows
 					ITextToSpeech tts = (ITextToSpeech)n.Notifier;
 					tts.Media = this.mediaPlayerIntegration;
 
-					var source = this.gablarski.Sources.CreateFake ("speech", tts.SupportedFormats.OrderByDescending (af => af.SampleRate).First(), 512);
+					var format = tts.SupportedFormats.OrderByDescending (af => af.SampleRate).FirstOrDefault();
+					if (format == null)
+						continue;
+
+					var source = this.gablarski.Sources.CreateFake ("speech", format, 512);
 					this.speechSources.Add (tts, source);
 					tts.AudioSource = source;
 					this.gablarski.Audio.Attach (this.audioPlayback, source, new AudioEnginePlaybackOptions());
