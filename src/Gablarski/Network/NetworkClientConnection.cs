@@ -451,6 +451,8 @@ namespace Gablarski.Network
 				}
 				else
 				{
+					if (msg.Reliable) // Someone tried to be tricksy
+						return;
 					if (debugLogging)
 						log.DebugFormat ("Received message {0} from {1}", msg.MessageTypeCode, endpoint);
 				
