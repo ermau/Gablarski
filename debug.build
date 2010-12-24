@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--EXTERNAL_PROPERTIES: DotNetFramework3.5_x86_Path;teamcity.buildConfName;build.vcs.number-->
 <project name="Gablarski" default="gablarski" basedir=".">
 	<property name="nant.settings.currentframework" value="net-3.5" />
 	<property name="gablarski.version" value="${teamcity.buildConfName}.${build.vcs.number}" />
