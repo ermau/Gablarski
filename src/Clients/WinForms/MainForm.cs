@@ -69,13 +69,15 @@ namespace Gablarski.Clients.Windows
 		{
 			lock (this.ignores)
 			{
-				string un = e.User.Username.Trim().ToLower();
+				string un = e.User.Username.Replace (" ", String.Empty).ToLower();
 				if (this.ignores.Contains (un) && e.Unmuted)
 				{
-					Persistance.Delete (Persistance.GetIgnores().First (ie => ie.ServerId == this.server.Id && ie.Username.ToLower().Trim() == un));
+					foreach (var entry in Persistance.GetIgnores().Where (ie => ie.ServerId == this.server.Id && ie.Username.Replace(" ", String.Empty).ToLower() == un))
+						Persistance.Delete (entry);
+
 					this.ignores.Remove (un);
 				}
-				else if (!e.Unmuted)
+				else if (!this.ignores.Contains (un) && !e.Unmuted)
 				{
 					Persistance.SaveOrUpdate (new IgnoreEntry (0) { ServerId = this.server.Id, Username = un });
 					this.ignores.Add (un);
@@ -650,7 +652,7 @@ namespace Gablarski.Clients.Windows
 		{
 			lock (this.ignores)
 			{
-				if (this.ignores != null && this.ignores.Contains (e.User.Username.Trim().ToLower()) && !this.gablarski.Users.GetIsIgnored (e.User))
+				if (this.ignores != null && this.ignores.Contains (e.User.Username.Replace (" ", String.Empty).ToLower()) && !this.gablarski.Users.GetIsIgnored (e.User))
 					this.gablarski.Users.ToggleIgnore (e.User);
 			}
 
@@ -666,7 +668,7 @@ namespace Gablarski.Clients.Windows
 				if (this.ignores == null)
 					return;
 
-				var usernames = this.gablarski.Users.ToDictionary (u => u.Username.Trim().ToLower());
+				var usernames = this.gablarski.Users.ToDictionary (u => u.Username.Replace (" ", String.Empty).ToLower());
 				foreach (string username in this.ignores.ToList())
 				{
 					IUserInfo user;
@@ -877,7 +879,7 @@ namespace Gablarski.Clients.Windows
 			
 			lock (this.ignores)
 			{
-				Persistance.GetIgnores().Where (i => i.ServerId == this.server.Id).Select (i => i.Username.Trim().ToLower()).
+				Persistance.GetIgnores().Where (i => i.ServerId == this.server.Id).Select (i => i.Username.Replace (" ", String.Empty).ToLower()).
 					ForEach (un => this.ignores.Add (un));
 			}
 
