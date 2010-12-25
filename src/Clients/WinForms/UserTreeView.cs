@@ -71,19 +71,27 @@ namespace Gablarski.Clients.Windows
 			set;
 		}
 
-		private void OnUserMuted (object sender, UserEventArgs e)
+		private void OnUserMuted (object sender, UserMutedEventArgs e)
 		{
 			TreeNode node;
 			if (!this.userNodes.TryGetValue (e.User, out node))
 				return;
 
-			MarkMuted (e.User);
+			if (!e.Unmuted)
+				MarkMuted (e.User);
+			else
+				MarkSilent (e.User);
+
 			SetupUserContext (node);
 		}
 
 		private void OnSourceMuted (object sender, AudioSourceMutedEventArgs e)
 		{
-			MarkMuted (e.Source);
+			if (!e.Unmuted)
+				MarkMuted (e.Source);
+			else
+				MarkSilent (e.Source);
+
 			SetupUserContext (userNodes[this.client.Users[e.Source.OwnerId]]);
 		}
 
