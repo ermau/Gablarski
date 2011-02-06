@@ -1,4 +1,4 @@
-// Copyright (c) 2010, Eric Maupin
+// Copyright (c) 2011, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -263,6 +263,7 @@ namespace Gablarski.Client
 		protected void OnConnected (object sender, EventArgs e)
 		{
 			this.connecting = false;
+			this.pingTimer = new Timer (s => Connection.Send (new ClientPingMessage()), null, 20000, 20000);
 			Interlocked.Exchange (ref this.reconnectAttempt, 0);
 
 			var connected = this.Connected;
@@ -272,6 +273,9 @@ namespace Gablarski.Client
 
 		protected void OnDisconnected (object sender, DisconnectedEventArgs e)
 		{
+			if (this.pingTimer != null)
+				this.pingTimer.Dispose();
+
 			var disconnected = this.Disconnected;
 			if (disconnected != null)
 				disconnected (this, e);
@@ -320,6 +324,7 @@ namespace Gablarski.Client
 			RegisterMessageHandler (ServerMessageType.Disconnect, OnDisconnectedMessage);
 		}
 
+		private Timer pingTimer;
 		protected readonly object StateSync = new object();
 		protected ServerInfo serverInfo;
 
