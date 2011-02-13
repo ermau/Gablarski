@@ -80,7 +80,7 @@ namespace Gablarski.Clients.Windows
 			if (!e.Unmuted)
 				MarkMuted (e.User);
 			else
-				MarkSilent (e.User);
+				MarkSilent (e.User, true);
 
 			SetupUserContext (node);
 		}
@@ -249,19 +249,19 @@ namespace Gablarski.Clients.Windows
 				sourceNodes.Remove (kvp.Key);
 		}
 
-		public void MarkTalking (IUserInfo user)
+		public void MarkTalking (IUserInfo user, bool ignoreStates = false)
 		{
 			if (user == null)
 				return;
 
 			if (this.InvokeRequired)
 			{
-				this.BeginInvoke ((Action<IUserInfo>)this.MarkTalking, user);
+				this.BeginInvoke ((Action<IUserInfo, bool>)this.MarkTalking, user, ignoreStates);
 				return;
 			}
 
 			TreeNode node;
-			if (!userNodes.TryGetValue (user, out node) || node.ImageKey == "talking")
+			if (!userNodes.TryGetValue (user, out node) || (!ignoreStates && NodeInState (node)))
 				return;
 
 			node.ImageKey = "talking";
@@ -269,14 +269,14 @@ namespace Gablarski.Clients.Windows
 			SetupUserContext (node);
 		}
 
-		public void MarkTalking (AudioSource source)
+		public void MarkTalking (AudioSource source, bool ignoreStates = false)
 		{
 			if (source == null)
 				return;
 
 			if (this.InvokeRequired)
 			{
-				BeginInvoke ((Action<AudioSource>)MarkTalking, source);
+				BeginInvoke ((Action<AudioSource, bool>)MarkTalking, source, ignoreStates);
 				return;
 			}
 
@@ -286,30 +286,11 @@ namespace Gablarski.Clients.Windows
 			else if (userNodes.TryGetValue (client.Users[source.OwnerId], out node))
 				SetupUserContext (node);
 
-			if (node != null)
+			if (node != null && (ignoreStates || !NodeInState (node)))
 			{
 				node.ImageKey = "talking";
 				node.SelectedImageKey = "talking";
 			}
-		}
-
-		public void MarkMusic (IUserInfo user)
-		{
-			if (user == null)
-				throw new ArgumentNullException ("user");
-
-			if (this.InvokeRequired)
-			{
-				this.BeginInvoke ((Action<IUserInfo>)this.MarkTalking, user);
-				return;
-			}
-
-			if (!userNodes.ContainsKey (user))
-				return;
-
-			var node = userNodes[user];
-			userNodes[user].ImageKey = node.SelectedImageKey = "music";
-			SetupUserContext (node);
 		}
 
 		public void MarkMuted (AudioSource source)
@@ -350,14 +331,14 @@ namespace Gablarski.Clients.Windows
 			SetupUserContext (node);
 		}
 
-		public void MarkSilent (AudioSource source)
+		public void MarkSilent (AudioSource source, bool ignoreStates = false)
 		{
 			if (source == null)
 				return;
 
 			if (this.InvokeRequired)
 			{
-				this.BeginInvoke ((Action<AudioSource>)this.MarkSilent, source);
+				this.BeginInvoke ((Action<AudioSource, bool>)this.MarkSilent, source, ignoreStates);
 				return;
 			}
 
@@ -366,31 +347,34 @@ namespace Gablarski.Clients.Windows
 				return;
 			
 			if (Settings.DisplaySources && sourceNodes.TryGetValue (source, out node))
-				SetupUserContext (node.Parent);
+			{
+				if (ignoreStates || !NodeInState (node.Parent))
+					SetupUserContext (node.Parent);
+			}
 			else
 			{
 				IUserInfo user = client.Users[source.OwnerId];
-				if (user != null && userNodes.TryGetValue (user, out node))
+				if (user != null && userNodes.TryGetValue (user, out node) && (ignoreStates || !NodeInState (node)))
 					SetupUserContext (node);
 			}
 
-			if (node != null)
+			if (node != null && (ignoreStates || !NodeInState (node)))
 				node.ImageKey = node.SelectedImageKey = "silent";
 		}
 
-		public void MarkSilent (IUserInfo user)
+		public void MarkSilent (IUserInfo user, bool ignoreStates = false)
 		{
 			if (user == null)
 				return;
 
 			if (this.InvokeRequired)
 			{
-				this.BeginInvoke ((Action<IUserInfo>)this.MarkSilent, user);
+				this.BeginInvoke ((Action<IUserInfo, bool>)this.MarkSilent, user, ignoreStates);
 				return;
 			}
 
 			TreeNode node;
-			if (!userNodes.TryGetValue (user, out node) || user.IsMuted)
+			if (!userNodes.TryGetValue (user, out node) || user.IsMuted || (!ignoreStates && NodeInState (node)))
 				return;
 
 			node.ImageKey = node.SelectedImageKey = "silent";
@@ -437,6 +421,11 @@ namespace Gablarski.Clients.Windows
 		private readonly Dictionary<IChannelInfo, TreeNode> channelNodes = new Dictionary<IChannelInfo, TreeNode>();
 		private readonly Dictionary<IUserInfo, TreeNode> userNodes = new Dictionary<IUserInfo, TreeNode>();
 		private readonly Dictionary<AudioSource, TreeNode> sourceNodes = new Dictionary<AudioSource, TreeNode>();
+
+		private bool NodeInState (TreeNode node)
+		{
+			return node.ImageKey == "muted" || node.ImageKey == "mutedmic" || node.ImageKey == "afk";
+		}
 
 		protected override void DefWndProc (ref Message m)
 		{
@@ -492,7 +481,11 @@ namespace Gablarski.Clients.Windows
 
 		protected override void OnNodeMouseDoubleClick (TreeNodeMouseClickEventArgs e)
 		{
-			ChannelInfo channel = this.SelectedNode.Tag as ChannelInfo;
+			var node = e.Node;
+			if (node.Tag == null)
+				return;
+
+			ChannelInfo channel = node.Tag as ChannelInfo;
 			if (e.Button != MouseButtons.Left || channel == null)
 			{
 				base.OnNodeMouseDoubleClick (e);
