@@ -374,7 +374,7 @@ namespace Gablarski.Clients.Windows
 			}
 
 			TreeNode node;
-			if (!userNodes.TryGetValue (user, out node) || user.IsMuted || (!ignoreStates && NodeInState (node)))
+			if (!userNodes.TryGetValue (user, out node) || (!ignoreStates && NodeInState (node)))
 				return;
 
 			node.ImageKey = node.SelectedImageKey = "silent";

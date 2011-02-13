@@ -143,7 +143,6 @@ namespace Gablarski
 			if (currentChannelId < 0)
 				throw new ArgumentOutOfRangeException ("currentChannelId");
 
-			Nickname = username;
 			Username = username;
 			UserId = userId;
 			CurrentChannelId = currentChannelId;

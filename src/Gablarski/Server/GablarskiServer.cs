@@ -1,4 +1,4 @@
-// Copyright (c) 2010, Eric Maupin
+// Copyright (c) 2011, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -177,6 +177,7 @@ namespace Gablarski.Server
 		{
 			this.running = true;
 			this.messageRunnerThread.Start ();
+			this.pingTimer = new Timer (s => this.users.Send (new ServerPingMessage()), null, 20000, 20000);
 		}
 
 		/// <summary>
@@ -226,6 +227,7 @@ namespace Gablarski.Server
 		private ServerSourceHandler sources;
 		private ServerChannelHandler channels;
 		private ServerUserManager userManager;
+		private Timer pingTimer;
 
 		IServerUserHandler IServerContext.Users
 		{
