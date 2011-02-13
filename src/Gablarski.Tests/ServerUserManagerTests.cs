@@ -595,7 +595,7 @@ namespace Gablarski.Tests
 			manager.Connect (server);
 			manager.Login (server, user);
 
-			Assert.IsFalse (manager.GetIsNicknameInUse (user.Username));
+			Assert.IsTrue (manager.GetIsNicknameInUse (user.Username));
 		}
 	}
 }
