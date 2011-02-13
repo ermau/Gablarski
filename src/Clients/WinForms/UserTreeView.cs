@@ -249,7 +249,12 @@ namespace Gablarski.Clients.Windows
 				sourceNodes.Remove (kvp.Key);
 		}
 
-		public void MarkTalking (IUserInfo user, bool ignoreStates = false)
+		public void MarkTalking (IUserInfo user)
+		{
+			MarkTalking (user, false);
+		}
+
+		public void MarkTalking (IUserInfo user, bool ignoreStates)
 		{
 			if (user == null)
 				return;
@@ -269,7 +274,12 @@ namespace Gablarski.Clients.Windows
 			SetupUserContext (node);
 		}
 
-		public void MarkTalking (AudioSource source, bool ignoreStates = false)
+		public void MarkTalking (AudioSource source)
+		{
+			MarkTalking (source, false);
+		}
+
+		public void MarkTalking (AudioSource source, bool ignoreStates)
 		{
 			if (source == null)
 				return;
@@ -331,7 +341,12 @@ namespace Gablarski.Clients.Windows
 			SetupUserContext (node);
 		}
 
-		public void MarkSilent (AudioSource source, bool ignoreStates = false)
+		public void MarkSilent (AudioSource source)
+		{
+			MarkSilent (source, false);
+		}
+
+		public void MarkSilent (AudioSource source, bool ignoreStates)
 		{
 			if (source == null)
 				return;
@@ -362,7 +377,12 @@ namespace Gablarski.Clients.Windows
 				node.ImageKey = node.SelectedImageKey = "silent";
 		}
 
-		public void MarkSilent (IUserInfo user, bool ignoreStates = false)
+		public void MarkSilent (IUserInfo user)
+		{
+			MarkSilent (user, false);
+		}
+
+		public void MarkSilent (IUserInfo user, bool ignoreStates)
 		{
 			if (user == null)
 				return;
