@@ -611,14 +611,18 @@ namespace Gablarski.Clients.Windows
 			if (this.audioPlayback == null)
 				return;
 
-			var user = gablarski.Users[source.OwnerId];
-			users.RemoveUser (user);
-			users.AddUser (user, gablarski.Sources[user]);
-
 			float gain = 1.0f;
-			VolumeEntry volume = Persistance.GetVolumes (this.server).FirstOrDefault (ve => ve.Username == user.Username);
-			if (volume != null)
-				gain = volume.Gain;
+
+			var user = gablarski.Users[source.OwnerId];
+			if (user != null)
+			{
+				users.RemoveUser (user);
+				users.AddUser (user, gablarski.Sources[user]);
+
+				VolumeEntry volume = Persistance.GetVolumes (this.server).FirstOrDefault (ve => ve.Username == user.Username);
+				if (volume != null)
+					gain = volume.Gain;
+			}
 
 			this.gablarski.Audio.Attach (this.audioPlayback, source, new AudioEnginePlaybackOptions (gain));
 		}
