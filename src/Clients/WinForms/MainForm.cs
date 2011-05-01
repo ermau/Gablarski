@@ -93,6 +93,12 @@ namespace Gablarski.Clients.Windows
 
 		private void SetupNotifications ()
 		{
+			if (this.notifications != null)
+			{
+				this.notifications.Close();
+				this.notifications = null;
+			}
+
 			this.notifications = new NotificationHandler (this.gablarski);
 			
 			var notifiers = Settings.EnabledNotifications.Select (g => new

@@ -274,6 +274,8 @@ namespace Gablarski.Clients
 			this.client.Users.UserJoined -= OnUserJoined;
 			this.client.Users.UserDisconnected -= OnUserDisconnected;
 			this.client.Users.UserChangedChannel -= OnUserChangedChannel;
+			this.client.Users.UserKickedFromChannel -= OnUserKickedFromChannel;
+			this.client.Users.UserKickedFromServer -= OnUserKickedFromServer;
 		}
 
 		private bool isDisposed;
