@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2010, Eric Maupin
+﻿// Copyright (c) 2011, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -339,13 +339,13 @@ namespace Gablarski.Input.DirectInput
 									{
 										if (nowState != currentState)
 										{
-											OnInputStateChanged (new CommandStateChangedEventArgs (kvp.Value, (nowState) ? InputState.On : InputState.Off));
+											OnInputStateChanged (new CommandStateChangedEventArgs (kvp.Value, nowState));
 											keybindingStates[kvp.Key] = nowState;
 										}
 									}
 									else if (nowState)
 									{
-										OnInputStateChanged (new CommandStateChangedEventArgs (kvp.Value, InputState.On));
+										OnInputStateChanged (new CommandStateChangedEventArgs (kvp.Value, true));
 										keybindingStates[kvp.Key] = true;
 									}
 								}
@@ -416,13 +416,13 @@ namespace Gablarski.Input.DirectInput
 									{
 										if (currentState != newState)
 										{
-											OnInputStateChanged (new CommandStateChangedEventArgs (c, (newState) ? InputState.On : InputState.Off));
+											OnInputStateChanged (new CommandStateChangedEventArgs (c, newState));
 											mousebindingStates[i] = newState;
 										}
 									}
 									else if (newState)
 									{
-										OnInputStateChanged (new CommandStateChangedEventArgs (c, InputState.On));
+										OnInputStateChanged (new CommandStateChangedEventArgs (c, true));
 										mousebindingStates[i] = true;
 									}
 								}
@@ -498,13 +498,13 @@ namespace Gablarski.Input.DirectInput
 										continue;
 
 									if (currentButtons.Contains (bd.Offset))
-										OnInputStateChanged (new CommandStateChangedEventArgs (c, (bd.Data == 128) ? InputState.On : InputState.Off));
+										OnInputStateChanged (new CommandStateChangedEventArgs (c, (bd.Data == 128)));
 									else
 									{
 										InputRange range = currentRanges[bd.Offset];
 
 										double value = (bd.Data != -1) ? bd.Data : range.Max;
-										OnInputStateChanged (new CommandStateChangedEventArgs (c, InputState.Axis, (value / (range.Max - range.Min)) * 100));
+										OnInputStateChanged (new CommandStateChangedEventArgs (c, (value / (range.Max - range.Min)) * 100));
 									}
 								}
 							}

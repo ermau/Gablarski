@@ -508,7 +508,7 @@ namespace Gablarski.Clients.Windows
 					if (!Settings.UsePushToTalk || this.voiceSource == null || this.voiceCapture == null)
 						return;
 
-					if (e.State == InputState.On)
+					if ((bool)e.State)
 						this.gablarski.Audio.BeginCapture (voiceSource, this.gablarski.CurrentChannel);
 					else
 						this.gablarski.Audio.EndCapture (voiceSource);
@@ -516,19 +516,19 @@ namespace Gablarski.Clients.Windows
 					break;
 
 				case Command.MuteMic:
-					if (e.State == InputState.On)
+					if ((bool)e.State)
 						BeginInvoke ((Action)(() => this.btnMuteMic.Checked = !this.btnMuteMic.Checked));
 
 					break;
 
 				case Command.MuteAll:
-					if (e.State == InputState.On)
+					if ((bool)e.State)
 						BeginInvoke ((Action)(() => this.btnMute.Checked = !this.btnMute.Checked));
 
 					break;
 
 				case Command.SayCurrentSong:
-					if (e.State != InputState.On)
+					if (!(bool)e.State)
 						return;
 
 					if (this.notifications != null && this.mediaPlayerIntegration != null)
