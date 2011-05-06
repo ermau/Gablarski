@@ -61,6 +61,8 @@ namespace Gablarski.Clients.Input
 		/// <summary>Invokes a notification for the current song.</summary>
 		SayCurrentSong = 5,
 
+		ActivateRecognition = 6,
+
 		[CommandParameter] SwitchChannel = 7,
 	}
 

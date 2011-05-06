@@ -472,8 +472,13 @@ namespace Gablarski.Clients.Windows
 			this.inputProvider.CommandStateChanged -= OnCommandStateChanged;
 			this.inputProvider.Dispose();
 			this.inputProvider = null;
+
+			this.speech.StopRecognizing();
+			this.speech.CommandStateChanged -= OnCommandStateChanged;
+			this.speech = null;
 		}
 
+		private ISpeechRecognizer speech;
 		private void SetupInput()
 		{
 			if (InvokeRequired)
@@ -483,6 +488,10 @@ namespace Gablarski.Clients.Windows
 			}
 
 			DisableInput();
+
+			this.speech = Modules.SpeechRecognizers.First();
+			this.speech.Update (this.gablarski.Channels, this.gablarski.Users);
+			this.speech.CommandStateChanged += OnCommandStateChanged;
 
 			Type settingType;
 			if (Settings.InputProvider.IsNullOrWhitespace() || (settingType = Type.GetType (Settings.InputProvider)) == null)
@@ -504,6 +513,22 @@ namespace Gablarski.Clients.Windows
 		{
 			switch (e.Command)
 			{
+				case Command.ActivateRecognition:
+					if (!Settings.UsePushToTalk)
+					{
+						if ((bool)e.State)
+							this.gablarski.Audio.MuteCapture();
+						else
+							this.gablarski.Audio.UnmuteCapture();
+					}
+
+					if ((bool)e.State)
+						this.speech.Recognize();
+					else
+						this.speech.StopRecognizing();
+
+					break;
+
 				case Command.Talk:
 					if (!Settings.UsePushToTalk || this.voiceSource == null || this.voiceCapture == null)
 						return;
@@ -512,6 +537,21 @@ namespace Gablarski.Clients.Windows
 						this.gablarski.Audio.BeginCapture (voiceSource, this.gablarski.CurrentChannel);
 					else
 						this.gablarski.Audio.EndCapture (voiceSource);
+
+					break;
+
+				case Command.SwitchChannel:
+					IChannelInfo channel = e.State as IChannelInfo;
+					if (channel == null)
+					{
+						if (e.State is int)
+							channel = this.gablarski.Channels[(int) e.State];
+					}
+
+					if (channel == null)
+						return;
+
+					this.gablarski.Users.Move (this.gablarski.CurrentUser, channel);
 
 					break;
 
@@ -672,6 +712,9 @@ namespace Gablarski.Clients.Windows
 		private void UsersReceivedUserList (object sender, ReceivedListEventArgs<IUserInfo> e)
 		{
 			this.users.Update (this.gablarski.Channels, e.Data, this.gablarski.Sources);
+			
+			if (this.speech != null)
+				this.speech.Update (this.gablarski.Channels, this.gablarski.Users);
 
 			lock (this.ignores)
 			{
@@ -694,6 +737,9 @@ namespace Gablarski.Clients.Windows
 		private void ChannelsReceivedChannelList (object sender, ReceivedListEventArgs<IChannelInfo> e)
 		{
 			this.users.Update (e.Data, this.gablarski.Users, this.gablarski.Sources);
+
+			if (this.speech != null)
+				this.speech.Update (this.gablarski.Channels, this.gablarski.Users);
 		}
 
 		private void CurrentUserReceivedLoginResult (object sender, ReceivedLoginResultEventArgs e)

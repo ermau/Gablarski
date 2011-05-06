@@ -58,6 +58,11 @@ namespace Gablarski.Clients.Windows
 			get { return modules.tts; }
 		}
 
+		public static IEnumerable<ISpeechRecognizer> SpeechRecognizers
+		{
+			get { return modules.speechRecognizers; }
+		}
+
 		private static readonly Modules modules = new Modules();
 
 		[ImportMany (AllowRecomposition = true)]
@@ -104,6 +109,13 @@ namespace Gablarski.Clients.Windows
 
 		[ImportMany (AllowRecomposition = true)]
 		private IEnumerable<IAudioPlaybackProvider> playback
+		{
+			get;
+			set;
+		}
+
+		[ImportMany (AllowRecomposition = true)]
+		private IEnumerable<ISpeechRecognizer> speechRecognizers
 		{
 			get;
 			set;

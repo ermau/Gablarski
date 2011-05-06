@@ -66,7 +66,7 @@ namespace Gablarski.Clients.Windows
 
 		public KeyValuePair<string, Command> BoundCommand
 		{
-			get { return new KeyValuePair<string, Command>(BindingListViewModel.SpaceEnum (Command.ToString()), Command); }
+			get { return new KeyValuePair<string, Command> (BindingListViewModel.SpaceEnum (Command.ToString()), Command); }
 			set
 			{
 				if (value.Value == Command)
@@ -147,7 +147,13 @@ namespace Gablarski.Clients.Windows
 
 		public IDictionary<string, Command> Commands
 		{
-			get { return ((Command[])Enum.GetValues (typeof (Command))).Skip (1).ToDictionary (c => SpaceEnum (c.ToString()), c => c); }
+			get
+			{
+				return ((Command[])Enum.GetValues (typeof (Command)))
+					.Skip (1)
+					.Where (c => !typeof (Command).GetMember (c.ToString())[0].GetCustomAttributes (typeof (CommandParameter), true).Any())
+					.ToDictionary (c => SpaceEnum (c.ToString()), c => c);
+			}
 		}
 
 		public ICollection<CommandBindingSettingEntry> Bindings

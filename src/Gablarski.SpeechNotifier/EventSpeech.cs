@@ -48,7 +48,7 @@ using Gablarski.Clients.Media;
 
 namespace Gablarski.SpeechNotifier
 {
-	[Export (typeof(ITextToSpeech))]
+	[Export (typeof (ITextToSpeech))]
 	public class EventSpeech
 		:  ITextToSpeech
 	{
