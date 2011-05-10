@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{828B6E63-65E5-47F0-9DF5-7C8D2FFEB924}</ProjectGuid>
+    <ProjectGuid>{6476C6DC-BA17-40DB-A52D-43A7021C0753}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Gablarski</RootNamespace>
-    <AssemblyName>Gablarski</AssemblyName>
+    <RootNamespace>Gablarski.Tests</RootNamespace>
+    <AssemblyName>Gablarski.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="nunit.framework">
+      <HintPath>..\..\lib\nunit.framework.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -40,30 +43,24 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Audio\AudioSource.cs" />
-    <Compile Include="Client\GablarskiClient.cs" />
-    <Compile Include="Messages\ClientCapabilitiesMessage.cs" />
-    <Compile Include="Messages\GablarskiMessage.cs" />
-    <Compile Include="Messages\GablarskiProtocol.cs" />
-    <Compile Include="Messages\QueryServerMessage.cs" />
-    <Compile Include="Messages\QueryServerResultMessage.cs" />
-    <Compile Include="Parameter.cs" />
+    <Compile Include="GablarskiServerTests.cs" />
+    <Compile Include="MessageTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ServerInfo.cs" />
-    <Compile Include="ServerSettings.cs" />
-    <Compile Include="Server\GablarskiServer.cs" />
-    <Compile Include="Server\GablarskiServerConfiguration.cs" />
-    <Compile Include="Server\ILoginProvider.cs" />
-    <Compile Include="Server\ServerAudioHandler.cs" />
-    <Compile Include="Server\ServerContext.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Tempest\Tempest.csproj">
+    <ProjectReference Include="..\..\Tempest\Tempest.csproj">
       <Project>{D6A2003C-CBB2-47B0-B306-521141D3068D}</Project>
       <Name>Tempest</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Tempest\Tests\Tempest.Tests.csproj">
+      <Project>{97D53DFA-634E-4595-9AE3-DC1BC8A5F553}</Project>
+      <Name>Tempest.Tests</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Gablarski.csproj">
+      <Project>{828B6E63-65E5-47F0-9DF5-7C8D2FFEB924}</Project>
+      <Name>Gablarski</Name>
+    </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
