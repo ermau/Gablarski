@@ -34,46 +34,13 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
-using System;
 using Tempest;
 
 namespace Gablarski.Server
 {
-	public sealed class ServerContext
+	public interface IGablarskiServerContext
 		: IServerContext
 	{
-		public ServerContext (IServerContext context)
-		{
-			if (context == null)
-				throw new ArgumentNullException ("context");
-
-			this.context = context;
-			
-			Audio = new ServerAudioHandler (this);
-		}
-
-		public event EventHandler<ConnectionMadeEventArgs> ConnectionMade
-		{
-			add { this.context.ConnectionMade += value; }
-			remove { this.context.ConnectionMade -= value; }
-		}
-
-		public ServerAudioHandler Audio
-		{
-			get;
-			private set;
-		}
-
-		public void RegisterMessageHandler (ushort messageType, Action<MessageEventArgs> handler)
-		{
-			this.context.RegisterMessageHandler (messageType, handler);
-		}
-
-		public void DisconnectWithReason (IConnection connection, string reason)
-		{
-			this.context.DisconnectWithReason (connection, reason);
-		}
-
-		private readonly IServerContext context;
+		ServerAudioHandler Audio { get; }
 	}
 }

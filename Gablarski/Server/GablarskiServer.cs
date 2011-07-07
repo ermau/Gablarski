@@ -40,7 +40,7 @@ using Tempest;
 namespace Gablarski.Server
 {
 	public class GablarskiServer
-		: ServerBase
+		: ServerBase, IGablarskiServerContext
 	{
 		public GablarskiServer (GablarskiServerConfiguration configuration)
 			: base (MessageTypes.All)
@@ -49,8 +49,20 @@ namespace Gablarski.Server
 				throw new ArgumentNullException ("configuration");
 
 			this.configuration = configuration;
+			Audio = new ServerAudioHandler (this);
+		}
+
+		public ServerAudioHandler Audio
+		{
+			get;
+			private set;
 		}
 
 		private readonly GablarskiServerConfiguration configuration;
+
+		protected override void OnConnectionMade (object sender, ConnectionMadeEventArgs e)
+		{
+			base.OnConnectionMade (sender, e);
+		}
 	}
 }

@@ -35,6 +35,7 @@
 // DAMAGE.
 
 using System;
+using Gablarski.Audio;
 using Tempest;
 
 namespace Gablarski
@@ -63,14 +64,22 @@ namespace Gablarski
 			set;
 		}
 
+		public AudioSourceNegotiationType AudioNegotiationType
+		{
+			get;
+			set;
+		}
+
 		public void Serialize (IValueWriter writer)
 		{
 			writer.WriteString (ServerName);
+			writer.WriteByte ((byte)AudioNegotiationType);
 		}
 
 		public void Deserialize (IValueReader reader)
 		{
 			ServerName = reader.ReadString();
+			AudioNegotiationType = (AudioSourceNegotiationType)reader.ReadByte();
 		}
 	}
 }

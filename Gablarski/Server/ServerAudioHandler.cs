@@ -41,17 +41,11 @@ namespace Gablarski.Server
 {
 	public class ServerAudioHandler
 	{
-		public ServerAudioHandler (ServerContext context)
+		public ServerAudioHandler (IGablarskiServerContext context)
 		{
 			this.context = context;
-			RegisterHandlers (context);
 		}
 		
-		private readonly ServerContext context;
-
-		private void RegisterHandlers (IServerContext context)
-		{
-			
-		}
+		private readonly IGablarskiServerContext context;
 	}
 }

@@ -39,7 +39,17 @@ using Tempest;
 
 namespace Gablarski.Audio
 {
+	public enum AudioSourceNegotiationType
+		: byte
+	{
+		ServerFixed = 1,
+		ServerRange = 2,
+		ClientNegotiation = 3,
+		ClientNegotationAndTranscoding = 4
+	}
+
 	public enum AudioSourceType
+		: byte
 	{
 		Local = 0,
 		Voice = 1,
@@ -49,14 +59,20 @@ namespace Gablarski.Audio
 	public class AudioSource
 		: ISerializable
 	{
+		public AudioSourceType Type
+		{
+			get;
+			set;
+		}
+
 		public void Serialize (IValueWriter writer)
 		{
-			throw new NotImplementedException();
+			writer.WriteByte ((byte)Type);
 		}
 
 		public void Deserialize (IValueReader reader)
 		{
-			throw new NotImplementedException();
+			Type = (AudioSourceType)reader.ReadByte();
 		}
 	}
 }

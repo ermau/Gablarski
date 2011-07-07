@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{828B6E63-65E5-47F0-9DF5-7C8D2FFEB924}</ProjectGuid>
+    <ProjectGuid>c93d2edb-c038-40a8-98fc-f31c065ad3ae</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Gablarski</RootNamespace>
-    <AssemblyName>Gablarski</AssemblyName>
+    <RootNamespace>Gablarski.Windows</RootNamespace>
+    <AssemblyName>Gablarski.Windows</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -40,35 +40,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Audio\AudioSource.cs" />
-    <Compile Include="Client\GablarskiClient.cs" />
-    <Compile Include="Messages\ClientCapabilitiesMessage.cs" />
-    <Compile Include="Messages\GablarskiMessage.cs" />
-    <Compile Include="Messages\GablarskiProtocol.cs" />
-    <Compile Include="Messages\QueryServerMessage.cs" />
-    <Compile Include="Messages\QueryServerResultMessage.cs" />
-    <Compile Include="Parameter.cs" />
+    <Compile Include="Class1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ServerInfo.cs" />
-    <Compile Include="ServerSettings.cs" />
-    <Compile Include="Server\GablarskiServer.cs" />
-    <Compile Include="Server\GablarskiServerConfiguration.cs" />
-    <Compile Include="Server\IGablarskiServerContext.cs" />
-    <Compile Include="Server\ILoginProvider.cs" />
-    <Compile Include="Server\ServerAudioHandler.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Tempest\Desktop\Tempest\Tempest.csproj">
-      <Project>{D6A2003C-CBB2-47B0-B306-521141D3068D}</Project>
-      <Name>Tempest</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <ProjectExtensions>
-    <VisualStudio>
-      <UserProperties ProjectLinkReference="7d580b22-92a6-4560-85de-15bbd89333c4" ProjectLinkerExcludeFilter="\\?desktop(\\.*)?$;\\?silverlight(\\.*)?$;\.desktop;\.silverlight;\.xaml;^service references(\\.*)?$;\.clientconfig;^web references(\\.*)?$" />
-    </VisualStudio>
-  </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
