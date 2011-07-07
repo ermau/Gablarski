@@ -126,6 +126,7 @@ namespace Gablarski.Messages
 				{ (ushort)ServerMessageType.UserList, () => new UserListMessage() },
 				{ (ushort)ServerMessageType.UserMuted, () => new UserMutedMessage() },
 				{ (ushort)ServerMessageType.UserUpdated, () => new UserUpdatedMessage() },
+				{ (ushort)ServerMessageType.Ping, () => new ServerPingMessage() },
 
 			    { (ushort)ClientMessageType.AudioData, () => new ClientAudioDataMessage() },
 				{ (ushort)ClientMessageType.BanUser, () => new BanUserMessage() },
@@ -149,7 +150,8 @@ namespace Gablarski.Messages
 				{ (ushort)ClientMessageType.RequestMuteUser, () => new RequestMuteUserMessage() },
 				{ (ushort)ClientMessageType.SetComment, () => new SetCommentMessage() },
 				{ (ushort)ClientMessageType.SetStatus, () => new SetStatusMessage() },
-				{ (ushort)ClientMessageType.SetPermissions, () => new SetPermissionsMessage() }
+				{ (ushort)ClientMessageType.SetPermissions, () => new SetPermissionsMessage() },
+				{ (ushort)ClientMessageType.Ping, () => new ClientPingMessage() },
 			});
 
 			//#else

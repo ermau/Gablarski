@@ -22,8 +22,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.Growl", "src\Gabl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.Input.DirectInput", "src\Gablarski.Input.DirectInput\Gablarski.Input.DirectInput.csproj", "{D5FBD205-094A-46C5-88A8-16D4053733D9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski-Gtk", "src\Clients\Gablarski-Gtk\Gablarski-Gtk.csproj", "{8021A1E4-B984-40A4-BB16-357BA2ED04AA}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.LocalServer", "src\Gablarski.LocalServer\Gablarski.LocalServer.csproj", "{64869D2A-B532-4586-A0AC-750FCB66C63B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.Winamp", "src\Gablarski.Winamp\Gablarski.Winamp.csproj", "{C9DE76C5-68FC-44E1-AF63-CCE2D80BAA6C}"
@@ -159,17 +157,6 @@ Global
 		{D5FBD205-094A-46C5-88A8-16D4053733D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D5FBD205-094A-46C5-88A8-16D4053733D9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D5FBD205-094A-46C5-88A8-16D4053733D9}.Release|x86.ActiveCfg = Release|Any CPU
-		{8021A1E4-B984-40A4-BB16-357BA2ED04AA}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{8021A1E4-B984-40A4-BB16-357BA2ED04AA}.Debug|x86.ActiveCfg = Debug|x86
-		{8021A1E4-B984-40A4-BB16-357BA2ED04AA}.Mono Debug|Any CPU.ActiveCfg = Debug|x86
-		{8021A1E4-B984-40A4-BB16-357BA2ED04AA}.Mono Debug|x86.ActiveCfg = Debug|x86
-		{8021A1E4-B984-40A4-BB16-357BA2ED04AA}.Mono Debug|x86.Build.0 = Debug|x86
-		{8021A1E4-B984-40A4-BB16-357BA2ED04AA}.Mono Release|Any CPU.ActiveCfg = Release|x86
-		{8021A1E4-B984-40A4-BB16-357BA2ED04AA}.Mono Release|x86.ActiveCfg = Release|x86
-		{8021A1E4-B984-40A4-BB16-357BA2ED04AA}.Mono Release|x86.Build.0 = Release|x86
-		{8021A1E4-B984-40A4-BB16-357BA2ED04AA}.Release|Any CPU.ActiveCfg = Release|x86
-		{8021A1E4-B984-40A4-BB16-357BA2ED04AA}.Release|x86.ActiveCfg = Release|x86
-		{8021A1E4-B984-40A4-BB16-357BA2ED04AA}.Release|x86.Build.0 = Release|x86
 		{64869D2A-B532-4586-A0AC-750FCB66C63B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{64869D2A-B532-4586-A0AC-750FCB66C63B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{64869D2A-B532-4586-A0AC-750FCB66C63B}.Debug|x86.ActiveCfg = Debug|Any CPU

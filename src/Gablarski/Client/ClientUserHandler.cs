@@ -181,6 +181,10 @@ namespace Gablarski.Client
 			if (user == null)
 				throw new ArgumentNullException ("user");
 
+			user = this[user.UserId];
+			if (user == null)
+				return false;
+
 			bool state = this.manager.ToggleIgnore (user);
 
 			OnUserIgnored (new UserMutedEventArgs (user, !state));
@@ -191,6 +195,10 @@ namespace Gablarski.Client
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
+
+			user = this[user.UserId];
+			if (user == null)
+				return;
 
 			context.Connection.Send (new RequestMuteUserMessage (user, !user.IsMuted));
 		}

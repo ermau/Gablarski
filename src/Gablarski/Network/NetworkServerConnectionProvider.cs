@@ -165,6 +165,7 @@ namespace Gablarski.Network
 		private int port = 42912;
 		private Socket udp;
 		private TcpListener tcpListener;
+		private Random rand = new Random();
 		private readonly Dictionary<uint, NetworkServerConnection> connections = new Dictionary<uint, NetworkServerConnection> (20);
 		private readonly log4net.ILog log;
 		private readonly bool debugLogging;
@@ -222,6 +223,14 @@ namespace Gablarski.Network
 					{
 						log.WarnFormat ("Message type {0} not found from {1}", mtype, connection);
 						return;
+					}
+
+					if (msg.Reliable) // Someone tried to be tricksy
+					{
+						if (connection != null)
+							connection.Disconnect();
+
+						continue;
 					}
 					
 					if (!msg.Encrypted)
@@ -347,7 +356,7 @@ namespace Gablarski.Network
 				NetworkServerConnection connection;
 				lock (connections)
 				{
-					while (connections.ContainsKey (++nid)) ;
+					while (connections.ContainsKey ((nid = (uint)rand.Next()))) ;
 
 					log.InfoFormat ("Accepted TCP Connection from {0}. Given NID: {1}", tendpoint, nid);
 

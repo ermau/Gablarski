@@ -69,13 +69,15 @@ namespace Gablarski.Clients.Windows
 		{
 			lock (this.ignores)
 			{
-				string un = e.User.Username.Trim().ToLower();
+				string un = e.User.Username.Replace (" ", String.Empty).ToLower();
 				if (this.ignores.Contains (un) && e.Unmuted)
 				{
-					Persistence.Persistence.Delete (Persistence.Persistence.GetIgnores().First (ie => ie.ServerId == this.server.Id && ie.Username.ToLower().Trim() == un));
+					foreach (var entry in Persistance.GetIgnores().Where (ie => ie.ServerId == this.server.Id && ie.Username.Replace(" ", String.Empty).ToLower() == un))
+						Persistance.Delete (entry);
+
 					this.ignores.Remove (un);
 				}
-				else if (!e.Unmuted)
+				else if (!this.ignores.Contains (un) && !e.Unmuted)
 				{
 					Persistence.Persistence.SaveOrUpdate (new IgnoreEntry (0) { ServerId = this.server.Id, Username = un });
 					this.ignores.Add (un);
@@ -91,6 +93,12 @@ namespace Gablarski.Clients.Windows
 
 		private void SetupNotifications ()
 		{
+			if (this.notifications != null)
+			{
+				this.notifications.Close();
+				this.notifications = null;
+			}
+
 			this.notifications = new NotificationHandler (this.gablarski);
 			
 			var notifiers = Settings.EnabledNotifications.Select (g => new
@@ -110,7 +118,11 @@ namespace Gablarski.Clients.Windows
 					ITextToSpeech tts = (ITextToSpeech)n.Notifier;
 					tts.Media = this.mediaPlayerIntegration;
 
-					var source = this.gablarski.Sources.CreateFake ("speech", tts.SupportedFormats.OrderByDescending (af => af.SampleRate).First(), 512);
+					var format = tts.SupportedFormats.OrderByDescending (af => af.SampleRate).FirstOrDefault();
+					if (format == null)
+						continue;
+
+					var source = this.gablarski.Sources.CreateFake ("speech", format, 512);
 					this.speechSources.Add (tts, source);
 					tts.AudioSource = source;
 					this.gablarski.Audio.Attach (this.audioPlayback, source, new AudioEnginePlaybackOptions());
@@ -605,14 +617,18 @@ namespace Gablarski.Clients.Windows
 			if (this.audioPlayback == null)
 				return;
 
-			var user = gablarski.Users[source.OwnerId];
-			users.RemoveUser (user);
-			users.AddUser (user, gablarski.Sources[user]);
-
 			float gain = 1.0f;
-			VolumeEntry volume = Persistence.Persistence.GetVolumes (this.server).FirstOrDefault (ve => ve.Username == user.Username);
-			if (volume != null)
-				gain = volume.Gain;
+
+			var user = gablarski.Users[source.OwnerId];
+			if (user != null)
+			{
+				users.RemoveUser (user);
+				users.AddUser (user, gablarski.Sources[user]);
+
+				VolumeEntry volume = Persistance.GetVolumes (this.server).FirstOrDefault (ve => ve.Username == user.Username);
+				if (volume != null)
+					gain = volume.Gain;
+			}
 
 			this.gablarski.Audio.Attach (this.audioPlayback, source, new AudioEnginePlaybackOptions (gain));
 		}
@@ -646,7 +662,7 @@ namespace Gablarski.Clients.Windows
 		{
 			lock (this.ignores)
 			{
-				if (this.ignores != null && this.ignores.Contains (e.User.Username.Trim().ToLower()) && !this.gablarski.Users.GetIsIgnored (e.User))
+				if (this.ignores != null && this.ignores.Contains (e.User.Username.Replace (" ", String.Empty).ToLower()) && !this.gablarski.Users.GetIsIgnored (e.User))
 					this.gablarski.Users.ToggleIgnore (e.User);
 			}
 
@@ -662,7 +678,7 @@ namespace Gablarski.Clients.Windows
 				if (this.ignores == null)
 					return;
 
-				var usernames = this.gablarski.Users.ToDictionary (u => u.Username.Trim().ToLower());
+				var usernames = this.gablarski.Users.ToDictionary (u => u.Username.Replace (" ", String.Empty).ToLower());
 				foreach (string username in this.ignores.ToList())
 				{
 					IUserInfo user;
@@ -873,8 +889,8 @@ namespace Gablarski.Clients.Windows
 			
 			lock (this.ignores)
 			{
-				Persistence.Persistence.GetIgnores().Where (i => i.ServerId == this.server.Id).Select (i => i.Username.Trim().ToLower()).
-					ForEach (un => this.ignores.Add (un));
+				Persistance.GetIgnores().Where (i => i.ServerId == this.server.Id).Select (i => i.Username.Replace (" ", String.Empty).ToLower())
+					.ForEach (un => this.ignores.Add (un));
 			}
 
 			string userpassword = this.server.UserPassword;

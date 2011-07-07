@@ -38,11 +38,12 @@ using System.Linq;
 
 namespace Gablarski.Messages
 {
-	// Next: 56
+	// Next: 58
 
 	public enum ClientMessageType
 		: ushort
 	{
+		Ping = 56,
 		Connect = 1,
 		Login = 3,
 		Register = 42,
@@ -79,6 +80,7 @@ namespace Gablarski.Messages
 	public enum ServerMessageType
 		: ushort
 	{
+		Ping = 57,
 		ConnectionRejected = 2,
 		PunchThroughReceived = 40,
 		Redirect = 41,
