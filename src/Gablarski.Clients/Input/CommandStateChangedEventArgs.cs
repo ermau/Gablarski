@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2010, Eric Maupin
+﻿// Copyright (c) 2011, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -38,24 +38,6 @@ using System;
 
 namespace Gablarski.Clients.Input
 {
-	public enum InputState
-	{
-		///<summary>
-		/// Wax on.
-		///</summary>
-		On,
-		
-		/// <summary>
-		/// Wax off.
-		/// </summary>
-		Off,
-
-		/// <summary>
-		/// Karate.
-		/// </summary>
-		Axis
-	}
-
 	/// <summary>
 	/// Provides data for the <see cref="IInputProvider.CommandStateChanged"/> event.
 	/// </summary>
@@ -67,26 +49,10 @@ namespace Gablarski.Clients.Input
 		/// </summary>
 		/// <param name="command">The command that's state has changed.</param>
 		/// <param name="state">The new state of the <paramref name="command"/>.</param>
-		public CommandStateChangedEventArgs (Command command, InputState state)
+		public CommandStateChangedEventArgs (Command command, object state)
 		{
-			if (state == InputState.Axis)
-				throw new ArgumentException ("State can not be axis without percentage setting", "state");
-
-			this.Command = command;
-			this.State = state;
-		}
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="CommandStateChangedEventArgs"/> class.
-		/// </summary>
-		/// <param name="command">The command that's state has changed.</param>
-		/// <param name="state">The new state of the <paramref name="command"/>.</param>
-		/// <param name="axisPercent">The percentage of the axis position.</param>
-		public CommandStateChangedEventArgs (Command command, InputState state, double axisPercent)
-		{
-			this.Command = command;
-			this.State = state;
-			this.AxisPercent = axisPercent;
+			Command = command;
+			State = state;
 		}
 
 		/// <summary>
@@ -101,16 +67,7 @@ namespace Gablarski.Clients.Input
 		/// <summary>
 		/// Gets the input state for the <see cref="Command"/>.
 		/// </summary>
-		public InputState State
-		{
-			get;
-			private set;
-		}
-
-		/// <summary>
-		/// Gets the percentage of an axis.
-		/// </summary>
-		public double AxisPercent
+		public object State
 		{
 			get;
 			private set;

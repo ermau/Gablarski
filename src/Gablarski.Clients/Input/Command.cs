@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2010, Eric Maupin
+﻿// Copyright (c) 2011, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -35,9 +35,6 @@
 // DAMAGE.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Gablarski.Clients.Input
 {
@@ -62,7 +59,17 @@ namespace Gablarski.Clients.Input
 		//[Axis] GlobalVolume = 4,
 
 		/// <summary>Invokes a notification for the current song.</summary>
-		SayCurrentSong = 5
+		SayCurrentSong = 5,
+
+		ActivateRecognition = 6,
+
+		[CommandParameter] SwitchChannel = 7,
+	}
+
+	[AttributeUsage(AttributeTargets.Field)]
+	public class CommandParameter
+		: Attribute
+	{
 	}
 
 	[AttributeUsage(AttributeTargets.Field)]
