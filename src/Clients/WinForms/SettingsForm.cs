@@ -28,8 +28,11 @@ namespace Gablarski.Clients.Windows
 			this.gablarskiURLs.Checked = Settings.EnableGablarskiURLs;
 
 			this.bindingViewModel = new BindingListViewModel (this.Handle, new AnonymousCommand (OnRecord, CanRecord));
+			this.bindingViewModel.PropertyChanged += OnBindingPropertyChanged;
 			this.bindingList.DataContext = this.bindingViewModel;
-			
+			if (this.bindingViewModel.InputProvider == null)
+				this.addBinding.Enabled = false;
+
 			IInputProvider sprovider = null;
 			foreach (IInputProvider provider in Modules.Input)
 			{
@@ -74,6 +77,16 @@ namespace Gablarski.Clients.Windows
 				this.notifiers.Items.Add (n, Settings.EnabledNotifications.Any (ig => ig.Key == n.GetType().GetSimpleName()));
 
 			this.ignoreNotificationChanges = false;
+		}
+
+		private void OnBindingPropertyChanged (object sender, PropertyChangedEventArgs e)
+		{
+			switch (e.PropertyName)
+			{
+				case "InputProvider":
+					this.addBinding.Enabled = (this.bindingViewModel.InputProvider != null);
+					break;
+			}
 		}
 
 		private void btnOk_Click (object sender, EventArgs e)
