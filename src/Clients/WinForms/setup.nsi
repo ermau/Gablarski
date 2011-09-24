@@ -130,10 +130,10 @@ Section -post SEC0001
     SetOverwrite on
     File ..\..\..\tools\dxwebsetup.exe
     ExecWait "dxwebsetup.exe /Q"
-    File ..\..\..\tools\dotNetFx40_Full_setup.exe
+    File ..\..\..\tools\dotNetFx40_Full_x86_x64.exe
     #!insertmacro CheckDotNET
     ${If} $InstallDotNET == "Yes"
-        ExecWait "dotNetFx40_Full_setup.exe /q /norestart"
+        Exec "dotNetFx40_Full_x86_x64.exe"
     ${EndIf}
 SectionEnd
 
