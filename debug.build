@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--EXTERNAL_PROPERTIES: DotNetFramework3.5_x86_Path;teamcity.buildConfName;build.vcs.number-->
+<!--EXTERNAL_PROPERTIES: DotNetFramework4.0_x86_Path;teamcity.buildConfName;build.number-->
 <project name="Gablarski" default="gablarski" basedir=".">
-	<property name="gablarski.version" value="${teamcity.buildConfName}.${build.vcs.number}" />
+	<property name="gablarski.version" value="${build.number}" />
 	<property name="gablarski.config" value="Debug" />
 
 	<target name="gablarski">
