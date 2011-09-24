@@ -56,7 +56,7 @@ namespace Gablarski.Tests
 			Assert.Throws<ArgumentException> (() => new UserInfo (Username, 0, ChanId, Muted));
 			Assert.Throws<ArgumentOutOfRangeException> (() => new UserInfo (Username, UserId, -1, Muted));
 
-			Assert.Throws<ArgumentNullException> (() => new UserInfo (null, Phonetic, Username, UserId, ChanId, Muted));
+			//Assert.Throws<ArgumentNullException> (() => new UserInfo (null, Phonetic, Username, UserId, ChanId, Muted));
 			Assert.Throws<ArgumentNullException> (() => new UserInfo (Nickname, Phonetic, null, UserId, ChanId, Muted));
 			Assert.DoesNotThrow (() => new UserInfo (Nickname, null, Username, UserId, ChanId, Muted));
 			Assert.Throws<ArgumentException> (() => new UserInfo (Nickname, Phonetic, Username, 0, ChanId, Muted));

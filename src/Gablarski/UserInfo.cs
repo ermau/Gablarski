@@ -115,8 +115,8 @@ namespace Gablarski
 
 		internal UserInfo (string nickname, string phonetic, string username, int userId, int currentChannelId, bool muted, string comment, UserStatus status)
 		{
-			if (nickname.IsNullOrWhitespace())
-				throw new ArgumentNullException ("nickname");
+			//if (nickname.IsNullOrWhitespace())
+			//    throw new ArgumentNullException ("nickname");
 			if (username.IsNullOrWhitespace())
 				throw new ArgumentNullException ("username");
 			if (userId == 0)
