@@ -146,7 +146,7 @@ namespace Gablarski.Client
 		#region IEnumerable<IChannelInfo> members
 		public IEnumerator<IChannelInfo> GetEnumerator ()
 		{
-			if (this.channels.Count == 0)
+			if (this.channels == null || this.channels.Count == 0)
 				return Enumerable.Empty<IChannelInfo> ().GetEnumerator();
 
 			lock (channelLock)
