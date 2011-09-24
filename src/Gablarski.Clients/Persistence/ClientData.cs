@@ -83,6 +83,15 @@ namespace Gablarski.Clients.Persistence
 					return true;
 				}
 
+				if (version < new Version (0, 13, 4))
+				{
+					Settings.PlaybackDevice = "Default";
+					Settings.VoiceDevice = "Default";
+					Settings.Save();
+
+					return true;
+				}
+
 				return false;
 			}
 

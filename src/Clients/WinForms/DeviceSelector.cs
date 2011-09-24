@@ -68,10 +68,18 @@ namespace Gablarski
 		{
 			if (String.IsNullOrEmpty (deviceName))
 				return;
+			
+			if (deviceName == "Default")
+			{
+				device.SelectedItem = this.defaultDevice;
+				return;
+			}
 
 			device.SelectedItem = device.Items.Cast<IAudioDevice>().FirstOrDefault (d => d.Name == deviceName)
-									?? Provider.DefaultDevice;
+									?? this.defaultDevice;
 		}
+
+		private readonly DefaultDevice defaultDevice = new DefaultDevice();
 
 		private void provider_SelectedIndexChanged (object sender, EventArgs e)
 		{
@@ -84,13 +92,28 @@ namespace Gablarski
 				this.device.Enabled = true;
 				try
 				{
-					this.device.DataSource = Provider.GetDevices ().ToList ();
-					this.device.SelectedItem = Provider.DefaultDevice;
+					var devices = Provider.GetDevices().ToList();
+					devices.Insert (0, this.defaultDevice);
+					this.device.DataSource = devices;
+					this.device.SelectedItem = this.defaultDevice;
 				}
 				catch
 				{
 					this.provider.SelectedItem = null;
 				}
+			}
+		}
+
+		private class DefaultDevice
+			: IAudioDevice
+		{
+			public string Name
+			{
+				get { return "Default"; }
+			}
+
+			public void Dispose()
+			{
 			}
 		}
 	}

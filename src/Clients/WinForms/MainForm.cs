@@ -223,7 +223,7 @@ namespace Gablarski.Clients.Windows
 
 				this.audioPlayback = (IAudioPlaybackProvider) Activator.CreateInstance (Type.GetType (Settings.PlaybackProvider));
 
-				if (Settings.PlaybackDevice.IsNullOrWhitespace())
+				if (Settings.PlaybackDevice.IsNullOrWhitespace() || Settings.PlaybackDevice == "Default")
 					this.audioPlayback.Device = this.audioPlayback.DefaultDevice;
 				else
 				{
@@ -294,7 +294,7 @@ namespace Gablarski.Clients.Windows
 
 				this.voiceCapture = (IAudioCaptureProvider)Activator.CreateInstance (Type.GetType (Settings.VoiceProvider));
 
-				if (String.IsNullOrEmpty (Settings.VoiceDevice))
+				if (String.IsNullOrEmpty (Settings.VoiceDevice) || Settings.VoiceDevice == "Default")
 					this.voiceCapture.Device = this.voiceCapture.DefaultDevice;
 				else
 				{

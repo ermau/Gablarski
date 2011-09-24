@@ -104,7 +104,7 @@ namespace Gablarski.Clients
 
 		public static string VoiceDevice
 		{
-			get { return GetSetting ("VoiceDevice", String.Empty); }
+			get { return GetSetting ("VoiceDevice", "Default"); }
 			set
 			{
 				if (SetSetting ("VoiceDevice", value))
@@ -126,7 +126,7 @@ namespace Gablarski.Clients
 		public const string PlaybackDeviceSettingName = "PlaybackDevice";
 		public static string PlaybackDevice
 		{
-			get { return GetSetting (PlaybackDeviceSettingName, String.Empty); }
+			get { return GetSetting (PlaybackDeviceSettingName, "Default"); }
 			set
 			{
 				if (SetSetting (PlaybackDeviceSettingName, value))
