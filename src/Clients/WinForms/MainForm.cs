@@ -473,9 +473,12 @@ namespace Gablarski.Clients.Windows
 			this.inputProvider.Dispose();
 			this.inputProvider = null;
 
-			this.speech.StopRecognizing();
-			this.speech.CommandStateChanged -= OnCommandStateChanged;
-			this.speech = null;
+			if (this.speech != null)
+			{
+				this.speech.StopRecognizing();
+				this.speech.CommandStateChanged -= OnCommandStateChanged;
+				this.speech = null;
+			}
 		}
 
 		private ISpeechRecognizer speech;
@@ -489,9 +492,12 @@ namespace Gablarski.Clients.Windows
 
 			DisableInput();
 
-			this.speech = Modules.SpeechRecognizers.First();
-			this.speech.Update (this.gablarski.Channels, this.gablarski.Users);
-			this.speech.CommandStateChanged += OnCommandStateChanged;
+			this.speech = Modules.SpeechRecognizers.FirstOrDefault();
+			if (this.speech != null)
+			{
+				this.speech.Update (this.gablarski.Channels, this.gablarski.Users);
+				this.speech.CommandStateChanged += OnCommandStateChanged;
+			}
 
 			Type settingType;
 			if (Settings.InputProvider.IsNullOrWhitespace() || (settingType = Type.GetType (Settings.InputProvider)) == null)
