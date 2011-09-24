@@ -54,8 +54,9 @@
 			// 
 			// device
 			// 
-			this.device.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-						| System.Windows.Forms.AnchorStyles.Right)));
+			this.device.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.device.DisplayMember = "Name";
 			this.device.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.device.Enabled = false;
 			this.device.FormattingEnabled = true;
