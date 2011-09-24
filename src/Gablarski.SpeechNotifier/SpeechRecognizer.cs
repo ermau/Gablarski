@@ -121,12 +121,16 @@ namespace Gablarski.SpeechNotifier
 			if (this.changeChannelGrammar != null)
 				this.recognition.UnloadGrammar (this.changeChannelGrammar);
 
+			IChannelInfo[] newChannels = channels.ToArray();
+			if (newChannels.Length == 0)
+				return;
+
 			GrammarBuilder builder = new GrammarBuilder();
 			builder.Append (new Choices ("Switch channel", "Switch to channel", "Switch channel to", "Change channel", "Change to channel",
 			                             "Change channel to", "Join", "Join channel"));
 
 			Choices channelChoices = new Choices();
-			foreach (IChannelInfo channel in channels)
+			foreach (IChannelInfo channel in newChannels)
 				channelChoices.Add (new SemanticResultValue (channel.Name, channel.ChannelId));
 
 			builder.Append (new SemanticResultKey ("changeChannelTo", channelChoices));
