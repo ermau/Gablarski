@@ -133,7 +133,7 @@ Section -post SEC0001
     File ..\..\..\tools\dotNetFx40_Full_setup.exe
     #!insertmacro CheckDotNET
     ${If} $InstallDotNET == "Yes"
-        ExecWait "dotNetFx40_Full_setup.exe /passive"
+        ExecWait "dotNetFx40_Full_setup.exe /q /norestart"
     ${EndIf}
 SectionEnd
 
