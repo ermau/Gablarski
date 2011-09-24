@@ -73,11 +73,13 @@ namespace Gablarski.Clients.Persistence
 		{
 			if (!Settings.Version.IsNullOrWhitespace())
 			{
-				Version version = new Version(Settings.Version);
+				string newVersion = Settings.Version = typeof (ClientData).Assembly.GetName().Version.ToString();
+				Version version = new Version (Settings.Version);
+
 				if (version < new Version (0, 13, 1))
 				{
 					Settings.TextToSpeech = "Gablarski.SpeechNotifier.EventSpeech, Gablarski.SpeechNotifier";
-					Settings.Version = typeof (ClientData).Assembly.GetName().Version.ToString();
+					Settings.Version = newVersion;
 					Settings.Save();
 
 					return true;
@@ -87,6 +89,7 @@ namespace Gablarski.Clients.Persistence
 				{
 					Settings.PlaybackDevice = "Default";
 					Settings.VoiceDevice = "Default";
+					Settings.Version = newVersion;
 					Settings.Save();
 
 					return true;
