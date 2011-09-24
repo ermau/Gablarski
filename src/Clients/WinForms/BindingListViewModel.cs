@@ -137,7 +137,7 @@ namespace Gablarski.Clients.Windows
 				this.inputProvider.Attach (this.window);
 				OnPropertyChanged (new PropertyChangedEventArgs ("InputProvider"));
 
-				this.bindings = new ObservableCollection<CommandBindingSettingEntry> (Persistence.Persistence.GetCommandBindings()
+				this.bindings = new ObservableCollection<CommandBindingSettingEntry> (ClientData.GetCommandBindings()
 					.Where (b => value.GetType().GetSimpleName() == b.ProviderType)
 					.Select (b => new CommandBindingSettingEntry (value, b)));
 

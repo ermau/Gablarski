@@ -72,14 +72,14 @@ namespace Gablarski.Clients.Windows
 				string un = e.User.Username.Replace (" ", String.Empty).ToLower();
 				if (this.ignores.Contains (un) && e.Unmuted)
 				{
-					foreach (var entry in Persistance.GetIgnores().Where (ie => ie.ServerId == this.server.Id && ie.Username.Replace(" ", String.Empty).ToLower() == un))
-						Persistance.Delete (entry);
+					foreach (var entry in ClientData.GetIgnores().Where (ie => ie.ServerId == this.server.Id && ie.Username.Replace(" ", String.Empty).ToLower() == un))
+						ClientData.Delete (entry);
 
 					this.ignores.Remove (un);
 				}
 				else if (!this.ignores.Contains (un) && !e.Unmuted)
 				{
-					Persistence.Persistence.SaveOrUpdate (new IgnoreEntry (0) { ServerId = this.server.Id, Username = un });
+					ClientData.SaveOrUpdate (new IgnoreEntry (0) { ServerId = this.server.Id, Username = un });
 					this.ignores.Add (un);
 				}
 			}
@@ -665,7 +665,7 @@ namespace Gablarski.Clients.Windows
 				users.RemoveUser (user);
 				users.AddUser (user, gablarski.Sources[user]);
 
-				VolumeEntry volume = Persistance.GetVolumes (this.server).FirstOrDefault (ve => ve.Username == user.Username);
+				VolumeEntry volume = ClientData.GetVolumes (this.server).FirstOrDefault (ve => ve.Username == user.Username);
 				if (volume != null)
 					gain = volume.Gain;
 			}
@@ -935,7 +935,7 @@ namespace Gablarski.Clients.Windows
 			
 			lock (this.ignores)
 			{
-				Persistance.GetIgnores().Where (i => i.ServerId == this.server.Id).Select (i => i.Username.Replace (" ", String.Empty).ToLower())
+				ClientData.GetIgnores().Where (i => i.ServerId == this.server.Id).Select (i => i.Username.Replace (" ", String.Empty).ToLower())
 					.ForEach (un => this.ignores.Add (un));
 			}
 

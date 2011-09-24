@@ -824,7 +824,7 @@ namespace Gablarski.Clients.Windows
 		private void VolumeOnClick (object sender, EventArgs eventArgs)
 		{
 			var user = (IUserInfo)this.SelectedNode.Tag;
-			VolumeEntry entry = Persistence.Persistence.GetVolumes (Server).FirstOrDefault (ve => ve.Username == user.Username)
+			VolumeEntry entry = ClientData.GetVolumes (Server).FirstOrDefault (ve => ve.Username == user.Username)
 				                    ?? new VolumeEntry { Username = user.Username, ServerId = Server.Id };
 
 			VolumeForm volume = new VolumeForm (entry.Gain, v =>
@@ -836,7 +836,7 @@ namespace Gablarski.Clients.Windows
 			v =>
 			{
 				entry.Gain = v;
-				Persistence.Persistence.SaveOrUpdate (entry);
+				ClientData.SaveOrUpdate (entry);
 			});
 			volume.ShowDialog (this.Parent);
 		}

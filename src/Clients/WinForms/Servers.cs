@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using Gablarski.Clients.Persistence;
 
 namespace Gablarski.Clients.Windows
@@ -10,17 +7,17 @@ namespace Gablarski.Clients.Windows
 	{
 		public static IEnumerable<ServerEntry> GetEntries()
 		{
-			return Persistence.Persistence.GetServers();
+			return ClientData.GetServers();
 		}
 
 		public static void SaveServer (ServerEntry entry)
 		{
-			Persistence.Persistence.SaveOrUpdate (entry);
+			ClientData.SaveOrUpdate (entry);
 		}
 
 		public static void DeleteServer (ServerEntry entry)
 		{
-			Persistence.Persistence.Delete (entry);
+			ClientData.Delete (entry);
 		}
 	}
 }

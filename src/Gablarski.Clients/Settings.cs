@@ -337,16 +337,16 @@ namespace Gablarski.Clients
 			lock (SettingLock)
 			{
 				foreach (var entry in settings.Values)
-					Persistence.Persistence.SaveOrUpdate (entry);
+					ClientData.SaveOrUpdate (entry);
 
 				settings = null;
 				if (commandBindings != null)
 				{
 					commandBindings.CollectionChanged -= OnCommandBindingsChanged;
 
-					Persistence.Persistence.DeleteAllBindings();
+					ClientData.DeleteAllBindings();
 					foreach (var binding in CommandBindings)
-						Persistence.Persistence.Create (new CommandBindingEntry (binding));
+						ClientData.Create (new CommandBindingEntry (binding));
 
 					commandBindings = null;
 				}
@@ -371,14 +371,14 @@ namespace Gablarski.Clients
 				if (settings != null)
 					return;
 
-				settings = Persistence.Persistence.GetSettings().ToDictionary (s => s.Name);
+				settings = ClientData.GetSettings().ToDictionary (s => s.Name);
 
-				if (Persistence.Persistence.CheckForUpdates())
-					settings = Persistence.Persistence.GetSettings().ToDictionary (s => s.Name);
+				if (ClientData.CheckForUpdates())
+					settings = ClientData.GetSettings().ToDictionary (s => s.Name);
 
 				commandBindings = new ObservableCollection<CommandBinding>();
 				commandBindings.CollectionChanged += OnCommandBindingsChanged;
-				foreach (var cbe in Persistence.Persistence.GetCommandBindings())
+				foreach (var cbe in ClientData.GetCommandBindings())
 				{
 					IInputProvider provider = Enumerable.FirstOrDefault<IInputProvider> (Modules.Input, ip => Extensions.GetSimpleName(ip.GetType()) == cbe.ProviderType);
 					if (provider == null)
