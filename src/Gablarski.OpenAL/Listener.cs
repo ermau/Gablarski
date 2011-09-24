@@ -23,10 +23,10 @@ namespace Gablarski.OpenAL
 			}
 		}
 		
-		[DllImport ("OpenAL32.dll")]
+		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
 		static extern void alListenerf (ALEnum param, float val);
 		
-		[DllImport ("OpenAL32.dll")]
+		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
 		static extern void alGetListenerf (ALEnum param, out float val);
 	}
 }
