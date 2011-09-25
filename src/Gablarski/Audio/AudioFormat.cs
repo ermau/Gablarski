@@ -37,6 +37,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Tempest;
 
 namespace Gablarski.Audio
 {
@@ -71,15 +72,15 @@ namespace Gablarski.Audio
 	}
 
 	public class AudioFormat
-		: IEquatable<AudioFormat>
+		: ISerializable, IEquatable<AudioFormat>
 	{
-		public AudioFormat (IValueReader reader)
+		public AudioFormat (ISerializationContext context, IValueReader reader)
 		{
 			if (reader == null)
 				throw new ArgumentNullException ("reader");
 
 			// ReSharper disable DoNotCallOverridableMethodsInConstructor
-			Deserialize (reader);
+			Deserialize (context, reader);
 			// ReSharper restore DoNotCallOverridableMethodsInConstructor
 		}
 
@@ -170,7 +171,7 @@ namespace Gablarski.Audio
 			}
 		}
 
-		protected internal virtual void Serialize (IValueWriter writer)
+		public virtual void Serialize (ISerializationContext context, IValueWriter writer)
 		{
 			writer.WriteUInt32 ((ushort)WaveEncoding);
 			writer.WriteByte ((byte)Channels);
@@ -178,7 +179,7 @@ namespace Gablarski.Audio
 			writer.WriteInt32 (SampleRate);
 		}
 
-		protected internal virtual void Deserialize (IValueReader reader)
+		public virtual void Deserialize (ISerializationContext context, IValueReader reader)
 		{
 			WaveEncoding = (WaveFormatEncoding) reader.ReadUInt32();
 			Channels = reader.ReadByte();

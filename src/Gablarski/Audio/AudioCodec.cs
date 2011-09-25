@@ -37,6 +37,7 @@
 using System;
 using System.Linq;
 using Gablarski.CELT;
+using Tempest;
 
 namespace Gablarski.Audio
 {
@@ -62,8 +63,8 @@ namespace Gablarski.Audio
 		{
 		}
 
-		internal AudioCodec (IValueReader reader)
-			: base (reader)
+		internal AudioCodec (ISerializationContext context, IValueReader reader)
+			: base (context, reader)
 		{
 		}
 

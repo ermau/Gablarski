@@ -36,6 +36,7 @@
 
 using System;
 using System.Linq;
+using Tempest;
 
 namespace Gablarski.Audio
 {
@@ -83,8 +84,8 @@ namespace Gablarski.Audio
 			Complexity = complexity;
 		}
 
-		internal AudioCodecArgs (IValueReader reader)
-			: base (reader)
+		internal AudioCodecArgs (ISerializationContext context, IValueReader reader)
+			: base (context, reader)
 		{
 		}
 
@@ -170,17 +171,17 @@ namespace Gablarski.Audio
 		private byte complexity;
 		private int bitrate;
 
-		protected internal override void Serialize (IValueWriter writer)
+		public override void Serialize (ISerializationContext context, IValueWriter writer)
 		{
-			base.Serialize (writer);
+			base.Serialize (context, writer);
 			writer.WriteInt32 (Bitrate);
 			writer.WriteInt16 (FrameSize);
 			writer.WriteByte (Complexity);
 		}
 
-		protected internal override void Deserialize (IValueReader reader)
+		public override void Deserialize (ISerializationContext context, IValueReader reader)
 		{
-			base.Deserialize (reader);
+			base.Deserialize (context, reader);
 			Bitrate = reader.ReadInt32();
 			FrameSize = reader.ReadInt16();
 			Complexity = reader.ReadByte();
