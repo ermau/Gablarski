@@ -116,6 +116,7 @@
     <Compile Include="Client\ICurrentUserHandler.cs" />
     <Compile Include="Client\ServerQuery.cs" />
     <Compile Include="Encryption.cs" />
+    <Compile Include="GablarskiProtocol.cs" />
     <Compile Include="IChannelInfo.cs" />
     <Compile Include="IIndexedEnumerable.cs" />
     <Compile Include="Client\IClientUserManager.cs" />
