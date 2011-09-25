@@ -475,6 +475,7 @@ namespace Gablarski.Clients.Windows
 
 			if (this.speech != null)
 			{
+				this.speech.Close();
 				this.speech.StopRecognizing();
 				this.speech.CommandStateChanged -= OnCommandStateChanged;
 				this.speech = null;
@@ -495,8 +496,17 @@ namespace Gablarski.Clients.Windows
 			this.speech = Modules.SpeechRecognizers.FirstOrDefault();
 			if (this.speech != null)
 			{
-				this.speech.Update (this.gablarski.Channels, this.gablarski.Users);
-				this.speech.CommandStateChanged += OnCommandStateChanged;
+				try
+				{
+					this.speech.Open();
+					this.speech.Update (this.gablarski.Channels, this.gablarski.Users);
+					this.speech.CommandStateChanged += OnCommandStateChanged;
+				}
+				catch (Exception ex)
+				{
+					MessageBox.Show ("Error initializing speech recognition: " + ex, "Speech Recognition", MessageBoxButtons.OK);
+					this.speech = null;
+				}
 			}
 
 			Type settingType;
@@ -529,7 +539,7 @@ namespace Gablarski.Clients.Windows
 					}
 
 					if ((bool)e.State)
-						this.speech.Recognize();
+						this.speech.StartRecognizing();
 					else
 						this.speech.StopRecognizing();
 

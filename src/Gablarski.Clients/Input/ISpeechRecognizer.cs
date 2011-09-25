@@ -36,20 +36,51 @@
 
 using System;
 using System.Collections.Generic;
-using Gablarski.Client;
 
 namespace Gablarski.Clients.Input
 {
+	/// <summary>
+	/// Contract for speech recognition -> commands.
+	/// </summary>
 	public interface ISpeechRecognizer
 		: INamedComponent, IDisposable
 	{
+		/// <summary>
+		/// Fired when a bound command state has changed.
+		/// </summary>
+		/// <seealso cref="IInputProvider.CommandStateChanged"/>
 		event EventHandler<CommandStateChangedEventArgs> CommandStateChanged;
 
 		ITextToSpeech TTS { set; }
 
-		void Recognize();
-		void StopRecognizing();
+		/// <summary>
+		/// Opens the recognizer and prepares it for use.
+		/// </summary>
+		/// <returns><c>true</c> if </returns>
+		void Open();
 
+		/// <summary>
+		/// Closes the recognizer.
+		/// </summary>
+		void Close();
+
+		/// <summary>
+		/// Updates the recognizer with the channels and users so it can update detections.
+		/// </summary>
+		/// <param name="channels">The channels</param>
+		/// <param name="users">The users</param>
+		/// <exception cref="ArgumentNullException"><paramref name="channels"/> or <paramref name="users"/> is <c>null</c>.</exception>
+		/// <exception cref="InvalidOperationException">The recognizer is currently stopped.</exception>
 		void Update (IEnumerable<IChannelInfo> channels, IEnumerable<IUserInfo> users);
+
+		/// <summary>
+		/// Starts attempting to recognize a command.
+		/// </summary>
+		void StartRecognizing();
+
+		/// <summary>
+		/// Stops attempting to recognize a command.
+		/// </summary>
+		void StopRecognizing();
 	}
 }

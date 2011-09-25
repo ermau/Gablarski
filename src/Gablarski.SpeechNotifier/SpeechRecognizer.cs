@@ -49,19 +49,6 @@ namespace Gablarski.SpeechNotifier
 	public class SpeechRecognizer
 		: ISpeechRecognizer
 	{
-		public SpeechRecognizer()
-		{
-			this.recognition.SpeechRecognized += OnSpeechRecognized;
-			this.recognition.MaxAlternates = 1;
-			this.recognition.SetInputToDefaultAudioDevice();
-
-			GrammarBuilder builder = new GrammarBuilder();
-			builder.Append (new SemanticResultKey ("command", new Choices ("mute", "unmute")));
-			builder.Append (new Choices (" ", "me"));
-
-			this.recognition.LoadGrammar (new Grammar (builder));
-		}
-		
 		public event EventHandler<CommandStateChangedEventArgs> CommandStateChanged;
 
 		public string Name
@@ -75,7 +62,31 @@ namespace Gablarski.SpeechNotifier
 			set;
 		}
 
-		public void Recognize()
+		public void Open()
+		{
+			this.recognition = new SpeechRecognitionEngine();
+			this.recognition.SpeechRecognized += OnSpeechRecognized;
+			this.recognition.MaxAlternates = 1;
+			this.recognition.SetInputToDefaultAudioDevice();
+
+			GrammarBuilder builder = new GrammarBuilder();
+			builder.Append (new SemanticResultKey ("command", new Choices ("mute", "unmute")));
+			builder.Append (new Choices (" ", "me"));
+
+			this.muteGrammar = new Grammar (builder);
+			this.recognition.LoadGrammar (this.muteGrammar);
+		}
+
+		public void Close()
+		{
+			if (this.recognition != null)
+				this.recognition.Dispose();
+
+			this.recognition = null;
+			this.muteGrammar = null;
+		}
+
+		public void StartRecognizing()
 		{
 			lock (this.recognition)
 				this.recognition.RecognizeAsync (RecognizeMode.Single);
@@ -106,9 +117,11 @@ namespace Gablarski.SpeechNotifier
 			this.recognition.Dispose();
 		}
 
+		private SpeechRecognitionEngine recognition;
+
 		private Grammar moveUserGrammar;
 		private Grammar changeChannelGrammar;
-		private readonly SpeechRecognitionEngine recognition = new SpeechRecognitionEngine();
+		private Grammar muteGrammar;
 
 		private void SetupMoveUserGrammar (IEnumerable<IChannelInfo> channels, IEnumerable<IUserInfo> users)
 		{
