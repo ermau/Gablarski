@@ -1,4 +1,4 @@
-// Copyright (c) 2010, Eric Maupin
+// Copyright (c) 2011, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -36,17 +36,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Diagnostics;
-using System.IO;
 using System.Reflection;
-using Gablarski.Audio;
 using Gablarski.Client;
-using Gablarski.Network;
-using Gablarski.Server;
-using Mono.Options;
-using System.Linq;
-using Cadenza;
+using Tempest.Providers.Network;
 
 namespace Gablarski.Clients.CLI
 {
@@ -57,7 +49,7 @@ namespace Gablarski.Clients.CLI
 		{
 			Console.WriteLine ("Gablarski CLI Client version {0}", Assembly.GetAssembly (typeof(Program)).GetName ().Version);
 	
-			GablarskiClient client = new GablarskiClient (new NetworkClientConnection ());
+			GablarskiClient client = new GablarskiClient (new NetworkClientConnection (GablarskiProtocol.Instance));
 	
 			List<CommandModule> modules = new List<CommandModule> 
 			{
