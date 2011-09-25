@@ -38,6 +38,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using Gablarski.Client;
 
@@ -98,7 +99,7 @@ namespace Gablarski.Clients.CLI
 					string[] hostParts = parts[2].Split (':');
 					int port = (hostParts.Length == 1) ? 42912 : Int32.Parse (hostParts[1]);
 
-					Client.Connect (hostParts[0], port);
+					Client.Connect (new DnsEndPoint (hostParts[0], port));
 
 					return true;
 				}
@@ -106,7 +107,7 @@ namespace Gablarski.Clients.CLI
 				case "disconnect":
 				{
 					if (Client.IsConnected)
-						Client.Disconnect();
+						Client.Disconnect (now: true);
 					else
 						Writer.WriteLine ("Not connected");
 					
