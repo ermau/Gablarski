@@ -108,9 +108,6 @@
     <Compile Include="Audio\Speex\SpeexPreprocessor.cs" />
     <Compile Include="Audio\VoiceActivation.cs" />
     <Compile Include="BanInfo.cs" />
-    <Compile Include="BinaryValueReader.cs" />
-    <Compile Include="BinaryValueWriter.cs" />
-    <Compile Include="ByteArrayValueReader.cs" />
     <Compile Include="Audio\AudioEngine.cs" />
     <Compile Include="Audio\IAudioSender.cs" />
     <Compile Include="Client\IClientSourceHandler.cs" />
@@ -120,8 +117,6 @@
     <Compile Include="Client\ServerQuery.cs" />
     <Compile Include="Encryption.cs" />
     <Compile Include="IChannelInfo.cs" />
-    <Compile Include="IConnectionHandler.cs" />
-    <Compile Include="IEncryption.cs" />
     <Compile Include="IIndexedEnumerable.cs" />
     <Compile Include="Client\IClientUserManager.cs" />
     <Compile Include="ISourceHandler.cs" />
@@ -163,8 +158,6 @@
     <Compile Include="Audio\IAudioPlaybackProvider.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="GenericResult.cs" />
-    <Compile Include="IClientConnection.cs" />
-    <Compile Include="IConnection.cs" />
     <Compile Include="LoginResult.cs" />
     <Compile Include="Messages\ServerAudioDataMessage.cs" />
     <Compile Include="Messages\ChannelChangeMessage.cs" />
@@ -186,13 +179,7 @@
     <Compile Include="Messages\SourceListMessage.cs" />
     <Compile Include="Messages\SourceResultMessage.cs" />
     <Compile Include="ByteArrayExtensions.cs" />
-    <Compile Include="Network\NetworkClientConnection.cs" />
-    <Compile Include="Network\NetworkServerConnection.cs" />
-    <Compile Include="Network\NetworkServerConnectionProvider.cs" />
-    <Compile Include="Network\SocketValueWriter.cs" />
-    <Compile Include="PublicRSAParameters.cs" />
     <Compile Include="Decryption.cs" />
-    <Compile Include="Server\IConnectionProvider.cs" />
     <Compile Include="Server\IRedirector.cs" />
     <Compile Include="Server\IServerChannelHandler.cs" />
     <Compile Include="Server\IConnectionManager.cs" />
@@ -217,8 +204,6 @@
     <Compile Include="Server\GuestUserProvider.cs" />
     <Compile Include="Server\IChannelProvider.cs" />
     <Compile Include="Server\IPermissionsProvider.cs" />
-    <Compile Include="IValueReader.cs" />
-    <Compile Include="IValueWriter.cs" />
     <Compile Include="Messages\ClientMessage.cs" />
     <Compile Include="Messages\DisconnectMessage.cs" />
     <Compile Include="Messages\LoginMessage.cs" />
@@ -230,8 +215,6 @@
     <Compile Include="Permission.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Server\ServerSettings.cs" />
-    <Compile Include="StreamValueReader.cs" />
-    <Compile Include="StreamValueWriter.cs" />
     <Compile Include="Messages\UserDisconnectedMessage.cs" />
     <Compile Include="Client\ClientUserHandler.cs" />
     <Compile Include="Client\ClientSourceManager.cs" />
