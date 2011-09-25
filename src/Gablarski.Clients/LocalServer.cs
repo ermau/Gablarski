@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Eric Maupin
+﻿// Copyright (c) 2011, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -34,12 +34,9 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Gablarski.Network;
+using System.Net;
 using Gablarski.Server;
+using Tempest.Providers.Network;
 
 namespace Gablarski.Clients
 {
@@ -77,7 +74,7 @@ namespace Gablarski.Clients
 			permissions = new GuestPermissionProvider();
 			settings = new ServerSettings();
 			server = new GablarskiServer (settings, authorization, permissions, channels);
-			server.AddConnectionProvider (new NetworkServerConnectionProvider());
+			server.AddConnectionProvider (new NetworkConnectionProvider (GablarskiProtocol.Instance, new IPEndPoint (IPAddress.Any, GablarskiProtocol.Port), 100));
 
 			server.Start();
 		}
@@ -87,7 +84,7 @@ namespace Gablarski.Clients
 			if (server == null)
 				return;
 
-			server.Shutdown();
+			server.Stop();
 			server = null;
 			channels = null;
 			authorization = null;
