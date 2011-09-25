@@ -39,6 +39,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using Gablarski.Server;
+using Tempest;
 using log4net;
 
 namespace Gablarski.Barrel.Config
@@ -79,6 +80,13 @@ namespace Gablarski.Barrel.Config
 		{
 			get { return (bool)this["network"]; }
 			set { this["network"] = value; }
+		}
+
+		[ConfigurationProperty ("maxConnections", DefaultValue = 100)]
+		public int MaxConnections
+		{
+			get { return (int) this["maxConnections"]; }
+			set { this["maxConnections"] = value; }
 		}
 
 		[ConfigurationProperty ("logourl", IsRequired = false)]

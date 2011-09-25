@@ -1,4 +1,4 @@
-// Copyright (c) 2010, Eric Maupin
+// Copyright (c) 2011, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -37,9 +37,11 @@
 using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using Gablarski.Barrel.Config;
-using Gablarski.Network;
 using Gablarski.Server;
+using Tempest;
+using Tempest.Providers.Network;
 using log4net;
 using Cadenza;
 
@@ -86,10 +88,11 @@ namespace Gablarski.Barrel
 				ServerLogo = serverConfig.LogoURL
 			}, providers.Users, providers.Permissions, providers.Channels);
 
-			server.AddConnectionProvider (new NetworkServerConnectionProvider { Port = serverConfig.Port });
+			if (serverConfig.Network)
+				server.AddConnectionProvider (new NetworkConnectionProvider (GablarskiProtocol.Instance, new IPEndPoint (IPAddress.Any, serverConfig.Port), serverConfig.MaxConnections));
 
 			foreach (IConnectionProvider provider in providers.ConnectionProviders)
-				server.AddConnectionProvider (provider);
+				server.AddConnectionProvider (provider, ExecutionMode.GlobalOrder);
 
 			server.Start();
 
