@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2010, Eric Maupin
+﻿// Copyright (c) 2011, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -35,13 +35,12 @@
 // DAMAGE.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using Tempest;
 
 namespace Gablarski
 {
 	public class BanInfo
-		: IEquatable<BanInfo>
+		: ISerializable, IEquatable<BanInfo>
 	{
 		public BanInfo (string ipMask, string username, TimeSpan length)
 		{
@@ -58,14 +57,14 @@ namespace Gablarski
 		{
 		}
 
-		internal BanInfo (IValueReader reader)
+		internal BanInfo (ISerializationContext context, IValueReader reader)
 		{
-			Deserialize (reader);
+			Deserialize (context, reader);
 		}
 
 		public bool IsExpired
 		{
-			get { return (Length == TimeSpan.Zero) ? false : (Created.Add (Length) < DateTime.Now); }
+			get { return !(this.Length == TimeSpan.Zero) && (this.Created.Add (this.Length) < DateTime.Now); }
 		}
 
 		public virtual string IPMask
@@ -92,7 +91,7 @@ namespace Gablarski
 			set;
 		}
 
-		internal void Serialize (IValueWriter writer)
+		public void Serialize (ISerializationContext context, IValueWriter writer)
 		{
 			writer.WriteString (IPMask);
 			writer.WriteString (Username);
@@ -100,7 +99,7 @@ namespace Gablarski
 			writer.WriteInt64 (Length.Ticks);
 		}
 
-		internal void Deserialize (IValueReader reader)
+		public void Deserialize (ISerializationContext context, IValueReader reader)
 		{
 			IPMask = reader.ReadString();
 			Username = reader.ReadString();
