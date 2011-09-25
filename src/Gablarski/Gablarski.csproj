@@ -224,7 +224,7 @@
     <Compile Include="Messages\UserChangedChannelMessage.cs" />
     <Compile Include="Messages\UserJoinedMessage.cs" />
     <Compile Include="Server\LobbyChannelProvider.cs" />
-    <Compile Include="Client\IClientContext.cs" />
+    <Compile Include="Client\IGablarskiClientContext.cs" />
     <Compile Include="Server\IGablarskiServerContext.cs" />
     <Compile Include="Messages\PunchThroughMessage.cs" />
     <Compile Include="Messages\PunchThroughReceivedMessage.cs" />
