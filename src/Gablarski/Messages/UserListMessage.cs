@@ -37,14 +37,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Tempest;
 
 namespace Gablarski.Messages
 {
 	public class UserListMessage
-		: ServerMessage
+		: GablarskiMessage
 	{
 		public UserListMessage()
-			: base (ServerMessageType.UserList)
+			: base (GablarskiMessageType.UserList)
 		{
 		}
 
@@ -59,7 +60,7 @@ namespace Gablarski.Messages
 			get; set;
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
 			int numUsers = reader.ReadInt32();
 			IUser[] users = new IUser[numUsers];
@@ -69,7 +70,7 @@ namespace Gablarski.Messages
 			Users = users;
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
 			var users = Users.ToList();
 			writer.WriteInt32 (users.Count);

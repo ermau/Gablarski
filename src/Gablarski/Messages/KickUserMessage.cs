@@ -37,14 +37,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Tempest;
 
 namespace Gablarski.Messages
 {
 	public class KickUserMessage
-		: ClientMessage
+		: GablarskiMessage
 	{
 		public KickUserMessage()
-			: base (ClientMessageType.KickUser)
+			: base (GablarskiMessageType.KickUser)
 		{
 		}
 
@@ -70,13 +71,13 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
 			UserId = reader.ReadInt32();
 			FromServer = reader.ReadBool();
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
 			writer.WriteInt32 (UserId);
 			writer.WriteBool (FromServer);

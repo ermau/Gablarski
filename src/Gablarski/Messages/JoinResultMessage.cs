@@ -35,14 +35,15 @@
 // DAMAGE.
 
 using System.Linq;
+using Tempest;
 
 namespace Gablarski.Messages
 {
 	public class JoinResultMessage
-		: ServerMessage
+		: GablarskiMessage
 	{
 		public JoinResultMessage()
-			: base (ServerMessageType.JoinResult)
+			: base (GablarskiMessageType.JoinResult)
 		{
 		}
 
@@ -70,20 +71,20 @@ namespace Gablarski.Messages
 
 		#region Overrides of MessageBase
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
 			writer.WriteInt32 ((int)this.Result);
 			
 			if (this.user != null)
-				this.user.Serialize (writer);
+				this.user.Serialize (context, writer);
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
 			this.Result = (LoginResultState)reader.ReadInt32();
 
 			if (this.Result == LoginResultState.Success)
-				this.UserInfo = new UserInfo (reader);
+				this.UserInfo = new UserInfo (context, reader);
 		}
 
 		#endregion

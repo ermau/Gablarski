@@ -36,14 +36,15 @@
 
 using System;
 using Cadenza;
+using Tempest;
 
 namespace Gablarski.Messages
 {
 	public class JoinMessage
-		: ClientMessage
+		: GablarskiMessage
 	{
 		public JoinMessage()
-			: base (ClientMessageType.Join)
+			: base (GablarskiMessageType.Join)
 		{
 		}
 		
@@ -80,14 +81,14 @@ namespace Gablarski.Messages
 
 		#region Overrides of MessageBase
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
 			writer.WriteString (this.Nickname);
 			writer.WriteString (this.Phonetic);
 			writer.WriteString (this.ServerPassword);
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
 			this.Nickname = reader.ReadString();
 			this.Phonetic = reader.ReadString();

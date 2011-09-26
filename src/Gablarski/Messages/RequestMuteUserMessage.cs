@@ -44,7 +44,7 @@ namespace Gablarski.Messages
 		: RequestMuteMessage
 	{
 		public RequestMuteUserMessage ()
-			: base (ClientMessageType.RequestMuteUser)
+			: base (GablarskiMessageType.RequestMuteUser)
 		{
 		}
 

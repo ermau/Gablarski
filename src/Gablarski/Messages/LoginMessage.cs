@@ -37,14 +37,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Tempest;
 
 namespace Gablarski.Messages
 {
 	public class LoginMessage
-		: ClientMessage
+		: GablarskiMessage
 	{
 		public LoginMessage ()
-			: base (ClientMessageType.Login)
+			: base (GablarskiMessageType.Login)
 		{
 		}
 
@@ -65,12 +66,7 @@ namespace Gablarski.Messages
 			get { return true; }
 		}
 
-		public override int MessageSize
-		{
-			get { return Username.Length + Password.Length; }
-		}
-
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
 			if (Password == null)
 				throw new InvalidOperationException ("Can not login without a password.");
@@ -79,7 +75,7 @@ namespace Gablarski.Messages
 			writer.WriteString (Password);
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
 			Username = reader.ReadString ();
 			Password = reader.ReadString ();

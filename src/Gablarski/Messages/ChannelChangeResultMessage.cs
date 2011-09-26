@@ -34,6 +34,7 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 using System.Linq;
+using Tempest;
 
 namespace Gablarski.Messages
 {
@@ -67,10 +68,10 @@ namespace Gablarski.Messages
 	}
 
 	public class ChannelChangeResultMessage
-		: ServerMessage
+		: GablarskiMessage
 	{
 		public ChannelChangeResultMessage ()
-			: base (ServerMessageType.ChangeChannelResult)
+			: base (GablarskiMessageType.ChangeChannelResult)
 		{
 		}
 
@@ -93,16 +94,16 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
 			writer.WriteByte ((byte)this.Result);
-			this.MoveInfo.Serialize (writer);
+			this.MoveInfo.Serialize (context, writer);
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
 			this.Result = (ChannelChangeResult)reader.ReadByte ();
-			this.MoveInfo = new ChannelChangeInfo (reader);
+			this.MoveInfo = new ChannelChangeInfo (context, reader);
 		}
 	}
 }

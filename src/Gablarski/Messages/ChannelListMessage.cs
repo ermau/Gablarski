@@ -38,14 +38,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Tempest;
 
 namespace Gablarski.Messages
 {
 	public class ChannelListMessage
-		: ServerMessage
+		: GablarskiMessage
 	{
 		public ChannelListMessage ()
-			: base (ServerMessageType.ChannelList)
+			: base (GablarskiMessageType.ChannelList)
 		{
 
 		}
@@ -96,9 +97,9 @@ namespace Gablarski.Messages
 			set { this.channels = value.Select (c => new ChannelInfo (c)).ToList(); }
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
-			writer.WriteGenericResult (this.Result);
+			writer.WriteByte ((byte)Result);
 			if (this.Result != GenericResult.Success)
 				return;
 
@@ -106,12 +107,12 @@ namespace Gablarski.Messages
 
 			writer.WriteInt32 (this.Channels.Count ());
 			foreach (var c in this.channels)
-				c.Serialize (writer);
+				c.Serialize (context, writer);
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
-			this.Result = reader.ReadGenericResult ();
+			this.Result = (GenericResult)reader.ReadByte();
 			if (this.Result != GenericResult.Success)
 				return;
 
@@ -120,7 +121,7 @@ namespace Gablarski.Messages
 			int nchannels = reader.ReadInt32();
 			this.channels = new List<ChannelInfo> (nchannels);
 			for (int i = 0; i < nchannels; ++i)
-				this.channels.Add (new ChannelInfo (reader));
+				this.channels.Add (new ChannelInfo (context, reader));
 		}
 		
 		private List<ChannelInfo> channels;

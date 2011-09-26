@@ -34,13 +34,15 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
+using Tempest;
+
 namespace Gablarski.Messages
 {
 	public class ServerInfoMessage
-		: ServerMessage
+		: GablarskiMessage
 	{
 		public ServerInfoMessage ()
-			: base (ServerMessageType.ServerInfoReceived)
+			: base (GablarskiMessageType.ServerInfoReceived)
 		{
 		}
 
@@ -56,14 +58,14 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
-			ServerInfo.Serialize (writer);
+			ServerInfo.Serialize (context, writer);
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
-			ServerInfo = new ServerInfo (reader);
+			ServerInfo = new ServerInfo (context, reader);
 		}
 	}
 }

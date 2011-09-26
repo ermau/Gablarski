@@ -39,14 +39,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Gablarski.Audio;
+using Tempest;
 
 namespace Gablarski.Messages
 {
 	public class SourceResultMessage
-		: ServerMessage
+		: GablarskiMessage
 	{
 		public SourceResultMessage ()
-			: base (ServerMessageType.SourceResult)
+			: base (GablarskiMessageType.SourceResult)
 		{
 		}
 
@@ -90,16 +91,16 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
 			writer.WriteString (this.SourceName);
 			writer.WriteByte ((byte)this.SourceResult);
 
 			if (this.Source != null)
-				this.Source.Serialize (writer);
+				this.Source.Serialize (context, writer);
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
 			this.SourceName = reader.ReadString ();
 			this.SourceResult = (SourceResult)reader.ReadByte ();
@@ -109,7 +110,7 @@ namespace Gablarski.Messages
 				case Messages.SourceResult.NewSource:
 				case Messages.SourceResult.SourceRemoved:
 				case Messages.SourceResult.Succeeded:
-					this.Source = new AudioSource (reader);
+					this.Source = new AudioSource (context, reader);
 					break;
 			}
 		}

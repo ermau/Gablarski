@@ -38,14 +38,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Gablarski.Audio;
+using Tempest;
 
 namespace Gablarski.Messages
 {
 	public class RequestSourceMessage
-		: ClientMessage
+		: GablarskiMessage
 	{
 		public RequestSourceMessage ()
-			: base (ClientMessageType.RequestSource)
+			: base (GablarskiMessageType.RequestSource)
 		{
 		}
 
@@ -72,13 +73,13 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
 			writer.WriteString (this.Name);
 			AudioSettings.Serialize (writer);
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
 			this.Name = reader.ReadString();
 			AudioSettings = new AudioCodecArgs (reader);

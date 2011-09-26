@@ -34,13 +34,15 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
+using Tempest;
+
 namespace Gablarski.Messages
 {
 	public class RegistrationApprovalMessage
-		: ClientMessage
+		: GablarskiMessage
 	{
 		public RegistrationApprovalMessage()
-			: base (ClientMessageType.RegistrationApproval)
+			: base (GablarskiMessageType.RegistrationApproval)
 		{
 		}
 
@@ -62,14 +64,14 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
 			writer.WriteInt32 (UserId);
 			writer.WriteString (Username);
 			writer.WriteBool (Approved);
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
 			UserId = reader.ReadInt32();
 			Username = reader.ReadString();

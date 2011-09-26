@@ -37,14 +37,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Tempest;
 
 namespace Gablarski.Messages
 {
 	public class UserMutedMessage
-		: ServerMessage
+		: GablarskiMessage
 	{
 		public UserMutedMessage()
-			: base (ServerMessageType.UserMuted)
+			: base (GablarskiMessageType.UserMuted)
 		{
 		}
 
@@ -58,13 +59,13 @@ namespace Gablarski.Messages
 			get; set;
 		}
 		
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
 			writer.WriteBool (this.Unmuted);
 			writer.WriteInt32 (this.UserId);
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
 			this.Unmuted = reader.ReadBool();
 			this.UserId = reader.ReadInt32();

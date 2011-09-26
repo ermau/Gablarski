@@ -37,14 +37,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Tempest;
 
 namespace Gablarski.Messages
 {
 	public class ChannelEditMessage
-		: ClientMessage
+		: GablarskiMessage
 	{
 		public ChannelEditMessage ()
-			: base (ClientMessageType.ChannelEdit)
+			: base (GablarskiMessageType.ChannelEdit)
 		{
 		}
 
@@ -75,16 +76,16 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
-			this.channel.Serialize (writer);
+			this.channel.Serialize (context, writer);
 			writer.WriteBool (Delete);
 			writer.WriteBool (MakeDefault);
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
-			this.channel = new ChannelInfo (reader);
+			this.channel = new ChannelInfo (context, reader);
 			Delete = reader.ReadBool ();
 			MakeDefault = reader.ReadBool();
 		}

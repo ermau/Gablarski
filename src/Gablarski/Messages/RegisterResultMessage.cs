@@ -37,14 +37,15 @@
 using System;
 using System.Linq;
 using Gablarski.Server;
+using Tempest;
 
 namespace Gablarski.Messages
 {
 	public class RegisterResultMessage
-		: ServerMessage
+		: GablarskiMessage
 	{
 		public RegisterResultMessage()
-			: base (ServerMessageType.RegisterResult)
+			: base (GablarskiMessageType.RegisterResult)
 		{
 		}
 
@@ -54,12 +55,12 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
 			writer.WriteByte ((byte)Result);
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
 			Result = (RegisterResult)reader.ReadByte();
 		}

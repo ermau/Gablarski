@@ -38,14 +38,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Tempest;
 
 namespace Gablarski.Messages
 {
 	public class ChannelEditResultMessage
-		: ServerMessage
+		: GablarskiMessage
 	{
 		public ChannelEditResultMessage ()
-			: base (ServerMessageType.ChannelEditResult)
+			: base (GablarskiMessageType.ChannelEditResult)
 		{
 		}
 
@@ -68,13 +69,13 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
 			writer.WriteInt32 (this.ChannelId);
 			writer.WriteByte ((byte)this.Result);
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
 			this.ChannelId = reader.ReadInt32();
 			this.Result = (ChannelEditResult)reader.ReadByte();

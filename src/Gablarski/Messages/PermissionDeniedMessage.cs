@@ -38,6 +38,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Tempest;
 
 namespace Gablarski.Messages
 {
@@ -50,34 +51,34 @@ namespace Gablarski.Messages
 	/// still need permissions.
 	/// </remarks>
 	public class PermissionDeniedMessage
-		: ServerMessage
+		: GablarskiMessage
 	{
 		public PermissionDeniedMessage()
-			: base (ServerMessageType.PermissionDenied)
+			: base (GablarskiMessageType.PermissionDenied)
 		{
 		}
 
-		public PermissionDeniedMessage (ClientMessageType type)
+		public PermissionDeniedMessage (GablarskiMessageType type)
 			: this()
 		{
 			this.DeniedMessage = type;
 		}
 
-		public ClientMessageType DeniedMessage
+		public GablarskiMessageType DeniedMessage
 		{
 			get; set;
 		}
 
 		#region Overrides of MessageBase
 
-		public override void WritePayload(IValueWriter writerm)
+		public override void WritePayload (ISerializationContext context, IValueWriter writerm)
 		{
 			writerm.WriteUInt16 ((ushort)this.DeniedMessage);
 		}
 
-		public override void ReadPayload(IValueReader reader)
+		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
-			this.DeniedMessage = (ClientMessageType)reader.ReadUInt16();
+			this.DeniedMessage = (GablarskiMessageType)reader.ReadUInt16();
 		}
 
 		#endregion

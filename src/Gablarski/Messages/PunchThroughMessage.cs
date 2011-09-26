@@ -34,6 +34,8 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
+using Tempest;
+
 namespace Gablarski.Messages
 {
 	public enum PunchThroughStatus
@@ -44,10 +46,10 @@ namespace Gablarski.Messages
 	}
 
 	public class PunchThroughMessage
-		: ClientMessage
+		: GablarskiMessage
 	{
 		public PunchThroughMessage ()
-			: base (ClientMessageType.PunchThrough)
+			: base (GablarskiMessageType.PunchThrough)
 		{
 		}
 		
@@ -63,17 +65,17 @@ namespace Gablarski.Messages
 			set;
 		}
 		
-		public override bool Reliable
+		public override bool  PreferReliable
 		{
 			get	{ return false; }
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
 			writer.WriteByte ((byte)Status);
 		}
 		
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
 			Status = (PunchThroughStatus)reader.ReadByte();
 		}

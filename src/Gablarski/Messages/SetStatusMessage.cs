@@ -37,14 +37,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Tempest;
 
 namespace Gablarski.Messages
 {
 	public class SetStatusMessage
-		: ClientMessage
+		: GablarskiMessage
 	{
 		public SetStatusMessage()
-			: base (ClientMessageType.SetStatus)
+			: base (GablarskiMessageType.SetStatus)
 		{
 		}
 
@@ -60,12 +61,12 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
 			writer.WriteByte ((byte)Status);
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
 			Status = (UserStatus)reader.ReadByte();
 		}

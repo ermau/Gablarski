@@ -38,14 +38,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Tempest;
 
 namespace Gablarski.Messages
 {
 	public class QueryServerMessage
-		: ClientMessage
+		: GablarskiMessage
 	{
 		public QueryServerMessage()
-			: base (ClientMessageType.QueryServer)
+			: base (GablarskiMessageType.QueryServer)
 		{
 		}
 
@@ -64,12 +65,12 @@ namespace Gablarski.Messages
 			get { return false; }
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
 			writer.WriteBool (this.ServerInfoOnly);
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
 			this.ServerInfoOnly = reader.ReadBool();
 		}

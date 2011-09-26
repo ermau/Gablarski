@@ -37,14 +37,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Tempest;
 
 namespace Gablarski.Messages
 {
 	public class SetPermissionsMessage
-		: ClientMessage
+		: GablarskiMessage
 	{
 		public SetPermissionsMessage()
-			: base (ClientMessageType.SetPermissions)
+			: base (GablarskiMessageType.SetPermissions)
 		{
 		}
 
@@ -80,24 +81,24 @@ namespace Gablarski.Messages
 			get; set;
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
 			writer.WriteInt32 (UserId);
 			
 			var perms = Permissions.ToList();
 			writer.WriteInt32 (perms.Count);
 			for (int i = 0; i < perms.Count; ++i)
-				perms[i].Serialize (writer);
+				perms[i].Serialize (context, writer);
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
 			UserId = reader.ReadInt32();
 
 			int permissionCount = reader.ReadInt32();
 			Permission[] permissions = new Permission[permissionCount];
 			for (int i = 0; i < permissions.Length; ++i)
-				permissions[i] = new Permission (reader);
+				permissions[i] = new Permission (context, reader);
 			
 			Permissions = permissions;
 		}

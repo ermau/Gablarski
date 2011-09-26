@@ -37,14 +37,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Tempest;
 
 namespace Gablarski.Messages
 {
 	public class SetCommentMessage
-		: ClientMessage
+		: GablarskiMessage
 	{
 		public SetCommentMessage ()
-			: base (ClientMessageType.SetComment)
+			: base (GablarskiMessageType.SetComment)
 		{
 		}
 
@@ -59,12 +60,12 @@ namespace Gablarski.Messages
 			get; set;
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
 			writer.WriteString (Comment);
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
 			Comment = reader.ReadString();
 		}

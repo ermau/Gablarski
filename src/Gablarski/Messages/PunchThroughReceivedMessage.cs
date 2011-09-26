@@ -35,14 +35,15 @@
 // DAMAGE.
 
 using System;
+using Tempest;
 
 namespace Gablarski.Messages
 {
 	public class PunchThroughReceivedMessage
-		: ServerMessage
+		: GablarskiMessage
 	{
 		public PunchThroughReceivedMessage ()
-			: base (ServerMessageType.PunchThroughReceived)
+			: base (GablarskiMessageType.PunchThroughReceived)
 		{
 		}
 		
@@ -51,11 +52,11 @@ namespace Gablarski.Messages
 			get { return false; }
 		}
 		
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
 		}
 	}

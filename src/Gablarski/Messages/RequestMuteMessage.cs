@@ -37,13 +37,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Tempest;
 
 namespace Gablarski.Messages
 {
 	public abstract class RequestMuteMessage
-		: ClientMessage
+		: GablarskiMessage
 	{
-		protected RequestMuteMessage (ClientMessageType type)
+		protected RequestMuteMessage (GablarskiMessageType type)
 			: base (type)
 		{
 		}
@@ -58,13 +59,13 @@ namespace Gablarski.Messages
 			get; set;
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
 			writer.WriteBool (this.Unmute);
 			writer.WriteInt32 (this.TargetId);
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
 			this.Unmute = reader.ReadBool();
 			this.TargetId = reader.ReadInt32();

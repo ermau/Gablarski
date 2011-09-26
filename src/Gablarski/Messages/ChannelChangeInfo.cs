@@ -38,6 +38,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Tempest;
 
 namespace Gablarski.Messages
 {
@@ -70,12 +71,12 @@ namespace Gablarski.Messages
 			this.RequestingUserId = requestingUserId;
 		}
 
-		public ChannelChangeInfo (IValueReader reader)
+		public ChannelChangeInfo (ISerializationContext context, IValueReader reader)
 		{
 			if (reader == null)
 				throw new ArgumentNullException("reader");
 
-			this.Deserialize (reader);
+			Deserialize (context, reader);
 		}
 
 		/// <summary>
@@ -114,7 +115,7 @@ namespace Gablarski.Messages
 			private set;
 		}
 
-		internal void Serialize (IValueWriter writer)
+		public void Serialize (ISerializationContext context, IValueWriter writer)
 		{
 			writer.WriteInt32 (this.RequestingUserId);
 			writer.WriteInt32 (this.TargetUserId);
@@ -122,7 +123,7 @@ namespace Gablarski.Messages
 			writer.WriteInt32 (this.PreviousChannelId);
 		}
 
-		internal void Deserialize (IValueReader reader)
+		public void Deserialize (ISerializationContext context, IValueReader reader)
 		{
 			this.RequestingUserId = reader.ReadInt32();
 			this.TargetUserId = reader.ReadInt32();

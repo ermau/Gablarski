@@ -38,19 +38,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Tempest;
 
 namespace Gablarski.Messages
 {
 	public class PermissionsMessage
-		: ServerMessage
+		: GablarskiMessage
 	{
 		public PermissionsMessage()
-			: base (ServerMessageType.Permissions)
+			: base (GablarskiMessageType.Permissions)
 		{
 		}
 
 		public PermissionsMessage (int ownerId, IEnumerable<Permission> permissions)
-			: base (ServerMessageType.Permissions)
+			: base (GablarskiMessageType.Permissions)
 		{
 			this.OwnerId = ownerId;
 			this.Permissions = permissions;
@@ -68,7 +69,7 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
 			writer.WriteInt32 (this.OwnerId);
 
@@ -76,20 +77,20 @@ namespace Gablarski.Messages
 			{
 				writer.WriteInt32 (this.Permissions.Count());
 				foreach (var p in this.Permissions)
-					p.Serialize (writer);
+					p.Serialize (context, writer);
 			}
 			else
 				writer.WriteInt32 (0);
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
 			this.OwnerId = reader.ReadInt32();
 
 			int npermissions = reader.ReadInt32();
 			Permission[] permissions = new Permission[npermissions];
 			for (int i = 0; i < permissions.Length; ++i)
-				permissions[i] = new Permission (reader);
+				permissions[i] = new Permission (context, reader);
 			
 			this.Permissions = permissions;
 		}

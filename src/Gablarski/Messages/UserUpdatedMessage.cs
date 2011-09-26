@@ -37,14 +37,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Tempest;
 
 namespace Gablarski.Messages
 {
 	public class UserUpdatedMessage
-		: ServerMessage
+		: GablarskiMessage
 	{
 		public UserUpdatedMessage()
-			: base (ServerMessageType.UserUpdated)
+			: base (GablarskiMessageType.UserUpdated)
 		{
 		}
 
@@ -63,14 +64,14 @@ namespace Gablarski.Messages
 			private set { this.user = new UserInfo (value); }
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
-			this.user = new UserInfo (reader);
+			this.user = new UserInfo (context, reader);
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
-			this.user.Serialize (writer);
+			this.user.Serialize (context, writer);
 		}
 		
 		private UserInfo user;

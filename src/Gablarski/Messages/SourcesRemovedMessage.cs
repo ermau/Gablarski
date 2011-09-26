@@ -39,14 +39,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Gablarski.Audio;
+using Tempest;
 
 namespace Gablarski.Messages
 {
 	public class SourcesRemovedMessage
-		: ServerMessage
+		: GablarskiMessage
 	{
 		public SourcesRemovedMessage ()
-			: base (ServerMessageType.SourcesRemoved)
+			: base (GablarskiMessageType.SourcesRemoved)
 		{
 		}
 
@@ -62,7 +63,7 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
 			int count = this.SourceIds.Count();
 			writer.WriteInt32 (count);
@@ -73,7 +74,7 @@ namespace Gablarski.Messages
 			}
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
 			int[] sourceIds = new int[reader.ReadInt32()];
 			for (int i = 0; i < sourceIds.Length; ++i)

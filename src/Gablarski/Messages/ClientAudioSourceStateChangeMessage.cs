@@ -34,18 +34,15 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using Tempest;
 
 namespace Gablarski.Messages
 {
 	public class ClientAudioSourceStateChangeMessage
-		: ClientMessage
+		: GablarskiMessage
 	{
 		public ClientAudioSourceStateChangeMessage ()
-			: base (ClientMessageType.ClientAudioSourceStateChange)
+			: base (GablarskiMessageType.ClientAudioSourceStateChange)
 		{
 		}
 
@@ -61,13 +58,13 @@ namespace Gablarski.Messages
 
 		#region Overrides of MessageBase
 
-		public override void WritePayload(IValueWriter writer)
+		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
 			writer.WriteBool (this.Starting);
 			writer.WriteInt32 (this.SourceId);
 		}
 
-		public override void ReadPayload(IValueReader reader)
+		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
 			this.Starting = reader.ReadBool();
 			this.SourceId = reader.ReadInt32();

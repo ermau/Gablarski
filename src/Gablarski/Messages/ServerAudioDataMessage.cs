@@ -37,14 +37,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Tempest;
 
 namespace Gablarski.Messages
 {
 	public class ServerAudioDataMessage
-		: ServerMessage
+		: GablarskiMessage
 	{
 		public ServerAudioDataMessage ()
-			: base (ServerMessageType.AudioData)
+			: base (GablarskiMessageType.AudioData)
 		{
 		}
 
@@ -88,7 +89,7 @@ namespace Gablarski.Messages
 			get { return false; }
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
 			writer.WriteInt32 (SourceId);
 			writer.WriteInt32 (Sequence);
@@ -98,7 +99,7 @@ namespace Gablarski.Messages
 				writer.WriteBytes (Data[i]);
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
 			SourceId = reader.ReadInt32 ();
 			Sequence = reader.ReadInt32();

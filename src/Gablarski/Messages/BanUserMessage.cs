@@ -35,14 +35,15 @@
 // DAMAGE.
 
 using System.Linq;
+using Tempest;
 
 namespace Gablarski.Messages
 {
 	public class BanUserMessage
-		: ClientMessage
+		: GablarskiMessage
 	{
 		public BanUserMessage()
-			: base (ClientMessageType.BanUser)
+			: base (GablarskiMessageType.BanUser)
 		{
 		}
 
@@ -58,16 +59,16 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
 			writer.WriteBool (Removing);
-			BanInfo.Serialize (writer);
+			BanInfo.Serialize (context, writer);
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
 			Removing = reader.ReadBool();
-			BanInfo = new BanInfo (reader);
+			BanInfo = new BanInfo (context, reader);
 		}
 	}
 }

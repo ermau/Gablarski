@@ -34,13 +34,15 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
+using Tempest;
+
 namespace Gablarski.Messages
 {
 	public class RedirectMessage
-		: ServerMessage
+		: GablarskiMessage
 	{
 		public RedirectMessage ()
-			: base (ServerMessageType.Redirect)
+			: base (GablarskiMessageType.Redirect)
 		{
 		}
 
@@ -56,13 +58,13 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
 			writer.WriteString (Host);
 			writer.WriteInt32 (Port);
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
 			Host = reader.ReadString();
 			Port = reader.ReadInt32();

@@ -37,19 +37,20 @@
 using System;
 using System.Linq;
 using Cadenza;
+using Tempest;
 
 namespace Gablarski.Messages
 {
 	public class RegisterMessage
-		: ClientMessage
+		: GablarskiMessage
 	{
 		public RegisterMessage()
-			: base (ClientMessageType.Register)
+			: base (GablarskiMessageType.Register)
 		{
 		}
 
 		public RegisterMessage (string username, string password)
-			: base (ClientMessageType.Register)
+			: base (GablarskiMessageType.Register)
 		{
 			if (username == null)
 				throw new ArgumentNullException ("username");
@@ -81,13 +82,13 @@ namespace Gablarski.Messages
 			private set;
 		}
 
-		public override void WritePayload(IValueWriter writer)
+		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
 			writer.WriteString (Username);
 			writer.WriteString (Password);
 		}
 
-		public override void ReadPayload(IValueReader reader)
+		public override void ReadPayload (ISerializationContext context,IValueReader reader)
 		{
 			Username = reader.ReadString();
 			Password = reader.ReadString();

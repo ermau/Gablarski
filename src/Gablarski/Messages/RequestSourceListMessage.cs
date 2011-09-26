@@ -38,22 +38,23 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Tempest;
 
 namespace Gablarski.Messages
 {
 	public class RequestSourceListMessage
-		: ClientMessage
+		: GablarskiMessage
 	{
 		public RequestSourceListMessage()
-			: base (ClientMessageType.RequestSourceList)
+			: base (GablarskiMessageType.RequestSourceList)
 		{
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
 		}
 	}

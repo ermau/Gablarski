@@ -37,6 +37,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Tempest;
 
 namespace Gablarski.Messages
 {
@@ -66,10 +67,10 @@ namespace Gablarski.Messages
 	}
 
 	public class ConnectionRejectedMessage
-		: ServerMessage
+		: GablarskiMessage
 	{
 		public ConnectionRejectedMessage ()
-			: base (ServerMessageType.ConnectionRejected)
+			: base (GablarskiMessageType.ConnectionRejected)
 		{
 		}
 
@@ -85,12 +86,12 @@ namespace Gablarski.Messages
 			private set;
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
 			writer.WriteByte ((byte)this.Reason);
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
 			this.Reason = (ConnectionRejectedReason)reader.ReadByte ();
 		}

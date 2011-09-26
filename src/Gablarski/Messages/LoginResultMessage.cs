@@ -34,18 +34,15 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using Tempest;
 
 namespace Gablarski.Messages
 {
 	public class LoginResultMessage
-		: ServerMessage
+		: GablarskiMessage
 	{
 		public LoginResultMessage ()
-			: base (ServerMessageType.LoginResult)
+			: base (GablarskiMessageType.LoginResult)
 		{
 		}
 
@@ -61,14 +58,14 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
-			this.Result = new LoginResult (reader);
+			this.Result = new LoginResult (context, reader);
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
-			this.Result.Serialize (writer);
+			this.Result.Serialize (context, writer);
 		}
 	}
 }

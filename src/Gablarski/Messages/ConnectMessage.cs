@@ -38,14 +38,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Tempest;
 
 namespace Gablarski.Messages
 {
 	public class ConnectMessage
-		: ClientMessage
+		: GablarskiMessage
 	{
 		public ConnectMessage ()
-			: base (ClientMessageType.Connect)
+			: base (GablarskiMessageType.Connect)
 		{
 		}
 
@@ -67,14 +68,14 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
 			writer.WriteInt32 (ProtocolVersion);
 			writer.WriteString (Host);
 			writer.WriteInt32 (Port);
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
 			ProtocolVersion = reader.ReadInt32 ();
 			Host = reader.ReadString();

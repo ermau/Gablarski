@@ -35,14 +35,15 @@
 // DAMAGE.
 
 using System.Linq;
+using Tempest;
 
 namespace Gablarski.Messages
 {
 	public class UserKickedMessage
-		: ServerMessage
+		: GablarskiMessage
 	{
 		public UserKickedMessage()
-			: base (ServerMessageType.UserKicked)
+			: base (GablarskiMessageType.UserKicked)
 		{
 		}
 
@@ -58,13 +59,13 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
 			writer.WriteBool (FromServer);
 			writer.WriteInt32 (UserId);
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
 			FromServer = reader.ReadBool();
 			UserId = reader.ReadInt32();

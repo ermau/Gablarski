@@ -37,6 +37,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Tempest;
 
 namespace Gablarski.Messages
 {
@@ -81,10 +82,10 @@ namespace Gablarski.Messages
 	}
 
 	public class DisconnectMessage
-		: ServerMessage
+		: GablarskiMessage
 	{
 		public DisconnectMessage ()
-			: base (ServerMessageType.Disconnect)
+			: base (GablarskiMessageType.Disconnect)
 		{
 		}
 
@@ -100,12 +101,12 @@ namespace Gablarski.Messages
 			set;
 		}
 
-		public override void WritePayload (IValueWriter writer)
+		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
 			writer.WriteByte ((byte)Reason);
 		}
 
-		public override void ReadPayload (IValueReader reader)
+		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
 			Reason = (DisconnectionReason)reader.ReadByte ();
 		}
