@@ -40,13 +40,14 @@ using System.Collections.Generic;
 using System.Linq;
 using Gablarski.Audio;
 using Gablarski.Messages;
+using Tempest;
 
 namespace Gablarski.Client
 {
 	public class ClientSourceHandler
 		: IClientSourceHandler
 	{
-		protected internal ClientSourceHandler (IClientContext context, IClientSourceManager manager)
+		protected internal ClientSourceHandler (IGablarskiClientContext context, IClientSourceManager manager)
 		{
 			if (context == null)
 				throw new ArgumentNullException ("context");
@@ -56,12 +57,12 @@ namespace Gablarski.Client
 			this.context = context;
 			this.manager = manager;
 
-			this.context.RegisterMessageHandler (ServerMessageType.SourceList, OnSourceListReceivedMessage);
-			this.context.RegisterMessageHandler (ServerMessageType.SourcesRemoved, OnSourcesRemovedMessage);
-			this.context.RegisterMessageHandler (ServerMessageType.SourceResult, OnSourceResultMessage);
-			this.context.RegisterMessageHandler (ServerMessageType.AudioData, OnAudioDataReceivedMessage);
-			this.context.RegisterMessageHandler (ServerMessageType.AudioSourceStateChange, OnAudioSourceStateChangedMessage);
-			this.context.RegisterMessageHandler (ServerMessageType.SourceMuted, OnSourceMutedMessage);
+			this.context.RegisterMessageHandler<SourceListMessage> (OnSourceListReceivedMessage);
+			this.context.RegisterMessageHandler<SourcesRemovedMessage> (OnSourcesRemovedMessage);
+			this.context.RegisterMessageHandler<SourceResultMessage> (OnSourceResultMessage);
+			this.context.RegisterMessageHandler<ServerAudioDataMessage> (OnAudioDataReceivedMessage);
+			this.context.RegisterMessageHandler<AudioSourceStateChangeMessage> (OnAudioSourceStateChangedMessage);
+			this.context.RegisterMessageHandler<SourceMutedMessage> (OnSourceMutedMessage);
 		}
 
 		public event EventHandler<ReceivedListEventArgs<AudioSource>> ReceivedSourceList;
@@ -225,11 +226,11 @@ namespace Gablarski.Client
 		}
 
 		private int nextFakeAudioId = -1;
-		private readonly IClientContext context;
+		private readonly IGablarskiClientContext context;
 		private readonly IClientSourceManager manager;
 		private readonly Dictionary<AudioSource, int> sequences = new Dictionary<AudioSource, int>();
 
-		private void OnSourceMutedMessage (MessageReceivedEventArgs e)
+		private void OnSourceMutedMessage (MessageEventArgs<SourceMutedMessage> e)
 		{
 			var msg = (SourceMutedMessage) e.Message;
 
@@ -249,7 +250,7 @@ namespace Gablarski.Client
 				OnAudioSourceMuted (new AudioSourceMutedEventArgs (s, msg.Unmuted));
 		}
 
-		internal void OnSourceListReceivedMessage (MessageReceivedEventArgs e)
+		internal void OnSourceListReceivedMessage (MessageEventArgs<SourceListMessage> e)
 		{
 			var msg = (SourceListMessage)e.Message;
 
@@ -258,7 +259,7 @@ namespace Gablarski.Client
 			OnReceivedSourceList (new ReceivedListEventArgs<AudioSource> (msg.Sources));
 		}
 
-		internal void OnSourceResultMessage (MessageReceivedEventArgs e)
+		internal void OnSourceResultMessage (MessageEventArgs<SourceResultMessage> e)
 		{
 			var msg = (SourceResultMessage)e.Message;
 
@@ -272,7 +273,7 @@ namespace Gablarski.Client
 			OnReceivedSource (new ReceivedAudioSourceEventArgs (msg.SourceName, source, msg.SourceResult));
 		}
 
-		internal void OnSourcesRemovedMessage (MessageReceivedEventArgs e)
+		internal void OnSourcesRemovedMessage (MessageEventArgs<SourcesRemovedMessage> e)
 		{
 			OnSourcesRemoved (new ReceivedListEventArgs<AudioSource> (
 				((SourcesRemovedMessage)e.Message).SourceIds
@@ -280,7 +281,7 @@ namespace Gablarski.Client
 				.Where (s => s != null && this.manager.Remove (s))));
 		}
 
-		internal void OnAudioSourceStateChangedMessage (MessageReceivedEventArgs e)
+		internal void OnAudioSourceStateChangedMessage (MessageEventArgs<AudioSourceStateChangeMessage> e)
 		{
 			var msg = (AudioSourceStateChangeMessage)e.Message;
 
@@ -295,7 +296,7 @@ namespace Gablarski.Client
 			}
 		}
 
-		internal void OnAudioDataReceivedMessage (MessageReceivedEventArgs e)
+		internal void OnAudioDataReceivedMessage (MessageEventArgs<ServerAudioDataMessage> e)
 		{
 			var msg = (ServerAudioDataMessage)e.Message;
 
