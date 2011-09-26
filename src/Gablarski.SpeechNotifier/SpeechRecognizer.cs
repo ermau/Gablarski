@@ -64,37 +64,46 @@ namespace Gablarski.SpeechNotifier
 
 		public void Open()
 		{
-			this.recognition = new SpeechRecognitionEngine();
-			this.recognition.SpeechRecognized += OnSpeechRecognized;
-			this.recognition.MaxAlternates = 1;
-			this.recognition.SetInputToDefaultAudioDevice();
+			lock (this.sync)
+			{
+				if (this.recognition == null)
+					throw new InvalidOperationException ("Already open");
 
-			GrammarBuilder builder = new GrammarBuilder();
-			builder.Append (new SemanticResultKey ("command", new Choices ("mute", "unmute")));
-			builder.Append (new Choices (" ", "me"));
+				this.recognition = new SpeechRecognitionEngine();
+				this.recognition.SpeechRecognized += OnSpeechRecognized;
+				this.recognition.MaxAlternates = 1;
+				this.recognition.SetInputToDefaultAudioDevice();
 
-			this.muteGrammar = new Grammar (builder);
-			this.recognition.LoadGrammar (this.muteGrammar);
+				GrammarBuilder builder = new GrammarBuilder();
+				builder.Append (new SemanticResultKey ("command", new Choices ("mute", "unmute")));
+				builder.Append (new Choices (" ", "me"));
+
+				this.muteGrammar = new Grammar (builder);
+				this.recognition.LoadGrammar (this.muteGrammar);
+			}
 		}
 
 		public void Close()
 		{
-			if (this.recognition != null)
-				this.recognition.Dispose();
+			lock (this.sync)
+			{
+				if (this.recognition != null)
+					this.recognition.Dispose();
 
-			this.recognition = null;
-			this.muteGrammar = null;
+				this.recognition = null;
+				this.muteGrammar = null;
+			}
 		}
 
 		public void StartRecognizing()
 		{
-			lock (this.recognition)
+			lock (this.sync)
 				this.recognition.RecognizeAsync (RecognizeMode.Single);
 		}
 
 		public void StopRecognizing()
 		{
-			lock (this.recognition)
+			lock (this.sync)
 				this.recognition.RecognizeAsyncCancel();
 		}
 
@@ -105,7 +114,7 @@ namespace Gablarski.SpeechNotifier
 			if (users == null)
 				throw new ArgumentNullException ("users");
 
-			lock (this.recognition)
+			lock (this.sync)
 			{
 				SetupChangeChannelGrammar (channels);
 				SetupMoveUserGrammar (channels, users);
@@ -117,6 +126,7 @@ namespace Gablarski.SpeechNotifier
 			this.recognition.Dispose();
 		}
 
+		private readonly object sync = new object();
 		private SpeechRecognitionEngine recognition;
 
 		private Grammar moveUserGrammar;
