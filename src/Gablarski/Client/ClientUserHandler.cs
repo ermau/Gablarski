@@ -40,13 +40,14 @@ using System.Collections.Generic;
 using System.Linq;
 using Cadenza.Collections;
 using Gablarski.Messages;
+using Tempest;
 
 namespace Gablarski.Client
 {
 	public class ClientUserHandler
 		: IClientUserHandler
 	{
-		protected internal ClientUserHandler (IClientContext context, IClientUserManager manager)
+		protected internal ClientUserHandler (IGablarskiClientContext context, IClientUserManager manager)
 		{
 			if (context == null)
 				throw new ArgumentNullException ("context");
@@ -56,14 +57,14 @@ namespace Gablarski.Client
 			this.context = context;
 			this.manager = manager;
 
-			this.context.RegisterMessageHandler (ServerMessageType.UserInfoList, OnUserListReceivedMessage);
-			this.context.RegisterMessageHandler (ServerMessageType.UserUpdated, OnUserUpdatedMessage);
-			this.context.RegisterMessageHandler (ServerMessageType.UserChangedChannel, OnUserChangedChannelMessage);
-			this.context.RegisterMessageHandler (ServerMessageType.ChangeChannelResult, OnChannelChangeResultMessage);
-			this.context.RegisterMessageHandler (ServerMessageType.UserJoined, OnUserJoinedMessage);
-			this.context.RegisterMessageHandler (ServerMessageType.UserDisconnected, OnUserDisconnectedMessage);
-			this.context.RegisterMessageHandler (ServerMessageType.UserMuted, OnUserMutedMessage);
-			this.context.RegisterMessageHandler (ServerMessageType.UserKicked, OnUserKickedMessage);
+			this.context.RegisterMessageHandler<UserInfoListMessage> (OnUserListReceivedMessage);
+			this.context.RegisterMessageHandler<UserUpdatedMessage> (OnUserUpdatedMessage);
+			this.context.RegisterMessageHandler<UserChangedChannelMessage> (OnUserChangedChannelMessage);
+			this.context.RegisterMessageHandler<ChannelChangeResultMessage> (OnChannelChangeResultMessage);
+			this.context.RegisterMessageHandler<UserJoinedMessage> (OnUserJoinedMessage);
+			this.context.RegisterMessageHandler<UserDisconnectedMessage> (OnUserDisconnectedMessage);
+			this.context.RegisterMessageHandler<UserMutedMessage> (OnUserMutedMessage);
+			this.context.RegisterMessageHandler<UserKickedMessage> (OnUserKickedMessage);
 		}
 
 		#region Events
@@ -258,10 +259,10 @@ namespace Gablarski.Client
 
 		private readonly IClientUserManager manager;
 		private readonly MutableLookup<int, IUserInfo> channels = new MutableLookup<int, IUserInfo> ();
-		private readonly IClientContext context;
+		private readonly IGablarskiClientContext context;
 
 		#region Message handlers
-		internal void OnUserKickedMessage (MessageReceivedEventArgs e)
+		internal void OnUserKickedMessage (MessageEventArgs<UserKickedMessage> e)
 		{
 			var msg = (UserKickedMessage) e.Message;
 
@@ -275,7 +276,7 @@ namespace Gablarski.Client
 				OnUserKickedFromChannel (new UserEventArgs (user));
 		}
 
-		internal void OnUserMutedMessage (MessageReceivedEventArgs e)
+		internal void OnUserMutedMessage (MessageEventArgs<UserMutedMessage> e)
 		{
 			var msg = (UserMutedMessage) e.Message;
 
@@ -295,7 +296,7 @@ namespace Gablarski.Client
 				OnUserMuted (new UserMutedEventArgs (user, msg.Unmuted));
 		}
 
-		internal void OnUserListReceivedMessage (MessageReceivedEventArgs e)
+		internal void OnUserListReceivedMessage (MessageEventArgs<UserInfoListMessage> e)
 		{
 			var msg = (UserInfoListMessage)e.Message;
 
@@ -309,7 +310,7 @@ namespace Gablarski.Client
 			OnReceivedUserList (new ReceivedListEventArgs<IUserInfo> (userlist));
 		}
 
-		internal void OnUserUpdatedMessage (MessageReceivedEventArgs e)
+		internal void OnUserUpdatedMessage (MessageEventArgs<UserUpdatedMessage> e)
 		{
 			var msg = (UserUpdatedMessage) e.Message;
 
@@ -319,7 +320,7 @@ namespace Gablarski.Client
 			OnUserUpdated (new UserEventArgs (msg.User));
 		}
 
-		internal void OnUserDisconnectedMessage (MessageReceivedEventArgs e)
+		internal void OnUserDisconnectedMessage (MessageEventArgs<UserDisconnectedMessage> e)
 		{
 			var msg = (UserDisconnectedMessage) e.Message;
 
@@ -335,7 +336,7 @@ namespace Gablarski.Client
 			OnUserDisconnected (new UserEventArgs (user));
 		}
 
-		internal void OnUserJoinedMessage (MessageReceivedEventArgs e)
+		internal void OnUserJoinedMessage (MessageEventArgs<UserJoinedMessage> e)
 		{
 			var msg = (UserJoinedMessage)e.Message;
 
@@ -346,7 +347,7 @@ namespace Gablarski.Client
 			OnUserJoined (new UserEventArgs (user));
 		}
 
-		internal void OnUserChangedChannelMessage (MessageReceivedEventArgs e)
+		internal void OnUserChangedChannelMessage (MessageEventArgs<UserChangedChannelMessage> e)
 		{
 			var msg = (UserChangedChannelMessage)e.Message;
 
@@ -375,7 +376,7 @@ namespace Gablarski.Client
 			OnUserUpdated (new UserEventArgs (user));
 		}
 
-		internal void OnChannelChangeResultMessage (MessageReceivedEventArgs e)
+		internal void OnChannelChangeResultMessage (MessageEventArgs<ChannelChangeResultMessage> e)
 		{
 			var msg = (ChannelChangeResultMessage)e.Message;
 
