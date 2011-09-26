@@ -39,29 +39,30 @@ using System.Collections.Generic;
 using System.Linq;
 using Gablarski.Messages;
 using Cadenza;
+using Tempest;
 
 namespace Gablarski.Client
 {
 	public class CurrentUser
 		: UserInfo, ICurrentUserHandler
 	{
-		public CurrentUser (IClientContext context)
+		public CurrentUser (IGablarskiClientContext context)
 		{
 			if (context == null)
 				throw new ArgumentNullException ("context");
 
 			this.context = context;
 
-			this.context.RegisterMessageHandler (ServerMessageType.UserChangedChannel, OnUserChangedChannelMessage);
-			this.context.RegisterMessageHandler (ServerMessageType.UserUpdated, OnUserUpdatedMessage);
-			this.context.RegisterMessageHandler (ServerMessageType.LoginResult, OnLoginResultMessage);
-			this.context.RegisterMessageHandler (ServerMessageType.JoinResult, OnJoinResultMessage);
-			this.context.RegisterMessageHandler (ServerMessageType.Permissions, OnPermissionsMessage);
-			this.context.RegisterMessageHandler (ServerMessageType.UserKicked, OnUserKickedMessage);
-			this.context.RegisterMessageHandler (ServerMessageType.RegisterResult, OnRegisterResultMessage);
+			this.context.RegisterMessageHandler<UserChangedChannelMessage> (OnUserChangedChannelMessage);
+			this.context.RegisterMessageHandler<UserUpdatedMessage> (OnUserUpdatedMessage);
+			this.context.RegisterMessageHandler<LoginResultMessage> (OnLoginResultMessage);
+			this.context.RegisterMessageHandler<JoinResultMessage> (OnJoinResultMessage);
+			this.context.RegisterMessageHandler<PermissionsMessage> (OnPermissionsMessage);
+			this.context.RegisterMessageHandler<UserKickedMessage> (OnUserKickedMessage);
+			this.context.RegisterMessageHandler<RegisterResultMessage> (OnRegisterResultMessage);
 		}
 
-		internal CurrentUser (IClientContext context, int userId, string nickname, int currentChannelId)
+		internal CurrentUser (IGablarskiClientContext context, int userId, string nickname, int currentChannelId)
 			: this (context)
 		{
 			if (userId == 0)
@@ -209,7 +210,7 @@ namespace Gablarski.Client
 			SetStatus (Status ^ UserStatus.MutedMicrophone);
 		}
 
-		private readonly IClientContext context;
+		private readonly IGablarskiClientContext context;
 		private readonly object permissionLock = new object();
 		private IEnumerable<Permission> permissions;
 
@@ -248,7 +249,7 @@ namespace Gablarski.Client
 				kicked (this, e);
 		}
 
-		internal void OnUserKickedMessage (MessageReceivedEventArgs e)
+		internal void OnUserKickedMessage (MessageEventArgs<UserKickedMessage> e)
 		{
 			var msg = (UserKickedMessage)e.Message;
 
@@ -258,7 +259,7 @@ namespace Gablarski.Client
 			OnKicked (EventArgs.Empty);
 		}
 
-		internal void OnUserChangedChannelMessage (MessageReceivedEventArgs e)
+		internal void OnUserChangedChannelMessage (MessageEventArgs<UserChangedChannelMessage> e)
 		{
 			var msg = (UserChangedChannelMessage) e.Message;
 
@@ -273,7 +274,7 @@ namespace Gablarski.Client
 			this.CurrentChannelId = msg.ChangeInfo.TargetChannelId;
 		}
 
-		internal void OnUserUpdatedMessage (MessageReceivedEventArgs e)
+		internal void OnUserUpdatedMessage (MessageEventArgs<UserUpdatedMessage> e)
 		{
 			var msg = (UserUpdatedMessage) e.Message;
 
@@ -284,7 +285,7 @@ namespace Gablarski.Client
 			this.Status = msg.User.Status;
 		}
 
-		internal void OnLoginResultMessage (MessageReceivedEventArgs e)
+		internal void OnLoginResultMessage (MessageEventArgs<LoginResultMessage> e)
 		{
 		    var msg = (LoginResultMessage)e.Message;
 			if (msg.Result.ResultState == LoginResultState.Success)
@@ -294,7 +295,7 @@ namespace Gablarski.Client
 			OnLoginResult (args);
 		}
 
-		internal void OnJoinResultMessage (MessageReceivedEventArgs e)
+		internal void OnJoinResultMessage (MessageEventArgs<JoinResultMessage> e)
 		{
 			var msg = (JoinResultMessage)e.Message;
 			if (msg.Result == LoginResultState.Success)
@@ -309,12 +310,12 @@ namespace Gablarski.Client
 			OnJoinResult (args);
 		}
 
-		internal void OnRegisterResultMessage (MessageReceivedEventArgs e)
+		internal void OnRegisterResultMessage (MessageEventArgs<RegisterResultMessage> e)
 		{
 			OnRegisterResult (new ReceivedRegisterResultEventArgs (((RegisterResultMessage)e.Message).Result));
 		}
 
-		internal void OnPermissionsMessage (MessageReceivedEventArgs e)
+		internal void OnPermissionsMessage (MessageEventArgs<PermissionsMessage> e)
 		{
 			var msg = (PermissionsMessage)e.Message;
 			if (msg.OwnerId != this.UserId)
