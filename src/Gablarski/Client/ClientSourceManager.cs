@@ -47,7 +47,7 @@ namespace Gablarski.Client
 	public class ClientSourceManager
 		: AudioSourceManager, IClientSourceManager
 	{
-		protected internal ClientSourceManager (IClientContext context)
+		protected internal ClientSourceManager (IGablarskiClientContext context)
 		{
 			if (context == null)
 				throw new ArgumentNullException ("context");
@@ -162,7 +162,7 @@ namespace Gablarski.Client
 			}
 		}
 
-		private readonly IClientContext context;
+		private readonly IGablarskiClientContext context;
 		private readonly HashSet<AudioSource> ignoredSources = new HashSet<AudioSource>();
 	}
 

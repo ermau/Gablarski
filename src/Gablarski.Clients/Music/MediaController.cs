@@ -47,7 +47,7 @@ namespace Gablarski.Clients.Media
 	public class MediaController
 		: IMediaController
 	{
-		public MediaController (IClientContext context, IEnumerable<IMediaPlayer> mediaPlayers)
+		public MediaController (IGablarskiClientContext context, IEnumerable<IMediaPlayer> mediaPlayers)
 		{
 			this.context = context;
 			this.mediaPlayers = mediaPlayers;
@@ -189,7 +189,7 @@ namespace Gablarski.Clients.Media
 
 		private int playing;
 
-		private readonly IClientContext context;
+		private readonly IGablarskiClientContext context;
 		private readonly IAudioReceiver receiver;
 		private readonly Dictionary<IMediaPlayer, int> attachedPlayers = new Dictionary<IMediaPlayer, int>();
 		private readonly HashSet<AudioSource> playingSources = new HashSet<AudioSource>();

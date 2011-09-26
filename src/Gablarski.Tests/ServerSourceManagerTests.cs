@@ -52,7 +52,7 @@ namespace Gablarski.Tests
 
 		private readonly AudioCodecArgs args = new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 64000, 512, 10);
 
-		private IServerContext context;
+		private IGablarskiServerContext context;
 		private ServerSourceManager manager;
 
 		[SetUp]

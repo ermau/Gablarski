@@ -37,6 +37,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Tempest;
 
 namespace Gablarski
 {
@@ -126,11 +127,11 @@ namespace Gablarski
 	}
 
 	public class Permission
-		: IEquatable<Permission>
+		: ISerializable, IEquatable<Permission>
 	{
-		internal Permission (IValueReader reader)
+		internal Permission (ISerializationContext context, IValueReader reader)
 		{
-			Deserialize (reader);
+			Deserialize (context, reader);
 		}
 
 		public Permission()
@@ -182,14 +183,14 @@ namespace Gablarski
 			return Equals ((Permission) obj);
 		}
 
-		internal void Serialize (IValueWriter writer)
+		public void Serialize (ISerializationContext context, IValueWriter writer)
 		{
 			writer.WriteInt32 ((int)Name);
 			writer.WriteInt32 (ChannelId);
 			writer.WriteBool (IsAllowed);
 		}
 
-		internal void Deserialize (IValueReader reader)
+		public void Deserialize (ISerializationContext context, IValueReader reader)
 		{
 			Name = (PermissionName)reader.ReadInt32();
 			ChannelId = reader.ReadInt32();

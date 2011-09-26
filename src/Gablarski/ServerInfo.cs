@@ -36,20 +36,21 @@
 
 using System;
 using Gablarski.Server;
+using Tempest;
 
 namespace Gablarski
 {
 	public class ServerInfo
 	{
-		internal ServerInfo (IValueReader reader)
+		internal ServerInfo (ISerializationContext context, IValueReader reader)
 		{
 			if (reader == null)
 				throw new ArgumentNullException ("reader");
 
-			Deserialize (reader);
+			Deserialize (context, reader);
 		}
 
-		internal ServerInfo (ServerSettings settings, IUserProvider userProvider, PublicRSAParameters publicRSAParameters)
+		internal ServerInfo (ServerSettings settings, IUserProvider userProvider)
 		{
 			if (settings == null)
 				throw new ArgumentNullException ("settings");
@@ -61,7 +62,6 @@ namespace Gablarski
 			Logo = settings.ServerLogo;
 			Passworded = !String.IsNullOrEmpty (settings.ServerPassword);
 			RegistrationMode = (userProvider.UpdateSupported) ? userProvider.RegistrationMode : UserRegistrationMode.None;
-			this.PublicRSAParameters = publicRSAParameters;
 			
 			if (RegistrationMode != UserRegistrationMode.None)
 				RegistrationContent = userProvider.RegistrationContent;
@@ -121,16 +121,7 @@ namespace Gablarski
 			private set;
 		}
 
-		/// <summary>
-		/// Gets the server's public RSA parameters.
-		/// </summary>
-		public PublicRSAParameters PublicRSAParameters
-		{
-			get;
-			private set;
-		}
-
-		internal void Serialize (IValueWriter writer)
+		public void Serialize (ISerializationContext context, IValueWriter writer)
 		{
 			writer.WriteString (Name);
 			writer.WriteString (Description);
@@ -140,11 +131,9 @@ namespace Gablarski
 			
 			if (RegistrationMode != UserRegistrationMode.None)
 				writer.WriteString (RegistrationContent);
-
-			PublicRSAParameters.Serialize (writer);
 		}
 
-		internal void Deserialize (IValueReader reader)
+		public void Deserialize (ISerializationContext context, IValueReader reader)
 		{
 			Name = reader.ReadString();
 			Description = reader.ReadString();
@@ -154,9 +143,6 @@ namespace Gablarski
 			
 			if (RegistrationMode != UserRegistrationMode.None)
 				RegistrationContent = reader.ReadString();
-
-			PublicRSAParameters = new PublicRSAParameters();
-			PublicRSAParameters.Deserialize (reader);
 		}
 	}
 }

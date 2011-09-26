@@ -92,7 +92,7 @@ namespace Gablarski.Tests
 		{
 		}
 
-		public void StartListening (IServerContext serverContext)
+		public void StartListening (IGablarskiServerContext serverContext)
 		{
 			this.IsListening = true;
 		}

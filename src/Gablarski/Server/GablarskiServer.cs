@@ -35,24 +35,19 @@
 // DAMAGE.
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using Cadenza.Collections;
 using Gablarski.Messages;
 using Cadenza;
+using Tempest;
 using log4net;
+using Timer = System.Threading.Timer;
 
 namespace Gablarski.Server
 {
 	public class GablarskiServer
-		: IServerContext
+		: ServerBase, IGablarskiServerContext
 	{
-		// ReSharper disable ConvertToConstant.Global
-		public static readonly int ProtocolVersion = 6;
-		// ReSharper restore ConvertToConstant.Global
-
 		/// <summary>
 		/// Initializes a new <c>GablarskiServer</c> instance.
 		/// </summary>
@@ -81,11 +76,6 @@ namespace Gablarski.Server
 			get; set;
 		}
 
-		public bool IsRunning
-		{
-			get { return this.running; }
-		}
-
 		public ServerSettings Settings
 		{
 			get { return this.settings; }
@@ -103,42 +93,6 @@ namespace Gablarski.Server
 		}
 
 		#region Public Methods
-		/// <summary>
-		/// Adds and starts an <c>IConnectionProvider</c>.
-		/// </summary>
-		/// <param name="provider">The <c>IConnectionProvider</c> to add and start listening.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="provider"/> is <c>null</c>.</exception>
-		public void AddConnectionProvider (IConnectionProvider provider)
-		{
-			if (provider == null)
-				throw new ArgumentNullException ("provider");
-
-			this.Log.InfoFormat ("{0} added.", provider.GetType().Name);
-
-			// MUST provide a guarantee of persona
-			lock (this.availableConnections)
-			{
-				provider.ConnectionMade += OnConnectionMade;
-				provider.ConnectionlessMessageReceived += OnMessageReceived;
-				provider.StartListening (this);
-		
-				this.availableConnections.Add (provider);
-			}
-		}
-
-		/// <summary>
-		/// Stops and removes an <c>IConnectionProvider</c>.
-		/// </summary>
-		/// <param name="provider">The connection provider to remove.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="provider"/> is <c>null</c>.</exception>
-		public void RemoveConnectionProvider (IConnectionProvider provider)
-		{
-			if (provider == null)
-				throw new ArgumentNullException ("provider");
-
-			RemoveConnectionProvider (provider, true);
-		}
-
 		/// <summary>
 		/// Adds <paramref name="redirector"/> to the list of redirectors.
 		/// </summary>
@@ -171,129 +125,69 @@ namespace Gablarski.Server
 				return redirectors.Remove (redirector);
 			}
 		}
-
-		/// <summary>
-		/// Starts the server.
-		/// </summary>
-		public void Start ()
-		{
-			this.running = true;
-			this.messageRunnerThread.Start ();
-			this.pingTimer = new Timer (s => this.users.Send (new ServerPingMessage()), null, 20000, 20000);
-		}
-
-		/// <summary>
-		/// Removes all connection providers, disconnects all users and shuts the server down.
-		/// </summary>
-		public void Shutdown ()
-		{
-			this.running = false;
-			
-			lock (this.availableConnections)
-			{
-				while (this.availableConnections.Count > 0)
-					RemoveConnectionProvider (this.availableConnections[0]);
-			}
-
-			this.incomingWait.Set ();
-			this.messageRunnerThread.Join();
-
-			this.users.Disconnect (c => true);
-		}
-
-		public void RegisterMessageHandler (ClientMessageType messageType, Action<MessageReceivedEventArgs> handler)
-		{
-			if (handler == null)
-				throw new ArgumentNullException ("handler");
-
-			this.handlers.Add (messageType, handler);
-		}
-
 		#endregion
 
 		private readonly ServerSettings settings;
 
 		private readonly List<IRedirector> redirectors = new List<IRedirector>();
-		private readonly List<IConnectionProvider> availableConnections = new List<IConnectionProvider> ();
 
-		private readonly Decryption decryption = new Decryption();
-
-		private readonly IServerContext context;
+		private readonly IGablarskiServerContext context;
 		private readonly IChannelProvider channelProvider;
 		private readonly IPermissionsProvider permissionProvider;
 		private readonly IUserProvider authProvider;
-		private volatile bool running = true;
 
 		private readonly object syncRoot = new object();
 
 		protected readonly ILog Log;
 
-		private readonly MutableLookup<ClientMessageType, Action<MessageReceivedEventArgs>> handlers = new MutableLookup<ClientMessageType, Action<MessageReceivedEventArgs>>();
-		private Dictionary<ClientMessageType, Action<IEnumerable<MessageReceivedEventArgs>>> setHandlers = new Dictionary<ClientMessageType, Action<IEnumerable<MessageReceivedEventArgs>>>();
-
-		private readonly Thread messageRunnerThread;
-		private readonly Queue<MessageReceivedEventArgs> mqueue = new Queue<MessageReceivedEventArgs> (1000);
-		private readonly AutoResetEvent incomingWait = new AutoResetEvent (false);
 		private IServerUserHandler users;
 		private ServerSourceHandler sources;
 		private ServerChannelHandler channels;
 		private ServerUserManager userManager;
 		private Timer pingTimer;
 
-		IServerUserHandler IServerContext.Users
+		IServerUserHandler IGablarskiServerContext.Users
 		{
 			get { return this.users; }
 		}
 
-		IConnectionHandler IServerContext.Connections
-		{
-			get { return this.users; }
-		}
-
-		IServerSourceHandler IServerContext.Sources
+		IServerSourceHandler IGablarskiServerContext.Sources
 		{
 			get { return this.sources; }
 		}
 
-		IServerChannelHandler IServerContext.Channels
+		IServerChannelHandler IGablarskiServerContext.Channels
 		{
 			get { return this.channels; }
 		}
 
-		IChannelProvider IServerContext.ChannelsProvider
+		IChannelProvider IGablarskiServerContext.ChannelsProvider
 		{
 			get { return this.channelProvider; }
 		}
 
-		IPermissionsProvider IServerContext.PermissionsProvider
+		IPermissionsProvider IGablarskiServerContext.PermissionsProvider
 		{
 			get { return this.permissionProvider; }
 		}
 
-		IUserProvider IServerContext.UserProvider
+		IUserProvider IGablarskiServerContext.UserProvider
 		{
 			get { return this.authProvider; }
 		}
 
-		PublicRSAParameters IServerContext.EncryptionParameters
+		IEnumerable<IConnection>  IGablarskiServerContext.Connections
 		{
-			get { return this.decryption.PublicParameters; }
-		}
-
-		int IServerContext.ProtocolVersion
-		{
-			get { return GablarskiServer.ProtocolVersion; }
+			get { lock (this.connections) return this.connections.Keys.ToList(); }
 		}
 
 		protected GablarskiServer (ServerSettings serverSettings)
+			: base (MessageTypes.Reliable)
 		{
 			Log = LogManager.GetLogger (serverSettings.Name.Remove (" "));
 
 			this.settings = serverSettings;
 			this.context = this;
-
-			this.messageRunnerThread = new Thread (this.MessageRunner);
-			this.messageRunnerThread.Name = "Gablarski Server Message Runner";
 		}
 
 		private void SetupHandlers()
@@ -308,107 +202,8 @@ namespace Gablarski.Server
 			
 			var channelHandler = new ServerChannelHandler (this);
 			this.channels = channelHandler;
-
-			RegisterMessageHandler (ClientMessageType.Disconnect, ClientDisconnected);
-			RegisterMessageHandler (ClientMessageType.QueryServer, ClientQueryServer);
-		}
-
-		private void MessageRunner ()
-		{
-			while (this.running)
-			{
-				if (mqueue.Count == 0)
-					incomingWait.WaitOne ();
-
-				while (mqueue.Count > 0)
-				{
-					MessageReceivedEventArgs e;
-					MessageReceivedEventArgs next = null;
-					lock (mqueue)
-					{
-						e = mqueue.Dequeue();
-
-						if (mqueue.Count > 0)
-							next = mqueue.Peek();
-					}
-
-					var msg = (e.Message as ClientMessage);
-					if (msg == null)
-					{
-						Disconnect (e.Connection);
-						return;
-					}
-
-					if (next != null && next.Message.MessageTypeCode == e.Message.MessageTypeCode)
-					{
-						Action<IEnumerable<MessageReceivedEventArgs>> setHandler;
-						if (this.setHandlers.TryGetValue (msg.MessageType, out setHandler))
-						{
-							var messages = new List<MessageReceivedEventArgs> (mqueue.Count);
-							lock (mqueue)
-							{
-								while (next != null && next.Message.MessageTypeCode == msg.MessageTypeCode)
-								{
-									e = mqueue.Dequeue();
-
-									messages.Add (e);
-
-									next = (mqueue.Count > 0) ? mqueue.Peek() : null;
-								}
-
-								setHandler (messages);
-							}
-						}
-					}
-					else
-					{
-						IEnumerable<Action<MessageReceivedEventArgs>> ehandlers;
-						if (this.handlers.TryGetValues (msg.MessageType, out ehandlers))
-						{
-							foreach (var handler in ehandlers)
-								handler (e);
-						}
-					}
-				}
-			}
-		}
-
-		protected virtual void OnMessageReceived (object sender, MessageReceivedEventArgs e)
-		{
-			lock (mqueue)
-			{
-				mqueue.Enqueue (e);
-			}
-
-			incomingWait.Set ();
-		}
-
-		private void Disconnect (IConnection connection)
-		{
-			if (connection == null)
-				throw new ArgumentNullException ("connection");
-
-			connection.Disconnect ();
-			connection.MessageReceived -= this.OnMessageReceived;
-			connection.Disconnected -= this.OnClientDisconnected;
-			this.users.Disconnect (connection);
-		}
-
-		private void RemoveConnectionProvider (IConnectionProvider provider, bool listRemove)
-		{
-			Log.InfoFormat ("{0} removed.", provider.GetType ().Name);
-
-			provider.StopListening ();
-			provider.ConnectionMade -= OnConnectionMade;
-			provider.ConnectionlessMessageReceived -= OnMessageReceived;
-
-			if (listRemove)
-			{
-				lock (this.availableConnections)
-				{
-					this.availableConnections.Remove (provider);
-				}
-			}
+			
+			//RegisterMessageHandler<QueryServerMessage> (ClientQueryServer);
 		}
 
 		private void OnPermissionsChanged (object sender, PermissionsChangedEventArgs e)
@@ -418,93 +213,79 @@ namespace Gablarski.Server
 				this.userManager.GetConnection (user).Send (new PermissionsMessage (e.UserId, this.context.PermissionsProvider.GetPermissions (e.UserId)));
 		}
 
-		protected void ClientDisconnected (MessageReceivedEventArgs e)
-		{
-			e.Connection.Disconnect();
-
-			OnClientDisconnected (this, new ConnectionEventArgs (e.Connection));
-		}
-
-		private void OnClientDisconnected (object sender, ConnectionEventArgs e)
+		protected override void OnConnectionDisconnectedGlobal (object sender, DisconnectedEventArgs e)
 		{
 			Log.Debug ("Client disconnected");
-
-			e.Connection.MessageReceived -= this.OnMessageReceived;
-			e.Connection.Disconnected -= this.OnClientDisconnected;
 
 			IUserInfo user = this.userManager.GetUser (e.Connection);
 			if (user != null)
 			{
 				this.sources.Remove (user);
-				this.users.Disconnect (e.Connection);
+				this.users.Disconnect (user, DisconnectionReason.Unknown); // TODO reason convert
 			}
+
+			base.OnConnectionDisconnectedGlobal(sender, e);
 		}
-		
-		private void OnConnectionMade (object sender, ConnectionMadeEventArgs e)
+
+		protected override void OnConnectionMadeGlobal(object sender, ConnectionMadeEventArgs e)
 		{
-			Log.Debug ("Connection Made");
+			// TODO
+			//foreach (BanInfo ban in this.authProvider.GetBans().Where (b => b.IPMask != null))
+			//{
+			//    string[] parts = ban.IPMask.Split ('.');
+			//    string[] addressParts = e.Connection.IPAddress.ToString().Split ('.');
+			//    for (int i = 0; i < parts.Length; ++i)
+			//    {
+			//        if (i + 1 == parts.Length || parts[i] == "*")
+			//        {
+			//            e.Rejected = true;
+			//            return;
+			//        }
 
-			if (e.Cancel)
-				return;
+			//        if (addressParts[i] != parts[i])
+			//            break;
+			//    }
+			//}
 
-			foreach (BanInfo ban in this.authProvider.GetBans().Where (b => b.IPMask != null))
-			{
-				string[] parts = ban.IPMask.Split ('.');
-				string[] addressParts = e.Connection.IPAddress.ToString().Split ('.');
-				for (int i = 0; i < parts.Length; ++i)
-				{
-					if (i + 1 == parts.Length || parts[i] == "*")
-					{
-						e.Cancel = true;
-						return;
-					}
-
-					if (addressParts[i] != parts[i])
-						break;
-				}
-			}
-
-			e.Connection.Decryption = this.decryption;
-			e.Connection.MessageReceived += this.OnMessageReceived;
-			e.Connection.Disconnected += this.OnClientDisconnected;
+			base.OnConnectionMadeGlobal (sender, e);
 		}
 
 		protected ServerInfo GetServerInfo()
 		{
-			return new ServerInfo (this.settings, ((IServerContext)this).UserProvider, this.decryption.PublicParameters);
+			return new ServerInfo (this.settings, ((IGablarskiServerContext)this).UserProvider);
 		}
 
-		private void ClientQueryServer (MessageReceivedEventArgs e)
-		{
-			var msg = (QueryServerMessage)e.Message;
-			var connectionless = (e as ConnectionlessMessageReceivedEventArgs);
+		//private void ClientQueryServer (MessageReceivedEventArgs e)
+		//{
+		//    var msg = (QueryServerMessage)e.Message;
+		//    var connectionless = (e as ConnectionlessMessageReceivedEventArgs);
 			
-			if (!msg.ServerInfoOnly && !context.GetPermission (PermissionName.RequestChannelList, e.Connection))
-			{
-				var denied = new PermissionDeniedMessage (ClientMessageType.QueryServer);
+		//    if (!msg.ServerInfoOnly && !context.GetPermission (PermissionName.RequestChannelList, e.Connection))
+		//    {
+		//        var denied = new PermissionDeniedMessage (ClientMessageType.QueryServer);
 
-				if (connectionless != null)
-					connectionless.Provider.SendConnectionlessMessage (denied, connectionless.EndPoint);
-				else
-					e.Connection.Send (denied);
+		//        if (connectionless != null)
+		//            connectionless.Provider.SendConnectionlessMessage (denied, connectionless.EndPoint);
+		//        else
+		//            e.Connection.Send (denied);
 
-				return;
-			}
+		//        return;
+		//    }
 
-			var result = new QueryServerResultMessage();
+		//    var result = new QueryServerResultMessage();
 
-			if (!msg.ServerInfoOnly)
-			{
-				result.Channels = this.context.ChannelsProvider.GetChannels();
-				result.Users = this.users.ToList();
-			}
+		//    if (!msg.ServerInfoOnly)
+		//    {
+		//        result.Channels = this.context.ChannelsProvider.GetChannels();
+		//        result.Users = this.users.ToList();
+		//    }
 
-			result.ServerInfo = GetServerInfo();
+		//    result.ServerInfo = GetServerInfo();
 
-			if (connectionless == null)
-				e.Connection.Send (result);
-			else
-				connectionless.Provider.SendConnectionlessMessage (result, connectionless.EndPoint);
-		}
+		//    if (connectionless == null)
+		//        e.Connection.Send (result);
+		//    else
+		//        connectionless.Provider.SendConnectionlessMessage (result, connectionless.EndPoint);
+		//}
 	}
 }

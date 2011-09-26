@@ -117,7 +117,7 @@ namespace Gablarski.Audio
 		/// Gets or sets the client context for the engine.
 		/// </summary>
 		/// <exception cref="InvalidOperationException"><see cref="IsRunning"/> is <c>true</c>.</exception>
-		IClientContext Context { get; set; }
+		IGablarskiClientContext Context { get; set; }
 
 		/// <summary>
 		/// Gets or sets the audio receiver.

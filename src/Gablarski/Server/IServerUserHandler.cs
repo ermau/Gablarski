@@ -37,11 +37,12 @@
 using System;
 using System.Linq;
 using Gablarski.Messages;
+using Tempest;
 
 namespace Gablarski.Server
 {
 	public interface IServerUserHandler
-		: IConnectionHandler, IIndexedEnumerable<int, IUserInfo>
+		: IIndexedEnumerable<int, IUserInfo>
 	{
 		/// <summary>
 		/// Gets the user associated with this connection.
@@ -92,7 +93,7 @@ namespace Gablarski.Server
 		/// <exception cref="ArgumentNullException"><paramref name="username"/> is <c>null</c>.</exception>
 		void ApproveRegistration (string username);
 
-		void Send (MessageBase message, Func<IConnection, IUserInfo, bool> predicate);
+		void Send (Message message, Func<IConnection, IUserInfo, bool> predicate);
 
 		/// <summary>
 		/// Disconnects a user for a specific reason.
@@ -105,7 +106,17 @@ namespace Gablarski.Server
 
 	public static class ServerUserHandlerExtensions
 	{
-		public static void Send (this IServerUserHandler self, MessageBase message, Func<IUserInfo, bool> predicate)
+		public static void Send (this IServerUserHandler self, Message message)
+		{
+			if (self == null)
+				throw new ArgumentNullException ("self");
+			if (message == null)
+				throw new ArgumentNullException ("message");
+
+			self.Send (message, (c, u) => true);
+		}
+
+		public static void Send (this IServerUserHandler self, Message message, Func<IUserInfo, bool> predicate)
 		{
 			if (self == null)
 				throw new ArgumentNullException ("self");

@@ -44,23 +44,21 @@ using System.Threading;
 using Cadenza.Collections;
 using Gablarski.Audio;
 using Gablarski.Messages;
-using Gablarski.Network;
+using Tempest;
+using Timer = System.Threading.Timer;
 
 namespace Gablarski.Client
 {
 	public class GablarskiClient
-		: IClientContext
+		: ClientBase, IGablarskiClientContext
 	{
-		// ReSharper disable ConvertToConstant.Global
-		public static readonly int ProtocolVersion = 6;
-		// ReSharper restore ConvertToConstant.Global
-
 		public GablarskiClient (IClientConnection connection)
 			: this (connection, new AudioEngine())
 		{
 		}
 
 		public GablarskiClient (IClientConnection connection, IAudioEngine audioEngine)
+			: base (connection, MessageTypes.Reliable)
 		{
 			if (connection == null)
 				throw new ArgumentNullException ("connection");
@@ -68,17 +66,18 @@ namespace Gablarski.Client
 				throw new ArgumentNullException ("audioEngine");
 
 			DebugLogging = Log.IsDebugEnabled;
-			Setup (connection, audioEngine, null, null, null);
+			Setup (audioEngine, null, null, null);
 		}
 
 		public GablarskiClient (IClientConnection connection, IAudioEngine audioEngine, IClientUserHandler userHandler, IClientSourceHandler sourceHandler, ClientChannelManager channelManager)
+			: base (connection, MessageTypes.Reliable)
 		{
 			if (connection == null)
 				throw new ArgumentNullException ("connection");
 			if (audioEngine == null)
 				throw new ArgumentNullException ("audioEngine");
 
-			Setup (connection, audioEngine, userHandler, sourceHandler, channelManager);
+			Setup (audioEngine, userHandler, sourceHandler, channelManager);
 		}
 
 		#region Events
@@ -106,24 +105,11 @@ namespace Gablarski.Client
 
 		#region Public Properties
 		/// <summary>
-		/// Gets whether the client is currently connected.
-		/// </summary>
-		public bool IsConnected
-		{
-			get { return (this.Connection.IsConnected && this.formallyConnected); }
-		}
-
-		/// <summary>
 		/// Gets whether the client is currently trying to connect or reconnect.
 		/// </summary>
 		public bool IsConnecting
 		{
 			get { return this.connecting; }
-		}
-
-		public IClientConnection Connection
-		{
-			get; protected set;
 		}
 
 		/// <summary>
@@ -218,46 +204,6 @@ namespace Gablarski.Client
 		}
 		#endregion
 
-		#region Public Methods
-		/// <summary>
-		/// Connects to a server server at <paramref name="host"/>:<paramref name="port"/>.
-		/// </summary>
-		/// <param name="host">The hostname of the server to connect to.</param>
-		/// <param name="port">The port of the server to connect to.</param>
-		/// <exception cref="ArgumentException"><paramref name="host"/> is invalid.</exception>
-		/// <exception cref="System.ArgumentNullException"><paramref name="host"/> is <c>null</c>.</exception>
-		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="port" /> is outside the acceptable port range.</exception>
-		/// <exception cref="System.Net.Sockets.SocketException">Hostname could not be resolved.</exception>
-		public void Connect (string host, int port)
-		{
-			this.connecting = true;
-			ThreadPool.QueueUserWorkItem (o => ConnectCore (((Tuple<string, int>)o).Item1, ((Tuple<string, int>)o).Item2), new Tuple<string, int> (host, port));
-		}
-
-		/// <summary>
-		/// Registers a message handler.
-		/// </summary>
-		/// <param name="messageType">The message type to register a handler for.</param>
-		/// <param name="handler">The handler to register for the message type.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="handler"/> is <c>null</c>.</exception>
-		/// <exception cref="InvalidOperationException"><paramref name="messageType"/> already has a registered handler.</exception>
-		public void RegisterMessageHandler (ServerMessageType messageType, Action<MessageReceivedEventArgs> handler)
-		{
-			if (handler == null)
-				throw new ArgumentNullException ("handler");
-
-			this.handlers.Add (messageType, handler);
-		}
-
-		/// <summary>
-		/// Disconnects from the current server.
-		/// </summary>
-		public void Disconnect()
-		{
-			ThreadPool.QueueUserWorkItem (s => DisconnectCore (DisconnectionReason.Requested, this.Connection));
-		}
-		#endregion
-
 		#region Event Invokers
 		protected void OnConnected (object sender, EventArgs e)
 		{
@@ -300,27 +246,25 @@ namespace Gablarski.Client
 		}
 		#endregion
 
-		IIndexedEnumerable<int, IChannelInfo> IClientContext.Channels
+		IIndexedEnumerable<int, IChannelInfo> IGablarskiClientContext.Channels
 		{
 			get { return this.Channels; }
 		}
 
-		private readonly MutableLookup<ServerMessageType, Action<MessageReceivedEventArgs>> handlers = new MutableLookup<ServerMessageType, Action<MessageReceivedEventArgs>>();
-		private void Setup (IClientConnection connection, IAudioEngine audioEngine, IClientUserHandler userHandler, IClientSourceHandler sourceHandler, ClientChannelManager channelManager)
+		private void Setup (IAudioEngine audioEngine, IClientUserHandler userHandler, IClientSourceHandler sourceHandler, ClientChannelManager channelManager)
 		{
 			this.CurrentUser = new CurrentUser (this);
 
-			this.Connection = connection;
 			this.Audio = (audioEngine ?? new AudioEngine());
 			this.Users = (userHandler ?? new ClientUserHandler (this, new ClientUserManager()));
 			this.Sources = (sourceHandler ?? new ClientSourceHandler (this, new ClientSourceManager (this)));
 			this.Channels = (channelManager ?? new ClientChannelManager (this));
 
-			RegisterMessageHandler (ServerMessageType.PermissionDenied, OnPermissionDeniedMessage);
-			RegisterMessageHandler (ServerMessageType.Redirect, OnRedirectMessage);
-			RegisterMessageHandler (ServerMessageType.ServerInfoReceived, OnServerInfoReceivedMessage);
-			RegisterMessageHandler (ServerMessageType.ConnectionRejected, OnConnectionRejectedMessage);
-			RegisterMessageHandler (ServerMessageType.Disconnect, OnDisconnectedMessage);
+			this.RegisterMessageHandler<PermissionDeniedMessage> (OnPermissionDeniedMessage);
+			this.RegisterMessageHandler<RedirectMessage> (OnRedirectMessage);
+			this.RegisterMessageHandler<ServerInfoMessage> (OnServerInfoReceivedMessage);
+			//this.RegisterMessageHandler<ConnectionRejectedMessage> (OnConnectionRejectedMessage);
+			this.RegisterMessageHandler<DisconnectMessage> (OnDisconnectedMessage);
 		}
 
 		private Timer pingTimer;
@@ -332,10 +276,6 @@ namespace Gablarski.Client
 
 		private int redirectLimit = 20;
 		private int redirectCount;
-		private volatile bool running;
-		private readonly AutoResetEvent incomingWait = new AutoResetEvent (false);
-		private readonly Queue<MessageReceivedEventArgs> mqueue = new Queue<MessageReceivedEventArgs> (100);
-		private Thread messageRunnerThread;
 
 		private IPEndPoint originalEndPoint;
 		private int disconnectedInChannelId;
@@ -344,90 +284,26 @@ namespace Gablarski.Client
 		private int reconnectAttempt;
 		private bool connecting;
 
-		private void OnDisconnectedMessage (MessageReceivedEventArgs e)
+		private void OnDisconnectedMessage (MessageEventArgs<DisconnectMessage> e)
 		{
-			var msg = (DisconnectMessage) e.Message;
-
-			DisconnectCore (msg.Reason, (IClientConnection)e.Connection, (GetHandlingForReason (msg.Reason) == DisconnectHandling.Reconnect), true);
+			DisconnectCore (e.Message.Reason, (IClientConnection)e.Connection, (GetHandlingForReason (e.Message.Reason) == DisconnectHandling.Reconnect), true);
 		}
 
-		private void OnPermissionDeniedMessage (MessageReceivedEventArgs obj)
+		private void OnPermissionDeniedMessage (MessageEventArgs<PermissionDeniedMessage> e)
 		{
-			OnPermissionDenied (new PermissionDeniedEventArgs (((PermissionDeniedMessage)obj.Message).DeniedMessage));
+			OnPermissionDenied (new PermissionDeniedEventArgs (e.Message.DeniedMessage));
 		}
 
-		private void MessageRunner ()
+		private void OnServerInfoReceivedMessage (MessageEventArgs<ServerInfoMessage> e)
 		{
-			while (this.running)
-			{
-				while (mqueue.Count > 0)
-				{
-					MessageReceivedEventArgs e;
-					lock (mqueue)
-					{
-						if (mqueue.Count == 0)
-							continue;
-
-						e = mqueue.Dequeue ();
-					}
-
-					var msg = (e.Message as ServerMessage);
-					if (msg == null)
-					{
-						this.Log.Error ("Non ServerMessage received (" + e.Message.MessageTypeCode + "), disconnecting.");
-						Connection.Disconnect ();
-						return;
-					}
-
-					if (DebugLogging)
-						this.Log.Debug ("Message Received: " + msg.MessageType);
-
-					if (this.running)
-					{
-						IEnumerable<Action<MessageReceivedEventArgs>> mhandlers;
-						if (this.handlers.TryGetValues (msg.MessageType, out mhandlers))
-						{
-							foreach (var h in mhandlers)
-								h (e);
-						}
-					}
-				}
-
-				if (mqueue.Count == 0)
-					incomingWait.WaitOne ();
-			}
-		}
-
-		private void OnMessageReceived (object sender, MessageReceivedEventArgs e)
-		{
-			lock (mqueue)
-			{
-				mqueue.Enqueue (e);
-			}
-
-			incomingWait.Set ();
-		}
-
-		private void OnConnectionRejectedMessage (MessageReceivedEventArgs e)
-		{
-			var msg = (ConnectionRejectedMessage)e.Message;
-
-			OnConnectionRejected (new RejectedConnectionEventArgs (msg.Reason, this.reconnectAttempt));
-		}
-
-		private void OnServerInfoReceivedMessage (MessageReceivedEventArgs e)
-		{
-			this.serverInfo = ((ServerInfoMessage)e.Message).ServerInfo;
-			this.Connection.Encryption = new Encryption (this.serverInfo.PublicRSAParameters);
+			this.serverInfo = e.Message.ServerInfo;
 			this.formallyConnected = true;
 
 			OnConnected (this, EventArgs.Empty);
 		}
 
-		private void OnRedirectMessage (MessageReceivedEventArgs e)
+		private void OnRedirectMessage (MessageEventArgs<RedirectMessage> e)
 		{
-			var msg = (RedirectMessage) e.Message;
-
 			int count = Interlocked.Increment (ref this.redirectCount);
 
 			DisconnectCore (DisconnectionReason.Redirected, this.Connection);
@@ -435,7 +311,7 @@ namespace Gablarski.Client
 			if (count > redirectLimit)
 				return;
 
-			Connect (msg.Host, msg.Port);
+			Connect (new DnsEndPoint (e.Message.Host, e.Message.Port));
 		}
 
 		private enum DisconnectHandling
@@ -474,31 +350,6 @@ namespace Gablarski.Client
 				this.running = false;
 				this.formallyConnected = false;
 
-				connection.Disconnected -= this.OnDisconnectedInternal;
-				connection.MessageReceived -= this.OnMessageReceived;
-
-				this.incomingWait.Set();
-
-				lock (this.mqueue)
-				{
-					if (reason == DisconnectionReason.Unknown)
-					{
-						var msg = this.mqueue.Select (a => a.Message).OfType<DisconnectMessage>().FirstOrDefault();
-						if (msg != null)
-							reason = msg.Reason;
-					}
-
-					this.mqueue.Clear();
-				}
-
-				if (this.messageRunnerThread != null)
-				{
-					if (this.messageRunnerThread != Thread.CurrentThread)
-						this.messageRunnerThread.Join();
-
-					this.messageRunnerThread = null;
-				}
-
 				CurrentUser = new CurrentUser (this);
 				this.Users.Reset();
 				this.Channels.Clear();
@@ -536,7 +387,7 @@ namespace Gablarski.Client
 			}
 
 			CurrentUser.ReceivedJoinResult += ReconnectJoinedResult;
-			ConnectCore();
+			//ConnectCore();
 		}
 
 		private void ReconnectJoinedResult (object sender, ReceivedJoinResultEventArgs e)
@@ -551,201 +402,47 @@ namespace Gablarski.Client
 			this.disconnectedInChannelId = 0;
 		}
 
-		private void ConnectCore (string host, int port)
+		protected override void OnConnected (EventArgs e)
 		{
-			if (String.IsNullOrWhiteSpace (host))
-				throw new ArgumentException ("host must not be null or empty", "host");
-
-			try
-			{
-				this.originalHost = host;
-				this.originalEndPoint = new IPEndPoint (Dns.GetHostAddresses (host).First (ip => ip.AddressFamily == AddressFamily.InterNetwork), port);
-				ConnectCore();
-			}
-			catch (SocketException)
-			{
-				OnConnectionRejected (new RejectedConnectionEventArgs (ConnectionRejectedReason.CouldNotResolve, this.reconnectAttempt));
-			}
-		}
-
-		private void ConnectCore ()
-		{
-			try
-			{
-				lock (StateSync)
-				{
-					if (this.running)
-						throw new InvalidOperationException ("Already running");
-
-					this.running = true;
-
-					this.messageRunnerThread = new Thread (this.MessageRunner) { Name = "Gablarski Client Message Runner" };
-					this.messageRunnerThread.SetApartmentState (ApartmentState.STA);
-					this.messageRunnerThread.Priority = ThreadPriority.Highest;
-					this.messageRunnerThread.Start();
-
-					this.Connection.Disconnected += OnDisconnectedInternal;
-					this.Connection.MessageReceived += OnMessageReceived;
-				}
-
-				this.Connection.Connect (this.originalEndPoint);
-
-				lock (StateSync)
-				{
-					if (!this.running)
-					{
-						this.Connection.Disconnect();
-						return;
-					}
-
-					this.Connection.Send (new ConnectMessage { ProtocolVersion = ProtocolVersion, Host = this.originalHost, Port = this.originalEndPoint.Port });
-
-					if (Audio.AudioSender == null)
-						Audio.AudioSender = Sources;
-					if (Audio.AudioReceiver == null)
-						Audio.AudioReceiver = Sources;
-
-					this.Audio.Context = this;
-					this.Audio.Start();
-				}
-			}
-			catch (IOException)
+			lock (StateSync)
 			{
 				if (!this.running)
 				{
-					Connection.Disconnect();
+					this.Connection.Disconnect();
 					return;
 				}
 
-				OnConnectionRejected (new RejectedConnectionEventArgs (ConnectionRejectedReason.CouldNotConnect, this.reconnectAttempt));
+				//this.Connection.Send (new ConnectMessage { ProtocolVersion = ProtocolVersion, Host = this.originalHost, Port = this.originalEndPoint.Port });
+
+				if (Audio.AudioSender == null)
+					Audio.AudioSender = Sources;
+				if (Audio.AudioReceiver == null)
+					Audio.AudioReceiver = Sources;
+
+				this.Audio.Context = this;
+				this.Audio.Start();
 			}
-			catch (SocketException)
-			{
-				if (!this.running)
-				{
-					Connection.Disconnect();
-					return;
-				}
 
-				OnConnectionRejected (new RejectedConnectionEventArgs (ConnectionRejectedReason.CouldNotConnect, this.reconnectAttempt));
-			}
+			base.OnConnected(e);
 		}
-
-		#region Statics
-		public static void QueryServer (string host, int port, object tag, Action<ServerQuery> callback)
-		{
-			new ServerQuery (host, port, tag, callback).Run();
-		}
-
-		/// <summary>
-		/// Searches for local servers and calls <paramref name="serversFound"/> for each server found.
-		/// </summary>
-		/// <param name="serversFound">Called each <paramref name="frequency"/> when servers return.</param>
-		/// <param name="frequency">How many milliseconds between arrival of servers and the next query.</param>
-		/// <param name="keepSearching">Returns <c>true</c> to keep searching, <c>false</c> to stop.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="serversFound"/> is <c>null</c>.</exception>
-		public static void FindLocalServers (int frequency, Action<IEnumerable<Tuple<ServerInfo, IPEndPoint>>> serversFound, Func<bool> keepSearching)
-		{
-			if (serversFound == null)
-				throw new ArgumentNullException ("serversFound");
-			if (keepSearching == null)
-				throw new ArgumentNullException ("keepSearching");
-
-			Thread findthread = new Thread (FindLocalServersCore)
-			{
-				IsBackground = true,
-				Name = "FindLocalServers"
-			};
-			findthread.Start (new Tuple<int, Action<IEnumerable<Tuple<ServerInfo, IPEndPoint>>>, Func<bool>> (frequency, serversFound, keepSearching));
-		}
-
-		private static void FindLocalServersCore (object o)
-		{
-			var found = (Tuple<int, Action<IEnumerable<Tuple<ServerInfo, IPEndPoint>>>, Func<bool>>)o;
-			
-			Socket s = new Socket (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-			s.EnableBroadcast = true;
-			s.Bind (new IPEndPoint (IPAddress.Any, 0));
-			s.ReceiveTimeout = 1500;
-
-			do
-			{
-				List<Tuple<QueryServerResultMessage, IPEndPoint>> results = new List<Tuple<QueryServerResultMessage, IPEndPoint>>();
-
-				try
-				{
-					var msg = new QueryServerMessage { ServerInfoOnly = true };
-
-					SocketValueWriter writer = new SocketValueWriter (s, new IPEndPoint (IPAddress.Broadcast, 42912));
-					writer.WriteByte (42);
-					writer.WriteUInt32 (0);
-					writer.WriteUInt16 (msg.MessageTypeCode);
-					msg.WritePayload (writer);
-					writer.Flush();
-
-					EndPoint server = new IPEndPoint (IPAddress.Any, 0);
-					byte[] buffer = new byte[131072];
-					ByteArrayValueReader reader = new ByteArrayValueReader (buffer);
-
-					DateTime start = DateTime.Now;
-
-					do
-					{
-						try
-						{
-							if (s.ReceiveFrom (buffer, ref server) == 0)
-								continue;
-						}
-						catch (SocketException)
-						{
-							continue;
-						}
-
-						byte sanity = reader.ReadByte();
-						if (sanity != 42)
-							continue;
-
-						ushort type = reader.ReadUInt16();
-
-						var result = new QueryServerResultMessage();
-						if (type != result.MessageTypeCode)
-							continue;
-
-						result.ReadPayload (reader);
-
-						results.Add (new Tuple<QueryServerResultMessage,IPEndPoint> (result, (IPEndPoint)server));
-					} while (DateTime.Now.Subtract (start).TotalSeconds < 2);
-				}
-				catch (Exception)
-				{
-					#if DEBUG
-					throw;
-					#endif
-				}
-
-				found.Item2 (results.Select (r => new Tuple<ServerInfo, IPEndPoint> (r.Item1.ServerInfo, r.Item2)));
-
-				Thread.Sleep (found.Item1);
-			} while (found.Item3());
-		}
-		#endregion
 	}
 
 	#region Event Args
 	public class PermissionDeniedEventArgs
 		: EventArgs
 	{
-		public PermissionDeniedEventArgs (ClientMessageType messageType)
+		public PermissionDeniedEventArgs (GablarskiMessageType messageType)
 		{
-			this.DeniedMessage = messageType;
+			DeniedMessage = messageType;
 		}
 
 		/// <summary>
 		/// Gets the message type that was denied.
 		/// </summary>
-		public ClientMessageType DeniedMessage
+		public GablarskiMessageType DeniedMessage
 		{
-			get; private set;
+			get;
+			private set;
 		}
 	}
 	
@@ -819,7 +516,6 @@ namespace Gablarski.Client
 		public DisconnectedEventArgs (DisconnectionReason reason)
 		{
 			Reason = reason;
-			
 		}
 
 		public DisconnectionReason Reason

@@ -44,9 +44,9 @@ namespace Gablarski.Server
 	public class ServerSourceManager
 		: AudioSourceManager, IServerSourceManager
 	{
-		private readonly IServerContext context;
+		private readonly IGablarskiServerContext context;
 
-		public ServerSourceManager (IServerContext serverContext)
+		public ServerSourceManager (IGablarskiServerContext serverContext)
 		{
 			this.context = serverContext;
 		}

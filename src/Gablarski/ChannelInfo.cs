@@ -35,8 +35,7 @@
 // DAMAGE.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using Tempest;
 
 namespace Gablarski
 {
@@ -48,12 +47,12 @@ namespace Gablarski
 		{
 		}
 
-		internal ChannelInfo (IValueReader reader)
+		internal ChannelInfo (ISerializationContext context, IValueReader reader)
 		{
 			if (reader == null)
 				throw new ArgumentNullException ("reader");
 
-			Deserialize (reader);
+			Deserialize (context, reader);
 		}
 
 		public ChannelInfo (int channelId)
@@ -141,7 +140,7 @@ namespace Gablarski
 			set;
 		}
 
-		internal void Serialize (IValueWriter writer)
+		public void Serialize (ISerializationContext context, IValueWriter writer)
 		{
 			writer.WriteInt32 (this.ChannelId);
 			writer.WriteInt32 (this.ParentChannelId);
@@ -151,7 +150,7 @@ namespace Gablarski
 			writer.WriteString (this.Description);
 		}
 
-		internal void Deserialize (IValueReader reader)
+		public void Deserialize (ISerializationContext context, IValueReader reader)
 		{
 			this.ChannelId = reader.ReadInt32();
 			this.ParentChannelId = reader.ReadInt32();

@@ -60,6 +60,11 @@ namespace Gablarski.Server
 		IChannelProvider ChannelsProvider { get; }
 
 		/// <summary>
+		/// Gets the current connections
+		/// </summary>
+		IEnumerable<IConnection> Connections { get; }
+
+		/// <summary>
 		/// Gets the user handler for the server.
 		/// </summary>
 		IServerUserHandler Users { get; }

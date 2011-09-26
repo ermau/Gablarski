@@ -39,21 +39,21 @@ using System.Collections.Generic;
 using System.Linq;
 using Gablarski.Messages;
 using System.Threading;
+using Tempest;
 
 namespace Gablarski.Client
 {
 	public class ClientChannelManager
 		: IIndexedEnumerable<int, IChannelInfo>
 	{
-		protected internal ClientChannelManager (IClientContext context)
+		protected internal ClientChannelManager (IGablarskiClientContext context)
 		{
 			if (context == null)
 				throw new ArgumentNullException ("context");
 
 			this.context = context;
 
-			this.context.RegisterMessageHandler (ServerMessageType.ChannelList, OnChannelListReceivedMessage);
-			this.context.RegisterMessageHandler (ServerMessageType.ChannelEditResult, OnChannelEditResultMessage);
+			this.context.RegisterMessageHandler<ChannelListMessage> (OnChannelListReceivedMessage);
 		}
 
 		#region Events
@@ -99,7 +99,8 @@ namespace Gablarski.Client
 			if (channel.ChannelId != 0)
 				throw new ArgumentException ("Can not create an existing channel", "channel");
 
-			this.context.Connection.Send (new ChannelEditMessage (channel));
+			this.context.Connection.SendFor<ChannelEditResultMessage> (new ChannelEditMessage (channel))
+				.ContinueWith (t => OnChannelEditResultMessage (t.Result));
 		}
 
 		/// <summary>
@@ -114,7 +115,8 @@ namespace Gablarski.Client
 			if (channel.ChannelId == 0)
 				throw new ArgumentException ("channel must be an existing channel", "channel");
 
-			this.context.Connection.Send (new ChannelEditMessage (channel));
+			this.context.Connection.SendFor<ChannelEditResultMessage> (new ChannelEditMessage (channel))
+				.ContinueWith (t => OnChannelEditResultMessage (t.Result));
 		}
 
 		/// <summary>
@@ -129,7 +131,8 @@ namespace Gablarski.Client
 			if (channel.ChannelId == 0)
 				throw new ArgumentException ("channel must be an existing channel", "channel");
 
-			this.context.Connection.Send (new ChannelEditMessage (channel) { Delete = true });
+			this.context.Connection.SendFor<ChannelEditResultMessage> (new ChannelEditMessage (channel) { Delete = true })
+				.ContinueWith (t => OnChannelEditResultMessage (t.Result));
 		}
 
 		/// <summary>
@@ -161,27 +164,23 @@ namespace Gablarski.Client
 		}
 		#endregion
 
-		private readonly IClientContext context;
+		private readonly IGablarskiClientContext context;
 
 		private readonly object channelLock = new object ();
 		private Dictionary<int, IChannelInfo> channels;
 
-		internal void OnChannelListReceivedMessage (MessageReceivedEventArgs e)
+		internal void OnChannelListReceivedMessage (MessageEventArgs<ChannelListMessage> e)
 		{
-			var msg = (ChannelListMessage)e.Message;
-
 			lock (channelLock)
 			{
-				this.channels = msg.Channels.ToDictionary (c => c.ChannelId);
+				this.channels = e.Message.Channels.ToDictionary (c => c.ChannelId);
 			}
 
-			OnReceivedChannelList (new ReceivedListEventArgs<IChannelInfo> (msg.Channels));
+			OnReceivedChannelList (new ReceivedListEventArgs<IChannelInfo> (e.Message.Channels));
 		}
 
-		internal void OnChannelEditResultMessage (MessageReceivedEventArgs e)
+		internal void OnChannelEditResultMessage (ChannelEditResultMessage msg)
 		{
-			var msg = (ChannelEditResultMessage)e.Message;
-
 			IChannelInfo channel;
 			lock (this.channelLock)
 			{

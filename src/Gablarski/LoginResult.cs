@@ -37,6 +37,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Tempest;
 
 namespace Gablarski
 {
@@ -111,9 +112,9 @@ namespace Gablarski
 	/// </summary>
 	public class LoginResult
 	{
-		internal LoginResult (IValueReader reader)
+		internal LoginResult (ISerializationContext context, IValueReader reader)
 		{
-			this.Deserialize (reader);
+			Deserialize (context, reader);
 		}
 
 		public LoginResult (int userId, LoginResultState state)
@@ -148,13 +149,13 @@ namespace Gablarski
 			internal set;
 		}
 
-		internal void Serialize (IValueWriter writer)
+		public void Serialize (ISerializationContext context, IValueWriter writer)
 		{
 			writer.WriteInt32 (this.UserId);
 			writer.WriteByte ((byte)this.ResultState);
 		}
 
-		internal void Deserialize (IValueReader reader)
+		public void Deserialize (ISerializationContext context, IValueReader reader)
 		{
 			this.UserId = reader.ReadInt32();
 			this.ResultState = (LoginResultState)reader.ReadByte ();

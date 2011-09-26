@@ -38,6 +38,84 @@ using Tempest;
 
 namespace Gablarski
 {
+
+	public enum GablarskiMessageType
+		: ushort
+	{
+		Ping = 56,
+		Connect = 1,
+		Login = 3,
+		Register = 42,
+		Join = 37,
+		Disconnect = 5,
+		QueryServer = 34,
+		PunchThrough = 39,
+		
+		SetComment = 47,
+		SetStatus = 48,
+
+		RequestSourceList = 15,
+		RequestSource = 7,
+		ClientAudioSourceStateChange = 28,
+		RemoveSource = 26,
+
+		RequestServerInfo = 11,
+		RequestUserList = 13,
+		
+		RequestChannelList = 18,
+		ChannelChange = 20,
+		ChannelEdit = 22,
+		
+		RequestMuteUser = 44,
+		RequestMuteSource = 45,
+
+		SetPermissions = 52,
+		KickUser = 50,
+		BanUser = 51,
+		RegistrationApproval = 54,
+
+		ConnectionRejected = 2,
+		PunchThroughReceived = 40,
+		Redirect = 41,
+		RegisterResult = 43,
+		
+		QueryServerResult = 36,
+		ServerInfoReceived = 12,
+		LoginResult = 4,
+		JoinResult = 38,
+		PermissionDenied = 32,
+
+		SourceList = 16,
+		SourceResult = 8,
+		AudioData = 10,
+		AudioSourceStateChange = 29,
+		SourcesRemoved = 25,
+		SourceMuted = 53,
+	
+		UserJoined = 24,
+		Permissions = 33,
+		UserInfoList = 14,
+		UserList = 49,
+		UserDisconnected = 17,
+		UserChangedChannel = 27,
+		UserMuted = 31,
+		UserUpdated = 46,
+		UserKicked = 55,
+
+		ChannelList = 19,
+		ChangeChannelResult = 21,
+		ChannelEditResult = 23,
+	}
+
+	public abstract class GablarskiMessage
+		: Message
+	{
+		protected GablarskiMessage (GablarskiMessageType messageType)
+			: base (GablarskiProtocol.Instance, (ushort)messageType)
+		{
+		}
+	}
+
 	public class GablarskiProtocol
 	{
 		public static readonly Protocol Instance = new Protocol (42, 7);

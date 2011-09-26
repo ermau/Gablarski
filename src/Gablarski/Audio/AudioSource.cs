@@ -36,14 +36,15 @@
 
 using System;
 using System.Linq;
+using Tempest;
 
 namespace Gablarski.Audio
 {
 	public class AudioSource
 		: AudioCodec, IEquatable<AudioSource>
 	{
-		internal AudioSource (IValueReader reader)
-			: base (reader)
+		internal AudioSource (ISerializationContext context, IValueReader reader)
+			: base (context, reader)
 		{
 		}
 
@@ -129,22 +130,22 @@ namespace Gablarski.Audio
 			return "AudioSource:" + Name + ":" + Id + ":" + OwnerId;
 		}
 
-		protected internal override void Serialize (IValueWriter writer)
+		public override void Serialize (ISerializationContext context, IValueWriter writer)
 		{
 			writer.WriteString (this.Name);
 			writer.WriteInt32 (this.Id);
 			writer.WriteInt32 (this.OwnerId);
 			writer.WriteBool (this.IsMuted);
-			base.Serialize (writer);
+			base.Serialize (context, writer);
 		}
 
-		protected internal override void Deserialize (IValueReader reader)
+		public override void Deserialize (ISerializationContext context, IValueReader reader)
 		{
 			this.Name = reader.ReadString();
 			this.Id = reader.ReadInt32 ();
 			this.OwnerId = reader.ReadInt32();
 			this.IsMuted = reader.ReadBool();
-			base.Deserialize (reader);
+			base.Deserialize (context, reader);
 		}
 
 		public override bool Equals (object obj)

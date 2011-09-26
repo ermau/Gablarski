@@ -70,7 +70,7 @@ namespace Gablarski.WebServer
 			throw new NotSupportedException();
 		}
 
-		public void StartListening (IServerContext context)
+		public void StartListening (IGablarskiServerContext context)
 		{
 			var sstore = new MemorySessionStore { ExpireTime = 15 };
 			server = new HttpServer.HttpServer (sstore);

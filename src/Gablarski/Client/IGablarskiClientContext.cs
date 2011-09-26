@@ -34,10 +34,7 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
-using System;
-using System.Linq;
 using Gablarski.Audio;
-using Gablarski.Messages;
 using Tempest;
 
 namespace Gablarski.Client

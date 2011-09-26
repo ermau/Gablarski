@@ -39,6 +39,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Gablarski.Client;
 using Cadenza;
+using Tempest;
 
 namespace Gablarski
 {
@@ -149,12 +150,12 @@ namespace Gablarski
 			IsMuted = muted;
 		}
 
-		internal UserInfo (IValueReader reader)
+		internal UserInfo (ISerializationContext context, IValueReader reader)
 		{
 			if (reader == null)
 				throw new ArgumentNullException("reader");
 
-			Deserialize (reader);
+			Deserialize (context, reader);
 		}
 
 		public int UserId
@@ -228,7 +229,7 @@ namespace Gablarski
 			protected set;
 		}
 
-		public void Serialize (IValueWriter writer)
+		public void Serialize (ISerializationContext context, IValueWriter writer)
 		{
 			writer.WriteInt32 (UserId);
 			writer.WriteString (Username);
@@ -240,7 +241,7 @@ namespace Gablarski
 			writer.WriteString (Comment);
 		}
 
-		public void Deserialize (IValueReader reader)
+		public void Deserialize (ISerializationContext context, IValueReader reader)
 		{
 			UserId = reader.ReadInt32();
 			Username = reader.ReadString();

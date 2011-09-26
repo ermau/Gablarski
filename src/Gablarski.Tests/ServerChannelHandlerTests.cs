@@ -48,7 +48,7 @@ namespace Gablarski.Tests
 	public class ServerChannelHandlerTests
 	{
 		private IChannelProvider channels;
-		private IServerContext context;
+		private IGablarskiServerContext context;
 		private IServerUserManager manager;
 		private ServerChannelHandler handler;
 		private MockPermissionsProvider permissions;

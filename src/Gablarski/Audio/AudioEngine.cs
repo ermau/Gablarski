@@ -51,7 +51,7 @@ namespace Gablarski.Audio
 		/// <summary>
 		/// Gets or sets the client context.
 		/// </summary>
-		public IClientContext Context
+		public IGablarskiClientContext Context
 		{
 			get { return this.context; }
 			set
@@ -501,7 +501,7 @@ namespace Gablarski.Audio
 		private readonly HashSet<IAudioPlaybackProvider> mutedPlayers = new HashSet<IAudioPlaybackProvider>();
 		private readonly HashSet<IAudioCaptureProvider> mutedCaptures = new HashSet<IAudioCaptureProvider>();
 
-		private IClientContext context;
+		private IGablarskiClientContext context;
 		private IAudioSender audioSender;
 		private IAudioReceiver audioReceiver;
 		private bool captureMuted;

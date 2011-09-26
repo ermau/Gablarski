@@ -48,7 +48,7 @@ namespace Gablarski.Tests
 	[TestFixture]
 	public class ServerSourceHandlerTests
 	{
-		private IServerContext context;
+		private IGablarskiServerContext context;
 		private IServerSourceManager manager;
 		private IServerUserManager userManager;
 		private ServerSourceHandler handler;

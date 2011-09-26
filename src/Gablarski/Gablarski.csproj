@@ -114,7 +114,6 @@
     <Compile Include="Client\IClientSourceManager.cs" />
     <Compile Include="Client\IClientUserHandler.cs" />
     <Compile Include="Client\ICurrentUserHandler.cs" />
-    <Compile Include="Client\ServerQuery.cs" />
     <Compile Include="Encryption.cs" />
     <Compile Include="GablarskiProtocol.cs" />
     <Compile Include="IChannelInfo.cs" />
@@ -205,12 +204,8 @@
     <Compile Include="Server\GuestUserProvider.cs" />
     <Compile Include="Server\IChannelProvider.cs" />
     <Compile Include="Server\IPermissionsProvider.cs" />
-    <Compile Include="Messages\ClientMessage.cs" />
     <Compile Include="Messages\DisconnectMessage.cs" />
     <Compile Include="Messages\LoginMessage.cs" />
-    <Compile Include="Messages\Message.cs" />
-    <Compile Include="Messages\MessageBase.cs" />
-    <Compile Include="Messages\ServerMessage.cs" />
     <Compile Include="Server\GablarskiServer.cs" />
     <Compile Include="Server\IUserProvider.cs" />
     <Compile Include="Permission.cs" />

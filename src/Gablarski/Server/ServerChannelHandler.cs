@@ -39,15 +39,16 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Gablarski.Messages;
+using Tempest;
 
 namespace Gablarski.Server
 {
 	public class ServerChannelHandler
 		: IServerChannelHandler
 	{
-		private readonly IServerContext context;
+		private readonly IGablarskiServerContext context;
 
-		public ServerChannelHandler (IServerContext context)
+		public ServerChannelHandler (IGablarskiServerContext context)
 		{
 			if (context == null)
 				throw new ArgumentNullException ("context");
@@ -55,8 +56,8 @@ namespace Gablarski.Server
 			this.context = context;
 			this.context.ChannelsProvider.ChannelsUpdated += ChannelsProviderOnChannelsUpdated;
 
-			this.context.RegisterMessageHandler (ClientMessageType.RequestChannelList, RequestChanneListMessage);
-			this.context.RegisterMessageHandler (ClientMessageType.ChannelEdit, ChannelEditMessage);
+			this.context.RegisterMessageHandler<RequestChannelListMessage> (RequestChanneListMessage);
+			this.context.RegisterMessageHandler<ChannelEditMessage> (ChannelEditMessage);
 		}
 
 		public IEnumerator<IChannelInfo> GetEnumerator()
@@ -85,7 +86,7 @@ namespace Gablarski.Server
 			context.Connections.Send (new ChannelListMessage (channels, context.ChannelsProvider.DefaultChannel));
 		}
 
-		internal void RequestChanneListMessage (MessageReceivedEventArgs e)
+		internal void RequestChanneListMessage (MessageEventArgs<RequestChannelListMessage> e)
 		{
 			if (!e.Connection.IsConnected)
 				return;
@@ -99,7 +100,7 @@ namespace Gablarski.Server
 			}
 		}
 
-		internal void ChannelEditMessage (MessageReceivedEventArgs e)
+		internal void ChannelEditMessage (MessageEventArgs<ChannelEditMessage> e)
 		{
 			var msg = (ChannelEditMessage)e.Message;
 

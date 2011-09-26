@@ -45,7 +45,7 @@ using Gablarski.Server;
 namespace Gablarski.Tests.Mocks
 {
 	public class MockServerContext
-		: IServerContext
+		: IGablarskiServerContext
 	{
 		public ReaderWriterLockSlim Synchronization
 		{

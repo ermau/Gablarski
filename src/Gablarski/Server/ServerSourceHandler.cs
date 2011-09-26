@@ -40,16 +40,17 @@ using System.Collections.Generic;
 using System.Linq;
 using Gablarski.Audio;
 using Gablarski.Messages;
+using Tempest;
 
 namespace Gablarski.Server
 {
 	public class ServerSourceHandler
 		: IServerSourceHandler
 	{
-		private readonly IServerContext context;
+		private readonly IGablarskiServerContext context;
 		private readonly IServerSourceManager manager;
 
-		public ServerSourceHandler (IServerContext context, IServerSourceManager manager)
+		public ServerSourceHandler (IGablarskiServerContext context, IServerSourceManager manager)
 		{
 			if (context == null)
 				throw new ArgumentNullException ("context");
@@ -59,11 +60,11 @@ namespace Gablarski.Server
 			this.context = context;
 			this.manager = manager;
 
-			this.context.RegisterMessageHandler (ClientMessageType.RequestSource, RequestSourceMessage);
-			this.context.RegisterMessageHandler (ClientMessageType.AudioData, SendAudioDataMessage);
-			this.context.RegisterMessageHandler (ClientMessageType.ClientAudioSourceStateChange, ClientAudioSourceStateChangeMessage);
-			this.context.RegisterMessageHandler (ClientMessageType.RequestMuteSource, RequestMuteSourceMessage);
-			this.context.RegisterMessageHandler (ClientMessageType.RequestSourceList, RequestSourceListMessage);
+			this.context.RegisterMessageHandler<RequestSourceMessage> (RequestSourceMessage);
+			this.context.RegisterMessageHandler<ClientAudioDataMessage> (SendAudioDataMessage);
+			this.context.RegisterMessageHandler<ClientAudioSourceStateChangeMessage> (ClientAudioSourceStateChangeMessage);
+			this.context.RegisterMessageHandler<RequestMuteSourceMessage> (RequestMuteSourceMessage);
+			this.context.RegisterMessageHandler<RequestSourceListMessage> (RequestSourceListMessage);
 		}
 
 		public IEnumerator<AudioSource> GetEnumerator()
@@ -103,7 +104,7 @@ namespace Gablarski.Server
 			manager.Remove (user);
 		}
 
-		internal void RequestSourceMessage (MessageReceivedEventArgs e)
+		internal void RequestSourceMessage (MessageEventArgs<RequestSourceMessage> e)
 		{
 			var request = (RequestSourceMessage)e.Message;
 
@@ -153,13 +154,12 @@ namespace Gablarski.Server
 				e.Connection.Send (new SourceResultMessage (request.Name, result, source));
 				if (result == SourceResult.Succeeded)
 				{
-					context.Connections.Send (new SourceResultMessage (request.Name, SourceResult.NewSource, source),
-					                    c => c != e.Connection);
+					context.Connections.Where (c => c != e.Connection).Send (new SourceResultMessage (request.Name, SourceResult.NewSource, source));
 				}
 			}
 		}
 
-		internal void RequestMuteSourceMessage (MessageReceivedEventArgs e)
+		internal void RequestMuteSourceMessage (MessageEventArgs<RequestMuteSourceMessage> e)
 		{
 			var request = (RequestMuteMessage)e.Message;
 			if (!e.Connection.IsConnected)
@@ -167,7 +167,7 @@ namespace Gablarski.Server
 
 			if (!context.GetPermission (PermissionName.MuteAudioSource, e.Connection))
 			{
-				e.Connection.Send (new PermissionDeniedMessage { DeniedMessage = ClientMessageType.RequestMuteSource });
+				e.Connection.Send (new PermissionDeniedMessage { DeniedMessage = GablarskiMessageType.RequestMuteSource });
 				return;
 			}
 
@@ -179,7 +179,7 @@ namespace Gablarski.Server
 			context.Connections.Send (new SourceMutedMessage { SourceId = source.Id, Unmuted = !muted });
 		}
 
-		internal void RequestSourceListMessage (MessageReceivedEventArgs e)
+		internal void RequestSourceListMessage (MessageEventArgs<RequestSourceListMessage> e)
 		{
 			if (!e.Connection.IsConnected)
 				return;
@@ -187,7 +187,7 @@ namespace Gablarski.Server
 			e.Connection.Send (new SourceListMessage (manager));
 		}
 
-		internal void ClientAudioSourceStateChangeMessage (MessageReceivedEventArgs e)
+		internal void ClientAudioSourceStateChangeMessage (MessageEventArgs<ClientAudioSourceStateChangeMessage> e)
 		{
 			var msg = (ClientAudioSourceStateChangeMessage)e.Message;
 
@@ -199,7 +199,7 @@ namespace Gablarski.Server
 			                    (con, user) => con != e.Connection);
 		}
 
-		internal void SendAudioDataMessage (MessageReceivedEventArgs e)
+		internal void SendAudioDataMessage (MessageEventArgs<ClientAudioDataMessage> e)
 		{
 			var msg = (ClientAudioDataMessage)e.Message;
 
@@ -209,13 +209,13 @@ namespace Gablarski.Server
 
 			if (!context.GetPermission (PermissionName.SendAudio, speaker))
 			{
-				e.Connection.Send (new PermissionDeniedMessage (ClientMessageType.AudioData));
+				e.Connection.Send (new PermissionDeniedMessage (GablarskiMessageType.AudioData));
 				return;
 			}
 
 			if (msg.TargetIds.Length > 1 && !context.GetPermission (PermissionName.SendAudioToMultipleTargets, speaker))
 			{
-				e.Connection.Send (new PermissionDeniedMessage (ClientMessageType.AudioData));
+				e.Connection.Send (new PermissionDeniedMessage (GablarskiMessageType.AudioData));
 				return;
 			}
 
