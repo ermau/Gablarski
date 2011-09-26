@@ -41,31 +41,32 @@ using System.Net;
 using Cadenza;
 using Gablarski.Messages;
 using log4net;
+using Tempest;
 
 namespace Gablarski.Server
 {
 	public class ServerUserHandler
 		: IServerUserHandler
 	{
-		public ServerUserHandler (IServerContext context, IServerUserManager manager)
+		public ServerUserHandler (IGablarskiServerContext context, IServerUserManager manager)
 		{
 			this.context = context;
 			this.Manager = manager;
 			this.log = LogManager.GetLogger (context.Settings.Name.Remove (" ") + ".ServerUserHandler");
 
-			this.context.RegisterMessageHandler (ClientMessageType.Connect, ConnectMessage);
-			this.context.RegisterMessageHandler (ClientMessageType.Login, LoginMessage);
-			this.context.RegisterMessageHandler (ClientMessageType.Join, JoinMessage);
-			this.context.RegisterMessageHandler (ClientMessageType.SetComment, SetCommentMessage);
-			this.context.RegisterMessageHandler (ClientMessageType.SetStatus, SetStatusMessage);
-			this.context.RegisterMessageHandler (ClientMessageType.SetPermissions, SetPermissionsMessage);
-			this.context.RegisterMessageHandler (ClientMessageType.KickUser, KickUserMessage);
-			this.context.RegisterMessageHandler (ClientMessageType.Register, RegisterMessage);
-			this.context.RegisterMessageHandler (ClientMessageType.RegistrationApproval, RegistrationApprovalMessage);
-			this.context.RegisterMessageHandler (ClientMessageType.BanUser, BanUserMessage);
-			this.context.RegisterMessageHandler (ClientMessageType.RequestMuteUser, RequestMuteUserMessage);
-			this.context.RegisterMessageHandler (ClientMessageType.RequestUserList, RequestUserListMessage);
-			this.context.RegisterMessageHandler (ClientMessageType.ChannelChange, ChannelChangeMessage);
+			this.context.RegisterMessageHandler<ConnectMessage> (OnConnectMessage);
+			this.context.RegisterMessageHandler<LoginMessage> (OnLoginMessage);
+			this.context.RegisterMessageHandler<JoinMessage> (OnJoinMessage);
+			this.context.RegisterMessageHandler<SetCommentMessage> (OnSetCommentMessage);
+			this.context.RegisterMessageHandler<SetStatusMessage> (OnSetStatusMessage);
+			this.context.RegisterMessageHandler<SetPermissionsMessage> (OnSetPermissionsMessage);
+			this.context.RegisterMessageHandler<KickUserMessage> (OnKickUserMessage);
+			this.context.RegisterMessageHandler<RegisterMessage> (OnRegisterMessage);
+			this.context.RegisterMessageHandler<RegistrationApprovalMessage> (OnRegistrationApprovalMessage);
+			this.context.RegisterMessageHandler<BanUserMessage> (OnBanUserMessage);
+			this.context.RegisterMessageHandler<RequestMuteUserMessage> (OnRequestMuteUserMessage);
+			this.context.RegisterMessageHandler<RequestUserListMessage> (OnRequestUserListMessage);
+			this.context.RegisterMessageHandler<ChannelChangeMessage> (OnChannelChangeMessage);
 		}
 
 		public IUserInfo this[int userId]
@@ -182,7 +183,7 @@ namespace Gablarski.Server
 			MoveUser (moverId, user.UserId, channel.ChannelId);
 		}
 
-		public void Send (MessageBase message, Func<IConnection, bool> predicate)
+		public void Send (Message message, Func<IConnection, bool> predicate)
 		{
 			if (message == null)
 				throw new ArgumentNullException ("message");
@@ -193,7 +194,7 @@ namespace Gablarski.Server
 				c.Send (message);
 		}
 
-		public void Send (MessageBase message, Func<IConnection, IUserInfo, bool> predicate)
+		public void Send (Message message, Func<IConnection, IUserInfo, bool> predicate)
 		{
 			if (message == null)
 				throw new ArgumentNullException ("message");
@@ -240,18 +241,18 @@ namespace Gablarski.Server
 
 		internal readonly IServerUserManager Manager;
 		private readonly ILog log;
-		private readonly IServerContext context;
+		private readonly IGablarskiServerContext context;
 		private readonly HashSet<IUserInfo> approvals = new HashSet<IUserInfo>();
 
-		internal void ConnectMessage (MessageReceivedEventArgs e)
+		internal void OnConnectMessage (MessageEventArgs<ConnectMessage> e)
 		{
 			var msg = (ConnectMessage)e.Message;
 
-			if (msg.ProtocolVersion < this.context.ProtocolVersion)
-			{
-				e.Connection.Send (new ConnectionRejectedMessage (ConnectionRejectedReason.IncompatibleVersion));
-				return;
-			}
+			//if (msg.ProtocolVersion < this.context.ProtocolVersion)
+			//{
+			//    e.Connection.Send (new ConnectionRejectedMessage (ConnectionRejectedReason.IncompatibleVersion));
+			//    return;
+			//}
 			
 			if (!msg.Host.IsNullOrWhitespace() && msg.Port != 0)
 			{
@@ -271,7 +272,7 @@ namespace Gablarski.Server
 			SendInfoMessages (e.Connection);
 		}
 
-		internal void JoinMessage (MessageReceivedEventArgs e)
+		internal void OnJoinMessage (MessageEventArgs<JoinMessage> e)
 		{
 			var join = (JoinMessage)e.Message;
 
@@ -320,7 +321,7 @@ namespace Gablarski.Server
 				e.Connection.Send (msg);
 		}
 
-		internal void LoginMessage (MessageReceivedEventArgs e)
+		internal void OnLoginMessage (MessageEventArgs<LoginMessage> e)
 		{
 			var login = (LoginMessage)e.Message;
 
@@ -343,7 +344,7 @@ namespace Gablarski.Server
 			this.log.DebugFormat ("{0} Login: {1}", login.Username, result.ResultState);
 		}
 
-		internal void RequestUserListMessage (MessageReceivedEventArgs e)
+		internal void OnRequestUserListMessage (MessageEventArgs<RequestUserListMessage> e)
 		{
 			var msg = (RequestUserListMessage) e.Message;
 
@@ -351,7 +352,7 @@ namespace Gablarski.Server
 			{
 				if (!context.GetPermission (PermissionName.RequestChannelList))
 				{
-					e.Connection.Send (new PermissionDeniedMessage (ClientMessageType.RequestUserList));
+					e.Connection.Send (new PermissionDeniedMessage (GablarskiMessageType.RequestUserList));
 					return;
 				}
 
@@ -361,7 +362,7 @@ namespace Gablarski.Server
 			{
 				if (!context.GetPermission (PermissionName.RequestFullUserList))
 				{
-					e.Connection.Send (new PermissionDeniedMessage (ClientMessageType.RequestUserList));
+					e.Connection.Send (new PermissionDeniedMessage (GablarskiMessageType.RequestUserList));
 					return;
 				}
 
@@ -369,7 +370,7 @@ namespace Gablarski.Server
 			}
 		}
 
-		internal void ChannelChangeMessage (MessageReceivedEventArgs e)
+		internal void OnChannelChangeMessage (MessageEventArgs<ChannelChangeMessage> e)
 		{
 			var change = (ChannelChangeMessage)e.Message;
 
@@ -378,13 +379,13 @@ namespace Gablarski.Server
 			MoveUser ((requestingUser != null) ? requestingUser.UserId : 0, change.TargetUserId, change.TargetChannelId);
 		}
 
-		internal void RequestMuteUserMessage (MessageReceivedEventArgs e)
+		internal void OnRequestMuteUserMessage (MessageEventArgs<RequestMuteUserMessage> e)
 		{
 			var msg = (RequestMuteUserMessage)e.Message;
 
 			if (!context.GetPermission (PermissionName.MuteUser, e.Connection))
 			{
-				e.Connection.Send (new PermissionDeniedMessage (ClientMessageType.RequestMuteUser));
+				e.Connection.Send (new PermissionDeniedMessage (GablarskiMessageType.RequestMuteUser));
 				return;
 			}
 
@@ -400,7 +401,7 @@ namespace Gablarski.Server
 			this.Send (new UserMutedMessage { UserId = user.UserId, Unmuted = msg.Unmute });
 		}
 
-		internal void KickUserMessage (MessageReceivedEventArgs e)
+		internal void OnKickUserMessage (MessageEventArgs<KickUserMessage> e)
 		{
 			var msg = (KickUserMessage)e.Message;
 
@@ -410,7 +411,7 @@ namespace Gablarski.Server
 
 			if (msg.FromServer && !context.GetPermission (PermissionName.KickPlayerFromServer, e.Connection))
 			{
-				e.Connection.Send (new PermissionDeniedMessage (ClientMessageType.KickUser));
+				e.Connection.Send (new PermissionDeniedMessage (GablarskiMessageType.KickUser));
 				return;
 			}
 
@@ -420,7 +421,7 @@ namespace Gablarski.Server
 
 			if (!msg.FromServer && !context.GetPermission (PermissionName.KickPlayerFromChannel, user.CurrentChannelId, kicker.UserId))
 			{
-				e.Connection.Send (new PermissionDeniedMessage (ClientMessageType.KickUser));
+				e.Connection.Send (new PermissionDeniedMessage (GablarskiMessageType.KickUser));
 				return;
 			}
 
@@ -432,7 +433,7 @@ namespace Gablarski.Server
 				context.Users.Move (user, context.ChannelsProvider.DefaultChannel);
 		}
 
-		internal void SetCommentMessage (MessageReceivedEventArgs e)
+		internal void OnSetCommentMessage (MessageEventArgs<SetCommentMessage> e)
 		{
 			var msg = (SetCommentMessage)e.Message;
 
@@ -445,7 +446,7 @@ namespace Gablarski.Server
 			this.Send (new UserUpdatedMessage (user));
 		}
 
-		internal void SetStatusMessage (MessageReceivedEventArgs e)
+		internal void OnSetStatusMessage (MessageEventArgs<SetStatusMessage> e)
 		{
 			var msg = (SetStatusMessage) e.Message;
 
@@ -458,7 +459,7 @@ namespace Gablarski.Server
 			this.Send (new UserUpdatedMessage (user));
 		}
 
-		internal void RegistrationApprovalMessage (MessageReceivedEventArgs e)
+		internal void OnRegistrationApprovalMessage (MessageEventArgs<RegistrationApprovalMessage> e)
 		{
 			var msg = (RegistrationApprovalMessage)e.Message;
 
@@ -467,7 +468,7 @@ namespace Gablarski.Server
 
 			if (!this.context.GetPermission (PermissionName.ApproveRegistrations, e.Connection))
 			{
-				e.Connection.Send (new PermissionDeniedMessage (ClientMessageType.RegistrationApproval));
+				e.Connection.Send (new PermissionDeniedMessage (GablarskiMessageType.RegistrationApproval));
 				return;
 			}
 
@@ -484,7 +485,7 @@ namespace Gablarski.Server
 			}
 		}
 		
-		internal void RegisterMessage (MessageReceivedEventArgs e)
+		internal void OnRegisterMessage (MessageEventArgs<RegisterMessage> e)
 		{
 			var msg = (RegisterMessage)e.Message;
 
@@ -531,7 +532,7 @@ namespace Gablarski.Server
 			e.Connection.Send (new RegisterResultMessage { Result = result });
 		}
 
-		internal void SetPermissionsMessage (MessageReceivedEventArgs e)
+		internal void OnSetPermissionsMessage (MessageEventArgs<SetPermissionsMessage> e)
 		{
 			var msg = (SetPermissionsMessage)e.Message;
 
@@ -540,7 +541,7 @@ namespace Gablarski.Server
 
 			if (!context.GetPermission (PermissionName.ModifyPermissions, e.Connection))
 			{
-				e.Connection.Send (new PermissionDeniedMessage (ClientMessageType.SetPermissions));
+				e.Connection.Send (new PermissionDeniedMessage (GablarskiMessageType.SetPermissions));
 				return;
 			}
 
@@ -559,7 +560,7 @@ namespace Gablarski.Server
 				c.Send (new PermissionsMessage (msg.UserId, context.PermissionsProvider.GetPermissions (msg.UserId)));
 		}
 
-		internal void BanUserMessage (MessageReceivedEventArgs e)
+		internal void OnBanUserMessage (MessageEventArgs<BanUserMessage> e)
 		{
 			var msg = (BanUserMessage)e.Message;
 
@@ -568,7 +569,7 @@ namespace Gablarski.Server
 
 			if (!context.GetPermission (PermissionName.BanUser, e.Connection))
 			{
-				e.Connection.Send (new PermissionDeniedMessage (ClientMessageType.BanUser));
+				e.Connection.Send (new PermissionDeniedMessage (GablarskiMessageType.BanUser));
 				return;
 			}
 
@@ -613,7 +614,7 @@ namespace Gablarski.Server
 
 		private void SendInfoMessages (IConnection connection)
 		{
-			connection.Send (new ServerInfoMessage { ServerInfo = new ServerInfo (context.Settings, context.UserProvider, context.EncryptionParameters) });
+			connection.Send (new ServerInfoMessage { ServerInfo = new ServerInfo (context.Settings, context.UserProvider) });
 			connection.Send (new ChannelListMessage (this.context.ChannelsProvider.GetChannels(), this.context.ChannelsProvider.DefaultChannel));
 			connection.Send (new UserInfoListMessage (Manager));
 			connection.Send (new SourceListMessage (this.context.Sources));
