@@ -68,7 +68,7 @@ namespace Gablarski.Messages
 		{
 			writer.WriteInt32 (this.users.Count);
 			foreach (var info in this.users)
-				info.Serialize (writer);
+				info.Serialize (context, writer);
 		}
 
 		public override void ReadPayload (ISerializationContext context, IValueReader reader)
@@ -76,7 +76,7 @@ namespace Gablarski.Messages
 			int nusers = reader.ReadInt32();
 			this.users = new List<UserInfo> (nusers);
 			for (int i = 0; i < nusers; ++i)
-				this.users.Add (new UserInfo (reader));
+				this.users.Add (new UserInfo (context, reader));
 		}
 
 		private List<UserInfo> users;

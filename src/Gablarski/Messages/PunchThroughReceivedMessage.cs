@@ -47,7 +47,12 @@ namespace Gablarski.Messages
 		{
 		}
 		
-		public override bool Reliable
+		public override bool MustBeReliable
+		{
+			get { return false; }
+		}
+
+		public override bool PreferReliable
 		{
 			get { return false; }
 		}

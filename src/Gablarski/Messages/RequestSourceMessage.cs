@@ -76,13 +76,13 @@ namespace Gablarski.Messages
 		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
 			writer.WriteString (this.Name);
-			AudioSettings.Serialize (writer);
+			AudioSettings.Serialize (context, writer);
 		}
 
 		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
 			this.Name = reader.ReadString();
-			AudioSettings = new AudioCodecArgs (reader);
+			AudioSettings = new AudioCodecArgs (context, reader);
 		}
 	}
 }

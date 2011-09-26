@@ -34,10 +34,6 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Tempest;
 
 namespace Gablarski.Messages
@@ -55,12 +51,17 @@ namespace Gablarski.Messages
 			get; set;
 		}
 
-		public override bool AcceptedConnectionless
+		public override bool AcceptedConnectionlessly
 		{
 			get { return true; }
 		}
 
-		public override bool Reliable
+		public override bool MustBeReliable
+		{
+			get { return false; }
+		}
+
+		public override bool PreferReliable
 		{
 			get { return false; }
 		}
