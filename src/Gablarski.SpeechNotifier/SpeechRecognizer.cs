@@ -66,7 +66,7 @@ namespace Gablarski.SpeechNotifier
 		{
 			lock (this.sync)
 			{
-				if (this.recognition == null)
+				if (this.recognition != null)
 					throw new InvalidOperationException ("Already open");
 
 				this.recognition = new SpeechRecognitionEngine();
