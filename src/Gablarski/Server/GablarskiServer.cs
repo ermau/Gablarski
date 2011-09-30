@@ -229,7 +229,7 @@ namespace Gablarski.Server
 		protected readonly ILog Log;
 
 		private readonly MutableLookup<ClientMessageType, Action<MessageReceivedEventArgs>> handlers = new MutableLookup<ClientMessageType, Action<MessageReceivedEventArgs>>();
-		private Dictionary<ClientMessageType, Action<IEnumerable<MessageReceivedEventArgs>>> setHandlers;
+		private Dictionary<ClientMessageType, Action<IEnumerable<MessageReceivedEventArgs>>> setHandlers = new Dictionary<ClientMessageType, Action<IEnumerable<MessageReceivedEventArgs>>>();
 
 		private readonly Thread messageRunnerThread;
 		private readonly Queue<MessageReceivedEventArgs> mqueue = new Queue<MessageReceivedEventArgs> (1000);
