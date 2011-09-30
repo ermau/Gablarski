@@ -123,7 +123,7 @@ namespace Gablarski.SpeechNotifier
 
 		public void Dispose()
 		{
-			this.recognition.Dispose();
+			Close();
 		}
 
 		private readonly object sync = new object();

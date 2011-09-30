@@ -475,8 +475,8 @@ namespace Gablarski.Clients.Windows
 
 			if (this.speech != null)
 			{
-				this.speech.Close();
 				this.speech.StopRecognizing();
+				this.speech.Close();
 				this.speech.CommandStateChanged -= OnCommandStateChanged;
 				this.speech = null;
 			}
@@ -538,10 +538,13 @@ namespace Gablarski.Clients.Windows
 							this.gablarski.Audio.UnmuteCapture();
 					}
 
-					if ((bool)e.State)
-						this.speech.StartRecognizing();
-					else
-						this.speech.StopRecognizing();
+					if (this.speech != null)
+					{
+						if ((bool) e.State)
+							this.speech.StartRecognizing();
+						else
+							this.speech.StopRecognizing();
+					}
 
 					break;
 
