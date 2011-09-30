@@ -149,7 +149,7 @@ namespace Gablarski.SpeechNotifier
 				return;
 
 			GrammarBuilder builder = new GrammarBuilder();
-			builder.Append (new Choices ("Switch channel", "Switch to channel", "Switch channel to", "Change channel", "Change to channel",
+			builder.Append (new Choices ("Switch to", "Switch channel", "Switch to channel", "Switch channel to", "Change channel", "Change to channel",
 			                             "Change channel to", "Join", "Join channel"));
 
 			Choices channelChoices = new Choices();
