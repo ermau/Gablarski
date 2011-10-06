@@ -465,13 +465,13 @@ namespace Gablarski.Clients.Windows
 		private IInputProvider inputProvider;
 		private void DisableInput()
 		{
-			if (this.inputProvider == null)
-				return;
-
-			this.inputProvider.Detach();
-			this.inputProvider.CommandStateChanged -= OnCommandStateChanged;
-			this.inputProvider.Dispose();
-			this.inputProvider = null;
+			if (this.inputProvider != null)
+			{
+				this.inputProvider.Detach();
+				this.inputProvider.CommandStateChanged -= OnCommandStateChanged;
+				this.inputProvider.Dispose();
+				this.inputProvider = null;
+			}
 
 			if (this.speech != null)
 			{

@@ -87,6 +87,8 @@ namespace Gablarski.SpeechNotifier
 		{
 			lock (this.sync)
 			{
+				UnloadGrammar();
+
 				if (this.recognition != null)
 					this.recognition.Dispose();
 
@@ -132,6 +134,16 @@ namespace Gablarski.SpeechNotifier
 		private Grammar moveUserGrammar;
 		private Grammar changeChannelGrammar;
 		private Grammar muteGrammar;
+
+		private void UnloadGrammar()
+		{
+			if (this.recognition != null)
+				this.recognition.UnloadAllGrammars();
+
+			this.moveUserGrammar = null;
+			this.changeChannelGrammar = null;
+			this.muteGrammar = null;
+		}
 
 		private void SetupMoveUserGrammar (IEnumerable<IChannelInfo> channels, IEnumerable<IUserInfo> users)
 		{
