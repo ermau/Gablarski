@@ -63,7 +63,6 @@ namespace Gablarski.Tests
 		public void InvalidArgsCtor()
 		{
 			Assert.Throws<ArgumentNullException> (() => new AudioCodecArgs ((AudioCodecArgs)null));
-			Assert.Throws<ArgumentNullException> (() => new AudioCodecArgs ((IValueReader)null));
 		}
 
 		private const int Bitrate = 64000;

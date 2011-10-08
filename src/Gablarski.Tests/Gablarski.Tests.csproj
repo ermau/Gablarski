@@ -127,6 +127,10 @@
       <Project>{7347052B-DA5B-4CCA-AB28-3963766E3CDB}</Project>
       <Name>Gablarski</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Tempest\Desktop\Tempest\Tempest.csproj">
+      <Project>{D6A2003C-CBB2-47B0-B306-521141D3068D}</Project>
+      <Name>Tempest</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
