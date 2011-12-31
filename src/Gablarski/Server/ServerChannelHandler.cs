@@ -56,7 +56,7 @@ namespace Gablarski.Server
 			this.context.ChannelsProvider.ChannelsUpdated += ChannelsProviderOnChannelsUpdated;
 
 			this.context.RegisterMessageHandler (ClientMessageType.RequestChannelList, RequestChanneListMessage);
-			this.context.RegisterMessageHandler (ClientMessageType.QueryServer, ChannelEditMessage);
+			this.context.RegisterMessageHandler (ClientMessageType.ChannelEdit, ChannelEditMessage);
 		}
 
 		public IEnumerator<IChannelInfo> GetEnumerator()
