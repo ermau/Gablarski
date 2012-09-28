@@ -32,6 +32,11 @@ namespace Gablarski.Tests
 			get { return this.connection.IsConnected; }
 		}
 
+		public long ConnectionId
+		{
+			get { return this.connection.ConnectionId; }
+		}
+
 		public IEnumerable<Protocol> Protocols
 		{
 			get { return this.connection.Protocols; }
@@ -50,6 +55,11 @@ namespace Gablarski.Tests
 		public IAsymmetricKey RemoteKey
 		{
 			get { return this.connection.RemoteKey; }
+		}
+
+		public IAsymmetricKey LocalKey
+		{
+			get { return this.connection.LocalKey; }
 		}
 
 		public int ResponseTime

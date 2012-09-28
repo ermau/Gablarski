@@ -311,7 +311,7 @@ namespace Gablarski.Client
 			if (count > redirectLimit)
 				return;
 
-			Connect (new DnsEndPoint (e.Message.Host, e.Message.Port));
+			ConnectAsync (new DnsEndPoint (e.Message.Host, e.Message.Port));
 		}
 
 		private enum DisconnectHandling
@@ -402,7 +402,7 @@ namespace Gablarski.Client
 			this.disconnectedInChannelId = 0;
 		}
 
-		protected override void OnConnected (EventArgs e)
+		protected override void OnConnected(ClientConnectionEventArgs e)
 		{
 			lock (StateSync)
 			{

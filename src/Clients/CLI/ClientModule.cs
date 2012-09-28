@@ -99,7 +99,7 @@ namespace Gablarski.Clients.CLI
 					string[] hostParts = parts[2].Split (':');
 					int port = (hostParts.Length == 1) ? 42912 : Int32.Parse (hostParts[1]);
 
-					Client.Connect (new DnsEndPoint (hostParts[0], port));
+					Client.ConnectAsync (new DnsEndPoint (hostParts[0], port));
 
 					return true;
 				}
