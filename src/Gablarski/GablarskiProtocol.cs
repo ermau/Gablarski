@@ -120,5 +120,10 @@ namespace Gablarski
 	{
 		public static readonly Protocol Instance = new Protocol (42, 7);
 		public const int Port = 42912;
+
+		static GablarskiProtocol()
+		{
+			Instance.DiscoverFromAssemblyOf<GablarskiProtocol>();
+		}
 	}
 }
