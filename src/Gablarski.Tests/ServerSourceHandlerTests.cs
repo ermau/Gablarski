@@ -76,6 +76,7 @@ namespace Gablarski.Tests
 			});
 
 			this.provider = new MockConnectionProvider (GablarskiProtocol.Instance);
+			this.provider.Start (MessageTypes.All);
 
 			userManager = new ServerUserManager();
 			MockServerContext c;
@@ -103,6 +104,7 @@ namespace Gablarski.Tests
 			var cs = provider.GetConnections (GablarskiProtocol.Instance);
 
 			client = new ConnectionBuffer (cs.Item1);
+			server = cs.Item2;
 
 			userManager.Connect (server);
 			userManager.Join (server, user);

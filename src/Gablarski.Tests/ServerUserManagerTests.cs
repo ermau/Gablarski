@@ -62,6 +62,7 @@ namespace Gablarski.Tests
 			manager = new ServerUserManager();
 
 			provider = new MockConnectionProvider (GablarskiProtocol.Instance);
+			provider.Start (MessageTypes.All);
 
 			var cs = provider.GetConnections (GablarskiProtocol.Instance);
 			server = cs.Item2;

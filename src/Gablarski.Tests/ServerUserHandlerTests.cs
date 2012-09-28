@@ -80,6 +80,8 @@ namespace Gablarski.Tests
 			context.Users = handler = new ServerUserHandler (context, context.UserManager);
 
 			provider = new MockConnectionProvider (GablarskiProtocol.Instance);
+			provider.Start (MessageTypes.All);
+
 			var cs = provider.GetConnections (GablarskiProtocol.Instance);
 			server = new ConnectionBuffer (cs.Item2);
 			client = new ConnectionBuffer (cs.Item1);

@@ -56,6 +56,8 @@ namespace Gablarski.Tests
 			Assert.AreEqual (UserId, msg.Result.UserId);
 
 			var provider = new MockConnectionProvider (GablarskiProtocol.Instance);
+			provider.Start (MessageTypes.All);
+
 			var cs = provider.GetConnections (GablarskiProtocol.Instance);
 
 			var map = new TypeMap();

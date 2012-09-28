@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2010, Eric Maupin
+﻿// Copyright (c) 2010-2012, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -41,6 +41,7 @@ using Gablarski.Audio;
 using Gablarski.Client;
 using Gablarski.Messages;
 using NUnit.Framework;
+using Tempest;
 using Tempest.Tests;
 
 namespace Gablarski.Tests
@@ -52,6 +53,7 @@ namespace Gablarski.Tests
 		public void ManagerSetup()
 		{
 			this.provider = new MockConnectionProvider (GablarskiProtocol.Instance);
+			this.provider.Start (MessageTypes.All);
 
 			var connections = this.provider.GetConnections (GablarskiProtocol.Instance);
 

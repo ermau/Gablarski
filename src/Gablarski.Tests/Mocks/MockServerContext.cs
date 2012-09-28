@@ -35,11 +35,8 @@
 // DAMAGE.
 
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
-using Gablarski.Messages;
 using Gablarski.Server;
 using Tempest;
 
@@ -83,8 +80,7 @@ namespace Gablarski.Tests.Mocks
 
 		public IEnumerable<IConnection> Connections
 		{
-			get;
-			private set;
+			get { return this.connections.Keys; }
 		}
 
 		public IServerUserHandler Users
