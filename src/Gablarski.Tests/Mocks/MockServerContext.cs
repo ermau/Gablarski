@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2010, Eric Maupin
+﻿// Copyright (c) 2012, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -41,12 +41,23 @@ using System.Linq;
 using System.Threading;
 using Gablarski.Messages;
 using Gablarski.Server;
+using Tempest;
 
 namespace Gablarski.Tests.Mocks
 {
 	public class MockServerContext
-		: IGablarskiServerContext
+		: ServerBase, IGablarskiServerContext
 	{
+		public MockServerContext()
+			: base (MessageTypes.All)
+		{
+		}
+
+		public MockServerContext (IConnectionProvider provider)
+			: base (provider, MessageTypes.All)
+		{
+		}
+
 		public ReaderWriterLockSlim Synchronization
 		{
 			get { return this.syncRoot; }
@@ -70,14 +81,10 @@ namespace Gablarski.Tests.Mocks
 			set;
 		}
 
-		public int ProtocolVersion
+		public IEnumerable<IConnection> Connections
 		{
-			get { return GablarskiServer.ProtocolVersion; }
-		}
-
-		public IConnectionHandler Connections
-		{
-			get { return Users; }
+			get;
+			private set;
 		}
 
 		public IServerUserHandler Users
@@ -111,16 +118,6 @@ namespace Gablarski.Tests.Mocks
 		}
 
 		public ServerSettings Settings
-		{
-			get;
-			set;
-		}
-
-		public void RegisterMessageHandler (ClientMessageType messageType, Action<MessageReceivedEventArgs> handler)
-		{
-		}
-
-		public PublicRSAParameters EncryptionParameters
 		{
 			get;
 			set;

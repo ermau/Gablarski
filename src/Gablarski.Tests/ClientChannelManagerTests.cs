@@ -5,6 +5,8 @@ using System.Text;
 using NUnit.Framework;
 using Gablarski.Client;
 using Gablarski.Messages;
+using Tempest;
+using Tempest.Tests;
 
 namespace Gablarski.Tests
 {
@@ -14,9 +16,9 @@ namespace Gablarski.Tests
 		[SetUp]
 		public void ManagerSetup ()
 		{
-			this.provider = new MockConnectionProvider ();
-			this.server = this.provider.EstablishConnection ();
-			this.manager = new ClientChannelManager (new MockClientContext { Connection = this.server.Client });
+			this.provider = new MockConnectionProvider (GablarskiProtocol.Instance);
+			this.server = new ConnectionBuffer (this.provider.GetServerConnection());
+			this.manager = new ClientChannelManager (new MockClientContext (this.provider.GetClientConnection()));
 		}
 
 		[TearDown]
@@ -26,7 +28,7 @@ namespace Gablarski.Tests
 			this.provider = null;
 		}
 
-		private MockServerConnection server;
+		private ConnectionBuffer server;
 		private ClientChannelManager manager;
 		private MockConnectionProvider provider;
 
@@ -142,7 +144,7 @@ namespace Gablarski.Tests
 				Description = "Description 3"
 			};
 
-			manager.OnChannelListReceivedMessage (new MessageReceivedEventArgs (server,
+			manager.OnChannelListReceivedMessage (new MessageEventArgs<ChannelListMessage> (server,
 				new ChannelListMessage (new[] { c1, sc1, c2 }, sc1)));
 
 			Assert.AreEqual (3, manager.Count ());
@@ -184,12 +186,11 @@ namespace Gablarski.Tests
 				Description = "Description 3"
 			};
 
-			manager.OnChannelListReceivedMessage (new MessageReceivedEventArgs (this.server,
+			manager.OnChannelListReceivedMessage (new MessageEventArgs<ChannelListMessage> (this.server,
 				new ChannelListMessage (new[] { c1, sc1, c2 }, sc1)));
 
 			ChannelInfo updated = new ChannelInfo (1, c1) { Name = "Updated 1", Description = "U Description 1" };
-			manager.OnChannelEditResultMessage (new MessageReceivedEventArgs (this.server,
-				new ChannelEditResultMessage (updated, ChannelEditResult.FailedUnknown)));
+			manager.OnChannelEditResultMessage (new ChannelEditResultMessage (updated, ChannelEditResult.FailedUnknown));
 
 			Assert.AreEqual (3, manager.Count ());
 			Assert.AreEqual (0, manager.Count (c => c.ChannelId == c1.ChannelId

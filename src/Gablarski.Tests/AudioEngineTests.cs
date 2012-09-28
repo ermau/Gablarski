@@ -41,13 +41,14 @@ using Gablarski.Audio;
 using Gablarski.Client;
 using Gablarski.Tests.Mocks.Audio;
 using NUnit.Framework;
+using Tempest.Tests;
 
 namespace Gablarski.Tests
 {
 	[TestFixture]
 	public class AudioEngineTests
 	{
-		private IClientContext context;
+		private IGablarskiClientContext context;
 		private IAudioReceiver receiver;
 		private IAudioSender sender;
 		private IAudioCaptureProvider provider;
@@ -59,7 +60,7 @@ namespace Gablarski.Tests
 			this.provider = new MockAudioCaptureProvider();
 			this.source = new AudioSource ("mockSource", 1, 1, AudioFormat.Mono16bitLPCM, 64000, 256, 10, false);
 
-			var client = new GablarskiClient (new MockClientConnection (new MockConnectionProvider().EstablishConnection()));
+			var client = new GablarskiClient (new MockConnectionProvider (GablarskiProtocol.Instance).GetClientConnection());
 			this.context = client;
 			this.sender = client.Sources;
 			this.receiver = client.Sources;

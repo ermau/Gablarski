@@ -42,6 +42,8 @@ using Gablarski.Messages;
 using Gablarski.Server;
 using Gablarski.Tests.Mocks;
 using NUnit.Framework;
+using Tempest;
+using Tempest.Tests;
 
 namespace Gablarski.Tests
 {
@@ -53,9 +55,11 @@ namespace Gablarski.Tests
 		private IServerUserManager userManager;
 		private ServerSourceHandler handler;
 		private MockServerConnection server;
+		private ConnectionBuffer client;
 		private MockPermissionsProvider permissions;
 		private UserInfo user;
-		
+		private MockConnectionProvider provider;
+
 		private const int defaultBitrate = 96000;
 		private const int maxBitrate = 192000;
 		private const int minBitrate = 32000;
@@ -71,9 +75,11 @@ namespace Gablarski.Tests
 				Name = "Channel 2"
 			});
 
+			this.provider = new MockConnectionProvider (GablarskiProtocol.Instance);
+
 			userManager = new ServerUserManager();
 			MockServerContext c;
-			context = c = new MockServerContext
+			context = c = new MockServerContext (provider)
 			{
 				Settings = new ServerSettings
 				{
@@ -93,7 +99,10 @@ namespace Gablarski.Tests
 			handler = new ServerSourceHandler (context, manager);
 
 			user = UserInfoTests.GetTestUser (1, 1, false);
-			server = new MockServerConnection();
+		
+			var cs = provider.GetConnections (GablarskiProtocol.Instance);
+
+			client = new ConnectionBuffer (cs.Item1);
 
 			userManager.Connect (server);
 			userManager.Join (server, user);
@@ -130,25 +139,29 @@ namespace Gablarski.Tests
 		[Test]
 		public void RequestSourceNotConnected()
 		{
-			var c = new MockServerConnection();
-			c.Disconnect();
+			var cs = this.provider.GetConnections (GablarskiProtocol.Instance);
+			var cl = new ConnectionBuffer (cs.Item1);
 
-			handler.RequestSourceMessage (new MessageReceivedEventArgs (c,
+			cs.Item2.Disconnect();
+
+			handler.RequestSourceMessage (new MessageEventArgs<RequestSourceMessage> (cs.Item2,
 				new RequestSourceMessage ("Name", AudioCodecArgsTests.GetTestArgs())));
 
-			c.Client.AssertNoMessage();
+			cl.AssertNoMessage();
 		}
 
 		[Test]
 		public void RequestSourceNotJoined()
 		{
-			var c = new MockServerConnection();
-			userManager.Connect (c);
+			var cs = this.provider.GetConnections (GablarskiProtocol.Instance);
+			var cl = new ConnectionBuffer (cs.Item1);
 
-			handler.RequestSourceMessage (new MessageReceivedEventArgs (c,
+			userManager.Connect (cs.Item2);
+
+			handler.RequestSourceMessage (new MessageEventArgs<RequestSourceMessage> (cs.Item2,
 				new RequestSourceMessage ("Name", AudioCodecArgsTests.GetTestArgs())));
 
-			c.Client.AssertNoMessage();
+			cl.AssertNoMessage();
 		}
 
 		[Test]
@@ -167,17 +180,17 @@ namespace Gablarski.Tests
 			permissions.EnablePermissions (userManager.GetUser (connection).UserId,	PermissionName.RequestSource);
 
 			var audioArgs = new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 64000, 512, 10);
-			handler.RequestSourceMessage (new MessageReceivedEventArgs (connection,
+			handler.RequestSourceMessage (new MessageEventArgs<RequestSourceMessage> (connection,
 				new RequestSourceMessage ("Name", audioArgs)));
 
-			var result = connection.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			var result = client.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.Succeeded, result.SourceResult);
 			Assert.AreEqual ("Name", result.SourceName);
 			Assert.AreEqual ("Name", result.Source.Name);
 			
 			AudioCodecArgsTests.AssertAreEqual (audioArgs, result.Source);
 
-			connection.Client.AssertNoMessage();
+			client.AssertNoMessage();
 
 			return result.Source;
 		}
@@ -188,9 +201,9 @@ namespace Gablarski.Tests
 			permissions.EnablePermissions (user.UserId, PermissionName.RequestSource);
 
 			var audioArgs = new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 0, 512, 10);
-			handler.RequestSourceMessage (new MessageReceivedEventArgs (server, new RequestSourceMessage ("Name", audioArgs)));
+			handler.RequestSourceMessage (new MessageEventArgs<RequestSourceMessage> (server, new RequestSourceMessage ("Name", audioArgs)));
 
-			var result = server.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			var result = client.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.Succeeded, result.SourceResult);
 			Assert.AreEqual ("Name", result.SourceName);
 			Assert.AreEqual ("Name", result.Source.Name);
@@ -198,7 +211,7 @@ namespace Gablarski.Tests
 			audioArgs.Bitrate = defaultBitrate;
 			AudioCodecArgsTests.AssertAreEqual (audioArgs, result.Source);
 
-			server.Client.AssertNoMessage();
+			client.AssertNoMessage();
 		}
 		
 		[Test]
@@ -207,9 +220,9 @@ namespace Gablarski.Tests
 			permissions.EnablePermissions (user.UserId, PermissionName.RequestSource);
 
 			var audioArgs = new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 200000, 512, 10);
-			handler.RequestSourceMessage (new MessageReceivedEventArgs (server, new RequestSourceMessage ("Name", audioArgs)));
+			handler.RequestSourceMessage (new MessageEventArgs<RequestSourceMessage> (server, new RequestSourceMessage ("Name", audioArgs)));
 			
-			var result = server.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			var result = client.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.Succeeded, result.SourceResult);
 			Assert.AreEqual ("Name", result.SourceName);
 			Assert.AreEqual ("Name", result.Source.Name);
@@ -217,7 +230,7 @@ namespace Gablarski.Tests
 			audioArgs.Bitrate = maxBitrate;
 			AudioCodecArgsTests.AssertAreEqual (audioArgs, result.Source);
 
-			server.Client.AssertNoMessage();
+			client.AssertNoMessage();
 		}
 		
 		[Test]
@@ -226,9 +239,9 @@ namespace Gablarski.Tests
 			permissions.EnablePermissions (user.UserId, PermissionName.RequestSource);
 
 			var audioArgs = new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 1, 512, 10);
-			handler.RequestSourceMessage (new MessageReceivedEventArgs (server, new RequestSourceMessage ("Name", audioArgs)));
+			handler.RequestSourceMessage (new MessageEventArgs<RequestSourceMessage> (server, new RequestSourceMessage ("Name", audioArgs)));
 			
-			var result = server.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			var result = client.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.Succeeded, result.SourceResult);
 			Assert.AreEqual ("Name", result.SourceName);
 			Assert.AreEqual ("Name", result.Source.Name);
@@ -236,7 +249,7 @@ namespace Gablarski.Tests
 			audioArgs.Bitrate = minBitrate;
 			AudioCodecArgsTests.AssertAreEqual (audioArgs, result.Source);
 
-			server.Client.AssertNoMessage();
+			client.AssertNoMessage();
 		}
 
 		[Test]
@@ -245,16 +258,16 @@ namespace Gablarski.Tests
 			permissions.EnablePermissions (user.UserId, PermissionName.RequestSource);
 
 			var audioArgs = AudioCodecArgsTests.GetTestArgs();
-			handler.RequestSourceMessage (new MessageReceivedEventArgs (server,
+			handler.RequestSourceMessage (new MessageEventArgs<RequestSourceMessage> (server,
 				new RequestSourceMessage ("Name", audioArgs)));
 
-			var result = server.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			var result = client.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.Succeeded, result.SourceResult);
 
-			handler.RequestSourceMessage (new MessageReceivedEventArgs (server,
+			handler.RequestSourceMessage (new MessageEventArgs<RequestSourceMessage> (server,
 				new RequestSourceMessage ("Name", audioArgs)));
 
-			result = server.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			result = client.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.FailedDuplicateSourceName, result.SourceResult);
 		}
 		
@@ -263,20 +276,23 @@ namespace Gablarski.Tests
 		{
 			permissions.EnablePermissions (user.UserId, PermissionName.RequestSource);
 
-			var c = new MockServerConnection();
+			var cs = provider.GetConnections (GablarskiProtocol.Instance);
+			var c = cs.Item2;
+			var cl = new ConnectionBuffer (cs.Item1);
+
 			userManager.Connect (c);
 			userManager.Join (c, UserInfoTests.GetTestUser (2));
 
 			var audioArgs = AudioCodecArgsTests.GetTestArgs();
-			handler.RequestSourceMessage (new MessageReceivedEventArgs (server,
+			handler.RequestSourceMessage (new MessageEventArgs<RequestSourceMessage> (server,
 				new RequestSourceMessage ("Name", audioArgs)));
 
-			var sourceAdded = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			var sourceAdded = cl.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.NewSource, sourceAdded.SourceResult);
 			Assert.AreEqual ("Name", sourceAdded.SourceName);
 			AudioCodecArgsTests.AssertAreEqual (audioArgs, sourceAdded.Source);
 
-			c.Client.AssertNoMessage();
+			cl.AssertNoMessage();
 		}
 		#endregion
 
@@ -284,23 +300,26 @@ namespace Gablarski.Tests
 		[Test]
 		public void RequestSourceListNotConnected()
 		{
-			var c = new MockServerConnection();
+			var cs = provider.GetConnections (GablarskiProtocol.Instance);
+			var c = cs.Item2;
+			var cl = new ConnectionBuffer (cs.Item1);
+
 			c.Disconnect();
 
-			handler.RequestSourceListMessage (new MessageReceivedEventArgs (c, new RequestSourceListMessage ()));
+			handler.RequestSourceListMessage (new MessageEventArgs<RequestSourceListMessage> (c, new RequestSourceListMessage ()));
 			
-			c.Client.AssertNoMessage();
+			cl.AssertNoMessage();
 		}
 		
 		[Test]
 		public void RequestSourceListEmpty()
 		{
-			handler.RequestSourceListMessage (new MessageReceivedEventArgs (server, new RequestSourceListMessage()));
+			handler.RequestSourceListMessage (new MessageEventArgs<RequestSourceListMessage> (server, new RequestSourceListMessage()));
 			
-			var list = server.Client.DequeueAndAssertMessage<SourceListMessage>();
+			var list = client.DequeueAndAssertMessage<SourceListMessage>();
 			Assert.IsEmpty (list.Sources.ToList());
 
-			server.Client.AssertNoMessage();
+			client.AssertNoMessage();
 		}
 
 		[Test]
@@ -308,28 +327,28 @@ namespace Gablarski.Tests
 		{
 			permissions.EnablePermissions (user.UserId, PermissionName.RequestSource);
 			var audioArgs = AudioCodecArgsTests.GetTestArgs();
-			handler.RequestSourceMessage (new MessageReceivedEventArgs (server,
+			handler.RequestSourceMessage (new MessageEventArgs<RequestSourceMessage> (server,
 				new RequestSourceMessage ("Name", audioArgs)));
 
-			var result = server.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			var result = client.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.Succeeded, result.SourceResult);
-			server.Client.AssertNoMessage();
+			client.AssertNoMessage();
 
-			handler.RequestSourceMessage (new MessageReceivedEventArgs (server,
+			handler.RequestSourceMessage (new MessageEventArgs<RequestSourceMessage> (server,
 				new RequestSourceMessage ("Name2", audioArgs)));
 
-			var result2 = server.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			var result2 = client.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.Succeeded, result2.SourceResult);
-			server.Client.AssertNoMessage();
+			client.AssertNoMessage();
 
-			handler.RequestSourceListMessage (new MessageReceivedEventArgs (server, new RequestSourceListMessage()));
-			var list = server.Client.DequeueAndAssertMessage<SourceListMessage>();
+			handler.RequestSourceListMessage (new MessageEventArgs<RequestSourceListMessage> (server, new RequestSourceListMessage()));
+			var list = client.DequeueAndAssertMessage<SourceListMessage>();
 
 			Assert.AreEqual (2, list.Sources.Count());
 			Assert.Contains (result.Source, list.Sources.ToList());
 			Assert.Contains (result2.Source, list.Sources.ToList());
 
-			server.Client.AssertNoMessage();
+			client.AssertNoMessage();
 		}
 
 		[Test]
@@ -337,30 +356,33 @@ namespace Gablarski.Tests
 		{
 			permissions.EnablePermissions (user.UserId, PermissionName.RequestSource);
 			var audioArgs = AudioCodecArgsTests.GetTestArgs();
-			handler.RequestSourceMessage (new MessageReceivedEventArgs (server,
+			handler.RequestSourceMessage (new MessageEventArgs<RequestSourceMessage> (server,
 				new RequestSourceMessage ("Name", audioArgs)));
 
-			var result = server.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			var result = client.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.Succeeded, result.SourceResult);
 
-			handler.RequestSourceMessage (new MessageReceivedEventArgs (server,
+			handler.RequestSourceMessage (new MessageEventArgs<RequestSourceMessage> (server,
 				new RequestSourceMessage ("Name2", audioArgs)));
 
-			var result2 = server.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			var result2 = client.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.Succeeded, result2.SourceResult);
-			server.Client.AssertNoMessage();
+			client.AssertNoMessage();
 
-			var c = new MockServerConnection();
+			var cs = provider.GetConnections (GablarskiProtocol.Instance);
+			var c = cs.Item2;
+			var cl = new ConnectionBuffer (cs.Item1);
+
 			userManager.Connect (c);
 			userManager.Join (c, UserInfoTests.GetTestUser (2));
 
-			handler.RequestSourceListMessage (new MessageReceivedEventArgs (c, new RequestSourceListMessage()));
-			var list = c.Client.DequeueAndAssertMessage<SourceListMessage>();
+			handler.RequestSourceListMessage (new MessageEventArgs<RequestSourceListMessage> (c, new RequestSourceListMessage()));
+			var list = cl.DequeueAndAssertMessage<SourceListMessage>();
 
 			Assert.AreEqual (2, list.Sources.Count());
 			Assert.Contains (result.Source, list.Sources.ToList());
 			Assert.Contains (result2.Source, list.Sources.ToList());
-			c.Client.AssertNoMessage();
+			cl.AssertNoMessage();
 		}
 
 		[Test]
@@ -368,32 +390,32 @@ namespace Gablarski.Tests
 		{
 			permissions.EnablePermissions (user.UserId, PermissionName.RequestSource);
 			var audioArgs = AudioCodecArgsTests.GetTestArgs();
-			handler.RequestSourceMessage (new MessageReceivedEventArgs (server,
+			handler.RequestSourceMessage (new MessageEventArgs<RequestSourceMessage> (server,
 				new RequestSourceMessage ("Name", audioArgs)));
 
-			var result = server.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			var result = client.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.Succeeded, result.SourceResult);
 
-			handler.RequestSourceListMessage (new MessageReceivedEventArgs (server, new RequestSourceListMessage()));
-			var list = server.Client.DequeueAndAssertMessage<SourceListMessage>();
+			handler.RequestSourceListMessage (new MessageEventArgs<RequestSourceListMessage> (server, new RequestSourceListMessage()));
+			var list = client.DequeueAndAssertMessage<SourceListMessage>();
 
 			Assert.AreEqual (1, list.Sources.Count());
 			Assert.Contains (result.Source, list.Sources.ToList());
-			server.Client.AssertNoMessage();
+			client.AssertNoMessage();
 
-			handler.RequestSourceMessage (new MessageReceivedEventArgs (server,
+			handler.RequestSourceMessage (new MessageEventArgs<RequestSourceMessage> (server,
 				new RequestSourceMessage ("Name2", audioArgs)));
 
-			var result2 = server.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			var result2 = client.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.Succeeded, result2.SourceResult);
 
-			handler.RequestSourceListMessage (new MessageReceivedEventArgs (server, new RequestSourceListMessage()));
-			list = server.Client.DequeueAndAssertMessage<SourceListMessage>();
+			handler.RequestSourceListMessage (new MessageEventArgs<RequestSourceListMessage> (server, new RequestSourceListMessage()));
+			list = client.DequeueAndAssertMessage<SourceListMessage>();
 
 			Assert.AreEqual (2, list.Sources.Count());
 			Assert.Contains (result.Source, list.Sources.ToList());
 			Assert.Contains (result2.Source, list.Sources.ToList());
-			server.Client.AssertNoMessage();
+			client.AssertNoMessage();
 		}
 		#endregion
 
@@ -401,53 +423,62 @@ namespace Gablarski.Tests
 		[Test]
 		public void RequestMuteNotConnected()
 		{
-			var c = new MockServerConnection();
+			var cs = provider.GetConnections (GablarskiProtocol.Instance);
+			var c = cs.Item2;
+			var cl = new ConnectionBuffer (cs.Item1);
+
 			c.Disconnect();
 
 			var source = GetSourceFromRequest();
 
-			handler.RequestMuteSourceMessage (new MessageReceivedEventArgs (c,
+			handler.RequestMuteSourceMessage (new MessageEventArgs<RequestMuteSourceMessage> (c,
 				new RequestMuteSourceMessage (source, true)));
 
-			c.Client.AssertNoMessage();
-			server.Client.AssertNoMessage();
+			cl.AssertNoMessage();
+			client.AssertNoMessage();
 		}
 
 		[Test]
 		public void RequestMuteNotJoined()
 		{
-			var c = new MockServerConnection();
+			var cs = provider.GetConnections (GablarskiProtocol.Instance);
+			var c = cs.Item2;
+			var cl = new ConnectionBuffer (cs.Item1);
+
 			userManager.Connect (c);
 
 			var source = GetSourceFromRequest();
 
-			Assert.AreEqual (SourceResult.NewSource, c.Client.DequeueAndAssertMessage<SourceResultMessage>().SourceResult);
+			Assert.AreEqual (SourceResult.NewSource, cl.DequeueAndAssertMessage<SourceResultMessage>().SourceResult);
 
-			handler.RequestMuteSourceMessage (new MessageReceivedEventArgs (c,
+			handler.RequestMuteSourceMessage (new MessageEventArgs<RequestMuteSourceMessage> (c,
 				new RequestMuteSourceMessage (source, true)));
 
-			var denied = c.Client.DequeueAndAssertMessage<PermissionDeniedMessage>();
-			Assert.AreEqual (ClientMessageType.RequestMuteSource, denied.DeniedMessage);
-			c.Client.AssertNoMessage();
+			var denied = cl.DequeueAndAssertMessage<PermissionDeniedMessage>();
+			Assert.AreEqual (GablarskiMessageType.RequestMuteSource, denied.DeniedMessage);
+			cl.AssertNoMessage();
 		}
 
 		[Test]
 		public void RequestMuteWithoutPermission()
 		{
-			var c = new MockServerConnection();
+			var cs = provider.GetConnections (GablarskiProtocol.Instance);
+			var c = cs.Item2;
+			var cl = new ConnectionBuffer (cs.Item1);
+
 			userManager.Connect (c);
 			userManager.Join (c, UserInfoTests.GetTestUser (2));
 
 			var source = GetSourceFromRequest();
-			Assert.AreEqual (SourceResult.NewSource, c.Client.DequeueAndAssertMessage<SourceResultMessage>().SourceResult);
-			c.Client.AssertNoMessage();
+			Assert.AreEqual (SourceResult.NewSource, cl.DequeueAndAssertMessage<SourceResultMessage>().SourceResult);
+			cl.AssertNoMessage();
 
-			handler.RequestMuteSourceMessage (new MessageReceivedEventArgs (c,
+			handler.RequestMuteSourceMessage (new MessageEventArgs<RequestMuteSourceMessage> (c,
 				new RequestMuteSourceMessage (source, true)));
 
-			var denied = c.Client.DequeueAndAssertMessage<PermissionDeniedMessage>();
-			Assert.AreEqual (ClientMessageType.RequestMuteSource, denied.DeniedMessage);
-			c.Client.AssertNoMessage();
+			var denied = cl.DequeueAndAssertMessage<PermissionDeniedMessage>();
+			Assert.AreEqual (GablarskiMessageType.RequestMuteSource, denied.DeniedMessage);
+			cl.AssertNoMessage();
 		}
 
 //		[Test]
@@ -460,22 +491,22 @@ namespace Gablarski.Tests
 //			permissions.SetPermissions (u.UserId, new[] { new Permission (PermissionName.MuteAudioSource, true) });
 //
 //			var source = GetSourceFromRequest();
-//			Assert.AreEqual (SourceResult.NewSource, c.Client.DequeueAndAssertMessage<SourceResultMessage>().SourceResult);
+//			Assert.AreEqual (SourceResult.NewSource, cl.DequeueAndAssertMessage<SourceResultMessage>().SourceResult);
 //
 //			handler.RequestMuteSourceMessage (new MessageReceivedEventArgs (c,
 //				new RequestMuteSourceMessage (source, true)));
 //
-//			var mute = c.Client.DequeueAndAssertMessage<MutedMessage>();
+//			var mute = cl.DequeueAndAssertMessage<MutedMessage>();
 //			Assert.AreEqual (false, mute.Unmuted);
 //			Assert.AreEqual (source.Id, mute.Target);
 //			Assert.AreEqual (MuteType.AudioSource, mute.Type);
-//			c.Client.AssertNoMessage();
+//			cl.AssertNoMessage();
 //
-//			mute = server.Client.DequeueAndAssertMessage<MutedMessage>();
+//			mute = client.DequeueAndAssertMessage<MutedMessage>();
 //			Assert.AreEqual (false, mute.Unmuted);
 //			Assert.AreEqual (source.Id, mute.Target);
 //			Assert.AreEqual (MuteType.AudioSource, mute.Type);
-//			c.Client.AssertNoMessage();
+//			cl.AssertNoMessage();
 //		}
 		#endregion
 
@@ -483,97 +514,119 @@ namespace Gablarski.Tests
 		[Test]
 		public void ClientAudioSourceStateChangeNotConnected()
 		{
-			var c = new MockServerConnection();
+			var cs = provider.GetConnections (GablarskiProtocol.Instance);
+			var c = cs.Item2;
+			var cl = new ConnectionBuffer (cs.Item1);
+
 			c.Disconnect();
 
-			handler.ClientAudioSourceStateChangeMessage (new MessageReceivedEventArgs (c,
+			handler.ClientAudioSourceStateChangeMessage (new MessageEventArgs<ClientAudioSourceStateChangeMessage> (c,
 				new ClientAudioSourceStateChangeMessage { SourceId = 1, Starting = true }));
 
-			server.Client.AssertNoMessage();
-			c.Client.AssertNoMessage();
+			client.AssertNoMessage();
+			cl.AssertNoMessage();
 		}
 
 		[Test]
 		public void ClientAudioSourceStateChangeNotJoined()
 		{
-			var c = new MockServerConnection();
+			var cs = provider.GetConnections (GablarskiProtocol.Instance);
+			var c = cs.Item2;
+			var cl = new ConnectionBuffer (cs.Item1);
+
 			userManager.Connect (c);
 
-			handler.ClientAudioSourceStateChangeMessage (new MessageReceivedEventArgs (c,
+			handler.ClientAudioSourceStateChangeMessage (new MessageEventArgs<ClientAudioSourceStateChangeMessage> (c,
 				new ClientAudioSourceStateChangeMessage { SourceId = 1, Starting = true }));
 
-			server.Client.AssertNoMessage();
-			c.Client.AssertNoMessage();
+			client.AssertNoMessage();
+			cl.AssertNoMessage();
 		}
 
 		[Test]
 		public void ClientAudioSourceStateChangeNotOwnedSource()
 		{
 			var u = UserInfoTests.GetTestUser (2, 1, false);
-			var c = new MockServerConnection();
+			
+			var cs = provider.GetConnections (GablarskiProtocol.Instance);
+			var c = cs.Item2;
+			var cl = new ConnectionBuffer (cs.Item1);
+
 			userManager.Connect (c);
 			userManager.Join (c, u);
 
 			var s = manager.Create ("Name", user, new AudioCodecArgs());
 
-			handler.ClientAudioSourceStateChangeMessage (new MessageReceivedEventArgs (c,
+			handler.ClientAudioSourceStateChangeMessage (new MessageEventArgs<ClientAudioSourceStateChangeMessage> (c,
 				new ClientAudioSourceStateChangeMessage { SourceId = s.Id, Starting = true }));
 
-			server.Client.AssertNoMessage();
-			c.Client.AssertNoMessage();
+			client.AssertNoMessage();
+			cl.AssertNoMessage();
 		}
 
 		[Test]
 		public void ClientAudioSourceStateChangedUserMuted()
 		{
 			var u = UserInfoTests.GetTestUser (2, 1, true);
-			var c = new MockServerConnection();
+			
+			var cs = provider.GetConnections (GablarskiProtocol.Instance);
+			var c = cs.Item2;
+			var cl = new ConnectionBuffer (cs.Item1);
+
 			userManager.Connect (c);
 			userManager.Join (c, u);
 
 			var s = manager.Create ("Name", u, new AudioCodecArgs ());
 
-			handler.ClientAudioSourceStateChangeMessage (new MessageReceivedEventArgs (c,
+			handler.ClientAudioSourceStateChangeMessage (new MessageEventArgs<ClientAudioSourceStateChangeMessage> (c,
 				new ClientAudioSourceStateChangeMessage { SourceId = s.Id, Starting = true }));
 
-			server.Client.AssertNoMessage();
-			c.Client.AssertNoMessage();
+			client.AssertNoMessage();
+			cl.AssertNoMessage();
 		}
 
 		[Test]
 		public void ClientAudioSourceStateChangedSourceMuted()
 		{
 			var u = UserInfoTests.GetTestUser (2, 1, false);
-			var c = new MockServerConnection();
+			
+			var cs = provider.GetConnections (GablarskiProtocol.Instance);
+			var c = cs.Item2;
+			var cl = new ConnectionBuffer (cs.Item1);
+
 			userManager.Connect (c);
 			userManager.Join (c, u);
 
 			var s = manager.Create ("Name", u, new AudioCodecArgs ());
 			manager.ToggleMute (s);
 
-			handler.ClientAudioSourceStateChangeMessage (new MessageReceivedEventArgs (c,
+			handler.ClientAudioSourceStateChangeMessage (new MessageEventArgs<ClientAudioSourceStateChangeMessage> (c,
 				new ClientAudioSourceStateChangeMessage { SourceId = s.Id, Starting = true }));
 
-			server.Client.AssertNoMessage();
-			c.Client.AssertNoMessage();
+			client.AssertNoMessage();
+			cl.AssertNoMessage();
 		}
 
 		[Test]
 		public void ClientAudioSourceStateChangedSameChannel()
 		{
 			var u = UserInfoTests.GetTestUser (2, 1, false);
-			var c = new MockServerConnection();
+			
+			var cs = provider.GetConnections (GablarskiProtocol.Instance);
+			var c = cs.Item2;
+			var cl = new ConnectionBuffer (cs.Item1);
+
 			userManager.Connect (c);
 			userManager.Join (c, u);
 
 			var s = manager.Create ("Name", u, new AudioCodecArgs ());
 
-			handler.ClientAudioSourceStateChangeMessage (new MessageReceivedEventArgs (c,
+			handler.ClientAudioSourceStateChangeMessage (new MessageEventArgs<ClientAudioSourceStateChangeMessage> (c,
 				new ClientAudioSourceStateChangeMessage { SourceId = s.Id, Starting = true }));
 
-			c.Client.AssertNoMessage();
+			cl.AssertNoMessage();
 
-			var change = server.Client.DequeueAndAssertMessage<AudioSourceStateChangeMessage>();
+			var change = client.DequeueAndAssertMessage<AudioSourceStateChangeMessage>();
 			Assert.AreEqual (s.Id, change.SourceId);
 			Assert.AreEqual (true, change.Starting);
 		}
@@ -582,18 +635,22 @@ namespace Gablarski.Tests
 		public void ClientAudioSourceStateChangedDifferentChannel()
 		{
 			var u = UserInfoTests.GetTestUser (2, 2, false);
-			var c = new MockServerConnection();
+			
+			var cs = provider.GetConnections (GablarskiProtocol.Instance);
+			var c = cs.Item2;
+			var cl = new ConnectionBuffer (cs.Item1);
+
 			userManager.Connect (c);
 			userManager.Join (c, u);
 
 			var s = manager.Create ("Name", u, new AudioCodecArgs ());
 
-			handler.ClientAudioSourceStateChangeMessage (new MessageReceivedEventArgs (c,
+			handler.ClientAudioSourceStateChangeMessage (new MessageEventArgs<ClientAudioSourceStateChangeMessage> (c,
 				new ClientAudioSourceStateChangeMessage { SourceId = s.Id, Starting = true }));
 
-			c.Client.AssertNoMessage();
+			cl.AssertNoMessage();
 
-			var change = server.Client.DequeueAndAssertMessage<AudioSourceStateChangeMessage>();
+			var change = client.DequeueAndAssertMessage<AudioSourceStateChangeMessage>();
 			Assert.AreEqual (s.Id, change.SourceId);
 			Assert.AreEqual (true, change.Starting);
 		}
@@ -603,10 +660,13 @@ namespace Gablarski.Tests
 		[Test]
 		public void SendAudioDataMessageNotConnected()
 		{			
-			var c = new MockServerConnection();
+			var cs = provider.GetConnections (GablarskiProtocol.Instance);
+			var c = cs.Item2;
+			var cl = new ConnectionBuffer (cs.Item1);
+
 			c.Disconnect();
 
-			handler.SendAudioDataMessage (new MessageReceivedEventArgs (c,
+			handler.SendAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (c,
 				new ClientAudioDataMessage
 				{
 					Data = new [] { new byte[512] },
@@ -615,17 +675,20 @@ namespace Gablarski.Tests
 					TargetIds = new [] { 1 }
 				}));
 
-			c.Client.AssertNoMessage();
-			server.Client.AssertNoMessage();
+			cl.AssertNoMessage();
+			client.AssertNoMessage();
 		}
 
 		[Test]
 		public void SendAudioDataMessageNotJoined()
 		{
-			var c = new MockServerConnection();
+			var cs = provider.GetConnections (GablarskiProtocol.Instance);
+			var c = cs.Item2;
+			var cl = new ConnectionBuffer (cs.Item1);
+
 			userManager.Connect (c);
 
-			handler.SendAudioDataMessage (new MessageReceivedEventArgs (c,
+			handler.SendAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (c,
 				new ClientAudioDataMessage
 				{
 					Data = new [] { new byte[512] },
@@ -634,18 +697,21 @@ namespace Gablarski.Tests
 					TargetIds = new [] { 1 }
 				}));
 
-			c.Client.AssertNoMessage();
-			server.Client.AssertNoMessage();
+			cl.AssertNoMessage();
+			client.AssertNoMessage();
 		}
 
 		[Test]
 		public void SendAudioDataMessageUnknownSource()
 		{
-			var c = new MockServerConnection();
+			var cs = provider.GetConnections (GablarskiProtocol.Instance);
+			var c = cs.Item2;
+			var cl = new ConnectionBuffer (cs.Item1);
+
 			userManager.Connect (c);
 			userManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
 
-			handler.SendAudioDataMessage (new MessageReceivedEventArgs (server,
+			handler.SendAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (server,
 				new ClientAudioDataMessage
 				{
 					Data = new [] { new byte[512] },
@@ -654,23 +720,26 @@ namespace Gablarski.Tests
 					TargetIds = new [] { 1 }
 				}));
 
-			c.Client.AssertNoMessage();
-			server.Client.AssertNoMessage();
+			cl.AssertNoMessage();
+			client.AssertNoMessage();
 		}
         
 		[Test]
 		public void SendAudioDataMessageSourceNotOwned()
 		{
-			var c = new MockServerConnection();
+			var cs = provider.GetConnections (GablarskiProtocol.Instance);
+			var c = cs.Item2;
+			var cl = new ConnectionBuffer (cs.Item1);
+
 			userManager.Connect (c);
 			userManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
 
 			var s = GetSourceFromRequest();
-			var result = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			var result = cl.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
-			c.Client.AssertNoMessage();
+			cl.AssertNoMessage();
 
-			handler.SendAudioDataMessage (new MessageReceivedEventArgs (c,
+			handler.SendAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (c,
 				new ClientAudioDataMessage
 				{
 					Data = new [] { new byte[512] },
@@ -679,25 +748,28 @@ namespace Gablarski.Tests
 					TargetIds = new [] { 1 }
 				}));
 
-			c.Client.AssertNoMessage();
-			server.Client.AssertNoMessage();
+			cl.AssertNoMessage();
+			client.AssertNoMessage();
 		}
 
 		[Test]
 		public void SendAudioDataMessageSourceMuted ()
 		{
-			var c = new MockServerConnection();
+			var cs = provider.GetConnections (GablarskiProtocol.Instance);
+			var c = cs.Item2;
+			var cl = new ConnectionBuffer (cs.Item1);
+
 			userManager.Connect (c);
 			userManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
 
 			var s = GetSourceFromRequest();
 			manager.ToggleMute (s);
 
-			var result = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			var result = cl.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
-			c.Client.AssertNoMessage();
+			cl.AssertNoMessage();
 
-			handler.SendAudioDataMessage (new MessageReceivedEventArgs (server,
+			handler.SendAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (server,
 				new ClientAudioDataMessage
 				{
 					Data = new [] { new byte[512] },
@@ -706,23 +778,26 @@ namespace Gablarski.Tests
 					TargetIds = new [] { 1 }
 				}));
 
-			c.Client.AssertNoMessage();
-			server.Client.AssertNoMessage();
+			cl.AssertNoMessage();
+			client.AssertNoMessage();
 		}
 
 		[Test]
 		public void SendAudioDataMessageUserMuted()
 		{
-			var c = new MockServerConnection();
+			var cs = provider.GetConnections (GablarskiProtocol.Instance);
+			var c = cs.Item2;
+			var cl = new ConnectionBuffer (cs.Item1);
+
 			userManager.Connect (c);
 			userManager.Join (c, UserInfoTests.GetTestUser (2, 1, true));
 
 			var s = GetSourceFromRequest (c);
-			var result = server.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			var result = client.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
-			server.Client.AssertNoMessage();
+			client.AssertNoMessage();
 
-			handler.SendAudioDataMessage (new MessageReceivedEventArgs (c,
+			handler.SendAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (c,
 				new ClientAudioDataMessage
 				{
 					Data = new [] { new byte[512] },
@@ -731,26 +806,29 @@ namespace Gablarski.Tests
 					TargetIds = new [] { 1 }
 				}));
 
-			c.Client.AssertNoMessage();
-			server.Client.AssertNoMessage();
+			cl.AssertNoMessage();
+			client.AssertNoMessage();
 		}
 
 		[Test]
 		public void SendAudioDataMessageToUser()
 		{
-			var c = new MockServerConnection();
+			var cs = provider.GetConnections (GablarskiProtocol.Instance);
+			var c = cs.Item2;
+			var cl = new ConnectionBuffer (cs.Item1);
+
 			userManager.Connect (c);
 			var u = UserInfoTests.GetTestUser (2, 2, false);
 			userManager.Join (c, u);
 
 			var s = GetSourceFromRequest();
-			var result = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			var result = cl.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
-			c.Client.AssertNoMessage();
+			cl.AssertNoMessage();
 
 			permissions.EnablePermissions (user.UserId, PermissionName.SendAudio);
 
-			handler.SendAudioDataMessage (new MessageReceivedEventArgs (server,
+			handler.SendAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (server,
 				new ClientAudioDataMessage
 				{
 					Data = new [] { new byte[512] },
@@ -759,24 +837,27 @@ namespace Gablarski.Tests
 					TargetIds = new [] { u.UserId }
 				}));
 
-			server.Client.AssertNoMessage();
-			Assert.AreEqual (s.Id, c.Client.DequeueAndAssertMessage<ServerAudioDataMessage>().SourceId);
+			client.AssertNoMessage();
+			Assert.AreEqual (s.Id, cl.DequeueAndAssertMessage<ServerAudioDataMessage>().SourceId);
 		}
 
 		[Test]
 		public void SendAudioDataMessageToUserWithoutPermission()
 		{
-			var c = new MockServerConnection();
+			var cs = provider.GetConnections (GablarskiProtocol.Instance);
+			var c = cs.Item2;
+			var cl = new ConnectionBuffer (cs.Item1);
+
 			userManager.Connect (c);
 			var u = UserInfoTests.GetTestUser (2, 2, false);
 			userManager.Join (c, u);
 
 			var s = GetSourceFromRequest();
-			var result = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			var result = cl.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
-			c.Client.AssertNoMessage();
+			cl.AssertNoMessage();
 
-			handler.SendAudioDataMessage (new MessageReceivedEventArgs (server,
+			handler.SendAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (server,
 				new ClientAudioDataMessage
 				{
 					Data = new [] { new byte[512] },
@@ -785,25 +866,28 @@ namespace Gablarski.Tests
 					TargetIds = new [] { u.UserId }
 				}));
 
-			c.Client.AssertNoMessage();
-			Assert.AreEqual (ClientMessageType.AudioData, server.Client.DequeueAndAssertMessage<PermissionDeniedMessage>().DeniedMessage);
+			cl.AssertNoMessage();
+			Assert.AreEqual (GablarskiMessageType.AudioData, client.DequeueAndAssertMessage<PermissionDeniedMessage>().DeniedMessage);
 		}
 
 		[Test]
 		public void SendAudioDataMessageToCurrentChannel()
 		{
-			var c = new MockServerConnection();
+			var cs = provider.GetConnections (GablarskiProtocol.Instance);
+			var c = cs.Item2;
+			var cl = new ConnectionBuffer (cs.Item1);
+
 			userManager.Connect (c);
 			userManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
 
 			var s = GetSourceFromRequest();
-			var result = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			var result = cl.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
-			c.Client.AssertNoMessage();
+			cl.AssertNoMessage();
 
 			permissions.EnablePermissions (user.UserId, PermissionName.SendAudio);
 
-			handler.SendAudioDataMessage (new MessageReceivedEventArgs (server,
+			handler.SendAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (server,
 				new ClientAudioDataMessage
 				{
 					Data = new [] { new byte[512] },
@@ -812,23 +896,26 @@ namespace Gablarski.Tests
 					TargetIds = new [] { user.CurrentChannelId }
 				}));
 
-			server.Client.AssertNoMessage();
-			Assert.AreEqual (s.Id, c.Client.DequeueAndAssertMessage<ServerAudioDataMessage>().SourceId);
+			client.AssertNoMessage();
+			Assert.AreEqual (s.Id, cl.DequeueAndAssertMessage<ServerAudioDataMessage>().SourceId);
 		}
 
 		[Test]
 		public void SendAudioDataMessageToCurrentChannelWithoutPermission()
 		{
-			var c = new MockServerConnection();
+			var cs = provider.GetConnections (GablarskiProtocol.Instance);
+			var c = cs.Item2;
+			var cl = new ConnectionBuffer (cs.Item1);
+
 			userManager.Connect (c);
 			userManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
 
 			var s = GetSourceFromRequest();
-			var result = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			var result = cl.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
-			c.Client.AssertNoMessage();
+			cl.AssertNoMessage();
 
-			handler.SendAudioDataMessage (new MessageReceivedEventArgs (server,
+			handler.SendAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (server,
 				new ClientAudioDataMessage
 				{
 					Data = new [] { new byte[512] },
@@ -837,33 +924,39 @@ namespace Gablarski.Tests
 					TargetIds = new [] { user.CurrentChannelId }
 				}));
 
-			c.Client.AssertNoMessage();
-			Assert.AreEqual (ClientMessageType.AudioData, server.Client.DequeueAndAssertMessage<PermissionDeniedMessage>().DeniedMessage);
+			cl.AssertNoMessage();
+			Assert.AreEqual (GablarskiMessageType.AudioData, client.DequeueAndAssertMessage<PermissionDeniedMessage>().DeniedMessage);
 		}
 
 		[Test]
 		public void SendAudioDataMessageToMultipleChannels()
 		{
-			var c = new MockServerConnection();
+			var cs = provider.GetConnections (GablarskiProtocol.Instance);
+			var c = cs.Item2;
+			var cl = new ConnectionBuffer (cs.Item1);
+
 			userManager.Connect (c);
 			userManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
 
-			var c2 = new MockServerConnection();
+			var cs2 = provider.GetConnections (GablarskiProtocol.Instance);
+			var c2 = cs2.Item2;
+			var cl2 = new ConnectionBuffer (cs.Item1);
+
 			userManager.Connect (c2);
 			userManager.Join (c2, UserInfoTests.GetTestUser (3, 2, false));
 
 			var s = GetSourceFromRequest();
-			var result = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			var result = cl.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
-			c.Client.AssertNoMessage();
+			cl.AssertNoMessage();
 
-			result = c2.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			result = cl2.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
-			c2.Client.AssertNoMessage();
+			cl2.AssertNoMessage();
 
 			permissions.EnablePermissions (user.UserId, PermissionName.SendAudio, PermissionName.SendAudioToMultipleTargets);
 
-			handler.SendAudioDataMessage (new MessageReceivedEventArgs (server,
+			handler.SendAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (server,
 				new ClientAudioDataMessage
 				{
 					Data = new [] { new byte[512] },
@@ -872,32 +965,38 @@ namespace Gablarski.Tests
 					TargetIds = new [] { 1, 2 }
 				}));
 
-			server.Client.AssertNoMessage();
-			Assert.AreEqual (s.Id, c.Client.DequeueAndAssertMessage<ServerAudioDataMessage>().SourceId);
-			Assert.AreEqual (s.Id, c2.Client.DequeueAndAssertMessage<ServerAudioDataMessage>().SourceId);
+			client.AssertNoMessage();
+			Assert.AreEqual (s.Id, cl.DequeueAndAssertMessage<ServerAudioDataMessage>().SourceId);
+			Assert.AreEqual (s.Id, cl2.DequeueAndAssertMessage<ServerAudioDataMessage>().SourceId);
 		}
 
 		[Test]
 		public void SendAudioDataMessageToMultipleChannelsWithoutPermission()
 		{
-			var c = new MockServerConnection();
+			var cs = provider.GetConnections (GablarskiProtocol.Instance);
+			var c = cs.Item2;
+			var cl = new ConnectionBuffer (cs.Item1);
+
 			userManager.Connect (c);
 			userManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
 
-			var c2 = new MockServerConnection();
+			var cs2 = provider.GetConnections (GablarskiProtocol.Instance);
+			var c2 = cs2.Item2;
+			var cl2 = new ConnectionBuffer (cs.Item1);
+
 			userManager.Connect (c2);
 			userManager.Join (c2, UserInfoTests.GetTestUser (3, 2, false));
 
 			var s = GetSourceFromRequest();
-			var result = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			var result = cl.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
-			c.Client.AssertNoMessage();
+			cl.AssertNoMessage();
 
-			result = c2.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			result = cl2.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
-			c2.Client.AssertNoMessage();
+			cl2.AssertNoMessage();
 
-			handler.SendAudioDataMessage (new MessageReceivedEventArgs (server,
+			handler.SendAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (server,
 				new ClientAudioDataMessage
 				{
 					Data = new [] { new byte[512] },
@@ -906,36 +1005,42 @@ namespace Gablarski.Tests
 					TargetIds = new [] { 1, 2 }
 				}));
 
-			c.Client.AssertNoMessage();
-			c2.Client.AssertNoMessage();
-			Assert.AreEqual (ClientMessageType.AudioData, server.Client.DequeueAndAssertMessage<PermissionDeniedMessage>().DeniedMessage);
+			cl.AssertNoMessage();
+			cl2.AssertNoMessage();
+			Assert.AreEqual (GablarskiMessageType.AudioData, client.DequeueAndAssertMessage<PermissionDeniedMessage>().DeniedMessage);
 		}
 
 		[Test]
 		public void SendAudioDataMessageToMultipleUsers()
 		{
-			var c = new MockServerConnection();
+			var cs = provider.GetConnections (GablarskiProtocol.Instance);
+			var c = cs.Item2;
+			var cl = new ConnectionBuffer (cs.Item1);
+
 			userManager.Connect (c);
 			var u1 = UserInfoTests.GetTestUser (2, 1, false);
 			userManager.Join (c, u1);
 
-			var c2 = new MockServerConnection();
+			var cs2 = provider.GetConnections (GablarskiProtocol.Instance);
+			var c2 = cs2.Item2;
+			var cl2 = new ConnectionBuffer (cs.Item1);
+
 			userManager.Connect (c2);
 			var u2 = UserInfoTests.GetTestUser (3, 2, false);
 			userManager.Join (c2, u2);
 
 			var s = GetSourceFromRequest();
-			var result = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			var result = cl.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
-			c.Client.AssertNoMessage();
+			cl.AssertNoMessage();
 
-			result = c2.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			result = cl2.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
-			c2.Client.AssertNoMessage();
+			cl2.AssertNoMessage();
 
 			permissions.EnablePermissions (user.UserId, PermissionName.SendAudio, PermissionName.SendAudioToMultipleTargets);
 
-			handler.SendAudioDataMessage (new MessageReceivedEventArgs (server,
+			handler.SendAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (server,
 				new ClientAudioDataMessage
 				{
 					Data = new [] { new byte[512] },
@@ -944,32 +1049,38 @@ namespace Gablarski.Tests
 					TargetIds = new [] { u1.UserId, u2.UserId }
 				}));
 
-			server.Client.AssertNoMessage();
-			Assert.AreEqual (s.Id, c.Client.DequeueAndAssertMessage<ServerAudioDataMessage>().SourceId);
-			Assert.AreEqual (s.Id, c2.Client.DequeueAndAssertMessage<ServerAudioDataMessage>().SourceId);
+			client.AssertNoMessage();
+			Assert.AreEqual (s.Id, cl.DequeueAndAssertMessage<ServerAudioDataMessage>().SourceId);
+			Assert.AreEqual (s.Id, cl2.DequeueAndAssertMessage<ServerAudioDataMessage>().SourceId);
 		}
 
 		[Test]
 		public void SendAudioDataMessageToMultipleUsersWithoutPermission()
 		{
-			var c = new MockServerConnection();
+			var cs = provider.GetConnections (GablarskiProtocol.Instance);
+			var c = cs.Item2;
+			var cl = new ConnectionBuffer (cs.Item1);
+
 			userManager.Connect (c);
 			var u1 = UserInfoTests.GetTestUser (2, 1, false);
 			userManager.Join (c, u1);
 
-			var c2 = new MockServerConnection();
+			var cs2 = provider.GetConnections (GablarskiProtocol.Instance);
+			var c2 = cs2.Item2;
+			var cl2 = new ConnectionBuffer (cs.Item1);
+
 			userManager.Connect (c2);
 			var u2 = UserInfoTests.GetTestUser (3, 1, false);
 			userManager.Join (c2, u2);
 
 			var s = GetSourceFromRequest();
-			var result = c.Client.DequeueAndAssertMessage<SourceResultMessage>();
+			var result = cl.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
-			c.Client.AssertNoMessage();
+			cl.AssertNoMessage();
 
 			permissions.EnablePermissions (user.UserId, PermissionName.SendAudio);
 
-			handler.SendAudioDataMessage (new MessageReceivedEventArgs (server,
+			handler.SendAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (server,
 				new ClientAudioDataMessage
 				{
 					Data = new [] { new byte[512] },
@@ -978,8 +1089,8 @@ namespace Gablarski.Tests
 					TargetIds = new [] { u1.UserId, u2.UserId }
 				}));
 
-			c.Client.AssertNoMessage();
-			Assert.AreEqual (ClientMessageType.AudioData, server.Client.DequeueAndAssertMessage<PermissionDeniedMessage>().DeniedMessage);
+			cl.AssertNoMessage();
+			Assert.AreEqual (GablarskiMessageType.AudioData, client.DequeueAndAssertMessage<PermissionDeniedMessage>().DeniedMessage);
 		}
 		#endregion
 	}

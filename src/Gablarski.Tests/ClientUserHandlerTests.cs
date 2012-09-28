@@ -41,6 +41,8 @@ using Gablarski.Client;
 using Gablarski.Messages;
 using Gablarski.Server;
 using NUnit.Framework;
+using Tempest;
+using Tempest.Tests;
 
 namespace Gablarski.Tests
 {
@@ -50,11 +52,15 @@ namespace Gablarski.Tests
 		[SetUp]
 		public void ManagerSetup ()
 		{
-			this.provider = new MockConnectionProvider ();
-			this.server = this.provider.EstablishConnection ();
+			this.provider = new MockConnectionProvider (GablarskiProtocol.Instance);
+
+			var connections = this.provider.GetConnections (GablarskiProtocol.Instance);
+
+			this.server = new ConnectionBuffer (connections.Item2);
+			this.client = connections.Item1;
 
 			userProvider = new MockUserProvider();
-			context = new MockClientContext { Connection = this.server.Client, ServerInfo = new ServerInfo (new ServerSettings(), userProvider, new PublicRSAParameters()) };
+			context = new MockClientContext (client) { ServerInfo = new ServerInfo (new ServerSettings(), userProvider) };
 
 			var channels = new ClientChannelManager (context);
 			ClientChannelManagerTests.PopulateChannels (channels, this.server);
@@ -78,7 +84,7 @@ namespace Gablarski.Tests
 
 		private static void CreateUsers (IClientConnection client, ClientUserHandler handler)
 		{
-			handler.OnUserListReceivedMessage (new MessageReceivedEventArgs (client,
+			handler.OnUserListReceivedMessage (new MessageEventArgs<UserInfoListMessage> (client,
 			                                                                 new UserInfoListMessage (new[]
 			                                                                 {
 			                                                                 	new UserInfo ("Foo", "Foo", 1, 1, false),
@@ -96,33 +102,34 @@ namespace Gablarski.Tests
 			Assert.AreEqual (1, manager.Count (u => u.UserId == 3 && u.Nickname == "Wee" && u.IsMuted && u.CurrentChannelId == 2));
 		}
 
-		private MockServerConnection server;
+		private ConnectionBuffer server;
 		private MockConnectionProvider provider;
 		private ClientUserHandler handler;
 		private MockClientContext context;
 		private MockUserProvider userProvider;
 		private ClientUserManager userManager;
+		private MockClientConnection client;
 
 		[Test]
 		public void NullConnection()
 		{
 			Assert.Throws<ArgumentNullException> (() => new ClientUserHandler (null, new ClientUserManager()));
-			Assert.Throws<ArgumentNullException> (() => new ClientUserHandler (new MockClientContext(), null));
+			Assert.Throws<ArgumentNullException> (() => new ClientUserHandler (new MockClientContext (this.client), null));
 		}
 
 		[Test]
 		public void Enumerator()
 		{
-			CreateUsers (this.server.Client, this.handler);
+			CreateUsers (this.client, this.handler);
 		}
 
 		[Test]
 		public void UserJoined()
 		{
-			CreateUsers (this.server.Client, this.handler);
+			CreateUsers (this.client, this.handler);
 
 			var newGuy = new UserInfo ("New", "new", 4, 3, false);
-			this.handler.OnUserJoinedMessage (new MessageReceivedEventArgs (this.server.Client,
+			this.handler.OnUserJoinedMessage (new MessageEventArgs<UserJoinedMessage> (this.client,
 				new UserJoinedMessage(newGuy)));
 
 			VerifyDefaultUsers (this.handler);
@@ -132,9 +139,9 @@ namespace Gablarski.Tests
 		[Test]
 		public void UserDisconnected()
 		{
-			CreateUsers (this.server.Client, this.handler);
+			CreateUsers (this.client, this.handler);
 
-			this.handler.OnUserDisconnectedMessage (new MessageReceivedEventArgs (this.server.Client,
+			this.handler.OnUserDisconnectedMessage (new MessageEventArgs<UserDisconnectedMessage> (this.client,
 				new UserDisconnectedMessage (1)));
 
 			Assert.AreEqual (2, this.handler.Count());
@@ -146,11 +153,11 @@ namespace Gablarski.Tests
 		[Test]
 		public void ChannelUpdate()
 		{
-			CreateUsers (this.server.Client, this.handler);
+			CreateUsers (this.client, this.handler);
 
 			var old = this.handler[2];
 
-			this.handler.OnUserChangedChannelMessage (new MessageReceivedEventArgs (this.server.Client,
+			this.handler.OnUserChangedChannelMessage (new MessageEventArgs<UserChangedChannelMessage> (this.client,
 				new UserChangedChannelMessage
 				{
 					ChangeInfo = new ChannelChangeInfo (2, 2, 1)
@@ -164,7 +171,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void IgnoreUser()
 		{
-			CreateUsers (this.server.Client, this.handler);
+			CreateUsers (this.client, this.handler);
 
 			var user = this.handler.First();
 			int userId = user.UserId;
@@ -177,7 +184,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void IgnoreUserPersists ()
 		{
-			CreateUsers (this.server.Client, this.handler);
+			CreateUsers (this.client, this.handler);
 
 			var user = this.handler.First ();
 			int userId = user.UserId;
@@ -186,7 +193,7 @@ namespace Gablarski.Tests
 			Assert.IsTrue (this.handler.ToggleIgnore (user));
 			Assert.IsTrue (this.handler.GetIsIgnored (user));
 
-			CreateUsers (this.server.Client, this.handler);
+			CreateUsers (this.client, this.handler);
 
 			Assert.IsTrue (this.handler.GetIsIgnored (user));
 		}
@@ -203,10 +210,10 @@ namespace Gablarski.Tests
 		{
 			userProvider.UpdateSupported = true;
 			userProvider.RegistrationMode = UserRegistrationMode.PreApproved;
-			context = new MockClientContext { Connection = this.server.Client, ServerInfo = new ServerInfo (new ServerSettings(), userProvider, new PublicRSAParameters()) };
+			context = new MockClientContext (this.client) { ServerInfo = new ServerInfo (new ServerSettings(), userProvider) };
 			this.handler = new ClientUserHandler (context, this.userManager);
 
-			CreateUsers (this.server.Client, this.handler);
+			CreateUsers (this.client, this.handler);
 
 			var user = this.handler.First();
 			int userId = user.UserId;
@@ -222,10 +229,10 @@ namespace Gablarski.Tests
 		{
 			userProvider.UpdateSupported = false;
 			userProvider.RegistrationMode = UserRegistrationMode.None;
-			context = new MockClientContext { Connection = this.server.Client, ServerInfo = new ServerInfo (new ServerSettings(), userProvider, new PublicRSAParameters()) };
+			context = new MockClientContext (this.client) { ServerInfo = new ServerInfo (new ServerSettings(), userProvider) };
 			this.handler = new ClientUserHandler (context, this.userManager);
 
-			CreateUsers (this.server.Client, this.handler);
+			CreateUsers (this.client, this.handler);
 
 			var user = this.handler.First();
 
@@ -237,7 +244,7 @@ namespace Gablarski.Tests
 		{
 			userProvider.UpdateSupported = true;
 			userProvider.RegistrationMode = UserRegistrationMode.Approved;
-			context = new MockClientContext { Connection = this.server.Client, ServerInfo = new ServerInfo (new ServerSettings(), userProvider, new PublicRSAParameters()) };
+			context = new MockClientContext (this.client) { ServerInfo = new ServerInfo (new ServerSettings(), userProvider) };
 			this.handler = new ClientUserHandler (context, this.userManager);
 			
 			this.handler.ApproveRegistration ("username");
@@ -261,7 +268,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void KickFromServer()
 		{
-			CreateUsers (this.server.Client, this.handler);
+			CreateUsers (this.client, this.handler);
 			var admin = this.handler.First();
 			var target = this.handler.Skip (1).First();
 
@@ -275,7 +282,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void KickFromChannel()
 		{
-			CreateUsers (this.server.Client, this.handler);
+			CreateUsers (this.client, this.handler);
 			var admin = this.handler.First();
 			var target = this.handler.Skip (1).First();
 
@@ -289,7 +296,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void UserKickedFromChannel()
 		{
-			CreateUsers (this.server.Client, this.handler);
+			CreateUsers (this.client, this.handler);
 			var target = this.handler.First();
 
 			handler.UserKickedFromChannel += (sender, e) =>
@@ -298,7 +305,7 @@ namespace Gablarski.Tests
 				Assert.Pass();
 			};
 
-			handler.OnUserKickedMessage (new MessageReceivedEventArgs (server.Client,
+			handler.OnUserKickedMessage (new MessageEventArgs<UserKickedMessage> (this.client,
 				new UserKickedMessage { UserId = target.UserId, FromServer = false }));
 
 			Assert.Fail ("UserKickedFromChannel event was not fired.");
@@ -307,7 +314,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void UserKickedFromServer()
 		{
-			CreateUsers (this.server.Client, this.handler);
+			CreateUsers (this.client, this.handler);
 			var target = this.handler.First();
 
 			handler.UserKickedFromServer += (sender, e) =>
@@ -316,7 +323,7 @@ namespace Gablarski.Tests
 				Assert.Pass();
 			};
 
-			handler.OnUserKickedMessage (new MessageReceivedEventArgs (server.Client,
+			handler.OnUserKickedMessage (new MessageEventArgs<UserKickedMessage> (this.client,
 				new UserKickedMessage { UserId = target.UserId, FromServer = true}));
 
 			Assert.Fail ("UserKickedFromServer event was not fired.");

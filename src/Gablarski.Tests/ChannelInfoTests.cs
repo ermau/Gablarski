@@ -39,6 +39,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
+using Tempest;
 
 namespace Gablarski.Tests
 {
@@ -58,9 +59,9 @@ namespace Gablarski.Tests
 		[Test]
 		public void CtorNull()
 		{
-			Assert.Throws<ArgumentNullException> (() => new ChannelInfo ((ChannelInfo)null));
+			Assert.Throws<ArgumentNullException> (() => new ChannelInfo (null));
 			Assert.Throws<ArgumentNullException> (() => new ChannelInfo (1, null));
-			Assert.Throws<ArgumentNullException> (() => new ChannelInfo ((IValueReader)null));
+			Assert.Throws<ArgumentNullException> (() => new ChannelInfo (null, null));
 		}
 
 		[Test]
@@ -96,12 +97,12 @@ namespace Gablarski.Tests
 				UserLimit = 2
 			};
 
-			channel.Serialize (writer);
+			channel.Serialize (null, writer);
 			long length = stream.Position;
 			stream.Position = 0;
 
 			var deserializedChannel = new ChannelInfo();
-			deserializedChannel.Deserialize (reader);
+			deserializedChannel.Deserialize (null, reader);
 
 			Assert.AreEqual (length, stream.Position);
 			AssertChanelsAreEqual (channel, deserializedChannel);

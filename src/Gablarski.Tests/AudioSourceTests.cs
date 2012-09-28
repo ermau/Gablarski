@@ -39,6 +39,7 @@ using System.IO;
 using System.Linq;
 using Gablarski.Audio;
 using NUnit.Framework;
+using Tempest;
 
 namespace Gablarski.Tests
 {
@@ -117,11 +118,11 @@ namespace Gablarski.Tests
 			var reader = new StreamValueReader (stream);
 
 			var source = GetTestSource();
-			source.Serialize (writer);
+			source.Serialize (null, writer);
 			long length = stream.Position;
 			stream.Position = 0;
 
-			source = new AudioSource (reader);
+			source = new AudioSource (null, reader);
 			AssertSourcesMatch (GetTestSource(), source);
 			Assert.AreEqual (length, stream.Position);
 		}

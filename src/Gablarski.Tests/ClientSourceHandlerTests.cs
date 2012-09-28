@@ -41,6 +41,7 @@ using Gablarski.Audio;
 using Gablarski.Client;
 using Gablarski.Messages;
 using NUnit.Framework;
+using Tempest.Tests;
 
 namespace Gablarski.Tests
 {
@@ -50,12 +51,14 @@ namespace Gablarski.Tests
 		[SetUp]
 		public void ManagerSetup()
 		{
-			this.provider = new MockConnectionProvider();
-			this.server = this.provider.EstablishConnection();
-			this.client = this.server.Client;
+			this.provider = new MockConnectionProvider (GablarskiProtocol.Instance);
+
+			var connections = this.provider.GetConnections (GablarskiProtocol.Instance);
+			this.server = new ConnectionBuffer (connections.Item2);
+			this.client = connections.Item1;
 
 			MockClientContext c;
-			this.context = c = new MockClientContext { Connection = this.server.Client };
+			this.context = c = new MockClientContext (this.client);
 			var channels = new ClientChannelManager (context);
 			ClientChannelManagerTests.PopulateChannels (channels, server);
 
@@ -67,11 +70,11 @@ namespace Gablarski.Tests
 			this.handler = new ClientSourceHandler (context, manager);
 		}
 
-		private IClientContext context;
+		private IGablarskiClientContext context;
 		private ClientSourceHandler handler;
 		private ClientSourceManager manager;
 		private MockConnectionProvider provider;
-		private MockServerConnection server;
+		private ConnectionBuffer server;
 		private MockClientConnection client;
 
 		[Test]

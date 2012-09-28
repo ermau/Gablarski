@@ -4,20 +4,19 @@ using System.Linq;
 using Gablarski.Audio;
 using Gablarski.Client;
 using Gablarski.Messages;
+using Tempest;
 
 namespace Gablarski.Tests
 {
 	public class MockClientContext
-		: IClientContext
+		: ClientBase, IGablarskiClientContext
 	{
-		#region Implementation of IClientContext
+		public MockClientContext (IClientConnection connection)
+			: base (connection, MessageTypes.All, false)
+		{
+		}
 
 		public IAudioEngine Audio { get; set; }
-
-		/// <summary>
-		/// Gets the connection associated with this client.
-		/// </summary>
-		public IClientConnection Connection { get; set; }
 
 		/// <summary>
 		/// Gets the channels in this context
@@ -40,11 +39,5 @@ namespace Gablarski.Tests
 		public ICurrentUserHandler CurrentUser { get; set; }
 
 		public ServerInfo ServerInfo { get; set; }
-
-		public void RegisterMessageHandler (ServerMessageType messageType, Action<MessageReceivedEventArgs> handler)
-		{
-		}
-
-		#endregion
 	}
 }

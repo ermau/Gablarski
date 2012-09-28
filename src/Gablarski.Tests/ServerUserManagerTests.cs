@@ -41,12 +41,15 @@ using System.Text;
 using Gablarski.Messages;
 using Gablarski.Server;
 using NUnit.Framework;
+using Tempest;
+using Tempest.Tests;
 
 namespace Gablarski.Tests
 {
 	[TestFixture]
 	public class ServerUserManagerTests
 	{
+		private MockConnectionProvider provider;
 		private IServerUserManager manager;
 		private MockClientConnection client;
 		private MockServerConnection server;
@@ -57,8 +60,12 @@ namespace Gablarski.Tests
 		{
 			user = new UserInfo ("Nickname", "Phonetic", "Username", 1, 2, true);
 			manager = new ServerUserManager();
-			server = new MockServerConnection();
-			client = new MockClientConnection (server);
+
+			provider = new MockConnectionProvider (GablarskiProtocol.Instance);
+
+			var cs = provider.GetConnections (GablarskiProtocol.Instance);
+			server = cs.Item2;
+			client = cs.Item1;
 		}
 
 		[TearDown]
@@ -104,7 +111,7 @@ namespace Gablarski.Tests
 			manager.Login (server, user);
 			Assert.IsTrue (manager.GetIsLoggedIn (server));
 
-			var c = new MockServerConnection();
+			var c = provider.GetServerConnection();
 			manager.Connect (c);
 			manager.Login (c, user);
 
@@ -455,7 +462,7 @@ namespace Gablarski.Tests
 			manager.Connect (server);
 
 			Assert.IsTrue (manager.GetIsConnected (server));
-			Assert.IsFalse (manager.GetIsConnected (new MockServerConnection()));
+			Assert.IsFalse (manager.GetIsConnected (provider.GetServerConnection()));
 
 			manager.Disconnect (server);
 

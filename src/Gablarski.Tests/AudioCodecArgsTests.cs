@@ -40,6 +40,7 @@ using System.IO;
 using System.Linq;
 using Gablarski.Audio;
 using NUnit.Framework;
+using Tempest;
 
 namespace Gablarski.Tests
 {
@@ -108,11 +109,11 @@ namespace Gablarski.Tests
 
 			var args = new AudioCodecArgs (Format, Bitrate, FrameSize, Complexity);
 			
-			args.Serialize (writer);
+			args.Serialize (null, writer);
 			long length = stream.Position;
 			stream.Position = 0;
 
-			args = new AudioCodecArgs (reader);
+			args = new AudioCodecArgs (null, reader);
 			Assert.AreEqual (length, stream.Position);
 			Assert.AreEqual (Format.WaveEncoding, args.WaveEncoding);
 			Assert.AreEqual (Format.Channels, args.Channels);

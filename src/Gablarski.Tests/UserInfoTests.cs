@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
+using Tempest;
 
 namespace Gablarski.Tests
 {
@@ -49,8 +50,8 @@ namespace Gablarski.Tests
 		[Test]
 		public void InvalidCtor()
 		{
-			Assert.Throws<ArgumentNullException> (() => new UserInfo ((IUserInfo)null));
-			Assert.Throws<ArgumentNullException> (() => new UserInfo ((StreamValueReader)null));
+			Assert.Throws<ArgumentNullException> (() => new UserInfo (null));
+			Assert.Throws<ArgumentNullException> (() => new UserInfo (null, (StreamValueReader)null));
 
 			Assert.Throws<ArgumentNullException> (() => new UserInfo (null, UserId, ChanId, Muted));
 			Assert.Throws<ArgumentException> (() => new UserInfo (Username, 0, ChanId, Muted));
@@ -92,11 +93,11 @@ namespace Gablarski.Tests
 
 			var info = new UserInfo (Nickname, Phonetic, Username, UserId, ChanId, Muted, Comment, Status);
 
-			info.Serialize (writer);
+			info.Serialize (null, writer);
 			long length = stream.Position;
 			stream.Position = 0;
 
-			info = new UserInfo (reader);
+			info = new UserInfo (null, reader);
 			Assert.AreEqual (length, stream.Position);
 			Assert.AreEqual (UserId, info.UserId);
 			Assert.AreEqual (ChanId, info.CurrentChannelId);

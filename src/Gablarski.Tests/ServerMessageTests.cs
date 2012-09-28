@@ -8,6 +8,8 @@ using Gablarski.Audio;
 using Gablarski.Messages;
 using Gablarski.Server;
 using NUnit.Framework;
+using Tempest;
+using Tempest.Tests;
 
 namespace Gablarski.Tests
 {
@@ -25,9 +27,9 @@ namespace Gablarski.Tests
 		[TearDown]
 		public void MessageTeardown()
 		{
-			writer.Dispose();
-			reader.Dispose();
 		}
+
+		private SerializationContext clientContext, serverContext;
 
 		private MemoryStream stream;
 		private IValueWriter writer;
@@ -52,6 +54,13 @@ namespace Gablarski.Tests
 			Assert.IsTrue (msg.Result.Succeeded);
 			Assert.AreEqual (state, msg.Result.ResultState);
 			Assert.AreEqual (UserId, msg.Result.UserId);
+
+			var provider = new MockConnectionProvider (GablarskiProtocol.Instance);
+			var cs = provider.GetConnections (GablarskiProtocol.Instance);
+
+			var map = new TypeMap();
+			this.clientContext = new SerializationContext (cs.Item1, GablarskiProtocol.Instance, map);
+			this.serverContext = new SerializationContext (cs.Item2, GablarskiProtocol.Instance, map);
 		}
 
 		[Test]
@@ -66,12 +75,12 @@ namespace Gablarski.Tests
 			Assert.AreEqual (Nickname, msg.UserInfo.Nickname);
 			Assert.AreEqual (ChannelId, msg.UserInfo.CurrentChannelId);
 			Assert.AreEqual (Muted, msg.UserInfo.IsMuted);
-			msg.WritePayload (writer);
+			msg.WritePayload (serverContext, writer);
 			long length = stream.Position;
 			stream.Position = 0;
 
 			msg = new JoinResultMessage();
-			msg.ReadPayload (reader);
+			msg.ReadPayload (clientContext, reader);
 
 			Assert.AreEqual (length, stream.Position);
 			Assert.AreEqual (state, msg.Result);
@@ -87,12 +96,12 @@ namespace Gablarski.Tests
 			GenericResult result = GenericResult.FailedPermissions;
 			var msg = new ChannelListMessage (result);
 			Assert.AreEqual (result, msg.Result);
-			msg.WritePayload (writer);
+			msg.WritePayload (serverContext, writer);
 			long length = stream.Position;
 			stream.Position = 0;
 
 			msg = new ChannelListMessage();
-			msg.ReadPayload (reader);
+			msg.ReadPayload (clientContext, reader);
 			Assert.AreEqual (length, stream.Position);
 			Assert.AreEqual (result, msg.Result);
 		}
@@ -106,15 +115,15 @@ namespace Gablarski.Tests
 				new ChannelInfo (ChannelId2)
 			};
 
-			var msg = new ChannelListMessage (channels.Cast<IChannelInfo>(), channels[0]);
+			var msg = new ChannelListMessage (channels, channels[0]);
 			Assert.AreEqual(1, msg.Channels.Count (c => c.ChannelId.Equals (channels[0].ChannelId) && c.ReadOnly == channels[0].ReadOnly));
 			Assert.AreEqual(1, msg.Channels.Count (c => c.ChannelId.Equals (channels[1].ChannelId) && c.ReadOnly == channels[1].ReadOnly));
-			msg.WritePayload (writer);
+			msg.WritePayload (serverContext, writer);
 			long length = stream.Position;
 			stream.Position = 0;
 
 			msg = new ChannelListMessage();
-			msg.ReadPayload (reader);
+			msg.ReadPayload (clientContext, reader);
 			Assert.AreEqual (length, stream.Position);
 			Assert.AreEqual (1, msg.Channels.Count (c => c.ChannelId.Equals (channels[0].ChannelId) && c.ReadOnly == channels[0].ReadOnly));
 			Assert.AreEqual (1, msg.Channels.Count (c => c.ChannelId.Equals (channels[1].ChannelId) && c.ReadOnly == channels[1].ReadOnly));
@@ -132,12 +141,12 @@ namespace Gablarski.Tests
 			var msg = new UserInfoListMessage (users);
 			Assert.AreEqual (1, msg.Users.Count (ui => ui.UserId.Equals (users[0].UserId) && ui.CurrentChannelId.Equals (users[0].CurrentChannelId) && ui.Nickname == users[0].Nickname && ui.IsMuted == users[0].IsMuted));
 			Assert.AreEqual (1, msg.Users.Count (ui => ui.UserId.Equals (users[1].UserId) && ui.CurrentChannelId.Equals (users[1].CurrentChannelId) && ui.Nickname == users[1].Nickname && ui.IsMuted == users[1].IsMuted));
-			msg.WritePayload (writer);
+			msg.WritePayload (serverContext, writer);
 			long length = stream.Position;
 			stream.Position = 0;
 
 			msg = new UserInfoListMessage();
-			msg.ReadPayload (reader);
+			msg.ReadPayload (clientContext, reader);
 			Assert.AreEqual (length, stream.Position);
 			Assert.AreEqual (1, msg.Users.Count (ui => ui.UserId.Equals (users[0].UserId) && ui.CurrentChannelId.Equals (users[0].CurrentChannelId) && ui.Nickname == users[0].Nickname && ui.IsMuted == users[0].IsMuted));
 			Assert.AreEqual (1, msg.Users.Count (ui => ui.UserId.Equals (users[1].UserId) && ui.CurrentChannelId.Equals (users[1].CurrentChannelId) && ui.Nickname == users[1].Nickname && ui.IsMuted == users[1].IsMuted));
@@ -148,12 +157,12 @@ namespace Gablarski.Tests
 		{
 			var msg = new UserInfoListMessage(new List<IUserInfo>());
 			Assert.AreEqual (0, msg.Users.Count());
-			msg.WritePayload (writer);
+			msg.WritePayload (serverContext, writer);
 			long length = stream.Position;
 			stream.Position = 0;
 
 			msg = new UserInfoListMessage();
-			msg.ReadPayload (reader);
+			msg.ReadPayload (clientContext, reader);
 			Assert.AreEqual (length, stream.Position);
 			Assert.AreEqual (0, msg.Users.Count ());
 		}
@@ -171,12 +180,12 @@ namespace Gablarski.Tests
 			foreach (var s in msg.Sources)
 				Assert.Contains (s, sources);
 
-			msg.WritePayload (writer);
+			msg.WritePayload (serverContext, writer);
 			long length = stream.Position;
 			stream.Position = 0;
 
 			msg = new SourceListMessage();
-			msg.ReadPayload (reader);
+			msg.ReadPayload (clientContext, reader);
 			Assert.AreEqual (length, stream.Position);
 			foreach (var s in sources)
 				Assert.Contains (s, msg.Sources.ToList());
@@ -187,12 +196,12 @@ namespace Gablarski.Tests
 		{
 			var msg = new SourceListMessage (new List<AudioSource>());
 			Assert.AreEqual (0, msg.Sources.Count());
-			msg.WritePayload (writer);
+			msg.WritePayload (serverContext, writer);
 			long length = stream.Position;
 			stream.Position = 0;
 
 			msg = new SourceListMessage();
-			msg.ReadPayload (reader);
+			msg.ReadPayload (clientContext, reader);
 			Assert.AreEqual (length, stream.Position);
 			Assert.AreEqual (0, msg.Sources.Count());
 		}
@@ -201,12 +210,12 @@ namespace Gablarski.Tests
 		public void UserLoggedIn()
 		{
 			var msg = new UserJoinedMessage (UserInfoTests.GetTestUser());
-			msg.WritePayload (writer);
+			msg.WritePayload (serverContext, writer);
 			long length = stream.Position;
 			stream.Position = 0;
 
 			msg = new UserJoinedMessage();
-			msg.ReadPayload (reader);
+			msg.ReadPayload (clientContext, reader);
 			Assert.AreEqual (length, stream.Position);
 			UserInfoTests.AssertUserInfosMatch (UserInfoTests.GetTestUser(), msg.UserInfo);
 		}
@@ -218,12 +227,12 @@ namespace Gablarski.Tests
 			var msg = new UserDisconnectedMessage (id);
 			Assert.AreEqual (id, msg.UserId);
 
-			msg.WritePayload (writer);
+			msg.WritePayload (serverContext, writer);
 			long length = stream.Position;
 			stream.Position = 0;
 
 			msg = new UserDisconnectedMessage();
-			msg.ReadPayload (reader);
+			msg.ReadPayload (clientContext, reader);
 
 			Assert.AreEqual (length, stream.Position);
 			Assert.AreEqual (id, msg.UserId);
@@ -235,7 +244,7 @@ namespace Gablarski.Tests
 			var msg = new DisconnectMessage (DisconnectionReason.Kicked);
 			Assert.AreEqual (DisconnectionReason.Kicked, msg.Reason);
 
-			msg = AssertLengthMatches (msg);
+			msg = msg.AssertLengthMatches();
 			Assert.AreEqual (DisconnectionReason.Kicked, msg.Reason);
 		}
 
@@ -251,12 +260,12 @@ namespace Gablarski.Tests
 			var msg = new SourcesRemovedMessage (sources);
 			Assert.AreEqual (1, msg.SourceIds.Count (sid => sid == sources[0].Id));
 			Assert.AreEqual (1, msg.SourceIds.Count (sid => sid == sources[1].Id));
-			msg.WritePayload (writer);
+			msg.WritePayload (serverContext, writer);
 			long length = stream.Position;
 			stream.Position = 0;
 
 			msg = new SourcesRemovedMessage();
-			msg.ReadPayload (reader);
+			msg.ReadPayload (clientContext, reader);
 			Assert.AreEqual (length, stream.Position);
 			Assert.AreEqual (1, msg.SourceIds.Count (sid => sid == sources[0].Id));
 			Assert.AreEqual (1, msg.SourceIds.Count (sid => sid == sources[1].Id));
@@ -272,12 +281,12 @@ namespace Gablarski.Tests
 			Assert.AreEqual (user.Nickname, msg.UserInfo.Nickname);
 			Assert.AreEqual (user.Username, msg.UserInfo.Username);
 			Assert.AreEqual (user.IsMuted, msg.UserInfo.IsMuted);
-			msg.WritePayload (writer);
+			msg.WritePayload (serverContext, writer);
 			long length = stream.Position;
 			stream.Position = 0;
 
 			msg = new UserJoinedMessage();
-			msg.ReadPayload (reader);
+			msg.ReadPayload (clientContext, reader);
 			Assert.AreEqual (length, stream.Position);
 			Assert.AreEqual (user.UserId, msg.UserInfo.UserId);
 			Assert.AreEqual (user.CurrentChannelId, msg.UserInfo.CurrentChannelId);
@@ -294,12 +303,12 @@ namespace Gablarski.Tests
 			Assert.AreEqual (changeInfo.TargetUserId, msg.ChangeInfo.TargetUserId);
 			Assert.AreEqual (changeInfo.TargetChannelId, msg.ChangeInfo.TargetChannelId);
 			Assert.AreEqual (changeInfo.RequestingUserId, msg.ChangeInfo.RequestingUserId);
-			msg.WritePayload (writer);
+			msg.WritePayload (serverContext, writer);
 			long length = stream.Position;
 			stream.Position = 0;
 
 			msg = new UserChangedChannelMessage();
-			msg.ReadPayload (reader);
+			msg.ReadPayload (clientContext, reader);
 			Assert.AreEqual (length, stream.Position);
 			Assert.AreEqual (changeInfo.TargetUserId, msg.ChangeInfo.TargetUserId);
 			Assert.AreEqual (changeInfo.TargetChannelId, msg.ChangeInfo.TargetChannelId);
@@ -315,12 +324,12 @@ namespace Gablarski.Tests
 			Assert.AreEqual (changeInfo.TargetChannelId, msg.ChangeInfo.TargetChannelId);
 			Assert.AreEqual (changeInfo.PreviousChannelId, msg.ChangeInfo.PreviousChannelId);
 			Assert.AreEqual (changeInfo.RequestingUserId, msg.ChangeInfo.RequestingUserId);
-			msg.WritePayload (writer);
+			msg.WritePayload (serverContext, writer);
 			long length = stream.Position;
 			stream.Position = 0;
 
 			msg = new UserChangedChannelMessage();
-			msg.ReadPayload (reader);
+			msg.ReadPayload (clientContext, reader);
 			Assert.AreEqual (length, stream.Position);
 			Assert.AreEqual (changeInfo.TargetUserId, msg.ChangeInfo.TargetUserId);
 			Assert.AreEqual (changeInfo.TargetChannelId, msg.ChangeInfo.TargetChannelId);
@@ -337,12 +346,12 @@ namespace Gablarski.Tests
 			var msg = new SourceResultMessage (name, result, source);
 			Assert.AreEqual (result, msg.SourceResult);
 			Assert.AreEqual (name, msg.SourceName);
-			msg.WritePayload (writer);
+			msg.WritePayload (serverContext, writer);
 			long length = stream.Position;
 			stream.Position = 0;
 
 			msg = new SourceResultMessage();
-			msg.ReadPayload (reader);
+			msg.ReadPayload (clientContext, reader);
 			Assert.AreEqual (length, stream.Position);
 			Assert.AreEqual (result, msg.SourceResult);
 			Assert.AreEqual (name, msg.SourceName);
@@ -356,12 +365,12 @@ namespace Gablarski.Tests
 			var msg = new SourceResultMessage (name, result, null);
 			Assert.AreEqual (result, msg.SourceResult);
 			Assert.AreEqual (name, msg.SourceName);
-			msg.WritePayload (writer);
+			msg.WritePayload (serverContext, writer);
 			long length = stream.Position;
 			stream.Position = 0;
 
 			msg = new SourceResultMessage ();
-			msg.ReadPayload (reader);
+			msg.ReadPayload (clientContext, reader);
 			Assert.AreEqual (length, stream.Position);
 			Assert.AreEqual (result, msg.SourceResult);
 			Assert.AreEqual (name, msg.SourceName);
@@ -385,13 +394,13 @@ namespace Gablarski.Tests
 				ServerLogo = "logo",
 				Name = "name",
 				Description = "description"
-			}, new GuestUserProvider(), new Decryption().PublicParameters));
-			msg.WritePayload (writer);
+			}, new GuestUserProvider()));
+			msg.WritePayload (serverContext, writer);
 			long length = stream.Position;
 			stream.Position = 0;
 
 			msg = new ServerInfoMessage();
-			msg.ReadPayload (reader);
+			msg.ReadPayload (clientContext, reader);
 			Assert.AreEqual (length, stream.Position);
 		}
 
@@ -401,7 +410,7 @@ namespace Gablarski.Tests
 			var msg = new UserUpdatedMessage (UserInfoTests.GetTestUser());
 			UserInfoTests.AssertUserInfosMatch (UserInfoTests.GetTestUser(), msg.User);
 
-			msg = AssertLengthMatches (msg);
+			msg = msg.AssertLengthMatches();
 			UserInfoTests.AssertUserInfosMatch (UserInfoTests.GetTestUser(), msg.User);
 		}
 
@@ -412,7 +421,7 @@ namespace Gablarski.Tests
 			Assert.AreEqual (msg.Users.First().UserId, 1);
 			Assert.AreEqual (msg.Users.Skip (1).First().UserId, 2);
 
-			msg = AssertLengthMatches (msg);
+			msg = msg.AssertLengthMatches();
 			Assert.AreEqual (msg.Users.First().UserId, 1);
 			Assert.AreEqual (msg.Users.Skip (1).First().UserId, 2);
 		}
@@ -422,23 +431,9 @@ namespace Gablarski.Tests
 		{
 			var msg = new UserKickedMessage { FromServer = true, UserId = 5 };
 
-			msg = AssertLengthMatches (msg);
+			msg = msg.AssertLengthMatches();
 			Assert.AreEqual (true, msg.FromServer);
 			Assert.AreEqual (5, msg.UserId);
-		}
-
-		private T AssertLengthMatches<T> (T msg)
-			where T : MessageBase, new()
-		{
-			msg.WritePayload (writer);
-			long len = stream.Position;
-			stream.Position = 0;
-
-			msg = new T();
-			msg.ReadPayload (reader);
-			Assert.AreEqual (len, stream.Position);
-
-			return msg;
 		}
 	}
 }

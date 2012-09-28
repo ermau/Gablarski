@@ -41,6 +41,8 @@ using Gablarski.Messages;
 using Gablarski.Server;
 using Gablarski.Tests.Mocks;
 using NUnit.Framework;
+using Tempest;
+using Tempest.Tests;
 
 namespace Gablarski.Tests
 {
@@ -54,6 +56,8 @@ namespace Gablarski.Tests
 		private MockPermissionsProvider permissions;
 		private MockServerConnection server;
 		private UserInfo user;
+		private ConnectionBuffer client;
+		private MockConnectionProvider provider;
 
 		[SetUp]
 		public void Setup()
@@ -75,7 +79,13 @@ namespace Gablarski.Tests
 			mcontext.Channels = handler = new ServerChannelHandler (context);
 
 			user = UserInfoTests.GetTestUser (1, 1, false);
-			server = new MockServerConnection();
+
+			provider = new MockConnectionProvider (GablarskiProtocol.Instance);
+
+			var connections = provider.GetConnections (GablarskiProtocol.Instance);
+			client = new ConnectionBuffer (connections.Item1);
+			server = connections.Item2;
+
 			manager.Connect (server);
 			manager.Join (server, user);
 		}
@@ -89,13 +99,13 @@ namespace Gablarski.Tests
 		[Test]
 		public void RequestChannelListMessageNotConnected()
 		{
-			var c = new MockServerConnection();
+			var c = provider.GetServerConnection();
 			c.Disconnect();
 			
-			handler.RequestChanneListMessage (new MessageReceivedEventArgs (c,
+			handler.RequestChanneListMessage (new MessageEventArgs<RequestChannelListMessage> (c,
 				new RequestChannelListMessage()));
 
-			c.Client.AssertNoMessage();
+			client.AssertNoMessage();
 		}
 
 		[Test]
@@ -103,13 +113,13 @@ namespace Gablarski.Tests
 		{
 			permissions.EnablePermissions (0, PermissionName.RequestChannelList);
 
-			var c = new MockServerConnection();
+			var c = provider.GetServerConnection();
 			manager.Connect (c);
 
-			handler.RequestChanneListMessage (new MessageReceivedEventArgs (c,
+			handler.RequestChanneListMessage (new MessageEventArgs<RequestChannelListMessage> (c,
 				new RequestChannelListMessage()));
 
-			var msg = c.Client.DequeueAndAssertMessage<ChannelListMessage>();
+			var msg = client.DequeueAndAssertMessage<ChannelListMessage>();
 			Assert.AreEqual (GenericResult.Success, msg.Result);
 			ChannelInfoTests.AssertChanelsAreEqual (channels.GetChannels().Single(), msg.Channels.Single());
 		}
@@ -120,29 +130,29 @@ namespace Gablarski.Tests
 			permissions.EnablePermissions (user.UserId, PermissionName.ChangeChannel);
 
 			Assert.AreEqual (ChannelEditResult.Success, channels.SaveChannel (new ChannelInfo { Name = "Channel 2" }));
-			server.Client.DequeueAndAssertMessage<ChannelListMessage>();
+			client.DequeueAndAssertMessage<ChannelListMessage>();
 
 			var channel = channels.GetChannels().Single (c => c.Name == "Channel 2");
 			context.Users.Move (server, user, channel);
-			server.Client.DequeueAndAssertMessage<UserChangedChannelMessage>();
+			client.DequeueAndAssertMessage<UserChangedChannelMessage>();
 
 			permissions.EnablePermissions (user.UserId, PermissionName.DeleteChannel, PermissionName.RequestChannelList);
 			
-			handler.ChannelEditMessage (new MessageReceivedEventArgs (server, new ChannelEditMessage
+			handler.ChannelEditMessage (new MessageEventArgs<ChannelEditMessage> (server, new ChannelEditMessage
 			{
 				Channel = channel,
 				Delete = true
 			}));
 
-			var moved = server.Client.DequeueAndAssertMessage<UserChangedChannelMessage>();
+			var moved = client.DequeueAndAssertMessage<UserChangedChannelMessage>();
 			Assert.AreEqual (user.UserId, moved.ChangeInfo.TargetUserId);
 			Assert.AreEqual (channels.GetChannels().Single().ChannelId, moved.ChangeInfo.TargetChannelId);
 			Assert.AreEqual (channel.ChannelId, moved.ChangeInfo.PreviousChannelId);
 			Assert.AreEqual (0, moved.ChangeInfo.RequestingUserId);
 
-			server.Client.DequeueAndAssertMessage<ChannelListMessage>();
+			client.DequeueAndAssertMessage<ChannelListMessage>();
 
-			var result = server.Client.DequeueAndAssertMessage<ChannelEditResultMessage>();
+			var result = client.DequeueAndAssertMessage<ChannelEditResultMessage>();
 			Assert.AreEqual (channel.ChannelId, result.ChannelId);
 			Assert.AreEqual (ChannelEditResult.Success, result.Result);
 		}
@@ -153,28 +163,32 @@ namespace Gablarski.Tests
 			permissions.EnablePermissions (user.UserId, PermissionName.ChangeChannel);
 
 			Assert.AreEqual (ChannelEditResult.Success, channels.SaveChannel (new ChannelInfo { Name = "Channel 2", UserLimit = 1 }));
-			server.Client.DequeueAndAssertMessage<ChannelListMessage>();
+			client.DequeueAndAssertMessage<ChannelListMessage>();
 
 			var channel = channels.GetChannels().Single (c => c.Name == "Channel 2");
 			context.Users.Move (user, channel);
 			
-			var moved = server.Client.DequeueAndAssertMessage<UserChangedChannelMessage>();
+			var moved = client.DequeueAndAssertMessage<UserChangedChannelMessage>();
 			Assert.AreEqual (user.UserId, moved.ChangeInfo.TargetUserId);
 			Assert.AreEqual (channel.ChannelId, moved.ChangeInfo.TargetChannelId);
 			Assert.AreEqual (channels.DefaultChannel.ChannelId, moved.ChangeInfo.PreviousChannelId);
 			Assert.AreEqual (0, moved.ChangeInfo.RequestingUserId);
 
 			var secondUser = UserInfoTests.GetTestUser (2, 1, false);
-			var secondServer = new MockServerConnection();
+
+			var cs = provider.GetConnections (GablarskiProtocol.Instance);
+			var secondClient = new ConnectionBuffer (cs.Item1);
+
+			var secondServer = cs.Item2;
 			manager.Connect (secondServer);
 			manager.Join (secondServer, secondUser);
 			permissions.EnablePermissions (secondUser.UserId, PermissionName.ChangeChannel);
 
 			context.Users.Move (secondServer, secondUser, channel);
 			
-			server.Client.AssertNoMessage();
+			client.AssertNoMessage();
 
-			var result = secondServer.Client.DequeueAndAssertMessage<ChannelChangeResultMessage>();
+			var result = secondClient.DequeueAndAssertMessage<ChannelChangeResultMessage>();
 			Assert.AreEqual (ChannelChangeResult.FailedFull, result.Result);
 		}
 	}
