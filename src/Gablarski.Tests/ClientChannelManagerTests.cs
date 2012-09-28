@@ -17,8 +17,12 @@ namespace Gablarski.Tests
 		public void ManagerSetup ()
 		{
 			this.provider = new MockConnectionProvider (GablarskiProtocol.Instance);
-			this.server = new ConnectionBuffer (this.provider.GetServerConnection());
-			this.manager = new ClientChannelManager (new MockClientContext (this.provider.GetClientConnection()));
+			this.provider.Start (MessageTypes.All);
+
+			var cs = this.provider.GetConnections (GablarskiProtocol.Instance);
+
+			this.server = new ConnectionBuffer (cs.Item2);
+			this.manager = new ClientChannelManager (new MockClientContext (cs.Item1));
 		}
 
 		[TearDown]

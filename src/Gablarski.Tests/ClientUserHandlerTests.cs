@@ -53,6 +53,7 @@ namespace Gablarski.Tests
 		public void ManagerSetup ()
 		{
 			this.provider = new MockConnectionProvider (GablarskiProtocol.Instance);
+			this.provider.Start (MessageTypes.All);
 
 			var connections = this.provider.GetConnections (GablarskiProtocol.Instance);
 

@@ -81,6 +81,7 @@ namespace Gablarski.Tests
 			user = UserInfoTests.GetTestUser (1, 1, false);
 
 			provider = new MockConnectionProvider (GablarskiProtocol.Instance);
+			provider.Start (MessageTypes.All);
 
 			var connections = provider.GetConnections (GablarskiProtocol.Instance);
 			client = new ConnectionBuffer (connections.Item1);
