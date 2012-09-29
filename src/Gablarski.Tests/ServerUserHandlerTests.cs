@@ -211,18 +211,6 @@ namespace Gablarski.Tests
 			client.DequeueAndAssertMessage<UserInfoListMessage>();
 			client.DequeueAndAssertMessage<SourceListMessage>();
 		}
-
-		[Test]
-		public void ConnectInvalidVersion()
-		{
-			handler.OnConnectMessage (new MessageEventArgs<ConnectMessage> (server, 
-				new ConnectMessage { ProtocolVersion = 1 }));
-
-			Assert.IsFalse (handler.Manager.GetIsConnected (server));
-
-			var rejected = client.DequeueAndAssertMessage<ConnectionRejectedMessage>();
-			Assert.AreEqual (ConnectionRejectedReason.IncompatibleVersion, rejected.Reason);
-		}
 		
 		[Test]
 		public void JoinNotConnectedLiterally()
