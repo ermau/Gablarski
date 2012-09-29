@@ -93,6 +93,18 @@ namespace Gablarski.Server
 		/// <exception cref="ArgumentNullException"><paramref name="username"/> is <c>null</c>.</exception>
 		void ApproveRegistration (string username);
 
+		/// <summary>
+		/// Sends a message to all active connections matching the <paramref name="predicate"/>.
+		/// </summary>
+		/// <param name="message">The message to send.</param>
+		/// <param name="predicate">The predicate to filter connections.</param>
+		void Send (Message message, Func<IConnection, bool> predicate);
+
+		/// <summary>
+		/// Sends a message to all users matching the <paramref name="predicate"/>.
+		/// </summary>
+		/// <param name="message">The message to send.</param>
+		/// <param name="predicate">The predicate to filter connections.</param>
 		void Send (Message message, Func<IConnection, IUserInfo, bool> predicate);
 
 		/// <summary>
@@ -113,7 +125,7 @@ namespace Gablarski.Server
 			if (message == null)
 				throw new ArgumentNullException ("message");
 
-			self.Send (message, (c, u) => true);
+			self.Send (message, c => true);
 		}
 
 		public static void Send (this IServerUserHandler self, Message message, Func<IUserInfo, bool> predicate)
