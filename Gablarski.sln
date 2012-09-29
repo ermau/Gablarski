@@ -36,7 +36,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tempest", "src\Tempest\Desk
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gablarski.Clients.WPF", "src\Clients\WPF\Gablarski.Clients.WPF.csproj", "{7F09830C-D58B-4071-B988-B0A8E30BCB56}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tempest.Tests", "..\Tempest\Desktop\Tempest\Tests\Tempest.Tests.csproj", "{97D53DFA-634E-4595-9AE3-DC1BC8A5F553}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tempest.Tests", "src\Tempest\Desktop\Tempest\Tests\Tempest.Tests.csproj", "{97D53DFA-634E-4595-9AE3-DC1BC8A5F553}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

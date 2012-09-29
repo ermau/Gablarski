@@ -120,17 +120,17 @@
     <Compile Include="Mocks\MockRedirector.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Tempest\Desktop\Tempest\Tests\Tempest.Tests.csproj">
-      <Project>{97d53dfa-634e-4595-9ae3-dc1bc8a5f553}</Project>
-      <Name>Tempest.Tests</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Gablarski\Gablarski.csproj">
       <Project>{7347052B-DA5B-4CCA-AB28-3963766E3CDB}</Project>
       <Name>Gablarski</Name>
     </ProjectReference>
     <ProjectReference Include="..\Tempest\Desktop\Tempest\Tempest.csproj">
-      <Project>{D6A2003C-CBB2-47B0-B306-521141D3068D}</Project>
+      <Project>{d6a2003c-cbb2-47b0-b306-521141d3068d}</Project>
       <Name>Tempest</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Tempest\Desktop\Tempest\Tests\Tempest.Tests.csproj">
+      <Project>{97d53dfa-634e-4595-9ae3-dc1bc8a5f553}</Project>
+      <Name>Tempest.Tests</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
