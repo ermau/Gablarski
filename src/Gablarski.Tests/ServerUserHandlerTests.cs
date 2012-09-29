@@ -52,7 +52,10 @@ namespace Gablarski.Tests
 		private ServerUserHandler handler;
 		
 		private MockConnectionProvider provider;
+
+		private IServerConnection sobserver;
 		private ConnectionBuffer observer;
+
 		private ConnectionBuffer server;
 		private ConnectionBuffer client;
 
@@ -85,7 +88,10 @@ namespace Gablarski.Tests
 			var cs = provider.GetConnections (GablarskiProtocol.Instance);
 			server = new ConnectionBuffer (cs.Item2);
 			client = new ConnectionBuffer (cs.Item1);
-			observer = new ConnectionBuffer (provider.GetServerConnection());
+
+			var observers = provider.GetConnections (GablarskiProtocol.Instance);
+			sobserver = observers.Item2;
+			observer = new ConnectionBuffer (observers.Item1);
 		}
 
 		[TearDown]
@@ -318,7 +324,7 @@ namespace Gablarski.Tests
 
 			if (connect)
 			{
-				handler.Manager.Connect (observer);
+				handler.Manager.Connect (sobserver);
 				handler.Manager.Connect (sc);
 			}
 
@@ -338,7 +344,7 @@ namespace Gablarski.Tests
 				//connection.Client.DequeueAndAssertMessage<UserInfoListMessage>();
 				//connection.Client.DequeueAndAssertMessage<SourceListMessage>();
 
-				cc.DequeueAndAssertMessage<UserJoinedMessage>();
+				observer.DequeueAndAssertMessage<UserJoinedMessage>();
 				
 				return msg.UserInfo;
 			}
