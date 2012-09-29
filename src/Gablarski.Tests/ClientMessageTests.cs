@@ -312,7 +312,7 @@ namespace Gablarski.Tests
 			msg = msg.AssertLengthMatches();
 			Assert.AreEqual (2, msg.UserId);
 			Assert.AreEqual (true, msg.Approved);
-			Assert.AreEqual (String.Empty, msg.Username);
+			Assert.AreEqual (null, msg.Username);
 		}
 
 		[Test]
