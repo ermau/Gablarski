@@ -96,7 +96,7 @@ namespace Gablarski.OpenAL
 		/// <param name="frequency">The frequency to open the capture device with.</param>
 		/// <param name="format">The audio format to open the device with.</param>
 		/// <returns>Returns <c>this</c>.</returns>
-		public unsafe CaptureDevice Open (uint frequency, OpenALAudioFormat format)
+		public CaptureDevice Open (uint frequency, OpenALAudioFormat format)
 		{
 			ThrowIfDisposed();
 			
@@ -111,8 +111,6 @@ namespace Gablarski.OpenAL
 			OpenAL.ErrorCheck (this);
 
 			pcm = new byte[bufferSize];
-			fixed (byte* bppcm = pcm)
-				pcmPtr = new IntPtr ((void*)bppcm);
 
 			return this;
 		}
@@ -223,9 +221,8 @@ namespace Gablarski.OpenAL
 		private volatile bool capturing;
 		private int minimumSamples = 1;
 		private byte[] pcm;
-		private IntPtr pcmPtr;
 
-		private byte[] GetSamples (int numSamples, bool block)
+		private unsafe byte[] GetSamples (int numSamples, bool block)
 		{
 			ThrowIfDisposed();
 
@@ -246,7 +243,9 @@ namespace Gablarski.OpenAL
 				}
 			}
 
-			alcCaptureSamples (this.Handle, pcmPtr, numSamples);
+			fixed (byte* pcmPtr = pcm)
+				alcCaptureSamples (this.Handle, new IntPtr (pcmPtr), numSamples);
+
 			OpenAL.ErrorCheck (this);
 			Array.Copy (pcm, samples, samples.Length);
 
