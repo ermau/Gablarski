@@ -119,12 +119,9 @@ namespace Gablarski.CELT
 
 			int nbCompressedBytes = (bitrate / 8) / (this.Mode.SampleRate / this.Mode.FrameSize);
 
-			IntPtr encodedPtr;
 			byte[] encoded = new byte[nbCompressedBytes];
 			fixed (byte* benc = encoded)
-				encodedPtr = new IntPtr ((void*)benc);
-			
-			length = celt_encode (this, pcm, IntPtr.Zero, encodedPtr, nbCompressedBytes);
+				length = celt_encode (this, pcm, IntPtr.Zero, new IntPtr (benc), nbCompressedBytes);
 
 			return encoded;
 		}

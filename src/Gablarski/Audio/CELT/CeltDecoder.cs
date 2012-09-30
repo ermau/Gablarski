@@ -71,12 +71,9 @@ namespace Gablarski.CELT
 				throw new ArgumentNullException ("encoded");
 			#endif
 
-			IntPtr pcmptr;
 			byte[] pcm = new byte[this.Mode.FrameSize * this.Mode.NumberOfChannels * 2];
 			fixed (byte* bpcm = pcm)
-				pcmptr = new IntPtr((void*)bpcm);
-
-			celt_decode (this.decoderState, encoded, encoded.Length, pcmptr).ThrowIfError();
+				celt_decode (this.decoderState, encoded, encoded.Length, new IntPtr (bpcm)).ThrowIfError();
 
 			return pcm;
 		}
