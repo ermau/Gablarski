@@ -247,7 +247,7 @@ namespace Gablarski.OpenAL
 				alcCaptureSamples (this.Handle, new IntPtr (pcmPtr), numSamples);
 
 			OpenAL.ErrorCheck (this);
-			Array.Copy (pcm, samples, samples.Length);
+			Buffer.BlockCopy (pcm, 0, samples, 0, samples.Length);
 
 			return samples;
 		}
