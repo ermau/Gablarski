@@ -1,6 +1,6 @@
 [submodule "Tempest"]
 	path = Tempest
-	url = git@github.com:ermau/Tempest.git
+	url = git://github.com/ermau/Tempest.git
 [submodule "Symphony"]
 	path = Symphony
-	url = git@github.com:ermau/Symphony.git
+	url = git://github.com/ermau/Symphony.git
