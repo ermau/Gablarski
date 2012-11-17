@@ -39,40 +39,31 @@ using Tempest;
 
 namespace Gablarski.Audio
 {
-	public enum AudioSourceNegotiationType
-		: byte
-	{
-		ServerFixed = 1,
-		ServerRange = 2,
-		ClientNegotiation = 3,
-		ClientNegotationAndTranscoding = 4
-	}
-
-	public enum AudioSourceType
-		: byte
-	{
-		Local = 0,
-		Voice = 1,
-		Music = 2,
-	}
-
 	public class AudioSource
-		: ISerializable
 	{
-		public AudioSourceType Type
+		public AudioSourceProfile Profile
 		{
 			get;
 			set;
 		}
+	}
 
-		public void Serialize (IValueWriter writer)
+	public class AudioSourceSerializer
+		: ISerializer<AudioSource>
+	{
+		public static readonly AudioSourceSerializer Instance = new AudioSourceSerializer();
+
+		public void Serialize (ISerializationContext context, IValueWriter writer, AudioSource element)
 		{
-			writer.WriteByte ((byte)Type);
+			writer.WriteByte ((byte)element.Profile);
 		}
 
-		public void Deserialize (IValueReader reader)
+		public AudioSource Deserialize (ISerializationContext context, IValueReader reader)
 		{
-			Type = (AudioSourceType)reader.ReadByte();
+			return new AudioSource
+			{
+				Profile = (AudioSourceProfile)reader.ReadByte()
+			};
 		}
 	}
 }

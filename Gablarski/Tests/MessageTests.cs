@@ -43,12 +43,6 @@ namespace Gablarski.Tests
 	[TestFixture]
 	public class MessageTests
 	{
-		[Test]
-		public void ClientCapabilitiesMessage()
-		{
-			var msg = new ClientCapabilitiesMessage();
-			
-			msg = msg.AssertLengthMatches();
-		}
+		
 	}
 }

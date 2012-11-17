@@ -38,20 +38,15 @@ using Tempest;
 
 namespace Gablarski.Messages
 {
-	public class QueryServerMessage
-		: GablarskiMessage
+	public static class GablarskiProtocol
 	{
-		public QueryServerMessage()
-			: base (GablarskiMessageType.QueryServer)
-		{
-		}
+		public static readonly Protocol Protocol = new Protocol (42, 15);
 
-		public override void WritePayload (IValueWriter writer)
-		{
-		}
+		public const int DefaultPort = 42912;
 
-		public override void ReadPayload (IValueReader reader)
+		static GablarskiProtocol()
 		{
+			Protocol.DiscoverFromAssemblyOf<GablarskiMessage>();
 		}
 	}
 }

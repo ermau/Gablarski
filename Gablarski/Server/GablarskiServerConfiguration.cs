@@ -45,11 +45,5 @@ namespace Gablarski.Server
 			get;
 			set;
 		}
-
-		public IEnumerable<ILoginProvider> LoginProviders
-		{
-			get;
-			set;
-		}
 	}
 }

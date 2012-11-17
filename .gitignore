@@ -2,3 +2,6 @@
 *.user
 obj
 bin
+*.dotCover
+*.ide
+*.docstates

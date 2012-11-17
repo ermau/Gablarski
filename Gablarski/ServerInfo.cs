@@ -40,32 +40,30 @@ using Tempest;
 namespace Gablarski
 {
 	public class ServerInfo
-		: ISerializable
 	{
-		public ServerSettings Settings
+		public string Name
 		{
 			get;
 			set;
 		}
+	}
 
-		public int UserCount
+	public sealed class ServerInfoSerializer
+		: ISerializer<ServerInfo>
+	{
+		public static readonly ServerInfoSerializer Instance = new ServerInfoSerializer();
+
+		public void Serialize (ISerializationContext context, IValueWriter writer, ServerInfo element)
 		{
-			get;
-			set;
+			writer.WriteString (element.Name);
 		}
 
-		
-
-		public void Serialize (IValueWriter writer)
+		public ServerInfo Deserialize (ISerializationContext context, IValueReader reader)
 		{
-			Settings.Serialize (writer);
-			writer.WriteInt32 (UserCount);
-		}
+			var info = new ServerInfo();
+			info.Name = reader.ReadString();
 
-		public void Deserialize (IValueReader reader)
-		{
-			Settings = new ServerSettings (reader);
-			UserCount = reader.ReadInt32();
+			return info;
 		}
 	}
 }

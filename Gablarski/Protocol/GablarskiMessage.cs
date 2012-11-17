@@ -38,20 +38,18 @@ using Tempest;
 
 namespace Gablarski.Messages
 {
-	public class ClientCapabilitiesMessage
-		: GablarskiMessage
+	public enum GablarskiMessageType
+		: ushort 
 	{
-		public ClientCapabilitiesMessage()
-			: base (GablarskiMessageType.ClientCapabilities)
-		{
-		}
+		
+	}
 
-		public override void WritePayload (IValueWriter writer)
+	public abstract class GablarskiMessage
+		: Message
+	{
+		protected GablarskiMessage (GablarskiMessageType type)
+			: base (GablarskiProtocol.Protocol, (ushort)type)
 		{
-		}
-
-		public override void ReadPayload (IValueReader reader)
-		{			
 		}
 	}
 }
