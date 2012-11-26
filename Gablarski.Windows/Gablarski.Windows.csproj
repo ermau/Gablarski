@@ -35,12 +35,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
@@ -95,7 +91,18 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="ViewModels\" />
+    <ProjectReference Include="..\Gablarski\Gablarski.csproj">
+      <Project>{828b6e63-65e5-47f0-9df5-7c8d2ffeb924}</Project>
+      <Name>Gablarski</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Tempest.Social\Desktop\Tempest.Social\Tempest.Social.csproj">
+      <Project>{0569ec5a-d715-4a46-a2a5-bbe5f06f56c0}</Project>
+      <Name>Tempest.Social</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Tempest\Desktop\Tempest\Tempest.csproj">
+      <Project>{d6a2003c-cbb2-47b0-b306-521141d3068d}</Project>
+      <Name>Tempest</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
