@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2011, Eric Maupin
+﻿// Copyright (c) 2012, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -34,11 +34,70 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
+using System;
+using System.Net;
+using System.Text;
+using System.Threading.Tasks;
 using Tempest;
+using Tempest.Providers.Network;
+using Tempest.Social;
 
 namespace Gablarski.Client
 {
 	public class GablarskiClient
 	{
+		public GablarskiClient (IAsymmetricKey key)
+			: this (
+				new NetworkClientConnection (GablarskiProtocol.Instance, CryptoFactory, key),
+				new NetworkClientConnection (SocialProtocol.Instance, CryptoFactory, key))
+		{
+		}
+
+		public GablarskiClient (IClientConnection connection, IClientConnection socialConnection)
+		{
+			if (connection == null)
+				throw new ArgumentNullException ("connection");
+			if (socialConnection == null)
+				throw new ArgumentNullException ("socialConnection");
+
+			var persona = new Person (GetIdentity (socialConnection.LocalKey))
+			{
+				Nickname = "Gablarski User",
+				Status = Status.Online
+			};
+
+			this.social = new SocialClient (socialConnection, persona);
+		}
+
+		public Person Persona
+		{
+			get { return this.social.Persona; }
+		}
+
+		public WatchList BuddyList
+		{
+			get { return this.social.WatchList; }
+		}
+
+		public Task<ClientConnectionResult> ConnectSocialAsync (EndPoint socialServer)
+		{
+			return this.social.ConnectAsync (socialServer);
+		}
+
+		private readonly SocialClient social;
+
+		private static IPublicKeyCrypto CryptoFactory()
+		{
+			return new RSACrypto();
+		}
+
+		private static string GetIdentity (IAsymmetricKey key)
+		{
+			StringBuilder builder = new StringBuilder (key.PublicSignature.Length * 2);
+			foreach (byte b in key.PublicSignature)
+				builder.Append (b.ToString ("X2"));
+
+			return builder.ToString();
+		}
 	}
 }

@@ -57,6 +57,10 @@
     <Compile Include="Server\ServerAudioHandler.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Tempest.Social\Desktop\Tempest.Social\Tempest.Social.csproj">
+      <Project>{0569ec5a-d715-4a46-a2a5-bbe5f06f56c0}</Project>
+      <Name>Tempest.Social</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Tempest\Desktop\Tempest\Tempest.csproj">
       <Project>{d6a2003c-cbb2-47b0-b306-521141d3068d}</Project>
       <Name>Tempest</Name>
