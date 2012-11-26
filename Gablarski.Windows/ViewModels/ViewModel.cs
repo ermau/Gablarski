@@ -34,63 +34,23 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Net;
-using System.Windows;
-using Gablarski.Client;
-using Tempest;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using Gablarski.Windows.Annotations;
 
-namespace Gablarski.Windows
+namespace Gablarski.ViewModels
 {
-	/// <summary>
-	/// Interaction logic for App.xaml
-	/// </summary>
-	public partial class App : Application
+	public abstract class ViewModel
+		: INotifyPropertyChanged
 	{
-		public static GablarskiClient Client;
+		public event PropertyChangedEventHandler PropertyChanged;
 
-		protected override void OnStartup (StartupEventArgs e)
+		[NotifyPropertyChangedInvocator]
+		protected virtual void OnPropertyChanged ([CallerMemberName] string propertyName = null)
 		{
-			AppDomain.CurrentDomain.UnhandledException += (o, exe) =>
-			{
-				if (Debugger.IsAttached)
-					Debugger.Break();
-
-				MessageBox.Show (exe.ExceptionObject.ToString(), "Fatal unhandled error", MessageBoxButton.OK, MessageBoxImage.Error);
-			};
-
-			string roaming = Environment.GetFolderPath (Environment.SpecialFolder.ApplicationData);
-			string gb = Path.Combine (roaming, "Gablarski");
-
-			Directory.CreateDirectory (gb);
-
-			IAsymmetricKey key = GetKey (Path.Combine (gb, "client.key"));
-
-			Client = new GablarskiClient (key);
-
-			base.OnStartup (e);
-		}
-
-		private static IAsymmetricKey GetKey (string path)
-		{
-			IAsymmetricKey key = null;
-			if (!File.Exists (path))
-			{
-				RSACrypto crypto = new RSACrypto();
-				key = crypto.ExportKey (true);
-				using (FileStream stream = File.Create (path))
-					key.Serialize (null, new StreamValueWriter (stream));
-			}
-
-			if (key == null)
-			{
-				using (FileStream stream = File.OpenRead (path))
-					key = new RSAAsymmetricKey (null, new StreamValueReader (stream));
-			}
-
-			return key;
+			PropertyChangedEventHandler handler = PropertyChanged;
+			if (handler != null)
+				handler (this, new PropertyChangedEventArgs (propertyName));
 		}
 	}
 }
