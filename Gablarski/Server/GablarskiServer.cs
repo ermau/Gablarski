@@ -40,7 +40,7 @@ using Tempest;
 namespace Gablarski.Server
 {
 	public class GablarskiServer
-		: ServerBase, IGablarskiServerContext
+		: Tempest.Server, IGablarskiServerContext
 	{
 		public GablarskiServer (GablarskiServerConfiguration configuration)
 			: base (MessageTypes.All)

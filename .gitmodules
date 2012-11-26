@@ -4,3 +4,6 @@
 [submodule "Symphony"]
 	path = Symphony
 	url = git://github.com/ermau/Symphony.git
+[submodule "Tempest.Social"]
+	path = Tempest.Social
+	url = git://github.com/ermau/Tempest.Social.git

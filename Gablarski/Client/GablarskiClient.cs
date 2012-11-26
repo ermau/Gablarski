@@ -39,11 +39,6 @@ using Tempest;
 namespace Gablarski.Client
 {
 	public class GablarskiClient
-		: ClientBase
 	{
-		public GablarskiClient (IClientConnection connection, bool poll = false)
-			: base (connection, MessageTypes.All, poll)
-		{
-		}
 	}
 }
