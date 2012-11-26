@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2011, Eric Maupin
+﻿// Copyright (c) 2012, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -36,7 +36,7 @@
 
 using Tempest;
 
-namespace Gablarski.Messages
+namespace Gablarski
 {
 	public enum GablarskiMessageType
 		: ushort 
@@ -48,7 +48,7 @@ namespace Gablarski.Messages
 		: Message
 	{
 		protected GablarskiMessage (GablarskiMessageType type)
-			: base (GablarskiProtocol.Protocol, (ushort)type)
+			: base (GablarskiProtocol.Instance, (ushort)type)
 		{
 		}
 	}

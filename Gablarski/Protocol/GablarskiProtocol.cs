@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2011, Eric Maupin
+﻿// Copyright (c) 2012, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -36,17 +36,17 @@
 
 using Tempest;
 
-namespace Gablarski.Messages
+namespace Gablarski
 {
 	public static class GablarskiProtocol
 	{
-		public static readonly Protocol Protocol = new Protocol (42, 15);
+		public static readonly Protocol Instance = new Protocol (42, 15);
 
 		public const int DefaultPort = 42912;
 
 		static GablarskiProtocol()
 		{
-			Protocol.DiscoverFromAssemblyOf<GablarskiMessage>();
+			Instance.DiscoverFromAssemblyOf<GablarskiMessage>();
 		}
 	}
 }
