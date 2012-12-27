@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2011, Eric Maupin
+﻿// Copyright (c) 2012, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -38,8 +38,13 @@ using System.Collections.Generic;
 
 namespace Gablarski.Server
 {
-	public class GablarskiServerConfiguration
+	public sealed class GablarskiServerConfiguration
 	{
+		public static readonly GablarskiServerConfiguration CallConfiguration = new GablarskiServerConfiguration
+		{
+			Settings = new ServerSettings { Name = "Local Call" }
+		};
+
 		public ServerSettings Settings
 		{
 			get;

@@ -34,11 +34,46 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Gablarski.Annotations;
+using Gablarski.Client;
+using Tempest.Social;
+
 namespace Gablarski.ViewModels
 {
 	public class MainWindowViewModel
 		: ViewModel
 	{
+		public MainWindowViewModel ([NotNull] GablarskiClient client)
+		{
+			if (client == null)
+				throw new ArgumentNullException ("client");
 
+			this.client = client;
+			this.buddyListViewModel = new BuddyListViewModel (client);
+			this.onlineFilter = new ObservableFilter<Person, WatchList> (this.client.BuddyList, p => p.Status != Status.Offline);
+		}
+
+		public event EventHandler<RequestConnectEventArgs> ConnectionRequested
+		{
+			add { this.client.ConnectionRequest += value; }
+			remove { this.client.ConnectionRequest -= value; }
+		}
+
+		public Person Persona
+		{
+			get { return this.client.Persona; }
+		}
+
+		public BuddyListViewModel BuddyList
+		{
+			get { return this.buddyListViewModel; }
+		}
+
+		private readonly ObservableFilter<Person, WatchList> onlineFilter;
+		private readonly GablarskiClient client;
+		private readonly BuddyListViewModel buddyListViewModel;
 	}
 }

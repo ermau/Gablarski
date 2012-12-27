@@ -34,69 +34,35 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Net;
-using System.Windows;
-using Gablarski.Client;
 using Tempest;
-using Tempest.Social;
 
-namespace Gablarski.Windows
+namespace Gablarski
 {
-	/// <summary>
-	/// Interaction logic for App.xaml
-	/// </summary>
-	public partial class App : Application
+	public sealed class Channel
 	{
-		public static GablarskiClient Client;
-
-		protected override void OnStartup (StartupEventArgs e)
+		public string Name
 		{
-			AppDomain.CurrentDomain.UnhandledException += (o, exe) =>
-			{
-				if (Debugger.IsAttached)
-					Debugger.Break();
+			get;
+			set;
+		}
+	}
 
-				MessageBox.Show (exe.ExceptionObject.ToString(), "Fatal unhandled error", MessageBoxButton.OK, MessageBoxImage.Error);
-			};
+	public sealed class ChannelSerializer
+		: ISerializer<Channel>
+	{
+		public static readonly ChannelSerializer Instance = new ChannelSerializer();
 
-			string roaming = Environment.GetFolderPath (Environment.SpecialFolder.ApplicationData);
-			string gb = Path.Combine (roaming, "Gablarski");
-
-			Directory.CreateDirectory (gb);
-
-			IAsymmetricKey key = GetKey (Path.Combine (gb, "client.key"));
-
-			Client = new GablarskiClient (key);
-			Client.ConnectSocialAsync (new IPEndPoint (IPAddress.Loopback, SocialProtocol.DefaultPort))
-				.ContinueWith (t =>
-				{
-					Client.BuddyList.Add (Client.Persona);
-				});
-
-			base.OnStartup (e);
+		public void Serialize (ISerializationContext context, IValueWriter writer, Channel element)
+		{
+			writer.WriteString (element.Name);
 		}
 
-		private static IAsymmetricKey GetKey (string path)
+		public Channel Deserialize (ISerializationContext context, IValueReader reader)
 		{
-			IAsymmetricKey key = null;
-			if (!File.Exists (path))
-			{
-				RSACrypto crypto = new RSACrypto();
-				key = crypto.ExportKey (true);
-				using (FileStream stream = File.Create (path))
-					key.Serialize (null, new StreamValueWriter (stream));
-			}
+			var channel = new Channel();
+			channel.Name = reader.ReadString();
 
-			if (key == null)
-			{
-				using (FileStream stream = File.OpenRead (path))
-					key = new RSAAsymmetricKey (null, new StreamValueReader (stream));
-			}
-
-			return key;
+			return channel;
 		}
 	}
 }

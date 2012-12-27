@@ -36,7 +36,7 @@
 
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Gablarski.Windows.Annotations;
+using Gablarski.Annotations;
 
 namespace Gablarski.ViewModels
 {

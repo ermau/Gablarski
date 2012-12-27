@@ -35,68 +35,54 @@
 // DAMAGE.
 
 using System;
-using System.Diagnostics;
-using System.IO;
-using System.Net;
-using System.Windows;
+using System.Collections.Generic;
+using System.Windows.Input;
+using Gablarski.Annotations;
 using Gablarski.Client;
-using Tempest;
 using Tempest.Social;
 
-namespace Gablarski.Windows
+namespace Gablarski.ViewModels
 {
-	/// <summary>
-	/// Interaction logic for App.xaml
-	/// </summary>
-	public partial class App : Application
+	public class BuddyListViewModel
+		: ViewModel
 	{
-		public static GablarskiClient Client;
-
-		protected override void OnStartup (StartupEventArgs e)
+		public BuddyListViewModel ([NotNull] GablarskiClient client)
 		{
-			AppDomain.CurrentDomain.UnhandledException += (o, exe) =>
-			{
-				if (Debugger.IsAttached)
-					Debugger.Break();
+			if (client == null)
+				throw new ArgumentNullException ("client");
 
-				MessageBox.Show (exe.ExceptionObject.ToString(), "Fatal unhandled error", MessageBoxButton.OK, MessageBoxImage.Error);
-			};
-
-			string roaming = Environment.GetFolderPath (Environment.SpecialFolder.ApplicationData);
-			string gb = Path.Combine (roaming, "Gablarski");
-
-			Directory.CreateDirectory (gb);
-
-			IAsymmetricKey key = GetKey (Path.Combine (gb, "client.key"));
-
-			Client = new GablarskiClient (key);
-			Client.ConnectSocialAsync (new IPEndPoint (IPAddress.Loopback, SocialProtocol.DefaultPort))
-				.ContinueWith (t =>
-				{
-					Client.BuddyList.Add (Client.Persona);
-				});
-
-			base.OnStartup (e);
+			this.client = client;
 		}
 
-		private static IAsymmetricKey GetKey (string path)
+		public IEnumerable<Person> Buddies
 		{
-			IAsymmetricKey key = null;
-			if (!File.Exists (path))
-			{
-				RSACrypto crypto = new RSACrypto();
-				key = crypto.ExportKey (true);
-				using (FileStream stream = File.Create (path))
-					key.Serialize (null, new StreamValueWriter (stream));
-			}
+			get { return this.client.BuddyList; }
+		}
 
-			if (key == null)
-			{
-				using (FileStream stream = File.OpenRead (path))
-					key = new RSAAsymmetricKey (null, new StreamValueReader (stream));
-			}
+		public ICommand CallPerson
+		{
+			get { return this.callCommand; }
+		}
 
-			return key;
+		private readonly GablarskiClient client;
+		private readonly DelegatedCommand callCommand;
+
+		private bool CanCallPerson (object parameter)
+		{
+			Person person = parameter as Person;
+			if (person == null)
+				return false;
+
+			return true;
+		}
+
+		private void CallHandler (object parameter)
+		{
+			Person person = parameter as Person;
+			if (person == null)
+				return;
+
+			
 		}
 	}
 }

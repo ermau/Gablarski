@@ -44,7 +44,7 @@ using Tempest.Social;
 
 namespace Gablarski.Client
 {
-	public class GablarskiClient
+	public sealed class GablarskiClient
 	{
 		public GablarskiClient (IAsymmetricKey key)
 			: this (
@@ -67,8 +67,35 @@ namespace Gablarski.Client
 			};
 
 			this.social = new SocialClient (socialConnection, persona);
+			this.client = new LocalClient (connection, MessageTypes.All);
+
+			this.social.StartingConnection += OnStartingConnection;
 		}
 
+		private void OnStartingConnection (object sender, ConnectEventArgs e)
+		{
+			if (e.YoureHosting)
+			{
+				
+			}
+			else
+			{
+				this.client.ConnectAsync (e.EndPoint);
+			}
+		}
+
+		/// <summary>
+		/// Raised when a social connection is requested.
+		/// </summary>
+		public event EventHandler<RequestConnectEventArgs> ConnectionRequest
+		{
+			add { this.social.ConnectionRequest += value; }
+			remove { this.social.ConnectionRequest -= value; }
+		}
+
+		/// <summary>
+		/// Gets your persona that includes your identifier as well as profile information.
+		/// </summary>
 		public Person Persona
 		{
 			get { return this.social.Persona; }
@@ -79,12 +106,18 @@ namespace Gablarski.Client
 			get { return this.social.WatchList; }
 		}
 
+		/// <summary>
+		/// Asynchronously connects to a Tempest.Social server
+		/// </summary>
+		/// <param name="socialServer">The location of the social server.</param>
+		/// <returns>The connection result.</returns>
 		public Task<ClientConnectionResult> ConnectSocialAsync (EndPoint socialServer)
 		{
 			return this.social.ConnectAsync (socialServer);
 		}
 
 		private readonly SocialClient social;
+		private readonly LocalClient client;
 
 		private static IPublicKeyCrypto CryptoFactory()
 		{

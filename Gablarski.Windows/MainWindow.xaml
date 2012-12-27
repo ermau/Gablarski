@@ -1,8 +1,85 @@
 ﻿<Window x:Class="Gablarski.Windows.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="500" Width="250">
-    <Grid>
-        
-    </Grid>
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:ViewModels="clr-namespace:Gablarski.ViewModels" xmlns:System="clr-namespace:System;assembly=mscorlib"
+		xmlns:Social="clr-namespace:Tempest.Social;assembly=Tempest.Social"
+		xmlns:ComponentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+		mc:Ignorable="d"
+		Title="Gablarski" Height="500" Width="250" d:DataContext="{d:DesignInstance ViewModels:MainWindowViewModel}">
+	<Window.Resources>
+		<CollectionViewSource x:Key="BuddiesByStatus" Source="{Binding BuddyList.Buddies}">
+			<CollectionViewSource.SortDescriptions>
+				<ComponentModel:SortDescription PropertyName="Status" Direction="Descending" />
+			</CollectionViewSource.SortDescriptions>
+		</CollectionViewSource>
+	</Window.Resources>
+	<DockPanel>
+		<StackPanel DockPanel.Dock="Top">
+			<Grid Margin="3">
+				<Grid.RowDefinitions>
+					<RowDefinition />
+					<RowDefinition />
+				</Grid.RowDefinitions>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="40" />
+					<ColumnDefinition />
+				</Grid.ColumnDefinitions>
+
+				<Image Grid.RowSpan="2" Grid.Column="0" Source="{Binding Persona.Avatar}" Height="32" Width="32">
+					<Image.Style>
+						<Style TargetType="Image">
+							<Setter Property="Source" Value="{Binding Persona.Avatar}" />
+							<Style.Triggers>
+								<DataTrigger Binding="{Binding Persona.Avatar}" Value="{x:Null}">
+									<Setter Property="Source" Value="../Resources/user.png" />
+								</DataTrigger>
+							</Style.Triggers>
+						</Style>
+					</Image.Style>
+				</Image>
+
+				<TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding Persona.Nickname}" />
+				
+				<StackPanel Grid.Column="1" Grid.Row="0" Orientation="Horizontal" Visibility="Collapsed">
+					<TextBox x:Name="nickname" Width="100" Text="{Binding Persona.Nickname, Mode=TwoWay, UpdateSourceTrigger=Explicit}" />
+					<Button IsDefault="True" Click="OnClickAcceptName" />
+				</StackPanel>
+				
+				<ComboBox Grid.Column="1" Grid.Row="1" SelectedValue="{Binding Persona.Status, Mode=TwoWay}">
+					<ComboBox.Resources>
+						<ObjectDataProvider x:Key="Status" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
+							<ObjectDataProvider.MethodParameters>
+								<x:Type TypeName="Social:Status" />
+							</ObjectDataProvider.MethodParameters>
+						</ObjectDataProvider>
+					</ComboBox.Resources>
+					<ComboBox.ItemsSource>
+						<Binding Source="{StaticResource Status}" />
+					</ComboBox.ItemsSource>
+				</ComboBox>
+			</Grid>
+		</StackPanel>
+		<ListBox x:Name="buddies" ItemsSource="{Binding Source={StaticResource BuddiesByStatus}}"
+				 d:DataContext="{d:DesignInstance Social:Person}">
+			<ListBox.Resources>
+				<Style x:Key="NameStyle" TargetType="TextBlock">
+					<Setter Property="FontStyle" Value="Normal" />
+					<Style.Triggers>
+						<DataTrigger Binding="{Binding Status}" Value="{x:Static Social:Status.Away}">
+							<Setter Property="FontStyle" Value="Italic" />
+						</DataTrigger>
+						<DataTrigger Binding="{Binding Status}" Value="{x:Static Social:Status.Offline}">
+							<Setter Property="Foreground" Value="LightGray" />
+						</DataTrigger>
+					</Style.Triggers>
+				</Style>
+			</ListBox.Resources>
+			<ListBox.ItemTemplate>
+				<DataTemplate>
+					<TextBlock Text="{Binding Nickname}" Style="{StaticResource NameStyle}" />
+				</DataTemplate>
+			</ListBox.ItemTemplate>
+		</ListBox>
+	</DockPanel>
 </Window>

@@ -17,7 +17,7 @@
 using System;
 using System.ComponentModel;
 
-namespace Gablarski.Windows.Annotations
+namespace Gablarski.Annotations
 {
   /// <summary>
   /// Indicates that marked element should be localized or not.
