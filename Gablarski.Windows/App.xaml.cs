@@ -70,7 +70,7 @@ namespace Gablarski.Windows
 			IAsymmetricKey key = GetKey (Path.Combine (gb, "client.key"));
 
 			Client = new GablarskiClient (key);
-			Client.ConnectSocialAsync (new IPEndPoint (IPAddress.Loopback, SocialProtocol.DefaultPort))
+			Client.ConnectSocialAsync (new Target (Target.LoopbackIP, SocialProtocol.DefaultPort))
 				.ContinueWith (t =>
 				{
 					Client.BuddyList.Add (Client.Persona);

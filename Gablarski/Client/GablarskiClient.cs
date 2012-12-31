@@ -80,7 +80,7 @@ namespace Gablarski.Client
 			}
 			else
 			{
-				this.client.ConnectAsync (e.EndPoint);
+				this.client.ConnectAsync (e.Target);
 			}
 		}
 
@@ -111,7 +111,7 @@ namespace Gablarski.Client
 		/// </summary>
 		/// <param name="socialServer">The location of the social server.</param>
 		/// <returns>The connection result.</returns>
-		public Task<ClientConnectionResult> ConnectSocialAsync (EndPoint socialServer)
+		public Task<ClientConnectionResult> ConnectSocialAsync (Target socialServer)
 		{
 			return this.social.ConnectAsync (socialServer);
 		}
