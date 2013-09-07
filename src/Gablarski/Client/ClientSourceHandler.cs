@@ -106,7 +106,7 @@ namespace Gablarski.Client
 			lock (sequences)
 				sequences[source] = 0;
 
-			this.context.Connection.Send (new ClientAudioSourceStateChangeMessage { Starting = true, SourceId = source.Id });
+			this.context.Connection.SendAsync (new ClientAudioSourceStateChangeMessage { Starting = true, SourceId = source.Id });
 
 			OnAudioSourceStarted (new AudioSourceEventArgs (source));
 		}
@@ -140,7 +140,7 @@ namespace Gablarski.Client
 				sequences[source] = sequence;
 			}
 
-			this.context.Connection.Send (new ClientAudioDataMessage
+			this.context.Connection.SendAsync (new ClientAudioDataMessage
 			{
 				Sequence = sequence,
 				TargetType = targetType,
@@ -157,7 +157,7 @@ namespace Gablarski.Client
 			if (source.OwnerId != this.context.CurrentUser.UserId)
 				throw new ArgumentException ("Can not send audio from a source you don't own", "source");
 
-			this.context.Connection.Send (new ClientAudioSourceStateChangeMessage { Starting = false, SourceId = source.Id });
+			this.context.Connection.SendAsync (new ClientAudioSourceStateChangeMessage { Starting = false, SourceId = source.Id });
 
 			OnAudioSourceStopped (new AudioSourceEventArgs (source));
 		}
@@ -167,7 +167,7 @@ namespace Gablarski.Client
 			if (source == null)
 				throw new ArgumentNullException ("source");
 
-			context.Connection.Send (new RequestMuteSourceMessage (source, !source.IsMuted));
+			this.context.Connection.SendAsync (new RequestMuteSourceMessage (source, !source.IsMuted));
 		}
 
 		/// <summary>
@@ -181,7 +181,7 @@ namespace Gablarski.Client
 		/// </remarks>
 		public void Request (string name, AudioFormat format, short frameSize, int targetBitrate)
 		{
-			this.context.Connection.Send (new RequestSourceMessage (name, new AudioCodecArgs (format, targetBitrate, frameSize, 10)));
+			this.context.Connection.SendAsync (new RequestSourceMessage (name, new AudioCodecArgs (format, targetBitrate, frameSize, 10)));
 		}
 
 		public AudioSource CreateFake (string name, AudioFormat format, short frameSize)

@@ -1,4 +1,4 @@
-// Copyright (c) 2011, Eric Maupin
+// Copyright (c) 2011-2013, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -46,7 +46,7 @@ using Timer = System.Threading.Timer;
 namespace Gablarski.Server
 {
 	public class GablarskiServer
-		: ServerBase, IGablarskiServerContext
+		: TempestServer, IGablarskiServerContext
 	{
 		/// <summary>
 		/// Initializes a new <c>GablarskiServer</c> instance.
@@ -129,6 +129,7 @@ namespace Gablarski.Server
 
 		private readonly ServerSettings settings;
 
+		private readonly List<IConnection> connections = new List<IConnection>();
 		private readonly List<IRedirector> redirectors = new List<IRedirector>();
 
 		private readonly IGablarskiServerContext context;
@@ -178,11 +179,15 @@ namespace Gablarski.Server
 
 		IEnumerable<IConnection>  IGablarskiServerContext.Connections
 		{
-			get { lock (this.connections) return this.connections.Keys.ToList(); }
+			get
+			{
+				lock (this.syncRoot)
+					return this.connections.ToArray();
+			}
 		}
 
 		protected GablarskiServer (ServerSettings serverSettings)
-			: base (MessageTypes.Reliable)
+			: base (MessageTypes.All)
 		{
 			Log = LogManager.GetLogger (serverSettings.Name.Remove (" "));
 
@@ -203,14 +208,27 @@ namespace Gablarski.Server
 			var channelHandler = new ServerChannelHandler (this);
 			this.channels = channelHandler;
 			
-			//RegisterMessageHandler<QueryServerMessage> (ClientQueryServer);
+			//RegisterConnectionlessMessageHandler(GablarskiProtocol.Instance, (ushort)GablarskiMessageType.QueryServer, ClientQueryServer);
 		}
 
 		private void OnPermissionsChanged (object sender, PermissionsChangedEventArgs e)
 		{
 			IUserInfo user = this.users[e.UserId];
 			if (user != null)
-				this.userManager.GetConnection (user).Send (new PermissionsMessage (e.UserId, this.context.PermissionsProvider.GetPermissions (e.UserId)));
+				this.userManager.GetConnection (user).SendAsync (new PermissionsMessage (e.UserId, this.context.PermissionsProvider.GetPermissions (e.UserId)));
+		}
+
+		protected override void OnConnectionDisconnected (object sender, DisconnectedEventArgs e)
+		{
+			Log.Debug ("Client disconnected");
+
+			IUserInfo user = this.userManager.GetUser (e.Connection);
+			if (user != null) {
+				this.sources.Remove (user);
+				this.users.DisconnectAsync (user, DisconnectionReason.Unknown);
+			}
+
+			base.OnConnectionDisconnected (sender, e);
 		}
 
 		protected override void OnConnectionDisconnectedGlobal (object sender, DisconnectedEventArgs e)
@@ -221,14 +239,25 @@ namespace Gablarski.Server
 			if (user != null)
 			{
 				this.sources.Remove (user);
-				this.users.Disconnect (user, DisconnectionReason.Unknown); // TODO reason convert
+				this.users.DisconnectAsync (user, DisconnectionReason.Unknown); // TODO reason convert
 			}
 
-			base.OnConnectionDisconnectedGlobal(sender, e);
+			base.OnConnectionDisconnectedGlobal (sender, e);
+		}
+
+		protected override void OnConnectionMade (object sender, ConnectionMadeEventArgs e)
+		{
+			lock (this.syncRoot)
+				this.connections.Add (e.Connection);
+
+			base.OnConnectionMade (sender, e);
 		}
 
 		protected override void OnConnectionMadeGlobal(object sender, ConnectionMadeEventArgs e)
 		{
+			lock (this.syncRoot)
+				this.connections.Add (e.Connection);
+
 			// TODO
 			//foreach (BanInfo ban in this.authProvider.GetBans().Where (b => b.IPMask != null))
 			//{
@@ -255,37 +284,36 @@ namespace Gablarski.Server
 			return new ServerInfo (this.settings, ((IGablarskiServerContext)this).UserProvider);
 		}
 
-		//private void ClientQueryServer (MessageReceivedEventArgs e)
+		//private void ClientQueryServer (ConnectionlessMessageEventArgs e)
 		//{
-		//    var msg = (QueryServerMessage)e.Message;
-		//    var connectionless = (e as ConnectionlessMessageReceivedEventArgs);
+		//	var msg = (QueryServerMessage)e.Message;
 			
-		//    if (!msg.ServerInfoOnly && !context.GetPermission (PermissionName.RequestChannelList, e.Connection))
-		//    {
-		//        var denied = new PermissionDeniedMessage (ClientMessageType.QueryServer);
+		//	if (!msg.ServerInfoOnly && !context.GetPermission (PermissionName.RequestChannelList, e.Connection))
+		//	{
+		//		var denied = new PermissionDeniedMessage (ClientMessageType.QueryServer);
 
-		//        if (connectionless != null)
-		//            connectionless.Provider.SendConnectionlessMessage (denied, connectionless.EndPoint);
-		//        else
-		//            e.Connection.Send (denied);
+		//		if (connectionless != null)
+		//			connectionless.Provider.SendConnectionlessMessage (denied, connectionless.EndPoint);
+		//		else
+		//			e.Connection.Send (denied);
 
-		//        return;
-		//    }
+		//		return;
+		//	}
 
-		//    var result = new QueryServerResultMessage();
+		//	var result = new QueryServerResultMessage();
 
-		//    if (!msg.ServerInfoOnly)
-		//    {
-		//        result.Channels = this.context.ChannelsProvider.GetChannels();
-		//        result.Users = this.users.ToList();
-		//    }
+		//	if (!msg.ServerInfoOnly)
+		//	{
+		//		result.Channels = this.context.ChannelsProvider.GetChannels();
+		//		result.Users = this.users.ToList();
+		//	}
 
-		//    result.ServerInfo = GetServerInfo();
+		//	result.ServerInfo = GetServerInfo();
 
-		//    if (connectionless == null)
-		//        e.Connection.Send (result);
-		//    else
-		//        connectionless.Provider.SendConnectionlessMessage (result, connectionless.EndPoint);
+		//	if (connectionless == null)
+		//		e.Connection.Send (result);
+		//	else
+		//		connectionless.Provider.SendConnectionlessMessage (result, connectionless.EndPoint);
 		//}
 	}
 }

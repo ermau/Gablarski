@@ -1,4 +1,4 @@
-// Copyright (c) 2011, Eric Maupin
+// Copyright (c) 2011-2013, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -38,6 +38,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using Cadenza;
 using Gablarski.Messages;
 using log4net;
@@ -105,36 +106,39 @@ namespace Gablarski.Server
 				this.approvals.Add (user);
 		}
 
-		public void Disconnect (IConnection connection)
+		public async Task DisconnectAsync (IConnection connection)
 		{
 			if (connection == null)
 				throw new ArgumentNullException ("connection");
 
-			if (connection.IsConnected)
-				Disconnect (ic => ic != connection);
-			else
-			{
-				IUserInfo user = Manager.GetUser (connection);
-				Manager.Disconnect (connection);
-
-				if (user != null)
-					context.Users.Send (new UserDisconnectedMessage (user.UserId));
+			if (connection.IsConnected) {
+				await DisconnectAsync (ic => ic != connection).ConfigureAwait (false);
+				return;
 			}
+
+			IUserInfo user = this.Manager.GetUser (connection);
+			this.Manager.Disconnect (connection);
+
+			if (user != null)
+				await this.context.Users.SendAsync (new UserDisconnectedMessage (user.UserId)).ConfigureAwait (false);
 		}
 
-		public void Disconnect (Func<IConnection, bool> predicate)
+		public async Task DisconnectAsync (Func<IConnection, bool> predicate)
 		{
 			if (predicate == null)
 				throw new ArgumentNullException ("predicate");
 
+			List<Task> tasks = new List<Task>();
 			foreach (IConnection c in Manager.GetConnections().Where (predicate))
 			{
 				IUserInfo user = Manager.GetUser (c);
 				if (user != null)
-					context.Users.Send (new UserDisconnectedMessage (user.UserId));
+					tasks.Add (context.Users.SendAsync (new UserDisconnectedMessage (user.UserId)));
 
-				c.Disconnect();
+				tasks.Add (c.DisconnectAsync());
 			}
+
+			await Task.WhenAll (tasks).ConfigureAwait (false);
 
 			Manager.Disconnect (predicate);
 		}
@@ -165,7 +169,7 @@ namespace Gablarski.Server
 				return;
 
 			Manager.Move (realUser, realChannel);
-			this.Send (new UserChangedChannelMessage { ChangeInfo = changeInfo });
+			this.SendAsync (new UserChangedChannelMessage { ChangeInfo = changeInfo });
 		}
 
 		public void Move (IConnection mover, IUserInfo user, IChannelInfo channel)
@@ -183,18 +187,21 @@ namespace Gablarski.Server
 			MoveUser (moverId, user.UserId, channel.ChannelId);
 		}
 
-		public void Send (Message message, Func<IConnection, bool> predicate)
+		public Task SendAsync (Message message, Func<IConnection, bool> predicate)
 		{
 			if (message == null)
 				throw new ArgumentNullException ("message");
 			if (predicate == null)
 				throw new ArgumentNullException ("predicate");
 
+			List<Task> tasks = new List<Task>();
 			foreach (IConnection c in Manager.GetConnections().Where (c => c.IsConnected).Where (predicate))
-				c.Send (message);
+				tasks.Add (c.SendAsync (message));
+
+		    return Task.WhenAll (tasks);
 		}
 
-		public void Send (Message message, Func<IConnection, IUserInfo, bool> predicate)
+		public Task SendAsync (Message message, Func<IConnection, IUserInfo, bool> predicate)
 		{
 			if (message == null)
 				throw new ArgumentNullException ("message");
@@ -206,11 +213,10 @@ namespace Gablarski.Server
 			                  where c.IsConnected && u != null && predicate (c, u)
 			                  select c;
 
-			foreach (IConnection c in connections)
-				c.Send (message);
+			return Task.WhenAll (connections.Select (c => c.SendAsync (message)));
 		}
 
-		public void Disconnect (IUserInfo user, DisconnectionReason reason)
+		public async Task DisconnectAsync (IUserInfo user, DisconnectionReason reason)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
@@ -219,10 +225,10 @@ namespace Gablarski.Server
 			if (c == null || !c.IsConnected)
 				return;
 
-			c.Send (new DisconnectMessage (reason));
-			c.DisconnectAsync();
+			await c.SendAsync (new DisconnectMessage (reason)).ConfigureAwait (false);
+			await c.DisconnectAsync().ConfigureAwait (false);
 
-			Send (new UserDisconnectedMessage (user.UserId), ic => ic != c);
+			await SendAsync (new UserDisconnectedMessage (user.UserId), ic => ic != c).ConfigureAwait (false);
 		}
 
 		#region IEnumerable<UserInfo> Members
@@ -262,7 +268,7 @@ namespace Gablarski.Server
 					if (redirect == null)
 						continue;
 					
-					e.Connection.Send (new RedirectMessage { Host = redirect.Address.ToString(), Port = redirect.Port });
+					e.Connection.SendAsync (new RedirectMessage { Host = redirect.Address.ToString(), Port = redirect.Port });
 					return;
 				}
 			}
@@ -281,13 +287,13 @@ namespace Gablarski.Server
 
 			if (join.Nickname.IsNullOrWhitespace ())
 			{
-				e.Connection.Send (new JoinResultMessage (LoginResultState.FailedInvalidNickname, null));
+				e.Connection.SendAsync (new JoinResultMessage (LoginResultState.FailedInvalidNickname, null));
 				return;
 			}
 
 			if (!String.IsNullOrEmpty (this.context.Settings.ServerPassword) && join.ServerPassword != this.context.Settings.ServerPassword)
 			{
-				e.Connection.Send (new JoinResultMessage (LoginResultState.FailedServerPassword, null));
+				e.Connection.SendAsync (new JoinResultMessage (LoginResultState.FailedServerPassword, null));
 				return;
 			}
 
@@ -308,17 +314,17 @@ namespace Gablarski.Server
 			if (result == LoginResultState.Success)
 			{
 				Manager.Join (e.Connection, info);
-				e.Connection.Send (msg);
+				e.Connection.SendAsync (msg);
 
 				if (!Manager.GetIsLoggedIn (e.Connection))
-					e.Connection.Send (new PermissionsMessage (info.UserId, this.context.PermissionsProvider.GetPermissions (info.UserId)));
+					e.Connection.SendAsync (new PermissionsMessage (info.UserId, this.context.PermissionsProvider.GetPermissions (info.UserId)));
 
-				this.Send (new UserJoinedMessage (info));
+				this.SendAsync (new UserJoinedMessage (info));
 
 				//SendInfoMessages (e.Connection);
 			}
 			else
-				e.Connection.Send (msg);
+				e.Connection.SendAsync (msg);
 		}
 
 		internal void OnLoginMessage (MessageEventArgs<LoginMessage> e)
@@ -327,18 +333,18 @@ namespace Gablarski.Server
 
 			if (login.Username.IsNullOrWhitespace())
 			{
-				e.Connection.Send (new LoginResultMessage (new LoginResult (0, LoginResultState.FailedUsername)));
+				e.Connection.SendAsync (new LoginResultMessage (new LoginResult (0, LoginResultState.FailedUsername)));
 				return;
 			}
 
 			LoginResult result = this.context.UserProvider.Login (login.Username, login.Password);
 
-			e.Connection.Send (new LoginResultMessage (result));
+			e.Connection.SendAsync (new LoginResultMessage (result));
 
 			if (result.Succeeded)
 			{
 				Manager.Login (e.Connection, new UserInfo (login.Username, result.UserId, this.context.ChannelsProvider.DefaultChannel.ChannelId, false));
-				e.Connection.Send (new PermissionsMessage (result.UserId, this.context.PermissionsProvider.GetPermissions (result.UserId)));
+				e.Connection.SendAsync (new PermissionsMessage (result.UserId, this.context.PermissionsProvider.GetPermissions (result.UserId)));
 			}
 			
 			this.log.DebugFormat ("{0} Login: {1}", login.Username, result.ResultState);
@@ -352,21 +358,21 @@ namespace Gablarski.Server
 			{
 				if (!context.GetPermission (PermissionName.RequestChannelList))
 				{
-					e.Connection.Send (new PermissionDeniedMessage (GablarskiMessageType.RequestUserList));
+					e.Connection.SendAsync (new PermissionDeniedMessage (GablarskiMessageType.RequestUserList));
 					return;
 				}
 
-				e.Connection.Send (new UserInfoListMessage (this));
+				e.Connection.SendAsync (new UserInfoListMessage (this));
 			}
 			else
 			{
 				if (!context.GetPermission (PermissionName.RequestFullUserList))
 				{
-					e.Connection.Send (new PermissionDeniedMessage (GablarskiMessageType.RequestUserList));
+					e.Connection.SendAsync (new PermissionDeniedMessage (GablarskiMessageType.RequestUserList));
 					return;
 				}
 
-				e.Connection.Send (new UserListMessage (context.UserProvider.GetUsers()));
+				e.Connection.SendAsync (new UserListMessage (context.UserProvider.GetUsers()));
 			}
 		}
 
@@ -385,7 +391,7 @@ namespace Gablarski.Server
 
 			if (!context.GetPermission (PermissionName.MuteUser, e.Connection))
 			{
-				e.Connection.Send (new PermissionDeniedMessage (GablarskiMessageType.RequestMuteUser));
+				e.Connection.SendAsync (new PermissionDeniedMessage (GablarskiMessageType.RequestMuteUser));
 				return;
 			}
 
@@ -398,7 +404,7 @@ namespace Gablarski.Server
 			else
 				return;
 
-			this.Send (new UserMutedMessage { UserId = user.UserId, Unmuted = msg.Unmute });
+			this.SendAsync (new UserMutedMessage { UserId = user.UserId, Unmuted = msg.Unmute });
 		}
 
 		internal void OnKickUserMessage (MessageEventArgs<KickUserMessage> e)
@@ -411,7 +417,7 @@ namespace Gablarski.Server
 
 			if (msg.FromServer && !context.GetPermission (PermissionName.KickPlayerFromServer, e.Connection))
 			{
-				e.Connection.Send (new PermissionDeniedMessage (GablarskiMessageType.KickUser));
+				e.Connection.SendAsync (new PermissionDeniedMessage (GablarskiMessageType.KickUser));
 				return;
 			}
 
@@ -421,14 +427,14 @@ namespace Gablarski.Server
 
 			if (!msg.FromServer && !context.GetPermission (PermissionName.KickPlayerFromChannel, user.CurrentChannelId, kicker.UserId))
 			{
-				e.Connection.Send (new PermissionDeniedMessage (GablarskiMessageType.KickUser));
+				e.Connection.SendAsync (new PermissionDeniedMessage (GablarskiMessageType.KickUser));
 				return;
 			}
 
-			context.Users.Send (new UserKickedMessage { FromServer = msg.FromServer, UserId = msg.UserId });
+			context.Users.SendAsync (new UserKickedMessage { FromServer = msg.FromServer, UserId = msg.UserId });
 
 			if (msg.FromServer)
-				Disconnect (user, DisconnectionReason.Kicked);
+				DisconnectAsync (user, DisconnectionReason.Kicked);
 			else
 				context.Users.Move (user, context.ChannelsProvider.DefaultChannel);
 		}
@@ -443,7 +449,7 @@ namespace Gablarski.Server
 
 			user = Manager.SetComment (user, msg.Comment);
 
-			this.Send (new UserUpdatedMessage (user));
+			this.SendAsync (new UserUpdatedMessage (user));
 		}
 
 		internal void OnSetStatusMessage (MessageEventArgs<SetStatusMessage> e)
@@ -456,7 +462,7 @@ namespace Gablarski.Server
 
 			user = Manager.SetStatus (user, msg.Status);
 
-			this.Send (new UserUpdatedMessage (user));
+			this.SendAsync (new UserUpdatedMessage (user));
 		}
 
 		internal void OnRegistrationApprovalMessage (MessageEventArgs<RegistrationApprovalMessage> e)
@@ -468,7 +474,7 @@ namespace Gablarski.Server
 
 			if (!this.context.GetPermission (PermissionName.ApproveRegistrations, e.Connection))
 			{
-				e.Connection.Send (new PermissionDeniedMessage (GablarskiMessageType.RegistrationApproval));
+				e.Connection.SendAsync (new PermissionDeniedMessage (GablarskiMessageType.RegistrationApproval));
 				return;
 			}
 
@@ -494,7 +500,7 @@ namespace Gablarski.Server
 			
 			if (!this.context.UserProvider.UpdateSupported)
 			{
-				e.Connection.Send (new RegisterResultMessage { Result = RegisterResult.FailedUnsupported });
+				e.Connection.SendAsync (new RegisterResultMessage { Result = RegisterResult.FailedUnsupported });
 				return;
 			}
 
@@ -511,7 +517,7 @@ namespace Gablarski.Server
 
 					if (!this.approvals.Remove (user))
 					{
-						e.Connection.Send (new RegisterResultMessage { Result = RegisterResult.FailedNotApproved });
+						e.Connection.SendAsync (new RegisterResultMessage { Result = RegisterResult.FailedNotApproved });
 						return;
 					}
 
@@ -520,16 +526,16 @@ namespace Gablarski.Server
 				case UserRegistrationMode.Message:
 				case UserRegistrationMode.WebPage:
 				case UserRegistrationMode.None:
-					e.Connection.Send (new RegisterResultMessage { Result = RegisterResult.FailedUnsupported });
+					e.Connection.SendAsync (new RegisterResultMessage { Result = RegisterResult.FailedUnsupported });
 					return;
 
 				default:
-					e.Connection.Send (new RegisterResultMessage { Result = RegisterResult.FailedUnknown });
+					e.Connection.SendAsync (new RegisterResultMessage { Result = RegisterResult.FailedUnknown });
 					return;
 			}
 
 			var result = this.context.UserProvider.Register (msg.Username, msg.Password);
-			e.Connection.Send (new RegisterResultMessage { Result = result });
+			e.Connection.SendAsync (new RegisterResultMessage { Result = result });
 		}
 
 		internal void OnSetPermissionsMessage (MessageEventArgs<SetPermissionsMessage> e)
@@ -541,7 +547,7 @@ namespace Gablarski.Server
 
 			if (!context.GetPermission (PermissionName.ModifyPermissions, e.Connection))
 			{
-				e.Connection.Send (new PermissionDeniedMessage (GablarskiMessageType.SetPermissions));
+				e.Connection.SendAsync (new PermissionDeniedMessage (GablarskiMessageType.SetPermissions));
 				return;
 			}
 
@@ -557,7 +563,7 @@ namespace Gablarski.Server
 
 			IConnection c = Manager.GetConnection (target);
 			if (c != null)
-				c.Send (new PermissionsMessage (msg.UserId, context.PermissionsProvider.GetPermissions (msg.UserId)));
+				c.SendAsync (new PermissionsMessage (msg.UserId, context.PermissionsProvider.GetPermissions (msg.UserId)));
 		}
 
 		internal void OnBanUserMessage (MessageEventArgs<BanUserMessage> e)
@@ -569,7 +575,7 @@ namespace Gablarski.Server
 
 			if (!context.GetPermission (PermissionName.BanUser, e.Connection))
 			{
-				e.Connection.Send (new PermissionDeniedMessage (GablarskiMessageType.BanUser));
+				e.Connection.SendAsync (new PermissionDeniedMessage (GablarskiMessageType.BanUser));
 				return;
 			}
 
@@ -583,7 +589,7 @@ namespace Gablarski.Server
 		{
 			if (!Manager.GetIsConnected (connection))
 			{
-				connection.Send (new JoinResultMessage (LoginResultState.FailedNotConnected, null));
+				connection.SendAsync (new JoinResultMessage (LoginResultState.FailedNotConnected, null));
 				return null;
 			}
 
@@ -593,14 +599,14 @@ namespace Gablarski.Server
 			{
 				if (!this.context.Settings.AllowGuestLogins)
 				{
-					connection.Send (new JoinResultMessage (LoginResultState.FailedUsername, null));
+					connection.SendAsync (new JoinResultMessage (LoginResultState.FailedUsername, null));
 					return null;
 				}
 
 				LoginResult r = this.context.UserProvider.Login (join.Nickname, null);
 				if (!r.Succeeded)
 				{
-					connection.Send (new JoinResultMessage (r.ResultState, null));
+					connection.SendAsync (new JoinResultMessage (r.ResultState, null));
 					return null;
 				}
 
@@ -614,10 +620,10 @@ namespace Gablarski.Server
 
 		private void SendInfoMessages (IConnection connection)
 		{
-			connection.Send (new ServerInfoMessage { ServerInfo = new ServerInfo (context.Settings, context.UserProvider) });
-			connection.Send (new ChannelListMessage (this.context.ChannelsProvider.GetChannels(), this.context.ChannelsProvider.DefaultChannel));
-			connection.Send (new UserInfoListMessage (Manager));
-			connection.Send (new SourceListMessage (this.context.Sources));
+			connection.SendAsync (new ServerInfoMessage { ServerInfo = new ServerInfo (context.Settings, context.UserProvider) });
+			connection.SendAsync (new ChannelListMessage (this.context.ChannelsProvider.GetChannels(), this.context.ChannelsProvider.DefaultChannel));
+			connection.SendAsync (new UserInfoListMessage (Manager));
+			connection.SendAsync (new SourceListMessage (this.context.Sources));
 		}
 
 		/// <returns><c>true</c> if the nickname is now free, <c>false</c> otherwise.</returns>
@@ -663,7 +669,7 @@ namespace Gablarski.Server
 			if (channel == null)
 			{
 				if (requester != null)
-					requester.Send (new ChannelChangeResultMessage (ChannelChangeResult.FailedUnknownChannel, info));
+					requester.SendAsync (new ChannelChangeResultMessage (ChannelChangeResult.FailedUnknownChannel, info));
 
 				return;
 			}
@@ -673,7 +679,7 @@ namespace Gablarski.Server
 				if (!this.context.GetPermission (PermissionName.ChangePlayersChannel, channel.ChannelId, moverId))
 				{
 					if (requester != null)
-						requester.Send (new ChannelChangeResultMessage (ChannelChangeResult.FailedPermissions, info));
+						requester.SendAsync (new ChannelChangeResultMessage (ChannelChangeResult.FailedPermissions, info));
 
 					return;
 				}
@@ -681,7 +687,7 @@ namespace Gablarski.Server
 			else if (!this.context.GetPermission (PermissionName.ChangeChannel, channel.ChannelId, user.UserId))
 			{
 				if (requester != null)
-					requester.Send (new ChannelChangeResultMessage (ChannelChangeResult.FailedPermissions, info));
+					requester.SendAsync (new ChannelChangeResultMessage (ChannelChangeResult.FailedPermissions, info));
 
 				return;
 			}
@@ -689,13 +695,13 @@ namespace Gablarski.Server
 			if (channel.UserLimit != 0 && channel.UserLimit <= context.Users.Count (u => u.CurrentChannelId == channel.ChannelId))
 			{
 				if (requester != null)
-					requester.Send (new ChannelChangeResultMessage (ChannelChangeResult.FailedFull, info));
+					requester.SendAsync (new ChannelChangeResultMessage (ChannelChangeResult.FailedFull, info));
 
 				return;
 			}
 
 			Manager.Move (user, channel);
-			this.Send (new UserChangedChannelMessage { ChangeInfo = info });
+			this.SendAsync (new UserChangedChannelMessage { ChangeInfo = info });
 		}
 	}
 }

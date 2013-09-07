@@ -106,8 +106,8 @@ namespace Gablarski.Tests
 		[Test]
 		public void DisconnectNull()
 		{
-			Assert.Throws<ArgumentNullException> (() => handler.Disconnect ((IConnection)null));
-			Assert.Throws<ArgumentNullException> (() => handler.Disconnect ((Func<IConnection, bool>)null));
+			Assert.Throws<ArgumentNullException> (() => handler.DisconnectAsync ((IConnection)null));
+			Assert.Throws<ArgumentNullException> (() => handler.DisconnectAsync ((Func<IConnection, bool>)null));
 		}
 
 		[Test]
@@ -165,12 +165,12 @@ namespace Gablarski.Tests
 		}
 
 		[Test]
-		public void SendNull()
+		public void SendAsyncNull()
 		{
-			Assert.Throws<ArgumentNullException> (() => handler.Send (new ConnectMessage(), (Func<IConnection, bool>)null));
-			Assert.Throws<ArgumentNullException> (() => handler.Send (null, c => false));
-			Assert.Throws<ArgumentNullException> (() => handler.Send (new ConnectMessage(), (Func<IConnection, IUserInfo, bool>)null));
-			Assert.Throws<ArgumentNullException> (() => handler.Send (null, (c, u) => false));
+			Assert.Throws<ArgumentNullException> (() => handler.SendAsync (new ConnectMessage(), (Func<IConnection, bool>)null));
+			Assert.Throws<ArgumentNullException> (() => handler.SendAsync (null, c => false));
+			Assert.Throws<ArgumentNullException> (() => handler.SendAsync (new ConnectMessage(), (Func<IConnection, IUserInfo, bool>)null));
+			Assert.Throws<ArgumentNullException> (() => handler.SendAsync (null, (c, u) => false));
 		}
 
 		[Test]
@@ -179,7 +179,7 @@ namespace Gablarski.Tests
 			Connect();
 
 			var msg = new ConnectMessage { ProtocolVersion = 42 };
-			handler.Send (msg, cc => cc == server);
+			handler.SendAsync (msg, cc => cc == server);
 
 			client.DequeueAndAssertMessage<ConnectMessage>();
 		}
@@ -193,7 +193,7 @@ namespace Gablarski.Tests
 			var user = handler.Manager.First();
 
 			var msg = new ConnectMessage { ProtocolVersion = 42 };
-			handler.Send (msg, (cc, u) => cc == server && u == user);
+			handler.SendAsync (msg, (cc, u) => cc == server && u == user);
 
 			client.DequeueAndAssertMessage<ConnectMessage>();
 		}
@@ -215,7 +215,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void JoinNotConnectedLiterally()
 		{
-			server.Disconnect();
+			server.DisconnectAsync().Wait();
 
 			context.Settings.AllowGuestLogins = true;
 			
@@ -357,7 +357,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void SetCommentNotConnected()
 		{
-			server.Disconnect();
+			server.DisconnectAsync().Wait();
 
 			handler.OnSetCommentMessage (new MessageEventArgs<SetCommentMessage> (server,
 				new SetCommentMessage ("comment")));
@@ -413,7 +413,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void SetStatusNotConnected()
 		{
-			server.Disconnect();
+			server.DisconnectAsync().Wait();
 
 			handler.OnSetStatusMessage (new MessageEventArgs<SetStatusMessage> (server,
 				new SetStatusMessage (UserStatus.MutedMicrophone)));
@@ -562,7 +562,7 @@ namespace Gablarski.Tests
 
 			var cs = provider.GetConnections (GablarskiProtocol.Instance);
 			var c = new ConnectionBuffer (cs.Item1);
-			cs.Item2.Disconnect();
+			cs.Item2.DisconnectAsync().Wait();
 
 			handler.OnSetPermissionsMessage (new MessageEventArgs<SetPermissionsMessage> (c,
 				new SetPermissionsMessage (u, new Permission[0])));

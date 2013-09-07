@@ -13,9 +13,11 @@ using Gablarski.Clients.Media;
 using Gablarski.Clients.Persistence;
 using Gablarski.Clients.Windows.Properties;
 using Gablarski.Messages;
-using Gablarski.Network;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Microsoft.WindowsAPICodePack.Taskbar;
+using Tempest;
+using Tempest.Providers.Network;
+using DisconnectedEventArgs = Gablarski.Client.DisconnectedEventArgs;
 
 namespace Gablarski.Clients.Windows
 {
@@ -26,7 +28,7 @@ namespace Gablarski.Clients.Windows
 		{
 			this.Icon = Resources.Headphones;
 
-			this.gablarski = new GablarskiClient (new NetworkClientConnection());
+			this.gablarski = new GablarskiClient (new NetworkClientConnection(GablarskiProtocol.Instance));
 			this.gablarski.ConnectionRejected += this.GablarskiConnectionRejected;
 			this.gablarski.Connected += this.GablarskiConnected;
 			this.gablarski.Disconnected += this.GablarskiDisconnected;
@@ -148,7 +150,7 @@ namespace Gablarski.Clients.Windows
 			this.btnConnect.Text = "Cancel";
 			this.btnConnect.ToolTipText = "Cancel (Connecting)";
 
-			this.gablarski.Connect (host, port);
+			this.gablarski.ConnectAsync (new Target (host, port));
 		}
 
 		public void Connect (ServerEntry connectTo)
@@ -778,7 +780,7 @@ namespace Gablarski.Clients.Windows
 						break;
 				}
 
-				gablarski.Disconnect();
+				gablarski.DisconnectAsync();
 			}
 			else
 			{
@@ -828,7 +830,7 @@ namespace Gablarski.Clients.Windows
 
 				Action<Form, string> d = (f, m) => MessageBox.Show (f, m, "Joining", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				BeginInvoke (d, this, "Join failed: " + reason);
-				gablarski.Disconnect();
+				gablarski.DisconnectAsync();
 			}
 			else
 			{
@@ -978,7 +980,7 @@ namespace Gablarski.Clients.Windows
 
 				if (input.ShowDialogOnFormThread (this) != DialogResult.OK)
 				{
-					this.gablarski.Disconnect();
+					this.gablarski.DisconnectAsync();
 					return;
 				}
 
@@ -1007,7 +1009,7 @@ namespace Gablarski.Clients.Windows
 
 			if (input.ShowDialogOnFormThread (this) != DialogResult.OK)
 			{
-				this.gablarski.Disconnect();
+				this.gablarski.DisconnectAsync();
 				return null;
 			}
 
@@ -1068,7 +1070,7 @@ namespace Gablarski.Clients.Windows
 			if (this.notifications != null)
 				this.notifications.Close ();
 
-			this.gablarski.Disconnect();
+			this.gablarski.DisconnectAsync();
 			LocalServer.Shutdown();
 		}
 
@@ -1077,7 +1079,7 @@ namespace Gablarski.Clients.Windows
 			if (this.gablarski.IsConnected || this.gablarski.IsConnecting)
 			{
 				this.reconnecting = false;
-				this.gablarski.Disconnect();
+				this.gablarski.DisconnectAsync();
 				LocalServer.Shutdown();
 			}
 			

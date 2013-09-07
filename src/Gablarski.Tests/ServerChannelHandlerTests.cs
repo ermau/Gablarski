@@ -81,7 +81,8 @@ namespace Gablarski.Tests
 			user = UserInfoTests.GetTestUser (1, 1, false);
 
 			provider = new MockConnectionProvider (GablarskiProtocol.Instance);
-			provider.Start (MessageTypes.All);
+			mcontext.AddConnectionProvider (provider);
+			mcontext.Start();
 
 			var connections = provider.GetConnections (GablarskiProtocol.Instance);
 			client = new ConnectionBuffer (connections.Item1);
@@ -101,7 +102,7 @@ namespace Gablarski.Tests
 		public void RequestChannelListMessageNotConnected()
 		{
 			var c = provider.GetServerConnection();
-			c.Disconnect();
+			c.DisconnectAsync().Wait();
 			
 			handler.RequestChanneListMessage (new MessageEventArgs<RequestChannelListMessage> (c,
 				new RequestChannelListMessage()));

@@ -55,7 +55,7 @@ namespace Gablarski.Tests
 		{
 			ConnectionBuffer connection = Connect();
 
-			connection.Send (new LoginMessage { Username = username, Password = password });
+			connection.SendAsync (new LoginMessage { Username = username, Password = password });
 			var loginResultMessage = connection.DequeueAndAssertMessage<LoginResultMessage>();
 			Assert.IsTrue (loginResultMessage.Result.Succeeded);
 
@@ -67,7 +67,7 @@ namespace Gablarski.Tests
 		private ConnectionBuffer Connect()
 		{
 			var connection = new ConnectionBuffer (provider.GetClientConnection());
-			connection.Send (new ConnectMessage { ProtocolVersion = GablarskiProtocol.Instance.Version, Host = "test", Port = 42912 });
+			connection.SendAsync (new ConnectMessage { ProtocolVersion = GablarskiProtocol.Instance.Version, Host = "test", Port = 42912 });
 			connection.DequeueAndAssertMessage<ServerInfoMessage>();
 			connection.DequeueAndAssertMessage<ChannelListMessage>();
 			connection.DequeueAndAssertMessage<UserInfoListMessage>();
@@ -82,7 +82,7 @@ namespace Gablarski.Tests
 
 		private IUserInfo Join (bool loggedIn, ConnectionBuffer connection, string nickname, string serverPassword)
 		{
-			connection.Send (new JoinMessage (nickname, serverPassword));
+			connection.SendAsync (new JoinMessage (nickname, serverPassword));
 
 			var joinResultMessage = connection.DequeueAndAssertMessage<JoinResultMessage>();
 			Assert.AreEqual (LoginResultState.Success, joinResultMessage.Result);
@@ -130,7 +130,7 @@ namespace Gablarski.Tests
 		public void OldVersionReject ()
 		{
 			var connection = new ConnectionBuffer (provider.GetClientConnection());
-			connection.Send (new ConnectMessage { ProtocolVersion = 0 });
+			connection.SendAsync (new ConnectMessage { ProtocolVersion = 0 });
 
 			Message message = connection.DequeueMessage ();
 			Assert.IsInstanceOf<ConnectionRejectedMessage> (message);
@@ -143,7 +143,7 @@ namespace Gablarski.Tests
 		public void ServerInfo()
 		{
 			var connection =new ConnectionBuffer (provider.GetClientConnection());
-			connection.Send (new ConnectMessage { ProtocolVersion = GablarskiProtocol.Instance.Version });
+			connection.SendAsync (new ConnectMessage { ProtocolVersion = GablarskiProtocol.Instance.Version });
 
 			var msg = connection.DequeueAndAssertMessage<ServerInfoMessage>();
 			Assert.AreEqual (this.settings.Name, msg.ServerInfo.Name);
@@ -157,7 +157,7 @@ namespace Gablarski.Tests
 			server.AddRedirector (new MockRedirector ("monkeys.com", new IPEndPoint (IPAddress.Any, 6113)));
 			
 			var connection = new ConnectionBuffer (provider.GetClientConnection());
-			connection.Send (new ConnectMessage { ProtocolVersion = GablarskiProtocol.Instance.Version,
+			connection.SendAsync (new ConnectMessage { ProtocolVersion = GablarskiProtocol.Instance.Version,
 				Host = "monkeys.com", Port = 42912 });
 				
 			var msg = connection.DequeueAndAssertMessage<RedirectMessage>();
@@ -171,7 +171,7 @@ namespace Gablarski.Tests
 			server.AddRedirector (new MockRedirector ("monkeys.com", new IPEndPoint (IPAddress.Any, 6113)));
 			
 			var connection = new ConnectionBuffer (provider.GetClientConnection());
-			connection.Send (new ConnectMessage { ProtocolVersion = GablarskiProtocol.Instance.Version,
+			connection.SendAsync (new ConnectMessage { ProtocolVersion = GablarskiProtocol.Instance.Version,
 				Host = "monkeys2.com", Port = 42912 });
 
 			var msg = connection.DequeueAndAssertMessage<ServerInfoMessage>();
@@ -184,7 +184,7 @@ namespace Gablarski.Tests
 		public void RequestChannelList ()
 		{
 			var connection = Connect();
-			connection.Send (new RequestChannelListMessage ());
+			connection.SendAsync (new RequestChannelListMessage ());
 
 			Message message = connection.DequeueMessage ();
 			Assert.IsInstanceOf<ChannelListMessage> (message);
@@ -192,14 +192,14 @@ namespace Gablarski.Tests
 
 			Assert.AreEqual (GenericResult.Success, list.Result);
 			Assert.IsNotNull (list.Channels);
-			Assert.IsTrue (list.Channels.Count () > 0);
+			CollectionAssert.IsNotEmpty (list.Channels);
 		}
 
 		[Test]
 		public void BadNickname ()
 		{
 			var connection = Connect();
-			connection.Send (new JoinMessage { Nickname = String.Empty });
+			connection.SendAsync (new JoinMessage { Nickname = String.Empty });
 
 			var join = connection.DequeueAndAssertMessage<JoinResultMessage>();
 
@@ -213,7 +213,7 @@ namespace Gablarski.Tests
 			Join (true, c, Nickname);
 
 			var connection = Connect();
-			connection.Send (new JoinMessage (Nickname, null));
+			connection.SendAsync (new JoinMessage (Nickname, null));
 
 			var join = connection.DequeueAndAssertMessage<JoinResultMessage>();
 			Assert.AreEqual (LoginResultState.FailedNicknameInUse, join.Result);
@@ -243,7 +243,7 @@ namespace Gablarski.Tests
 			this.server.Settings.ServerPassword = "foo";
 
 			var connection = new ConnectionBuffer (provider.GetClientConnection());;
-			connection.Send (new JoinMessage (Nickname, null));
+			connection.SendAsync (new JoinMessage (Nickname, null));
 
 			var join = connection.DequeueAndAssertMessage<JoinResultMessage>();
 			Assert.AreEqual (LoginResultState.FailedServerPassword, join.Result);
@@ -255,7 +255,7 @@ namespace Gablarski.Tests
 			this.server.Settings.ServerPassword = "foo";
 
 			var c = Login (Username, Password);
-			c.Send (new JoinMessage (Nickname, null));
+			c.SendAsync (new JoinMessage (Nickname, null));
 
 			var join = c.DequeueAndAssertMessage<JoinResultMessage>();
 			Assert.AreEqual (LoginResultState.FailedServerPassword, join.Result);
@@ -269,7 +269,7 @@ namespace Gablarski.Tests
 
 			var barc = Login (Username2, Password2);
 
-			fooc.Disconnect();
+			fooc.DisconnectAsync().Wait();
 
 			barc.DequeueAndAssertMessage<SourcesRemovedMessage>();
 
@@ -284,7 +284,7 @@ namespace Gablarski.Tests
 			var u = Join (false, c, Nickname);
 
 			var args = AudioCodecArgsTests.GetTestArgs();
-			c.Send (new RequestSourceMessage ("source", args));
+			c.SendAsync (new RequestSourceMessage ("source", args));
 
 			var msg = c.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.Succeeded, msg.SourceResult);
@@ -315,10 +315,10 @@ namespace Gablarski.Tests
 		    var c = Connect();
 		    var u = Join (false, c, Nickname);
 
-		    c.Send (new RequestSourceMessage ("source", AudioCodecArgsTests.GetTestArgs()));
+		    c.SendAsync (new RequestSourceMessage ("source", AudioCodecArgsTests.GetTestArgs()));
 		    c.DequeueAndAssertMessage<SourceResultMessage>();
 
-		    c.Send (new ClientAudioSourceStateChangeMessage { Starting = true, SourceId = 1 });
+		    c.SendAsync (new ClientAudioSourceStateChangeMessage { Starting = true, SourceId = 1 });
 
 		    //var msg = c.Client.DequeueAndAssertMessage<AudioSourceStateChangeMessage>();
 		    //Assert.AreEqual (true, msg.Starting);

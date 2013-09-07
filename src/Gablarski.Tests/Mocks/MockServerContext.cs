@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, Eric Maupin
+﻿// Copyright (c) 2012-2013, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -43,7 +43,7 @@ using Tempest;
 namespace Gablarski.Tests.Mocks
 {
 	public class MockServerContext
-		: ServerBase, IGablarskiServerContext
+		: TempestServer, IGablarskiServerContext
 	{
 		public MockServerContext()
 			: base (MessageTypes.All)
@@ -80,7 +80,13 @@ namespace Gablarski.Tests.Mocks
 
 		public IEnumerable<IConnection> Connections
 		{
-			get { return this.connections.Keys; }
+			get
+			{
+				Synchronization.EnterReadLock();
+				var cs = this.connections.ToArray();
+				syncRoot.ExitReadLock();
+				return cs;
+			}
 		}
 
 		public IServerUserHandler Users
@@ -120,5 +126,42 @@ namespace Gablarski.Tests.Mocks
 		}
 
 		private readonly ReaderWriterLockSlim syncRoot = new ReaderWriterLockSlim();
+		private readonly List<IConnection> connections = new List<IConnection>();
+
+		protected override void OnConnectionMade (object sender, ConnectionMadeEventArgs e)
+		{
+			Synchronization.EnterWriteLock();
+			this.connections.Add (e.Connection);
+			Synchronization.ExitWriteLock();
+
+			base.OnConnectionMade (sender, e);
+		}
+
+		protected override void OnConnectionMadeGlobal (object sender, ConnectionMadeEventArgs e)
+		{
+			Synchronization.EnterWriteLock();
+			this.connections.Add (e.Connection);
+			Synchronization.ExitWriteLock();
+
+			base.OnConnectionMadeGlobal (sender, e);
+		}
+
+		protected override void OnConnectionDisconnected (object sender, DisconnectedEventArgs e)
+		{
+			Synchronization.EnterWriteLock();
+			this.connections.Remove (e.Connection);
+			Synchronization.ExitWriteLock();
+
+			base.OnConnectionDisconnected (sender, e);
+		}
+
+		protected override void OnConnectionDisconnectedGlobal (object sender, DisconnectedEventArgs e)
+		{
+			Synchronization.EnterWriteLock();
+			this.connections.Remove (e.Connection);
+			Synchronization.ExitWriteLock();
+
+			base.OnConnectionDisconnectedGlobal (sender, e);
+		}
 	}
 }

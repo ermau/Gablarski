@@ -16,7 +16,7 @@
     <OldToolsVersion>3.5</OldToolsVersion>
     <UpgradeBackupLocation />
     <StartupObject>Gablarski.Clients.Windows.Program</StartupObject>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
@@ -47,6 +47,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Optimize>false</Optimize>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
     <OutputPath>bin\x64\Release\</OutputPath>
@@ -56,6 +57,7 @@
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -67,6 +69,7 @@
     <WarningLevel>4</WarningLevel>
     <Optimize>false</Optimize>
     <UseVSHostingProcess>false</UseVSHostingProcess>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <OutputPath>bin\x86\Release\</OutputPath>
@@ -76,6 +79,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Mono Debug|x64' ">
     <DebugSymbols>true</DebugSymbols>
@@ -84,6 +88,7 @@
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Mono Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -92,6 +97,7 @@
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Cadenza">
@@ -273,16 +279,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Gablarski.Clients\Gablarski.Clients.csproj">
-      <Project>{F8A695AA-8BC9-46D4-8B7A-BDBD7B74401F}</Project>
-      <Name>Gablarski.Clients</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Gablarski\Gablarski.csproj">
-      <Project>{7347052B-DA5B-4CCA-AB28-3963766E3CDB}</Project>
-      <Name>Gablarski</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
+    <None Include="app.config" />
     <None Include="GablarskiClient.exe.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
@@ -368,6 +365,20 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Gablarski.Clients\Gablarski.Clients.csproj">
+      <Project>{f8a695aa-8bc9-46d4-8b7a-bdbd7b74401f}</Project>
+      <Name>Gablarski.Clients</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Gablarski\Gablarski.csproj">
+      <Project>{7347052b-da5b-4cca-ab28-3963766e3cdb}</Project>
+      <Name>Gablarski</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Tempest\Desktop\Tempest\Tempest.csproj">
+      <Project>{d6a2003c-cbb2-47b0-b306-521141d3068d}</Project>
+      <Name>Tempest</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

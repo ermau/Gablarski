@@ -41,6 +41,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using Gablarski.Client;
+using Tempest;
 
 namespace Gablarski.Clients.CLI
 {
@@ -99,7 +100,7 @@ namespace Gablarski.Clients.CLI
 					string[] hostParts = parts[2].Split (':');
 					int port = (hostParts.Length == 1) ? 42912 : Int32.Parse (hostParts[1]);
 
-					Client.ConnectAsync (new DnsEndPoint (hostParts[0], port));
+					Client.ConnectAsync (new Target (hostParts[0], port));
 
 					return true;
 				}
@@ -107,7 +108,7 @@ namespace Gablarski.Clients.CLI
 				case "disconnect":
 				{
 					if (Client.IsConnected)
-						Client.Disconnect (now: true);
+						Client.DisconnectAsync();
 					else
 						Writer.WriteLine ("Not connected");
 					

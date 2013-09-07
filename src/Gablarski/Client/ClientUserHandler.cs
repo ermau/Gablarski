@@ -139,7 +139,7 @@ namespace Gablarski.Client
 			if (targetChannel == null)
 				throw new ArgumentNullException ("targetChannel");
 
-			this.context.Connection.Send (new ChannelChangeMessage (user.UserId, targetChannel.ChannelId));
+			this.context.Connection.SendAsync (new ChannelChangeMessage (user.UserId, targetChannel.ChannelId));
 		}
 
 		public void ApproveRegistration (IUserInfo userInfo)
@@ -149,7 +149,7 @@ namespace Gablarski.Client
 			if (context.ServerInfo.RegistrationMode != UserRegistrationMode.PreApproved)
 				throw new NotSupportedException();
 
-			this.context.Connection.Send (new RegistrationApprovalMessage { Approved = true, UserId = userInfo.UserId });
+			this.context.Connection.SendAsync (new RegistrationApprovalMessage { Approved = true, UserId = userInfo.UserId });
 		}
 
 		public void ApproveRegistration (string username)
@@ -159,7 +159,7 @@ namespace Gablarski.Client
 			if (context.ServerInfo.RegistrationMode != UserRegistrationMode.Approved)
 				throw new NotSupportedException();
 
-			this.context.Connection.Send (new RegistrationApprovalMessage { Approved = true, Username = username });
+			this.context.Connection.SendAsync (new RegistrationApprovalMessage { Approved = true, Username = username });
 		}
 
 		public void RejectRegistration (string username)
@@ -169,7 +169,7 @@ namespace Gablarski.Client
 			if (context.ServerInfo.RegistrationMode != UserRegistrationMode.Approved)
 				throw new NotSupportedException();
 
-			this.context.Connection.Send (new RegistrationApprovalMessage { Approved = false, Username = username });
+			this.context.Connection.SendAsync (new RegistrationApprovalMessage { Approved = false, Username = username });
 		}
 
 		public bool GetIsIgnored (IUserInfo user)
@@ -201,7 +201,7 @@ namespace Gablarski.Client
 			if (user == null)
 				return;
 
-			context.Connection.Send (new RequestMuteUserMessage (user, !user.IsMuted));
+			this.context.Connection.SendAsync (new RequestMuteUserMessage (user, !user.IsMuted));
 		}
 
 		public void Kick (IUser user, bool fromServer)
@@ -209,7 +209,7 @@ namespace Gablarski.Client
 			if (user == null)
 				throw new ArgumentNullException ("user");
 
-			this.context.Connection.Send (new KickUserMessage (user, fromServer));
+			this.context.Connection.SendAsync (new KickUserMessage (user, fromServer));
 		}
 
 		public IEnumerable<IUserInfo> GetUsersInChannel (int channelId)
@@ -219,8 +219,6 @@ namespace Gablarski.Client
 				return this.channels[channelId].ToList();
 			}
 		}
-
-		
 
 		public IUserInfo this[int userId]
 		{

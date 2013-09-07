@@ -212,7 +212,7 @@ namespace Gablarski.Server
 			IConnection oldConnection;
 			if (connectedUsers.TryGetValue (user, out oldConnection))
 			{
-				oldConnection.Disconnect();
+				oldConnection.DisconnectAsync();
 				connectedUsers.Remove (user);
 				loggedIn.Remove (oldConnection);
 				connections.Remove (oldConnection);

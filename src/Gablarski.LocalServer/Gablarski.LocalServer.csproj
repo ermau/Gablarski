@@ -16,7 +16,7 @@
     </FileUpgradeFlags>
     <OldToolsVersion>3.5</OldToolsVersion>
     <UpgradeBackupLocation />
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
@@ -30,6 +30,7 @@
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
     <WarningLevel>4</WarningLevel>
     <Optimize>false</Optimize>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <OutputPath>bin\Release\</OutputPath>
@@ -41,6 +42,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Cadenza, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -115,7 +117,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Gablarski\Gablarski.csproj">
-      <Project>{7347052B-DA5B-4CCA-AB28-3963766E3CDB}</Project>
+      <Project>{7347052b-da5b-4cca-ab28-3963766e3cdb}</Project>
       <Name>Gablarski</Name>
     </ProjectReference>
     <ProjectReference Include="..\Tempest\Desktop\Tempest\Tempest.csproj">

@@ -9,7 +9,7 @@ using Tempest;
 namespace Gablarski.Tests
 {
 	public class MockClientContext
-		: ClientBase, IGablarskiClientContext
+		: TempestClient, IGablarskiClientContext
 	{
 		public MockClientContext (IClientConnection connection)
 			: base (connection, MessageTypes.All, false)

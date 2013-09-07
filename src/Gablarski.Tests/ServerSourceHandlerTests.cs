@@ -144,7 +144,7 @@ namespace Gablarski.Tests
 			var cs = this.provider.GetConnections (GablarskiProtocol.Instance);
 			var cl = new ConnectionBuffer (cs.Item1);
 
-			cs.Item2.Disconnect();
+			cs.Item2.DisconnectAsync().Wait();
 
 			handler.RequestSourceMessage (new MessageEventArgs<RequestSourceMessage> (cs.Item2,
 				new RequestSourceMessage ("Name", AudioCodecArgsTests.GetTestArgs())));
@@ -306,7 +306,7 @@ namespace Gablarski.Tests
 			var c = cs.Item2;
 			var cl = new ConnectionBuffer (cs.Item1);
 
-			c.Disconnect();
+			c.DisconnectAsync().Wait();
 
 			handler.RequestSourceListMessage (new MessageEventArgs<RequestSourceListMessage> (c, new RequestSourceListMessage ()));
 			
@@ -429,7 +429,7 @@ namespace Gablarski.Tests
 			var c = cs.Item2;
 			var cl = new ConnectionBuffer (cs.Item1);
 
-			c.Disconnect();
+			c.DisconnectAsync().Wait();
 
 			var source = GetSourceFromRequest();
 
@@ -520,7 +520,7 @@ namespace Gablarski.Tests
 			var c = cs.Item2;
 			var cl = new ConnectionBuffer (cs.Item1);
 
-			c.Disconnect();
+			c.DisconnectAsync().Wait();
 
 			handler.ClientAudioSourceStateChangeMessage (new MessageEventArgs<ClientAudioSourceStateChangeMessage> (c,
 				new ClientAudioSourceStateChangeMessage { SourceId = 1, Starting = true }));
@@ -666,7 +666,7 @@ namespace Gablarski.Tests
 			var c = cs.Item2;
 			var cl = new ConnectionBuffer (cs.Item1);
 
-			c.Disconnect();
+			c.DisconnectAsync().Wait();
 
 			handler.SendAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (c,
 				new ClientAudioDataMessage

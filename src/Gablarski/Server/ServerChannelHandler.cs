@@ -92,11 +92,11 @@ namespace Gablarski.Server
 				return;
 
 			if (!context.GetPermission (PermissionName.RequestChannelList, e.Connection))
-				e.Connection.Send (new ChannelListMessage (GenericResult.FailedPermissions));
+				e.Connection.SendAsync (new ChannelListMessage (GenericResult.FailedPermissions));
 			else
 			{
 				IEnumerable<IChannelInfo> channels = this.context.ChannelsProvider.GetChannels();
-				e.Connection.Send (new ChannelListMessage (channels, context.ChannelsProvider.DefaultChannel));
+				e.Connection.SendAsync (new ChannelListMessage (channels, context.ChannelsProvider.DefaultChannel));
 			}
 		}
 
@@ -139,7 +139,7 @@ namespace Gablarski.Server
 					result = this.context.ChannelsProvider.DeleteChannel (msg.Channel);
 			}
 
-			e.Connection.Send (new ChannelEditResultMessage (msg.Channel, result));
+			e.Connection.SendAsync (new ChannelEditResultMessage (msg.Channel, result));
 		}
 	}
 }

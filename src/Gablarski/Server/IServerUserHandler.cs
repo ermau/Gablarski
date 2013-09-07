@@ -36,6 +36,7 @@
 
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Gablarski.Messages;
 using Tempest;
 
@@ -98,14 +99,14 @@ namespace Gablarski.Server
 		/// </summary>
 		/// <param name="message">The message to send.</param>
 		/// <param name="predicate">The predicate to filter connections.</param>
-		void Send (Message message, Func<IConnection, bool> predicate);
+		Task SendAsync (Message message, Func<IConnection, bool> predicate);
 
 		/// <summary>
 		/// Sends a message to all users matching the <paramref name="predicate"/>.
 		/// </summary>
 		/// <param name="message">The message to send.</param>
 		/// <param name="predicate">The predicate to filter connections.</param>
-		void Send (Message message, Func<IConnection, IUserInfo, bool> predicate);
+		Task SendAsync (Message message, Func<IConnection, IUserInfo, bool> predicate);
 
 		/// <summary>
 		/// Disconnects a user for a specific reason.
@@ -113,29 +114,29 @@ namespace Gablarski.Server
 		/// <param name="user">The user to disconnect.</param>
 		/// <param name="reason">The reason to disconnect the user.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
-		void Disconnect (IUserInfo user, DisconnectionReason reason);
+		Task DisconnectAsync (IUserInfo user, DisconnectionReason reason);
 	}
 
 	public static class ServerUserHandlerExtensions
 	{
-		public static void Send (this IServerUserHandler self, Message message)
+		public static Task SendAsync (this IServerUserHandler self, Message message)
 		{
 			if (self == null)
 				throw new ArgumentNullException ("self");
 			if (message == null)
 				throw new ArgumentNullException ("message");
 
-			self.Send (message, c => true);
+			return self.SendAsync (message, c => true);
 		}
 
-		public static void Send (this IServerUserHandler self, Message message, Func<IUserInfo, bool> predicate)
+		public static Task SendAsync (this IServerUserHandler self, Message message, Func<IUserInfo, bool> predicate)
 		{
 			if (self == null)
 				throw new ArgumentNullException ("self");
 			if (predicate == null)
 				throw new ArgumentNullException ("predicate");
 
-			self.Send (message, (c, u) => predicate (u));
+			return self.SendAsync (message, (c, u) => predicate (u));
 		}
 	}
 }

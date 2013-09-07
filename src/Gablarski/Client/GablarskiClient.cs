@@ -1,4 +1,4 @@
-// Copyright (c) 2011, Eric Maupin
+// Copyright (c) 2011-2013, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -41,6 +41,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using System.Threading.Tasks;
 using Cadenza.Collections;
 using Gablarski.Audio;
 using Gablarski.Messages;
@@ -50,7 +51,7 @@ using Timer = System.Threading.Timer;
 namespace Gablarski.Client
 {
 	public class GablarskiClient
-		: ClientBase, IGablarskiClientContext
+		: TempestClient, IGablarskiClientContext
 	{
 		public GablarskiClient (IClientConnection connection)
 			: this (connection, new AudioEngine())
@@ -204,11 +205,17 @@ namespace Gablarski.Client
 		}
 		#endregion
 
+		public override Task<ClientConnectionResult> ConnectAsync (Target target)
+		{
+			this.running = true;
+			return base.ConnectAsync (target);
+		}
+
 		#region Event Invokers
 		protected void OnConnected (object sender, EventArgs e)
 		{
 			this.connecting = false;
-			this.pingTimer = new Timer (s => Connection.Send (new ClientPingMessage()), null, 20000, 20000);
+			this.pingTimer = new Timer (s => Connection.SendAsync (new ClientPingMessage()), null, 20000, 20000);
 			Interlocked.Exchange (ref this.reconnectAttempt, 0);
 
 			var connected = this.Connected;
@@ -282,7 +289,7 @@ namespace Gablarski.Client
 
 		private string originalHost;
 		private int reconnectAttempt;
-		private bool connecting;
+		private bool connecting, running;
 
 		private void OnDisconnectedMessage (MessageEventArgs<DisconnectMessage> e)
 		{
@@ -311,7 +318,7 @@ namespace Gablarski.Client
 			if (count > redirectLimit)
 				return;
 
-			ConnectAsync (new DnsEndPoint (e.Message.Host, e.Message.Port));
+			ConnectAsync (new Target (e.Message.Host, e.Message.Port));
 		}
 
 		private enum DisconnectHandling
@@ -357,7 +364,7 @@ namespace Gablarski.Client
 
 				this.Audio.Stop();
 
-				connection.Disconnect();
+				connection.DisconnectAsync();
 
 				if (fireEvent)
 					OnDisconnected (this, new DisconnectedEventArgs (reason));
@@ -402,13 +409,13 @@ namespace Gablarski.Client
 			this.disconnectedInChannelId = 0;
 		}
 
-		protected override void OnConnected(ClientConnectionEventArgs e)
+		protected override void OnConnected (ClientConnectionEventArgs e)
 		{
 			lock (StateSync)
 			{
 				if (!this.running)
 				{
-					this.Connection.Disconnect();
+					Connection.DisconnectAsync();
 					return;
 				}
 
@@ -419,8 +426,8 @@ namespace Gablarski.Client
 				if (Audio.AudioReceiver == null)
 					Audio.AudioReceiver = Sources;
 
-				this.Audio.Context = this;
-				this.Audio.Start();
+				Audio.Context = this;
+				Audio.Start();
 			}
 
 			base.OnConnected(e);

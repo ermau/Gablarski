@@ -808,7 +808,7 @@ namespace Gablarski.Clients.Windows
 
 		private void ContextBanUsername (object sender, EventArgs eventArgs)
 		{
-			Client.Connection.Send (new BanUserMessage { BanInfo = new BanInfo (null, ((IUserInfo)this.SelectedNode.Tag).Username, TimeSpan.MaxValue) });
+			Client.Connection.SendAsync (new BanUserMessage { BanInfo = new BanInfo (null, ((IUserInfo)this.SelectedNode.Tag).Username, TimeSpan.MaxValue) });
 		}
 
 		private void ContextServerKick (object sender, EventArgs e)

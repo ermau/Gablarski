@@ -89,7 +89,7 @@ namespace Gablarski.Barrel
 			}, providers.Users, providers.Permissions, providers.Channels);
 
 			if (serverConfig.Network)
-				server.AddConnectionProvider (new NetworkConnectionProvider (GablarskiProtocol.Instance, new IPEndPoint (IPAddress.Any, serverConfig.Port), serverConfig.MaxConnections));
+				server.AddConnectionProvider (new NetworkConnectionProvider (GablarskiProtocol.Instance, new Target (Target.AnyIP, serverConfig.Port), serverConfig.MaxConnections), ExecutionMode.GlobalOrder);
 
 			foreach (IConnectionProvider provider in providers.ConnectionProviders)
 				server.AddConnectionProvider (provider, ExecutionMode.GlobalOrder);

@@ -32,7 +32,8 @@ namespace Gablarski.Tests
 			get { return this.connection.IsConnected; }
 		}
 
-		public long ConnectionId
+
+		public int ConnectionId
 		{
 			get { return this.connection.ConnectionId; }
 		}
@@ -47,9 +48,9 @@ namespace Gablarski.Tests
 			get { return this.connection.Modes; }
 		}
 
-		public EndPoint RemoteEndPoint
+		public Target RemoteTarget
 		{
-			get { return this.connection.RemoteEndPoint; }
+			get { return this.connection.RemoteTarget; }
 		}
 
 		public IAsymmetricKey RemoteKey
@@ -68,12 +69,11 @@ namespace Gablarski.Tests
 		}
 
 		public event EventHandler<MessageEventArgs> MessageReceived;
-		public event EventHandler<MessageEventArgs> MessageSent;
 		public event EventHandler<DisconnectedEventArgs> Disconnected;
 
-		public void Send (Message message)
+		public Task<bool> SendAsync (Message message)
 		{
-			this.connection.Send (message);
+			return this.connection.SendAsync (message);
 		}
 
 		public Task<TResponse> SendFor<TResponse> (Message message, int timeout = 0) where TResponse : Message
@@ -81,9 +81,9 @@ namespace Gablarski.Tests
 			return this.connection.SendFor<TResponse> (message, timeout);
 		}
 
-		public void SendResponse (Message originalMessage, Message response)
+		public Task<bool> SendResponseAsync (Message originalMessage, Message response)
 		{
-			this.connection.SendResponse (originalMessage, response);
+			return this.connection.SendResponseAsync (originalMessage, response);
 		}
 
 		public IEnumerable<MessageEventArgs> Tick ()
@@ -91,24 +91,14 @@ namespace Gablarski.Tests
 			return this.connection.Tick();
 		}
 
-		public void Disconnect ()
+		public Task DisconnectAsync ()
 		{
-			this.connection.Disconnect();
+			return this.connection.DisconnectAsync();
 		}
 
-		public void Disconnect (ConnectionResult reason, string customReason = null)
+		public Task DisconnectAsync (ConnectionResult reason, string customReason = null)
 		{
-			this.connection.Disconnect (reason, customReason);
-		}
-
-		public void DisconnectAsync ()
-		{
-			this.connection.DisconnectAsync();
-		}
-
-		public void DisconnectAsync (ConnectionResult reason, string customReason = null)
-		{
-			this.connection.DisconnectAsync (reason, customReason);
+			return this.connection.DisconnectAsync (reason, customReason);
 		}
 
 		public T DequeueAndAssertMessage<T>()

@@ -116,7 +116,7 @@ namespace Gablarski.Client
 			if (password == null)
 				throw new ArgumentNullException("password");
 
-			this.context.Connection.Send (new LoginMessage
+			this.context.Connection.SendAsync (new LoginMessage
 			{
 				Username = username,
 				Password = password
@@ -136,12 +136,12 @@ namespace Gablarski.Client
 			if (phonetic.IsNullOrWhitespace())
 				phonetic = nickname;
 
-			this.context.Connection.Send (new JoinMessage (nickname, phonetic, serverPassword));
+			this.context.Connection.SendAsync (new JoinMessage (nickname, phonetic, serverPassword));
 		}
 
 		public void Register (string username, string password)
 		{
-			this.context.Connection.Send (new RegisterMessage (username, password));
+			this.context.Connection.SendAsync (new RegisterMessage (username, password));
 		}
 
 		/// <summary>
@@ -154,7 +154,7 @@ namespace Gablarski.Client
 				return;
 
 			Comment = comment;
-			this.context.Connection.Send (new SetCommentMessage (comment));
+			this.context.Connection.SendAsync (new SetCommentMessage (comment));
 		}
 
 		/// <summary>
@@ -167,7 +167,7 @@ namespace Gablarski.Client
 				return;
 
 			Status = status;
-			this.context.Connection.Send (new SetStatusMessage (status));
+			this.context.Connection.SendAsync (new SetStatusMessage (status));
 		}
 
 		/// <summary>

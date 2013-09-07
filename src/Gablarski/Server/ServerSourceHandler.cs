@@ -89,7 +89,7 @@ namespace Gablarski.Server
 
 		public void Remove (AudioSource source)
 		{
-			context.Users.Send (new SourcesRemovedMessage (new[] { source }));
+			context.Users.SendAsync (new SourcesRemovedMessage (new[] { source }));
 
 			manager.Remove (source);
 		}
@@ -100,7 +100,7 @@ namespace Gablarski.Server
 			if (sources == null)
 				return;
 
-			context.Users.Send (new SourcesRemovedMessage (sources));
+			context.Users.SendAsync (new SourcesRemovedMessage (sources));
 			manager.Remove (user);
 		}
 
@@ -151,7 +151,7 @@ namespace Gablarski.Server
 			}
 			finally
 			{
-				e.Connection.Send (new SourceResultMessage (request.Name, result, source));
+				e.Connection.SendAsync (new SourceResultMessage (request.Name, result, source));
 				if (result == SourceResult.Succeeded)
 				{
 					context.Connections.Where (c => c != e.Connection).Send (new SourceResultMessage (request.Name, SourceResult.NewSource, source));
@@ -167,7 +167,7 @@ namespace Gablarski.Server
 
 			if (!context.GetPermission (PermissionName.MuteAudioSource, e.Connection))
 			{
-				e.Connection.Send (new PermissionDeniedMessage { DeniedMessage = GablarskiMessageType.RequestMuteSource });
+				e.Connection.SendAsync (new PermissionDeniedMessage { DeniedMessage = GablarskiMessageType.RequestMuteSource });
 				return;
 			}
 
@@ -184,7 +184,7 @@ namespace Gablarski.Server
 			if (!e.Connection.IsConnected)
 				return;
 			
-			e.Connection.Send (new SourceListMessage (manager));
+			e.Connection.SendAsync (new SourceListMessage (manager));
 		}
 
 		internal void ClientAudioSourceStateChangeMessage (MessageEventArgs<ClientAudioSourceStateChangeMessage> e)
@@ -195,7 +195,7 @@ namespace Gablarski.Server
 			if (!CanSendFromSource (e.Connection, msg.SourceId, out speaker))
 				return;
 
-			context.Users.Send (new AudioSourceStateChangeMessage { Starting = msg.Starting, SourceId = msg.SourceId },
+			context.Users.SendAsync (new AudioSourceStateChangeMessage { Starting = msg.Starting, SourceId = msg.SourceId },
 			                    (con, user) => con != e.Connection);
 		}
 
@@ -209,13 +209,13 @@ namespace Gablarski.Server
 
 			if (!context.GetPermission (PermissionName.SendAudio, speaker))
 			{
-				e.Connection.Send (new PermissionDeniedMessage (GablarskiMessageType.AudioData));
+				e.Connection.SendAsync (new PermissionDeniedMessage (GablarskiMessageType.AudioData));
 				return;
 			}
 
 			if (msg.TargetIds.Length > 1 && !context.GetPermission (PermissionName.SendAudioToMultipleTargets, speaker))
 			{
-				e.Connection.Send (new PermissionDeniedMessage (GablarskiMessageType.AudioData));
+				e.Connection.SendAsync (new PermissionDeniedMessage (GablarskiMessageType.AudioData));
 				return;
 			}
 
@@ -224,11 +224,11 @@ namespace Gablarski.Server
 			if (msg.TargetType == TargetType.Channel)
 			{
 				for (int i = 0; i < msg.TargetIds.Length; ++i)
-					context.Users.Send (sendMessage, (con, user) => con != e.Connection && user.CurrentChannelId == msg.TargetIds[i]);
+					context.Users.SendAsync (sendMessage, (con, user) => con != e.Connection && user.CurrentChannelId == msg.TargetIds[i]);
 			}
 			else if (msg.TargetType == TargetType.User)
 			{
-				context.Users.Send (sendMessage, (con, user) => con != e.Connection && msg.TargetIds.Contains (user.UserId));
+				context.Users.SendAsync (sendMessage, (con, user) => con != e.Connection && msg.TargetIds.Contains (user.UserId));
 			}
 		}
 
