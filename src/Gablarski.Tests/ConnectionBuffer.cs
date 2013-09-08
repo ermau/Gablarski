@@ -106,21 +106,21 @@ namespace Gablarski.Tests
 		{
 			Message msg = DequeueMessage();
 
-			if (!(msg is T))
+			if (msg != null && !(msg is T))
 				Assert.Fail ("Message was " + msg.GetType().Name + ", not expected " + typeof (T).Name);
 
 			return (T)msg;
 		}
 
-		public Message DequeueMessage (bool wait = true)
+		public Message DequeueMessage()
 		{
-			ushort tick = 0;
+			Message msg = null;
+			do {
+				if (this.messages.TryDequeue (out msg))
+					break;
+			} while (this.wait.WaitOne (TimeSpan.FromSeconds (15)));
 
-			Message msg;
-			while (!this.messages.TryDequeue (out msg) && tick++ < (UInt16.MaxValue - 1))
-				Thread.Sleep (1);
-
-			if (tick == UInt16.MaxValue)
+			if (msg == null)
 				Assert.Fail ("Message never arrived");
 
 			return msg;
@@ -128,13 +128,18 @@ namespace Gablarski.Tests
 
 		public void AssertNoMessage()
 		{
-			Assert.IsTrue (this.messages.Count == 0);
+			Message msg;
+			bool hadMessages = this.messages.TryPeek (out msg);
+
+			Assert.IsFalse (hadMessages, "Expected no message, but {0} was waiting.", msg);
 		}
 
+		private readonly AutoResetEvent wait = new AutoResetEvent (false);
 		private readonly ConcurrentQueue<Message> messages = new ConcurrentQueue<Message>();
 		private void OnMessageReceived (object sender, MessageEventArgs e)
 		{
 			this.messages.Enqueue (e.Message);
+			this.wait.Set();
 		}
 	}
 }
