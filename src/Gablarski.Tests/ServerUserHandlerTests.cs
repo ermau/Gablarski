@@ -37,6 +37,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Gablarski.Messages;
 using Gablarski.Server;
 using Gablarski.Tests.Mocks;
@@ -106,8 +107,8 @@ namespace Gablarski.Tests
 		[Test]
 		public void DisconnectNull()
 		{
-			Assert.Throws<ArgumentNullException> (() => handler.DisconnectAsync ((IConnection)null));
-			Assert.Throws<ArgumentNullException> (() => handler.DisconnectAsync ((Func<IConnection, bool>)null));
+			AsyncAssert.Throws<ArgumentNullException> (() => handler.DisconnectAsync ((IConnection)null));
+			AsyncAssert.Throws<ArgumentNullException> (() => handler.DisconnectAsync ((Func<IConnection, bool>)null));
 		}
 
 		[Test]
