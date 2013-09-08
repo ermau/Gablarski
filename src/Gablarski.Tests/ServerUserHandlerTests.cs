@@ -1015,7 +1015,7 @@ namespace Gablarski.Tests
 			var admin = JoinAsGuest (s, c, "admin");
 
 			var target = JoinAsGuest (server, client, "target");
-			client.DequeueAndAssertMessage<UserJoinedMessage>();
+			c.DequeueAndAssertMessage<UserJoinedMessage>();
 
 			handler.OnKickUserMessage (new MessageEventArgs<KickUserMessage> (s,
 				new KickUserMessage (target, false)));
@@ -1041,7 +1041,7 @@ namespace Gablarski.Tests
 			var admin = JoinAsGuest (s, c, "admin");
 
 			var target = JoinAsGuest (server, client, "target");
-			client.DequeueAndAssertMessage<UserJoinedMessage>();
+			c.DequeueAndAssertMessage<UserJoinedMessage>();
 
 			handler.OnKickUserMessage (new MessageEventArgs<KickUserMessage> (s,
 				new KickUserMessage (target, true)));
