@@ -66,7 +66,9 @@ namespace Gablarski.Tests
 
 		private ConnectionBuffer Connect()
 		{
-			var connection = new ConnectionBuffer (provider.GetClientConnection());
+			var cs = provider.GetConnections (GablarskiProtocol.Instance);
+
+			var connection = new ConnectionBuffer (cs.Item1);
 			connection.SendAsync (new ConnectMessage { ProtocolVersion = GablarskiProtocol.Instance.Version, Host = "test", Port = 42912 });
 			connection.DequeueAndAssertMessage<ServerInfoMessage>();
 			connection.DequeueAndAssertMessage<ChannelListMessage>();
