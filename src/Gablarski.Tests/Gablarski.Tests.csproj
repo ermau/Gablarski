@@ -87,6 +87,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AsyncAssert.cs" />
     <Compile Include="AudioCodecArgsTests.cs" />
     <Compile Include="AudioEngineTests.cs" />
     <Compile Include="AudioFormatTests.cs" />
