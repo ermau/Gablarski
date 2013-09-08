@@ -698,13 +698,13 @@ namespace Gablarski.Tests
 		//}
 
 		[Test]
-		public void RegisterNotConnected()
+		public async Task RegisterNotConnected()
 		{
 			var cs = provider.GetConnections (GablarskiProtocol.Instance);
 			var s = new ConnectionBuffer (cs.Item2);
 			var c = new ConnectionBuffer (cs.Item1);
 
-			var u = JoinAsGuest (s, c, "nick");
+			await s.DisconnectAsync();
 
 			handler.OnRegisterMessage (new MessageEventArgs<RegisterMessage> (s, 
 				new RegisterMessage ("username", "password")));
