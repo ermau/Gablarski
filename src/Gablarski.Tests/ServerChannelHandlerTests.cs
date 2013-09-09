@@ -116,17 +116,20 @@ namespace Gablarski.Tests
 
 		[Test]
 		[Description ("Even if the connection hasn't 'joined', it should still be able to request the channel list.")]
-		public void RequestChanneListMessageNotJoined()
+		public void RequestChannelListMessageNotJoined()
 		{
 			permissions.EnablePermissions (0, PermissionName.RequestChannelList);
 
-			var c = provider.GetServerConnection();
-			manager.Connect (c);
+			var cs = provider.GetConnections (GablarskiProtocol.Instance);
+			var c = new ConnectionBuffer (cs.Item1);
+			var s = new ConnectionBuffer (cs.Item2);
 
-			handler.RequestChanneListMessage (new MessageEventArgs<RequestChannelListMessage> (c,
+			manager.Connect (cs.Item2);
+
+			handler.RequestChanneListMessage (new MessageEventArgs<RequestChannelListMessage> (s,
 				new RequestChannelListMessage()));
 
-			var msg = client.DequeueAndAssertMessage<ChannelListMessage>();
+			var msg = c.DequeueAndAssertMessage<ChannelListMessage>();
 			Assert.AreEqual (GenericResult.Success, msg.Result);
 			ChannelInfoTests.AssertChanelsAreEqual (channels.GetChannels().Single(), msg.Channels.Single());
 		}
