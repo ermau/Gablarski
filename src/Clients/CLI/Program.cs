@@ -49,7 +49,7 @@ namespace Gablarski.Clients.CLI
 		{
 			Console.WriteLine ("Gablarski CLI Client version {0}", Assembly.GetAssembly (typeof(Program)).GetName ().Version);
 	
-			GablarskiClient client = new GablarskiClient (new NetworkClientConnection (GablarskiProtocol.Instance));
+			GablarskiClient client = new GablarskiClient (new UdpClientConnection (GablarskiProtocol.Instance));
 	
 			List<CommandModule> modules = new List<CommandModule> 
 			{

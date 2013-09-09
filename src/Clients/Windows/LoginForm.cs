@@ -370,7 +370,7 @@ namespace Gablarski.Clients.Windows
 			playPhonetic.Enabled = Modules.TextToSpeech.Any (tts => tts.GetType().GetSimpleName() == Settings.TextToSpeech);
 		}
 
-		private void startLocal_Click (object sender, EventArgs e)
+		private async void startLocal_Click (object sender, EventArgs e)
 		{
 			InputForm nickname = new InputForm();
 			if (nickname.ShowDialogOnFormThread (this) == DialogResult.Cancel)
@@ -378,7 +378,7 @@ namespace Gablarski.Clients.Windows
 
 			string nick = nickname.Input.Text.Trim();
 
-			LocalServer.Start();
+			await LocalServer.StartAsync();
 
 			this.DialogResult = DialogResult.OK;
 			this.Entry = new ServerEntry (0)

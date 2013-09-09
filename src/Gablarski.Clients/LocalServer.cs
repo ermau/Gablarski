@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2011, Eric Maupin
+﻿// Copyright (c) 2011-2013, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -35,6 +35,7 @@
 // DAMAGE.
 
 using System.Net;
+using System.Threading.Tasks;
 using Gablarski.Server;
 using Tempest;
 using Tempest.Providers.Network;
@@ -68,16 +69,27 @@ namespace Gablarski.Clients
 			get { return authorization; }
 		}
 
-		public static void Start()
+		public static Task StartAsync ()
 		{
-			channels = new LobbyChannelProvider();
-			authorization = new GuestUserProvider { FirstUserIsAdmin = true };
-			permissions = new GuestPermissionProvider();
-			settings = new ServerSettings();
-			server = new GablarskiServer (settings, authorization, permissions, channels);
-			server.AddConnectionProvider (new NetworkConnectionProvider (GablarskiProtocol.Instance, new Target  (Target.AnyIP, GablarskiProtocol.Port), 100));
+			return Task.Run (() => {
+				var crypto = new RSACrypto();
+				return crypto.ExportKey (true);
+			}).ContinueWith (t => StartAsync (t.Result)).Unwrap();
+		}
 
-			server.Start();
+		public static Task StartAsync (IAsymmetricKey key)
+		{
+			return Task.Run (() => {
+				channels = new LobbyChannelProvider();
+				authorization = new GuestUserProvider { FirstUserIsAdmin = true };
+				permissions = new GuestPermissionProvider();
+				settings = new ServerSettings();
+
+				server = new GablarskiServer (settings, authorization, permissions, channels);
+				server.AddConnectionProvider (new UdpConnectionProvider (GablarskiProtocol.Port, GablarskiProtocol.Instance, key));
+
+				server.Start();
+			});
 		}
 
 		public static void Shutdown()
