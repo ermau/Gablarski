@@ -377,7 +377,7 @@ namespace Gablarski.Tests
 
 			JoinAsGuest (s, c, "Nickname2");
 
-			c.DequeueAndAssertMessage<UserJoinedMessage>();
+			client.DequeueAndAssertMessage<UserJoinedMessage>();
 
 			handler.OnSetCommentMessage (new MessageEventArgs<SetCommentMessage> (server,
 				new SetCommentMessage ("comment")));
@@ -582,7 +582,7 @@ namespace Gablarski.Tests
 
 			var u = JoinAsGuest (s, c, "nick");
 
-			handler.OnSetPermissionsMessage (new MessageEventArgs<SetPermissionsMessage> (c,
+			handler.OnSetPermissionsMessage (new MessageEventArgs<SetPermissionsMessage> (s,
 				new SetPermissionsMessage (u, new Permission[0])));
 
 			Assert.AreEqual (GablarskiMessageType.SetPermissions, c.DequeueAndAssertMessage<PermissionDeniedMessage>().DeniedMessage);
@@ -600,7 +600,7 @@ namespace Gablarski.Tests
 			var u = JoinAsGuest (s, c, "nick");
 			permissions.EnablePermissions (u.UserId, PermissionName.ModifyPermissions);
 
-			handler.OnSetPermissionsMessage (new MessageEventArgs<SetPermissionsMessage> (c,
+			handler.OnSetPermissionsMessage (new MessageEventArgs<SetPermissionsMessage> (s,
 				new SetPermissionsMessage (u, new Permission[0])));
 
 			c.AssertNoMessage();
@@ -616,7 +616,7 @@ namespace Gablarski.Tests
 			var u = JoinAsGuest (s, c, "nick");
 			permissions.EnablePermissions (u.UserId, PermissionName.ModifyPermissions);
 
-			handler.OnSetPermissionsMessage (new MessageEventArgs<SetPermissionsMessage> (c,
+			handler.OnSetPermissionsMessage (new MessageEventArgs<SetPermissionsMessage> (s,
 				new SetPermissionsMessage (u, new []
 				{
 					new Permission (PermissionName.SendAudio, true), 
@@ -639,7 +639,7 @@ namespace Gablarski.Tests
 			permissions.UpdatedSupported = true;
 			permissions.EnablePermissions (u.UserId, PermissionName.ModifyPermissions);
 
-			handler.OnSetPermissionsMessage (new MessageEventArgs<SetPermissionsMessage> (c,
+			handler.OnSetPermissionsMessage (new MessageEventArgs<SetPermissionsMessage> (s,
 				new SetPermissionsMessage (u, new []
 				{
 					new Permission (PermissionName.SendAudio, true), 
@@ -672,9 +672,9 @@ namespace Gablarski.Tests
 			var s2 = new ConnectionBuffer (cs.Item2);
 			var c2 = new ConnectionBuffer (cs.Item1);
 
-			var u2 = JoinAsGuest (s2, c2, "nick");
+			var u2 = JoinAsGuest (s2, c2, "nick2");
 
-			handler.OnSetPermissionsMessage (new MessageEventArgs<SetPermissionsMessage> (c1,
+			handler.OnSetPermissionsMessage (new MessageEventArgs<SetPermissionsMessage> (s1,
 				new SetPermissionsMessage (u2, new []
 				{
 					new Permission (PermissionName.SendAudio, true), 
