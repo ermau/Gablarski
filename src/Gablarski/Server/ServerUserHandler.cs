@@ -222,11 +222,13 @@ namespace Gablarski.Server
 				throw new ArgumentNullException ("user");
 
 			IConnection c = Manager.GetConnection (user);
-			if (c == null || !c.IsConnected)
+			if (c == null)
 				return;
 
-			await c.SendAsync (new DisconnectMessage (reason)).ConfigureAwait (false);
-			await c.DisconnectAsync().ConfigureAwait (false);
+			if (c.IsConnected) {
+				await c.SendAsync (new DisconnectMessage (reason)).ConfigureAwait (false);
+				await c.DisconnectAsync().ConfigureAwait (false);
+			}
 
 			await SendAsync (new UserDisconnectedMessage (user.UserId), ic => ic != c).ConfigureAwait (false);
 		}
