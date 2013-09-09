@@ -14,6 +14,7 @@ using Gablarski.Clients.Persistence;
 using Gablarski.Clients.Windows.Properties;
 using Gablarski.Messages;
 using Gablarski.Server;
+using Tempest;
 
 namespace Gablarski.Clients.Windows
 {
@@ -383,7 +384,7 @@ namespace Gablarski.Clients.Windows
 			this.DialogResult = DialogResult.OK;
 			this.Entry = new ServerEntry (0)
 			{
-				Host = "localhost",
+				Host = Target.LoopbackIP,
 				Port = 42912,
 				UserName = nick,
 				UserNickname = nick,
