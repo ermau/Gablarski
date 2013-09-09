@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.ComponentModel;
 using Gablarski.Client;
@@ -10,11 +11,14 @@ using System.Linq;
 using Microsoft.WindowsAPICodePack.Taskbar;
 using System.Collections.Generic;
 using Microsoft.WindowsAPICodePack.Shell;
+using Tempest;
 
 namespace Gablarski.Clients.Windows
 {
 	static class Program
 	{
+		public static Task<IAsymmetricKey> Key;
+
 		public static void EnableGablarskiURIs()
 		{
 			try
@@ -108,6 +112,8 @@ namespace Gablarski.Clients.Windows
 
 			FileInfo program = new FileInfo (Process.GetCurrentProcess().MainModule.FileName);
 			Environment.CurrentDirectory = program.Directory.FullName;
+
+			Key = ClientData.GetCryptoKeyAsync();
 
 			if (Settings.FirstRun)
 			{

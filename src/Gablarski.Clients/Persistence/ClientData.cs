@@ -40,8 +40,10 @@ using System.Configuration;
 using System.Data.Common;
 using System.Data.SQLite;
 using System.IO;
+using System.Threading.Tasks;
 using Cadenza;
 using Gablarski.Clients.Input;
+using Tempest;
 
 namespace Gablarski.Clients.Persistence
 {
@@ -49,16 +51,16 @@ namespace Gablarski.Clients.Persistence
 	{
 		static ClientData()
 		{
-			DirectoryInfo gablarskiData = new DirectoryInfo (Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.ApplicationData), "Gablarski"));
-			if (!gablarskiData.Exists)
-				gablarskiData.Create();
+			DataDirectory = new DirectoryInfo (Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.ApplicationData), "Gablarski"));
+			if (!DataDirectory.Exists)
+				DataDirectory.Create();
 
 			string useLocal = ConfigurationManager.AppSettings["useLocalDatabase"];
 
 			if (useLocal != null && Boolean.Parse (useLocal))
 				DbFile = new FileInfo ("gablarski.db");
 			else
-				DbFile = new FileInfo (Path.Combine (gablarskiData.FullName, "gablarski.db"));
+				DbFile = new FileInfo (Path.Combine (DataDirectory.FullName, "gablarski.db"));
 
 			var builder = new SQLiteConnectionStringBuilder();
 			builder.DataSource = DbFile.FullName;
@@ -67,6 +69,27 @@ namespace Gablarski.Clients.Persistence
 			db.Open();
 			
 			CreateDbs();
+		}
+
+		public static Task<IAsymmetricKey> GetCryptoKeyAsync()
+		{
+			return Task.Run (() => {
+				string keypath = Path.Combine (DataDirectory.FullName, "gablarski.key");
+				if (!File.Exists (keypath)) {
+
+					var crypto = new RSACrypto();
+					IAsymmetricKey key = crypto.ExportKey (true);
+
+					using (FileStream fs = File.OpenWrite (keypath)) {
+						var writer = new StreamValueWriter (fs);
+						key.Serialize (null, writer);
+					}
+				}
+
+				byte[] data = File.ReadAllBytes (keypath);
+				BufferValueReader reader = new BufferValueReader (data);
+				return (IAsymmetricKey)new RSAAsymmetricKey (null, reader);
+			});
 		}
 
 		public static bool CheckForUpdates()
@@ -369,6 +392,7 @@ namespace Gablarski.Clients.Persistence
 		}
 		#endregion
 
+		private static readonly DirectoryInfo DataDirectory;
 		private static readonly DbConnection db;
 		private static readonly FileInfo DbFile;
 

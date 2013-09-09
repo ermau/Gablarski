@@ -28,7 +28,7 @@ namespace Gablarski.Clients.Windows
 		{
 			this.Icon = Resources.Headphones;
 
-			this.gablarski = new GablarskiClient (new UdpClientConnection (GablarskiProtocol.Instance));
+			this.gablarski = new GablarskiClient (new UdpClientConnection (GablarskiProtocol.Instance, Program.Key.Result)); // TODO: Asyncify
 			this.gablarski.ConnectionRejected += this.GablarskiConnectionRejected;
 			this.gablarski.Connected += this.GablarskiConnected;
 			this.gablarski.Disconnected += this.GablarskiDisconnected;
