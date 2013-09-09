@@ -40,6 +40,8 @@ using System.Configuration;
 using System.Data.Common;
 using System.Data.SQLite;
 using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Cadenza;
 using Gablarski.Clients.Input;
@@ -71,24 +73,30 @@ namespace Gablarski.Clients.Persistence
 			CreateDbs();
 		}
 
-		public static Task<IAsymmetricKey> GetCryptoKeyAsync()
+		public static Task<RSAAsymmetricKey> GetCryptoKeyAsync()
 		{
 			return Task.Run (() => {
+
+				BinaryFormatter formatter = new BinaryFormatter();
+
 				string keypath = Path.Combine (DataDirectory.FullName, "gablarski.key");
 				if (!File.Exists (keypath)) {
 
-					var crypto = new RSACrypto();
-					IAsymmetricKey key = crypto.ExportKey (true);
-
-					using (FileStream fs = File.OpenWrite (keypath)) {
-						var writer = new StreamValueWriter (fs);
-						key.Serialize (null, writer);
+					var rsa = RSA.Create();
+					RSAParameters parameters = rsa.ExportParameters (true);
+				
+					using (var stream = File.OpenWrite (keypath)) {
+						formatter.Serialize (stream, parameters);
 					}
 				}
 
-				byte[] data = File.ReadAllBytes (keypath);
-				BufferValueReader reader = new BufferValueReader (data);
-				return (IAsymmetricKey)new RSAAsymmetricKey (null, reader);
+				RSAAsymmetricKey key;
+				using (var stream = File.OpenRead (keypath)) {
+					RSAParameters parameters = (RSAParameters)formatter.Deserialize (stream);
+					key = new RSAAsymmetricKey (parameters);
+				}
+
+				return key;
 			});
 		}
 

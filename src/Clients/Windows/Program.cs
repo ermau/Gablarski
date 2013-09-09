@@ -17,7 +17,7 @@ namespace Gablarski.Clients.Windows
 {
 	static class Program
 	{
-		public static Task<IAsymmetricKey> Key;
+		public static Task<RSAAsymmetricKey> Key;
 
 		public static void EnableGablarskiURIs()
 		{

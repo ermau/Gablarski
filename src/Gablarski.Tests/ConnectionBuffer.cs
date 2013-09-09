@@ -53,12 +53,12 @@ namespace Gablarski.Tests
 			get { return this.connection.RemoteTarget; }
 		}
 
-		public IAsymmetricKey RemoteKey
+		public RSAAsymmetricKey RemoteKey
 		{
 			get { return this.connection.RemoteKey; }
 		}
 
-		public IAsymmetricKey LocalKey
+		public RSAAsymmetricKey LocalKey
 		{
 			get { return this.connection.LocalKey; }
 		}

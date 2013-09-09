@@ -77,7 +77,7 @@ namespace Gablarski.Clients
 			}).ContinueWith (t => StartAsync (t.Result)).Unwrap();
 		}
 
-		public static Task StartAsync (IAsymmetricKey key)
+		public static Task StartAsync (RSAAsymmetricKey key)
 		{
 			return Task.Run (() => {
 				channels = new LobbyChannelProvider();

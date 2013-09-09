@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2011, Eric Maupin
+﻿// Copyright (c) 2011-2013, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -37,6 +37,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -62,6 +63,26 @@ namespace Gablarski.Clients
 			var cmd = self.CreateCommand();
 			cmd.CommandText = text;
 			return cmd;
+		}
+
+		public static void WriteBytes (this BinaryWriter self, byte[] data)
+		{
+			if (self == null)
+				throw new ArgumentNullException ("self");
+			if (data == null)
+				throw new ArgumentNullException ("data");
+
+			self.Write (data.Length);
+			self.Write (data);
+		}
+
+		public static byte[] ReadBytes (this BinaryReader reader)
+		{
+			if (reader == null)
+				throw new ArgumentNullException ("reader");
+
+			int len = reader.ReadInt32();
+			return reader.ReadBytes (len);
 		}
 	}
 }
