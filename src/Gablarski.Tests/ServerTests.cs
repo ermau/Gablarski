@@ -129,9 +129,12 @@ namespace Gablarski.Tests
 		//}
 
 		[Test]
+		[Ignore ("Tempest has versioning support built in, this should be updated to use that")]
 		public void OldVersionReject ()
 		{
-			var connection = new ConnectionBuffer (provider.GetClientConnection());
+			var cs = provider.GetConnections (GablarskiProtocol.Instance);
+			var connection = new ConnectionBuffer (cs.Item1);
+
 			connection.SendAsync (new ConnectMessage { ProtocolVersion = 0 });
 
 			Message message = connection.DequeueMessage ();
@@ -144,13 +147,15 @@ namespace Gablarski.Tests
 		[Test]
 		public void ServerInfo()
 		{
-			var connection =new ConnectionBuffer (provider.GetClientConnection());
+			var cs = provider.GetConnections (GablarskiProtocol.Instance);
+			var connection = new ConnectionBuffer (cs.Item1);
+
 			connection.SendAsync (new ConnectMessage { ProtocolVersion = GablarskiProtocol.Instance.Version });
 
 			var msg = connection.DequeueAndAssertMessage<ServerInfoMessage>();
 			Assert.AreEqual (this.settings.Name, msg.ServerInfo.Name);
 			Assert.AreEqual (this.settings.Description, msg.ServerInfo.Description);
-			Assert.AreEqual (String.Empty, msg.ServerInfo.Logo);
+			Assert.IsNull (msg.ServerInfo.Logo);
 		}
 		
 		[Test]
@@ -158,7 +163,9 @@ namespace Gablarski.Tests
 		{
 			server.AddRedirector (new MockRedirector ("monkeys.com", new IPEndPoint (IPAddress.Any, 6113)));
 			
-			var connection = new ConnectionBuffer (provider.GetClientConnection());
+			var cs = provider.GetConnections (GablarskiProtocol.Instance);
+			var connection = new ConnectionBuffer (cs.Item1);
+
 			connection.SendAsync (new ConnectMessage { ProtocolVersion = GablarskiProtocol.Instance.Version,
 				Host = "monkeys.com", Port = 42912 });
 				
@@ -172,20 +179,24 @@ namespace Gablarski.Tests
 		{
 			server.AddRedirector (new MockRedirector ("monkeys.com", new IPEndPoint (IPAddress.Any, 6113)));
 			
-			var connection = new ConnectionBuffer (provider.GetClientConnection());
+			var cs = provider.GetConnections (GablarskiProtocol.Instance);
+			var connection = new ConnectionBuffer (cs.Item1);
+
 			connection.SendAsync (new ConnectMessage { ProtocolVersion = GablarskiProtocol.Instance.Version,
 				Host = "monkeys2.com", Port = 42912 });
 
 			var msg = connection.DequeueAndAssertMessage<ServerInfoMessage>();
 			Assert.AreEqual (this.settings.Name, msg.ServerInfo.Name);
 			Assert.AreEqual (this.settings.Description, msg.ServerInfo.Description);
-			Assert.AreEqual (String.Empty, msg.ServerInfo.Logo);
+			Assert.IsNull (msg.ServerInfo.Logo);
 		}
 
 		[Test]
 		public void RequestChannelList ()
 		{
-			var connection = Connect();
+			var cs = provider.GetConnections (GablarskiProtocol.Instance);
+			var connection = new ConnectionBuffer (cs.Item1);
+
 			connection.SendAsync (new RequestChannelListMessage ());
 
 			Message message = connection.DequeueMessage ();
@@ -244,7 +255,7 @@ namespace Gablarski.Tests
 		{
 			this.server.Settings.ServerPassword = "foo";
 
-			var connection = new ConnectionBuffer (provider.GetClientConnection());;
+			var connection = Connect();
 			connection.SendAsync (new JoinMessage (Nickname, null));
 
 			var join = connection.DequeueAndAssertMessage<JoinResultMessage>();
