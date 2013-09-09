@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration ("")]
 [assembly: AssemblyCompany ("Eric Maupin")]
 [assembly: AssemblyProduct ("Gablarski Windows Client")]
-[assembly: AssemblyCopyright ("Copyright © Eric Maupin 2010")]
+[assembly: AssemblyCopyright ("Copyright © Eric Maupin 2010-2013")]
 [assembly: AssemblyTrademark ("")]
 [assembly: AssemblyCulture ("")]
 
