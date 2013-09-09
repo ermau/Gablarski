@@ -37,6 +37,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Gablarski.Messages;
 using Gablarski.Server;
 using Gablarski.Tests.Mocks;
@@ -99,18 +100,22 @@ namespace Gablarski.Tests
 		}
 
 		[Test]
-		public void RequestChannelListMessageNotConnected()
+		[Description ("If not connected, don't attempt to reply.")]
+		public async Task RequestChannelListMessageNotConnected()
 		{
-			var c = provider.GetServerConnection();
-			c.DisconnectAsync().Wait();
+			var cs = provider.GetConnections (GablarskiProtocol.Instance);
+			var c = new ConnectionBuffer (cs.Item1);
+
+			await c.DisconnectAsync();
 			
-			handler.RequestChanneListMessage (new MessageEventArgs<RequestChannelListMessage> (c,
+			handler.RequestChanneListMessage (new MessageEventArgs<RequestChannelListMessage> (cs.Item2,
 				new RequestChannelListMessage()));
 
-			client.AssertNoMessage();
+			c.AssertNoMessage();
 		}
 
 		[Test]
+		[Description ("Even if the connection hasn't 'joined', it should still be able to request the channel list.")]
 		public void RequestChanneListMessageNotJoined()
 		{
 			permissions.EnablePermissions (0, PermissionName.RequestChannelList);
@@ -127,6 +132,7 @@ namespace Gablarski.Tests
 		}
 
 		[Test]
+		[Description ("If the channel the user is in is deleted, the user should be automatically moved.")]
 		public void DeleteChannelUserIsIn()
 		{
 			permissions.EnablePermissions (user.UserId, PermissionName.ChangeChannel);
