@@ -174,25 +174,25 @@ namespace Gablarski.Tests
 
 		public AudioSource GetSourceFromRequest()
 		{
-			return GetSourceFromRequest (server);
+			return GetSourceFromRequest (server, client);
 		}
 
-		public AudioSource GetSourceFromRequest (MockServerConnection connection)
+		public AudioSource GetSourceFromRequest (MockServerConnection serverConnection, ConnectionBuffer clientConnection)
 		{
-			permissions.EnablePermissions (userManager.GetUser (connection).UserId,	PermissionName.RequestSource);
+			permissions.EnablePermissions (userManager.GetUser (serverConnection).UserId,	PermissionName.RequestSource);
 
 			var audioArgs = new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 64000, 512, 10);
-			handler.RequestSourceMessage (new MessageEventArgs<RequestSourceMessage> (connection,
+			handler.RequestSourceMessage (new MessageEventArgs<RequestSourceMessage> (serverConnection,
 				new RequestSourceMessage ("Name", audioArgs)));
 
-			var result = client.DequeueAndAssertMessage<SourceResultMessage>();
+			var result = clientConnection.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.Succeeded, result.SourceResult);
 			Assert.AreEqual ("Name", result.SourceName);
 			Assert.AreEqual ("Name", result.Source.Name);
 			
 			AudioCodecArgsTests.AssertAreEqual (audioArgs, result.Source);
 
-			client.AssertNoMessage();
+			clientConnection.AssertNoMessage();
 
 			return result.Source;
 		}
@@ -794,7 +794,8 @@ namespace Gablarski.Tests
 			userManager.Connect (c);
 			userManager.Join (c, UserInfoTests.GetTestUser (2, 1, true));
 
-			var s = GetSourceFromRequest (c);
+			var s = GetSourceFromRequest (c, cl);
+
 			var result = client.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
 			client.AssertNoMessage();
