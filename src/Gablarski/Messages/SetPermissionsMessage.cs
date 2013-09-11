@@ -1,4 +1,4 @@
-// Copyright (c) 2011, Eric Maupin
+// Copyright (c) 2011-2013, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -69,6 +69,11 @@ namespace Gablarski.Messages
 
 			UserId = userId;
 			Permissions = permissions;
+		}
+
+		public override bool Encrypted
+		{
+			get { return true; }
 		}
 
 		public int UserId

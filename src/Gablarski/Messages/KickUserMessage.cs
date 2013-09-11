@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2011, Eric Maupin
+﻿// Copyright (c) 2011-2013, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -35,7 +35,6 @@
 // DAMAGE.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Tempest;
 
@@ -57,6 +56,11 @@ namespace Gablarski.Messages
 
 			UserId = user.UserId;
 			FromServer = fromServer;
+		}
+
+		public override bool Authenticated
+		{
+			get { return true; }
 		}
 
 		public int UserId

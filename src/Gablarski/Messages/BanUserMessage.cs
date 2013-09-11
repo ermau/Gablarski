@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2011, Eric Maupin
+﻿// Copyright (c) 2011-2013, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -45,6 +45,11 @@ namespace Gablarski.Messages
 		public BanUserMessage()
 			: base (GablarskiMessageType.BanUser)
 		{
+		}
+
+		public override bool Authenticated
+		{
+			get { return true; }
 		}
 
 		public bool Removing

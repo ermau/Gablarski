@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2011, Eric Maupin
+﻿// Copyright (c) 2011-2013, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -37,7 +37,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Tempest;
 
 namespace Gablarski.Messages
@@ -55,6 +54,11 @@ namespace Gablarski.Messages
 		{
 			this.OwnerId = ownerId;
 			this.Permissions = permissions;
+		}
+
+		public override bool Encrypted
+		{
+			get { return true; }
 		}
 
 		public int OwnerId
