@@ -51,7 +51,7 @@ using Timer = System.Threading.Timer;
 namespace Gablarski.Client
 {
 	public class GablarskiClient
-		: TempestClient, IGablarskiClientContext
+		: IGablarskiClientContext
 	{
 		public GablarskiClient (IClientConnection connection)
 			: this (connection, new AudioEngine())
@@ -59,7 +59,6 @@ namespace Gablarski.Client
 		}
 
 		public GablarskiClient (IClientConnection connection, IAudioEngine audioEngine)
-			: base (connection, MessageTypes.Reliable)
 		{
 			if (connection == null)
 				throw new ArgumentNullException ("connection");
@@ -67,21 +66,19 @@ namespace Gablarski.Client
 				throw new ArgumentNullException ("audioEngine");
 
 			DebugLogging = Log.IsDebugEnabled;
-			Setup (audioEngine, null, null, null);
+			Setup (connection, audioEngine, null, null, null);
 		}
 
 		public GablarskiClient (IClientConnection connection, IAudioEngine audioEngine, IClientUserHandler userHandler, IClientSourceHandler sourceHandler, ClientChannelManager channelManager)
-			: base (connection, MessageTypes.Reliable)
 		{
 			if (connection == null)
 				throw new ArgumentNullException ("connection");
 			if (audioEngine == null)
 				throw new ArgumentNullException ("audioEngine");
 
-			Setup (audioEngine, userHandler, sourceHandler, channelManager);
+			Setup (connection, audioEngine, userHandler, sourceHandler, channelManager);
 		}
 
-		#region Events
 		/// <summary>
 		/// The client has connected to the server.
 		/// </summary>
@@ -102,15 +99,18 @@ namespace Gablarski.Client
 		/// </summary>
 		public event EventHandler<DisconnectedEventArgs> Disconnected;
 
-		#endregion
 
-		#region Public Properties
 		/// <summary>
 		/// Gets whether the client is currently trying to connect or reconnect.
 		/// </summary>
 		public bool IsConnecting
 		{
 			get { return this.connecting; }
+		}
+
+		public bool IsConnected
+		{
+			get { return this.formallyConnected; }
 		}
 
 		/// <summary>
@@ -203,63 +203,29 @@ namespace Gablarski.Client
 		{
 			get; set;
 		}
-		#endregion
 
-		public override Task<ClientConnectionResult> ConnectAsync (Target target)
+		public Task<ClientConnectionResult> ConnectAsync (Target target)
 		{
 			this.running = true;
-			return base.ConnectAsync (target);
+			return this.client.ConnectAsync (target);
 		}
 
-		#region Event Invokers
-		protected void OnConnected (object sender, EventArgs e)
+		public Task DisconnectAsync()
 		{
-			this.connecting = false;
-			this.pingTimer = new Timer (s => Connection.SendAsync (new ClientPingMessage()), null, 20000, 20000);
-			Interlocked.Exchange (ref this.reconnectAttempt, 0);
-
-			var connected = this.Connected;
-			if (connected != null)
-				connected (this, e);
+			return this.client.DisconnectAsync();
 		}
-
-		protected void OnDisconnected (object sender, DisconnectedEventArgs e)
-		{
-			if (this.pingTimer != null)
-				this.pingTimer.Dispose();
-
-			var disconnected = this.Disconnected;
-			if (disconnected != null)
-				disconnected (this, e);
-		}
-
-		protected void OnConnectionRejected (RejectedConnectionEventArgs e)
-		{
-			this.connecting = false;
-			e.Reconnect = (e.Reason == ConnectionRejectedReason.CouldNotConnect || e.Reason == ConnectionRejectedReason.Unknown);
-
-			var rejected = this.ConnectionRejected;
-			if (rejected != null)
-				rejected (this, e);
-
-			DisconnectCore (DisconnectionReason.Rejected, this.Connection, e.Reconnect, false);
-		}
-
-		protected void OnPermissionDenied (PermissionDeniedEventArgs e)
-		{
-			var denied = this.PermissionDenied;
-			if (denied != null)
-				denied (this, e);
-		}
-		#endregion
 
 		IIndexedEnumerable<int, IChannelInfo> IGablarskiClientContext.Channels
 		{
 			get { return this.Channels; }
 		}
 
-		private void Setup (IAudioEngine audioEngine, IClientUserHandler userHandler, IClientSourceHandler sourceHandler, ClientChannelManager channelManager)
+		private void Setup (IClientConnection connection, IAudioEngine audioEngine, IClientUserHandler userHandler, IClientSourceHandler sourceHandler, ClientChannelManager channelManager)
 		{
+			this.client = new TempestClient (connection, MessageTypes.All);
+			this.client.Connected += OnClientConnected;
+			this.client.Disconnected += OnClientDisconnected;
+
 			this.CurrentUser = new CurrentUser (this);
 
 			this.Audio = (audioEngine ?? new AudioEngine());
@@ -291,6 +257,48 @@ namespace Gablarski.Client
 		private int reconnectAttempt;
 		private bool connecting, running;
 
+		private TempestClient client;
+
+		protected void OnConnected (object sender, EventArgs e)
+		{
+			this.connecting = false;
+			this.pingTimer = new Timer (s => this.client.Connection.SendAsync (new ClientPingMessage()), null, 20000, 20000);
+			Interlocked.Exchange (ref this.reconnectAttempt, 0);
+
+			var connected = this.Connected;
+			if (connected != null)
+				connected (this, e);
+		}
+
+		protected void OnDisconnected (object sender, DisconnectedEventArgs e)
+		{
+			if (this.pingTimer != null)
+				this.pingTimer.Dispose();
+
+			var disconnected = this.Disconnected;
+			if (disconnected != null)
+				disconnected (this, e);
+		}
+
+		protected void OnConnectionRejected (RejectedConnectionEventArgs e)
+		{
+			this.connecting = false;
+			e.Reconnect = (e.Reason == ConnectionRejectedReason.CouldNotConnect || e.Reason == ConnectionRejectedReason.Unknown);
+
+			var rejected = this.ConnectionRejected;
+			if (rejected != null)
+				rejected (this, e);
+
+			DisconnectCore (DisconnectionReason.Rejected, this.client.Connection, e.Reconnect, false);
+		}
+
+		protected void OnPermissionDenied (PermissionDeniedEventArgs e)
+		{
+			var denied = this.PermissionDenied;
+			if (denied != null)
+				denied (this, e);
+		}
+
 		private void OnDisconnectedMessage (MessageEventArgs<DisconnectMessage> e)
 		{
 			DisconnectCore (e.Message.Reason, (IClientConnection)e.Connection, (GetHandlingForReason (e.Message.Reason) == DisconnectHandling.Reconnect), true);
@@ -313,7 +321,7 @@ namespace Gablarski.Client
 		{
 			int count = Interlocked.Increment (ref this.redirectCount);
 
-			DisconnectCore (DisconnectionReason.Redirected, this.Connection);
+			DisconnectCore (DisconnectionReason.Redirected, this.client.Connection);
 			
 			if (count > redirectLimit)
 				return;
@@ -377,11 +385,6 @@ namespace Gablarski.Client
 			}
 		}
 
-		private void OnDisconnectedInternal (object sender, ConnectionEventArgs e)
-		{
-			DisconnectCore (DisconnectionReason.Unknown, (IClientConnection)e.Connection);
-		}
-
 		private void Reconnect (object state)
 		{
 			Interlocked.Increment (ref this.reconnectAttempt);
@@ -409,17 +412,23 @@ namespace Gablarski.Client
 			this.disconnectedInChannelId = 0;
 		}
 
-		protected override void OnConnected (ClientConnectionEventArgs e)
+		private void OnClientDisconnected (object sender, ClientDisconnectedEventArgs e)
+		{
+			DisconnectCore (DisconnectionReason.Unknown, this.client.Connection);
+		}
+
+		private void OnClientConnected (object sender, ClientConnectionEventArgs e)
 		{
 			lock (StateSync)
 			{
 				if (!this.running)
 				{
-					Connection.DisconnectAsync();
+					this.client.DisconnectAsync();
 					return;
 				}
 
-				//this.Connection.Send (new ConnectMessage { ProtocolVersion = ProtocolVersion, Host = this.originalHost, Port = this.originalEndPoint.Port });
+				client.Connection.SendAsync (new ConnectMessage { ProtocolVersion = 14 });
+				//Host = this.originalHost, Port = this.originalEndPoint.Port
 
 				if (Audio.AudioSender == null)
 					Audio.AudioSender = Sources;
@@ -429,8 +438,26 @@ namespace Gablarski.Client
 				Audio.Context = this;
 				Audio.Start();
 			}
+		}
 
-			base.OnConnected(e);
+		void IContext.LockHandlers()
+		{
+			this.client.LockHandlers();
+		}
+
+		void IContext.RegisterConnectionlessMessageHandler (Protocol protocol, ushort messageType, Action<ConnectionlessMessageEventArgs> handler)
+		{
+			this.client.RegisterConnectionlessMessageHandler (protocol, messageType, handler);
+		}
+
+		void IContext.RegisterMessageHandler (Protocol protocol, ushort messageType, Action<MessageEventArgs> handler)
+		{
+			this.client.RegisterMessageHandler (protocol, messageType, handler);
+		}
+
+		IClientConnection IClientContext.Connection
+		{
+			get { return this.client.Connection; }
 		}
 	}
 
