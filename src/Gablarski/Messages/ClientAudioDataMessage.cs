@@ -52,7 +52,7 @@ namespace Gablarski.Messages
 		: GablarskiMessage
 	{
 		public ClientAudioDataMessage ()
-			: base (GablarskiMessageType.AudioData)
+			: base (GablarskiMessageType.ClientAudioData)
 		{
 		}
 

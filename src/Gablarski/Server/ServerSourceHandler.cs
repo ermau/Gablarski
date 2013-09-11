@@ -61,7 +61,7 @@ namespace Gablarski.Server
 			this.manager = manager;
 
 			this.context.RegisterMessageHandler<RequestSourceMessage> (RequestSourceMessage);
-			this.context.RegisterMessageHandler<ClientAudioDataMessage> (SendAudioDataMessage);
+			this.context.RegisterMessageHandler<ClientAudioDataMessage> (OnClientAudioDataMessage);
 			this.context.RegisterMessageHandler<ClientAudioSourceStateChangeMessage> (ClientAudioSourceStateChangeMessage);
 			this.context.RegisterMessageHandler<RequestMuteSourceMessage> (RequestMuteSourceMessage);
 			this.context.RegisterMessageHandler<RequestSourceListMessage> (RequestSourceListMessage);
@@ -199,7 +199,7 @@ namespace Gablarski.Server
 			                    (con, user) => con != e.Connection);
 		}
 
-		internal void SendAudioDataMessage (MessageEventArgs<ClientAudioDataMessage> e)
+		internal void OnClientAudioDataMessage (MessageEventArgs<ClientAudioDataMessage> e)
 		{
 			var msg = (ClientAudioDataMessage)e.Message;
 
@@ -209,13 +209,13 @@ namespace Gablarski.Server
 
 			if (!context.GetPermission (PermissionName.SendAudio, speaker))
 			{
-				e.Connection.SendAsync (new PermissionDeniedMessage (GablarskiMessageType.AudioData));
+				e.Connection.SendAsync (new PermissionDeniedMessage (GablarskiMessageType.ClientAudioData));
 				return;
 			}
 
 			if (msg.TargetIds.Length > 1 && !context.GetPermission (PermissionName.SendAudioToMultipleTargets, speaker))
 			{
-				e.Connection.SendAsync (new PermissionDeniedMessage (GablarskiMessageType.AudioData));
+				e.Connection.SendAsync (new PermissionDeniedMessage (GablarskiMessageType.ClientAudioData));
 				return;
 			}
 

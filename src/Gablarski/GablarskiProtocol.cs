@@ -87,7 +87,16 @@ namespace Gablarski
 
 		SourceList = 16,
 		SourceResult = 8,
-		AudioData = 10,
+
+		/// <summary>
+		/// Audio data sent from a client.
+		/// </summary>
+		ClientAudioData = 10,
+
+		/// <summary>
+		/// Audio data sent from a server.
+		/// </summary>
+		ServerAudioData = 57,
 		AudioSourceStateChange = 29,
 		SourcesRemoved = 25,
 		SourceMuted = 53,
@@ -105,7 +114,7 @@ namespace Gablarski
 		ChannelList = 19,
 		ChangeChannelResult = 21,
 		ChannelEditResult = 23,
-	}
+	} // next: 58
 
 	public abstract class GablarskiMessage
 		: Message

@@ -45,7 +45,7 @@ namespace Gablarski.Messages
 		: GablarskiMessage
 	{
 		public ServerAudioDataMessage ()
-			: base (GablarskiMessageType.AudioData)
+			: base (GablarskiMessageType.ServerAudioData)
 		{
 		}
 

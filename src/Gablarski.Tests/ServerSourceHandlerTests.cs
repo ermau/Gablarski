@@ -668,7 +668,7 @@ namespace Gablarski.Tests
 
 			c.DisconnectAsync().Wait();
 
-			handler.SendAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (c,
+			handler.OnClientAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (c,
 				new ClientAudioDataMessage
 				{
 					Data = new [] { new byte[512] },
@@ -690,7 +690,7 @@ namespace Gablarski.Tests
 
 			userManager.Connect (c);
 
-			handler.SendAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (c,
+			handler.OnClientAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (c,
 				new ClientAudioDataMessage
 				{
 					Data = new [] { new byte[512] },
@@ -713,7 +713,7 @@ namespace Gablarski.Tests
 			userManager.Connect (c);
 			userManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
 
-			handler.SendAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (server,
+			handler.OnClientAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (server,
 				new ClientAudioDataMessage
 				{
 					Data = new [] { new byte[512] },
@@ -741,7 +741,7 @@ namespace Gablarski.Tests
 			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
 			cl.AssertNoMessage();
 
-			handler.SendAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (c,
+			handler.OnClientAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (c,
 				new ClientAudioDataMessage
 				{
 					Data = new [] { new byte[512] },
@@ -771,7 +771,7 @@ namespace Gablarski.Tests
 			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
 			cl.AssertNoMessage();
 
-			handler.SendAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (server,
+			handler.OnClientAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (server,
 				new ClientAudioDataMessage
 				{
 					Data = new [] { new byte[512] },
@@ -800,7 +800,7 @@ namespace Gablarski.Tests
 			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
 			client.AssertNoMessage();
 
-			handler.SendAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (c,
+			handler.OnClientAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (c,
 				new ClientAudioDataMessage
 				{
 					Data = new [] { new byte[512] },
@@ -831,7 +831,7 @@ namespace Gablarski.Tests
 
 			permissions.EnablePermissions (user.UserId, PermissionName.SendAudio);
 
-			handler.SendAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (server,
+			handler.OnClientAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (server,
 				new ClientAudioDataMessage
 				{
 					Data = new [] { new byte[512] },
@@ -860,7 +860,7 @@ namespace Gablarski.Tests
 			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
 			cl.AssertNoMessage();
 
-			handler.SendAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (server,
+			handler.OnClientAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (server,
 				new ClientAudioDataMessage
 				{
 					Data = new [] { new byte[512] },
@@ -870,7 +870,7 @@ namespace Gablarski.Tests
 				}));
 
 			cl.AssertNoMessage();
-			Assert.AreEqual (GablarskiMessageType.AudioData, client.DequeueAndAssertMessage<PermissionDeniedMessage>().DeniedMessage);
+			Assert.AreEqual (GablarskiMessageType.ClientAudioData, client.DequeueAndAssertMessage<PermissionDeniedMessage>().DeniedMessage);
 		}
 
 		[Test]
@@ -890,7 +890,7 @@ namespace Gablarski.Tests
 
 			permissions.EnablePermissions (user.UserId, PermissionName.SendAudio);
 
-			handler.SendAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (server,
+			handler.OnClientAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (server,
 				new ClientAudioDataMessage
 				{
 					Data = new [] { new byte[512] },
@@ -918,7 +918,7 @@ namespace Gablarski.Tests
 			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
 			cl.AssertNoMessage();
 
-			handler.SendAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (server,
+			handler.OnClientAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (server,
 				new ClientAudioDataMessage
 				{
 					Data = new [] { new byte[512] },
@@ -928,7 +928,7 @@ namespace Gablarski.Tests
 				}));
 
 			cl.AssertNoMessage();
-			Assert.AreEqual (GablarskiMessageType.AudioData, client.DequeueAndAssertMessage<PermissionDeniedMessage>().DeniedMessage);
+			Assert.AreEqual (GablarskiMessageType.ClientAudioData, client.DequeueAndAssertMessage<PermissionDeniedMessage>().DeniedMessage);
 		}
 
 		[Test]
@@ -959,7 +959,7 @@ namespace Gablarski.Tests
 
 			permissions.EnablePermissions (user.UserId, PermissionName.SendAudio, PermissionName.SendAudioToMultipleTargets);
 
-			handler.SendAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (server,
+			handler.OnClientAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (server,
 				new ClientAudioDataMessage
 				{
 					Data = new [] { new byte[512] },
@@ -999,7 +999,7 @@ namespace Gablarski.Tests
 			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
 			cl2.AssertNoMessage();
 
-			handler.SendAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (server,
+			handler.OnClientAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (server,
 				new ClientAudioDataMessage
 				{
 					Data = new [] { new byte[512] },
@@ -1010,7 +1010,7 @@ namespace Gablarski.Tests
 
 			cl.AssertNoMessage();
 			cl2.AssertNoMessage();
-			Assert.AreEqual (GablarskiMessageType.AudioData, client.DequeueAndAssertMessage<PermissionDeniedMessage>().DeniedMessage);
+			Assert.AreEqual (GablarskiMessageType.ClientAudioData, client.DequeueAndAssertMessage<PermissionDeniedMessage>().DeniedMessage);
 		}
 
 		[Test]
@@ -1043,7 +1043,7 @@ namespace Gablarski.Tests
 
 			permissions.EnablePermissions (user.UserId, PermissionName.SendAudio, PermissionName.SendAudioToMultipleTargets);
 
-			handler.SendAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (server,
+			handler.OnClientAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (server,
 				new ClientAudioDataMessage
 				{
 					Data = new [] { new byte[512] },
@@ -1083,7 +1083,7 @@ namespace Gablarski.Tests
 
 			permissions.EnablePermissions (user.UserId, PermissionName.SendAudio);
 
-			handler.SendAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (server,
+			handler.OnClientAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (server,
 				new ClientAudioDataMessage
 				{
 					Data = new [] { new byte[512] },
@@ -1093,7 +1093,7 @@ namespace Gablarski.Tests
 				}));
 
 			cl.AssertNoMessage();
-			Assert.AreEqual (GablarskiMessageType.AudioData, client.DequeueAndAssertMessage<PermissionDeniedMessage>().DeniedMessage);
+			Assert.AreEqual (GablarskiMessageType.ClientAudioData, client.DequeueAndAssertMessage<PermissionDeniedMessage>().DeniedMessage);
 		}
 		#endregion
 	}

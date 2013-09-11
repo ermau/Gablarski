@@ -60,7 +60,7 @@ namespace Gablarski.Client
 			this.context.RegisterMessageHandler<SourceListMessage> (OnSourceListReceivedMessage);
 			this.context.RegisterMessageHandler<SourcesRemovedMessage> (OnSourcesRemovedMessage);
 			this.context.RegisterMessageHandler<SourceResultMessage> (OnSourceResultMessage);
-			this.context.RegisterMessageHandler<ServerAudioDataMessage> (OnAudioDataReceivedMessage);
+			this.context.RegisterMessageHandler<ServerAudioDataMessage> (OnServerAudioDataMessage);
 			this.context.RegisterMessageHandler<AudioSourceStateChangeMessage> (OnAudioSourceStateChangedMessage);
 			this.context.RegisterMessageHandler<SourceMutedMessage> (OnSourceMutedMessage);
 		}
@@ -296,7 +296,7 @@ namespace Gablarski.Client
 			}
 		}
 
-		internal void OnAudioDataReceivedMessage (MessageEventArgs<ServerAudioDataMessage> e)
+		internal void OnServerAudioDataMessage (MessageEventArgs<ServerAudioDataMessage> e)
 		{
 			var msg = (ServerAudioDataMessage)e.Message;
 
