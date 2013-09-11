@@ -158,6 +158,8 @@ namespace Gablarski.Client
 		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
 		void Kick (IUser user, bool fromServer);
 
+		Task BanAsync (IUserInfo user, TimeSpan banLength);
+
 		/// <summary>
 		/// Attempts to toggle mute on <paramref name="user"/>.
 		/// </summary>

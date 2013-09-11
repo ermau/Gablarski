@@ -806,9 +806,11 @@ namespace Gablarski.Clients.Windows
 			Client.Users.ApproveRegistration ((IUserInfo)this.SelectedNode.Tag);
 		}
 
-		private void ContextBanUsername (object sender, EventArgs eventArgs)
+		private async void ContextBanUsername (object sender, EventArgs eventArgs)
 		{
-			Client.Connection.SendAsync (new BanUserMessage { BanInfo = new BanInfo (null, ((IUserInfo)this.SelectedNode.Tag).Username, TimeSpan.MaxValue) });
+			var user = (IUserInfo)this.SelectedNode.Tag;
+
+			await Client.Users.BanAsync (user, TimeSpan.MaxValue);
 		}
 
 		private void ContextServerKick (object sender, EventArgs e)

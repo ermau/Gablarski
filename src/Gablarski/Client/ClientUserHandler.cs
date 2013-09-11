@@ -38,6 +38,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Cadenza.Collections;
 using Gablarski.Messages;
 using Tempest;
@@ -210,6 +211,16 @@ namespace Gablarski.Client
 				throw new ArgumentNullException ("user");
 
 			this.context.Connection.SendAsync (new KickUserMessage (user, fromServer));
+		}
+
+		public Task BanAsync (IUserInfo user, TimeSpan banLength)
+		{
+			if (user == null)
+				throw new ArgumentNullException ("user");
+
+			return this.context.Connection.SendAsync (new BanUserMessage {
+				BanInfo = new BanInfo (null, user.Username, banLength)
+			});
 		}
 
 		public IEnumerable<IUserInfo> GetUsersInChannel (int channelId)
