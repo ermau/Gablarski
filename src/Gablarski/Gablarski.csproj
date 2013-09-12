@@ -182,6 +182,7 @@
     <Compile Include="Messages\SourceListMessage.cs" />
     <Compile Include="Messages\SourceResultMessage.cs" />
     <Compile Include="ByteArrayExtensions.cs" />
+    <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Server\IRedirector.cs" />
     <Compile Include="Server\IServerChannelHandler.cs" />
     <Compile Include="Server\IConnectionManager.cs" />
