@@ -265,8 +265,8 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Tempest\Desktop\Tempest\Tempest.csproj">
-      <Project>{D6A2003C-CBB2-47B0-B306-521141D3068D}</Project>
+    <ProjectReference Include="..\Tempest.Social\Tempest\Desktop\Tempest\Tempest.csproj">
+      <Project>{d6a2003c-cbb2-47b0-b306-521141d3068d}</Project>
       <Name>Tempest</Name>
     </ProjectReference>
   </ItemGroup>
