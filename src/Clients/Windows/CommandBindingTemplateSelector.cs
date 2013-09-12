@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using Cadenza;
+using Gablarski.Clients.ViewModels;
 
 namespace Gablarski.Clients.Windows
 {
@@ -22,7 +23,7 @@ namespace Gablarski.Clients.Windows
 
 		public override DataTemplate SelectTemplate (object item, DependencyObject container)
 		{
-			var binding = (item as CommandBindingSettingEntry);
+			var binding = (item as CommandBindingViewModel);
 			if (binding == null)
 				return base.SelectTemplate (item, container);
 

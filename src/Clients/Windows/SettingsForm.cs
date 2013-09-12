@@ -171,7 +171,7 @@ namespace Gablarski.Clients.Windows
 
 		private MutableLookup<string, NotificationType> notifications;
 		private BindingListViewModel bindingViewModel;
-		private CommandBindingSettingEntry recordingEntry;
+		private CommandBindingViewModel recordingEntry;
 		private readonly object inputSync = new object();
 		private bool ignoreNotificationChanges;
 
@@ -213,7 +213,7 @@ namespace Gablarski.Clients.Windows
 
 		private void OnRecord (object obj)
 		{
-			var entry = (obj as CommandBindingSettingEntry);
+			var entry = (obj as CommandBindingViewModel);
 			if (entry == null)
 				return;
 
@@ -230,7 +230,7 @@ namespace Gablarski.Clients.Windows
 
 		private bool CanRecord (object arg)
 		{
-			var binding = (arg as CommandBindingSettingEntry);
+			var binding = (arg as CommandBindingViewModel);
 			if (binding == null)
 				return false;
 
@@ -239,7 +239,7 @@ namespace Gablarski.Clients.Windows
 
 		private void addBinding_LinkClicked (object sender, LinkLabelLinkClickedEventArgs e)
 		{
-			this.bindingViewModel.Bindings.Add (new CommandBindingSettingEntry (this.bindingViewModel.InputProvider));
+			this.bindingViewModel.Bindings.Add (new CommandBindingViewModel (this.bindingViewModel.InputProvider));
 		}
 
 		private void OnNewRecording (object sender, RecordingEventArgs e)
@@ -247,7 +247,7 @@ namespace Gablarski.Clients.Windows
 			if (this.recordingEntry == null)
 				return;
 
-			CommandBindingSettingEntry entry;
+			CommandBindingViewModel entry;
 			lock (this.inputSync)
 			{
 				if (this.recordingEntry == null)
@@ -264,7 +264,7 @@ namespace Gablarski.Clients.Windows
 				entry.Recording = false;
 			}
 
-			BeginInvoke ((Action<CommandBindingSettingEntry>)(be =>
+			BeginInvoke ((Action<CommandBindingViewModel>)(be =>
 			{
 				((AnonymousCommand)this.bindingViewModel.RecordCommand).ChangeCanExecute();
 				this.addBinding.Enabled = true;

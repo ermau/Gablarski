@@ -113,6 +113,7 @@
     <Compile Include="Settings.cs" />
     <Compile Include="ViewModels\AnonymousCommand.cs" />
     <Compile Include="ViewModels\BindingListViewModel.cs" />
+    <Compile Include="ViewModels\CommandBindingViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Gablarski\Gablarski.csproj">

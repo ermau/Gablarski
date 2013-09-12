@@ -40,90 +40,11 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
-using Cadenza;
 using Gablarski.Clients.Persistence;
 using Gablarski.Clients.Input;
 
 namespace Gablarski.Clients.ViewModels
 {
-	public class CommandBindingSettingEntry
-		: CommandBindingEntry, INotifyPropertyChanged
-	{
-		public CommandBindingSettingEntry (IInputProvider provider)
-		{
-			if (provider == null)
-				throw new ArgumentNullException ("provider");
-
-			this.provider = provider;
-		}
-
-		public CommandBindingSettingEntry (IInputProvider provider, CommandBindingEntry entry)
-		{
-			if (provider == null)
-				throw new ArgumentNullException ("provider");
-
-			this.provider = provider;
-			Input = entry.Input;
-			ProviderType = entry.ProviderType;
-			Command = entry.Command;
-		}
-
-		public event PropertyChangedEventHandler PropertyChanged;
-
-		public string NiceInput
-		{
-			get
-			{
-				if (Input.IsNullOrWhitespace())
-					return "Set binding";
-				if (Recording)
-					return "Do something already..";
-				if (this.provider != null)
-					return this.provider.GetNiceInputName (Command, Input);
-
-				return "Error";
-			}
-		}
-
-		public bool Recording
-		{
-			get { return this.recording; }
-			set
-			{
-				if (value == this.Recording)
-					return;
-
-				this.recording = value;
-				OnPropertyChanged (new PropertyChangedEventArgs ("Recording"));
-				OnPropertyChanged (new PropertyChangedEventArgs ("NiceInput"));
-			}
-		}
-
-		public KeyValuePair<string, Command> BoundCommand
-		{
-			get { return new KeyValuePair<string, Command> (BindingListViewModel.SpaceEnum (Command.ToString()), Command); }
-			set
-			{
-				if (value.Value == Command)
-					return;
-
-				Command = value.Value;
-				OnPropertyChanged (new PropertyChangedEventArgs ("Command"));
-				OnPropertyChanged (new PropertyChangedEventArgs ("BoundCommand"));
-			}
-		}
-
-		private readonly IInputProvider provider;
-		private bool recording;
-
-		private void OnPropertyChanged (PropertyChangedEventArgs e)
-		{
-			var changed = PropertyChanged;
-			if (changed != null)
-				changed (this, e);
-		}
-	}
-
 	public class BindingListViewModel
 		: INotifyPropertyChanged
 	{
@@ -138,14 +59,14 @@ namespace Gablarski.Clients.ViewModels
 			this.window = window;
 			this.RemoveCommand = new AnonymousCommand (o =>
 			{
-				var binding = (o as CommandBindingSettingEntry);
+				var binding = (o as CommandBindingViewModel);
 				if (binding == null)
 					return;
 
 				this.bindings.Remove (binding);
 			},
 
-			o => o is CommandBindingSettingEntry);
+			o => o is CommandBindingViewModel);
 		}
 
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -172,9 +93,9 @@ namespace Gablarski.Clients.ViewModels
 				this.inputProvider.Attach (this.window);
 				OnPropertyChanged (new PropertyChangedEventArgs ("InputProvider"));
 
-				this.bindings = new ObservableCollection<CommandBindingSettingEntry> (ClientData.GetCommandBindings()
+				this.bindings = new ObservableCollection<CommandBindingViewModel> (ClientData.GetCommandBindings()
 					.Where (b => value.GetType().GetSimpleName() == b.ProviderType)
-					.Select (b => new CommandBindingSettingEntry (value, b)));
+					.Select (b => new CommandBindingViewModel (value, b)));
 
 				OnPropertyChanged (new PropertyChangedEventArgs ("Bindings"));
 			}
@@ -191,7 +112,7 @@ namespace Gablarski.Clients.ViewModels
 			}
 		}
 
-		public ICollection<CommandBindingSettingEntry> Bindings
+		public ICollection<CommandBindingViewModel> Bindings
 		{
 			get { return this.bindings; }
 		}
@@ -208,7 +129,7 @@ namespace Gablarski.Clients.ViewModels
 			private set;
 		}
 
-		private ObservableCollection<CommandBindingSettingEntry> bindings;
+		private ObservableCollection<CommandBindingViewModel> bindings;
 
 		private void OnPropertyChanged (PropertyChangedEventArgs e)
 		{
