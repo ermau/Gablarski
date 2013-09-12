@@ -42,6 +42,7 @@ using System.Linq;
 using System.Windows.Input;
 using Gablarski.Clients.Persistence;
 using Gablarski.Clients.Input;
+using GalaSoft.MvvmLight.Command;
 
 namespace Gablarski.Clients.ViewModels
 {
@@ -57,16 +58,7 @@ namespace Gablarski.Clients.ViewModels
 
 			this.RecordCommand = recordCommand;
 			this.window = window;
-			this.RemoveCommand = new AnonymousCommand (o =>
-			{
-				var binding = (o as CommandBindingViewModel);
-				if (binding == null)
-					return;
-
-				this.bindings.Remove (binding);
-			},
-
-			o => o is CommandBindingViewModel);
+			RemoveCommand = new RelayCommand<CommandBindingViewModel> (b => this.bindings.Remove (b));
 		}
 
 		public event PropertyChangedEventHandler PropertyChanged;

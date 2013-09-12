@@ -10,6 +10,7 @@ using Gablarski.Clients.Media;
 using Gablarski.Clients.Windows.Properties;
 using Gablarski.Clients.ViewModels;
 using Cadenza;
+using GalaSoft.MvvmLight.Command;
 
 namespace Gablarski.Clients.Windows
 {
@@ -28,7 +29,7 @@ namespace Gablarski.Clients.Windows
 			this.inConnectOnStart.Checked = Settings.ShowConnectOnStart;
 			this.gablarskiURLs.Checked = Settings.EnableGablarskiURLs;
 
-			this.bindingViewModel = new BindingListViewModel (this.Handle, new AnonymousCommand (OnRecord, CanRecord));
+			this.bindingViewModel = new BindingListViewModel (this.Handle, new RelayCommand<CommandBindingViewModel> (OnRecord, CanRecord));
 			this.bindingViewModel.PropertyChanged += OnBindingPropertyChanged;
 			this.bindingList.DataContext = this.bindingViewModel;
 			if (this.bindingViewModel.InputProvider == null)
@@ -211,15 +212,11 @@ namespace Gablarski.Clients.Windows
 			this.normalVolume.Enabled = !this.inUseCurrentVolume.Checked;
 		}
 
-		private void OnRecord (object obj)
+		private void OnRecord (CommandBindingViewModel entry)
 		{
-			var entry = (obj as CommandBindingViewModel);
-			if (entry == null)
-				return;
-
 			this.recordingEntry = entry;
 			this.recordingEntry.Recording = true;
-			((AnonymousCommand)this.bindingViewModel.RecordCommand).ChangeCanExecute();
+			((RelayCommand<CommandBindingViewModel>)this.bindingViewModel.RecordCommand).RaiseCanExecuteChanged();
 
 			this.addBinding.Enabled = false;
 			this.AcceptButton = null;
@@ -266,7 +263,7 @@ namespace Gablarski.Clients.Windows
 
 			BeginInvoke ((Action<CommandBindingViewModel>)(be =>
 			{
-				((AnonymousCommand)this.bindingViewModel.RecordCommand).ChangeCanExecute();
+				((RelayCommand<CommandBindingViewModel>)this.bindingViewModel.RecordCommand).RaiseCanExecuteChanged();
 				this.addBinding.Enabled = true;
 				this.AcceptButton = this.btnOk;
 				this.CancelButton = this.btnCancel;
