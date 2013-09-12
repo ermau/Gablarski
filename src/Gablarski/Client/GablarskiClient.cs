@@ -1,4 +1,4 @@
-// Copyright (c) 2011-2013, Eric Maupin
+// Copyright (c) 2010-2013, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -36,16 +36,15 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using Cadenza.Collections;
 using Gablarski.Audio;
 using Gablarski.Messages;
 using Tempest;
+using Tempest.Providers.Network;
+using Tempest.Social;
 using Timer = System.Threading.Timer;
 
 namespace Gablarski.Client
@@ -117,6 +116,12 @@ namespace Gablarski.Client
 		/// Gets the channel manager for this client.
 		/// </summary>
 		public ClientChannelManager Channels
+		{
+			get;
+			private set;
+		}
+
+		public SocialClient Social
 		{
 			get;
 			private set;
@@ -213,6 +218,22 @@ namespace Gablarski.Client
 		public Task DisconnectAsync()
 		{
 			return this.client.DisconnectAsync();
+		}
+
+		public async Task<Group> StartGroupWithAsync (Person person)
+		{
+			if (person == null)
+				throw new ArgumentNullException ("person");
+
+			Group group = await Social.CreateGroupAsync().ConfigureAwait (false);
+			if (group == null)
+				return null;
+
+			Invitation invitation = await Social.InviteToGroupAsync (group, person).ConfigureAwait (false);
+			if (invitation == null)
+				return null;
+
+			return group;
 		}
 
 		IIndexedEnumerable<int, IChannelInfo> IGablarskiClientContext.Channels
