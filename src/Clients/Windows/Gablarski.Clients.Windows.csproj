@@ -159,7 +159,6 @@
     <Compile Include="BindingList.xaml.cs">
       <DependentUpon>BindingList.xaml</DependentUpon>
     </Compile>
-    <Compile Include="BindingListViewModel.cs" />
     <Compile Include="ChannelForm.cs">
       <SubType>Form</SubType>
     </Compile>

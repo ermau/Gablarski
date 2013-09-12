@@ -8,6 +8,7 @@ using Gablarski.Audio;
 using Gablarski.Clients.Input;
 using Gablarski.Clients.Media;
 using Gablarski.Clients.Windows.Properties;
+using Gablarski.Clients.ViewModels;
 using Cadenza;
 
 namespace Gablarski.Clients.Windows
