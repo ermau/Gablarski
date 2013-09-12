@@ -125,14 +125,22 @@
     <Compile Include="Persistence\VolumeEntry.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings.cs" />
-    <Compile Include="ViewModels\AnonymousCommand.cs" />
     <Compile Include="ViewModels\BindingListViewModel.cs" />
+    <Compile Include="ViewModels\BuddyListViewModel.cs" />
+    <Compile Include="ViewModels\ChatViewModel.cs" />
     <Compile Include="ViewModels\CommandBindingViewModel.cs" />
+    <Compile Include="ViewModels\GroupViewModel.cs" />
+    <Compile Include="ViewModels\MainWindowViewModel.cs" />
+    <Compile Include="ViewModels\ObservableFilter.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Gablarski\Gablarski.csproj">
       <Project>{7347052b-da5b-4cca-ab28-3963766e3cdb}</Project>
       <Name>Gablarski</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Tempest.Social\Desktop\Tempest.Social\Tempest.Social.csproj">
+      <Project>{0569ec5a-d715-4a46-a2a5-bbe5f06f56c0}</Project>
+      <Name>Tempest.Social</Name>
     </ProjectReference>
     <ProjectReference Include="..\Tempest.Social\Tempest\Desktop\Tempest\Tempest.csproj">
       <Project>{d6a2003c-cbb2-47b0-b306-521141d3068d}</Project>
