@@ -222,7 +222,7 @@ namespace Gablarski.Clients.Windows
 			Program.UpdateTaskbarServers();
 
 			this.ClearEdit();
-			//this.LoadServerEntries();
+			this.LoadServerEntries();
 		}
 
 		private void btnCancel_Click (object sender, EventArgs e)
@@ -237,28 +237,28 @@ namespace Gablarski.Clients.Windows
 				this.Close ();
 		}
 
-		//private void LoadServerEntries()
-		//{
-		//	this.servers.BeginUpdate();
-		//	this.servers.Items.Clear();
+		private void LoadServerEntries()
+		{
+			this.servers.BeginUpdate();
+			this.servers.Items.Clear();
 
-		//	GablarskiClient.FindLocalServers (0, DisplayLocalServer, () => !(this.IsDisposed || !this.Visible));
+			//GablarskiClient.FindLocalServers (0, DisplayLocalServer, () => !(this.IsDisposed || !this.Visible));
 
-		//	this.servers.Groups.Add ("local", "Local Servers");
-		//	var saved = this.servers.Groups.Add ("dbentries", "Saved Servers");
+			this.servers.Groups.Add ("local", "Local Servers");
+			var saved = this.servers.Groups.Add ("dbentries", "Saved Servers");
 
-		//	foreach (var entry in Servers.GetEntries())
-		//	{
-		//		var li = this.servers.Items.Add (entry.Name);
-		//		li.Tag = entry;
-		//		li.ImageKey = "serverQuery";
-		//		saved.Items.Add (li);
+			foreach (var entry in Servers.GetEntries())
+			{
+				var li = this.servers.Items.Add (entry.Name);
+				li.Tag = entry;
+				li.ImageKey = "serverQuery";
+				saved.Items.Add (li);
 
-		//		GablarskiClient.QueryServer (entry.Host, entry.Port, li, ServerQueried);
-		//	}
+				//GablarskiClient.QueryServer (entry.Host, entry.Port, li, ServerQueried);
+			}
 
-		//	this.servers.EndUpdate();
-		//}
+			this.servers.EndUpdate();
+		}
 
 		private void UpdateImage (ListViewItem li, string key)
 		{
@@ -349,7 +349,7 @@ namespace Gablarski.Clients.Windows
 			Settings.SettingChanged += OnSettingsChanged;
 			SetupTTS();
 
-			//this.LoadServerEntries();
+			this.LoadServerEntries();
 		}
 
 		private void LoginForm_FormClosing (object sender, FormClosingEventArgs e)
