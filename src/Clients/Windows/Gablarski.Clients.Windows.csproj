@@ -154,7 +154,6 @@
     <Compile Include="AboutForm.Designer.cs">
       <DependentUpon>AboutForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="AnonymousCommand.cs" />
     <Compile Include="EditBalloon.cs" />
     <Compile Include="BindingList.xaml.cs">
       <DependentUpon>BindingList.xaml</DependentUpon>
@@ -365,9 +364,9 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Gablarski.Clients\Gablarski.Clients.csproj">
+    <ProjectReference Include="..\..\Gablarski.Clients.Core\Gablarski.Clients.Core.csproj">
       <Project>{f8a695aa-8bc9-46d4-8b7a-bdbd7b74401f}</Project>
-      <Name>Gablarski.Clients</Name>
+      <Name>Gablarski.Clients.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Gablarski\Gablarski.csproj">
       <Project>{7347052b-da5b-4cca-ab28-3963766e3cdb}</Project>
