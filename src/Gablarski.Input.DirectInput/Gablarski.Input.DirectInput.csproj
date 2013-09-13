@@ -76,7 +76,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Gablarski.Clients\Gablarski.Clients.csproj">
+    <ProjectReference Include="..\Gablarski.Clients.Core\Gablarski.Clients.Core.csproj">
       <Project>{F8A695AA-8BC9-46D4-8B7A-BDBD7B74401F}</Project>
       <Name>Gablarski.Clients</Name>
     </ProjectReference>
