@@ -142,6 +142,9 @@ namespace Gablarski.Clients.Windows
 				}
 			}
 
+			if (Settings.Nickname == null)
+				PersonalSetup();
+
 			Application.EnableVisualStyles ();
 			Application.SetCompatibleTextRenderingDefault (false);
 
@@ -181,6 +184,14 @@ namespace Gablarski.Clients.Windows
 			Application.Run (m);
 
 			Settings.Save();
+		}
+
+		private static void PersonalSetup()
+		{
+			var setupWindow = new PersonaSetupWindow();
+			bool? result = setupWindow.ShowDialog();
+			if (!result.HasValue || !result.Value)
+				Environment.Exit (0);
 		}
 	}
 }
