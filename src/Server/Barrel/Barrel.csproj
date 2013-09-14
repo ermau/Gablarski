@@ -138,7 +138,7 @@
   <PropertyGroup>
     <PostBuildEvent>xcopy /Y "$(SolutionDir)src\Gablarski.WebServer\bin\$(ConfigurationName)\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)src\Gablarski.WebServer\bin\$(ConfigurationName)\*.pdb" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)src\Gablarski.LocalServer\bin\Debug\*.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)src\Gablarski.LocalServer\bin\Debug\*.pdb" "$(TargetDir)"</PostBuildEvent>
+xcopy /Y "$(SolutionDir)src\Gablarski.LocalServer\bin\$(ConfigurationName)\*.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)src\Gablarski.LocalServer\bin\$(ConfigurationName)\*.pdb" "$(TargetDir)"</PostBuildEvent>
   </PropertyGroup>
 </Project>
