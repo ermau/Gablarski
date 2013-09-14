@@ -6,7 +6,7 @@
         xmlns:Social="clr-namespace:Tempest.Social;assembly=Tempest.Social"
         xmlns:Gablarski="clr-namespace:Gablarski.Clients.Windows"
         xmlns:ComponentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
-        Title="MainWindow" Height="500" Width="250">
+        Title="Gablarski" Height="500" Width="250">
 	<Window.Resources>
 		<Gablarski:AvatarConverter x:Key="AvatarConverter" />
 		<CollectionViewSource x:Key="BuddiesByStatus" Source="{Binding BuddyList.Buddies}">
