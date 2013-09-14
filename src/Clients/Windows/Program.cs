@@ -187,12 +187,14 @@ namespace Gablarski.Clients.Windows
 			Application.EnableVisualStyles ();
 			Application.SetCompatibleTextRenderingDefault (false);
 
-			var m = new MainForm();
-			m.Show();
+			SetupSocial();
+
+			MainWindow window = new MainWindow();
+			window.Show();
 
 			UpdateTaskbarServers();
 
-			if (args.Length > 0)
+			/*if (args.Length > 0)
 			{
 				int id;
 				if (Int32.TryParse (args[0], out id))
@@ -218,9 +220,10 @@ namespace Gablarski.Clients.Windows
 			{
 				if (!m.ShowConnect (true))
 					return;
-			}
-			
-			Application.Run (m);
+			}*/
+
+			System.Windows.Application app = new System.Windows.Application();
+			app.Run (window);
 
 			Settings.Save();
 		}
