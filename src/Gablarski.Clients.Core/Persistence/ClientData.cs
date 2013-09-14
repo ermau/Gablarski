@@ -1,4 +1,4 @@
-// Copyright (c) 2011, Eric Maupin
+// Copyright (c) 2011-2013, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -40,7 +40,7 @@ using System.Configuration;
 using System.Data.Common;
 using System.Data.SQLite;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Cadenza;
@@ -67,7 +67,7 @@ namespace Gablarski.Clients.Persistence
 			var builder = new SQLiteConnectionStringBuilder();
 			builder.DataSource = DbFile.FullName;
 
-			db = new SQLiteConnection(builder.ToString());
+			db = new SQLiteConnection (builder.ToString());
 			db.Open();
 			
 			CreateDbs();
@@ -294,6 +294,11 @@ namespace Gablarski.Clients.Persistence
 					};
 				}
 			}
+		}
+
+		public static Task<IEnumerable<ServerEntry>> GetServersAsync()
+		{
+			return Task.Run<IEnumerable<ServerEntry>> (() => GetServers().ToArray());
 		}
 
 		public static void SaveOrUpdate (ServerEntry server)
