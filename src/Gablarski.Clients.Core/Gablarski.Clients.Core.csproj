@@ -98,6 +98,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AsyncValue.cs" />
     <Compile Include="AvatarCache.cs" />
     <Compile Include="AutomaticErrorReporter.cs" />
     <Compile Include="Extensions.cs" />

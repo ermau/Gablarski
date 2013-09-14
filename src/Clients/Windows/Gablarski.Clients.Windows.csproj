@@ -168,7 +168,6 @@
     <Compile Include="AboutForm.Designer.cs">
       <DependentUpon>AboutForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="AsyncValue.cs" />
     <Compile Include="AvatarConverter.cs" />
     <Compile Include="EditBalloon.cs" />
     <Compile Include="BindingList.xaml.cs">

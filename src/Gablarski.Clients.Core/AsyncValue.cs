@@ -42,13 +42,14 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Gablarski.Annotations;
 
-namespace Gablarski.Clients.Windows
+namespace Gablarski.Clients
 {
-	internal sealed class AsyncValue<T>
+	public sealed class AsyncValue<T>
 		: INotifyPropertyChanged
 	{
 		private readonly Task<T> valueTask;
 		private readonly T defaultValue;
+		private bool isRunning = true;
 
 		public AsyncValue ([NotNull] Task<T> valueTask, T defaultValue)
 		{
@@ -59,11 +60,28 @@ namespace Gablarski.Clients.Windows
 			this.defaultValue = defaultValue;
 
 			this.valueTask.ContinueWith (t => {
+				IsRunning = false;
+			}, TaskContinuationOptions.HideScheduler);
+
+			this.valueTask.ContinueWith (t => {
 				OnPropertyChanged ("Value");
 			}, TaskContinuationOptions.HideScheduler | TaskContinuationOptions.OnlyOnRanToCompletion);
 		}
 
 		public event PropertyChangedEventHandler PropertyChanged;
+
+		public bool IsRunning
+		{
+			get { return this.isRunning; }
+			set
+			{
+				if (this.isRunning == value)
+					return;
+				
+				this.isRunning = value;
+				OnPropertyChanged();
+			}
+		}
 
 		public T Value
 		{
