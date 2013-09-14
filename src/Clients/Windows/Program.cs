@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
@@ -12,13 +13,16 @@ using Microsoft.WindowsAPICodePack.Taskbar;
 using System.Collections.Generic;
 using Microsoft.WindowsAPICodePack.Shell;
 using Tempest;
+using Tempest.Social;
 
 namespace Gablarski.Clients.Windows
 {
 	static class Program
 	{
 		public static Task<RSAAsymmetricKey> Key;
+		public static Task<ClientConnectionResult> SocialConnectTask;
 
+		public static GablarskiSocialClient SocialClient;
 		public static void EnableGablarskiURIs()
 		{
 			try
@@ -184,6 +188,19 @@ namespace Gablarski.Clients.Windows
 			Application.Run (m);
 
 			Settings.Save();
+		}
+
+		private static void SetupSocial()
+		{
+			var person = new Person (Key.Result.PublicSignature.Aggregate (String.Empty, (s, b) => s + b.ToString ("X2"))) {
+				Nickname = Settings.Nickname,
+				Avatar = Settings.Avatar
+			};
+
+			SocialClient = new GablarskiSocialClient (person, Key.Result);
+
+			string host = ConfigurationManager.AppSettings["socialHost"];
+			SocialConnectTask = SocialClient.ConnectAsync (new Target (host, SocialProtocol.DefaultPort));
 		}
 
 		private static void PersonalSetup()
