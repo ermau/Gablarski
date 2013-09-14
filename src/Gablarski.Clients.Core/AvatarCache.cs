@@ -66,15 +66,20 @@ namespace Gablarski.Clients
 				return avatarData;
 
 			Uri imageUri;
-			if (Uri.TryCreate (avatar, UriKind.Absolute, out imageUri)) {
+			if (Uri.TryCreate (avatar, UriKind.Absolute, out imageUri) && imageUri.Scheme != "gravatar") {
 				if (imageUri.IsFile)
 					return null;
 			} else {
-				// Try gravatar if it looks like an email
-				if (avatar.Contains ("@") && avatar.Contains (".")) {
+				if (imageUri != null && imageUri.Scheme == "gravatar") {
+					imageUri = new Uri (GravatarBaseUri, imageUri.Host + "?d=mm&s=96");
+				} else if (avatar.Contains ("@") && avatar.Contains (".")) {
 					string clean = avatar.Trim().ToLower();
-					byte[] hash = Md5.ComputeHash (Encoding.ASCII.GetBytes (clean));
-					imageUri = new Uri (GravatarBaseUri, hash.Aggregate (String.Empty, (s, b) => s + b.ToString ("x2")) + "?d=mm&s=96");
+					byte[] hashData = Md5.ComputeHash (Encoding.ASCII.GetBytes (clean));
+					string hash = hashData.Aggregate (String.Empty, (s, b) => s + b.ToString ("x2"));
+
+					avatar = "gravatar://" + hash;
+
+					imageUri = new Uri (GravatarBaseUri, hash + "?d=mm&s=96");
 				} else
 					return await MysteryMan.Value.ConfigureAwait (false);
 			}
