@@ -133,6 +133,7 @@
     <Compile Include="ViewModels\GroupViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\ObservableFilter.cs" />
+    <Compile Include="ViewModels\PersonaSetupViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Gablarski\Gablarski.csproj">
