@@ -37,6 +37,28 @@ namespace Gablarski.Clients
 			}
 		}
 
+		public const string NicknameName = "Nickname";
+		public static string Nickname
+		{
+			get { return GetSetting (NicknameName, null); }
+			set
+			{
+				if (SetSetting (NicknameName, value))
+					OnSettingsChanged (NicknameName);
+			}
+		}
+
+		public const string AvatarName = "AvatarUrl";
+		public static string Avatar
+		{
+			get { return GetSetting (AvatarName, null); }
+			set
+			{
+				if (SetSetting (AvatarName, value))
+					OnSettingsChanged (AvatarName);
+			}
+		}
+
 		public const string GlobalVolumeName = "GlobalVolume";
 		public static float GlobalVolume
 		{
