@@ -38,7 +38,6 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Input;
 using Gablarski.Annotations;
-using Gablarski.Client;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Tempest.Social;
@@ -48,7 +47,7 @@ namespace Gablarski.Clients.ViewModels
 	public class BuddyListViewModel
 		: ViewModelBase
 	{
-		public BuddyListViewModel ([NotNull] GablarskiClient client)
+		public BuddyListViewModel ([NotNull] GablarskiSocialClient client)
 		{
 			if (client == null)
 				throw new ArgumentNullException ("client");
@@ -59,7 +58,7 @@ namespace Gablarski.Clients.ViewModels
 
 		public IEnumerable<Person> Buddies
 		{
-			get { return this.client.Social.WatchList; }
+			get { return this.client.WatchList; }
 		}
 
 		public ICommand StartChat
@@ -67,7 +66,7 @@ namespace Gablarski.Clients.ViewModels
 			get { return this.startChatCommand; }
 		}
 
-		private readonly GablarskiClient client;
+		private readonly GablarskiSocialClient client;
 		private readonly RelayCommand<Person> startChatCommand;
 
 		private bool CanStartChatWithPerson (Person parameter)

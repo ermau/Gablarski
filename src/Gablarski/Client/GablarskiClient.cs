@@ -44,7 +44,6 @@ using Gablarski.Audio;
 using Gablarski.Messages;
 using Tempest;
 using Tempest.Providers.Network;
-using Tempest.Social;
 using Timer = System.Threading.Timer;
 
 namespace Gablarski.Client
@@ -52,30 +51,12 @@ namespace Gablarski.Client
 	public class GablarskiClient
 		: IGablarskiClientContext
 	{
-		public GablarskiClient (IClientConnection connection)
-			: this (connection, new AudioEngine())
+		public GablarskiClient (RSAAsymmetricKey key)
 		{
-		}
+			if (key == null)
+				throw new ArgumentNullException ("key");
 
-		public GablarskiClient (IClientConnection connection, IAudioEngine audioEngine)
-		{
-			if (connection == null)
-				throw new ArgumentNullException ("connection");
-			if (audioEngine == null)
-				throw new ArgumentNullException ("audioEngine");
-
-			DebugLogging = Log.IsDebugEnabled;
-			Setup (connection, audioEngine, null, null, null);
-		}
-
-		public GablarskiClient (IClientConnection connection, IAudioEngine audioEngine, IClientUserHandler userHandler, IClientSourceHandler sourceHandler, ClientChannelManager channelManager)
-		{
-			if (connection == null)
-				throw new ArgumentNullException ("connection");
-			if (audioEngine == null)
-				throw new ArgumentNullException ("audioEngine");
-
-			Setup (connection, audioEngine, userHandler, sourceHandler, channelManager);
+			Setup (new UdpClientConnection (GablarskiProtocol.Instance, key), null, null, null, null);
 		}
 
 		/// <summary>
@@ -116,12 +97,6 @@ namespace Gablarski.Client
 		/// Gets the channel manager for this client.
 		/// </summary>
 		public ClientChannelManager Channels
-		{
-			get;
-			private set;
-		}
-
-		public SocialClient Social
 		{
 			get;
 			private set;
@@ -220,21 +195,7 @@ namespace Gablarski.Client
 			return this.client.DisconnectAsync();
 		}
 
-		public async Task<Group> StartGroupWithAsync (Person person)
-		{
-			if (person == null)
-				throw new ArgumentNullException ("person");
-
-			Group group = await Social.CreateGroupAsync().ConfigureAwait (false);
-			if (group == null)
-				return null;
-
-			Invitation invitation = await Social.InviteToGroupAsync (group, person).ConfigureAwait (false);
-			if (invitation == null)
-				return null;
-
-			return group;
-		}
+		
 
 		IIndexedEnumerable<int, IChannelInfo> IGablarskiClientContext.Channels
 		{

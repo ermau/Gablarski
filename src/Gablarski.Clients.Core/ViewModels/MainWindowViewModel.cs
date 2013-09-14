@@ -38,7 +38,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Gablarski.Annotations;
-using Gablarski.Client;
 using GalaSoft.MvvmLight;
 using Tempest.Social;
 
@@ -47,19 +46,19 @@ namespace Gablarski.Clients.ViewModels
 	public class MainWindowViewModel
 		: ViewModelBase
 	{
-		public MainWindowViewModel ([NotNull] GablarskiClient client)
+		public MainWindowViewModel ([NotNull] GablarskiSocialClient client)
 		{
 			if (client == null)
 				throw new ArgumentNullException ("client");
 
 			this.client = client;
 			this.buddyListViewModel = new BuddyListViewModel (client);
-			this.onlineFilter = new ObservableFilter<Person, WatchList> (this.client.Social.WatchList, p => p.Status != Status.Offline);
+			this.onlineFilter = new ObservableFilter<Person, WatchList> (this.client.WatchList, p => p.Status != Status.Offline);
 		}
 
 		public Person Persona
 		{
-			get { return this.client.Social.Persona; }
+			get { return this.client.Persona; }
 		}
 
 		public BuddyListViewModel BuddyList
@@ -68,7 +67,7 @@ namespace Gablarski.Clients.ViewModels
 		}
 
 		private readonly ObservableFilter<Person, WatchList> onlineFilter;
-		private readonly GablarskiClient client;
+		private readonly GablarskiSocialClient client;
 		private readonly BuddyListViewModel buddyListViewModel;
 	}
 }
