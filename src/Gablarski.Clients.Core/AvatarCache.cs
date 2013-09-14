@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2011, Eric Maupin
+﻿// Copyright (c) 2011-2013, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -35,65 +35,58 @@
 // DAMAGE.
 
 using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using System.Net;
+using System.Collections.Concurrent;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace Gablarski.Clients
 {
-	public class AvatarCache
+	public static class AvatarCache
 	{
 		/// <summary>
-		/// Gets an <see cref="Bitmap"/> for the specified from the URL, from the cache if available.
+		/// Gets the binary data from the specified URL, or from the cache if available.
 		/// </summary>
 		/// <param name="url">The URL to retrieve the image from.</param>
-		/// <returns>The <see cref="Bitmap"/> for the url. <c>null</c> if <paramref name="url"/> is invalid.</returns>
-		/// <exception cref="ArgumentNullException">If <paramref name="url"/> is null.</exception>
-		public Image GetAvatar (string url)
+		/// <returns>The byte array for the data. <c>null</c> if <paramref name="url"/> is invalid.</returns>
+		public static async Task<byte[]> GetAvatarAsync (string url)
 		{
-			if (url == null)
-				throw new ArgumentNullException("url");
-			
-			if (url.Trim() == String.Empty)
+			if (String.IsNullOrWhiteSpace (url))
 				return null;
 
-			Image avatar;
-			lock (Avatars)
-			{
-				if (Avatars.TryGetValue (url, out avatar))
-					return avatar;
-			}
+			byte[] avatar;
+			if (Avatars.TryGetValue (url, out avatar))
+				return avatar;
 
 			Uri imageUri;
-			if (Uri.TryCreate (url, UriKind.Absolute, out imageUri))
-			{
+			if (Uri.TryCreate (url, UriKind.Absolute, out imageUri)) {
 				if (imageUri.IsFile)
 					return null;
-			}
-			else
+			} else
 				return null;
 
-			try
-			{
-				byte[] image;
-				lock (wclient)
-					image = wclient.DownloadData (imageUri);
+			byte[] image = null;
+			try {
+				image = await WebClient.GetByteArrayAsync (imageUri).ConfigureAwait (false);
+				Avatars.TryAdd (url, image);
 
-				avatar = Image.FromStream (new MemoryStream (image));
-			}
-			catch
-			{
+				return image;
+			} catch {
 				return null;
 			}
-
-			lock (Avatars)
-				Avatars.Add (url, avatar);
-
-			return avatar;
 		}
 
-		private readonly Dictionary<string, Image> Avatars = new Dictionary<string, Image>();
-		private static readonly WebClient wclient = new WebClient();
+		public static void RemoveAvatar (string url)
+		{
+			byte[] data;
+			Avatars.TryRemove (url, out data);
+		}
+
+		public static void Clear()
+		{
+			Avatars.Clear();
+		}
+
+		private static readonly ConcurrentDictionary<string, byte[]> Avatars = new ConcurrentDictionary<string, byte[]>();
+		private static readonly HttpClient WebClient = new HttpClient();
 	}
 }
