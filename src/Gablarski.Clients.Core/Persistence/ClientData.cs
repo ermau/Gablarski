@@ -447,6 +447,37 @@ namespace Gablarski.Clients.Persistence
 		}
 		#endregion
 
+		public static async Task<IEnumerable<string>> GetBuddiesAsync()
+		{
+			using (var cmd = db.CreateCommand ("SELECT * FROM buddies"))
+			using (var reader = await cmd.ExecuteReaderAsync().ConfigureAwait (false)) {
+				List<string> buddies = new List<string>();
+				while (await reader.ReadAsync().ConfigureAwait (false)) {
+					buddies. Add(reader.GetString (0));
+				}
+
+				return buddies;
+			}
+		}
+
+		public static async Task SaveBuddiesAsync (IEnumerable<string> buddies)
+		{
+			if (buddies == null)
+				throw new ArgumentNullException ("buddies");
+
+			HashSet<string> buddySet = new HashSet<string> (buddies);
+
+			var currentBuddies = await GetBuddiesAsync().ConfigureAwait (false);
+			buddySet.ExceptWith (currentBuddies);
+
+			foreach (string identity in buddySet) {
+				using (var cmd = db.CreateCommand ("INSERT INTO buddies (identity) VALUES (?)")) {
+					cmd.Parameters.Add (new SQLiteParameter ("identity", identity));
+					await cmd.ExecuteNonQueryAsync().ConfigureAwait (false);
+				}
+			}
+		}
+
 		private static readonly DirectoryInfo DataDirectory;
 		private static readonly DbConnection db;
 		private static readonly FileInfo DbFile;
@@ -466,6 +497,9 @@ namespace Gablarski.Clients.Persistence
 				cmd.ExecuteNonQuery();
 
 			using (var cmd = db.CreateCommand ("CREATE TABLE IF NOT EXISTS commandbindings (commandbindingProvider string, commandbindingCommand integer, commandbindingInput varchar(255))"))
+				cmd.ExecuteNonQuery();
+
+			using (var cmd = db.CreateCommand ("CREATE TABLE IF NOT EXISTS buddies (identity string)"))
 				cmd.ExecuteNonQuery();
 		}
 	}
