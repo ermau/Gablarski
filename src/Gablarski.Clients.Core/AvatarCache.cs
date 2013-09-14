@@ -36,38 +36,52 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Linq;
 using System.Net.Http;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Gablarski.Clients
 {
 	public static class AvatarCache
 	{
+		static AvatarCache()
+		{
+			MysteryMan = new Lazy<Task<byte[]>> (() => WebClient.GetByteArrayAsync (new Uri (GravatarBaseUri, "0000?f=y&d=mm&s=96")));
+		}
+
 		/// <summary>
 		/// Gets the binary data from the specified URL, or from the cache if available.
 		/// </summary>
-		/// <param name="url">The URL to retrieve the image from.</param>
-		/// <returns>The byte array for the data. <c>null</c> if <paramref name="url"/> is invalid.</returns>
-		public static async Task<byte[]> GetAvatarAsync (string url)
+		/// <param name="avatar">The URL or Gravatar email to retrieve the image from.</param>
+		/// <returns>The byte array for the image data. <c>null</c> if <paramref name="avatar"/> is invalid.</returns>
+		public static async Task<byte[]> GetAvatarAsync (string avatar)
 		{
-			if (String.IsNullOrWhiteSpace (url))
-				return null;
+			if (String.IsNullOrWhiteSpace (avatar))
+				return await MysteryMan.Value.ConfigureAwait (false);
 
-			byte[] avatar;
-			if (Avatars.TryGetValue (url, out avatar))
-				return avatar;
+			byte[] avatarData;
+			if (Avatars.TryGetValue (avatar, out avatarData))
+				return avatarData;
 
 			Uri imageUri;
-			if (Uri.TryCreate (url, UriKind.Absolute, out imageUri)) {
+			if (Uri.TryCreate (avatar, UriKind.Absolute, out imageUri)) {
 				if (imageUri.IsFile)
 					return null;
-			} else
-				return null;
+			} else {
+				// Try gravatar if it looks like an email
+				if (avatar.Contains ("@") && avatar.Contains (".")) {
+					string clean = avatar.Trim().ToLower();
+					byte[] hash = Md5.ComputeHash (Encoding.ASCII.GetBytes (clean));
+					imageUri = new Uri (GravatarBaseUri, hash.Aggregate (String.Empty, (s, b) => s + b.ToString ("x2")) + "?d=mm&s=96");
+				} else
+					return await MysteryMan.Value.ConfigureAwait (false);
+			}
 
-			byte[] image = null;
 			try {
-				image = await WebClient.GetByteArrayAsync (imageUri).ConfigureAwait (false);
-				Avatars.TryAdd (url, image);
+				byte[] image = await WebClient.GetByteArrayAsync (imageUri).ConfigureAwait (false);
+				Avatars.TryAdd (avatar, image);
 
 				return image;
 			} catch {
@@ -86,6 +100,11 @@ namespace Gablarski.Clients
 			Avatars.Clear();
 		}
 
+		private static readonly Lazy<Task<byte[]>> MysteryMan;
+
+		private static readonly Uri GravatarBaseUri = new Uri ("http://www.gravatar.com/avatar/");
+
+		private static readonly MD5CryptoServiceProvider Md5 = new MD5CryptoServiceProvider();
 		private static readonly ConcurrentDictionary<string, byte[]> Avatars = new ConcurrentDictionary<string, byte[]>();
 		private static readonly HttpClient WebClient = new HttpClient();
 	}
