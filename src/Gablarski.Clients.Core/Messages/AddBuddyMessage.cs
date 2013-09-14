@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2013, Eric Maupin
+﻿// Copyright (c) 2013, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -35,59 +35,11 @@
 // DAMAGE.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Input;
-using Gablarski.Annotations;
-using Gablarski.Clients.Messages;
-using Gablarski.Clients.Persistence;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
-using Tempest.Social;
 
-namespace Gablarski.Clients.ViewModels
+namespace Gablarski.Clients.Messages
 {
-	public class MainWindowViewModel
-		: ViewModelBase
+	public sealed class AddBuddyMessage
 	{
-		public MainWindowViewModel ([NotNull] GablarskiSocialClient client)
-		{
-			if (client == null)
-				throw new ArgumentNullException ("client");
-
-			this.client = client;
-			this.buddyListViewModel = new BuddyListViewModel (client);
-			this.onlineFilter = new ObservableFilter<Person, WatchList> (this.client.WatchList, p => p.Status != Status.Offline);
-
-			Servers = new AsyncValue<IEnumerable<ServerEntry>> (ClientData.GetServersAsync(), Enumerable.Empty<ServerEntry>());
-
-			AddBuddy = new RelayCommand (() => MessengerInstance.Send (new AddBuddyMessage()));
-		}
-
-		public Person Persona
-		{
-			get { return this.client.Persona; }
-		}
-
-		public BuddyListViewModel BuddyList
-		{
-			get { return this.buddyListViewModel; }
-		}
-
-		public AsyncValue<IEnumerable<ServerEntry>> Servers
-		{
-			get;
-			private set;
-		}
-
-		public ICommand AddBuddy
-		{
-			get;
-			private set;
-		}
-
-		private readonly ObservableFilter<Person, WatchList> onlineFilter;
-		private readonly GablarskiSocialClient client;
-		private readonly BuddyListViewModel buddyListViewModel;
 	}
 }
