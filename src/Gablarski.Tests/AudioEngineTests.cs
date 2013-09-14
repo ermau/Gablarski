@@ -60,10 +60,12 @@ namespace Gablarski.Tests
 			this.provider = new MockAudioCaptureProvider();
 			this.source = new AudioSource ("mockSource", 1, 1, AudioFormat.Mono16bitLPCM, 64000, 256, 10, false);
 
-			var client = new GablarskiClient (new MockConnectionProvider (GablarskiProtocol.Instance).GetClientConnection());
+			var c = new MockConnectionProvider (GablarskiProtocol.Instance).GetClientConnection();
+
+			var client = new MockClientContext (c);
 			this.context = client;
-			this.sender = client.Sources;
-			this.receiver = client.Sources;
+			this.sender = new ClientSourceHandler (client, new ClientSourceManager (client));
+			this.receiver = (IAudioReceiver)this.sender;
 		}
 
 		[TearDown]
