@@ -36,7 +36,9 @@
 
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using Gablarski.Messages;
 using Tempest;
 using Tempest.Providers.Network;
 using Tempest.Social;
@@ -47,12 +49,10 @@ namespace Gablarski
 		: SocialClient
 	{
 		public GablarskiSocialClient (Person person, RSAAsymmetricKey key)
-			: base (new NetworkClientConnection (SocialProtocol.Instance, key), person)
+			: base (new NetworkClientConnection (new [] { SocialProtocol.Instance, GablarskiProtocol.Instance }, key), person)
 		{
 			if (key == null)
 				throw new ArgumentNullException ("key");
-
-			this.key = key;
 		}
 
 		public void SetTarget (Target target)
@@ -81,16 +81,23 @@ namespace Gablarski
 			return group;
 		}
 
-		public async Task ConnectToGroupVoice (Group group)
+		public async Task<Target> RequestGroupVoiceAsync (Group group)
 		{
 			if (group == null)
 				throw new ArgumentNullException ("group");
 
-			
+			var joinVoice = new JoinVoiceMessage {
+				Target = ServerTarget,
+				GroupId = group.Id
+			};
+
+			JoinVoiceMessage join = await Connection.SendFor<JoinVoiceMessage> (joinVoice, 30000).ConfigureAwait(false);
+			return join.Target;
 		}
 
 		private Target target;
-		private readonly RSAAsymmetricKey key;
+
+		private int forwardedId;
 
 		protected override void OnDisconnected (ClientDisconnectedEventArgs e)
 		{

@@ -114,7 +114,9 @@ namespace Gablarski
 		ChannelList = 19,
 		ChangeChannelResult = 21,
 		ChannelEditResult = 23,
-	} // next: 58
+
+		JoinVoice = 58
+	} // next: 59
 
 	public abstract class GablarskiMessage
 		: Message

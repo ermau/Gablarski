@@ -84,6 +84,7 @@
     <Compile Include="Messages\AudioSourceStateChangeMessage.cs" />
     <Compile Include="Messages\BanUserMessage.cs" />
     <Compile Include="Messages\ClientAudioSourceStateChangeMessage.cs" />
+    <Compile Include="Messages\JoinVoiceMessage.cs" />
     <Compile Include="Messages\PingMessage.cs" />
     <Compile Include="Messages\JoinMessage.cs" />
     <Compile Include="Messages\JoinResultMessage.cs" />

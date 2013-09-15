@@ -81,6 +81,11 @@ namespace Gablarski.Tests
 			return this.connection.SendFor<TResponse> (message, timeout);
 		}
 
+		public Task<Message> SendFor (Message message, int timeout = 0)
+		{
+			return this.connection.SendFor (message, timeout);
+		}
+
 		public Task<bool> SendResponseAsync (Message originalMessage, Message response)
 		{
 			return this.connection.SendResponseAsync (originalMessage, response);
