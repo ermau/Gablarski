@@ -226,7 +226,6 @@ namespace Gablarski.Client
 		protected readonly object StateSync = new object();
 		protected ServerInfo serverInfo;
 
-		protected readonly log4net.ILog Log = log4net.LogManager.GetLogger ("GablarskiClient");
 		protected readonly bool DebugLogging;
 
 		private int redirectLimit = 20;

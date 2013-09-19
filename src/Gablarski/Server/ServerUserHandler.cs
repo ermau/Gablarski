@@ -41,7 +41,6 @@ using System.Net;
 using System.Threading.Tasks;
 using Cadenza;
 using Gablarski.Messages;
-using log4net;
 using Tempest;
 
 namespace Gablarski.Server
@@ -53,7 +52,6 @@ namespace Gablarski.Server
 		{
 			this.context = context;
 			this.Manager = manager;
-			this.log = LogManager.GetLogger (context.Settings.Name.Remove (" ") + ".ServerUserHandler");
 
 			this.context.RegisterMessageHandler<ConnectMessage> (OnConnectMessage);
 			this.context.RegisterMessageHandler<LoginMessage> (OnLoginMessage);
@@ -248,7 +246,6 @@ namespace Gablarski.Server
 		#endregion
 
 		internal readonly IServerUserManager Manager;
-		private readonly ILog log;
 		private readonly IGablarskiServerContext context;
 		private readonly HashSet<IUserInfo> approvals = new HashSet<IUserInfo>();
 
@@ -348,8 +345,6 @@ namespace Gablarski.Server
 				Manager.Login (e.Connection, new UserInfo (login.Username, result.UserId, this.context.ChannelsProvider.DefaultChannel.ChannelId, false));
 				e.Connection.SendAsync (new PermissionsMessage (result.UserId, this.context.PermissionsProvider.GetPermissions (result.UserId)));
 			}
-			
-			this.log.DebugFormat ("{0} Login: {1}", login.Username, result.ResultState);
 		}
 
 		internal void OnRequestUserListMessage (MessageEventArgs<RequestUserListMessage> e)
@@ -636,15 +631,10 @@ namespace Gablarski.Server
 			if (nickname == null)
 				throw new ArgumentNullException ("nickname");
 
-			this.log.DebugFormat ("Attempting nickname recovery for '{0}'", nickname);
-
 			nickname = nickname.ToLower().Trim();
 
 			IUserInfo current = Manager.Single (u => u.Nickname.ToLower().Trim() == nickname);
-			if (info.IsRegistered && info.UserId == current.UserId)
-			{
-				this.log.DebugFormat ("Recovery attempt succeeded, disconnecting current '{0}'", current.Nickname);
-
+			if (info.IsRegistered && info.UserId == current.UserId) {
 				Manager.Disconnect (current);
 				return true;
 			}

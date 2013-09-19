@@ -40,7 +40,6 @@ using System.Linq;
 using Gablarski.Messages;
 using Cadenza;
 using Tempest;
-using log4net;
 using Timer = System.Threading.Timer;
 
 namespace Gablarski.Server
@@ -139,8 +138,6 @@ namespace Gablarski.Server
 
 		private readonly object syncRoot = new object();
 
-		protected readonly ILog Log;
-
 		private IServerUserHandler users;
 		private ServerSourceHandler sources;
 		private ServerChannelHandler channels;
@@ -189,8 +186,6 @@ namespace Gablarski.Server
 		protected GablarskiServer (ServerSettings serverSettings)
 			: base (MessageTypes.All)
 		{
-			Log = LogManager.GetLogger (serverSettings.Name.Remove (" "));
-
 			this.settings = serverSettings;
 			this.context = this;
 		}
@@ -220,8 +215,6 @@ namespace Gablarski.Server
 
 		protected override void OnConnectionDisconnected (object sender, DisconnectedEventArgs e)
 		{
-			Log.Debug ("Client disconnected");
-
 			IUserInfo user = this.userManager.GetUser (e.Connection);
 			if (user != null) {
 				this.sources.Remove (user);
@@ -233,8 +226,6 @@ namespace Gablarski.Server
 
 		protected override void OnConnectionDisconnectedGlobal (object sender, DisconnectedEventArgs e)
 		{
-			Log.Debug ("Client disconnected");
-
 			IUserInfo user = this.userManager.GetUser (e.Connection);
 			if (user != null)
 			{
