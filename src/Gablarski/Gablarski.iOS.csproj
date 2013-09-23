@@ -59,6 +59,7 @@
     <Compile Include="Client\IClientUserHandler.cs" />
     <Compile Include="Client\ICurrentUserHandler.cs" />
     <Compile Include="GablarskiProtocol.cs" />
+    <Compile Include="GablarskiSocialClient.cs" />
     <Compile Include="IChannelInfo.cs" />
     <Compile Include="IIndexedEnumerable.cs" />
     <Compile Include="Client\IClientUserManager.cs" />
@@ -66,10 +67,12 @@
     <Compile Include="ISourceManager.cs" />
     <Compile Include="IUser.cs" />
     <Compile Include="IUserInfo.cs" />
+    <Compile Include="JoinVoiceEventArgs.cs" />
     <Compile Include="Messages\AudioSourceStateChangeMessage.cs" />
     <Compile Include="Messages\BanUserMessage.cs" />
     <Compile Include="Messages\ClientAudioSourceStateChangeMessage.cs" />
     <Compile Include="Messages\JoinVoiceMessage.cs" />
+    <Compile Include="Messages\JoinVoiceResponseMessage.cs" />
     <Compile Include="Messages\PingMessage.cs" />
     <Compile Include="Messages\JoinMessage.cs" />
     <Compile Include="Messages\JoinResultMessage.cs" />
@@ -123,6 +126,7 @@
     <Compile Include="Messages\SourceListMessage.cs" />
     <Compile Include="Messages\SourceResultMessage.cs" />
     <Compile Include="ByteArrayExtensions.cs" />
+    <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Server\IRedirector.cs" />
     <Compile Include="Server\IServerChannelHandler.cs" />
     <Compile Include="Server\IConnectionManager.cs" />
@@ -170,14 +174,19 @@
     <Compile Include="Client\ClientUserManager.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Tempest.Social\iOS\Tempest.Social.iOS\Tempest.Social.iOS.csproj">
+      <Project>{db758ad2-4073-4512-8da9-90ab433b6437}</Project>
+      <Name>Tempest.Social.iOS</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Tempest.Social\Tempest\iOS\Tempest\Tempest.iOS.csproj">
       <Project>{7994a7c5-fbc5-486e-a345-0b7499a34589}</Project>
       <Name>Tempest.iOS</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Cadenza">
-      <HintPath>..\..\lib\Cadenza.dll</HintPath>
+    <Reference Include="Cadenza, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Tempest.Social\Libraries\Cadenza.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xml" />

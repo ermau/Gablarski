@@ -36,53 +36,40 @@
 
 using System;
 using System.Linq;
-using Gablarski.Messages;
 using Tempest;
-using Tempest.Social;
 
-namespace Gablarski.Server
+namespace Gablarski.Messages
 {
-	public class GablarskiSocialServer
-		: SocialServer
+	public sealed class JoinVoiceResponseMessage
+		: GablarskiMessage
 	{
-		public GablarskiSocialServer (IWatchListProvider provider, IIdentityProvider identityProvider)
-			: base (provider, identityProvider)
+		public JoinVoiceResponseMessage()
+			: base (GablarskiMessageType.JoinVoiceResponse)
 		{
-			this.RegisterMessageHandler<JoinVoiceMessage> (OnJoinVoiceMessage);
 		}
 
-		private async void OnJoinVoiceMessage (MessageEventArgs<JoinVoiceMessage> e)
+		public bool Accepted
 		{
-			var person = await GetPersonAsync (e.Connection);
-			if (person == null) {
-				await e.Connection.DisconnectAsync();
-				return;
-			}
+			get;
+			set;
+		}
 
-			Group group;
-			lock (SyncRoot) {
-				if (!Groups.TryGetGroup (e.Message.GroupId, out group) || !group.Participants.Contains (person.Identity))
-					return;
-			}
+		public Target Target
+		{
+			get;
+			set;
+		}
 
-			IConnection connection;
-			lock (SyncRoot) {
-				connection = GetConnection (group.OwnerId);
-			}
+		public override void WritePayload (ISerializationContext context, IValueWriter writer)
+		{
+			if (writer.WriteBool (Accepted))
+				Target.Serialize (context, writer);
+		}
 
-			if (connection == null)
-				return;
-
-			var join = new JoinVoiceMessage {
-				GroupId = e.Message.GroupId,
-				Target = e.Message.Target
-			};
-
-			try {
-				var response = await connection.SendFor<JoinVoiceResponseMessage> (join, responseTimeout: 30000);
-				await e.Connection.SendResponseAsync (e.Message, response);
-			} catch (OperationCanceledException) {
-			}
+		public override void ReadPayload (ISerializationContext context, IValueReader reader)
+		{
+			if (Accepted = reader.ReadBool())
+				Target = new Target (context, reader);
 		}
 	}
 }

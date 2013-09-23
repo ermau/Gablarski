@@ -53,6 +53,10 @@ namespace Gablarski
 		{
 			if (key == null)
 				throw new ArgumentNullException ("key");
+
+			this.RegisterMessageHandler<JoinVoiceMessage> (OnJoinVoiceMessage);
+
+			InvitedToGroup += (sender, args) => args.AcceptInvite = true;
 		}
 
 		public void SetTarget (Target target)
@@ -75,7 +79,7 @@ namespace Gablarski
 				return null;
 
 			Invitation invitation = await InviteToGroupAsync (group, person).ConfigureAwait (false);
-			if (invitation == null)
+			if (invitation == null || invitation.Response != InvitationResponse.Accepted)
 				return null;
 
 			return group;
@@ -91,8 +95,8 @@ namespace Gablarski
 				GroupId = group.Id
 			};
 
-			JoinVoiceMessage join = await Connection.SendFor<JoinVoiceMessage> (joinVoice, 30000).ConfigureAwait(false);
-			return join.Target;
+			var response = await Connection.SendFor<JoinVoiceResponseMessage> (joinVoice, 30000).ConfigureAwait (false);
+			return response.Target;
 		}
 
 		private Target target;
@@ -113,6 +117,22 @@ namespace Gablarski
 				result = await ConnectAsync (this.target).ConfigureAwait (false);
 				await Task.Delay (10000).ConfigureAwait (false);
 			} while (result.Result != ConnectionResult.Success);
+		}
+
+		private async void OnJoinVoiceMessage (MessageEventArgs<JoinVoiceMessage> e)
+		{
+			Group group = Groups.FirstOrDefault (g => g.Id == e.Message.GroupId);
+			if (group == null)
+				return;
+
+			if (group.OwnerId != Persona.Identity)
+				return;
+
+			await LocalServer.StartAsync (Connection.LocalKey);
+			await Connection.SendResponseAsync (e.Message, new JoinVoiceResponseMessage {
+				Accepted = true,
+				Target = this.target
+			});
 		}
 	}
 }

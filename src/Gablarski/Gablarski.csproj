@@ -82,8 +82,9 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Cadenza, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\..\lib\Cadenza.dll</HintPath>
+    <Reference Include="Cadenza, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Tempest.Social\Libraries\Cadenza.dll</HintPath>
     </Reference>
     <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821">
       <SpecificVersion>False</SpecificVersion>
@@ -128,10 +129,12 @@
     <Compile Include="ISourceManager.cs" />
     <Compile Include="IUser.cs" />
     <Compile Include="IUserInfo.cs" />
+    <Compile Include="JoinVoiceEventArgs.cs" />
     <Compile Include="Messages\AudioSourceStateChangeMessage.cs" />
     <Compile Include="Messages\BanUserMessage.cs" />
     <Compile Include="Messages\ClientAudioSourceStateChangeMessage.cs" />
     <Compile Include="Messages\JoinVoiceMessage.cs" />
+    <Compile Include="Messages\JoinVoiceResponseMessage.cs" />
     <Compile Include="Messages\PingMessage.cs" />
     <Compile Include="Messages\JoinMessage.cs" />
     <Compile Include="Messages\JoinResultMessage.cs" />
@@ -186,6 +189,7 @@
     <Compile Include="Messages\SourceResultMessage.cs" />
     <Compile Include="ByteArrayExtensions.cs" />
     <Compile Include="Properties\Annotations.cs" />
+    <Compile Include="Server\GablarskiSocialServer.cs" />
     <Compile Include="Server\IRedirector.cs" />
     <Compile Include="Server\IServerChannelHandler.cs" />
     <Compile Include="Server\IConnectionManager.cs" />

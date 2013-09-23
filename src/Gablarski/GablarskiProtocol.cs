@@ -34,6 +34,9 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
+using System;
+using System.Collections.Generic;
+using Gablarski.Messages;
 using Tempest;
 
 namespace Gablarski
@@ -115,8 +118,9 @@ namespace Gablarski
 		ChangeChannelResult = 21,
 		ChannelEditResult = 23,
 
-		JoinVoice = 58
-	} // next: 59
+		JoinVoice = 58,
+		JoinVoiceResponse = 59,
+	} // next: 60
 
 	public abstract class GablarskiMessage
 		: Message
