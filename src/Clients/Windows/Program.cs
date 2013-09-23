@@ -57,6 +57,8 @@ namespace Gablarski.Clients.Windows
 		public static Task<RSAAsymmetricKey> Key;
 
 		public static GablarskiSocialClient SocialClient;
+		public static ChatHistory History;
+
 		public static void EnableGablarskiURIs()
 		{
 			try
@@ -151,6 +153,11 @@ namespace Gablarski.Clients.Windows
 			FileInfo program = new FileInfo (Process.GetCurrentProcess().MainModule.FileName);
 			Environment.CurrentDirectory = program.Directory.FullName;
 
+			string useLocalValue = ConfigurationManager.AppSettings["useLocal"];
+			bool useLocal;
+			Boolean.TryParse (useLocalValue, out useLocal);
+
+			ClientData.Setup (useLocal);
 			Key = ClientData.GetCryptoKeyAsync();
 
 			if (Settings.FirstRun)
@@ -235,6 +242,8 @@ namespace Gablarski.Clients.Windows
 			};
 
 			SocialClient = new GablarskiSocialClient (person, Key.Result);
+
+			History = new ChatHistory (SocialClient);
 
 			string host = ConfigurationManager.AppSettings["socialHost"];
 			SocialClient.SetTarget (new Target (host, SocialProtocol.DefaultPort));
