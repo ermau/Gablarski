@@ -101,11 +101,18 @@ namespace Gablarski
 
 		private Target target;
 
-		private int forwardedId;
+		protected override void OnConnected (ClientConnectionEventArgs e)
+		{
+			base.OnConnected (e);
+
+			Persona.Status = Status.Online;
+		}
 
 		protected override void OnDisconnected (ClientDisconnectedEventArgs e)
 		{
 			base.OnDisconnected (e);
+
+			Persona.Status = Status.Offline;
 
 			Task.Run (() => Reconnect());
 		}
