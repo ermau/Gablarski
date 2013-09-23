@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2011, Eric Maupin
+﻿// Copyright (c) 2011-2013, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -42,23 +42,6 @@ namespace Gablarski.Messages
 		: GablarskiMessage
 	{
 		public ClientPingMessage()
-			: base (GablarskiMessageType.Ping)
-		{
-		}
-
-		public override void WritePayload (ISerializationContext context, IValueWriter writer)
-		{
-		}
-
-		public override void ReadPayload (ISerializationContext context, IValueReader reader)
-		{
-		}
-	}
-
-	public class ServerPingMessage
-		: GablarskiMessage
-	{
-		public ServerPingMessage()
 			: base (GablarskiMessageType.Ping)
 		{
 		}
