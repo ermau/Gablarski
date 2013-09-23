@@ -35,28 +35,48 @@
 // DAMAGE.
 
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
-namespace Gablarski.Clients.Messages
+namespace Gablarski.Clients.ViewModels
 {
-	public sealed class AddBuddyMessage
+	public static class Messenger
 	{
-		public AddBuddyMessage()
+		public static void Register<T> (Action<T> responder)
 		{
+			if (responder == null)
+				throw new ArgumentNullException ("responder");
+
+			Action<object> realResponder;
+			if (SynchronizationContext.Current == null)
+				realResponder = o => responder ((T)o);
+			else {
+				SynchronizationContext context = SynchronizationContext.Current;
+				realResponder = o => {
+					context.Send (s => responder ((T)s), o);
+				};
+			}
+
+			List<Action<object>> respondersForType = Responders.GetOrAdd (typeof (T), t => new List<Action<object>>());
+			lock (respondersForType)
+				respondersForType.Add (realResponder);
 		}
 
-		public AddBuddyMessage (string identity)
+		public static void Send<T> (T message)
 		{
-			if (identity == null)
-				throw new ArgumentNullException ("identity");
+			List<Action<object>> respondersForType;
+			if (!Responders.TryGetValue (typeof (T), out respondersForType))
+				return;
 
-			Identity = identity;
+			lock (respondersForType) {
+				foreach (Action<object> action in respondersForType) {
+					action (message);
+				}
+			}
 		}
 
-		public string Identity
-		{
-			get;
-			private set;
-		}
+		private static readonly ConcurrentDictionary<Type, List<Action<object>>> Responders = new ConcurrentDictionary<Type, List<Action<object>>>();
 	}
 }

@@ -41,8 +41,6 @@ using System.Windows.Input;
 using Gablarski.Annotations;
 using Gablarski.Clients.Messages;
 using Gablarski.Clients.Persistence;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
 using Tempest.Social;
 
 namespace Gablarski.Clients.ViewModels
@@ -61,7 +59,8 @@ namespace Gablarski.Clients.ViewModels
 
 			Servers = new AsyncValue<IEnumerable<ServerEntry>> (ClientData.GetServersAsync(), Enumerable.Empty<ServerEntry>());
 
-			AddBuddy = new RelayCommand (() => MessengerInstance.Send (new AddBuddyMessage()));
+			AddBuddy = new RelayCommand (() => Messenger.Send (new AddBuddyMessage()));
+			StartChat = new RelayCommand<Person> (OnStartChat);
 		}
 
 		public Person Persona
@@ -86,8 +85,32 @@ namespace Gablarski.Clients.ViewModels
 			private set;
 		}
 
+		public ICommand StartChat
+		{
+			get;
+			private set;
+		}
+
+		public ICommand InviteToChat
+		{
+			get;
+			private set;
+		}
+
 		private readonly ObservableFilter<Person, WatchList> onlineFilter;
 		private readonly GablarskiSocialClient client;
 		private readonly BuddyListViewModel buddyListViewModel;
+
+		private async void OnStartChat (Person person)
+		{
+			if (person == null)
+				return;
+
+			Group group = await this.client.StartGroupWithAsync (person);
+			if (group == null)
+				return;
+
+			Messenger.Send (new StartChatMessage (group));
+		}
 	}
 }

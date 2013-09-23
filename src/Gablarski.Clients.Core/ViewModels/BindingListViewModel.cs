@@ -42,7 +42,6 @@ using System.Linq;
 using System.Windows.Input;
 using Gablarski.Clients.Persistence;
 using Gablarski.Clients.Input;
-using GalaSoft.MvvmLight.Command;
 
 namespace Gablarski.Clients.ViewModels
 {

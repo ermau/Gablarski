@@ -36,24 +36,21 @@
 
 using System;
 using System.Linq;
+using Tempest;
 
 namespace Gablarski.Clients.Messages
 {
-	public sealed class AddBuddyMessage
+	public class JoinVoiceMessage
 	{
-		public AddBuddyMessage()
+		public JoinVoiceMessage (Target target)
 		{
+			if (target == null)
+				throw new ArgumentNullException ("target");
+
+			Target = target;
 		}
 
-		public AddBuddyMessage (string identity)
-		{
-			if (identity == null)
-				throw new ArgumentNullException ("identity");
-
-			Identity = identity;
-		}
-
-		public string Identity
+		public Target Target
 		{
 			get;
 			private set;

@@ -39,8 +39,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
 using Tempest.Social;
 
 namespace Gablarski.Clients.ViewModels
@@ -66,15 +64,26 @@ namespace Gablarski.Clients.ViewModels
 			get { return this.search; }
 			set
 			{
-				if (Set (() => Search, ref this.search, value))
-					RunSearch (value);
+				if (this.search == value)
+					return;
+
+				this.search = value;
+				OnPropertyChanged();
+				RunSearch (value);
 			}
 		}
 
 		public AsyncValue<IEnumerable<Person>> SearchResults
 		{
 			get { return this.searchResults; }
-			set { Set (() => SearchResults, ref this.searchResults, value); }
+			set
+			{
+				if (this.searchResults == value)
+					return;
+
+				this.searchResults = value;
+				OnPropertyChanged();
+			}
 		}
 
 		public ICommand AddBuddy

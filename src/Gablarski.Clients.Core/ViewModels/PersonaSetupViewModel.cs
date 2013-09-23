@@ -3,8 +3,6 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Input;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
 
 namespace Gablarski.Clients.ViewModels
 {
@@ -27,8 +25,12 @@ namespace Gablarski.Clients.ViewModels
 			get { return this.nickname; }
 			set
 			{
-				if (Set (() => Nickname, ref this.nickname, value))
-					this.done.RaiseCanExecuteChanged();
+				if (this.nickname == value)
+					return;
+
+				this.nickname = value;
+				OnPropertyChanged();
+				this.done.RaiseCanExecuteChanged();
 			}
 		}
 
@@ -36,7 +38,14 @@ namespace Gablarski.Clients.ViewModels
 		public string Avatar
 		{
 			get { return this.avatar; }
-			set { Set (() => Avatar, ref this.avatar, value); }
+			set
+			{
+				if (this.avatar == value)
+					return;
+
+				this.avatar = value;
+				OnPropertyChanged();
+			}
 		}
 
 		private readonly RelayCommand done;
@@ -68,5 +77,5 @@ namespace Gablarski.Clients.ViewModels
 			if (done != null)
 				done (this, EventArgs.Empty);
 		}
-    }
+	}
 }

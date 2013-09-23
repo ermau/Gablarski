@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Cadenza.Collections;
 using Gablarski.Clients.Input;
 using Gablarski.Clients.Persistence;
@@ -375,6 +376,11 @@ namespace Gablarski.Clients
 			}
 		}
 
+		public static Task SaveAsync()
+		{
+			return Task.Run ((Action)Save);
+		}
+
 		public static void Clear()
 		{
 			lock (SettingLock)
@@ -388,12 +394,14 @@ namespace Gablarski.Clients
 
 		private static void LoadSettings ()
 		{
+			
 			lock (SettingLock)
 			{
 				if (settings != null)
 					return;
 
-				settings = ClientData.GetSettings().ToDictionary (s => s.Name);
+				var settingsEntries = ClientData.GetSettings();
+				settings = settingsEntries.ToDictionary (s => s.Name);
 
 				if (ClientData.CheckForUpdates())
 					settings = ClientData.GetSettings().ToDictionary (s => s.Name);

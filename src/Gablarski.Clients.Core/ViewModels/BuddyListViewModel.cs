@@ -38,8 +38,6 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Input;
 using Gablarski.Annotations;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
 using Tempest.Social;
 
 namespace Gablarski.Clients.ViewModels

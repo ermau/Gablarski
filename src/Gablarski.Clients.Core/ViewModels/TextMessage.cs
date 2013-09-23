@@ -36,24 +36,39 @@
 
 using System;
 using System.Linq;
+using Tempest.Social;
 
-namespace Gablarski.Clients.Messages
+namespace Gablarski.Clients.ViewModels
 {
-	public sealed class AddBuddyMessage
+	public class TextMessage
 	{
-		public AddBuddyMessage()
+		public TextMessage (Group group, Person person, string message)
 		{
+			if (group == null)
+				throw new ArgumentNullException ("group");
+			if (person == null)
+				throw new ArgumentNullException ("person");
+			if (message == null)
+				throw new ArgumentNullException ("message");
+
+			Group = group;
+			Person = person;
+			Message = message;
 		}
 
-		public AddBuddyMessage (string identity)
+		public Group Group
 		{
-			if (identity == null)
-				throw new ArgumentNullException ("identity");
-
-			Identity = identity;
+			get;
+			private set;
 		}
 
-		public string Identity
+		public Person Person
+		{
+			get;
+			private set;
+		}
+
+		public string Message
 		{
 			get;
 			private set;

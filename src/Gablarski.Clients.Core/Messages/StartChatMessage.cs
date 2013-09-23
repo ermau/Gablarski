@@ -36,24 +36,21 @@
 
 using System;
 using System.Linq;
+using Tempest.Social;
 
 namespace Gablarski.Clients.Messages
 {
-	public sealed class AddBuddyMessage
+	public class StartChatMessage
 	{
-		public AddBuddyMessage()
+		public StartChatMessage (Group group)
 		{
+			if (group == null)
+				throw new ArgumentNullException ("group");
+
+			Group = group;
 		}
 
-		public AddBuddyMessage (string identity)
-		{
-			if (identity == null)
-				throw new ArgumentNullException ("identity");
-
-			Identity = identity;
-		}
-
-		public string Identity
+		public Group Group
 		{
 			get;
 			private set;

@@ -35,28 +35,22 @@
 // DAMAGE.
 
 using System;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
-namespace Gablarski.Clients.Messages
+namespace Gablarski.Clients.ViewModels
 {
-	public sealed class AddBuddyMessage
+	public abstract class ViewModelBase
+		: INotifyPropertyChanged
 	{
-		public AddBuddyMessage()
-		{
-		}
+		public event PropertyChangedEventHandler PropertyChanged;
 
-		public AddBuddyMessage (string identity)
+		protected virtual void OnPropertyChanged ([CallerMemberName] string propertyName = null)
 		{
-			if (identity == null)
-				throw new ArgumentNullException ("identity");
-
-			Identity = identity;
-		}
-
-		public string Identity
-		{
-			get;
-			private set;
+			PropertyChangedEventHandler handler = PropertyChanged;
+			if (handler != null)
+				handler (this, new PropertyChangedEventArgs (propertyName));
 		}
 	}
 }

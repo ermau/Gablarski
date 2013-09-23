@@ -38,7 +38,6 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.Common;
-using System.Data.SQLite;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -47,27 +46,45 @@ using Cadenza;
 using Gablarski.Clients.Input;
 using Tempest;
 
+#if XAMARIN
+using SQLiteConnectionStringBuilder=Mono.Data.Sqlite.SqliteConnectionStringBuilder;
+using SQLiteConnection=Mono.Data.Sqlite.SqliteConnection;
+using SQLiteParameter=Mono.Data.Sqlite.SqliteParameter;
+#else
+using System.Data.SQLite;
+#endif
+
 namespace Gablarski.Clients.Persistence
 {
 	public static class ClientData
 	{
-		static ClientData()
+		public static void Setup (bool useLocalFiles)
 		{
 			DataDirectory = new DirectoryInfo (Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.ApplicationData), "Gablarski"));
 			if (!DataDirectory.Exists)
 				DataDirectory.Create();
 
-			string useLocal = ConfigurationManager.AppSettings["useLocalDatabase"];
-
-			if (useLocal != null && Boolean.Parse (useLocal))
+			if (useLocalFiles) {
+				KeyFile = new FileInfo ("gablarski.key");
 				DbFile = new FileInfo ("gablarski.db");
-			else
+			} else {
+				KeyFile = new FileInfo (Path.Combine (DataDirectory.FullName, "gablarski.key"));
 				DbFile = new FileInfo (Path.Combine (DataDirectory.FullName, "gablarski.db"));
+			}
 
+			#if !XAMARIN
 			var builder = new SQLiteConnectionStringBuilder();
 			builder.DataSource = DbFile.FullName;
 
 			db = new SQLiteConnection (builder.ToString());
+			#else
+			KeyFile = new FileInfo (Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.Personal), KeyFile.Name));
+			DbFile = new FileInfo (Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.Personal), DbFile.Name));
+			if (!DbFile.Exists)
+				SQLiteConnection.CreateFile (DbFile.FullName);
+
+			db = new SQLiteConnection ("Data Source=" + DbFile.FullName);
+			#endif
 			db.Open();
 			
 			CreateDbs();
@@ -119,20 +136,18 @@ namespace Gablarski.Clients.Persistence
 		{
 			return Task.Run (() => {
 
-				string keypath = Path.Combine (DataDirectory.FullName, "gablarski.key");
-				if (!File.Exists (keypath)) {
-
+				if (!KeyFile.Exists) {
 					var rsa = new RSACrypto();
 					RSAParameters parameters = rsa.ExportKey (true);
 				
-					using (var stream = File.OpenWrite (keypath)) {
+					using (var stream = File.OpenWrite (KeyFile.FullName)) {
 						var writer = new StreamValueWriter (stream);
 						RSAParametersSerializer.Serialize (writer, parameters);
 					}
 				}
 
 				RSAAsymmetricKey key;
-				using (var stream = File.OpenRead (keypath)) {
+				using (var stream = File.OpenRead (KeyFile.FullName)) {
 					var reader = new StreamValueReader (stream);
 					RSAParameters parameters = RSAParametersSerializer.Deserialize (reader);
 					key = new RSAAsymmetricKey (parameters);
@@ -208,8 +223,8 @@ namespace Gablarski.Clients.Persistence
 			using (var cmd = db.CreateCommand())
 			{
 				cmd.CommandText = ignore.Id > 0
-				                  	? "UPDATE ignores SET ignoreServerId=?,ignoreUsername=? WHERE (ignoreId=?)"
-				                  	: "INSERT INTO ignores (ignoreServerId,ignoreUsername) VALUES (?,?)";
+									? "UPDATE ignores SET ignoreServerId=?,ignoreUsername=? WHERE (ignoreId=?)"
+									: "INSERT INTO ignores (ignoreServerId,ignoreUsername) VALUES (?,?)";
 
 				cmd.Parameters.Add (new SQLiteParameter ("server", ignore.ServerId));
 				cmd.Parameters.Add (new SQLiteParameter ("username", ignore.Username));
@@ -261,8 +276,8 @@ namespace Gablarski.Clients.Persistence
 			using (var cmd = db.CreateCommand())
 			{
 				cmd.CommandText = setting.Id > 0
-				                  	? "UPDATE settings SET settingName=?,settingValue=? WHERE (settingId=?)"
-				                  	: "INSERT INTO settings (settingName,settingValue) VALUES (?,?)";
+									? "UPDATE settings SET settingName=?,settingValue=? WHERE (settingId=?)"
+									: "INSERT INTO settings (settingName,settingValue) VALUES (?,?)";
 
 				cmd.Parameters.Add (new SQLiteParameter ("name", setting.Name));
 				cmd.Parameters.Add (new SQLiteParameter ("value", setting.Value));
@@ -375,8 +390,8 @@ namespace Gablarski.Clients.Persistence
 			using (var cmd = db.CreateCommand())
 			{
 				cmd.CommandText = (volumeEntry.VolumeId > 0)
-				                  	? "UPDATE volumes SET volumeServerId=?, volumeUsername=?, volumeGain=? WHERE volumeId=?"
-				                  	: "INSERT INTO volumes (volumeServerId,volumeUsername,volumeGain) VALUES (?,?,?)";
+									? "UPDATE volumes SET volumeServerId=?, volumeUsername=?, volumeGain=? WHERE volumeId=?"
+									: "INSERT INTO volumes (volumeServerId,volumeUsername,volumeGain) VALUES (?,?,?)";
 
 				cmd.Parameters.Add (new SQLiteParameter ("serverId", volumeEntry.ServerId));
 				cmd.Parameters.Add (new SQLiteParameter ("username", volumeEntry.Username));
@@ -478,9 +493,10 @@ namespace Gablarski.Clients.Persistence
 			}
 		}
 
-		private static readonly DirectoryInfo DataDirectory;
-		private static readonly DbConnection db;
-		private static readonly FileInfo DbFile;
+		private static DirectoryInfo DataDirectory;
+		private static DbConnection db;
+		private static FileInfo DbFile;
+		private static FileInfo KeyFile;
 
 		private static void CreateDbs()
 		{

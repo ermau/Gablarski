@@ -39,32 +39,32 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
 using Gablarski.Annotations;
-using Gablarski.Client;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
 using Tempest.Social;
 
 namespace Gablarski.Clients.ViewModels
 {
-	class ChatViewModel
+	public class ChatViewModel
 		: ViewModelBase
 	{
-		private readonly GablarskiClient client;
+		private readonly GablarskiSocialClient client;
 
-		public ChatViewModel ([NotNull] GablarskiClient client)
+		public ChatViewModel ([NotNull] GablarskiSocialClient client, ChatHistory history)
 		{
 			if (client == null)
 				throw new ArgumentNullException ("client");
 
 			this.client = client;
-			this.closeGroupCommand = new RelayCommand<Group> (CloseGroupCore, CanCloseGroup);
+			this.closeGroupCommand = new RelayCommand<Group> (CloseGroupCore);
+			this.groups = new SelectedObservableCollection<Group, GroupViewModel> (client.Groups,
+				g => new GroupViewModel (client, g, history.GetMessages (g)));
 		}
 
 		public IEnumerable<GroupViewModel> Groups
 		{
-			get { throw new NotImplementedException(); }
+			get { return this.groups; }
 		}
 
+		private SelectedObservableCollection<Group, GroupViewModel> groups;
 		private readonly RelayCommand<Group> closeGroupCommand;
 
 		public ICommand CloseGroup
@@ -72,14 +72,13 @@ namespace Gablarski.Clients.ViewModels
 			get { return this.closeGroupCommand; }
 		}
 
-		private bool CanCloseGroup (object o)
+		private void CloseGroupCore (Group group)
 		{
-			return true;
-		}
+			GroupViewModel vm = this.groups.FirstOrDefault (g => g.Group.Id == group.Id);
+			if (vm == null)
+				return;
 
-		private void CloseGroupCore (object o)
-		{
-			
+			this.groups.Remove (vm);
 		}
 	}
 }
