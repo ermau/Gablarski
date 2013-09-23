@@ -1,0 +1,82 @@
+﻿<UserControl x:Class="Gablarski.Clients.Windows.GroupView"
+			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			 xmlns:ViewModels="clr-namespace:Gablarski.Clients.ViewModels;assembly=Gablarski.Clients"
+			 xmlns:Windows="clr-namespace:Gablarski.Clients.Windows"
+			 mc:Ignorable="d"
+			 Height="400" Width="400">
+	
+	<UserControl.Resources>
+		<Windows:AvatarConverter x:Key="AvatarConverter" />
+		<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+
+		<Style x:Key="Hint" TargetType="TextBox">
+			<Setter Property="Margin" Value="5,2" />
+			<Setter Property="Foreground" Value="LightGray" />
+			<Setter Property="BorderBrush" Value="Transparent" />
+			<Setter Property="FontSize" Value="18" />
+			<Setter Property="Focusable" Value="False" />
+		</Style>
+
+		<Style x:Key="TextInput" TargetType="TextBox">
+			<Setter Property="Background" Value="Transparent" />
+
+			<Setter Property="FontSize" Value="18" />
+		</Style>
+	</UserControl.Resources>
+	
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="74" />
+			<RowDefinition Height="*" />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+
+		<ListBox Grid.Row="0" ItemsSource="{Binding Participants}">
+			<ListBox.ItemsPanel>
+				<ItemsPanelTemplate>
+					<StackPanel Orientation="Horizontal" IsItemsHost="True" />
+				</ItemsPanelTemplate>
+			</ListBox.ItemsPanel>
+
+			<ListBox.ItemTemplate>
+				<DataTemplate>
+					<StackPanel>
+						<Image Margin="0,0,0,3" Height="64" DataContext="{Binding Avatar,Converter={StaticResource AvatarConverter}}" Source="{Binding Value}" />
+						<TextBlock Text="{Binding Nickname}" />
+					</StackPanel>
+				</DataTemplate>
+			</ListBox.ItemTemplate>
+		</ListBox>
+
+		<ListBox Grid.Row="1" ItemsSource="{Binding Chat}">
+			<ListBox.ItemTemplate>
+				<DataTemplate>
+					<StackPanel Orientation="Horizontal">
+						<Image Margin="0,0,5,0" DataContext="{Binding Person.Avatar,Converter={StaticResource AvatarConverter}}" Source="{Binding Value}" />
+						<TextBlock Text="{Binding Person.Nickname,StringFormat={}{0}:}" Margin="0,0,0,5" />
+						<TextBlock Text="{Binding Message}" />
+					</StackPanel>
+				</DataTemplate>
+			</ListBox.ItemTemplate>
+		</ListBox>
+
+		<Grid Grid.Row="2" Margin="4">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+
+			<Button Grid.Column="0" Command="{Binding JoinVoice}" ToolTip="Join Voice" Padding="5">
+				<Image Source="Resources/sound.png" />
+			</Button>
+
+			<Grid Grid.Column="1" Margin="4,0,4,0" Background="White">
+				<TextBox Style="{StaticResource Hint}" Text="chat" Visibility="{Binding ElementName=text, Path=Text.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}" />
+				<TextBox Style="{StaticResource TextInput}" Name="text" KeyDown="OnTextKeyDown" />
+			</Grid>
+		</Grid>
+	</Grid>
+</UserControl>
