@@ -60,7 +60,6 @@
     <Compile Include="Input\CommandStateChangedEventArgs.cs" />
     <Compile Include="Input\ISpeechRecognizer.cs" />
     <Compile Include="ITextToSpeech.cs" />
-    <Compile Include="LocalServer.cs" />
     <Compile Include="Modules.cs" />
     <Compile Include="Music\IControlMediaPlayer.cs" />
     <Compile Include="Input\IInputProvider.cs" />

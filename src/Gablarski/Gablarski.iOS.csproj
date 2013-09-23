@@ -131,6 +131,7 @@
     <Compile Include="Server\IServerUserHandler.cs" />
     <Compile Include="Server\IServerUserManager.cs" />
     <Compile Include="Server\ISettingsProvider.cs" />
+    <Compile Include="Server\LocalServer.cs" />
     <Compile Include="Server\RegisterResult.cs" />
     <Compile Include="Server\ServerChannelHandler.cs" />
     <Compile Include="Server\ServerSourceHandler.cs" />
