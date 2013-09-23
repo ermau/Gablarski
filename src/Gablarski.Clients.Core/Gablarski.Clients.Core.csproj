@@ -101,6 +101,7 @@
     <Compile Include="AsyncValue.cs" />
     <Compile Include="AvatarCache.cs" />
     <Compile Include="AutomaticErrorReporter.cs" />
+    <Compile Include="ChatHistory.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="GablarskiErrorReporter.cs" />
     <Compile Include="IErrorReporter.cs" />
