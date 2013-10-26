@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2011, Eric Maupin
+﻿// Copyright (c) 2011-2013, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -37,10 +37,10 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Gablarski.Clients.Input;
-using Microsoft.DirectX.DirectInput;
+using SharpDX.DirectInput;
 
 namespace Gablarski.Input.DirectInput
 {
@@ -58,58 +58,56 @@ namespace Gablarski.Input.DirectInput
 
 		public IEnumerable<CommandBinding> Defaults
 		{
-			get { yield return new CommandBinding (this, Command.Talk, String.Format ("{0}|{1}", SystemGuid.Keyboard, Key.X.ToString())); }
+			get { yield return new CommandBinding (this, Command.Talk, String.Format ("{0}|{1}", "keyboard", Key.X.ToString())); }
 		}
 
 		public void Attach (IntPtr window)
 		{
-			int index = 2;
-			this.running = true;
+			//return Task.Factory.StartNew (() => {
+				this.input = new SharpDX.DirectInput.DirectInput();
 
-			lock (this.syncRoot)
-			{
-				List<AutoResetEvent> resets = new List<AutoResetEvent>();
-				foreach (DeviceInstance di in Manager.GetDevices (DeviceClass.GameControl, EnumDevicesFlags.AttachedOnly))
-				{
-					AutoResetEvent reset = new AutoResetEvent (false);
+				int index = 2;
+				this.running = true;
 
-					var d = new Device (di.InstanceGuid);
-					d.Properties.BufferSize = 10;
-					d.SetCooperativeLevel (window, CooperativeLevelFlags.Background | CooperativeLevelFlags.NonExclusive);
-					d.SetDataFormat (DeviceDataFormat.Joystick);
-					d.SetEventNotification (reset);
-					d.Acquire();
+				lock (this.syncRoot) {
+					List<AutoResetEvent> resets = new List<AutoResetEvent>();
+					foreach (DeviceInstance di in this.input.GetDevices (DeviceClass.GameControl, DeviceEnumerationFlags.AttachedOnly)) {
+						AutoResetEvent reset = new AutoResetEvent (false);
 
-					resets.Add (reset);
-					this.joysticks.Add (di.InstanceGuid, d);
-					this.joystickIndexes.Add (index++, di.InstanceGuid);
+						var d = new Joystick (this.input, di.InstanceGuid);
+						d.Properties.BufferSize = 10;
+						d.SetCooperativeLevel (window, CooperativeLevel.Background | CooperativeLevel.NonExclusive);
+						d.SetNotification (reset);
+						d.Acquire();
+
+						resets.Add (reset);
+						this.joysticks.Add (di.InstanceGuid, d);
+						this.joystickIndexes.Add (index++, di.InstanceGuid);
+					}
+
+					this.waits = new AutoResetEvent[this.joysticks.Count + 2];
+					this.waits[0] = new AutoResetEvent (false);
+					this.keyboard = new Keyboard (this.input);
+					this.keyboard.Properties.BufferSize = 10;
+					this.keyboard.SetCooperativeLevel (window, CooperativeLevel.Background | CooperativeLevel.NonExclusive);
+					this.keyboard.SetNotification (this.waits[0]);
+					this.keyboard.Acquire();
+
+					this.waits[1] = new AutoResetEvent (false);
+					this.mouse = new Mouse (this.input);
+					this.mouse.Properties.BufferSize = 10;
+					this.mouse.SetCooperativeLevel (window, CooperativeLevel.Background | CooperativeLevel.NonExclusive);
+					this.mouse.SetNotification (this.waits[1]);
+					this.mouse.Acquire();
+
+					resets.CopyTo (this.waits, 2);
 				}
 
-				this.waits = new AutoResetEvent[this.joysticks.Count + 2];
-				this.waits[0] = new AutoResetEvent (false);
-				this.keyboard = new Device (SystemGuid.Keyboard);
-				this.keyboard.Properties.BufferSize = 10;
-				this.keyboard.SetCooperativeLevel (window, CooperativeLevelFlags.Background | CooperativeLevelFlags.NonExclusive);
-				this.keyboard.SetDataFormat (DeviceDataFormat.Keyboard);
-				this.keyboard.SetEventNotification (this.waits[0]);
-				this.keyboard.Acquire();
-
-				this.waits[1] = new AutoResetEvent (false);
-				this.mouse = new Device (SystemGuid.Mouse);
-				this.mouse.Properties.BufferSize = 10;
-				this.mouse.SetCooperativeLevel (window, CooperativeLevelFlags.Background | CooperativeLevelFlags.NonExclusive);
-				this.mouse.SetDataFormat (DeviceDataFormat.Mouse);
-				this.mouse.SetEventNotification (this.waits[1]);
-				this.mouse.Acquire();
-
-				resets.CopyTo (this.waits, 2);
-			}
-
-			(this.inputRunnerThread = new Thread (InputRunner)
-			{
-				Name = "DirectInput Runner",
-				IsBackground = true
-			}).Start();
+				(this.inputRunnerThread = new Thread (InputRunner) {
+					Name = "DirectInput Runner",
+					IsBackground = true
+				}).Start();
+			//});
 		}
 
 		public void SetBindings (IEnumerable<CommandBinding> bindings)
@@ -123,7 +121,7 @@ namespace Gablarski.Input.DirectInput
 				{
 					string[] parts = binding.Input.Split ('|');
 					Guid deviceGuid = new Guid (parts[0]);
-					if (deviceGuid == SystemGuid.Keyboard)
+					if (deviceGuid == KeyboardGuid)
 					{
 						string[] keys = parts[1].Split ('+');
 						Key[] boundKeys = new Key[keys.Length];
@@ -133,7 +131,7 @@ namespace Gablarski.Input.DirectInput
 
 						this.keyboardBindings.Add (boundKeys, binding.Command);
 					}
-					else if (deviceGuid == SystemGuid.Mouse)
+					else if (deviceGuid == MouseGuid)
 					{
 						int button;
 						if (!Int32.TryParse (parts[1], out button))
@@ -203,17 +201,31 @@ namespace Gablarski.Input.DirectInput
 			this.recording = true;
 		}
 
-		public string GetNiceInputName (Command command, string input)
+		public string GetNiceInputName (Command command, string deviceInput)
 		{
-			if (input == null || input.Trim() == String.Empty)
-				throw new ArgumentNullException ("input");
-			if (!input.Contains ("|"))
+			if (deviceInput == null || deviceInput.Trim() == String.Empty)
+				throw new ArgumentNullException ("deviceInput");
+			if (!deviceInput.Contains ("|"))
 				throw new FormatException ("Input was in an unrecognized format.");
 
-			string[] parts = input.Split ('|');
+			string[] parts = deviceInput.Split ('|');
 			Guid deviceGuid = new Guid (parts[0]);
+
+			Device device = null;
+			if (deviceGuid == KeyboardGuid)
+				device = this.keyboard;
+			else if (deviceGuid == MouseGuid)
+				device = this.mouse;
+			else {
+				Joystick joystick;
+				if (this.joysticks.TryGetValue (deviceGuid, out joystick))
+					device = joystick;
+			}
+
+			if (device == null)
+				return "Unknown Device";
 			
-			return GetNiceInputName (parts[1], new Device (deviceGuid));
+			return GetNiceInputName (parts[1], device);
 		}
 
 		public void EndRecord()
@@ -232,7 +244,7 @@ namespace Gablarski.Input.DirectInput
 		private bool running;
 		private bool recording;
 
-		private readonly Dictionary<Guid, Device> joysticks = new Dictionary<Guid, Device>();
+		private readonly Dictionary<Guid, Joystick> joysticks = new Dictionary<Guid, Joystick>();
 		private readonly Dictionary<int, Guid> joystickIndexes = new Dictionary<int, Guid>();
 		private readonly Dictionary<Guid, Dictionary<int, Command>> joystickBindings = new Dictionary<Guid, Dictionary<int, Command>>();
 		private readonly Dictionary<Key[], Command> keyboardBindings = new Dictionary<Key[], Command>();
@@ -241,27 +253,32 @@ namespace Gablarski.Input.DirectInput
 		private readonly object syncRoot = new object();
 
 		private AutoResetEvent[] waits;
-		
-		private Device keyboard;
-		private Device mouse;
+
+		private SharpDX.DirectInput.DirectInput input;
+
+		private static readonly Guid KeyboardGuid = new Guid ("6f1d2b61-d5a0-11cf-bfc7-444553540000");
+		private Keyboard keyboard;
+
+		private static readonly Guid MouseGuid = new Guid ("6f1d2b60-d5a0-11cf-bfc7-444553540000");
+		private Mouse mouse;
 
 		private Thread inputRunnerThread;
 
-		private string GetNiceInputName (string input, Device device)
+		private string GetNiceInputName (string deviceInput, Device device)
 		{
-			switch (device.DeviceInformation.DeviceType)
+			switch (device.Information.Type)
 			{
 				case DeviceType.Keyboard:
-					return input.Replace ("Menu", "Alt");
+					return deviceInput.Replace ("Menu", "Alt");
 
 				case DeviceType.Mouse:
-					return "Mouse " + (Int32.Parse(input) + 1);
+					return "Mouse " + (Int32.Parse(deviceInput) + 1);
 
 				default:
-					string[] parts = input.Split (';');
+					string[] parts = deviceInput.Split (';');
 
 					string r = device.Properties.ProductName + " " +
-					           device.GetObjectInformation (Int32.Parse (parts[0]), ParameterHow.ByOffset).Name;
+					           device.Information.InstanceName;
 					if (parts.Length == 2)
 						r += parts[1];
 
@@ -320,7 +337,7 @@ namespace Gablarski.Input.DirectInput
 					{
 						case 0: // Keyboard
 						{
-							KeyboardState state = this.keyboard.GetCurrentKeyboardState();
+							KeyboardState state = this.keyboard.GetCurrentState();
 
 							if (!this.recording && this.keyboardBindings != null)
 							{
@@ -329,7 +346,7 @@ namespace Gablarski.Input.DirectInput
 									int match = 0;
 									for (int i = 0; i < kvp.Key.Length; ++i)
 									{
-										if (state[kvp.Key[i]])
+										if (state.PressedKeys.Contains (kvp.Key[i]))
 											match++;
 									}
 
@@ -354,7 +371,7 @@ namespace Gablarski.Input.DirectInput
 							{
 								bool[] currentState = new bool[keyValues.Length];
 								for (int i = 0; i < keyValues.Length; ++i)
-									currentState[i] = state[keyValues[i]];
+									currentState[i] = state.AllKeys.Contains (keyValues[i]);
 
 								bool up = false;
 								if (keyRecordedState != null)
@@ -373,13 +390,13 @@ namespace Gablarski.Input.DirectInput
 
 								if (up)
 								{
-									string currentRecording = SystemGuid.Keyboard + "|";
+									string currentRecording = KeyboardGuid + "|";
 									for (int i = 0; i < keyValues.Length; ++i)
 									{
 										if (!keyRecordedState[i])
 											continue;
 
-										if (currentRecording != SystemGuid.Keyboard + "|")
+										if (currentRecording != KeyboardGuid + "|")
 											currentRecording += "+";
 
 										currentRecording += keyValues[i].ToString();
@@ -400,7 +417,7 @@ namespace Gablarski.Input.DirectInput
 							if (!this.recording && this.mouseBindings.Count == 0)
 								continue;
 
-							byte[] state = this.mouse.CurrentMouseState.GetMouseButtons();
+							bool[] state = this.mouse.GetCurrentState().Buttons;
 							
 							if (!this.recording)
 							{
@@ -410,7 +427,7 @@ namespace Gablarski.Input.DirectInput
 									if (!this.mouseBindings.TryGetValue (i, out c))
 										continue;
 
-									bool newState = (state[i] != 0);
+									bool newState = state[i];
 									bool currentState;
 									if (mousebindingStates.TryGetValue (i, out currentState))
 									{
@@ -432,10 +449,10 @@ namespace Gablarski.Input.DirectInput
 
 								for (int i = 0; i < state.Length; ++i)
 								{
-									if (state[i] == 0)
+									if (!state[i])
 										continue;
 
-									OnNewRecording (new RecordingEventArgs (this, SystemGuid.Mouse + "|" + i));
+									OnNewRecording (new RecordingEventArgs (this, MouseGuid + "|" + i));
 									break;
 								}
 							}
@@ -452,59 +469,58 @@ namespace Gablarski.Input.DirectInput
 							var currentInitials = objectInitial[d];
 							var currentRanges = objectRanges[d];
 
-							BufferedDataCollection buffer = d.GetBufferedData();
-							if (buffer == null)
+							JoystickUpdate[] updates = d.GetBufferedData();
+							if (updates == null)
 								continue;
 
-							for (int i = 0; i < buffer.Count; i++)
+							for (int i = 0; i < updates.Length; i++)
 							{
-								BufferedData bd = buffer[i];
-
+								JoystickUpdate update = updates[i];
 								if (this.recording)
 								{
 									int initial;
-									if (!currentInitials.TryGetValue (bd.Offset, out initial))
+									if (!currentInitials.TryGetValue (update.RawOffset, out initial))
 									{
-										if (!currentButtons.Contains (bd.Offset))
+										if (!currentButtons.Contains (update.RawOffset))
 										{
 											try
 											{
-												currentRanges.Add (bd.Offset, d.Properties.GetRange (ParameterHow.ByOffset, bd.Offset));
-												currentInitials[bd.Offset] = bd.Data;
+												currentRanges.Add (update.RawOffset, d.Properties.Range);
+												currentInitials[update.RawOffset] = update.Value;
 											}
-											catch (UnsupportedException)
+											catch (NotSupportedException)
 											{
 											}
 										}
 										else
-											OnNewRecording (new RecordingEventArgs (this, String.Format ("{0}|{1}", d.DeviceInformation.InstanceGuid, bd.Offset)));
+											OnNewRecording (new RecordingEventArgs (this, String.Format ("{0}|{1}", d.Information.InstanceGuid, update.Offset)));
 									}
 									else
 									{
-										InputRange range = currentRanges[bd.Offset];
-										int delta = Math.Abs (initial - bd.Data);
-										if (((float)delta / (range.Max - range.Min)) > 0.25) // >25% change
-											OnNewRecording (new RecordingEventArgs (this, String.Format ("{0}|{1};{2}", d.DeviceInformation.InstanceGuid, bd.Offset, ((initial > bd.Data) ? "+" : "-"))));
+										InputRange range = currentRanges[update.RawOffset];
+										int delta = Math.Abs (initial - update.Value);
+										if (((float)delta / (range.Maximum - range.Minimum)) > 0.25) // >25% change
+											OnNewRecording (new RecordingEventArgs (this, String.Format ("{0}|{1};{2}", d.Information.InstanceGuid, update.Offset, ((initial > update.Value) ? "+" : "-"))));
 									}
 								}
 								else
 								{
 									Dictionary<int, Command> binds;
-									if (!this.joystickBindings.TryGetValue (d.DeviceInformation.InstanceGuid, out binds) || binds.Count == 0)
+									if (!this.joystickBindings.TryGetValue (d.Information.InstanceGuid, out binds) || binds.Count == 0)
 										continue;
 									 
 									Command c;
-									if (!binds.TryGetValue (bd.Offset, out c))
+									if (!binds.TryGetValue (update.RawOffset, out c))
 										continue;
 
-									if (currentButtons.Contains (bd.Offset))
-										OnInputStateChanged (new CommandStateChangedEventArgs (c, (bd.Data == 128)));
+									if (currentButtons.Contains (update.RawOffset))
+										OnInputStateChanged (new CommandStateChangedEventArgs (c, (update.Value == 128)));
 									else
 									{
-										InputRange range = currentRanges[bd.Offset];
+										InputRange range = currentRanges[update.RawOffset];
 
-										double value = (bd.Data != -1) ? bd.Data : range.Max;
-										OnInputStateChanged (new CommandStateChangedEventArgs (c, (value / (range.Max - range.Min)) * 100));
+										double value = (update.Value != -1) ? update.Value : range.Maximum;
+										OnInputStateChanged (new CommandStateChangedEventArgs (c, (value / (range.Maximum - range.Minimum)) * 100));
 									}
 								}
 							}
