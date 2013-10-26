@@ -37,32 +37,31 @@
 using System;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Media.Imaging;
 
 namespace Gablarski.Clients.Windows
 {
-    internal class AvatarConverter
-        : IValueConverter
-    {
-        public object Convert (object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            string uriOrEmail = value as string;
+	internal class AvatarConverter
+		: IValueConverter
+	{
+		public object Convert (object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			string uriOrEmail = value as string;
 
-	        Task<BitmapSource> task = AvatarCache.GetAvatarAsync (uriOrEmail).ContinueWith (t => {
-		        var stream = new MemoryStream (t.Result);
+			Task<BitmapSource> task = AvatarCache.GetAvatarAsync (uriOrEmail).ContinueWith (t => {
+				var stream = new MemoryStream (t.Result);
 				var decoder = BitmapDecoder.Create (stream, BitmapCreateOptions.None, BitmapCacheOption.None);
-		        return (BitmapSource)decoder.Frames[0];
-	        });
+				return (BitmapSource)decoder.Frames[0];
+			});
 
-	        return new AsyncValue<BitmapSource> (task, null);
-        }
+			return new AsyncValue<BitmapSource> (task, null);
+		}
 
-        public object ConvertBack (object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
+		public object ConvertBack (object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			throw new NotImplementedException();
+		}
+	}
 }
