@@ -10,7 +10,6 @@ using Gablarski.Clients.Media;
 using Gablarski.Clients.Windows.Properties;
 using Gablarski.Clients.ViewModels;
 using Cadenza;
-using GalaSoft.MvvmLight.Command;
 
 namespace Gablarski.Clients.Windows
 {

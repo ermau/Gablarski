@@ -4,7 +4,6 @@ using System.Windows;
 using System.Windows.Input;
 using Gablarski.Clients.Messages;
 using Gablarski.Clients.ViewModels;
-using GalaSoft.MvvmLight.Messaging;
 
 namespace Gablarski.Clients.Windows
 {
@@ -18,7 +17,7 @@ namespace Gablarski.Clients.Windows
 			InitializeComponent();
 			DataContext = new MainWindowViewModel (Program.SocialClient);
 
-			Messenger.Default.Register<AddBuddyMessage> (this, OnAddBuddyMessage);
+			Messenger.Register<AddBuddyMessage> (OnAddBuddyMessage);
 		}
 
 		private void OnClickAcceptName (object sender, RoutedEventArgs e)
