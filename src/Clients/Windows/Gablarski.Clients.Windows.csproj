@@ -437,9 +437,7 @@ xcopy /Y "$(SolutionDir)src\Gablarski.iTunes\bin\$(ConfigurationName)\*.pdb" "$(
 xcopy /Y "$(SolutionDir)src\Gablarski.Winamp\bin\$(ConfigurationName)\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)src\Gablarski.Winamp\bin\$(ConfigurationName)\*.pdb" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)src\Gablarski.SpeechNotifier\bin\$(ConfigurationName)\*.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)src\Gablarski.SpeechNotifier\bin\$(ConfigurationName)\*.pdb" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)src\Gablarski.Growl\bin\$(ConfigurationName)\*.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)src\Gablarski.Growl\bin\$(ConfigurationName)\*.pdb" "$(TargetDir)"</PostBuildEvent>
+xcopy /Y "$(SolutionDir)src\Gablarski.SpeechNotifier\bin\$(ConfigurationName)\*.pdb" "$(TargetDir)"</PostBuildEvent>
   </PropertyGroup>
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
 </Project>
