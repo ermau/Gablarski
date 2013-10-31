@@ -15,7 +15,7 @@ RequestExecutionLevel admin
 !define MUI_STARTMENUPAGE_REGISTRY_KEY ${REGKEY}
 !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME StartMenuGroup
 !define MUI_STARTMENUPAGE_DEFAULTFOLDER Gablarski
-!define MUI_UNICON "bin\x86\{config}\Headphones.ico"
+!define MUI_UNICON "Resources\Headphones.ico"
 !define MUI_UNFINISHPAGE_NOAUTOCLOSE
 
 # Included files
@@ -76,7 +76,7 @@ Section -Main SEC0000
     File ..\..\..\lib\OpenAL32.dll
     File ..\..\..\lib\OpenALSoft.License.txt
     File ..\..\..\lib\System.Data.SQLite.DLL
-	File ..\..\..\lib\sqlite3.dll
+    File ..\..\..\lib\sqlite3.dll
     File ..\..\Gablarski\bin\{config}\Gablarski.dll
     File ..\..\..\Gablarski.License.txt
     File ..\..\Gablarski\bin\{config}\Gablarski.pdb
@@ -100,7 +100,7 @@ Section -Main SEC0000
     File bin\x86\{config}\GablarskiClient.exe
     File bin\x86\{config}\GablarskiClient.exe.config
     File bin\x86\{config}\GablarskiClient.pdb
-    File bin\x86\{config}\Headphones.ico
+    File Resources\Headphones.ico
     File bin\x86\{config}\Microsoft.WindowsAPICodePack.dll
     File bin\x86\{config}\Microsoft.WindowsAPICodePack.pdb
     File bin\x86\{config}\Microsoft.WindowsAPICodePack.Shell.dll
