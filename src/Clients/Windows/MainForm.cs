@@ -192,12 +192,14 @@ namespace Gablarski.Clients.Windows
 		{
 			if (String.IsNullOrEmpty (connectTo.UserNickname))
 			{
-				InputForm nickname = new InputForm();
+				/*InputForm nickname = new InputForm();
 				if (nickname.ShowDialog () == DialogResult.Cancel)
 					return;
 
 				string nick = nickname.Input.Text.Trim();
-				connectTo.UserNickname = nick;
+				connectTo.UserNickname = nick;*/
+
+				connectTo.UserNickname = Settings.Nickname;
 			}
 
 			this.server = connectTo;
@@ -985,7 +987,9 @@ namespace Gablarski.Clients.Windows
 
 			if (this.server == null)
 			{
-				this.server = new ServerEntry (0);
+				this.server = new ServerEntry (0) {
+					UserNickname = Settings.Nickname
+				};
 				this.users.Server = this.server;
 			}
 			
