@@ -34,19 +34,16 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
-using System;
-using System.Linq;
-using System.Windows;
 using Gablarski.Clients.ViewModels;
 
 namespace Gablarski.Clients.Windows
 {
-    public partial class PersonaSetupWindow : Window
-    {
-        public PersonaSetupWindow()
-        {
-            InitializeComponent();
-	        this.nickname.Focus();
+	public partial class PersonaSetupWindow
+	{
+		public PersonaSetupWindow()
+		{
+			InitializeComponent();
+			this.nickname.Focus();
 
 			var vm = new PersonaSetupViewModel();
 			vm.SetupDone += (sender, args) => {
@@ -54,7 +51,7 @@ namespace Gablarski.Clients.Windows
 				Close();
 			};
 
-	        DataContext = vm;
-        }
-    }
+			DataContext = vm;
+		}
+	}
 }

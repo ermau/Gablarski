@@ -34,9 +34,6 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
-using System;
-using System.Linq;
-using System.Windows;
 using Gablarski.Clients.ViewModels;
 
 namespace Gablarski.Clients.Windows
@@ -44,7 +41,7 @@ namespace Gablarski.Clients.Windows
 	/// <summary>
 	/// Interaction logic for AddBuddyWindow.xaml
 	/// </summary>
-	public partial class AddBuddyWindow : Window
+	public partial class AddBuddyWindow
 	{
 		public AddBuddyWindow()
 		{

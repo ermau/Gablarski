@@ -1,34 +1,42 @@
-﻿<Window x:Class="Gablarski.Clients.Windows.PersonaSetupWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:Gablarski="clr-namespace:Gablarski.Clients.Windows"
-        Title="Setup" Height="300" Width="500" ResizeMode="NoResize">
+﻿<metro:Window x:Class="Gablarski.Clients.Windows.PersonaSetupWindow"
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:Gablarski="clr-namespace:Gablarski.Clients.Windows"
+		xmlns:metro="http://schemas.codeplex.com/elysium"
+		xmlns:params="http://schemas.codeplex.com/elysium/params"
+		Height="260" Width="500" ResizeMode="NoResize"
+		params:Design.Theme="Dark"
+		params:Design.AccentBrush="{x:Static metro:AccentBrushes.Blue}"
+		params:Design.ContrastBrush="White"
+		Background="{DynamicResource BackgroundBrush}"
+		BorderThickness="1">
 	
 	<Window.Resources>
 		<Gablarski:AvatarConverter x:Key="AvatarConverter" />
 		
 		<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 		
-		<Style x:Key="Hint" TargetType="TextBox">
+		<Style x:Key="Hint" TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
 			<Setter Property="Margin" Value="5,2" />
-			<Setter Property="Foreground" Value="LightGray" />
+			<Setter Property="Foreground" Value="White" />
 			<Setter Property="BorderBrush" Value="Transparent" />
 			<Setter Property="FontSize" Value="30" />
 			<Setter Property="Focusable" Value="False" />
 		</Style>
-		
-		<Style x:Key="TextInput" TargetType="TextBox">
+
+		<Style x:Key="TextInput" TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
 			<Setter Property="Background" Value="Transparent" />
 			<Setter Property="BorderThickness" Value="0,0,0,1" />
 			<Setter Property="FontSize" Value="30" />
+			<Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}" />
 		</Style>
 	</Window.Resources>
 	
-    <Grid HorizontalAlignment="Center">
-        <Grid.RowDefinitions>
+	<Grid HorizontalAlignment="Center" Margin="0,-40,0,0">
+		<Grid.RowDefinitions>
 			<RowDefinition Height="70" />
 			<RowDefinition />
-			<RowDefinition Height="40" />
+			<RowDefinition Height="45" />
 		</Grid.RowDefinitions>
 		
 		<TextBlock Grid.Row="0" FontSize="40" Margin="0,10,0,0">setup persona</TextBlock>
@@ -60,6 +68,6 @@
 			
 		</Grid>
 		
-		<Button IsDefault="True" Grid.Row="2" Grid.ColumnSpan="2" Height="25" Width="70" HorizontalAlignment="Center" VerticalAlignment="Center" Command="{Binding Done}">Done</Button>
-    </Grid>
-</Window>
+		<Button IsDefault="True" Grid.Row="2" Grid.ColumnSpan="2" Height="30" Width="70" HorizontalAlignment="Center" VerticalAlignment="Center" Command="{Binding Done}">Done</Button>
+	</Grid>
+</metro:Window>

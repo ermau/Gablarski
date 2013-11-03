@@ -44,16 +44,20 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Forms;
 using log4net;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Mindscape.Raygun4Net;
+using System.Windows.Media;
+using Elysium;
 using Tempest;
 using Tempest.Social;
 using Gablarski.Clients.Input;
 using Gablarski.Clients.Persistence;
 using Microsoft.WindowsAPICodePack.Shell;
 using Microsoft.WindowsAPICodePack.Taskbar;
+using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace Gablarski.Clients.Windows
 {
@@ -179,6 +183,10 @@ namespace Gablarski.Clients.Windows
 
 			SetupFirstRun();
 
+			System.Windows.Application app = new System.Windows.Application();
+			app.Resources.MergedDictionaries.Add (new ResourceDictionary { Source = new Uri ("/Elysium;component/Themes/Generic.xaml", UriKind.Relative) });
+			app.Apply (Theme.Dark, AccentBrushes.Blue, Brushes.White);
+
 			if (Settings.Nickname == null)
 				PersonalSetup();
 
@@ -187,20 +195,20 @@ namespace Gablarski.Clients.Windows
 
 			ResourceWebRequestFactory.Register();
 
-			Application.EnableVisualStyles ();
-			Application.SetCompatibleTextRenderingDefault (false);
+			//Application.EnableVisualStyles ();
+			//Application.SetCompatibleTextRenderingDefault (false);
 
 			//SetupSocial();
 
-			/*MainWindow window = new MainWindow();
-			window.Show();*/
+			MainWindow window = new MainWindow();
+			window.Show();
 
-			var m = new MainForm();
-			m.Show();
+			/*var m = new MainForm();
+			m.Show();*/
 
 			UpdateTaskbarServers();
 
-			if (args.Length > 0) {
+			/*if (args.Length > 0) {
 				int id;
 				if (Int32.TryParse (args[0], out id)) {
 					ServerEntry server = Servers.GetEntries ().FirstOrDefault (s => s.Id == id);
@@ -220,8 +228,8 @@ namespace Gablarski.Clients.Windows
 
 			/*System.Windows.Application app = new System.Windows.Application();
 			app.Run (window);*/
-
-			Application.Run (m);
+			
+			app.Run (window);
 
 			Settings.Save();
 		}
