@@ -373,11 +373,15 @@ namespace Gablarski.Clients.Windows
 
 		private async void startLocal_Click (object sender, EventArgs e)
 		{
-			InputForm nickname = new InputForm();
-			if (nickname.ShowDialogOnFormThread (this) == DialogResult.Cancel)
-				return;
+			string nick;
+			if (Settings.Nickname == null) {
+				InputForm nickname = new InputForm();
+				if (nickname.ShowDialogOnFormThread (this) == DialogResult.Cancel)
+					return;
 
-			string nick = nickname.Input.Text.Trim();
+				nick = nickname.Input.Text.Trim();
+			} else
+				nick = Settings.Nickname;
 
 			await LocalServer.StartAsync();
 
