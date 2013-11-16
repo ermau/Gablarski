@@ -1098,7 +1098,7 @@ namespace Gablarski.Tests
 			var c = new ConnectionBuffer (cs.Item1);
 
 			var admin = JoinAsGuest (s, c, "admin");
-			permissions.EnablePermissions (admin.UserId, PermissionName.KickPlayerFromChannel);
+			permissions.EnablePermissions (admin.UserId, PermissionName.KickPlayerFromServer);
 			
 			var target = JoinAsGuest (server, client, "target");
 			c.DequeueAndAssertMessage<UserJoinedMessage>();
