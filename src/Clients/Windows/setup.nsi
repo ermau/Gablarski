@@ -58,8 +58,6 @@ VIAddVersionKey LegalCopyright ""
 InstallDirRegKey HKLM "${REGKEY}" Path
 ShowUninstDetails show
 
-Var InstallDotNet
-
 # Installer sections
 Section -Main SEC0000
     SetOutPath $INSTDIR
@@ -76,7 +74,7 @@ Section -Main SEC0000
     File ..\..\..\lib\OpenAL32.dll
     File ..\..\..\lib\OpenALSoft.License.txt
     File ..\..\..\lib\System.Data.SQLite.DLL
-	File ..\..\..\lib\sqlite3.dll
+    File ..\..\..\lib\sqlite3.dll
     File ..\..\Gablarski\bin\{config}\Gablarski.dll
     File ..\..\..\Gablarski.License.txt
     File ..\..\Gablarski\bin\{config}\Gablarski.pdb
@@ -84,10 +82,11 @@ Section -Main SEC0000
     File ..\..\Gablarski.Clients\bin\{config}\Gablarski.Clients.dll
     File ..\..\Gablarski.Clients\bin\{config}\Gablarski.Clients.pdb
     File ..\..\Gablarski.Clients\bin\{config}\Gablarski.Clients.XML
-    File ..\..\Gablarski.Growl\bin\{config}\Gablarski.Growl.dll
-    File ..\..\Gablarski.Growl\bin\{config}\Gablarski.Growl.pdb
     File ..\..\Gablarski.Input.DirectInput\bin\{config}\Gablarski.Input.DirectInput.dll
     File ..\..\Gablarski.Input.DirectInput\bin\{config}\Gablarski.Input.DirectInput.pdb
+    File ..\..\..\lib\SharpDX.License.txt
+    File ..\..\Gablarski.Input.DirectInput\bin\{config}\SharpDX.dll
+    File ..\..\Gablarski.Input.DirectInput\bin\{config}\SharpDX.DirectInput.dll
     File ..\..\Gablarski.iTunes\bin\{config}\Gablarski.iTunes.dll
     File ..\..\Gablarski.iTunes\bin\{config}\Gablarski.iTunes.pdb
     File ..\..\..\lib\Interop.iTunesLib.dll
@@ -125,16 +124,6 @@ Section -post SEC0001
     WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" UninstallString $INSTDIR\uninstall.exe
     WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" NoModify 1
     WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" NoRepair 1
-
-	SetOutPath $TEMP
-    SetOverwrite on
-    File ..\..\..\tools\dxwebsetup.exe
-    ExecWait "dxwebsetup.exe /Q"
-    File ..\..\..\tools\dotNetFx40_Full_x86_x64.exe
-    #!insertmacro CheckDotNET
-    ${If} $InstallDotNET == "Yes"
-        Exec "dotNetFx40_Full_x86_x64.exe"
-    ${EndIf}
 SectionEnd
 
 # Macro for selecting uninstaller sections
@@ -171,8 +160,9 @@ Section /o -un.Main UNSEC0000
     Delete /REBOOTOK $INSTDIR\Gablarski.iTunes.dll
     Delete /REBOOTOK $INSTDIR\Gablarski.Input.DirectInput.pdb
     Delete /REBOOTOK $INSTDIR\Gablarski.Input.DirectInput.dll
-    Delete /REBOOTOK $INSTDIR\Gablarski.Growl.pdb
-    Delete /REBOOTOK $INSTDIR\Gablarski.Growl.dll
+    Delete /REBOOTOK $INSTDIR\SharpDX.dll
+    Delete /REBOOTOK $INSTDIR\SharpDX.DirectInput.dll
+    Delete /REBOOTOK $INSTDIR\SharpDX.License.txt
     Delete /REBOOTOK $INSTDIR\Gablarski.Clients.XML
     Delete /REBOOTOK $INSTDIR\Gablarski.Clients.pdb
     Delete /REBOOTOK $INSTDIR\Gablarski.Clients.dll
@@ -181,7 +171,7 @@ Section /o -un.Main UNSEC0000
     Delete /REBOOTOK $INSTDIR\Gablarski.License.txt
     Delete /REBOOTOK $INSTDIR\Gablarski.dll
     Delete /REBOOTOK $INSTDIR\System.Data.SQLite.DLL
-	Delete /REBOOTOK $INSTDIR\sqlite3.dll
+    Delete /REBOOTOK $INSTDIR\sqlite3.dll
     Delete /REBOOTOK $INSTDIR\OpenALSoft.License.txt
     Delete /REBOOTOK $INSTDIR\OpenAL32.dll
     Delete /REBOOTOK $INSTDIR\log4net.License.txt
@@ -216,24 +206,6 @@ SectionEnd
 # Installer functions
 Function .onInit
     InitPluginsDir
-    
-    Call GetDotNETVersion
-FunctionEnd
-
-Function GetDotNETVersion
-    ClearErrors
-    ReadRegStr $0 HKLM "SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full" "Version"
-    IfErrors notinstalled
-    
-    ${VersionCompare} $0 "4.0.30319" $1
-    IntCmp $1 2 notinstalled installed
-    
-    installed:
-        StrCpy $InstallDotNET "No"
-        Return
-    notinstalled:
-        StrCpy $InstallDotNET "Yes"
-        Return
 FunctionEnd
 
 # Uninstaller functions
