@@ -997,8 +997,8 @@ namespace Gablarski.Tests
 
 			var u = JoinAsGuest (s, c, "nick");
 
-			handler.OnKickUserMessage (new MessageEventArgs<KickUserMessage> (s,
-				new KickUserMessage (JoinAsGuest (server, client, "nick"), true)));
+			handler.OnKickUserMessage (new MessageEventArgs<KickUserMessage> (server,
+				new KickUserMessage (u, true)));
 
 			c.AssertNoMessage();
 		}
