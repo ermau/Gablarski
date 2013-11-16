@@ -64,9 +64,6 @@ Section -Main SEC0000
     SetOverwrite on
     File ..\..\..\lib\Cadenza.dll
     File ..\..\..\lib\Cadenza.pdb
-    File ..\..\..\lib\Growl.Connector.dll
-    File ..\..\..\lib\Growl.CoreLibrary.dll
-    File ..\..\..\lib\Growl.license.txt
     File ..\..\..\lib\log4net.dll
     File ..\..\..\lib\log4net.License.txt
     File ..\..\..\lib\OpenAL32.dll
