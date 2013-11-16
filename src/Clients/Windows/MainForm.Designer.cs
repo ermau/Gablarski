@@ -28,6 +28,7 @@
 		/// </summary>
 		private void InitializeComponent ()
 		{
+			this.components = new System.ComponentModel.Container();
 			System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
 			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
 			this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
@@ -37,7 +38,6 @@
 			this.btnMute = new System.Windows.Forms.ToolStripButton();
 			this.btnMuteMic = new System.Windows.Forms.ToolStripButton();
 			this.btnAFK = new System.Windows.Forms.ToolStripButton();
-			this.btnMusic = new System.Windows.Forms.ToolStripButton();
 			this.btnComment = new System.Windows.Forms.ToolStripButton();
 			this.btnSettings = new System.Windows.Forms.ToolStripButton();
 			this.aboutButton = new System.Windows.Forms.ToolStripButton();
@@ -70,7 +70,6 @@
             this.toolStripSeparator1,
             this.btnMute,
             this.btnMuteMic,
-            this.btnMusic,
             this.toolStripSeparator2,
             this.btnAFK,
             this.btnComment,
@@ -141,17 +140,6 @@
 			this.btnAFK.Text = "AFK";
 			this.btnAFK.CheckedChanged += new System.EventHandler(this.btnAFK_CheckedChanged);
 			// 
-			// btnMusic
-			// 
-			this.btnMusic.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.btnMusic.Image = global::Gablarski.Clients.Windows.Properties.Resources.MusicImage;
-			this.btnMusic.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.btnMusic.Name = "btnMusic";
-			this.btnMusic.Size = new System.Drawing.Size(23, 22);
-			this.btnMusic.Text = "Play Music";
-			this.btnMusic.Visible = false;
-			this.btnMusic.Click += new System.EventHandler(this.musicButton_Click);
-			// 
 			// btnComment
 			// 
 			this.btnComment.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -187,9 +175,9 @@
 			// users
 			// 
 			this.users.AllowDrop = true;
-			this.users.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-						| System.Windows.Forms.AnchorStyles.Left)
-						| System.Windows.Forms.AnchorStyles.Right)));
+			this.users.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.users.ImageIndex = 0;
 			this.users.Location = new System.Drawing.Point(-1, 25);
 			this.users.Name = "users";
@@ -221,7 +209,6 @@
 		private UserTreeView users;
 		private System.Windows.Forms.ToolStripButton btnConnect;
 		private System.Windows.Forms.ToolStripButton btnSettings;
-		private System.Windows.Forms.ToolStripButton btnMusic;
 		private System.Windows.Forms.ToolStripButton btnRegister;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;

@@ -1140,25 +1140,6 @@ namespace Gablarski.Clients.Windows
 		private readonly Dictionary<ITextToSpeech, AudioSource> speechSources = new Dictionary<ITextToSpeech, AudioSource>();
 		private readonly HashSet<string> ignores = new HashSet<string>();
 
-		private void musicButton_Click (object sender, EventArgs e)
-		{
-			using (MusicForm mf = new MusicForm())
-			{
-				if (mf.ShowDialog (this) != DialogResult.OK)
-					return;
-			
-				if (!mf.File && mf.Provider != null)
-				{
-					musicprovider = (IAudioCaptureProvider)mf.Provider;
-					musicprovider.Device = mf.CaptureDevice;
-				}
-				else
-				{
-					//musicprovider = new MusicFileCaptureProvider (new FileInfo (mf.FilePath));
-				}
-			}
-		}
-
 		private void btnComment_Click (object sender, EventArgs e)
 		{
 			var changeComment = new CommentForm (this.gablarski.CurrentUser.Comment);
