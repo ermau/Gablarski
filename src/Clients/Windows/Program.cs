@@ -193,14 +193,17 @@ namespace Gablarski.Clients.Windows
 			Application.EnableVisualStyles ();
 			Application.SetCompatibleTextRenderingDefault (false);
 
-			SetupSocial();
+			//SetupSocial();
 
-			MainWindow window = new MainWindow();
-			window.Show();
+			/*MainWindow window = new MainWindow();
+			window.Show();*/
+
+			var m = new MainForm();
+			m.Show();
 
 			UpdateTaskbarServers();
 
-			/*if (args.Length > 0)
+			if (args.Length > 0)
 			{
 				int id;
 				if (Int32.TryParse (args[0], out id))
@@ -226,15 +229,17 @@ namespace Gablarski.Clients.Windows
 			{
 				if (!m.ShowConnect (true))
 					return;
-			}*/
+			}
 
-			System.Windows.Application app = new System.Windows.Application();
-			app.Run (window);
+			/*System.Windows.Application app = new System.Windows.Application();
+			app.Run (window);*/
+
+			Application.Run (m);
 
 			Settings.Save();
 		}
 
-		private static void SetupSocial()
+		/*private static void SetupSocial()
 		{
 			var person = new Person (Key.Result.PublicSignature.Aggregate (String.Empty, (s, b) => s + b.ToString ("X2"))) {
 				Nickname = Settings.Nickname,
@@ -247,7 +252,7 @@ namespace Gablarski.Clients.Windows
 
 			string host = ConfigurationManager.AppSettings["socialHost"];
 			SocialClient.SetTarget (new Target (host, SocialProtocol.DefaultPort));
-		}
+		}*/
 
 		private static void PersonalSetup()
 		{
