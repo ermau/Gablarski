@@ -269,7 +269,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Opus.NET\OpusWrapper\OpusWrapper.csproj">
+    <ProjectReference Include="..\Opus.NET\OpusWrapper\OpusWrapper.csproj">
       <Project>{838bdb0b-5eb1-4c1e-9026-0a8842ac00c6}</Project>
       <Name>OpusWrapper</Name>
     </ProjectReference>
