@@ -61,9 +61,9 @@ namespace Gablarski.Input.DirectInput
 			get { yield return new CommandBinding (this, Command.Talk, String.Format ("{0}|{1}", "keyboard", Key.X.ToString())); }
 		}
 
-		public void Attach (IntPtr window)
+		public Task AttachAsync (IntPtr window)
 		{
-			//return Task.Factory.StartNew (() => {
+			return Task.Factory.StartNew (() => {
 				this.input = new SharpDX.DirectInput.DirectInput();
 
 				int index = 2;
@@ -107,7 +107,7 @@ namespace Gablarski.Input.DirectInput
 					Name = "DirectInput Runner",
 					IsBackground = true
 				}).Start();
-			//});
+			});
 		}
 
 		public void SetBindings (IEnumerable<CommandBinding> bindings)

@@ -36,6 +36,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Gablarski.Clients.Input
 {
@@ -51,13 +52,13 @@ namespace Gablarski.Clients.Input
 		/// <seealso cref="IInputProvider.CommandStateChanged"/>
 		event EventHandler<CommandStateChangedEventArgs> CommandStateChanged;
 
-		ITextToSpeech TTS { set; }
+		ITextToSpeech TextToSpeech { set; }
 
 		/// <summary>
 		/// Opens the recognizer and prepares it for use.
 		/// </summary>
 		/// <returns><c>true</c> if </returns>
-		void Open();
+		Task OpenAsync();
 
 		/// <summary>
 		/// Closes the recognizer.

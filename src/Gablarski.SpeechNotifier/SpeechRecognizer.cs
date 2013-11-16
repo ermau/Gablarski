@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2011, Eric Maupin
+﻿// Copyright (c) 2011-2013, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -39,7 +39,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Speech.Recognition;
-using Gablarski.Client;
+using System.Threading.Tasks;
 using Gablarski.Clients;
 using Gablarski.Clients.Input;
 
@@ -56,31 +56,32 @@ namespace Gablarski.SpeechNotifier
 			get { return "Windows Speech Recognition"; }
 		}
 
-		public ITextToSpeech TTS
+		public ITextToSpeech TextToSpeech
 		{
 			get;
 			set;
 		}
 
-		public void Open()
+		public Task OpenAsync()
 		{
-			lock (this.sync)
-			{
-				if (this.recognition != null)
-					throw new InvalidOperationException ("Already open");
+			return Task.Factory.StartNew (() => {
+				lock (this.sync) {
+					if (this.recognition != null)
+						throw new InvalidOperationException ("Already open");
 
-				this.recognition = new SpeechRecognitionEngine();
-				this.recognition.SpeechRecognized += OnSpeechRecognized;
-				this.recognition.MaxAlternates = 1;
-				this.recognition.SetInputToDefaultAudioDevice();
+					this.recognition = new SpeechRecognitionEngine();
+					this.recognition.SpeechRecognized += OnSpeechRecognized;
+					this.recognition.MaxAlternates = 1;
+					this.recognition.SetInputToDefaultAudioDevice();
 
-				GrammarBuilder builder = new GrammarBuilder();
-				builder.Append (new SemanticResultKey ("command", new Choices ("mute", "unmute")));
-				builder.Append (new Choices (" ", "me"));
+					GrammarBuilder builder = new GrammarBuilder();
+					builder.Append (new SemanticResultKey ("command", new Choices ("mute", "unmute")));
+					builder.Append (new Choices (" ", "me"));
 
-				this.muteGrammar = new Grammar (builder);
-				this.recognition.LoadGrammar (this.muteGrammar);
-			}
+					this.muteGrammar = new Grammar (builder);
+					this.recognition.LoadGrammar (this.muteGrammar);
+				}
+			});
 		}
 
 		public void Close()

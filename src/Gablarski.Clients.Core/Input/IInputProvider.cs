@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2011, Eric Maupin
+﻿// Copyright (c) 2011-2013, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -35,9 +35,8 @@
 // DAMAGE.
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 
 namespace Gablarski.Clients.Input
 {
@@ -68,7 +67,7 @@ namespace Gablarski.Clients.Input
 		/// <param name="window">Application window handle.</param>
 		/// <exception cref="ArgumentException">If <paramref name="window"/> is equal to <see cref="IntPtr.Zero"/>.</exception>
 		/// <exception cref="InvalidOperationException">If it's already attached.</exception>
-		void Attach (IntPtr window);
+		Task AttachAsync (IntPtr window);
 
 		/// <summary>
 		/// Sets the bindings to listen for.
@@ -85,7 +84,7 @@ namespace Gablarski.Clients.Input
 		/// <summary>
 		/// Starts recording input combinations for saving.
 		/// </summary>
-		/// <exception cref="InvalidOperationException">If called before <see cref="Attach"/>.</exception>
+		/// <exception cref="InvalidOperationException">If called before <see cref="AttachAsync"/>.</exception>
 		void BeginRecord();
 
 		/// <summary>

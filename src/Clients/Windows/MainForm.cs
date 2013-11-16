@@ -39,6 +39,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Cadenza;
 using Cadenza.Collections;
@@ -404,7 +405,7 @@ namespace Gablarski.Clients.Windows
 			Connect (this.server.Host, this.server.Port);
 		}
 
-		private void SettingsSettingChanged (object sender, PropertyChangedEventArgs e)
+		private async void SettingsSettingChanged (object sender, PropertyChangedEventArgs e)
 		{
 			switch (e.PropertyName)
 			{
@@ -422,7 +423,7 @@ namespace Gablarski.Clients.Windows
 					break;
 
 				case Settings.UsePushToTalkSettingName:
-					SetupInput();
+					await SetupInputAsync();
 					SetupVoiceCapture();
 					break;
 
@@ -492,11 +493,8 @@ namespace Gablarski.Clients.Windows
 					break;
 
 				case "InputProvider":
-					SetupInput();
-					break;
-
 				case "InputSettings":
-					SetupInput();
+					await SetupInputAsync();
 					break;
 			}
 		}
@@ -522,11 +520,11 @@ namespace Gablarski.Clients.Windows
 		}
 
 		private ISpeechRecognizer speech;
-		private void SetupInput()
+		private async Task SetupInputAsync()
 		{
 			if (InvokeRequired)
 			{
-				BeginInvoke ((Action) SetupInput);
+				BeginInvoke ((Action)(async () => await SetupInputAsync()));
 				return;
 			}
 
@@ -537,7 +535,7 @@ namespace Gablarski.Clients.Windows
 			{
 				try
 				{
-					this.speech.Open();
+					await this.speech.OpenAsync();
 					this.speech.Update (this.gablarski.Channels, this.gablarski.Users);
 					this.speech.CommandStateChanged += OnCommandStateChanged;
 				}
@@ -559,7 +557,7 @@ namespace Gablarski.Clients.Windows
 			else
 			{
 				this.inputProvider.CommandStateChanged += OnCommandStateChanged;
-				this.inputProvider.Attach (this.Handle);
+				await this.inputProvider.AttachAsync (Handle);
 				this.inputProvider.SetBindings (Settings.CommandBindings.Where (b => b.Provider.GetType().GetSimpleName() == this.inputProvider.GetType().GetSimpleName()));
 			}
 		}
@@ -833,7 +831,7 @@ namespace Gablarski.Clients.Windows
 			}
 		}
 
-		void CurrentUserReceivedJoinResult (object sender, ReceivedJoinResultEventArgs e)
+		async void CurrentUserReceivedJoinResult (object sender, ReceivedJoinResultEventArgs e)
 		{
 			if (e.Result != LoginResultState.Success)
 			{
@@ -867,11 +865,11 @@ namespace Gablarski.Clients.Windows
 
 				Action<Form, string> d = (f, m) => MessageBox.Show (f, m, "Joining", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				BeginInvoke (d, this, "Join failed: " + reason);
-				gablarski.DisconnectAsync();
+				await gablarski.DisconnectAsync();
 			}
 			else
 			{
-				SetupInput();
+				await SetupInputAsync();
 
 				if (!this.gablarski.CurrentUser.IsRegistered && this.gablarski.ServerInfo.RegistrationMode != UserRegistrationMode.None)
 					BeginInvoke ((Action)(() => btnRegister.Visible = true ));
@@ -1125,7 +1123,7 @@ namespace Gablarski.Clients.Windows
 			this.ShowConnect (true);
 		}
 
-		private void btnSettings_Click (object sender, EventArgs e)
+		private async void btnSettings_Click (object sender, EventArgs e)
 		{
 			DisableInput();
 
@@ -1133,7 +1131,7 @@ namespace Gablarski.Clients.Windows
 			settingsForm.ShowDialog();
 
 			if (inputProvider == null)
-				SetupInput();
+				await SetupInputAsync();
 		}
 
 		private IAudioCaptureProvider musicprovider;

@@ -81,7 +81,7 @@ namespace Gablarski.Clients.ViewModels
 				if (this.inputProvider == null)
 					return;
 
-				this.inputProvider.Attach (this.window);
+				this.inputProvider.AttachAsync (this.window).Wait();
 				OnPropertyChanged (new PropertyChangedEventArgs ("InputProvider"));
 
 				this.bindings = new ObservableCollection<CommandBindingViewModel> (ClientData.GetCommandBindings()
