@@ -49,7 +49,7 @@
 			// 
 			okButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
 			okButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			okButton.Location = new System.Drawing.Point(69, 265);
+			okButton.Location = new System.Drawing.Point(78, 265);
 			okButton.Name = "okButton";
 			okButton.Size = new System.Drawing.Size(75, 23);
 			okButton.TabIndex = 0;
@@ -62,9 +62,9 @@
 			this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.label2.Location = new System.Drawing.Point(13, 29);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(170, 15);
+			this.label2.Size = new System.Drawing.Size(202, 15);
 			this.label2.TabIndex = 2;
-			this.label2.Text = "Copyright 2010 © Eric Maupin";
+			this.label2.Text = "Copyright 2008-2013 © Eric Maupin";
 			// 
 			// label1
 			// 
@@ -202,7 +202,7 @@
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.CancelButton = okButton;
-			this.ClientSize = new System.Drawing.Size(213, 300);
+			this.ClientSize = new System.Drawing.Size(231, 300);
 			this.Controls.Add(this.WebLinkLabel9);
 			this.Controls.Add(this.WebLinkLabel2);
 			this.Controls.Add(this.WebLinkLabel8);
