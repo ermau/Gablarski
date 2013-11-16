@@ -70,7 +70,9 @@ namespace Gablarski.Tests
 			permissions = new MockPermissionsProvider();
 			users = new MockUserProvider();
 
-			context = new MockServerContext
+			provider = new MockConnectionProvider (GablarskiProtocol.Instance);
+
+			context = new MockServerContext (provider)
 			{
 				Settings = new ServerSettings(),
 				UserProvider = users,
@@ -83,8 +85,7 @@ namespace Gablarski.Tests
 			context.UserManager = new ServerUserManager();
 			context.Users = handler = new ServerUserHandler (context, context.UserManager);
 
-			provider = new MockConnectionProvider (GablarskiProtocol.Instance);
-			provider.Start (MessageTypes.All);
+			context.Start();
 
 			var cs = provider.GetConnections (GablarskiProtocol.Instance);
 			server = new ConnectionBuffer (cs.Item2);
@@ -329,9 +330,6 @@ namespace Gablarski.Tests
 
 				cc.DequeueAndAssertMessage<PermissionsMessage>();
 				cc.DequeueAndAssertMessage<UserJoinedMessage>();
-				//connection.Client.DequeueAndAssertMessage<ChannelListMessage>();
-				//connection.Client.DequeueAndAssertMessage<UserInfoListMessage>();
-				//connection.Client.DequeueAndAssertMessage<SourceListMessage>();
 
 				observer.DequeueAndAssertMessage<UserJoinedMessage>();
 				
