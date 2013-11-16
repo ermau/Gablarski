@@ -74,8 +74,8 @@ Section -Main SEC0000
     File ..\..\Gablarski\bin\{config}\Gablarski.dll
     File ..\..\..\Gablarski.License.txt
     File ..\..\Gablarski\bin\{config}\Gablarski.pdb
-    File ..\..\Gablarski.Clients\bin\{config}\Gablarski.Clients.dll
-    File ..\..\Gablarski.Clients\bin\{config}\Gablarski.Clients.pdb
+    File ..\..\Gablarski.Clients.Core\bin\{config}\Gablarski.Clients.dll
+    File ..\..\Gablarski.Clients.Core\bin\{config}\Gablarski.Clients.pdb
     File ..\..\Gablarski.Input.DirectInput\bin\{config}\Gablarski.Input.DirectInput.dll
     File ..\..\Gablarski.Input.DirectInput\bin\{config}\Gablarski.Input.DirectInput.pdb
     File ..\..\..\lib\SharpDX.License.txt
