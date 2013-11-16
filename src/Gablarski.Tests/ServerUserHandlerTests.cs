@@ -150,6 +150,9 @@ namespace Gablarski.Tests
 		{
 			IChannelInfo altChannel = new ChannelInfo { Name = "Channel 2" };
 			context.ChannelsProvider.SaveChannel (altChannel);
+			client.DequeueAndAssertMessage<ChannelListMessage>();
+			observer.DequeueAndAssertMessage<ChannelListMessage>();
+
 			altChannel = context.ChannelsProvider.GetChannels().Single (c => c.Name == "Channel 2");
 
 		    Connect();
@@ -160,6 +163,12 @@ namespace Gablarski.Tests
 			handler.Move (user, altChannel);
 
 		    var move = client.DequeueAndAssertMessage<UserChangedChannelMessage>();
+			Assert.AreEqual (user.UserId, move.ChangeInfo.TargetUserId);
+			Assert.AreEqual (altChannel.ChannelId, move.ChangeInfo.TargetChannelId);
+			Assert.AreEqual (1, move.ChangeInfo.PreviousChannelId);
+			Assert.AreEqual (0, move.ChangeInfo.RequestingUserId);
+
+			move = observer.DequeueAndAssertMessage<UserChangedChannelMessage>();
 			Assert.AreEqual (user.UserId, move.ChangeInfo.TargetUserId);
 			Assert.AreEqual (altChannel.ChannelId, move.ChangeInfo.TargetChannelId);
 			Assert.AreEqual (1, move.ChangeInfo.PreviousChannelId);
