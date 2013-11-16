@@ -50,7 +50,7 @@ namespace Gablarski.Tests
 		private readonly UserInfo user = new UserInfo ("username", 1, 2, false);
 		private readonly UserInfo user2 = new UserInfo ("Username2", 2, 1, false);
 
-		private readonly AudioCodecArgs args = new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 64000, 512, 10);
+		private readonly AudioCodecArgs args = new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 48000, 480, 10);
 
 		private IGablarskiServerContext context;
 		private ServerSourceManager manager;

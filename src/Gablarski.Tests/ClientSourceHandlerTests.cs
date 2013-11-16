@@ -147,17 +147,17 @@ namespace Gablarski.Tests
 		[Test]
 		public void RequestNull()
 		{
-			Assert.Throws<ArgumentNullException> (() => handler.Request (null, AudioFormat.Mono16bitLPCM, 512));
-			Assert.Throws<ArgumentNullException> (() => handler.Request ("name", null, 512));
+			Assert.Throws<ArgumentNullException> (() => handler.Request (null, AudioFormat.Mono16bitLPCM, AudioSourceTests.FrameSize));
+			Assert.Throws<ArgumentNullException> (() => handler.Request ("name", null, AudioSourceTests.FrameSize));
 
-			Assert.Throws<ArgumentNullException> (() => handler.Request (null, AudioFormat.Mono16bitLPCM, 512, 64000));
-			Assert.Throws<ArgumentNullException> (() => handler.Request ("name", null, 512, 64000));
+			Assert.Throws<ArgumentNullException> (() => handler.Request (null, AudioFormat.Mono16bitLPCM, AudioSourceTests.FrameSize, 64000));
+			Assert.Throws<ArgumentNullException> (() => handler.Request ("name", null, AudioSourceTests.FrameSize, 64000));
 		}
 
 		[Test]
 		public void RequestDefaultBitrate()
 		{
-			this.handler.Request ("voice", AudioFormat.Mono16bitLPCM, 512);
+			this.handler.Request ("voice", AudioFormat.Mono16bitLPCM, 480);
 
 			var msg = this.server.DequeueAndAssertMessage<RequestSourceMessage>();
 			Assert.AreEqual ("voice", msg.Name);
@@ -171,13 +171,14 @@ namespace Gablarski.Tests
 		[Test]
 		public void RequestFrequencyAndBitRate()
 		{
-			this.handler.Request ("voice", new AudioFormat (WaveFormatEncoding.LPCM, 1, 16, 48000), 512, 64000);
+			this.handler.Request ("voice", new AudioFormat (WaveFormatEncoding.LPCM, 1, 16, 48000), AudioSourceTests.FrameSize, 64000);
 
 			var msg = this.server.DequeueAndAssertMessage<RequestSourceMessage>();
 			Assert.AreEqual ("voice", msg.Name);
 			Assert.AreEqual (AudioFormat.Mono16bitLPCM.BitsPerSample, msg.AudioSettings.BitsPerSample);
 			Assert.AreEqual (AudioFormat.Mono16bitLPCM.Channels, msg.AudioSettings.Channels);
 			Assert.AreEqual (AudioFormat.Mono16bitLPCM.WaveEncoding, msg.AudioSettings.WaveEncoding);
+			Assert.AreEqual (480, msg.AudioSettings.FrameSize);
 			Assert.AreEqual (48000, msg.AudioSettings.SampleRate);
 			Assert.AreEqual (64000, msg.AudioSettings.Bitrate);
 		}
@@ -187,12 +188,12 @@ namespace Gablarski.Tests
 		{
 			string name = "fakeMonkeys";
 			AudioFormat format = AudioFormat.Stereo16bitLPCM;
-			short frameSize = 512;
+			short frameSize = 480;
 
 			var s = this.handler.CreateFake (name, format, frameSize);
 
 			Assert.AreEqual (name, s.Name);
-			AudioCodecArgsTests.AssertAreEqual (new AudioCodecArgs(format, 0, frameSize, 10), s);
+			AudioCodecArgsTests.AssertAreEqual (new AudioCodecArgs (format, 0, frameSize, 10), s);
 			
 			Assert.AreSame (s, this.handler[s.Id]);
 		}

@@ -104,14 +104,9 @@
     <Compile Include="Audio\AudioExtensions.cs" />
     <Compile Include="Audio\AudioFormat.cs" />
     <Compile Include="Audio\AudioPlaybackEntity.cs" />
-    <Compile Include="Audio\CELT\Celt.cs" />
-    <Compile Include="Audio\CELT\CeltDecoder.cs" />
-    <Compile Include="Audio\CELT\CeltEncoder.cs" />
-    <Compile Include="Audio\CELT\CeltMode.cs" />
     <Compile Include="Client\ClientSourceHandler.cs" />
     <Compile Include="Audio\IAudioEngine.cs" />
     <Compile Include="Audio\IAudioReceiver.cs" />
-    <Compile Include="Audio\Speex\SpeexPreprocessor.cs" />
     <Compile Include="Audio\VoiceActivation.cs" />
     <Compile Include="BanInfo.cs" />
     <Compile Include="Audio\AudioEngine.cs" />
@@ -274,6 +269,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Opus.NET\OpusWrapper\OpusWrapper.csproj">
+      <Project>{838bdb0b-5eb1-4c1e-9026-0a8842ac00c6}</Project>
+      <Name>OpusWrapper</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Tempest.Social\Desktop\Tempest.Social\Tempest.Social.csproj">
       <Project>{0569ec5a-d715-4a46-a2a5-bbe5f06f56c0}</Project>
       <Name>Tempest.Social</Name>

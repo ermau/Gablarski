@@ -413,10 +413,9 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy /Y "$(SolutionDir)Gablarski.License.txt" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)lib\libcelt.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)lib\libcelt.license.txt" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)lib\libspeexdsp.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)lib\libspeexdsp.license.txt" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)src\Opus.NET\license.txt" "$(TargetDir)\opus.net license.txt"
+xcopy /Y "$(SolutionDir)src\Opus.NET\opus license.txt" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)src\Opus.NET\OpusWrapper\opus.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)lib\OpenAL32.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)lib\OpenALSoft.License.txt" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)src\Gablarski.OpenAL\bin\$(PlatformName)\$(ConfigurationName)\*.dll" "$(TargetDir)"

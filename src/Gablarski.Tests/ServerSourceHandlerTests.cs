@@ -181,7 +181,7 @@ namespace Gablarski.Tests
 		{
 			permissions.EnablePermissions (userManager.GetUser (serverConnection).UserId,	PermissionName.RequestSource);
 
-			var audioArgs = new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 64000, 512, 10);
+			var audioArgs = new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 64000, AudioSourceTests.FrameSize, 10);
 			handler.RequestSourceMessage (new MessageEventArgs<RequestSourceMessage> (serverConnection,
 				new RequestSourceMessage ("Name", audioArgs)));
 
@@ -202,7 +202,7 @@ namespace Gablarski.Tests
 		{
 			permissions.EnablePermissions (user.UserId, PermissionName.RequestSource);
 
-			var audioArgs = new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 0, 512, 10);
+			var audioArgs = new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 0, AudioSourceTests.FrameSize, 10);
 			handler.RequestSourceMessage (new MessageEventArgs<RequestSourceMessage> (server, new RequestSourceMessage ("Name", audioArgs)));
 
 			var result = client.DequeueAndAssertMessage<SourceResultMessage>();
@@ -221,7 +221,7 @@ namespace Gablarski.Tests
 		{
 			permissions.EnablePermissions (user.UserId, PermissionName.RequestSource);
 
-			var audioArgs = new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 200000, 512, 10);
+			var audioArgs = new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 200000, AudioSourceTests.FrameSize, 10);
 			handler.RequestSourceMessage (new MessageEventArgs<RequestSourceMessage> (server, new RequestSourceMessage ("Name", audioArgs)));
 			
 			var result = client.DequeueAndAssertMessage<SourceResultMessage>();
@@ -240,7 +240,7 @@ namespace Gablarski.Tests
 		{
 			permissions.EnablePermissions (user.UserId, PermissionName.RequestSource);
 
-			var audioArgs = new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 1, 512, 10);
+			var audioArgs = new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 1, AudioSourceTests.FrameSize, 10);
 			handler.RequestSourceMessage (new MessageEventArgs<RequestSourceMessage> (server, new RequestSourceMessage ("Name", audioArgs)));
 			
 			var result = client.DequeueAndAssertMessage<SourceResultMessage>();
@@ -725,7 +725,7 @@ namespace Gablarski.Tests
 			cl.AssertNoMessage();
 			client.AssertNoMessage();
 		}
-        
+		
 		[Test]
 		public void SendAudioDataMessageSourceNotOwned()
 		{

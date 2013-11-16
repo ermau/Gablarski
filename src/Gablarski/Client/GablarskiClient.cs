@@ -195,8 +195,6 @@ namespace Gablarski.Client
 			return this.client.DisconnectAsync();
 		}
 
-		
-
 		IIndexedEnumerable<int, IChannelInfo> IGablarskiClientContext.Channels
 		{
 			get { return this.Channels; }

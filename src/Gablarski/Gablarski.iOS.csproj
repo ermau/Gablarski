@@ -42,14 +42,9 @@
     <Compile Include="Audio\AudioExtensions.cs" />
     <Compile Include="Audio\AudioFormat.cs" />
     <Compile Include="Audio\AudioPlaybackEntity.cs" />
-    <Compile Include="Audio\CELT\Celt.cs" />
-    <Compile Include="Audio\CELT\CeltDecoder.cs" />
-    <Compile Include="Audio\CELT\CeltEncoder.cs" />
-    <Compile Include="Audio\CELT\CeltMode.cs" />
     <Compile Include="Client\ClientSourceHandler.cs" />
     <Compile Include="Audio\IAudioEngine.cs" />
     <Compile Include="Audio\IAudioReceiver.cs" />
-    <Compile Include="Audio\Speex\SpeexPreprocessor.cs" />
     <Compile Include="Audio\VoiceActivation.cs" />
     <Compile Include="BanInfo.cs" />
     <Compile Include="Audio\AudioEngine.cs" />

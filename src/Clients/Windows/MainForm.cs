@@ -874,7 +874,7 @@ namespace Gablarski.Clients.Windows
 				if (!this.gablarski.CurrentUser.IsRegistered && this.gablarski.ServerInfo.RegistrationMode != UserRegistrationMode.None)
 					BeginInvoke ((Action)(() => btnRegister.Visible = true ));
 
-				this.gablarski.Sources.Request ("voice", AudioFormat.Mono16bitLPCM, 512);
+				this.gablarski.Sources.Request ("voice", AudioFormat.Mono16bitLPCM, 480);
 			}
 		}
 

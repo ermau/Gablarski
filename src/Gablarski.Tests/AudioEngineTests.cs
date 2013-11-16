@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2010, Eric Maupin
+﻿// Copyright (c) 2010-2013, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -58,7 +58,7 @@ namespace Gablarski.Tests
 		public void Setup()
 		{
 			this.provider = new MockAudioCaptureProvider();
-			this.source = new AudioSource ("mockSource", 1, 1, AudioFormat.Mono16bitLPCM, 64000, 256, 10, false);
+			this.source = AudioSourceTests.GetTestSource();
 
 			var c = new MockConnectionProvider (GablarskiProtocol.Instance).GetClientConnection();
 

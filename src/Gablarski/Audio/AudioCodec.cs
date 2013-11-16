@@ -1,4 +1,4 @@
-// Copyright (c) 2011, Eric Maupin
+// Copyright (c) 2011-2013, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -35,8 +35,8 @@
 // DAMAGE.
 
 using System;
-using System.Linq;
-using Gablarski.CELT;
+using FragLabs.Audio.Codecs;
+using FragLabs.Audio.Codecs.Opus;
 using Tempest;
 
 namespace Gablarski.Audio
@@ -45,9 +45,9 @@ namespace Gablarski.Audio
 		: AudioCodecArgs
 	{
 		private readonly object codecLock = new object();
-		private CeltEncoder encoder;
-		private CeltDecoder decoder;
-		private CeltMode mode;
+
+		private OpusEncoder encoder;
+		private OpusDecoder decoder;
 
 		public AudioCodec (AudioCodecArgs args)
 			: base (args)
@@ -70,29 +70,23 @@ namespace Gablarski.Audio
 
 		public byte[] Encode (byte[] data)
 		{
-#if DEBUG
 			if (data == null)
 				throw new ArgumentNullException("data");
-#endif
 
-			if (this.encoder == null)
-			{
-				lock (this.codecLock)
-				{
-					if (this.mode == null)
-						this.mode = CeltMode.Create (SampleRate, Channels, FrameSize);
-
-					if (this.encoder == null)
-						this.encoder = CeltEncoder.Create (this.mode);
+			if (this.encoder == null) {
+				lock (this.codecLock) {
+					if (this.encoder == null) {
+						this.encoder = OpusEncoder.Create (SampleRate, Channels, Application.Voip);
+						this.encoder.Bitrate = Bitrate;
+					}
 				}
 			}
 
-			int len;
-			byte[] encoded = this.encoder.Encode (data, this.Bitrate, out len);
-			if (encoded.Length != len)
-			{
-				byte[] final = new byte[len];
-				Array.Copy (encoded, final, len);
+			int encodedLength;
+			byte[] encoded = this.encoder.Encode (data, data.Length, out encodedLength);
+			if (encoded.Length != encodedLength) {
+				byte[] final = new byte[encodedLength];
+				Buffer.BlockCopy (encoded, 0, final, 0, encodedLength);
 				encoded = final;
 			}
 
@@ -101,24 +95,26 @@ namespace Gablarski.Audio
 
 		public byte[] Decode (byte[] data)
 		{
-#if DEBUG
 			if (data == null)
 				throw new ArgumentNullException("data");
-#endif
 			
-			if (this.decoder == null)
-			{
-				lock (this.codecLock)
-				{
-					if (this.mode == null)
-						this.mode = CeltMode.Create (SampleRate, Channels, FrameSize);
-
-					if (this.decoder == null)
-						this.decoder = CeltDecoder.Create (this.mode);
+			if (this.decoder == null) {
+				lock (this.codecLock) {
+					if (this.decoder == null) {
+						this.decoder = OpusDecoder.Create (SampleRate, Channels);
+					}
 				}
 			}
 
-			return this.decoder.Decode (data);
+			int decodedLength;
+			byte[] decoded = this.decoder.Decode (data, data.Length, out decodedLength);
+			if (decoded.Length != decodedLength) {
+				byte[] final = new byte[decodedLength];
+				Buffer.BlockCopy (decoded, 0, final, 0, decodedLength);
+				decoded = final;
+			}
+
+			return decoded;
 		}
 	}
 }

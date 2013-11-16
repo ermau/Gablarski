@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2010, Eric Maupin
+﻿// Copyright (c) 2010-2013, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -46,22 +46,24 @@ namespace Gablarski.Tests
 	[TestFixture]
 	public class AudioSourceTests
 	{
+		public const int FrameSize = 480;
+
 		[Test]
 		public void InvalidSource()
 		{
-			Assert.Throws<ArgumentNullException> (() => new AudioSource (null, 1, 1, AudioFormat.Mono16bitLPCM, 64000, 512, 10, false));
+			Assert.Throws<ArgumentNullException> (() => new AudioSource (null, 1, 1, AudioFormat.Mono16bitLPCM, 64000, 480, 10, false));
 
-			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource ("voice", 0, 1, AudioFormat.Mono16bitLPCM, 64000, 512, 10, false));
+			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource ("voice", 0, 1, AudioFormat.Mono16bitLPCM, 64000, 480, 10, false));
 
-			Assert.Throws<ArgumentException> (() => new AudioSource ("voice", 1, 0, AudioFormat.Mono16bitLPCM, 64000, 512, 10, false));
+			Assert.Throws<ArgumentException> (() => new AudioSource ("voice", 1, 0, AudioFormat.Mono16bitLPCM, 64000, 480, 10, false));
 
-			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource ("voice", 1, 1, AudioFormat.Mono16bitLPCM, -1, 512, 10, false));
+			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource ("voice", 1, 1, AudioFormat.Mono16bitLPCM, -1, 480, 10, false));
 
 			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource ("voice", 1, 1, AudioFormat.Mono16bitLPCM, 64000, 32, 10, false));
 			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource ("voice", 1, 1, AudioFormat.Mono16bitLPCM, 64000, 5120, 10, false));
 
-			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource ("voice", 1, 1, AudioFormat.Mono16bitLPCM, 64000, 512, 0, false));
-			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource ("voice", 1, 1, AudioFormat.Mono16bitLPCM, 64000, 512, 11, false));
+			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource ("voice", 1, 1, AudioFormat.Mono16bitLPCM, 64000, 480, 0, false));
+			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioSource ("voice", 1, 1, AudioFormat.Mono16bitLPCM, 64000, 480, 11, false));
 		}
 
 		public static AudioSource GetTestSource ()
@@ -76,7 +78,7 @@ namespace Gablarski.Tests
 
 		public static AudioSource GetTestSource (int owner, int increment)
 		{
-			return new AudioSource ("TestSource" + increment, 1 + increment, owner, AudioFormat.Mono16bitLPCM, 64000, 256, 10, false);
+			return new AudioSource ("TestSource" + increment, 1 + increment, owner, AudioFormat.Mono16bitLPCM, 48000, 240, 10, false);
 		}
 
 		public static void AssertSourcesMatch (AudioSource expected, AudioSource actual)
@@ -96,7 +98,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void Values()
 		{
-			var source = new AudioSource ("voice", 1, 1, new AudioFormat (WaveFormatEncoding.LPCM, 2, 8, 48000), 64000, 512, 10, true);
+			var source = new AudioSource ("voice", 1, 1, new AudioFormat (WaveFormatEncoding.LPCM, 2, 8, 48000), 64000, 480, 10, true);
 			Assert.AreEqual ("voice",					source.Name);
 			Assert.AreEqual (1,							source.Id);
 			Assert.AreEqual (WaveFormatEncoding.LPCM,	source.WaveEncoding);
@@ -105,7 +107,7 @@ namespace Gablarski.Tests
 			Assert.AreEqual (1,							source.OwnerId);
 			Assert.AreEqual (64000,						source.Bitrate);
 			Assert.AreEqual (48000,						source.SampleRate);
-			Assert.AreEqual (512,						source.FrameSize);
+			Assert.AreEqual (480,						source.FrameSize);
 			Assert.AreEqual (10,						source.Complexity);
 			Assert.AreEqual (true,						source.IsMuted);
 		}

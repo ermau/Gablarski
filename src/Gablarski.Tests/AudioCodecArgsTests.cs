@@ -50,14 +50,14 @@ namespace Gablarski.Tests
 		[Test]
 		public void InvalidParamsCtor ()
 		{
-			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioCodecArgs (AudioFormat.Mono16bitLPCM, -1, 512, 10));
-			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 480000, 512, 10));
+			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioCodecArgs (AudioFormat.Mono16bitLPCM, -1, 480, 10));
+			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 640000, 480, 10));
 
-			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 48000, 1, 10));
-			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 48000, 5120, 10));
+			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 64000, 1, 10));
+			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 64000, 512, 10));
 
-			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 48000, 512, 0));
-			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 48000, 512, 11));
+			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 64000, 480, 0));
+			Assert.Throws<ArgumentOutOfRangeException> (() => new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 64000, 480, 11));
 		}
 
 		[Test]
@@ -66,9 +66,9 @@ namespace Gablarski.Tests
 			Assert.Throws<ArgumentNullException> (() => new AudioCodecArgs ((AudioCodecArgs)null));
 		}
 
-		private const int Bitrate = 64000;
+		private const int Bitrate = 48000;
 		private readonly AudioFormat Format = AudioFormat.Mono16bitLPCM;
-		private const int FrameSize = 512;
+		private const int FrameSize = 480;
 		private const byte Complexity = 10;
 
 		public static void AssertAreEqual (AudioCodecArgs expected, AudioCodecArgs actual)
@@ -84,7 +84,7 @@ namespace Gablarski.Tests
 
 		public static AudioCodecArgs GetTestArgs()
 		{
-			return new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 64000, 512, 10);
+			return new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 64000, 480, 10);
 		}
 		
 		[Test]

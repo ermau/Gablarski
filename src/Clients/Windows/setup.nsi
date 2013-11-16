@@ -67,14 +67,13 @@ Section -Main SEC0000
     File ..\..\..\lib\Growl.Connector.dll
     File ..\..\..\lib\Growl.CoreLibrary.dll
     File ..\..\..\lib\Growl.license.txt
-    File ..\..\..\lib\libcelt.dll
-    File ..\..\..\lib\libcelt.license.txt
     File ..\..\..\lib\log4net.dll
     File ..\..\..\lib\log4net.License.txt
     File ..\..\..\lib\OpenAL32.dll
     File ..\..\..\lib\OpenALSoft.License.txt
     File ..\..\..\lib\System.Data.SQLite.DLL
     File ..\..\..\lib\sqlite3.dll
+    File ..\..\Opus.NET\OpusWrapper\opus.dll
     File ..\..\Gablarski\bin\{config}\Gablarski.dll
     File ..\..\..\Gablarski.License.txt
     File ..\..\Gablarski\bin\{config}\Gablarski.pdb
@@ -96,6 +95,7 @@ Section -Main SEC0000
     File ..\..\Gablarski.SpeechNotifier\bin\{config}\Gablarski.SpeechNotifier.pdb
     File ..\..\Gablarski.Winamp\bin\{config}\Gablarski.Winamp.dll
     File ..\..\Gablarski.Winamp\bin\{config}\Gablarski.Winamp.pdb
+    File bin\x86\{config}\OpusWrapper.dll
     File bin\x86\{config}\GablarskiClient.exe
     File bin\x86\{config}\GablarskiClient.exe.config
     File bin\x86\{config}\GablarskiClient.pdb
@@ -146,6 +146,7 @@ Section /o -un.Main UNSEC0000
     Delete /REBOOTOK $INSTDIR\Microsoft.WindowsAPICodePack.pdb
     Delete /REBOOTOK $INSTDIR\Microsoft.WindowsAPICodePack.dll
     Delete /REBOOTOK $INSTDIR\Headphones.ico
+    Delete /REBOOTOK $INSTDIR\OpusWrapper.dll
     Delete /REBOOTOK $INSTDIR\GablarskiClient.pdb
     Delete /REBOOTOK $INSTDIR\GablarskiClient.exe.config
     Delete /REBOOTOK $INSTDIR\GablarskiClient.exe
@@ -172,6 +173,7 @@ Section /o -un.Main UNSEC0000
     Delete /REBOOTOK $INSTDIR\Gablarski.dll
     Delete /REBOOTOK $INSTDIR\System.Data.SQLite.DLL
     Delete /REBOOTOK $INSTDIR\sqlite3.dll
+    Delete /REBOOTOK $INSTDIR\opus.dll
     Delete /REBOOTOK $INSTDIR\OpenALSoft.License.txt
     Delete /REBOOTOK $INSTDIR\OpenAL32.dll
     Delete /REBOOTOK $INSTDIR\log4net.License.txt

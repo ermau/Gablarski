@@ -121,7 +121,7 @@ namespace Gablarski.Server
 				|| AudioCodecArgs.IsInvalidBitrate (request.AudioSettings.Bitrate)
 				|| AudioCodecArgs.IsInvalidComplexity (request.AudioSettings.Complexity)
 				|| AudioCodecArgs.IsInvalidFrequency (request.AudioSettings.SampleRate)
-				|| AudioCodecArgs.IsInvalidFrameSize (request.AudioSettings.FrameSize))
+				|| AudioCodecArgs.IsInvalidFrameSize (request.AudioSettings.SampleRate, request.AudioSettings.Channels, request.AudioSettings.FrameSize))
 			{
 				result = SourceResult.FailedInvalidArguments;
 			}

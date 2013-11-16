@@ -231,8 +231,6 @@ namespace Gablarski.Server
 			await SendAsync (new UserDisconnectedMessage (user.UserId), ic => ic != c).ConfigureAwait (false);
 		}
 
-		#region IEnumerable<UserInfo> Members
-
 		public IEnumerator<IUserInfo> GetEnumerator()
 		{
 			return Manager.GetEnumerator();
@@ -242,8 +240,6 @@ namespace Gablarski.Server
 		{
 			return GetEnumerator();
 		}
-
-		#endregion
 
 		internal readonly IServerUserManager Manager;
 		private readonly IGablarskiServerContext context;

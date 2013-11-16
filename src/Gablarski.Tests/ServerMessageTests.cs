@@ -173,8 +173,8 @@ namespace Gablarski.Tests
 		{
 			var sources = new List<AudioSource>
 			{
-				new AudioSource ("voice", 1, UserId, AudioFormat.Mono16bitLPCM, 64000, 256, 10, false),
-				new AudioSource ("voice", 2, UserId2, AudioFormat.Stereo16bitLPCM, 128000, 512, 10, false)
+				new AudioSource ("voice", 1, UserId, AudioFormat.Mono16bitLPCM, 64000, 240, 10, false),
+				new AudioSource ("voice", 2, UserId2, AudioFormat.Stereo16bitLPCM, 128000, 480, 10, false)
 			};
 
 			var msg = new SourceListMessage (sources);

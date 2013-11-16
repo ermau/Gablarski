@@ -1,4 +1,4 @@
-// Copyright (c) 2011, Eric Maupin
+// Copyright (c) 2010-2013, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -44,7 +44,7 @@ namespace Gablarski.Audio
 		: AudioFormat, IEquatable<AudioCodecArgs>
 	{
 		public AudioCodecArgs()
-			: this (WaveFormatEncoding.LPCM, 1, 16, 48000, 44100, 512, 10)
+			: this (WaveFormatEncoding.LPCM, 1, 16, 48000, 64000, 480, 10)
 		{
 		}
 
@@ -130,7 +130,7 @@ namespace Gablarski.Audio
 
 			protected internal set
 			{
-				if (IsInvalidFrameSize (value))
+				if (IsInvalidFrameSize (SampleRate, Channels, value))
 					throw new ArgumentOutOfRangeException ("value");
 
 				this.frameSize = value;
@@ -187,14 +187,17 @@ namespace Gablarski.Audio
 			Complexity = reader.ReadByte();
 		}
 
-		public static bool IsInvalidFrameSize (short value)
+		public static bool IsInvalidFrameSize (int sampleRate, int channels, int value)
 		{
-			return value < 64 || value > 1024 || (value % 64) != 0;
+			value /= channels;
+			float s = (value / (float) sampleRate);
+			float ms = s * 1000;
+			return !(ms == 2.5 || ms == 5 || ms == 10 || ms == 20 || ms == 40 || ms == 60);
 		}
 
 		public static bool IsInvalidFrequency (int value)
 		{
-			return value < 20000 || value > 96000;
+			return value < 20000 || value > 48000;
 		}
 
 		public static bool IsInvalidComplexity (byte value)
