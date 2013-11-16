@@ -178,9 +178,6 @@ Section /o -un.Main UNSEC0000
     Delete /REBOOTOK $INSTDIR\log4net.dll
     Delete /REBOOTOK $INSTDIR\libcelt.license.txt
     Delete /REBOOTOK $INSTDIR\libcelt.dll
-    Delete /REBOOTOK $INSTDIR\Growl.license.txt
-    Delete /REBOOTOK $INSTDIR\Growl.CoreLibrary.dll
-    Delete /REBOOTOK $INSTDIR\Growl.Connector.dll
     Delete /REBOOTOK $INSTDIR\Cadenza.pdb
     Delete /REBOOTOK $INSTDIR\Cadenza.dll
     DeleteRegValue HKLM "${REGKEY}\Components" Main
