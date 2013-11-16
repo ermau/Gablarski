@@ -43,11 +43,6 @@ namespace Gablarski.Tests
 			get { return this.connection.Protocols; }
 		}
 
-		public MessagingModes Modes
-		{
-			get { return this.connection.Modes; }
-		}
-
 		public Target RemoteTarget
 		{
 			get { return this.connection.RemoteTarget; }
@@ -89,11 +84,6 @@ namespace Gablarski.Tests
 		public Task<bool> SendResponseAsync (Message originalMessage, Message response)
 		{
 			return this.connection.SendResponseAsync (originalMessage, response);
-		}
-
-		public IEnumerable<MessageEventArgs> Tick ()
-		{
-			return this.connection.Tick();
 		}
 
 		public Task DisconnectAsync ()
