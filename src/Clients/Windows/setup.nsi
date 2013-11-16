@@ -74,10 +74,8 @@ Section -Main SEC0000
     File ..\..\Gablarski\bin\{config}\Gablarski.dll
     File ..\..\..\Gablarski.License.txt
     File ..\..\Gablarski\bin\{config}\Gablarski.pdb
-    File ..\..\Gablarski\bin\{config}\Gablarski.XML
     File ..\..\Gablarski.Clients\bin\{config}\Gablarski.Clients.dll
     File ..\..\Gablarski.Clients\bin\{config}\Gablarski.Clients.pdb
-    File ..\..\Gablarski.Clients\bin\{config}\Gablarski.Clients.XML
     File ..\..\Gablarski.Input.DirectInput\bin\{config}\Gablarski.Input.DirectInput.dll
     File ..\..\Gablarski.Input.DirectInput\bin\{config}\Gablarski.Input.DirectInput.pdb
     File ..\..\..\lib\SharpDX.License.txt
@@ -161,10 +159,8 @@ Section /o -un.Main UNSEC0000
     Delete /REBOOTOK $INSTDIR\SharpDX.dll
     Delete /REBOOTOK $INSTDIR\SharpDX.DirectInput.dll
     Delete /REBOOTOK $INSTDIR\SharpDX.License.txt
-    Delete /REBOOTOK $INSTDIR\Gablarski.Clients.XML
     Delete /REBOOTOK $INSTDIR\Gablarski.Clients.pdb
     Delete /REBOOTOK $INSTDIR\Gablarski.Clients.dll
-    Delete /REBOOTOK $INSTDIR\Gablarski.XML
     Delete /REBOOTOK $INSTDIR\Gablarski.pdb
     Delete /REBOOTOK $INSTDIR\Gablarski.License.txt
     Delete /REBOOTOK $INSTDIR\Gablarski.dll
