@@ -55,19 +55,15 @@ namespace Gablarski.Audio
 			this.threshold = threshold.TotalSeconds;
 		}
 
-		public bool IsTalking (byte[] samples)
+		public int GetLevel (byte[] samples)
 		{
 			int avg;
-			switch (this.source.BitsPerSample)
-			{
-				case 16:
-				{
+			switch (this.source.BitsPerSample) {
+				case 16: {
 					int total = 0;
-					for (int i = 0; i < samples.Length; i += 2)
-					{
+					for (int i = 0; i < samples.Length; i += 2) {
 						#if !SAFE
-						unsafe
-						{
+						unsafe {
 							fixed (byte* numRef = &(samples[i]))
 								total += Math.Abs (*((short*) numRef) - 128);
 						}
@@ -80,8 +76,7 @@ namespace Gablarski.Audio
 					break;
 				}
 					
-				case 8:
-				{
+				case 8: {
 					int total = 0;
 					for (int i = 0; i < samples.Length; ++i)
 						total += Math.Abs (samples[i] - 128);
@@ -94,20 +89,23 @@ namespace Gablarski.Audio
 					throw new NotSupportedException ("BitsPerSample " + this.source.BitsPerSample + " is unsupported for VoiceActivation");
 			}
 
-			time += length;
+			return avg;
+		}
+
+		public bool IsTalking (byte[] samples)
+		{
+			int avg = GetLevel (samples);
+			this.time += this.length;
 
 			bool result = false;
-			if (avg >= ((talking) ? contVol : startVol))
-			{
+			if (avg >= ((this.talking) ? contVol : startVol)) {
 				result = true;
-				time = 0;
-			}
-			else if (talking && time <= threshold)
-			{
+				this.time = 0;
+			} else if (this.talking && this.time <= threshold) {
 				result = true;
 			}
 
-			talking = result;
+			this.talking = result;
 
 			return result;
 		}
