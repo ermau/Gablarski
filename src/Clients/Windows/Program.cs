@@ -142,7 +142,7 @@ namespace Gablarski.Clients.Windows
 		[STAThread]
 		static void Main (string[] args)
 		{
-			if (RaygunKey != "{raygun}")
+			if (RaygunKey[0] != '{')
 				Raygun = new RaygunClient (RaygunKey);
 
 			AppDomain.CurrentDomain.UnhandledException += (sender, e) => {
