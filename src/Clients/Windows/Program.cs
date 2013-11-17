@@ -43,6 +43,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Mindscape.Raygun4Net;
 using Tempest;
 using Tempest.Social;
 using Gablarski.Clients.Input;
@@ -54,6 +55,9 @@ namespace Gablarski.Clients.Windows
 {
 	static class Program
 	{
+		private const string RaygunKey = "{raygun}";
+		public static RaygunClient Raygun;
+
 		public static Task<RSAAsymmetricKey> Key;
 
 		public static GablarskiSocialClient SocialClient;
@@ -138,8 +142,13 @@ namespace Gablarski.Clients.Windows
 		[STAThread]
 		static void Main (string[] args)
 		{
-			AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
-			{
+			if (RaygunKey != "{raygun}")
+				Raygun = new RaygunClient (RaygunKey);
+
+			AppDomain.CurrentDomain.UnhandledException += (sender, e) => {
+				if (Raygun != null)
+					Raygun.Send ((Exception) e.ExceptionObject);
+
 				MessageBox.Show ("Unexpected error" + Environment.NewLine + (e.ExceptionObject as Exception).ToDisplayString(),
 				                 "Unexpected error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			};
