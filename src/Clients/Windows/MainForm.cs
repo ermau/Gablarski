@@ -50,6 +50,7 @@ using Gablarski.Clients.Media;
 using Gablarski.Clients.Persistence;
 using Gablarski.Clients.Windows.Properties;
 using Gablarski.Messages;
+using log4net;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Microsoft.WindowsAPICodePack.Taskbar;
 using Tempest;
@@ -138,22 +139,27 @@ namespace Gablarski.Clients.Windows
 			}
 
 			this.notifications = new NotificationHandler (this.gablarski);
-			
-			var notifiers = Settings.EnabledNotifications.Select (g => new
-			{
-				Notifier = Activator.CreateInstance (Type.GetType (g.Key)),
-				Types = (IEnumerable<NotificationType>)g
-			}).ToList();
-			
-			foreach (var n in notifiers.Where (n => n.Notifier is INotifier))
-				this.notifications.AddNotifier ((INotifier)n.Notifier, n.Types);
 
-			var speech = notifiers.Where (n => n.Notifier is ITextToSpeech);//.Select (n => { n.Media = this.mediaPlayerIntegration; return n; }).ToList();
-			if (speech.Any())
-			{
-				foreach (var n in speech)
-				{
-					ITextToSpeech tts = (ITextToSpeech)n.Notifier;
+			var enabledSpeech = new MutableLookup<ITextToSpeech, NotificationType>();
+			foreach (var enabled in Settings.EnabledNotifications) {
+				Type type = Type.GetType (enabled.Key);
+				if (type == null) {
+					LogManager.GetLogger ("Notifications").WarnFormat ("Notifier {0} not found", enabled.Key);
+					continue;
+				}
+
+				object n = Activator.CreateInstance (type);
+
+				var notifier = n as INotifier;
+				if (notifier != null)
+					this.notifications.AddNotifier (notifier, enabled);
+				else if (n is ITextToSpeech)
+					enabledSpeech.Add ((ITextToSpeech) n, enabled);
+			}
+
+			if (enabledSpeech.Count > 0) {
+				foreach (var enabled in enabledSpeech) {
+					ITextToSpeech tts = enabled.Key;
 					tts.Media = this.mediaPlayerIntegration;
 
 					var format = tts.SupportedFormats.OrderByDescending (af => af.SampleRate).FirstOrDefault();
@@ -165,7 +171,7 @@ namespace Gablarski.Clients.Windows
 					tts.AudioSource = source;
 					this.gablarski.Audio.Attach (this.audioPlayback, source, new AudioEnginePlaybackOptions());
 
-					this.notifications.AddNotifier (tts, n.Types);
+					this.notifications.AddNotifier (tts, enabled);
 				}
 				
 				this.notifications.SpeechReceiver = this.gablarski.Sources;
