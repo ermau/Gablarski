@@ -90,6 +90,7 @@ Section -Main SEC0000
     File ..\..\Gablarski.SpeechNotifier\bin\{config}\Gablarski.SpeechNotifier.pdb
     File ..\..\Gablarski.Winamp\bin\{config}\Gablarski.Winamp.dll
     File ..\..\Gablarski.Winamp\bin\{config}\Gablarski.Winamp.pdb
+    File bin\x86\{config}\Mindscape.Raygun4Net.dll
     File bin\x86\{config}\Tempest.dll
     File bin\x86\{config}\Tempest.pdb
     File bin\x86\{config}\Tempest.Social.dll
@@ -145,6 +146,7 @@ Section /o -un.Main UNSEC0000
     Delete /REBOOTOK $INSTDIR\Microsoft.WindowsAPICodePack.pdb
     Delete /REBOOTOK $INSTDIR\Microsoft.WindowsAPICodePack.dll
     Delete /REBOOTOK $INSTDIR\Headphones.ico
+    Delete /REBOOTOK $INSTDIR\Mindscape.Raygun4Net.dll
     Delete /REBOOTOK $INSTDIR\Tempest.dll
     Delete /REBOOTOK $INSTDIR\Tempest.pdb
     Delete /REBOOTOK $INSTDIR\Tempest.Social.dll
