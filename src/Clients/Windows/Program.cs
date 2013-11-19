@@ -142,8 +142,8 @@ namespace Gablarski.Clients.Windows
 				                 "Unexpected error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			};
 
-			AutomaticErrorReporter errors = new AutomaticErrorReporter();
-			errors.Add (new GablarskiErrorReporter (typeof(Program).Assembly));
+			//AutomaticErrorReporter errors = new AutomaticErrorReporter();
+			//errors.Add (new GablarskiErrorReporter (typeof(Program).Assembly));
 
 			log4net.Config.XmlConfigurator.Configure ();
 			log4net.LogManager.GetLogger ("Gablarski WinForms").InfoFormat ("Program Start. PID: {0}", Process.GetCurrentProcess().Id);
