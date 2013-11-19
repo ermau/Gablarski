@@ -67,39 +67,29 @@ namespace Gablarski.Clients.Windows
 
 		public static void EnableGablarskiURIs()
 		{
-			try
-			{
-				Process p = new Process
-				{
-					StartInfo = new ProcessStartInfo ("cmd.exe", "/C ftype gablarski=\"" + Path.Combine (Environment.CurrentDirectory, Process.GetCurrentProcess ().ProcessName) + ".exe\" \"%1\"")
-					{
+			try {
+				Process p = new Process {
+					StartInfo = new ProcessStartInfo ("cmd.exe", "/C ftype gablarski=\"" + Path.Combine (Environment.CurrentDirectory, Process.GetCurrentProcess ().ProcessName) + ".exe\" \"%1\"") {
 						Verb = "runas",
 					}
 				};
 				p.Start ();
 				p.WaitForExit ();
-			}
-			catch (Win32Exception)
-			{
+			} catch (Win32Exception) {
 			}
 		}
 
 		public static void DisableGablarskiURIs()
 		{
-			try
-			{
-				Process p = new Process
-				{
-					StartInfo = new ProcessStartInfo ("cmd.exe", "/C ftype gablarski=")
-					{
+			try {
+				Process p = new Process {
+					StartInfo = new ProcessStartInfo ("cmd.exe", "/C ftype gablarski=") {
 						Verb = "runas",
 					}
 				};
 				p.Start();
 				p.WaitForExit();
-			}
-			catch (Win32Exception)
-			{
+			} catch (Win32Exception) {
 			}
 		}
 
@@ -124,17 +114,14 @@ namespace Gablarski.Clients.Windows
 					IconReference = new IconReference (exe, 1)
 				};
 			}
-			
+
 			serverCategory.AddJumpListItems (links);
 
 			jl.AddCustomCategories (serverCategory);
 
-			try
-			{
+			try {
 				jl.Refresh ();
-			}
-			catch (UnauthorizedAccessException) // Jumplists disabled
-			{
+			} catch (UnauthorizedAccessException) { // Jumplists disabled
 			}
 		}
 
@@ -173,60 +160,13 @@ namespace Gablarski.Clients.Windows
 			var keyCancelSource = new CancellationTokenSource();
 			Key = ClientData.GetCryptoKeyAsync (keyCancelSource.Token);
 
-			if (Settings.FirstRun)
-			{
-				DialogResult result = MessageBox.Show ("Register gablarski:// urls with this client?", "Register gablarski://", MessageBoxButtons.OKCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1);
-				Settings.EnableGablarskiURLs = (result == DialogResult.OK);
-				Settings.Version = typeof (Program).Assembly.GetName().Version.ToString();
-				Settings.Save ();
-
-				IInputProvider input = Modules.Input.FirstOrDefault (p => p.GetType().GetSimpleName() == Settings.InputProvider);
-				if (input != null)
-				{
-					foreach (CommandBinding binding in input.Defaults)
-						Settings.CommandBindings.Add (new CommandBinding (binding.Provider, binding.Command, binding.Input));
-				}
-
-				try
-				{
-					if (Settings.EnableGablarskiURLs)
-						EnableGablarskiURIs();
-
-					Settings.FirstRun = false;
-					Settings.Save ();
-				}
-				catch
-				{
-				}
-			}
+			SetupFirstRun();
 
 			if (Settings.Nickname == null)
 				PersonalSetup();
 
-			if (!Key.IsCompleted) {
-				bool showing = false;
-				TaskDialog progress = new TaskDialog {
-					Caption = "Gablarski",
-					InstructionText = "Setting up personal key...",
-					ProgressBar = new TaskDialogProgressBar { State = TaskDialogProgressBarState.Marquee },
-					StandardButtons = TaskDialogStandardButtons.Cancel,
-					StartupLocation = TaskDialogStartupLocation.CenterScreen
-				};
-
-				progress.Opened += (s, e) => showing = true;
-
-				Key.ContinueWith (t => {
-					while (!showing)
-						Thread.Sleep (1);
-
-					progress.Close (TaskDialogResult.Ok);
-				}, TaskContinuationOptions.NotOnCanceled);
-
-				if (progress.Show() == TaskDialogResult.Cancel) {
-					keyCancelSource.Cancel();
-					return;
-				}
-			}
+			if (!ShowKeyProgress (keyCancelSource))
+				return;
 
 			Application.EnableVisualStyles ();
 			Application.SetCompatibleTextRenderingDefault (false);
@@ -241,30 +181,20 @@ namespace Gablarski.Clients.Windows
 
 			UpdateTaskbarServers();
 
-			if (args.Length > 0)
-			{
+			if (args.Length > 0) {
 				int id;
-				if (Int32.TryParse (args[0], out id))
-				{
+				if (Int32.TryParse (args[0], out id)) {
 					ServerEntry server = Servers.GetEntries ().FirstOrDefault (s => s.Id == id);
-					if (server == null)
-					{
+					if (server == null) {
 						if (!m.ShowConnect (true))
 							return;
-					}
-					else
-					{
+					} else
 						m.Connect (server);
-					}
-				}
-				else
-				{
+				} else {
 					Uri server = new Uri (args[0]);
 					m.Connect (server.Host, (server.Port != -1) ? server.Port : 42912);
 				}
-			}
-			else if (Settings.ShowConnectOnStart)
-			{
+			} else if (Settings.ShowConnectOnStart) {
 				if (!m.ShowConnect (true))
 					return;
 			}
@@ -275,6 +205,65 @@ namespace Gablarski.Clients.Windows
 			Application.Run (m);
 
 			Settings.Save();
+		}
+
+		private static bool ShowKeyProgress (CancellationTokenSource keyCancelSource)
+		{
+			if (Key.IsCompleted)
+				return true;
+
+			bool showing = false;
+			TaskDialog progress = new TaskDialog {
+				Caption = "Gablarski",
+				InstructionText = "Setting up personal key...",
+				ProgressBar = new TaskDialogProgressBar { State = TaskDialogProgressBarState.Marquee },
+				StandardButtons = TaskDialogStandardButtons.Cancel,
+				StartupLocation = TaskDialogStartupLocation.CenterScreen
+			};
+
+			progress.Opened += (s, e) => showing = true;
+
+			Key.ContinueWith (t => {
+				while (!showing)
+					Thread.Sleep (1);
+
+				progress.Close (TaskDialogResult.Ok);
+			}, TaskContinuationOptions.NotOnCanceled);
+
+			if (progress.Show() == TaskDialogResult.Cancel) {
+				keyCancelSource.Cancel();
+				return false;
+			}
+
+			return true;
+		}
+
+		private static void SetupFirstRun()
+		{
+			if (!Settings.FirstRun)
+				return;
+
+			DialogResult result = MessageBox.Show ("Register gablarski:// urls with this client?", "Register gablarski://",
+				MessageBoxButtons.OKCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1);
+
+			Settings.EnableGablarskiURLs = (result == DialogResult.OK);
+			Settings.Version = typeof (Program).Assembly.GetName().Version.ToString();
+			Settings.Save();
+
+			IInputProvider input = Modules.Input.FirstOrDefault (p => p.GetType().GetSimpleName() == Settings.InputProvider);
+			if (input != null) {
+				foreach (CommandBinding binding in input.Defaults)
+					Settings.CommandBindings.Add (new CommandBinding (binding.Provider, binding.Command, binding.Input));
+			}
+
+			try {
+				if (Settings.EnableGablarskiURLs)
+					EnableGablarskiURIs();
+
+				Settings.FirstRun = false;
+				Settings.Save();
+			} catch {
+			}
 		}
 
 		/*private static void SetupSocial()
