@@ -157,6 +157,8 @@ namespace Gablarski.Clients.Windows
 
 			ClientData.Setup (useLocal);
 
+			CheckForUpdates();
+
 			var keyCancelSource = new CancellationTokenSource();
 			Key = ClientData.GetCryptoKeyAsync (keyCancelSource.Token);
 
@@ -205,6 +207,61 @@ namespace Gablarski.Clients.Windows
 			Application.Run (m);
 
 			Settings.Save();
+		}
+
+		private static void CheckForUpdates()
+		{
+			Updater.CheckAsync (UpdateChannel.Nightly).ContinueWith (t => {
+				Version currentVersion = typeof (Program).Assembly.GetName().Version;
+				if (t.Result.Version <= currentVersion)
+					return;
+
+				TaskDialog update = new TaskDialog {
+					InstructionText = "Would you like to update?",
+					Text = String.Format ("You're using version {0}, version {1} is available.", currentVersion, t.Result.Version),
+					Icon = TaskDialogStandardIcon.Information,
+					Caption = "Gablarski",
+					StartupLocation = TaskDialogStartupLocation.CenterScreen,
+					StandardButtons = TaskDialogStandardButtons.Yes | TaskDialogStandardButtons.No
+				};
+
+				//update.Controls.Add (new TaskDialogButton ("update", "Yes") { UseElevationIcon = true });
+				//update.Controls.Add (new TaskDialogButton ("dontupdate", "No"));
+
+				update.Closing += (sender, args) => {
+					//if (args.CustomButton != "update")
+						//return;
+					if (args.TaskDialogResult != TaskDialogResult.Yes)
+						return;
+
+					Task.Run (() => {
+						var cancelSource = new CancellationTokenSource();
+
+						TaskDialog downloadUpdate = new TaskDialog {
+							InstructionText = "Downloading update...",
+							StandardButtons = TaskDialogStandardButtons.Cancel,
+							ProgressBar = new TaskDialogProgressBar (0, 100, 0)
+						};
+
+						var progress = new Progress<int> (p => {
+							downloadUpdate.ProgressBar.Value = p;
+						});
+
+						Updater.DownloadAsync (t.Result, progress, cancelSource.Token).ContinueWith (dt => {
+							downloadUpdate.Close (TaskDialogResult.Ok);
+
+							Process.Start (dt.Result);
+							Environment.Exit (0);
+						}, TaskContinuationOptions.OnlyOnRanToCompletion);
+
+						if (downloadUpdate.Show() == TaskDialogResult.Cancel)
+							cancelSource.Cancel();
+					});
+				};
+
+				var result = update.Show();
+				result.ToString();
+			}, TaskContinuationOptions.OnlyOnRanToCompletion);
 		}
 
 		private static bool ShowKeyProgress (CancellationTokenSource keyCancelSource)
