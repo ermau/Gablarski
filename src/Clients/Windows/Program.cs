@@ -44,6 +44,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.WindowsAPICodePack.Dialogs;
 using Mindscape.Raygun4Net;
 using Tempest;
 using Tempest.Social;
@@ -201,6 +202,31 @@ namespace Gablarski.Clients.Windows
 
 			if (Settings.Nickname == null)
 				PersonalSetup();
+
+			if (!Key.IsCompleted) {
+				bool showing = false;
+				TaskDialog progress = new TaskDialog {
+					Caption = "Gablarski",
+					InstructionText = "Setting up personal key...",
+					ProgressBar = new TaskDialogProgressBar { State = TaskDialogProgressBarState.Marquee },
+					StandardButtons = TaskDialogStandardButtons.Cancel,
+					StartupLocation = TaskDialogStartupLocation.CenterScreen
+				};
+
+				progress.Opened += (s, e) => showing = true;
+
+				Key.ContinueWith (t => {
+					while (!showing)
+						Thread.Sleep (1);
+
+					progress.Close (TaskDialogResult.Ok);
+				}, TaskContinuationOptions.NotOnCanceled);
+
+				if (progress.Show() == TaskDialogResult.Cancel) {
+					keyCancelSource.Cancel();
+					return;
+				}
+			}
 
 			Application.EnableVisualStyles ();
 			Application.SetCompatibleTextRenderingDefault (false);
