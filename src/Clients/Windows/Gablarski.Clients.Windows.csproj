@@ -32,9 +32,9 @@
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <ApplicationIcon>
-    </ApplicationIcon>
-    <Win32Resource>Resources.res</Win32Resource>
+    <ApplicationIcon>Headphones.ico</ApplicationIcon>
+    <Win32Resource>
+    </Win32Resource>
     <TargetFrameworkProfile />
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\..\</SolutionDir>
@@ -100,6 +100,10 @@
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup />
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Cadenza">
@@ -294,7 +298,6 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
-    <None Include="Resources.res" />
     <None Include="Resources\connect.png" />
     <None Include="Resources\server_add.png" />
     <None Include="Resources\server_connect.png" />
@@ -343,6 +346,8 @@
     <None Include="Resources\user_add.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="iconlist.txt" />
+    <None Include="app.manifest" />
     <None Include="..\..\..\lib\sqlite3.dll">
       <Link>sqlite3.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -413,9 +418,10 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /Y "$(SolutionDir)Gablarski.License.txt" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)src\Opus.NET\license.txt" "$(TargetDir)\opus.net license.txt"
-xcopy /Y "$(SolutionDir)src\Opus.NET\opus license.txt" "$(TargetDir)"
+    <PostBuildEvent>"$(SolutionDir)\tools\InsertIcons.exe" "$(TargetPath)" "$(ProjectDir)\iconlist.txt"
+copy /y "$(SolutionDir)Gablarski.License.txt" "$(TargetDir)"
+copy /y "$(SolutionDir)src\Opus.NET\license.txt" "$(TargetDir)\opus.net license.txt"
+copy /y "$(SolutionDir)src\Opus.NET\opus license.txt" "$(TargetDir)\opus license.txt"
 xcopy /Y "$(SolutionDir)src\Opus.NET\OpusWrapper\opus.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)lib\OpenAL32.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)lib\OpenALSoft.License.txt" "$(TargetDir)"
