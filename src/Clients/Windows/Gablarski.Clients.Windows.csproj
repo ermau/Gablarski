@@ -313,9 +313,6 @@
     <None Include="Resources\group.png" />
     <None Include="Resources\cog.png" />
     <None Include="setup.nsi" />
-    <None Include="XTaskDlg.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="Resources\group_add.png" />
     <None Include="Resources\group_delete.png" />
     <None Include="Resources\group_edit.png" />
