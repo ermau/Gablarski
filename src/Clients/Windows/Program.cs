@@ -41,6 +41,7 @@ using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Mindscape.Raygun4Net;
@@ -167,7 +168,9 @@ namespace Gablarski.Clients.Windows
 			Boolean.TryParse (useLocalValue, out useLocal);
 
 			ClientData.Setup (useLocal);
-			Key = ClientData.GetCryptoKeyAsync();
+
+			var keyCancelSource = new CancellationTokenSource();
+			Key = ClientData.GetCryptoKeyAsync (keyCancelSource.Token);
 
 			if (Settings.FirstRun)
 			{

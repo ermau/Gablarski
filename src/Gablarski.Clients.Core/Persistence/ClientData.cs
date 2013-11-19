@@ -38,9 +38,11 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.Common;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Threading;
 using System.Threading.Tasks;
 using Cadenza;
 using Gablarski.Clients.Input;
@@ -134,11 +136,34 @@ namespace Gablarski.Clients.Persistence
 
 		public static Task<RSAAsymmetricKey> GetCryptoKeyAsync()
 		{
+			return GetCryptoKeyAsync (CancellationToken.None);
+		}
+
+		public static Task<RSAAsymmetricKey> GetCryptoKeyAsync (CancellationToken cancelToken = default(CancellationToken))
+		{
 			return Task.Run (() => {
+				RSAAsymmetricKey key = null;
+				if (KeyFile.Exists) {
+					try {
+						using (var stream = File.OpenRead (KeyFile.FullName)) {
+							var reader = new StreamValueReader (stream);
+							RSAParameters parameters = RSAParametersSerializer.Deserialize (reader);
+							key = new RSAAsymmetricKey (parameters);
+						}
+					} catch (Exception ex) {
+						Trace.TraceWarning ("Failed to read key: {0}", ex);
+						KeyFile.Delete();
+					}
+				}
+
+				cancelToken.ThrowIfCancellationRequested();
 
 				if (!KeyFile.Exists) {
 					var rsa = new RSACrypto();
 					RSAParameters parameters = rsa.ExportKey (true);
+					key = new RSAAsymmetricKey (parameters);
+
+					cancelToken.ThrowIfCancellationRequested();
 				
 					using (var stream = File.OpenWrite (KeyFile.FullName)) {
 						var writer = new StreamValueWriter (stream);
@@ -146,15 +171,8 @@ namespace Gablarski.Clients.Persistence
 					}
 				}
 
-				RSAAsymmetricKey key;
-				using (var stream = File.OpenRead (KeyFile.FullName)) {
-					var reader = new StreamValueReader (stream);
-					RSAParameters parameters = RSAParametersSerializer.Deserialize (reader);
-					key = new RSAAsymmetricKey (parameters);
-				}
-
 				return key;
-			});
+			}, cancelToken);
 		}
 
 		public static bool CheckForUpdates()
