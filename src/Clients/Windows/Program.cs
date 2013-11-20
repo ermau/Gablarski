@@ -44,6 +44,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using log4net;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Mindscape.Raygun4Net;
 using Tempest;
@@ -64,6 +65,8 @@ namespace Gablarski.Clients.Windows
 
 		public static GablarskiSocialClient SocialClient;
 		public static ChatHistory History;
+
+		public static ILog StartupLog;
 
 		public static void EnableGablarskiURIs()
 		{
@@ -146,7 +149,8 @@ namespace Gablarski.Clients.Windows
 			//errors.Add (new GablarskiErrorReporter (typeof(Program).Assembly));
 
 			log4net.Config.XmlConfigurator.Configure ();
-			log4net.LogManager.GetLogger ("Gablarski Windows").InfoFormat ("Program Start. PID: {0}", Process.GetCurrentProcess().Id);
+			StartupLog = LogManager.GetLogger ("Startup");
+			StartupLog.DebugFormat ("PID: {0}", Process.GetCurrentProcess().Id);
 
 			FileInfo program = new FileInfo (Process.GetCurrentProcess().MainModule.FileName);
 			Environment.CurrentDirectory = program.Directory.FullName;
@@ -155,12 +159,19 @@ namespace Gablarski.Clients.Windows
 			bool useLocal;
 			Boolean.TryParse (useLocalValue, out useLocal);
 
+			StartupLog.DebugFormat ("Local files: {0}", useLocal);
+			StartupLog.DebugFormat ("Setting up databases..");
+
 			ClientData.Setup (useLocal);
+
+			StartupLog.DebugFormat ("Databases setup.");
 
 			CheckForUpdates();
 
+			StartupLog.Debug ("Starting key retrieval");
 			var keyCancelSource = new CancellationTokenSource();
 			Key = ClientData.GetCryptoKeyAsync (keyCancelSource.Token);
+			Key.ContinueWith (t => StartupLog.DebugFormat ("Key retrieval: {0}{1}{2}", t.Status, Environment.NewLine, t.Exception));
 
 			SetupFirstRun();
 
@@ -211,8 +222,20 @@ namespace Gablarski.Clients.Windows
 
 		private static void CheckForUpdates()
 		{
+			StartupLog.Debug ("Checking for updates..");
+
 			Updater.CheckAsync (UpdateChannel.Nightly).ContinueWith (t => {
+				if (t.IsCanceled) {
+					StartupLog.Debug ("Update check was canceled.");
+					return;
+				} else if (t.IsFaulted) {
+					StartupLog.Debug ("Update check failed", t.Exception.Flatten());
+					return;
+				}
+
 				Version currentVersion = typeof (Program).Assembly.GetName().Version;
+				StartupLog.DebugFormat ("Update check: Current {0} vs. {1}", currentVersion, t.Result.Version);
+
 				if (t.Result.Version <= currentVersion)
 					return;
 
@@ -259,15 +282,16 @@ namespace Gablarski.Clients.Windows
 					});
 				};
 
-				var result = update.Show();
-				result.ToString();
-			}, TaskContinuationOptions.OnlyOnRanToCompletion);
+				update.Show();
+			});
 		}
 
 		private static bool ShowKeyProgress (CancellationTokenSource keyCancelSource)
 		{
 			if (Key.IsCompleted)
 				return true;
+
+			StartupLog.Debug ("Key retrieval not complete in time, showing dialog.");
 
 			bool showing = false;
 			TaskDialog progress = new TaskDialog {
@@ -299,6 +323,8 @@ namespace Gablarski.Clients.Windows
 		{
 			if (!Settings.FirstRun)
 				return;
+
+			StartupLog.Debug ("Setting up first run..");
 
 			DialogResult result = MessageBox.Show ("Register gablarski:// urls with this client?", "Register gablarski://",
 				MessageBoxButtons.OKCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1);
