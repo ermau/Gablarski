@@ -138,6 +138,9 @@ namespace Gablarski.Clients.Windows
 				Raygun = new RaygunClient (RaygunKey);
 
 			AppDomain.CurrentDomain.UnhandledException += (sender, e) => {
+				if (StartupLog != null)
+					StartupLog.Error ("Fatal Error", (Exception)e.ExceptionObject);
+
 				if (Raygun != null)
 					Raygun.Send ((Exception) e.ExceptionObject);
 
