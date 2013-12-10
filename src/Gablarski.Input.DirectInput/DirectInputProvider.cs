@@ -120,7 +120,15 @@ namespace Gablarski.Input.DirectInput
 				foreach (CommandBinding binding in bindings)
 				{
 					string[] parts = binding.Input.Split ('|');
-					Guid deviceGuid = new Guid (parts[0]);
+					if (parts[0] == "keyboard")
+						parts[0] = KeyboardGuid.ToString();
+					else if (parts[1] == "mouse")
+						parts[0] = MouseGuid.ToString();
+
+					Guid deviceGuid;
+					if (!Guid.TryParse (parts[0], out deviceGuid))
+						continue;
+
 					if (deviceGuid == KeyboardGuid)
 					{
 						string[] keys = parts[1].Split ('+');
