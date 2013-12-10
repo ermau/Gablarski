@@ -166,7 +166,7 @@ namespace Gablarski.Clients.Windows
 					if (format == null)
 						continue;
 
-					var source = this.gablarski.Sources.CreateFake ("speech", format, 512);
+					var source = this.gablarski.Sources.CreateFake ("speech", format, (short)(format.SampleRate / 100));
 					this.speechSources.Add (tts, source);
 					tts.AudioSource = source;
 					this.gablarski.Audio.Attach (this.audioPlayback, source, new AudioEnginePlaybackOptions());
