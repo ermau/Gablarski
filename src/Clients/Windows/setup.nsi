@@ -83,7 +83,6 @@ Section -Main SEC0000
     File ..\..\Gablarski.Input.DirectInput\bin\{config}\SharpDX.DirectInput.dll
     File ..\..\Gablarski.iTunes\bin\{config}\Gablarski.iTunes.dll
     File ..\..\Gablarski.iTunes\bin\{config}\Gablarski.iTunes.pdb
-    File ..\..\..\lib\Interop.iTunesLib.dll
     File ..\..\Gablarski.OpenAL\bin\x86\{config}\Gablarski.OpenAL.dll
     File ..\..\Gablarski.OpenAL\bin\x86\{config}\Gablarski.OpenAL.pdb
     File ..\..\Gablarski.SpeechNotifier\bin\{config}\Gablarski.SpeechNotifier.dll
@@ -161,7 +160,6 @@ Section /o -un.Main UNSEC0000
     Delete /REBOOTOK $INSTDIR\Gablarski.SpeechNotifier.dll
     Delete /REBOOTOK $INSTDIR\Gablarski.OpenAL.pdb
     Delete /REBOOTOK $INSTDIR\Gablarski.OpenAL.dll
-    Delete /REBOOTOK $INSTDIR\Interop.iTunesLib.dll
     Delete /REBOOTOK $INSTDIR\Gablarski.iTunes.pdb
     Delete /REBOOTOK $INSTDIR\Gablarski.iTunes.dll
     Delete /REBOOTOK $INSTDIR\Gablarski.Input.DirectInput.pdb
