@@ -41,6 +41,7 @@ using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -183,6 +184,8 @@ namespace Gablarski.Clients.Windows
 
 			if (!ShowKeyProgress (keyCancelSource))
 				return;
+
+			ResourceWebRequestFactory.Register();
 
 			Application.EnableVisualStyles ();
 			Application.SetCompatibleTextRenderingDefault (false);

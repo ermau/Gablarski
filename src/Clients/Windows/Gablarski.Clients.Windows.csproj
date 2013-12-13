@@ -232,6 +232,7 @@
     <Compile Include="RegisterForm.Designer.cs">
       <DependentUpon>RegisterForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="ResourceWebRequestFactory.cs" />
     <Compile Include="UserTreeView.cs">
       <SubType>Component</SubType>
     </Compile>
