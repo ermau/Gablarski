@@ -1,0 +1,25 @@
+﻿<UserControl x:Class="Gablarski.Clients.Windows.ActivationSlider"
+			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+			 mc:Ignorable="d" 
+			 d:DesignHeight="30" d:DesignWidth="200" Name="root">
+	<Grid>
+		<ProgressBar Name="activation" HorizontalAlignment="Left" Background="Transparent"
+					 Height="{Binding ElementName=root,Path=ActualHeight}"
+					 Minimum="{Binding ElementName=root,Path=Minimum}"
+					 Maximum="{Binding ElementName=root,Path=Maximum}"
+					 Value="{Binding ElementName=root,Path=ActivationLevel}"
+					 BorderThickness="0" Margin="10,0,10,0" />
+
+		<Slider Name="slider"
+				Minimum="{Binding ElementName=root,Path=Minimum}"
+				Maximum="{Binding ElementName=root,Path=Maximum}"
+				Value="{Binding ElementName=root,Path=Value}"
+				LargeChange="{Binding ElementName=root,Path=LargeChange}"
+				SmallChange="{Binding ElementName=root,Path=SmallChange}"
+				TickFrequency="{Binding ElementName=root,Path=TickFrequency}"
+				TickPlacement="BottomRight" />
+	</Grid>
+</UserControl>

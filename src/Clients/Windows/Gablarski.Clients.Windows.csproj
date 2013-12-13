@@ -163,6 +163,9 @@
     <Compile Include="AboutForm.Designer.cs">
       <DependentUpon>AboutForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="ActivationSlider.xaml.cs">
+      <DependentUpon>ActivationSlider.xaml</DependentUpon>
+    </Compile>
     <Compile Include="AddBuddyWindow.xaml.cs">
       <DependentUpon>AddBuddyWindow.xaml</DependentUpon>
     </Compile>
@@ -374,6 +377,10 @@
     <None Include="Resources\Headphones.ico" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="ActivationSlider.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="AddBuddyWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
