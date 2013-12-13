@@ -41,15 +41,15 @@ using Tempest;
 namespace Gablarski.Audio
 {
 	public class AudioSource
-		: AudioCodec, IEquatable<AudioSource>
+		: IEquatable<AudioSource>
 	{
 		internal AudioSource (ISerializationContext context, IValueReader reader)
-			: base (context, reader)
 		{
+			Deserialize (context, reader);
 		}
 
 		internal AudioSource (AudioSource source)
-			: this (source.Name, source.Id, source.OwnerId, source.IsMuted, source)
+			: this (source.Name, source.Id, source.OwnerId, source.IsMuted, source.CodecSettings)
 		{
 		}
 
@@ -59,7 +59,7 @@ namespace Gablarski.Audio
 		}
 
 		internal AudioSource (string name, int sourceId, int ownerId, AudioFormat format, int bitrate, short frameSize, byte complexity)
-			: this(name, sourceId, ownerId, format, bitrate, frameSize, complexity, false)
+			: this (name, sourceId, ownerId, format, bitrate, frameSize, complexity, false)
 		{
 		}
 
@@ -74,19 +74,21 @@ namespace Gablarski.Audio
 		/// <param name="name"></param>
 		/// <param name="sourceId">If sourceId &lt; 0, the audio source is local.</param>
 		public AudioSource (string name, int sourceId, int ownerId, bool isMuted, AudioCodecArgs args)
-			: base (args)
 		{
 			if (name == null)
 				throw new ArgumentNullException ("name");
+			if (args == null)
+				throw new ArgumentNullException ("args");
 			if (sourceId == 0)
 				throw new ArgumentOutOfRangeException ("sourceId");
 			if (sourceId > 0 && ownerId == 0)
 				throw new ArgumentException ("ownerId");			
 
-			this.Name = name;
-			this.Id = sourceId;
-			this.OwnerId = ownerId;
-			this.IsMuted = isMuted;
+			Name = name;
+			Id = sourceId;
+			OwnerId = ownerId;
+			IsMuted = isMuted;
+			CodecSettings = args;
 		}
 
 		/// <summary>
@@ -95,7 +97,7 @@ namespace Gablarski.Audio
 		public bool IsMuted
 		{
 			get;
-			protected internal set;
+			internal set;
 		}
 
 		/// <summary>
@@ -104,7 +106,7 @@ namespace Gablarski.Audio
 		public string Name
 		{
 			get;
-			protected internal set;
+			private set;
 		}
 
 		/// <summary>
@@ -113,7 +115,7 @@ namespace Gablarski.Audio
 		public int Id
 		{
 			get;
-			protected internal set;
+			private set;
 		}
 
 		/// <summary>
@@ -122,7 +124,13 @@ namespace Gablarski.Audio
 		public int OwnerId
 		{
 			get;
-			protected internal set;
+			private set;
+		}
+
+		public AudioCodecArgs CodecSettings
+		{
+			get;
+			private set;
 		}
 
 		public override string ToString ()
@@ -130,22 +138,22 @@ namespace Gablarski.Audio
 			return "AudioSource:" + Name + ":" + Id + ":" + OwnerId;
 		}
 
-		public override void Serialize (ISerializationContext context, IValueWriter writer)
+		public void Serialize (ISerializationContext context, IValueWriter writer)
 		{
-			writer.WriteString (this.Name);
-			writer.WriteInt32 (this.Id);
-			writer.WriteInt32 (this.OwnerId);
-			writer.WriteBool (this.IsMuted);
-			base.Serialize (context, writer);
+			writer.WriteString (Name);
+			writer.WriteInt32 (Id);
+			writer.WriteInt32 (OwnerId);
+			writer.WriteBool (IsMuted);
+			CodecSettings.Serialize (context, writer);
 		}
 
-		public override void Deserialize (ISerializationContext context, IValueReader reader)
+		public void Deserialize (ISerializationContext context, IValueReader reader)
 		{
-			this.Name = reader.ReadString();
-			this.Id = reader.ReadInt32 ();
-			this.OwnerId = reader.ReadInt32();
-			this.IsMuted = reader.ReadBool();
-			base.Deserialize (context, reader);
+			Name = reader.ReadString();
+			Id = reader.ReadInt32 ();
+			OwnerId = reader.ReadInt32();
+			IsMuted = reader.ReadBool();
+			CodecSettings = new AudioCodecArgs (context, reader);
 		}
 
 		public override bool Equals (object obj)
@@ -154,8 +162,9 @@ namespace Gablarski.Audio
 				return false;
 			if (ReferenceEquals (this, obj))
 				return true;
-
-			return Equals (obj as AudioSource);
+			if (obj.GetType() != this.GetType())
+				return false;
+			return Equals ((AudioSource) obj);
 		}
 
 		public bool Equals (AudioSource other)
@@ -164,34 +173,28 @@ namespace Gablarski.Audio
 				return false;
 			if (ReferenceEquals (this, other))
 				return true;
-
-			return base.Equals (other) && other.Id == this.Id;
+			return IsMuted.Equals (other.IsMuted) && string.Equals (Name, other.Name) && Id == other.Id && OwnerId == other.OwnerId && CodecSettings.Equals (other.CodecSettings);
 		}
 
 		public override int GetHashCode()
 		{
-			unchecked
-			{
-				{
-					return (base.GetHashCode() * 397) ^ this.Id;
-				}
+			unchecked {
+				int hashCode = IsMuted.GetHashCode();
+				hashCode = (hashCode * 397) ^ Name.GetHashCode();
+				hashCode = (hashCode * 397) ^ Id;
+				hashCode = (hashCode * 397) ^ OwnerId;
+				hashCode = (hashCode * 397) ^ CodecSettings.GetHashCode();
+				return hashCode;
 			}
 		}
 
 		internal void CopyTo (AudioSource targetSource)
 		{
-			targetSource.Name = this.Name;
-			targetSource.Id = this.Id;
-			targetSource.OwnerId = this.OwnerId;
-			targetSource.IsMuted = this.IsMuted;
-
-			targetSource.WaveEncoding = WaveEncoding;
-			targetSource.BitsPerSample = BitsPerSample;
-			targetSource.Channels = Channels;
-			targetSource.Bitrate = Bitrate;
-			targetSource.SampleRate = SampleRate;
-			targetSource.FrameSize = FrameSize;
-			targetSource.Complexity = Complexity;
+			targetSource.Name = Name;
+			targetSource.Id = Id;
+			targetSource.OwnerId = OwnerId;
+			targetSource.IsMuted = IsMuted;
+			targetSource.CodecSettings = new AudioCodecArgs (targetSource.CodecSettings);
 		}
 
 		public static bool operator == (AudioSource left, AudioSource right)

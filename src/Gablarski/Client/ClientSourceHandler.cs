@@ -38,6 +38,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Gablarski.Audio;
 using Gablarski.Messages;
 using Tempest;
@@ -93,7 +95,7 @@ namespace Gablarski.Client
 			byte[][] data = new byte[1][];
 			data[0] = audio;
 
-			OnReceivedAudio (new ReceivedAudioEventArgs (source, data, false));
+			OnReceivedAudio (new ReceivedAudioEventArgs (source, data));
 		}
 
 		public void BeginSending (AudioSource source)
@@ -103,15 +105,23 @@ namespace Gablarski.Client
 			if (source.OwnerId != this.context.CurrentUser.UserId)
 				throw new ArgumentException ("Can not send audio from a source you don't own", "source");
 
-			lock (sequences)
-				sequences[source] = 0;
+			lock (this.sources) {
+				SourceState state;
+				if (!this.sources.TryGetValue (source, out state))
+					this.sources[source] = state = new SourceState();
+
+				if (state.Codec == null)
+					state.Codec = new AudioCodec (source.CodecSettings);
+
+				state.Sequence = 0;
+			}
 
 			this.context.Connection.SendAsync (new ClientAudioSourceStateChangeMessage { Starting = true, SourceId = source.Id });
 
 			OnAudioSourceStarted (new AudioSourceEventArgs (source));
 		}
 
-		public void SendAudioData (AudioSource source, TargetType targetType, int[] targetIds, byte[][] data)
+		public Task SendAudioDataAsync (AudioSource source, TargetType targetType, int[] targetIds, byte[][] data)
 		{
 			#if DEBUG
 			if (source == null)
@@ -128,19 +138,19 @@ namespace Gablarski.Client
 
 			byte[][] encoded = new byte[data.Length][];
 
-			for (int i = 0; i < data.Length; i++)
-				encoded[i] = source.Encode (data[i]);
-
 			int sequence;
-			lock (sequences)
-			{
-				if (sequences.TryGetValue (source, out sequence))
-					sequence++;
+			SourceState state;
+			lock (this.sources) {
+				if (!this.sources.TryGetValue (source, out state))
+					throw new InvalidOperationException ("You must call BeginSending on the source before you can call SendAudioData");
 
-				sequences[source] = sequence;
+				sequence = ++state.Sequence;
 			}
 
-			this.context.Connection.SendAsync (new ClientAudioDataMessage
+			for (int i = 0; i < data.Length; i++)
+				encoded[i] = state.Codec.Encode (data[i]);
+
+			return this.context.Connection.SendAsync (new ClientAudioDataMessage
 			{
 				Sequence = sequence,
 				TargetType = targetType,
@@ -211,7 +221,7 @@ namespace Gablarski.Client
 
 		public void Reset()
 		{
-			this.sequences.Clear();
+			this.sources.Clear();
 			this.manager.Clear();
 		}
 
@@ -228,7 +238,13 @@ namespace Gablarski.Client
 		private int nextFakeAudioId = -1;
 		private readonly IGablarskiClientContext context;
 		private readonly IClientSourceManager manager;
-		private readonly Dictionary<AudioSource, int> sequences = new Dictionary<AudioSource, int>();
+		private readonly Dictionary<AudioSource, SourceState> sources = new Dictionary<AudioSource, SourceState>();
+
+		class SourceState
+		{
+			public int Sequence;
+			public AudioCodec Codec;
+		}
 
 		private void OnSourceMutedMessage (MessageEventArgs<SourceMutedMessage> e)
 		{
@@ -298,15 +314,31 @@ namespace Gablarski.Client
 
 		internal void OnServerAudioDataMessage (MessageEventArgs<ServerAudioDataMessage> e)
 		{
-			var msg = (ServerAudioDataMessage)e.Message;
-
-			var source = this.manager[msg.SourceId];
+			var source = this.manager[e.Message.SourceId];
 			if (source == null || this.manager.GetIsIgnored (source))
 				return;
 
+			SourceState state;
+			lock (this.sources) {
+				if (!this.sources.TryGetValue (source, out state)) {
+					this.sources[source] = state = new SourceState();
+					state.Codec = new AudioCodec (source.CodecSettings);
+				}
+
+				state.Sequence = e.Message.Sequence;
+			}
+
 			var user = this.context.Users[source.OwnerId];
-			if (user != null && !this.context.Users.GetIsIgnored (user))
-				OnReceivedAudio (new ReceivedAudioEventArgs (source, msg.Data));
+			if (user == null || this.context.Users.GetIsIgnored (user))
+				return;
+
+			byte[][] data = e.Message.Data;
+			byte[][] decoded = new byte[data.Length][];
+			for (int i = 0; i < decoded.Length; i++) {
+				decoded[i] = state.Codec.Decode (data[i]);
+			}
+
+			OnReceivedAudio (new ReceivedAudioEventArgs (source, decoded));
 		}
 
 		internal void OnMutedMessage (int sourceId, bool unmuted)

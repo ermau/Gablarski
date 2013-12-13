@@ -303,7 +303,7 @@ namespace Gablarski.Tests
 			Assert.AreEqual (SourceResult.Succeeded, msg.SourceResult);
 			Assert.AreEqual ("source", msg.Source.Name);
 			Assert.AreEqual (false, msg.Source.IsMuted);
-			AudioCodecArgsTests.AssertAreEqual (args, msg.Source);
+			AudioCodecArgsTests.AssertAreEqual (args, msg.Source.CodecSettings);
 		}
 
 		//[Test]

@@ -102,30 +102,6 @@ namespace Gablarski.Tests
 		}
 
 		[Test]
-		public void ToggleIgnoreReferenceChanges()
-		{
-			manager.Add (source);
-			source.Name = "NewName";
-
-			Assert.IsFalse (manager.ToggleMute (source));
-
-			Assert.AreNotEqual (source.Name, manager[source.Id].Name);
-		}
-
-		[Test]
-		public void ToggleIgnoreChanges()
-		{
-			manager.Add (source);
-
-			var update = new AudioSource (source);
-			update.Name = "NewName";
-
-			Assert.IsFalse (manager.ToggleMute (update));
-
-			Assert.AreNotEqual (update.Name, manager[update.Id].Name);
-		}
-
-		[Test]
 		public void RemoveNull()
 		{
 			Assert.Throws<ArgumentNullException> (() => manager.Remove ((AudioSource)null));

@@ -130,8 +130,8 @@ namespace Gablarski.Tests
 		[Test]
 		public void Enumerable()
 		{
-			var source = manager.Create ("Name", user, AudioSourceTests.GetTestSource());
-			var source2 = manager.Create ("Name2", user, AudioSourceTests.GetTestSource());
+			var source = manager.Create ("Name", user, AudioSourceTests.GetTestSource().CodecSettings);
+			var source2 = manager.Create ("Name2", user, AudioSourceTests.GetTestSource().CodecSettings);
 
 			Assert.Contains (source, handler.ToList());
 			Assert.Contains (source2, handler.ToList());
@@ -190,7 +190,7 @@ namespace Gablarski.Tests
 			Assert.AreEqual ("Name", result.SourceName);
 			Assert.AreEqual ("Name", result.Source.Name);
 			
-			AudioCodecArgsTests.AssertAreEqual (audioArgs, result.Source);
+			AudioCodecArgsTests.AssertAreEqual (audioArgs, result.Source.CodecSettings);
 
 			clientConnection.AssertNoMessage();
 
@@ -211,7 +211,7 @@ namespace Gablarski.Tests
 			Assert.AreEqual ("Name", result.Source.Name);
 			
 			audioArgs.Bitrate = defaultBitrate;
-			AudioCodecArgsTests.AssertAreEqual (audioArgs, result.Source);
+			AudioCodecArgsTests.AssertAreEqual (audioArgs, result.Source.CodecSettings);
 
 			client.AssertNoMessage();
 		}
@@ -230,7 +230,7 @@ namespace Gablarski.Tests
 			Assert.AreEqual ("Name", result.Source.Name);
 			
 			audioArgs.Bitrate = maxBitrate;
-			AudioCodecArgsTests.AssertAreEqual (audioArgs, result.Source);
+			AudioCodecArgsTests.AssertAreEqual (audioArgs, result.Source.CodecSettings);
 
 			client.AssertNoMessage();
 		}
@@ -249,7 +249,7 @@ namespace Gablarski.Tests
 			Assert.AreEqual ("Name", result.Source.Name);
 			
 			audioArgs.Bitrate = minBitrate;
-			AudioCodecArgsTests.AssertAreEqual (audioArgs, result.Source);
+			AudioCodecArgsTests.AssertAreEqual (audioArgs, result.Source.CodecSettings);
 
 			client.AssertNoMessage();
 		}
@@ -292,7 +292,7 @@ namespace Gablarski.Tests
 			var sourceAdded = cl.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.NewSource, sourceAdded.SourceResult);
 			Assert.AreEqual ("Name", sourceAdded.SourceName);
-			AudioCodecArgsTests.AssertAreEqual (audioArgs, sourceAdded.Source);
+			AudioCodecArgsTests.AssertAreEqual (audioArgs, sourceAdded.Source.CodecSettings);
 
 			cl.AssertNoMessage();
 		}

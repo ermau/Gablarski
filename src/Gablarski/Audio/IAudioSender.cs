@@ -36,6 +36,7 @@
 
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Gablarski.Messages;
 
 namespace Gablarski.Audio
@@ -61,7 +62,7 @@ namespace Gablarski.Audio
 		/// <exception cref="ArgumentException"><paramref name="source"/> does not belong to you.</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="data"/> is <c>null</c>.</exception>
 		/// <exception cref="ArgumentException"><paramref name="data"/> is empty.</exception>
-		void SendAudioData (AudioSource source, TargetType targetType, int[] targetIds, byte[][] data);
+		Task SendAudioDataAsync (AudioSource source, TargetType targetType, int[] targetIds, byte[][] data);
 
 		/// <summary>
 		/// Sends notifications that you're finished sending audio from <paramref name="source"/>.

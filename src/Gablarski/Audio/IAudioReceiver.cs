@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2011, Eric Maupin
+﻿// Copyright (c) 2010-2013, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -77,7 +77,7 @@ namespace Gablarski.Audio
 	{
 		public AudioSourceEventArgs (AudioSource source)
 		{
-			this.Source = source;
+			Source = source;
 		}
 
 		/// <summary>
@@ -94,21 +94,9 @@ namespace Gablarski.Audio
 		: AudioSourceEventArgs
 	{
 		public ReceivedAudioEventArgs (AudioSource source, byte[][] data)
-			: this(source, data, true)
-		{
-		}
-
-		public ReceivedAudioEventArgs (AudioSource source, byte[][] data, bool encoded)
 			: base (source)
 		{
-			this.AudioData = data;
-			Encoded = encoded;
-		}
-
-		public bool Encoded
-		{
-			get;
-			private set;
+			AudioData = data;
 		}
 
 		/// <summary>

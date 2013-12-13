@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2011, Eric Maupin
+﻿// Copyright (c) 2010-2013, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -40,15 +40,15 @@ namespace Gablarski.Audio
 {
 	public class VoiceActivation
 	{
-		public VoiceActivation (AudioSource source, int startVolume, int continueVolume, TimeSpan threshold)
+		public VoiceActivation (AudioFormat format, int frameSize, int startVolume, int continueVolume, TimeSpan threshold)
 		{
-			if (source == null)
-				throw new ArgumentNullException ("source");
-			if (source.Channels != 1 || source.WaveEncoding != WaveFormatEncoding.LPCM)
+			if (format == null)
+				throw new ArgumentNullException ("format");
+			if (format.Channels != 1 || format.WaveEncoding != WaveFormatEncoding.LPCM)
 				throw new ArgumentException ("Can not perform voice activation on a non-mono or non-LPCM source.");
 
-			this.source = source;
-			this.length = (double) this.source.FrameSize / source.SampleRate;
+			this.format = format;
+			this.length = (double) frameSize / this.format.SampleRate;
 
 			this.startVol = startVolume;
 			this.contVol = continueVolume;
@@ -58,7 +58,7 @@ namespace Gablarski.Audio
 		public int GetLevel (byte[] samples)
 		{
 			int avg;
-			switch (this.source.BitsPerSample) {
+			switch (this.format.BitsPerSample) {
 				case 16: {
 					int total = 0;
 					for (int i = 0; i < samples.Length; i += 2) {
@@ -86,7 +86,7 @@ namespace Gablarski.Audio
 				}
 					
 				default:
-					throw new NotSupportedException ("BitsPerSample " + this.source.BitsPerSample + " is unsupported for VoiceActivation");
+					throw new NotSupportedException ("BitsPerSample " + this.format.BitsPerSample + " is unsupported for VoiceActivation");
 			}
 
 			return avg;
@@ -110,7 +110,7 @@ namespace Gablarski.Audio
 			return result;
 		}
 
-		private readonly AudioSource source;
+		private readonly AudioFormat format;
 		private readonly int startVol;
 		private readonly int contVol;
 		private readonly double threshold;

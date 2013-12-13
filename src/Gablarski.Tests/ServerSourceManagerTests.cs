@@ -78,13 +78,13 @@ namespace Gablarski.Tests
 			Assert.IsNotNull (source);
 			Assert.AreEqual ("Name", source.Name);
 			Assert.AreEqual (1, source.OwnerId);
-			Assert.AreEqual (args.WaveEncoding, source.WaveEncoding);
-			Assert.AreEqual (args.Channels, source.Channels);
-			Assert.AreEqual (args.BitsPerSample, source.BitsPerSample);
-			Assert.AreEqual (args.Bitrate, source.Bitrate);
-			Assert.AreEqual (args.SampleRate, source.SampleRate);
-			Assert.AreEqual (args.FrameSize, source.FrameSize);
-			Assert.AreEqual (args.Complexity, source.Complexity);
+			Assert.AreEqual (args.WaveEncoding,		source.CodecSettings.WaveEncoding);
+			Assert.AreEqual (args.Channels,			source.CodecSettings.Channels);
+			Assert.AreEqual (args.BitsPerSample,	source.CodecSettings.BitsPerSample);
+			Assert.AreEqual (args.Bitrate,			source.CodecSettings.Bitrate);
+			Assert.AreEqual (args.SampleRate,		source.CodecSettings.SampleRate);
+			Assert.AreEqual (args.FrameSize,		source.CodecSettings.FrameSize);
+			Assert.AreEqual (args.Complexity,		source.CodecSettings.Complexity);
 
 			Assert.That (source.Id > 0, "Source ID is not greater than 0");
 		}

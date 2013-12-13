@@ -163,7 +163,7 @@ namespace Gablarski.Audio
 			lock (captures)
 			{
 				audioCapture.SamplesAvailable += OnSamplesAvailable;
-				audioCapture.BeginCapture (source, source.FrameSize);
+				audioCapture.BeginCapture (source.CodecSettings, source.CodecSettings.FrameSize);
 				captures[source] = new AudioCaptureEntity (audioCapture, source, options);
 				captureToSourceLookup[audioCapture] = source;
 
@@ -457,16 +457,16 @@ namespace Gablarski.Audio
 			if (IsRunning)
 				return;
 
-			if (this.AudioReceiver == null)
+			if (AudioReceiver == null)
 				throw new InvalidOperationException ("AudioReceiver is not set.");
-			if (this.AudioSender == null)
+			if (AudioSender == null)
 				throw new InvalidOperationException ("AudioSender is not set.");
-			if (this.Context == null)
+			if (Context == null)
 				throw new InvalidOperationException ("Context is not set.");
 
 			this.running = true;
 
-			this.AudioReceiver.ReceivedAudio += OnReceivedAudio;
+			AudioReceiver.ReceivedAudio += OnReceivedAudio;
 		}
 
 		public void Stop ()
@@ -551,14 +551,14 @@ namespace Gablarski.Audio
 
 				AudioEngineCaptureMode mode = entity.Options.Mode;
 					
-				int framesAvailable = e.Available / source.FrameSize;
+				int framesAvailable = e.Available / source.CodecSettings.FrameSize;
 				int talkingFrames = (mode == AudioEngineCaptureMode.Explicit) ? framesAvailable : 0;
 				int talkingIndex = -1;
 
 				byte[][] frames = new byte[framesAvailable][];
 				for (int i = 0; i < framesAvailable; ++i)
 				{
-					byte[] samples = entity.AudioCapture.ReadSamples (source.FrameSize);
+					byte[] samples = entity.AudioCapture.ReadSamples (source.CodecSettings.FrameSize);
 					if (mode == AudioEngineCaptureMode.Activated)
 					{
 						talking = entity.VoiceActivation.IsTalking (samples);
@@ -570,7 +570,7 @@ namespace Gablarski.Audio
 						}
 
 						if (talking && !entity.Talking)
-							this.AudioSender.BeginSending (source);
+							AudioSender.BeginSending (source);
 					}
 
 					frames[i] = samples;
@@ -584,9 +584,9 @@ namespace Gablarski.Audio
 				}
 
 				if (talking)
-					this.AudioSender.SendAudioData (source, entity.TargetType, entity.CurrentTargets, frames);
+					AudioSender.SendAudioDataAsync (source, entity.TargetType, entity.CurrentTargets, frames);
 				else if (entity.Talking && entity.Options.Mode == AudioEngineCaptureMode.Activated)
-					this.AudioSender.EndSending (source);
+					AudioSender.EndSending (source);
 
 				entity.Talking = talking;
 			}
@@ -598,20 +598,15 @@ namespace Gablarski.Audio
 				return;
 
 			AudioPlaybackEntity entity;
-			lock (playbacks)
-			{
+			lock (playbacks) {
 				if (!playbacks.TryGetValue (e.Source, out entity) || entity.Muted)
 					return;
 			}
 
-			for (int i = 0; i < e.AudioData.Length; ++i)
-			{
-				byte[] decoded = (e.Encoded) ? e.Source.Decode (e.AudioData[i]): e.AudioData[i];
-
-				lock (playbacks)
-				{
+			for (int i = 0; i < e.AudioData.Length; ++i) {
+				lock (playbacks) {
 					if (!entity.Muted)
-						entity.AudioPlayback.QueuePlayback (e.Source, decoded);
+						entity.AudioPlayback.QueuePlayback (e.Source, e.AudioData[i]);
 				}
 			}
 		}

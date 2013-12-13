@@ -126,16 +126,16 @@ namespace Gablarski.Tests
 		[Test]
 		public void SendAudioDataNull()
 		{
-			Assert.Throws<ArgumentNullException> (() => handler.SendAudioData (null, TargetType.User, new [] { 1 }, new byte[1][]));
-			Assert.Throws<ArgumentNullException> (() => handler.SendAudioData (AudioSourceTests.GetTestSource(), TargetType.User, null, new byte[1][]));
-			Assert.Throws<ArgumentNullException> (() => handler.SendAudioData (AudioSourceTests.GetTestSource(), TargetType.User, new [] { 1 }, null));
+			Assert.Throws<ArgumentNullException> (() => handler.SendAudioDataAsync (null, TargetType.User, new [] { 1 }, new byte[1][]));
+			Assert.Throws<ArgumentNullException> (() => handler.SendAudioDataAsync (AudioSourceTests.GetTestSource(), TargetType.User, null, new byte[1][]));
+			Assert.Throws<ArgumentNullException> (() => handler.SendAudioDataAsync (AudioSourceTests.GetTestSource(), TargetType.User, new [] { 1 }, null));
 		}
 
 		[Test]
 		public void SendAudioDataInvalid()
 		{
-			Assert.Throws<ArgumentException> (() => handler.SendAudioData (AudioSourceTests.GetTestSource(), TargetType.User, new [] { 1 }, new byte[0][]));
-			Assert.Throws<ArgumentException> (() => handler.SendAudioData (AudioSourceTests.GetTestSource (2), TargetType.User, new [] { 1 }, new byte[1][] ));
+			Assert.Throws<ArgumentException> (() => handler.SendAudioDataAsync (AudioSourceTests.GetTestSource(), TargetType.User, new [] { 1 }, new byte[0][]));
+			Assert.Throws<ArgumentException> (() => handler.SendAudioDataAsync (AudioSourceTests.GetTestSource (2), TargetType.User, new [] { 1 }, new byte[1][] ));
 		}
 
 		[Test]
@@ -193,7 +193,7 @@ namespace Gablarski.Tests
 			var s = this.handler.CreateFake (name, format, frameSize);
 
 			Assert.AreEqual (name, s.Name);
-			AudioCodecArgsTests.AssertAreEqual (new AudioCodecArgs (format, 0, frameSize, 10), s);
+			AudioCodecArgsTests.AssertAreEqual (new AudioCodecArgs (format, 0, frameSize, 10), s.CodecSettings);
 			
 			Assert.AreSame (s, this.handler[s.Id]);
 		}

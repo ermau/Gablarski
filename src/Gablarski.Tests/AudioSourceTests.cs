@@ -85,13 +85,13 @@ namespace Gablarski.Tests
 		{
 			Assert.AreEqual (expected.Name, actual.Name, "Source Name not matching");
 			Assert.AreEqual (expected.OwnerId, actual.OwnerId, "Source OwnerId not matching");
-			Assert.AreEqual (expected.WaveEncoding, actual.WaveEncoding, "Source WaveEncoding not matching");
-			Assert.AreEqual (expected.Channels, actual.Channels, "Source Channels not matching");
-			Assert.AreEqual (expected.BitsPerSample, actual.BitsPerSample, "Source BitsPerSample not matching");
-			Assert.AreEqual (expected.Bitrate, actual.Bitrate, "Source Bitrate not matching");
-			Assert.AreEqual (expected.SampleRate, actual.SampleRate, "Source Frequency not matching");
-			Assert.AreEqual (expected.FrameSize, actual.FrameSize, "Source FrameSize not matching");
-			Assert.AreEqual (expected.Complexity, actual.Complexity, "Source Complexity not matching.");
+			Assert.AreEqual (expected.CodecSettings.WaveEncoding, actual.CodecSettings.WaveEncoding, "Source WaveEncoding not matching");
+			Assert.AreEqual (expected.CodecSettings.Channels, actual.CodecSettings.Channels, "Source Channels not matching");
+			Assert.AreEqual (expected.CodecSettings.BitsPerSample, actual.CodecSettings.BitsPerSample, "Source BitsPerSample not matching");
+			Assert.AreEqual (expected.CodecSettings.Bitrate, actual.CodecSettings.Bitrate, "Source Bitrate not matching");
+			Assert.AreEqual (expected.CodecSettings.SampleRate, actual.CodecSettings.SampleRate, "Source Frequency not matching");
+			Assert.AreEqual (expected.CodecSettings.FrameSize, actual.CodecSettings.FrameSize, "Source FrameSize not matching");
+			Assert.AreEqual (expected.CodecSettings.Complexity, actual.CodecSettings.Complexity, "Source Complexity not matching.");
 			Assert.AreEqual (expected.IsMuted, actual.IsMuted, "Source IsMuted not matching");
 		}
 
@@ -101,15 +101,16 @@ namespace Gablarski.Tests
 			var source = new AudioSource ("voice", 1, 1, new AudioFormat (WaveFormatEncoding.LPCM, 2, 8, 48000), 64000, 480, 10, true);
 			Assert.AreEqual ("voice",					source.Name);
 			Assert.AreEqual (1,							source.Id);
-			Assert.AreEqual (WaveFormatEncoding.LPCM,	source.WaveEncoding);
-			Assert.AreEqual (2,							source.Channels);
-			Assert.AreEqual (8,							source.BitsPerSample);
 			Assert.AreEqual (1,							source.OwnerId);
-			Assert.AreEqual (64000,						source.Bitrate);
-			Assert.AreEqual (48000,						source.SampleRate);
-			Assert.AreEqual (480,						source.FrameSize);
-			Assert.AreEqual (10,						source.Complexity);
 			Assert.AreEqual (true,						source.IsMuted);
+			Assert.AreEqual (WaveFormatEncoding.LPCM,	source.CodecSettings.WaveEncoding);
+			Assert.AreEqual (2,							source.CodecSettings.Channels);
+			Assert.AreEqual (8,							source.CodecSettings.BitsPerSample);
+			Assert.AreEqual (64000,						source.CodecSettings.Bitrate);
+			Assert.AreEqual (48000,						source.CodecSettings.SampleRate);
+			Assert.AreEqual (480,						source.CodecSettings.FrameSize);
+			Assert.AreEqual (10,						source.CodecSettings.Complexity);
+			
 		}
 
 		[Test]

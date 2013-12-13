@@ -37,12 +37,10 @@
 using System;
 using FragLabs.Audio.Codecs;
 using FragLabs.Audio.Codecs.Opus;
-using Tempest;
 
 namespace Gablarski.Audio
 {
-	public class AudioCodec
-		: AudioCodecArgs
+	public sealed class AudioCodec
 	{
 		private readonly object codecLock = new object();
 
@@ -50,22 +48,19 @@ namespace Gablarski.Audio
 		private OpusDecoder decoder;
 
 		public AudioCodec (AudioCodecArgs args)
-			: base (args)
 		{
+			if (args == null)
+				throw new ArgumentNullException ("args");
+
+			this.settings = args;
 		}
 
 		public AudioCodec (AudioFormat format, int bitrate, short frameSize, byte complexity)
-			: base (format, bitrate, frameSize, complexity)
 		{
-		}
+			if (format == null)
+				throw new ArgumentNullException ("format");
 
-		protected AudioCodec()
-		{
-		}
-
-		internal AudioCodec (ISerializationContext context, IValueReader reader)
-			: base (context, reader)
-		{
+			this.settings = new AudioCodecArgs (format, bitrate, frameSize, complexity);
 		}
 
 		public byte[] Encode (byte[] data)
@@ -76,8 +71,8 @@ namespace Gablarski.Audio
 			if (this.encoder == null) {
 				lock (this.codecLock) {
 					if (this.encoder == null) {
-						this.encoder = OpusEncoder.Create (SampleRate, Channels, Application.Voip);
-						this.encoder.Bitrate = Bitrate;
+						this.encoder = OpusEncoder.Create (this.settings.SampleRate, this.settings.Channels, Application.Voip);
+						this.encoder.Bitrate = this.settings.Bitrate;
 					}
 				}
 			}
@@ -101,7 +96,7 @@ namespace Gablarski.Audio
 			if (this.decoder == null) {
 				lock (this.codecLock) {
 					if (this.decoder == null) {
-						this.decoder = OpusDecoder.Create (SampleRate, Channels);
+						this.decoder = OpusDecoder.Create (this.settings.SampleRate, this.settings.Channels);
 					}
 				}
 			}
@@ -116,5 +111,7 @@ namespace Gablarski.Audio
 
 			return decoded;
 		}
+
+		private readonly AudioCodecArgs settings;
 	}
 }

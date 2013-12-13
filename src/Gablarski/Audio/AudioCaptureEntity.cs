@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2011, Eric Maupin
+﻿// Copyright (c) 2010-2013, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -50,11 +50,11 @@ namespace Gablarski.Audio
 			this.source = source;
 			this.options = options;
 
-			this.frameLength = (this.source.FrameSize / source.SampleRate) * 1000;
+			this.frameLength = (this.source.CodecSettings.FrameSize / source.CodecSettings.SampleRate) * 1000;
 
 			if (options.Mode == AudioEngineCaptureMode.Activated)
 			{
-				activation = new VoiceActivation (source, options.StartVolume, options.ContinuationVolume, options.ContinueThreshold);
+				activation = new VoiceActivation (source.CodecSettings, source.CodecSettings.FrameSize, options.StartVolume, options.ContinuationVolume, options.ContinueThreshold);
 				//preprocessor = new SpeexPreprocessor (this.source.FrameSize, this.source.Frequency);
 			}
 		}
