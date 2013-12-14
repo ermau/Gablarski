@@ -111,8 +111,10 @@ namespace Gablarski.OpenAL.Providers
 			if (!this.device.IsOpen)
 				this.device.Open();
 
-			if (Context.CurrentContext == null || Context.CurrentContext.Device != this.device)
+			if (Context.CurrentContext == null || Context.CurrentContext.Device != this.device) {
 				Context.CreateAndActivate (this.device);
+				SourceBuffer.Clear();
+			}
 
 			isOpen = true;
 		}

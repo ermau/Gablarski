@@ -109,7 +109,7 @@ namespace Gablarski.OpenAL
 
 		public void Dispose ()
 		{
-			this.Dispose (true);
+			Dispose (true);
 			GC.SuppressFinalize (this);
 		}
 
@@ -167,6 +167,16 @@ namespace Gablarski.OpenAL
 				}
 
 				return buffers;
+			}
+		}
+
+		public static void Clear()
+		{
+			lock (lck) {
+				foreach (SourceBuffer buffer in Buffers.Values)
+					buffer.Dispose();
+
+				Buffers.Clear();
 			}
 		}
 
