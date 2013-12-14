@@ -353,6 +353,11 @@ namespace Gablarski.Clients
 			}
 		}
 
+		public static System.Collections.IDictionary CurrentSettings
+		{
+			get { return settings; }
+		}
+
 		public static void Save()
 		{
 			LoadSettings();

@@ -143,7 +143,7 @@ namespace Gablarski.Clients.Windows
 					StartupLog.Error ("Fatal Error", (Exception)e.ExceptionObject);
 
 				if (Raygun != null)
-					Raygun.Send ((Exception) e.ExceptionObject);
+					Raygun.Send ((Exception) e.ExceptionObject, null, Settings.CurrentSettings);
 
 				MessageBox.Show ("Unexpected error" + Environment.NewLine + (e.ExceptionObject as Exception).ToDisplayString(),
 				                 "Unexpected error", MessageBoxButtons.OK, MessageBoxIcon.Error);
