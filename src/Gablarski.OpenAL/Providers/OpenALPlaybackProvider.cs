@@ -111,10 +111,8 @@ namespace Gablarski.OpenAL.Providers
 			if (!this.device.IsOpen)
 				this.device.Open();
 
-			if (Context.CurrentContext == null || Context.CurrentContext.Device != this.device) {
+			if (Context.CurrentContext == null || Context.CurrentContext.Device != this.device)
 				Context.CreateAndActivate (this.device);
-				SourceBuffer.Clear();
-			}
 
 			isOpen = true;
 		}
@@ -233,6 +231,8 @@ namespace Gablarski.OpenAL.Providers
 				if (this.device != null)
 					this.device.Dispose();
 			}
+
+			SourceBuffer.Clear();
 
 			OpenALRunner.RemoveUser();
 			OpenALRunner.RemovePlaybackProvider (this);

@@ -173,7 +173,10 @@ namespace Gablarski.OpenAL
 		public static void Clear()
 		{
 			lock (lck) {
-				foreach (SourceBuffer buffer in Buffers.Values)
+				if (Buffers == null)
+					return;
+
+				foreach (SourceBuffer buffer in Buffers.Values.ToArray())
 					buffer.Dispose();
 
 				Buffers.Clear();
