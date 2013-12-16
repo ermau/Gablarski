@@ -354,7 +354,7 @@ namespace Gablarski.Input.DirectInput
 									int match = 0;
 									for (int i = 0; i < kvp.Key.Length; ++i)
 									{
-										if (state.PressedKeys.Contains (kvp.Key[i]))
+										if (state.IsPressed (kvp.Key[i]))
 											match++;
 									}
 
@@ -379,7 +379,7 @@ namespace Gablarski.Input.DirectInput
 							{
 								bool[] currentState = new bool[keyValues.Length];
 								for (int i = 0; i < keyValues.Length; ++i)
-									currentState[i] = state.AllKeys.Contains (keyValues[i]);
+									currentState[i] = state.IsPressed (keyValues[i]);
 
 								bool up = false;
 								if (keyRecordedState != null)
