@@ -151,9 +151,9 @@ namespace Gablarski.OpenAL.Providers
 					RequireBuffers (bufferStack, source, bufferLen);
 					for (int i = 0; i < bufferLen; ++i)
 					{
-						OpenALAudioFormat format = audioSource.ToOpenALFormat();
+						OpenALAudioFormat format = audioSource.CodecSettings.ToOpenALFormat();
 						SourceBuffer wait = bufferStack.Pop();
-						wait.Buffer (new byte[format.GetBytes ((uint)audioSource.FrameSize)], format, (uint)audioSource.SampleRate);
+						wait.Buffer (new byte[format.GetBytes ((uint)audioSource.CodecSettings.FrameSize)], format, (uint)audioSource.CodecSettings.SampleRate);
 						source.QueueAndPlay (wait);
 					}
 				}
@@ -161,14 +161,14 @@ namespace Gablarski.OpenAL.Providers
 				RequireBuffers (bufferStack, source, 1);
 				SourceBuffer buffer = bufferStack.Pop();
 
-				buffer.Buffer (data, audioSource.ToOpenALFormat(), (uint)audioSource.SampleRate);
+				buffer.Buffer (data, audioSource.CodecSettings.ToOpenALFormat(), (uint)audioSource.CodecSettings.SampleRate);
 				source.QueueAndPlay (buffer);
 			}
 		}
 
 		public IEnumerable<IAudioDevice> GetDevices ()
 		{
-			return OpenAL.GetPlaybackDevices().Cast<IAudioDevice>();
+			return OpenAL.GetPlaybackDevices();
 		}
 
 		public void FreeSource (AudioSource source)
