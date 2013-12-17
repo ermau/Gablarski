@@ -49,8 +49,6 @@ namespace Gablarski.iTunes
 	public class iTunesIntegration
 		: IControlMediaPlayer
 	{
-		#region IMediaPlayer Members
-
 		/// <summary>
 		/// Gets whether or not the media player is currently running.
 		/// </summary>
@@ -157,10 +155,6 @@ namespace Gablarski.iTunes
 			}
 		}
 
-		#endregion
-
-		#region IControlMediaPlayer Members
-
 		public void Play ()
 		{
 			try
@@ -231,15 +225,13 @@ namespace Gablarski.iTunes
 			}
 		}
 
-		#endregion
-
-		private iTunesAppClass itunes;
-		private iTunesAppClass iTunes
+		private iTunesApp itunes;
+		private iTunesApp iTunes
 		{
 			get
 			{
 				if (itunes == null)
-					itunes = new iTunesAppClass();
+					itunes = new iTunesApp();
 
 				return itunes;
 			}
