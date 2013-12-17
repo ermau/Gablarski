@@ -70,7 +70,7 @@ namespace Gablarski.SpeechNotifier
 			get { return this.audioSource; }
 			set
 			{
-				if (!SupportedFormats.Contains (value, AudioFormatEqualityComparer.Comparer))
+				if (!SupportedFormats.Contains (value.CodecSettings, AudioFormatEqualityComparer.Comparer))
 					throw new ArgumentException ("The audio source's format is unsupported", "value");
 
 				this.audioSource = value;
@@ -91,7 +91,7 @@ namespace Gablarski.SpeechNotifier
 
 			lock (speech)
 			{
-				speech.SetOutputToAudioStream (this.voiceBuffer, this.formats[source]);
+				speech.SetOutputToAudioStream (this.voiceBuffer, this.formats[source.CodecSettings]);
 				speech.Speak (say);
 
 				byte[] output = this.voiceBuffer.ToArray();
