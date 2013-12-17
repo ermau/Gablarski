@@ -60,8 +60,8 @@ namespace Gablarski.Tests
 
 			var cs = provider.GetConnections (GablarskiProtocol.Instance);
 
-			this.clientContext = new SerializationContext (cs.Item1, GablarskiProtocol.Instance);
-			this.serverContext = new SerializationContext (cs.Item2, GablarskiProtocol.Instance);
+			this.clientContext = new SerializationContext (cs.Item1, new Dictionary<byte, Protocol> { { 42, GablarskiProtocol.Instance } });
+			this.serverContext = new SerializationContext (cs.Item2, new Dictionary<byte, Protocol> { { 42, GablarskiProtocol.Instance } });
 		}
 
 		[Test]
