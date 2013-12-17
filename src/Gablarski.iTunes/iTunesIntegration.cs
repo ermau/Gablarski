@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009-2013, Eric Maupin
+﻿// Copyright (c) 2011, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -49,6 +49,8 @@ namespace Gablarski.iTunes
 	public class iTunesIntegration
 		: IControlMediaPlayer
 	{
+		#region IMediaPlayer Members
+
 		/// <summary>
 		/// Gets whether or not the media player is currently running.
 		/// </summary>
@@ -155,6 +157,10 @@ namespace Gablarski.iTunes
 			}
 		}
 
+		#endregion
+
+		#region IControlMediaPlayer Members
+
 		public void Play ()
 		{
 			try
@@ -225,13 +231,15 @@ namespace Gablarski.iTunes
 			}
 		}
 
-		private iTunesApp itunes;
-		private iTunesApp iTunes
+		#endregion
+
+		private iTunesAppClass itunes;
+		private iTunesAppClass iTunes
 		{
 			get
 			{
 				if (itunes == null)
-					itunes = new iTunesApp();
+					itunes = new iTunesAppClass();
 
 				return itunes;
 			}
