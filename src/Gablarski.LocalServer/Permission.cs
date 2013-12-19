@@ -42,7 +42,8 @@ namespace Gablarski.LocalServer
 	{
 		public virtual int Id
 		{
-			get; private set;
+			get;
+			protected set;
 		}
 
 		public virtual PermissionName Name

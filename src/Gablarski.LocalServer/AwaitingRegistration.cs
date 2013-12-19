@@ -43,7 +43,7 @@ namespace Gablarski.LocalServer
 		public virtual int Id
 		{
 			get;
-			private set;
+			protected set;
 		}
 
 		public virtual string Username
