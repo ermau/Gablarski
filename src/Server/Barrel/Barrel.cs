@@ -34,10 +34,13 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
+using System;
 using System.Configuration;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
+using System.Security.Cryptography;
 using Gablarski.Barrel.Config;
 using Gablarski.Server;
 using Tempest;
@@ -88,8 +91,35 @@ namespace Gablarski.Barrel
 				ServerLogo = serverConfig.LogoURL
 			}, providers.Users, providers.Permissions, providers.Channels);
 
-			if (serverConfig.Network)
-				server.AddConnectionProvider (new UdpConnectionProvider (serverConfig.Port, GablarskiProtocol.Instance));
+			if (serverConfig.Network) {
+				var keyFile = new FileInfo ("server.key");
+				RSAAsymmetricKey key = null;
+				if (keyFile.Exists) {
+					try {
+						using (var stream = File.OpenRead (keyFile.FullName)) {
+							var reader = new StreamValueReader (stream);
+							RSAParameters parameters = RSAParametersSerializer.Deserialize (reader);
+							key = new RSAAsymmetricKey (parameters);
+						}
+					} catch (Exception ex) {
+						Trace.TraceWarning ("Failed to read key: {0}", ex);
+						keyFile.Delete();
+					}
+				}
+
+				if (!keyFile.Exists) {
+					var rsa = new RSACrypto();
+					RSAParameters parameters = rsa.ExportKey (true);
+					key = new RSAAsymmetricKey (parameters);
+			
+					using (var stream = File.OpenWrite (keyFile.FullName)) {
+						var writer = new StreamValueWriter (stream);
+						RSAParametersSerializer.Serialize (writer, parameters);
+					}
+				}
+
+				server.AddConnectionProvider (new UdpConnectionProvider (serverConfig.Port, GablarskiProtocol.Instance, key));
+			}
 
 			foreach (IConnectionProvider provider in providers.ConnectionProviders)
 				server.AddConnectionProvider (provider, ExecutionMode.GlobalOrder);
@@ -97,6 +127,48 @@ namespace Gablarski.Barrel
 			server.Start();
 
 			log.Info ("Server started");
+		}
+
+		sealed class RSAParametersSerializer
+			: ISerializer<RSAParameters>
+		{
+			public static readonly RSAParametersSerializer Instance = new RSAParametersSerializer();
+
+			public static void Serialize (IValueWriter writer, RSAParameters element)
+			{
+				Instance.Serialize (null, writer, element);
+			}
+
+			public static RSAParameters Deserialize (IValueReader reader)
+			{
+				return Instance.Deserialize (null, reader);
+			}
+
+			public void Serialize (ISerializationContext context, IValueWriter writer, RSAParameters element)
+			{
+				writer.WriteBytes (element.D);
+				writer.WriteBytes (element.DP);
+				writer.WriteBytes (element.DQ);
+				writer.WriteBytes (element.Exponent);
+				writer.WriteBytes (element.InverseQ);
+				writer.WriteBytes (element.Modulus);
+				writer.WriteBytes (element.P);
+				writer.WriteBytes (element.Q);
+			}
+
+			public RSAParameters Deserialize (ISerializationContext context, IValueReader reader)
+			{
+				return new RSAParameters {
+					D = reader.ReadBytes(),
+					DP = reader.ReadBytes(),
+					DQ = reader.ReadBytes(),
+					Exponent = reader.ReadBytes(),
+					InverseQ = reader.ReadBytes(),
+					Modulus = reader.ReadBytes(),
+					P = reader.ReadBytes(),
+					Q = reader.ReadBytes()
+				};
+			}
 		}
 	}
 }
