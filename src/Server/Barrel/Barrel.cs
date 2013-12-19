@@ -127,6 +127,9 @@ namespace Gablarski.Barrel
 			server.Start();
 
 			log.Info ("Server started");
+
+			while (true)
+				Console.ReadKey();
 		}
 
 		sealed class RSAParametersSerializer
