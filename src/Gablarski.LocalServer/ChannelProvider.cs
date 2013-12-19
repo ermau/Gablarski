@@ -94,7 +94,7 @@ namespace Gablarski.LocalServer
 		public IEnumerable<IChannelInfo> GetChannels()
 		{
 			using (ISession session = Persistance.SessionFactory.OpenSession())
-				return session.Linq<LocalChannelInfo>().Cast<IChannelInfo>().ToList();
+				return session.Query<LocalChannelInfo>().Cast<IChannelInfo>().ToList();
 		}
 
 		public ChannelEditResult SaveChannel (IChannelInfo channel)
@@ -167,8 +167,8 @@ namespace Gablarski.LocalServer
 
 		private LocalChannelInfo GetDefaultChannel (ISession session)
 		{
-			var channel = session.Linq<LocalChannelInfo>().SingleOrDefault (c => c.IsDefault);
-			if (channel == null && !session.Linq<LocalChannelInfo>().Any())
+			var channel = session.Query<LocalChannelInfo>().SingleOrDefault (c => c.IsDefault);
+			if (channel == null && !session.Query<LocalChannelInfo>().Any())
 				CreateLobby (session);
 
 			return channel;

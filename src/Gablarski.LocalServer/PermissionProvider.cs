@@ -68,7 +68,7 @@ namespace Gablarski.LocalServer
 				{
 					foreach (var permission in permissions)
 					{
-						Permission realp = session.Linq<Permission>().FirstOrDefault (p => p.UserID == userId && p.Name == permission.Name);
+						Permission realp = session.Query<Permission>().FirstOrDefault (p => p.UserID == userId && p.Name == permission.Name);
 						if (realp == null)
 							CreatePermission (session, permission.Name, userId, permission.ChannelId, permission.IsAllowed);
 						else
@@ -92,7 +92,7 @@ namespace Gablarski.LocalServer
 				{
 					using (var session = Persistance.SessionFactory.OpenSession())
 					{
-						var permissions = session.Linq<Permission>().Where (p => p.UserID == userId);
+						var permissions = session.Query<Permission>().Where (p => p.UserID == userId);
 						foreach (var p in permissions)
 							permissionCache.Add (userId, new Gablarski.Permission (p.Name, p.Allowed));
 					}

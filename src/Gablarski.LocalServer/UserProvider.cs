@@ -74,7 +74,7 @@ namespace Gablarski.LocalServer
 		public IEnumerable<IUser> GetUsers()
 		{
 			using (var session = Persistance.SessionFactory.OpenSession())
-				return session.Linq<LocalUser>().Cast<IUser>().ToList();
+				return session.Query<LocalUser>().Cast<IUser>().ToList();
 		}
 
 		public IEnumerable<string> GetAwaitingRegistrations()
@@ -83,7 +83,7 @@ namespace Gablarski.LocalServer
 				throw new NotSupportedException();
 
 			using (var session = Persistance.SessionFactory.OpenSession())
-				return session.Linq<AwaitingRegistration>().Select (ar => ar.Username).ToList();
+				return session.Query<AwaitingRegistration>().Select (ar => ar.Username).ToList();
 		}
 
 		public void ApproveRegistration (string username)
@@ -96,7 +96,7 @@ namespace Gablarski.LocalServer
 			using (var session = Persistance.SessionFactory.OpenSession())
 			using (var transaction = session.BeginTransaction())
 			{
-				var ar = session.Linq<AwaitingRegistration>().SingleOrDefault (r => r.Username == username);
+				var ar = session.Query<AwaitingRegistration>().SingleOrDefault (r => r.Username == username);
 				if (ar == null)
 					return;
 
@@ -119,7 +119,7 @@ namespace Gablarski.LocalServer
 			using (var session = Persistance.SessionFactory.OpenSession())
 			using (var transaction = session.BeginTransaction())
 			{
-				var ar = session.Linq<AwaitingRegistration>().SingleOrDefault (r => r.Username.Trim().ToLower() == username);
+				var ar = session.Query<AwaitingRegistration>().SingleOrDefault (r => r.Username.Trim().ToLower() == username);
 				if (ar == null)
 					return;
 
@@ -140,7 +140,7 @@ namespace Gablarski.LocalServer
 		public IEnumerable<BanInfo> GetBans()
 		{
 			using (var session = Persistance.SessionFactory.OpenSession())
-				return session.Linq<LocalBanInfo>().Cast<BanInfo>().ToList();
+				return session.Query<LocalBanInfo>().Cast<BanInfo>().ToList();
 		}
 
 		public void AddBan (BanInfo ban)
@@ -168,7 +168,7 @@ namespace Gablarski.LocalServer
 			using (var session = Persistance.SessionFactory.OpenSession())
 			{
 				LocalBanInfo localBan = (ban as LocalBanInfo)
-										?? session.Linq<LocalBanInfo>().FirstOrDefault (b => b.Username == ban.Username || b.IPMask == ban.IPMask);
+										?? session.Query<LocalBanInfo>().FirstOrDefault (b => b.Username == ban.Username || b.IPMask == ban.IPMask);
 
 				if (localBan == null)
 					return;
@@ -184,10 +184,10 @@ namespace Gablarski.LocalServer
 
 			using (var session = Persistance.SessionFactory.OpenSession())
 			{
-				if (session.Linq<LocalBanInfo>().Any (b => b.Username == username))
+				if (session.Query<LocalBanInfo>().Any (b => b.Username == username))
 					return new LoginResult (0, LoginResultState.FailedBanned);
 
-				var user = session.Linq<LocalUser>().FirstOrDefault (u => u.Username == username);
+				var user = session.Query<LocalUser>().FirstOrDefault (u => u.Username == username);
 				if (user == null)
 				{
 					if (password == null && AllowGuests)
@@ -244,7 +244,7 @@ namespace Gablarski.LocalServer
 
 		private bool UserExists (ISession session, string username)
 		{
-			return session.Linq<LocalUser>().Any (u => u.Username == username);
+			return session.Query<LocalUser>().Any (u => u.Username == username);
 		}
 
 		private int guestId;
@@ -256,7 +256,7 @@ namespace Gablarski.LocalServer
 
 		private void CreateUser (ISession session, string username, string hashedPassword)
 		{
-			bool first = !session.Linq<LocalUser>().Any();
+			bool first = !session.Query<LocalUser>().Any();
 
 			var user = new LocalUser { HashedPassword = hashedPassword, Username = username };
 			session.SaveOrUpdate (user);

@@ -57,10 +57,10 @@ namespace Gablarski.LocalServer
 			using (var session = SessionFactory.OpenSession())
 			using (var trans = session.BeginTransaction())
 			{
-				if (!session.Linq<LocalChannelInfo>().Any())
+				if (!session.Query<LocalChannelInfo>().Any())
 					ChannelProvider.Setup (session);
 
-				if (!session.Linq<Permission>().Any())
+				if (!session.Query<Permission>().Any())
 					PermissionProvider.Setup (session);
 
 				trans.Commit();
