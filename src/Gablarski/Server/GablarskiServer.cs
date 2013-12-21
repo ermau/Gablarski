@@ -174,12 +174,12 @@ namespace Gablarski.Server
 			get { return this.authProvider; }
 		}
 
-		IEnumerable<IConnection>  IGablarskiServerContext.Connections
+		IEnumerable<IConnection> IGablarskiServerContext.Connections
 		{
 			get
 			{
 				lock (this.syncRoot)
-					return this.connections.ToArray();
+					return this.userManager.GetConnections();
 			}
 		}
 
