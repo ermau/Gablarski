@@ -16,7 +16,7 @@
 		<Slider Name="slider"
 				Minimum="{Binding ElementName=root,Path=Minimum}"
 				Maximum="{Binding ElementName=root,Path=Maximum}"
-				Value="{Binding ElementName=root,Path=Value}"
+				Value="{Binding ElementName=root,Path=Value,UpdateSourceTrigger=PropertyChanged}"
 				LargeChange="{Binding ElementName=root,Path=LargeChange}"
 				SmallChange="{Binding ElementName=root,Path=SmallChange}"
 				TickFrequency="{Binding ElementName=root,Path=TickFrequency}"

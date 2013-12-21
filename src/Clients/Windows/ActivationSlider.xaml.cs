@@ -26,7 +26,7 @@ namespace Gablarski.Clients.Windows
 		}
 
 		public static readonly DependencyProperty ValueProperty = DependencyProperty.Register (
-			"Value", typeof (int), typeof (ActivationSlider), new PropertyMetadata (default(int)));
+			"Value", typeof (int), typeof (ActivationSlider), new FrameworkPropertyMetadata (default(int)) { DefaultUpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged, BindsTwoWayByDefault = true });
 
 		public int Value
 		{
