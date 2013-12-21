@@ -116,7 +116,7 @@ namespace Gablarski
 				settings = new ServerSettings();
 
 				server = new GablarskiServer (settings, authorization, permissions, channels);
-				server.AddConnectionProvider (new UdpConnectionProvider (GablarskiProtocol.Port, GablarskiProtocol.Instance, key));
+				server.AddConnectionProvider (new UdpConnectionProvider (GablarskiProtocol.Port, GablarskiProtocol.Instance, key), ExecutionMode.GlobalOrder);
 
 				server.Start();
 			}
