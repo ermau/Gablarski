@@ -45,11 +45,6 @@ namespace Gablarski.OpenAL.Providers
 	public class OpenALCaptureProvider
 		: IAudioCaptureProvider
 	{
-		public OpenALCaptureProvider()
-		{
-			OpenALRunner.AddUser();
-		}
-
 		public event EventHandler<SamplesAvailableEventArgs> SamplesAvailable;
 
 		public int AvailableSampleCount
@@ -95,6 +90,7 @@ namespace Gablarski.OpenAL.Providers
 		public void BeginCapture (AudioFormat format, int captureFrameSize)
 		{
 			CheckState();
+			OpenALRunner.AddUser();
 
 			if (!this.isOpened)
 			{
