@@ -284,8 +284,11 @@ namespace Gablarski.Clients.Windows
 			if (source == null)
 				return;
 
-			if (this.InvokeRequired)
-			{
+			IUserInfo user = client.Users[source.OwnerId];
+			if (user == null)
+				return;
+
+			if (InvokeRequired) {
 				BeginInvoke ((Action<AudioSource, bool>)MarkTalking, source, ignoreStates);
 				return;
 			}
@@ -293,11 +296,10 @@ namespace Gablarski.Clients.Windows
 			TreeNode node;
 			if (Settings.DisplaySources && sourceNodes.TryGetValue (source, out node))
 				SetupUserContext (node.Parent);
-			else if (userNodes.TryGetValue (client.Users[source.OwnerId], out node))
+			else if (userNodes.TryGetValue (user, out node))
 				SetupUserContext (node);
 
-			if (node != null && (ignoreStates || !NodeInState (node)))
-			{
+			if (node != null && (ignoreStates || !NodeInState (node))) {
 				node.ImageKey = "talking";
 				node.SelectedImageKey = "talking";
 			}
