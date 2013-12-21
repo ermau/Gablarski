@@ -221,6 +221,7 @@
     <Compile Include="InputForm.Designer.cs">
       <DependentUpon>InputForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="NotificationTypeConverter.cs" />
     <Compile Include="PersonaSetupWindow.xaml.cs">
       <DependentUpon>PersonaSetupWindow.xaml</DependentUpon>
     </Compile>
@@ -236,6 +237,9 @@
       <DependentUpon>RegisterForm.cs</DependentUpon>
     </Compile>
     <Compile Include="ResourceWebRequestFactory.cs" />
+    <Compile Include="SettingsWindow.xaml.cs">
+      <DependentUpon>SettingsWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UserTreeView.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -402,6 +406,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="PersonaSetupWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SettingsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

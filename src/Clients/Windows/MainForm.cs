@@ -1133,8 +1133,8 @@ namespace Gablarski.Clients.Windows
 		{
 			DisableInput();
 
-			SettingsForm settingsForm = new SettingsForm();
-			settingsForm.ShowDialog();
+			SettingsWindow settingsWindow = new SettingsWindow();
+			settingsWindow.ShowDialog();
 
 			if (inputProvider == null)
 				await SetupInputAsync();

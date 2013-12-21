@@ -55,7 +55,7 @@ namespace Gablarski.Clients.ViewModels
 			if (recordCommand == null)
 				throw new ArgumentNullException ("recordCommand");
 
-			this.RecordCommand = recordCommand;
+			RecordCommand = recordCommand;
 			this.window = window;
 			RemoveCommand = new RelayCommand<CommandBindingViewModel> (b => this.bindings.Remove (b));
 		}

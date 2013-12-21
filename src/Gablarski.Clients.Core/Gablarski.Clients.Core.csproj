@@ -128,16 +128,24 @@
     <Compile Include="Settings.cs" />
     <Compile Include="Updater.cs" />
     <Compile Include="ViewModels\AddBuddyViewModel.cs" />
+    <Compile Include="ViewModels\AudioCaptureSettingsViewModel.cs" />
+    <Compile Include="ViewModels\AudioPlaybackSettingsViewModel.cs" />
     <Compile Include="ViewModels\BindingListViewModel.cs" />
     <Compile Include="ViewModels\BuddyListViewModel.cs" />
     <Compile Include="ViewModels\ChatViewModel.cs" />
     <Compile Include="ViewModels\CommandBindingViewModel.cs" />
+    <Compile Include="ViewModels\DeviceViewModel.cs" />
     <Compile Include="ViewModels\GroupViewModel.cs" />
+    <Compile Include="ViewModels\InputSettingsViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\Messenger.cs" />
+    <Compile Include="ViewModels\MusicSettingsViewModel.cs" />
+    <Compile Include="ViewModels\NotificationSettingsViewModel.cs" />
+    <Compile Include="ViewModels\NotificationTypeViewModel.cs" />
     <Compile Include="ViewModels\ObservableFilter.cs" />
     <Compile Include="ViewModels\PersonaSetupViewModel.cs" />
     <Compile Include="ViewModels\RelayCommand.cs" />
+    <Compile Include="ViewModels\SettingsViewModel.cs" />
     <Compile Include="ViewModels\TextMessage.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
   </ItemGroup>

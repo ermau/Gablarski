@@ -1,0 +1,266 @@
+﻿<Window x:Class="Gablarski.Clients.Windows.SettingsWindow"
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:vm="clr-namespace:Gablarski.Clients.ViewModels;assembly=Gablarski.Clients"
+		xmlns:system="clr-namespace:System;assembly=mscorlib"
+		xmlns:gb="clr-namespace:Gablarski.Clients.Windows"
+		mc:Ignorable="d"
+		d:DataContext="{d:DesignInstance vm:SettingsViewModel}"
+		Title="Settings" MinHeight="450" MinWidth="510" Height="450" Width="510">
+	<Window.Resources>
+		<DataTemplate x:Key="NameTemplate" DataType="vm:DeviceViewModel">
+			<TextBlock Text="{Binding DisplayName}" />
+		</DataTemplate>
+		
+		<BooleanToVisibilityConverter x:Key="VisibilityConverter" />
+		
+		<Style TargetType="Label">
+			<Setter Property="VerticalAlignment" Value="Center" />
+		</Style>
+		
+		<Style TargetType="ComboBox">
+			<Setter Property="VerticalAlignment" Value="Center" />
+		</Style>
+		
+		<Style TargetType="Slider">
+			<Setter Property="Margin" Value="5,0,5,0" />
+		</Style>
+
+		<Style TargetType="Grid" x:Key="TabContents">
+			<Setter Property="Margin" Value="4" />
+		</Style>
+		
+		<system:String x:Key="SilenceThresholdTooltip">The amount of time you can be silent before voice activation stops</system:String>
+	</Window.Resources>
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+		
+		<TabControl Grid.Row="0">
+			<TabItem Header="Playback" DataContext="{Binding Playback}">
+				<Grid Style="{StaticResource TabContents}">
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto" />
+						<RowDefinition Height="30" />
+						<RowDefinition Height="30" />
+					</Grid.RowDefinitions>
+					
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="110" />
+						<ColumnDefinition />
+					</Grid.ColumnDefinitions>
+
+					<Grid Grid.Row="0" Grid.ColumnSpan="2">
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="Auto" />
+						</Grid.RowDefinitions>
+
+						<Label Content="Volume:" Grid.Row="0" Target="{Binding ElementName=volume}" />
+						<Slider Name="volume" Grid.Row="1" TickPlacement="BottomRight" Value="100" Maximum="500" SmallChange="1" TickFrequency="50" LargeChange="10" />
+					</Grid>
+					
+					<Label Grid.Row="1" Grid.Column="0" Target="{Binding ElementName=playbackProvider}">Playback Provider:</Label>
+					<ComboBox Name="playbackProvider" Grid.Row="1" Grid.Column="1" ItemsSource="{Binding PlaybackProviders}" SelectedItem="{Binding CurrentPlaybackProvider}"/>
+					
+					<Label Grid.Row="2" Grid.Column="0" Target="{Binding ElementName=playbackDevice}">Playback Device:</Label>
+					<ComboBox Name="playbackDevice" Grid.Row="2" Grid.Column="1" ItemsSource="{Binding PlaybackDevices}" ItemTemplate="{StaticResource NameTemplate}" SelectedItem="{Binding CurrentPlaybackDevice}" />
+				</Grid>
+			</TabItem>
+			<TabItem Header="Voice" DataContext="{Binding Capture}">
+				<Grid Style="{StaticResource TabContents}">
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto" />
+						<RowDefinition Height="30" />
+						<RowDefinition Height="30" />
+					</Grid.RowDefinitions>
+					
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="110" />
+						<ColumnDefinition />
+					</Grid.ColumnDefinitions>
+					
+					<GroupBox Grid.Row="0" Grid.ColumnSpan="2">
+						<GroupBox.Header>
+							<CheckBox IsChecked="{Binding UseVoiceActivation}">Voice Activation</CheckBox>
+						</GroupBox.Header>
+						
+						<Grid>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="Auto" />
+								<RowDefinition Height="Auto" />
+								<RowDefinition Height="Auto" />
+								<RowDefinition Height="Auto" />
+								<RowDefinition Height="Auto" />
+							</Grid.RowDefinitions>
+
+							<StackPanel Grid.Row="0"  Orientation="Horizontal">
+								<Label Target="{Binding ElementName=sensitivity}">Sensitivity:</Label>
+								<Image Visibility="{Binding IsActivating,Converter={StaticResource VisibilityConverter}}" Source="resx://SoundImage" />
+							</StackPanel>
+							
+							<gb:ActivationSlider x:Name="sensitivity" Grid.Row="1" Value="{Binding VoiceActivationThreshold}" ActivationLevel="{Binding ActivationLevel}" Maximum="8000" LargeChange="500" SmallChange="50" TickFrequency="100" />
+							
+							<Grid Grid.Row="2">
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition />
+									<ColumnDefinition />
+								</Grid.ColumnDefinitions>
+								
+								<TextBlock Grid.Column="0" Text="Whisper" />
+								<TextBlock Grid.Column="1" Text="Yell" HorizontalAlignment="Right" />
+							</Grid>
+							
+							<StackPanel Grid.Row="3" Orientation="Horizontal">
+								<Label Target="{Binding ElementName=silenceThreshold}" ToolTip="{StaticResource SilenceThresholdTooltip}">Silence threshold:</Label>
+								<TextBlock VerticalAlignment="Center" Margin="5,0,0,0" Text="{Binding VoiceActivationSilenceTime.TotalSeconds, StringFormat={}{0:N2}s}" />
+							</StackPanel>
+
+							<Slider Name="silenceThreshold" Grid.Row="4" Value="{Binding VoiceActivationSilenceThreshold}" TickPlacement="BottomRight" Maximum="30" SmallChange="1" LargeChange="5" ToolTip="{StaticResource SilenceThresholdTooltip}" />
+							
+						</Grid>
+					</GroupBox>
+					
+					<Label Grid.Row="1" Grid.Column="0" Target="{Binding ElementName=captureProvider}">Capture Provider:</Label>
+					<ComboBox Name="captureProvider" Grid.Row="1" Grid.Column="1" ItemsSource="{Binding CaptureProviders}" SelectedItem="{Binding CurrentCaptureProvider}" />
+
+					<Label Grid.Row="2" Grid.Column="0" Target="{Binding ElementName=captureDevice}">Capture Device:</Label>
+					<ComboBox Name="captureDevice" Grid.Row="2" Grid.Column="1" ItemsSource="{Binding CaptureDevices}" ItemTemplate="{StaticResource NameTemplate}" SelectedItem="{Binding CurrentCaptureDevice}" />
+				</Grid>
+			</TabItem>
+			<TabItem Header="Controls" DataContext="{Binding Input}">
+				<Grid Style="{StaticResource TabContents}">
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto" />
+						<RowDefinition Height="Auto" />
+						<RowDefinition />
+						<RowDefinition Height="Auto" />
+					</Grid.RowDefinitions>
+					
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="110" />
+						<ColumnDefinition />
+					</Grid.ColumnDefinitions>
+					
+					<Label Grid.Row="0">Input Provider:</Label>
+					<ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding InputProviders}" SelectedItem="{Binding Bindings.InputProvider}">
+						<ComboBox.ItemTemplate>
+							<DataTemplate>
+								<TextBlock Text="{Binding Name}" />
+							</DataTemplate>
+						</ComboBox.ItemTemplate>
+					</ComboBox>
+
+					<Label Grid.Row="1" Grid.Column="0" Target="{Binding ElementName=bindings}">Bindings:</Label>
+					<gb:BindingList Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" x:Name="bindings" DataContext="{Binding Bindings}" />
+					<TextBlock Grid.Row="3" Grid.Column="1" HorizontalAlignment="Right" Margin="0,3,0,0">
+						<Hyperlink Command="{Binding NewBinding}">Add Binding...</Hyperlink>
+					</TextBlock>
+
+				</Grid>
+			</TabItem>		
+			<TabItem Header="Music" DataContext="{Binding Music}">
+				<Grid Style="{StaticResource TabContents}">
+					<Grid.RowDefinitions>
+						<RowDefinition Height="25" />
+						<RowDefinition Height="Auto" />
+						<RowDefinition Height="Auto" />
+						<RowDefinition Height="Auto" />
+						<RowDefinition Height="Auto" />
+						<RowDefinition Height="Auto" />
+						<RowDefinition Height="Auto" />
+						<RowDefinition />
+					</Grid.RowDefinitions>
+					
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition />
+						<ColumnDefinition />
+					</Grid.ColumnDefinitions>
+					
+					<CheckBox IsChecked="{Binding EnableVolumeControl}" Grid.Row="0" Grid.Column="0">Enable volume control</CheckBox>
+					<CheckBox IsChecked="{Binding IgnoreYourSources}" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right">Ignore your sources</CheckBox>
+					
+					<Label Grid.Row="1" Grid.Column="0" Target="{Binding ElementName=talkingVolume}">Music volume when talking:</Label>
+					<Slider Value="{Binding TalkingVolume}" Name="talkingVolume" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" TickPlacement="BottomRight" />
+					<TextBlock Grid.Row="3" Grid.Column="0" Margin="5,0,0,0">0%</TextBlock>
+					<TextBlock Grid.Row="3" Grid.Column="1" HorizontalAlignment="Right">100%</TextBlock>
+
+					<StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,10,0,0">
+						<Label Target="{Binding ElementName=normalVolume}">Normal Volume:</Label>
+						<CheckBox IsChecked="{Binding UseMusicCurrentVolume}" Name="useCurrentMusicVolume" Margin="5,0,0,0" VerticalAlignment="Center" Checked="UseCurrentMusicVolumeChecked">Use music's current volume</CheckBox>
+					</StackPanel>
+					<Slider Value="{Binding NormalVolume}" Name="normalVolume" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" TickPlacement="BottomRight" />
+					
+					<TextBlock Grid.Row="6" Grid.Column="0" Margin="5,0,0,0">0%</TextBlock>
+					<TextBlock Grid.Row="6" Grid.Column="1" HorizontalAlignment="Right">100%</TextBlock>
+					
+					<ListBox ItemsSource="{Binding MediaPlayers}" Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,10,5,0">
+						<ListBox.ItemTemplate>
+							<DataTemplate>
+								<CheckBox IsChecked="{Binding IsEnabled}" Content="{Binding Player.Name}" />
+							</DataTemplate>
+						</ListBox.ItemTemplate>
+					</ListBox>
+				</Grid>
+			</TabItem>
+			
+			<TabItem Header="Notifications" DataContext="{Binding Notifications}">
+				<Grid Style="{StaticResource TabContents}">
+					<Grid.RowDefinitions>
+						<RowDefinition Height="25" />
+						<RowDefinition Height="*" />
+						<RowDefinition Height="Auto" />
+						<RowDefinition Height="*" />
+					</Grid.RowDefinitions>
+
+					<CheckBox IsChecked="{Binding NotificationsEnabled}" Name="notificationsEnabled" Grid.Row="0" VerticalAlignment="Center">Enable Notifications</CheckBox>
+
+					<ListBox Grid.Row="1" ItemsSource="{Binding Notifiers}" IsEnabled="{Binding IsChecked,ElementName=notificationsEnabled}" SelectedItem="{Binding CurrentNotifier}">
+						<ListBox.ItemTemplate>
+							<DataTemplate>
+								<StackPanel Orientation="Horizontal">
+									<CheckBox IsChecked="{Binding IsEnabled}" />
+									<TextBlock Text="{Binding Notifier.Name}" Margin="5,0,0,0" VerticalAlignment="Center" />
+								</StackPanel>
+							</DataTemplate>
+						</ListBox.ItemTemplate>
+					</ListBox>
+
+					<Label Grid.Row="2" Target="{Binding ElementName=enabledNotifications}">Notifications:</Label>
+
+					<ListBox Name="enabledNotifications" Grid.Row="3" ItemsSource="{Binding EnabledNotifications}" IsEnabled="{Binding IsChecked,ElementName=notificationsEnabled}">
+						<ListBox.Resources>
+							<gb:NotificationTypeConverter x:Key="NotificationTypeConverter" />
+						</ListBox.Resources>
+						<ListBox.ItemTemplate>
+							<DataTemplate>
+								<StackPanel Orientation="Horizontal">
+									<CheckBox IsChecked="{Binding IsEnabled}" />
+									<TextBlock Text="{Binding Type,Converter={StaticResource NotificationTypeConverter}}" Margin="5,0,0,0" VerticalAlignment="Center" />
+								</StackPanel>
+							</DataTemplate>
+						</ListBox.ItemTemplate>
+					</ListBox>
+				</Grid>
+			</TabItem>
+		</TabControl>
+		
+		<StackPanel Grid.Row="1" Orientation="Horizontal" Height="30" HorizontalAlignment="Right">
+			<StackPanel.Resources>
+				<Style TargetType="Button">
+					<Setter Property="Margin" Value="3" />
+					<Setter Property="MinWidth" Value="75" />
+					<Setter Property="Height" Value="21" />
+				</Style>
+			</StackPanel.Resources>
+			
+			<Button IsDefault="True" Command="{Binding SaveCommand}">Ok</Button>
+			<Button Command="{Binding CloseCommand}">Cancel</Button>
+		</StackPanel>
+	</Grid>
+</Window>

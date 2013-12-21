@@ -398,8 +398,8 @@ namespace Gablarski.Clients.Windows
 
 		private void settingsButton_Click (object sender, EventArgs e)
 		{
-			SettingsForm sf = new SettingsForm();
-			sf.ShowDialog();
+			SettingsWindow settings = new SettingsWindow();
+			settings.ShowDialog();
 		}
 
 		private void servers_KeyUp (object sender, KeyEventArgs e)
