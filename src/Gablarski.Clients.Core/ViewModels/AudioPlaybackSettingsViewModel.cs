@@ -61,7 +61,7 @@ namespace Gablarski.Clients.ViewModels
 				}
 			}
 
-			Volume = Settings.GlobalVolume;
+			Volume = Settings.GlobalVolume * 100;
 		}
 
 		private double volume;
@@ -151,7 +151,7 @@ namespace Gablarski.Clients.ViewModels
 				? CurrentPlaybackDevice.Device.Name
 				: null;
 
-			Settings.GlobalVolume = (float)Volume;
+			Settings.GlobalVolume = (float)Volume / 100f;
 		}
 	}
 }

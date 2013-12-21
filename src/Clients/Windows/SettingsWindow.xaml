@@ -62,7 +62,7 @@
 						</Grid.RowDefinitions>
 
 						<Label Content="Volume:" Grid.Row="0" Target="{Binding ElementName=volume}" />
-						<Slider Name="volume" Grid.Row="1" TickPlacement="BottomRight" Value="100" Maximum="500" SmallChange="1" TickFrequency="50" LargeChange="10" />
+						<Slider Name="volume" Grid.Row="1" TickPlacement="BottomRight" Value="{Binding Volume}" Maximum="500" SmallChange="1" TickFrequency="50" LargeChange="10" />
 					</Grid>
 					
 					<Label Grid.Row="1" Grid.Column="0" Target="{Binding ElementName=playbackProvider}">Playback Provider:</Label>
