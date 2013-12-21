@@ -213,17 +213,6 @@ namespace Gablarski.Server
 				this.userManager.GetConnection (user).SendAsync (new PermissionsMessage (e.UserId, this.context.PermissionsProvider.GetPermissions (e.UserId)));
 		}
 
-		protected override void OnConnectionDisconnected (object sender, DisconnectedEventArgs e)
-		{
-			IUserInfo user = this.userManager.GetUser (e.Connection);
-			if (user != null) {
-				this.sources.Remove (user);
-				this.users.DisconnectAsync (user, DisconnectionReason.Unknown);
-			}
-
-			base.OnConnectionDisconnected (sender, e);
-		}
-
 		protected override void OnConnectionDisconnectedGlobal (object sender, DisconnectedEventArgs e)
 		{
 			IUserInfo user = this.userManager.GetUser (e.Connection);
@@ -236,15 +225,7 @@ namespace Gablarski.Server
 			base.OnConnectionDisconnectedGlobal (sender, e);
 		}
 
-		protected override void OnConnectionMade (object sender, ConnectionMadeEventArgs e)
-		{
-			lock (this.syncRoot)
-				this.connections.Add (e.Connection);
-
-			base.OnConnectionMade (sender, e);
-		}
-
-		protected override void OnConnectionMadeGlobal(object sender, ConnectionMadeEventArgs e)
+		protected override void OnConnectionMadeGlobal (object sender, ConnectionMadeEventArgs e)
 		{
 			lock (this.syncRoot)
 				this.connections.Add (e.Connection);
