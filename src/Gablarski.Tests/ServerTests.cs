@@ -21,7 +21,7 @@ namespace Gablarski.Tests
 			this.channels = new LobbyChannelProvider();
 			this.users = new GuestUserProvider();
 			this.server = new GablarskiServer (this.settings, this.users, this.permissions, this.channels);
-			this.server.AddConnectionProvider (this.provider = new MockConnectionProvider (GablarskiProtocol.Instance));
+			this.server.AddConnectionProvider (this.provider = new MockConnectionProvider (GablarskiProtocol.Instance), ExecutionMode.GlobalOrder);
 			this.server.Start ();
 		}
 
