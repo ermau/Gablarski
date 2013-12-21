@@ -190,12 +190,6 @@
     <Compile Include="CommentForm.Designer.cs">
       <DependentUpon>CommentForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="DeviceSelector.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="DeviceSelector.Designer.cs">
-      <DependentUpon>DeviceSelector.cs</DependentUpon>
-    </Compile>
     <Compile Include="Extensions.cs" />
     <Compile Include="GroupView.xaml.cs">
       <DependentUpon>GroupView.xaml</DependentUpon>
@@ -263,9 +257,6 @@
     <EmbeddedResource Include="CommentForm.resx">
       <DependentUpon>CommentForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="DeviceSelector.resx">
-      <DependentUpon>DeviceSelector.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="LoginForm.resx">
       <DependentUpon>LoginForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -284,17 +275,8 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Servers.cs" />
-    <Compile Include="SettingsForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="SettingsForm.Designer.cs">
-      <DependentUpon>SettingsForm.cs</DependentUpon>
-    </Compile>
     <EmbeddedResource Include="RegisterForm.resx">
       <DependentUpon>RegisterForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="SettingsForm.resx">
-      <DependentUpon>SettingsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="VolumeForm.resx">
       <DependentUpon>VolumeForm.cs</DependentUpon>
