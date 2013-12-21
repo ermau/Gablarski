@@ -157,7 +157,13 @@ namespace Gablarski.Server
 				e.Connection.SendAsync (new SourceResultMessage (request.Name, result, source));
 				if (result == SourceResult.Succeeded)
 				{
-					context.Connections.Where (c => c != e.Connection).Send (new SourceResultMessage (request.Name, SourceResult.NewSource, source));
+					foreach (IConnection connection in context.Connections)
+					{
+						if (connection == e.Connection)
+							continue;
+
+						connection.SendAsync (new SourceResultMessage (request.Name, SourceResult.NewSource, source));
+					}
 				}
 			}
 		}
@@ -179,7 +185,8 @@ namespace Gablarski.Server
 				return;
 
 			bool muted = manager.ToggleMute (source);
-			context.Connections.Send (new SourceMutedMessage { SourceId = source.Id, Unmuted = !muted });
+			foreach (IConnection connection in this.context.Connections)
+				connection.SendAsync (new SourceMutedMessage { SourceId = source.Id, Unmuted = !muted });
 		}
 
 		internal void RequestSourceListMessage (MessageEventArgs<RequestSourceListMessage> e)
