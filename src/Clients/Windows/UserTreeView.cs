@@ -662,7 +662,7 @@ namespace Gablarski.Clients.Windows
 				un.ContextMenuStrip.Items.Add (copy);
 
 				string comment = target.Comment.Trim();
-				if (comment.StartsWith ("http://") || comment.StartsWith ("www."))
+				if (comment.StartsWith ("http://") || comment.StartsWith ("https://") || comment.StartsWith ("www."))
 				{
 					var gotourl = new ToolStripMenuItem ("Open web page", Resources.LinkImage);
 					gotourl.ToolTipText = "Opens the URL in your web browser";
