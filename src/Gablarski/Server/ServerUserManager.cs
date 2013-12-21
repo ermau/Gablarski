@@ -54,11 +54,14 @@ namespace Gablarski.Server
 			}
 		}
 
-		#region IConnectionManager Members
-
 		public IEnumerable<IConnection> GetConnections()
 		{
 			return connections.ToList();
+		}
+
+		public IEnumerable<IConnection> GetUserConnections()
+		{
+			return this.connectedUsers.Values;
 		}
 
 		public void Connect (IConnection connection)
@@ -301,8 +304,6 @@ namespace Gablarski.Server
 
 			return connection;
 		}
-
-		#endregion
 
 		private readonly HashSet<IConnection> joined = new HashSet<IConnection>();
 		private readonly HashSet<IConnection> loggedIn = new HashSet<IConnection>();

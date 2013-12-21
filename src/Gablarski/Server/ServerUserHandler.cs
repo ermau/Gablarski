@@ -83,6 +83,14 @@ namespace Gablarski.Server
 			get { return (IServerConnection)Manager.GetConnection (user); }
 		}
 
+		/// <summary>
+		/// Gets the connections for joined users.
+		/// </summary>
+		public IEnumerable<IConnection> Connections
+		{
+			get { return Manager.GetUserConnections(); }
+		}
+
 		public void ApproveRegistration (string username)
 		{
 			if (username == null)
@@ -109,36 +117,18 @@ namespace Gablarski.Server
 			if (connection == null)
 				throw new ArgumentNullException ("connection");
 
-			if (connection.IsConnected) {
-				await DisconnectAsync (ic => ic != connection).ConfigureAwait (false);
-				return;
-			}
-
-			IUserInfo user = this.Manager.GetUser (connection);
-			this.Manager.Disconnect (connection);
-
-			if (user != null)
-				await this.context.Users.SendAsync (new UserDisconnectedMessage (user.UserId)).ConfigureAwait (false);
-		}
-
-		public async Task DisconnectAsync (Func<IConnection, bool> predicate)
-		{
-			if (predicate == null)
-				throw new ArgumentNullException ("predicate");
+			IUserInfo user = Manager.GetUser (connection);
+			Manager.Disconnect (connection);
 
 			List<Task> tasks = new List<Task>();
-			foreach (IConnection c in Manager.GetConnections().Where (predicate))
-			{
-				IUserInfo user = Manager.GetUser (c);
-				if (user != null)
-					tasks.Add (context.Users.SendAsync (new UserDisconnectedMessage (user.UserId)));
-
-				tasks.Add (c.DisconnectAsync());
+			if (user != null) {
+				foreach (IConnection c in this.context.Connections)
+					tasks.Add (c.SendAsync (new UserDisconnectedMessage (user.UserId)));
 			}
 
-			await Task.WhenAll (tasks).ConfigureAwait (false);
+			tasks.Add (connection.DisconnectAsync());
 
-			Manager.Disconnect (predicate);
+			await Task.WhenAll (tasks).ConfigureAwait (false);
 		}
 
 		public void Move (IUserInfo user, IChannelInfo channel)
@@ -167,7 +157,9 @@ namespace Gablarski.Server
 				return;
 
 			Manager.Move (realUser, realChannel);
-			this.SendAsync (new UserChangedChannelMessage { ChangeInfo = changeInfo });
+
+			foreach (var connection in Manager.GetConnections())
+				connection.SendAsync (new UserChangedChannelMessage { ChangeInfo = changeInfo });
 		}
 
 		public void Move (IConnection mover, IUserInfo user, IChannelInfo channel)
@@ -185,35 +177,6 @@ namespace Gablarski.Server
 			MoveUser (moverId, user.UserId, channel.ChannelId);
 		}
 
-		public Task SendAsync (Message message, Func<IConnection, bool> predicate)
-		{
-			if (message == null)
-				throw new ArgumentNullException ("message");
-			if (predicate == null)
-				throw new ArgumentNullException ("predicate");
-
-			List<Task> tasks = new List<Task>();
-			foreach (IConnection c in Manager.GetConnections().Where (c => c.IsConnected).Where (predicate))
-				tasks.Add (c.SendAsync (message));
-
-		    return Task.WhenAll (tasks);
-		}
-
-		public Task SendAsync (Message message, Func<IConnection, IUserInfo, bool> predicate)
-		{
-			if (message == null)
-				throw new ArgumentNullException ("message");
-			if (predicate == null)
-				throw new ArgumentNullException ("predicate");
-
-			var connections = from c in Manager.GetConnections()
-			                  let u = Manager.GetUser (c)
-			                  where c.IsConnected && u != null && predicate (c, u)
-			                  select c;
-
-			return Task.WhenAll (connections.Select (c => c.SendAsync (message)));
-		}
-
 		public async Task DisconnectAsync (IUserInfo user, DisconnectionReason reason)
 		{
 			if (user == null)
@@ -228,7 +191,15 @@ namespace Gablarski.Server
 				await c.DisconnectAsync().ConfigureAwait (false);
 			}
 
-			await SendAsync (new UserDisconnectedMessage (user.UserId), ic => ic != c).ConfigureAwait (false);
+			List<Task> tasks = new List<Task>();
+			foreach (IConnection connection in Manager.GetConnections()) {
+				if (connection == c)
+					continue;
+				
+				tasks.Add (connection.SendAsync (new UserDisconnectedMessage (user.UserId)));
+			}
+
+			await Task.WhenAll (tasks).ConfigureAwait (false);
 		}
 
 		public IEnumerator<IUserInfo> GetEnumerator()
@@ -247,13 +218,7 @@ namespace Gablarski.Server
 
 		internal void OnConnectMessage (MessageEventArgs<ConnectMessage> e)
 		{
-			var msg = (ConnectMessage)e.Message;
-
-			//if (msg.ProtocolVersion < this.context.ProtocolVersion)
-			//{
-			//    e.Connection.Send (new ConnectionRejectedMessage (ConnectionRejectedReason.IncompatibleVersion));
-			//    return;
-			//}
+			var msg = e.Message;
 			
 			if (!msg.Host.IsNullOrWhitespace() && msg.Port != 0)
 			{
@@ -275,7 +240,7 @@ namespace Gablarski.Server
 
 		internal void OnJoinMessage (MessageEventArgs<JoinMessage> e)
 		{
-			var join = (JoinMessage)e.Message;
+			var join = e.Message;
 
 			if (!e.Connection.IsConnected)
 				return;
@@ -314,9 +279,8 @@ namespace Gablarski.Server
 				if (!Manager.GetIsLoggedIn (e.Connection))
 					e.Connection.SendAsync (new PermissionsMessage (info.UserId, this.context.PermissionsProvider.GetPermissions (info.UserId)));
 
-				this.SendAsync (new UserJoinedMessage (info));
-
-				//SendInfoMessages (e.Connection);
+				foreach (IConnection connection in this.context.Connections)
+					connection.SendAsync (new UserJoinedMessage (info));
 			}
 			else
 				e.Connection.SendAsync (msg);
@@ -324,7 +288,7 @@ namespace Gablarski.Server
 
 		internal void OnLoginMessage (MessageEventArgs<LoginMessage> e)
 		{
-			var login = (LoginMessage)e.Message;
+			var login = e.Message;
 
 			if (login.Username.IsNullOrWhitespace())
 			{
@@ -345,7 +309,7 @@ namespace Gablarski.Server
 
 		internal void OnRequestUserListMessage (MessageEventArgs<RequestUserListMessage> e)
 		{
-			var msg = (RequestUserListMessage) e.Message;
+			var msg = e.Message;
 
 			if (msg.Mode == UserListMode.Current)
 			{
@@ -380,7 +344,7 @@ namespace Gablarski.Server
 
 		internal void OnRequestMuteUserMessage (MessageEventArgs<RequestMuteUserMessage> e)
 		{
-			var msg = (RequestMuteUserMessage)e.Message;
+			var msg = e.Message;
 
 			if (!context.GetPermission (PermissionName.MuteUser, e.Connection))
 			{
@@ -397,12 +361,13 @@ namespace Gablarski.Server
 			else
 				return;
 
-			this.SendAsync (new UserMutedMessage { UserId = user.UserId, Unmuted = msg.Unmute });
+			foreach (IConnection connection in this.context.Connections)
+				connection.SendAsync (new UserMutedMessage { UserId = user.UserId, Unmuted = msg.Unmute });
 		}
 
 		internal void OnKickUserMessage (MessageEventArgs<KickUserMessage> e)
 		{
-			var msg = (KickUserMessage)e.Message;
+			var msg = e.Message;
 
 			var kicker = context.Users[e.Connection];
 			if (kicker == null)
@@ -424,7 +389,14 @@ namespace Gablarski.Server
 				return;
 			}
 
-			context.Users.SendAsync (new UserKickedMessage { FromServer = msg.FromServer, UserId = msg.UserId });
+			foreach (IUserInfo u in context.Users)
+			{
+				IConnection connection = this.context.Users[user];
+				if (connection == null)
+					continue;
+
+				connection.SendAsync (new UserKickedMessage { FromServer = msg.FromServer, UserId = msg.UserId });
+			}
 
 			if (msg.FromServer)
 				DisconnectAsync (user, DisconnectionReason.Kicked);
@@ -434,7 +406,7 @@ namespace Gablarski.Server
 
 		internal void OnSetCommentMessage (MessageEventArgs<SetCommentMessage> e)
 		{
-			var msg = (SetCommentMessage)e.Message;
+			var msg = e.Message;
 
 			IUserInfo user = Manager.GetUser (e.Connection);
 			if (user == null || user.Comment == msg.Comment)
@@ -442,12 +414,13 @@ namespace Gablarski.Server
 
 			user = Manager.SetComment (user, msg.Comment);
 
-			this.SendAsync (new UserUpdatedMessage (user));
+			foreach (IConnection connection in Manager.GetConnections())
+				connection.SendAsync (new UserUpdatedMessage (user));
 		}
 
 		internal void OnSetStatusMessage (MessageEventArgs<SetStatusMessage> e)
 		{
-			var msg = (SetStatusMessage) e.Message;
+			var msg = e.Message;
 
 			IUserInfo user = Manager.GetUser (e.Connection);
 			if (user == null || user.Status == msg.Status)
@@ -455,12 +428,13 @@ namespace Gablarski.Server
 
 			user = Manager.SetStatus (user, msg.Status);
 
-			this.SendAsync (new UserUpdatedMessage (user));
+			foreach (IConnection connection in Manager.GetConnections())
+				connection.SendAsync (new UserUpdatedMessage (user));
 		}
 
 		internal void OnRegistrationApprovalMessage (MessageEventArgs<RegistrationApprovalMessage> e)
 		{
-			var msg = (RegistrationApprovalMessage)e.Message;
+			var msg = e.Message;
 
 			if (!Manager.GetIsConnected (e.Connection))
 				return;
@@ -486,7 +460,7 @@ namespace Gablarski.Server
 		
 		internal void OnRegisterMessage (MessageEventArgs<RegisterMessage> e)
 		{
-			var msg = (RegisterMessage)e.Message;
+			var msg = e.Message;
 
 			if (!Manager.GetIsConnected (e.Connection))
 				return;
@@ -533,7 +507,7 @@ namespace Gablarski.Server
 
 		internal void OnSetPermissionsMessage (MessageEventArgs<SetPermissionsMessage> e)
 		{
-			var msg = (SetPermissionsMessage)e.Message;
+			var msg = e.Message;
 
 			if (!e.Connection.IsConnected || !context.PermissionsProvider.UpdatedSupported)
 				return;
@@ -689,7 +663,9 @@ namespace Gablarski.Server
 			}
 
 			Manager.Move (user, channel);
-			this.SendAsync (new UserChangedChannelMessage { ChangeInfo = info });
+
+			foreach (IConnection connection in Manager.GetConnections())
+				connection.SendAsync (new UserChangedChannelMessage { ChangeInfo = info });
 		}
 	}
 }

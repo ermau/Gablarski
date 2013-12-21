@@ -1,4 +1,4 @@
-// Copyright (c) 2011, Eric Maupin
+// Copyright (c) 2011-2013, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -36,7 +36,6 @@
 
 using System;
 using System.Collections.Generic;
-using Gablarski.Messages;
 using Tempest;
 
 namespace Gablarski.Server
@@ -60,7 +59,7 @@ namespace Gablarski.Server
 		IChannelProvider ChannelsProvider { get; }
 
 		/// <summary>
-		/// Gets the current connections
+		/// Gets the current connections.
 		/// </summary>
 		IEnumerable<IConnection> Connections { get; }
 

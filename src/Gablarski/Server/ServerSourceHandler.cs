@@ -89,7 +89,8 @@ namespace Gablarski.Server
 
 		public void Remove (AudioSource source)
 		{
-			context.Users.SendAsync (new SourcesRemovedMessage (new[] { source }));
+			foreach (var connection in context.Connections)
+				connection.SendAsync (new SourcesRemovedMessage (new[] { source }));
 
 			manager.Remove (source);
 		}
@@ -100,7 +101,9 @@ namespace Gablarski.Server
 			if (sources == null)
 				return;
 
-			context.Users.SendAsync (new SourcesRemovedMessage (sources));
+			foreach (var connection in context.Connections)
+				connection.SendAsync (new SourcesRemovedMessage (sources));
+
 			manager.Remove (user);
 		}
 
@@ -189,19 +192,24 @@ namespace Gablarski.Server
 
 		internal void ClientAudioSourceStateChangeMessage (MessageEventArgs<ClientAudioSourceStateChangeMessage> e)
 		{
-			var msg = (ClientAudioSourceStateChangeMessage)e.Message;
+			var msg = e.Message;
 
 			IUserInfo speaker;
 			if (!CanSendFromSource (e.Connection, msg.SourceId, out speaker))
 				return;
 
-			context.Users.SendAsync (new AudioSourceStateChangeMessage { Starting = msg.Starting, SourceId = msg.SourceId },
-			                    (con, user) => con != e.Connection);
+			foreach (IConnection connection in context.Users.Connections)
+			{
+				if (connection == e.Connection)
+					continue;
+
+				connection.SendAsync (new AudioSourceStateChangeMessage { Starting = msg.Starting, SourceId = msg.SourceId });
+			}
 		}
 
 		internal void OnClientAudioDataMessage (MessageEventArgs<ClientAudioDataMessage> e)
 		{
-			var msg = (ClientAudioDataMessage)e.Message;
+			var msg = e.Message;
 
 			IUserInfo speaker;
 			if (!CanSendFromSource (e.Connection, msg.SourceId, out speaker))
@@ -219,16 +227,42 @@ namespace Gablarski.Server
 				return;
 			}
 
-			var sendMessage = new ServerAudioDataMessage { Data = msg.Data, Sequence = msg.Sequence, SourceId = msg.SourceId };
-
 			if (msg.TargetType == TargetType.Channel)
 			{
 				for (int i = 0; i < msg.TargetIds.Length; ++i)
-					context.Users.SendAsync (sendMessage, (con, user) => con != e.Connection && user.CurrentChannelId == msg.TargetIds[i]);
+				{
+					foreach (var user in this.context.Users.Where (u => u.CurrentChannelId == msg.TargetIds[i]))
+					{
+						IConnection connection = this.context.Users[user];
+						if (connection == null)
+							continue;
+
+						connection.SendAsync (new ServerAudioDataMessage {
+							Data = msg.Data,
+							Sequence = msg.Sequence,
+							SourceId = msg.SourceId
+						});
+					}
+				}
 			}
 			else if (msg.TargetType == TargetType.User)
 			{
-				context.Users.SendAsync (sendMessage, (con, user) => con != e.Connection && msg.TargetIds.Contains (user.UserId));
+				for (int i = 0; i < msg.TargetIds.Length; ++i)
+				{
+					IUserInfo user = this.context.Users[msg.TargetIds[i]];
+					if (user == null)
+						continue;
+
+					IConnection connection = this.context.Users[user];
+					if (connection == null)
+						continue;
+
+					connection.SendAsync (new ServerAudioDataMessage {
+						Data = msg.Data,
+						Sequence = msg.Sequence,
+						SourceId = msg.SourceId
+					});
+				}
 			}
 		}
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2011, Eric Maupin
+// Copyright (c) 2011-2013, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -43,6 +43,11 @@ namespace Gablarski.Server
 	public interface IConnectionManager
 	{
 		IEnumerable<IConnection> GetConnections();
+
+		/// <summary>
+		/// Gets the connections for joined users.
+		/// </summary>
+		IEnumerable<IConnection> GetUserConnections();
 
 		/// <exception cref="ArgumentNullException"><paramref name="connection"/> is <c>null</c>.</exception>
 		void Connect (IConnection connection);
