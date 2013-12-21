@@ -241,7 +241,7 @@ namespace Gablarski.Server
 					foreach (var user in this.context.Users.Where (u => u.CurrentChannelId == msg.TargetIds[i]))
 					{
 						IConnection connection = this.context.Users[user];
-						if (connection == null)
+						if (connection == null || connection == e.Connection)
 							continue;
 
 						connection.SendAsync (new ServerAudioDataMessage {
@@ -261,7 +261,7 @@ namespace Gablarski.Server
 						continue;
 
 					IConnection connection = this.context.Users[user];
-					if (connection == null)
+					if (connection == null || connection == e.Connection)
 						continue;
 
 					connection.SendAsync (new ServerAudioDataMessage {

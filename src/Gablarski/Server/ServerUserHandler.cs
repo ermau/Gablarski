@@ -391,7 +391,7 @@ namespace Gablarski.Server
 
 			foreach (IUserInfo u in context.Users)
 			{
-				IConnection connection = this.context.Users[user];
+				IConnection connection = this.context.Users[u];
 				if (connection == null)
 					continue;
 
