@@ -74,6 +74,13 @@ namespace Gablarski.OpenAL
 			return this;
 		}
 
+		public void Close()
+		{
+			ThrowIfDisposed();
+
+			alcCloseDevice (this.Handle);
+		}
+
 		/// <summary>
 		/// Creates and returns a new device context.
 		/// </summary>
@@ -98,7 +105,7 @@ namespace Gablarski.OpenAL
 
 		protected override void Dispose (bool disposing)
 		{
-			if (this.Handle == IntPtr.Zero)
+			if (Handle == IntPtr.Zero)
 				return;
 
 			if (disposing)
@@ -109,8 +116,8 @@ namespace Gablarski.OpenAL
 
 			OpenAL.DebugFormat ("Destroying playback device {0}", Name);
 
-			alcCloseDevice (this.Handle);
-			this.Handle = IntPtr.Zero;
+			Close();
+			Handle = IntPtr.Zero;
 			this.disposed = true;
 
 			OpenAL.DebugFormat ("Destroyed playback device {0}", Name);

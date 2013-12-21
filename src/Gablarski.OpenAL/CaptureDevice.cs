@@ -117,7 +117,7 @@ namespace Gablarski.OpenAL
 
 		public void Close ()
 		{
-			Dispose (true);
+			alcCaptureCloseDevice (Handle);
 		}
 
 		/// <summary>
@@ -186,13 +186,13 @@ namespace Gablarski.OpenAL
 
 		protected override void Dispose (bool disposing)
 		{
-			if (this.Handle == IntPtr.Zero)
+			if (Handle == IntPtr.Zero)
 				return;
 
 			OpenAL.DebugFormat ("Destroying capture device {0}", Name);		
 
-			alcCaptureCloseDevice (this.Handle);
-			this.Handle = IntPtr.Zero;
+			Close();
+			Handle = IntPtr.Zero;
 			this.pcm = null;
 			
 			this.disposed = true;
