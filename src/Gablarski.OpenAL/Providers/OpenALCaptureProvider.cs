@@ -1,11 +1,11 @@
-﻿// Copyright (c) 2011, Eric Maupin
+﻿// Copyright (c) 2011-2013, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
 // or without modification, are permitted provided that
 // the following conditions are met:
 //
-// - Redistributions of source code must retain the above 
+// - Redistributions of source code must retain the above
 //   copyright notice, this list of conditions and the
 //   following disclaimer.
 //
@@ -37,7 +37,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
 using Gablarski.Audio;
 
 namespace Gablarski.OpenAL.Providers
@@ -51,7 +50,6 @@ namespace Gablarski.OpenAL.Providers
 			OpenALRunner.AddUser();
 		}
 
-		#region IAudioCaptureProvider Members
 		public event EventHandler<SamplesAvailableEventArgs> SamplesAvailable;
 
 		public int AvailableSampleCount
@@ -109,13 +107,13 @@ namespace Gablarski.OpenAL.Providers
 
 			this.frameSize = captureFrameSize;
 			OpenALRunner.AddCaptureProvider (this);
-			this.IsCapturing = true;
+			IsCapturing = true;
 			this.device.StartCapture();
 		}
 
 		private void OnSamplesAvailable (int samplesAvailable)
 		{
-			var available = this.SamplesAvailable;
+			var available = SamplesAvailable;
 			if (available != null)
 				available (this, new SamplesAvailableEventArgs (this, samplesAvailable));
 		}
@@ -138,41 +136,31 @@ namespace Gablarski.OpenAL.Providers
 			if (!this.device.IsOpen)
 				return;
 
-			this.IsCapturing = false;
+			IsCapturing = false;
 			this.device.StopCapture();
 			OpenALRunner.RemoveCaptureProvider (this);
 		}
 
-		#endregion
-
-		#region IAudioDeviceProvider Members
-		
 		public IEnumerable<IAudioDevice> GetDevices ()
 		{
-			return OpenAL.GetCaptureDevices().Cast<IAudioDevice>();
+			return OpenAL.GetCaptureDevices();
 		}
 
 		public IAudioDevice DefaultDevice
 		{
 			get { return OpenAL.GetDefaultCaptureDevice(); }
 		}
-		
-		#endregion
 
 		public override string ToString()
 		{
 			return "OpenAL Capture";
 		}
-		
-		#region IDisposable Members
 
 		public void Dispose ()
 		{
 			GC.SuppressFinalize (this);
 			Dispose (true);
 		}
-
-		#endregion
 
 		private CaptureDevice device;
 		private bool disposed;
@@ -189,7 +177,7 @@ namespace Gablarski.OpenAL.Providers
 			{
 				if (IsCapturing)
 					EndCapture();
-			
+
 				if (this.device != null)
 					this.device.Dispose();
 			}

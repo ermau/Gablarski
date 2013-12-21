@@ -49,7 +49,7 @@ namespace Gablarski.OpenAL
 	{
 		protected Device (string deviceName)
 		{
-			this.Name = deviceName;
+			Name = deviceName;
 		}
 
 		/// <summary>
@@ -86,52 +86,42 @@ namespace Gablarski.OpenAL
 
 		public override string ToString ()
 		{
-			return this.Name;
-		}
-
-		public static bool operator==(Device d1, Device d2)
-		{
-			bool oneNull = Object.ReferenceEquals (d1, null);
-			bool twoNull = Object.ReferenceEquals (d2, null);
-			if (oneNull && twoNull)
-				return true;
-			else if (!twoNull)
-				return false;
-
-			return d1.Equals (d2);
-		}
-
-		public static bool operator!=(Device d1, Device d2)
-		{
-			return !(d1 == d2);
+			return Name;
 		}
 
 		public override bool Equals (object obj)
 		{
-			var d = (obj as Device);
-			if (d == null)
+			if (ReferenceEquals (null, obj))
 				return false;
-
-			return (d.Name == this.Name);
+			if (ReferenceEquals (this, obj))
+				return true;
+			if (obj.GetType() != GetType())
+				return false;
+			return Equals ((Device) obj);
 		}
 
-		public override int GetHashCode ()
+		protected bool Equals (Device other)
 		{
-			return this.Name.GetHashCode();
+			return string.Equals (Name, other.Name);
+		}
+
+		public override int GetHashCode()
+		{
+			return Name.GetHashCode();
+		}
+
+		public static bool operator == (Device left, Device right)
+		{
+			return Equals (left, right);
+		}
+
+		public static bool operator != (Device left, Device right)
+		{
+			return !Equals (left, right);
 		}
 
 		internal IntPtr Handle;
 		protected bool disposed;
-
-		#region Imports
-		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
-		private static extern IntPtr alcOpenDevice (string deviceName);
-
-		[DllImport ("OpenAL32.dll", CallingConvention = CallingConvention.Cdecl)]
-		private static extern IntPtr alcCloseDevice (IntPtr handle);
-		#endregion
-
-		#region IDisposable Members
 
 		public void Dispose ()
 		{
@@ -143,7 +133,7 @@ namespace Gablarski.OpenAL
 
 		~Device ()
 		{
-			this.Dispose (false);
+			Dispose (false);
 		}
 
 		[Conditional ("DEBUG")]
@@ -152,6 +142,5 @@ namespace Gablarski.OpenAL
 			if (this.disposed)
 				throw new ObjectDisposedException ("Device");
 		}
-		#endregion
 	}
 }
