@@ -1158,5 +1158,29 @@ namespace Gablarski.Tests
 
 			Assert.Fail ("Ban never reached the user provider");
 		}
+
+		[Test]
+		public void DisconnectUser()
+		{
+			var user = JoinAsGuest (server, client, "Nickname");
+
+			handler.DisconnectAsync (user, DisconnectionReason.Unknown).Wait();
+
+			observer.DequeueAndAssertMessage<UserDisconnectedMessage>();
+
+			Assert.IsNull (handler[user], "Connection was still present for user");
+		}
+
+		[Test]
+		public void DisconnectConnection()
+		{
+			var user = JoinAsGuest (server, client, "Nickname");
+
+			handler.DisconnectAsync (server).Wait();
+
+			observer.DequeueAndAssertMessage<UserDisconnectedMessage>();
+
+			Assert.IsNull (handler[user], "Connection was still present for user");
+		}
 	}
 }

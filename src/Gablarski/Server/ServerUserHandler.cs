@@ -186,18 +186,16 @@ namespace Gablarski.Server
 			if (c == null)
 				return;
 
+			Manager.Disconnect (c);
+
 			if (c.IsConnected) {
 				await c.SendAsync (new DisconnectMessage (reason)).ConfigureAwait (false);
 				await c.DisconnectAsync().ConfigureAwait (false);
 			}
 
 			List<Task> tasks = new List<Task>();
-			foreach (IConnection connection in Manager.GetConnections()) {
-				if (connection == c)
-					continue;
-				
+			foreach (IConnection connection in Manager.GetConnections())
 				tasks.Add (connection.SendAsync (new UserDisconnectedMessage (user.UserId)));
-			}
 
 			await Task.WhenAll (tasks).ConfigureAwait (false);
 		}
