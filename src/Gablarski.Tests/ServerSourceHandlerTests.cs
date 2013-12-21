@@ -109,7 +109,7 @@ namespace Gablarski.Tests
 			userManager.Connect (server);
 			userManager.Join (server, user);
 		}
-        
+
 		[TearDown]
 		public void Teardown()
 		{
@@ -189,7 +189,7 @@ namespace Gablarski.Tests
 			Assert.AreEqual (SourceResult.Succeeded, result.SourceResult);
 			Assert.AreEqual ("Name", result.SourceName);
 			Assert.AreEqual ("Name", result.Source.Name);
-			
+
 			AudioCodecArgsTests.AssertAreEqual (audioArgs, result.Source.CodecSettings);
 
 			clientConnection.AssertNoMessage();
@@ -209,7 +209,7 @@ namespace Gablarski.Tests
 			Assert.AreEqual (SourceResult.Succeeded, result.SourceResult);
 			Assert.AreEqual ("Name", result.SourceName);
 			Assert.AreEqual ("Name", result.Source.Name);
-			
+
 			audioArgs.Bitrate = defaultBitrate;
 			AudioCodecArgsTests.AssertAreEqual (audioArgs, result.Source.CodecSettings);
 
@@ -223,12 +223,12 @@ namespace Gablarski.Tests
 
 			var audioArgs = new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 200000, AudioSourceTests.FrameSize, 10);
 			handler.RequestSourceMessage (new MessageEventArgs<RequestSourceMessage> (server, new RequestSourceMessage ("Name", audioArgs)));
-			
+
 			var result = client.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.Succeeded, result.SourceResult);
 			Assert.AreEqual ("Name", result.SourceName);
 			Assert.AreEqual ("Name", result.Source.Name);
-			
+
 			audioArgs.Bitrate = maxBitrate;
 			AudioCodecArgsTests.AssertAreEqual (audioArgs, result.Source.CodecSettings);
 
@@ -242,12 +242,12 @@ namespace Gablarski.Tests
 
 			var audioArgs = new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 1, AudioSourceTests.FrameSize, 10);
 			handler.RequestSourceMessage (new MessageEventArgs<RequestSourceMessage> (server, new RequestSourceMessage ("Name", audioArgs)));
-			
+
 			var result = client.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.Succeeded, result.SourceResult);
 			Assert.AreEqual ("Name", result.SourceName);
 			Assert.AreEqual ("Name", result.Source.Name);
-			
+
 			audioArgs.Bitrate = minBitrate;
 			AudioCodecArgsTests.AssertAreEqual (audioArgs, result.Source.CodecSettings);
 
@@ -309,7 +309,7 @@ namespace Gablarski.Tests
 			c.DisconnectAsync().Wait();
 
 			handler.RequestSourceListMessage (new MessageEventArgs<RequestSourceListMessage> (c, new RequestSourceListMessage ()));
-			
+
 			cl.AssertNoMessage();
 		}
 		
@@ -317,7 +317,7 @@ namespace Gablarski.Tests
 		public void RequestSourceListEmpty()
 		{
 			handler.RequestSourceListMessage (new MessageEventArgs<RequestSourceListMessage> (server, new RequestSourceListMessage()));
-			
+
 			var list = client.DequeueAndAssertMessage<SourceListMessage>();
 			Assert.IsEmpty (list.Sources.ToList());
 

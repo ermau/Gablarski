@@ -11,6 +11,15 @@ using Tempest;
 
 namespace Gablarski.Tests
 {
+	public class ServerConnectionBuffer
+		: ConnectionBuffer, IServerConnection
+	{
+		public ServerConnectionBuffer (IServerConnection connection)
+			: base (connection)
+		{
+		}
+	}
+
 	public class ConnectionBuffer
 		: IConnection
 	{

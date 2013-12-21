@@ -57,7 +57,7 @@ namespace Gablarski.Tests
 		private IServerConnection sobserver;
 		private ConnectionBuffer observer;
 
-		private ConnectionBuffer server;
+		private ServerConnectionBuffer server;
 		private ConnectionBuffer client;
 
 		private MockServerContext context;
@@ -88,7 +88,7 @@ namespace Gablarski.Tests
 			context.Start();
 
 			var cs = provider.GetConnections (GablarskiProtocol.Instance);
-			server = new ConnectionBuffer (cs.Item2);
+			server = new ServerConnectionBuffer (cs.Item2);
 			client = new ConnectionBuffer (cs.Item1);
 
 			var observers = provider.GetConnections (GablarskiProtocol.Instance);
@@ -108,8 +108,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void DisconnectNull()
 		{
-			AsyncAssert.Throws<ArgumentNullException> (() => handler.DisconnectAsync ((IConnection)null));
-			AsyncAssert.Throws<ArgumentNullException> (() => handler.DisconnectAsync ((Func<IConnection, bool>)null));
+			AsyncAssert.Throws<ArgumentNullException> (() => handler.DisconnectAsync (null));
 		}
 
 		[Test]
@@ -173,40 +172,6 @@ namespace Gablarski.Tests
 			Assert.AreEqual (altChannel.ChannelId, move.ChangeInfo.TargetChannelId);
 			Assert.AreEqual (1, move.ChangeInfo.PreviousChannelId);
 			Assert.AreEqual (0, move.ChangeInfo.RequestingUserId);
-		}
-
-		[Test]
-		public void SendAsyncNull()
-		{
-			Assert.Throws<ArgumentNullException> (() => handler.SendAsync (new ConnectMessage(), (Func<IConnection, bool>)null));
-			Assert.Throws<ArgumentNullException> (() => handler.SendAsync (null, c => false));
-			Assert.Throws<ArgumentNullException> (() => handler.SendAsync (new ConnectMessage(), (Func<IConnection, IUserInfo, bool>)null));
-			Assert.Throws<ArgumentNullException> (() => handler.SendAsync (null, (c, u) => false));
-		}
-
-		[Test]
-		public void SendConnection()
-		{
-			Connect();
-
-			var msg = new ConnectMessage { ProtocolVersion = 42 };
-			handler.SendAsync (msg, cc => cc == server);
-
-			client.DequeueAndAssertMessage<ConnectMessage>();
-		}
-
-		[Test]
-		public void SendJoinedUser()
-		{
-			Connect();
-			JoinAsGuest();
-
-			var user = handler.Manager.First();
-
-			var msg = new ConnectMessage { ProtocolVersion = 42 };
-			handler.SendAsync (msg, (cc, u) => cc == server && u == user);
-
-			client.DequeueAndAssertMessage<ConnectMessage>();
 		}
 
 		[Test]
@@ -952,7 +917,7 @@ namespace Gablarski.Tests
 			handler.OnRegistrationApprovalMessage (new MessageEventArgs<RegistrationApprovalMessage> (s,
 				new RegistrationApprovalMessage { Approved = true, UserId = 2 }));
 
-			client.AssertNoMessage();
+			c.AssertNoMessage();
 		}
 
 		[Test]
@@ -973,7 +938,7 @@ namespace Gablarski.Tests
 			handler.OnRegistrationApprovalMessage (new MessageEventArgs<RegistrationApprovalMessage> (s,
 				new RegistrationApprovalMessage { Approved = true, Username = null }));
 
-			client.AssertNoMessage();
+			c.AssertNoMessage();
 		}
 
 		[Test]
@@ -994,7 +959,7 @@ namespace Gablarski.Tests
 			handler.OnRegistrationApprovalMessage (new MessageEventArgs<RegistrationApprovalMessage> (s,
 				new RegistrationApprovalMessage { Approved = true, UserId = 2 }));
 
-			client.AssertNoMessage();
+			c.AssertNoMessage();
 		}
 
 		[Test]
@@ -1020,6 +985,7 @@ namespace Gablarski.Tests
 			var c = new ConnectionBuffer (cs.Item1);
 
 			var admin = JoinAsGuest (s, c, "admin");
+			client.DequeueAndAssertMessage<UserJoinedMessage>();
 
 			var target = JoinAsGuest (server, client, "target");
 			c.DequeueAndAssertMessage<UserJoinedMessage>();
@@ -1028,7 +994,6 @@ namespace Gablarski.Tests
 				new KickUserMessage (target, false)));
 
 			Assert.AreEqual (GablarskiMessageType.KickUser, c.DequeueAndAssertMessage<PermissionDeniedMessage>().DeniedMessage);
-
 
 			permissions.EnablePermissions (admin.UserId, PermissionName.KickPlayerFromServer);
 
@@ -1046,6 +1011,7 @@ namespace Gablarski.Tests
 			var c = new ConnectionBuffer (cs.Item1);
 
 			var admin = JoinAsGuest (s, c, "admin");
+			client.DequeueAndAssertMessage<UserJoinedMessage>();
 
 			var target = JoinAsGuest (server, client, "target");
 			c.DequeueAndAssertMessage<UserJoinedMessage>();
@@ -1054,7 +1020,6 @@ namespace Gablarski.Tests
 				new KickUserMessage (target, true)));
 
 			Assert.AreEqual (GablarskiMessageType.KickUser, c.DequeueAndAssertMessage<PermissionDeniedMessage>().DeniedMessage);
-
 
 			permissions.EnablePermissions (admin.UserId, PermissionName.KickPlayerFromChannel);
 
@@ -1068,10 +1033,11 @@ namespace Gablarski.Tests
 		public void KickUserFromChannel()
 		{
 			var cs = provider.GetConnections (GablarskiProtocol.Instance);
-			var s = new ConnectionBuffer (cs.Item2);
+			var s = new ServerConnectionBuffer (cs.Item2);
 			var c = new ConnectionBuffer (cs.Item1);
 
 			var admin = JoinAsGuest (s, c, "admin");
+			client.DequeueAndAssertMessage<UserJoinedMessage>();
 			permissions.EnablePermissions (admin.UserId, PermissionName.KickPlayerFromChannel);
 			
 			var target = JoinAsGuest (server, client, "target");
@@ -1103,10 +1069,11 @@ namespace Gablarski.Tests
 		public void KickUserFromServer()
 		{
 			var cs = provider.GetConnections (GablarskiProtocol.Instance);
-			var s = new ConnectionBuffer (cs.Item2);
+			var s = new ServerConnectionBuffer (cs.Item2);
 			var c = new ConnectionBuffer (cs.Item1);
 
 			var admin = JoinAsGuest (s, c, "admin");
+			client.DequeueAndAssertMessage<UserJoinedMessage>();
 			permissions.EnablePermissions (admin.UserId, PermissionName.KickPlayerFromServer);
 			
 			var target = JoinAsGuest (server, client, "target");
