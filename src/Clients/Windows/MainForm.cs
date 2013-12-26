@@ -255,6 +255,7 @@ namespace Gablarski.Clients.Windows
 		private AudioSource voiceSource;
 		private AudioSource musicSource;
 
+		private bool playbackDisabled;
 		private void SetupPlayback ()
 		{
 			DisablePlayback();
@@ -285,13 +286,18 @@ namespace Gablarski.Clients.Windows
 
 				BeginInvoke ((Action)(() =>
 				{
-					if (btnMute.Checked)
+					if (btnMute.Checked && !this.playbackDisabled)
 						return;
 
 					btnMute.Image = Resources.SoundMuteImage;
 					btnMute.Checked = false;
 					btnMute.Enabled = true;
 					btnMute.ToolTipText = "Mute Sound";
+
+					if (this.playbackDisabled)
+						btnMuteMic.Checked = false;
+
+					this.playbackDisabled = false;
 				}));
 			}
 			catch (Exception ex)
@@ -305,6 +311,7 @@ namespace Gablarski.Clients.Windows
 
 				BeginInvoke ((Action) (() =>
 				{
+					this.playbackDisabled = true;
 					btnMute.Image = Resources.SoundMuteImage.ToErrorIcon();
 					btnMute.Checked = true;
 					btnMute.Enabled = false;
@@ -328,6 +335,7 @@ namespace Gablarski.Clients.Windows
 			this.audioPlayback.Dispose ();
 		}
 
+		private bool captureDisabled;
 		private void SetupVoiceCapture ()
 		{
 			DisableVoiceCapture();
@@ -363,13 +371,14 @@ namespace Gablarski.Clients.Windows
 
 				BeginInvoke ((Action)(() =>
 				{
-					if (btnMute.Checked)
+					if (btnMute.Checked && !this.captureDisabled)
 						return;
 
 					btnMuteMic.Image = Resources.CaptureMuteImage;
 					btnMuteMic.Checked = false;
 					btnMuteMic.Enabled = true;
 					btnMuteMic.ToolTipText = "Mute Microphone";
+					this.captureDisabled = false;
 				}));
 			}
 			catch (Exception ex)
@@ -383,6 +392,7 @@ namespace Gablarski.Clients.Windows
 
 				BeginInvoke ((Action) (() =>
 				{
+					this.captureDisabled = true;
 					btnMuteMic.Image = Resources.CaptureMuteImage.ToErrorIcon();
 					btnMuteMic.Checked = true;
 					btnMuteMic.Enabled = false;
