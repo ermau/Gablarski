@@ -296,6 +296,8 @@ namespace Gablarski.Clients.Windows
 			}
 			catch (Exception ex)
 			{
+				Program.Raygun.Send (ex, new[] { "playback-init" }, Settings.CurrentSettings);
+
 				if (this.audioPlayback != null)
 					this.audioPlayback.Dispose();
 
@@ -372,6 +374,8 @@ namespace Gablarski.Clients.Windows
 			}
 			catch (Exception ex)
 			{
+				Program.Raygun.Send (ex, new[] { "capture-init" }, Settings.CurrentSettings);
+
 				if (this.voiceCapture != null)
 					this.voiceCapture.Dispose();
 
