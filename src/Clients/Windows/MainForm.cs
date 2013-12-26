@@ -344,7 +344,6 @@ namespace Gablarski.Clients.Windows
 					this.voiceCapture.Device = this.voiceCapture.DefaultDevice;
 				else
 				{
-					this.voiceCapture.GetDevices().FirstOrDefault (d => d.Name == Settings.VoiceDevice).Name.ToString();
 					this.voiceCapture.Device = this.voiceCapture.GetDevices().FirstOrDefault (d => d.Name == Settings.VoiceDevice) ??
 					                           this.voiceCapture.DefaultDevice;
 				}
