@@ -59,8 +59,8 @@ namespace Gablarski.OpenAL.Providers
 				return new[]
 				{
 					new AudioFormat (WaveFormatEncoding.LPCM, 1, 8, 44100),
-					new AudioFormat (WaveFormatEncoding.LPCM, 1, 16, 44100), 
-					new AudioFormat (WaveFormatEncoding.LPCM, 2, 8, 44100), 
+					new AudioFormat (WaveFormatEncoding.LPCM, 1, 16, 44100),
+					new AudioFormat (WaveFormatEncoding.LPCM, 2, 8, 44100),
 					new AudioFormat (WaveFormatEncoding.LPCM, 2, 16, 44100),
 				};
 			}
@@ -101,6 +101,7 @@ namespace Gablarski.OpenAL.Providers
 			if (!this.device.IsOpen)
 				return;
 
+			this.format = format;
 			this.frameSize = captureFrameSize;
 			OpenALRunner.AddCaptureProvider (this);
 			IsCapturing = true;
@@ -129,12 +130,11 @@ namespace Gablarski.OpenAL.Providers
 			if (!this.isOpened)
 				return;
 
-			if (!this.device.IsOpen)
-				return;
-
 			IsCapturing = false;
-			this.device.StopCapture();
 			OpenALRunner.RemoveCaptureProvider (this);
+
+			if (this.device.IsOpen)
+				this.device.StopCapture();
 		}
 
 		public IEnumerable<IAudioDevice> GetDevices ()
@@ -161,6 +161,7 @@ namespace Gablarski.OpenAL.Providers
 		private CaptureDevice device;
 		private bool disposed;
 		private int frameSize;
+		private AudioFormat format;
 
 		protected void Dispose (bool disposing)
 		{
@@ -189,6 +190,19 @@ namespace Gablarski.OpenAL.Providers
 
 		internal void Tick()
 		{
+			if (!this.device.IsConnected)
+			{
+				var d = DefaultDevice;
+				if (d == null || d.Equals (this.device))
+					return;
+
+				this.device.Dispose();
+
+				Device = d;
+				this.device.Open ((uint) this.format.SampleRate, this.format.ToOpenALFormat());
+				this.device.StartCapture();
+			}
+
 			int samples = this.device.AvailableSamples;
 			if (samples > this.frameSize)
 				OnSamplesAvailable (samples);

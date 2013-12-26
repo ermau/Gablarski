@@ -84,6 +84,21 @@ namespace Gablarski.OpenAL
 			}
 		}
 
+		/// <summary>
+		/// Gets whether or not the device is still connected.
+		/// </summary>
+		public bool IsConnected
+		{
+			get
+			{
+				ThrowIfDisposed();
+
+				int connected;
+				OpenAL.alcGetIntegerv (Handle, ALCEnum.ALC_CONNECTED, 1, out connected);
+				return (connected != 0);
+			}
+		}
+
 		public override string ToString ()
 		{
 			return Name;
