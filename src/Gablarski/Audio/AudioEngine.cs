@@ -556,7 +556,7 @@ namespace Gablarski.Audio
 				int talkingIndex = -1;
 
 				byte[][] frames = new byte[framesAvailable][];
-				for (int i = 0; i < framesAvailable; ++i)
+				for (int i = 0; i < frames.Length; ++i)
 				{
 					byte[] samples = entity.AudioCapture.ReadSamples (source.CodecSettings.FrameSize);
 					if (mode == AudioEngineCaptureMode.Activated)
