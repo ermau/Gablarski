@@ -535,7 +535,7 @@ namespace Gablarski.Audio
 					return;
 				}
 
-				if (e.Available <= source.CodecSettings.FrameSize)
+				if (e.Available < source.CodecSettings.FrameSize)
 					return;
 
 				bool talking = entity.Talking;
