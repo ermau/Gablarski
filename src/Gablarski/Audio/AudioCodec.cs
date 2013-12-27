@@ -90,9 +90,6 @@ namespace Gablarski.Audio
 
 		public byte[] Decode (byte[] data)
 		{
-			if (data == null)
-				throw new ArgumentNullException("data");
-			
 			if (this.decoder == null) {
 				lock (this.codecLock) {
 					if (this.decoder == null) {
@@ -101,8 +98,10 @@ namespace Gablarski.Audio
 				}
 			}
 
+			int length = (data != null) ? data.Length : 0;
+
 			int decodedLength;
-			byte[] decoded = this.decoder.Decode (data, data.Length, out decodedLength);
+			byte[] decoded = this.decoder.Decode (data, length, out decodedLength);
 			if (decoded.Length != decodedLength) {
 				byte[] final = new byte[decodedLength];
 				Buffer.BlockCopy (decoded, 0, final, 0, decodedLength);
