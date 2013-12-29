@@ -44,7 +44,7 @@ namespace Gablarski.Audio
 	{
 		public static int GetBytesPerSample (this AudioFormat self)
 		{
-			return self.BitsPerSample * self.Channels;
+			return (self.BitsPerSample * self.Channels) / 8;
 		}
 
 		public static int GetBytes (this AudioFormat self, int samples)
