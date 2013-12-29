@@ -88,7 +88,7 @@ namespace Gablarski.Audio
 			return encoded;
 		}
 
-		public byte[] Decode (byte[] data)
+		public byte[] Decode (byte[] data, int length)
 		{
 			if (this.decoder == null) {
 				lock (this.codecLock) {
@@ -97,8 +97,6 @@ namespace Gablarski.Audio
 					}
 				}
 			}
-
-			int length = (data != null) ? data.Length : 0;
 
 			int decodedLength;
 			byte[] decoded = this.decoder.Decode (data, length, out decodedLength);

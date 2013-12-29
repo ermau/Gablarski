@@ -318,12 +318,23 @@ namespace Gablarski.Client
 			if (source == null || this.manager.GetIsIgnored (source))
 				return;
 
+			int skipped;
+
 			SourceState state;
 			lock (this.sources) {
 				if (!this.sources.TryGetValue (source, out state)) {
 					this.sources[source] = state = new SourceState();
 					state.Codec = new AudioCodec (source.CodecSettings);
 				}
+
+				skipped = e.Message.Sequence - state.Sequence - 1;
+				
+				// We can't wait around for the start signal, and the first message
+				// in the sequence might be dropped. We'll just assume a new stream
+				// if we give a _lower_ sequence than the last one.
+				
+				if (skipped < 0)
+					skipped = e.Message.Sequence - 1;
 
 				state.Sequence = e.Message.Sequence;
 			}
@@ -332,10 +343,18 @@ namespace Gablarski.Client
 			if (user == null || this.context.Users.GetIsIgnored (user))
 				return;
 
+			int defaultSize = source.CodecSettings.GetBytes (source.CodecSettings.FrameSize);
+
 			byte[][] data = e.Message.Data;
-			byte[][] decoded = new byte[data.Length][];
-			for (int i = 0; i < decoded.Length; i++) {
-				decoded[i] = state.Codec.Decode (data[i]);
+			byte[][] decoded = new byte[data.Length + skipped][];
+
+			for (int i = 0; i < skipped; i++) {
+				decoded[i] = state.Codec.Decode (null, defaultSize);
+			}
+
+			for (int i = skipped; i < decoded.Length; i++) {
+				byte[] frame = data[i - skipped];
+				decoded[i] = state.Codec.Decode (frame, frame.Length);
 			}
 
 			OnReceivedAudio (new ReceivedAudioEventArgs (source, decoded));
