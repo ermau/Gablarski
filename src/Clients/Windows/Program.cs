@@ -159,7 +159,7 @@ namespace Gablarski.Clients.Windows
 			FileInfo program = new FileInfo (Process.GetCurrentProcess().MainModule.FileName);
 			Environment.CurrentDirectory = program.Directory.FullName;
 
-			string useLocalValue = ConfigurationManager.AppSettings["useLocal"];
+			string useLocalValue = ConfigurationManager.AppSettings["useLocalDatabase"];
 			bool useLocal;
 			Boolean.TryParse (useLocalValue, out useLocal);
 
