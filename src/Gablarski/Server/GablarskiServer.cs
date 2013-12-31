@@ -67,14 +67,6 @@ namespace Gablarski.Server
 			SetupHandlers();
 		}
 
-		/// <summary>
-		/// Gets or sets whether to trace verbosely (trace audio data mostly).
-		/// </summary>
-		public bool VerboseTracing
-		{
-			get; set;
-		}
-
 		public ServerSettings Settings
 		{
 			get { return this.settings; }
