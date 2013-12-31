@@ -115,6 +115,7 @@
     <Compile Include="Client\IClientSourceManager.cs" />
     <Compile Include="Client\IClientUserHandler.cs" />
     <Compile Include="Client\ICurrentUserHandler.cs" />
+    <Compile Include="Client\QueryResults.cs" />
     <Compile Include="GablarskiProtocol.cs" />
     <Compile Include="GablarskiSocialClient.cs" />
     <Compile Include="IChannelInfo.cs" />

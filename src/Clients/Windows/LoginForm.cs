@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Gablarski.Client;
 using Gablarski.Clients;
@@ -254,7 +255,19 @@ namespace Gablarski.Clients.Windows
 				li.ImageKey = "serverQuery";
 				saved.Items.Add (li);
 
-				//GablarskiClient.QueryServer (entry.Host, entry.Port, li, ServerQueried);
+				GablarskiClient.QueryAsync (Program.Key.Result, new Target (entry.Host, entry.Port), TimeSpan.FromSeconds (10)).ContinueWith (t => {
+					if (IsDisposed || Disposing || this.closing)
+						return;
+
+					if (t.IsCanceled) {
+						UpdateImage (li, "serverConnectError");
+						return;
+					}
+
+					UpdateImage (li, "server");
+					var results = t.Result;
+					li.ToolTipText = String.Format ("{0}{1}Users: {2}", results.ServerInfo.Description, Environment.NewLine, results.Users.Count());
+				}, TaskScheduler.FromCurrentSynchronizationContext());
 			}
 
 			this.servers.EndUpdate();
@@ -267,70 +280,6 @@ namespace Gablarski.Clients.Windows
 
 			li.ImageKey = key;
 		}
-
-		//private void ServerQueried (ServerQuery query)
-		//{
-		//	if (IsDisposed || Disposing || this.closing)
-		//		return;
-
-		//	var li = (ListViewItem)query.Tag;
-
-		//	switch (query.RejectedReason)
-		//	{
-		//		case ConnectionRejectedReason.CouldNotConnect:
-		//			BeginInvoke((Action<ListViewItem, string>)UpdateImage, li, "serverConnectError");
-		//			return;
-
-		//		case ConnectionRejectedReason.BanHammer:
-		//			BeginInvoke((Action<ListViewItem, string>)UpdateImage, li, "serverBanned");
-		//			return;
-
-		//		case ConnectionRejectedReason.IncompatibleVersion:
-		//			BeginInvoke((Action<ListViewItem, string>)UpdateImage, li, "serverVersionError");
-		//			return;
-
-		//		case ConnectionRejectedReason.Unknown:
-		//		{
-		//			BeginInvoke ((Action<ServerQuery>)(q =>
-		//			{
-		//				if (this.closing)
-		//					return;
-
-		//				li.ToolTipText = String.Format ("{0}{1}Users: {2}", q.ServerInfo.Description, Environment.NewLine, q.Users.Count());
-		//			}), query);
-
-		//			BeginInvoke ((Action<ListViewItem, string>)UpdateImage, li, "server");
-
-		//			if (!String.IsNullOrEmpty (query.ServerInfo.Logo))
-		//			{
-		//				Uri logoUri;
-		//				if (Uri.TryCreate (query.ServerInfo.Logo, UriKind.Absolute, out logoUri))
-		//				{
-		//					try
-		//					{
-		//						WebClient client = new WebClient();
-		//						byte[] data = client.DownloadData (query.ServerInfo.Logo);
-
-		//						Image logo = Image.FromStream (new MemoryStream (data));
-		//						BeginInvoke ((Action<Image>)(l =>
-		//						{
-		//							if (IsDisposed || Disposing || this.closing)
-		//								return;
-
-		//							int index = li.ImageList.Images.Add (l, Color.Transparent);
-		//							li.ImageIndex = index;
-		//						}), logo);
-		//					}
-		//					catch
-		//					{
-		//					}
-		//				}
-		//			}
-
-		//			break;
-		//		}
-		//	}
-		//}
 
 		private void LoginForm_Load (object sender, EventArgs e)
 		{

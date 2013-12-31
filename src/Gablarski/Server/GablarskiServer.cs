@@ -91,7 +91,6 @@ namespace Gablarski.Server
 			}
 		}
 
-		#region Public Methods
 		/// <summary>
 		/// Adds <paramref name="redirector"/> to the list of redirectors.
 		/// </summary>
@@ -124,7 +123,6 @@ namespace Gablarski.Server
 				return redirectors.Remove (redirector);
 			}
 		}
-		#endregion
 
 		private readonly ServerSettings settings;
 
@@ -203,7 +201,7 @@ namespace Gablarski.Server
 			var channelHandler = new ServerChannelHandler (this);
 			this.channels = channelHandler;
 			
-			//RegisterConnectionlessMessageHandler(GablarskiProtocol.Instance, (ushort)GablarskiMessageType.QueryServer, ClientQueryServer);
+			RegisterConnectionlessMessageHandler (GablarskiProtocol.Instance, (ushort)GablarskiMessageType.QueryServer, ClientQueryServer);
 		}
 
 		private void OnPermissionsChanged (object sender, PermissionsChangedEventArgs e)
@@ -256,36 +254,26 @@ namespace Gablarski.Server
 			return new ServerInfo (this.settings, ((IGablarskiServerContext)this).UserProvider);
 		}
 
-		//private void ClientQueryServer (ConnectionlessMessageEventArgs e)
-		//{
-		//	var msg = (QueryServerMessage)e.Message;
+		private void ClientQueryServer (ConnectionlessMessageEventArgs e)
+		{
+			var msg = (QueryServerMessage)e.Message;
 			
-		//	if (!msg.ServerInfoOnly && !context.GetPermission (PermissionName.RequestChannelList, e.Connection))
-		//	{
-		//		var denied = new PermissionDeniedMessage (ClientMessageType.QueryServer);
+			if (!msg.ServerInfoOnly && !context.GetPermission (PermissionName.RequestChannelList)) {
+				var denied = new PermissionDeniedMessage (GablarskiMessageType.QueryServer);
+				e.Messenger.SendConnectionlessMessage (denied, e.From);
 
-		//		if (connectionless != null)
-		//			connectionless.Provider.SendConnectionlessMessage (denied, connectionless.EndPoint);
-		//		else
-		//			e.Connection.Send (denied);
+				return;
+			}
 
-		//		return;
-		//	}
+			var result = new QueryServerResultMessage();
 
-		//	var result = new QueryServerResultMessage();
+			if (!msg.ServerInfoOnly) {
+				result.Channels = this.context.ChannelsProvider.GetChannels();
+				result.Users = this.users.ToList();
+			}
 
-		//	if (!msg.ServerInfoOnly)
-		//	{
-		//		result.Channels = this.context.ChannelsProvider.GetChannels();
-		//		result.Users = this.users.ToList();
-		//	}
-
-		//	result.ServerInfo = GetServerInfo();
-
-		//	if (connectionless == null)
-		//		e.Connection.Send (result);
-		//	else
-		//		connectionless.Provider.SendConnectionlessMessage (result, connectionless.EndPoint);
-		//}
+			result.ServerInfo = GetServerInfo();
+			e.Messenger.SendConnectionlessMessage (result, e.From);
+		}
 	}
 }

@@ -44,13 +44,45 @@ using Gablarski.Audio;
 using Gablarski.Messages;
 using Tempest;
 using Tempest.Providers.Network;
-using Timer = System.Threading.Timer;
 
 namespace Gablarski.Client
 {
 	public class GablarskiClient
 		: IGablarskiClientContext
 	{
+		public static Task<QueryResults> QueryAsync (RSAAsymmetricKey key, Target target, TimeSpan timeout)
+		{
+			if (key == null)
+				throw new ArgumentNullException ("key");
+			if (target == null)
+				throw new ArgumentNullException ("target");
+
+			var tcs = new TaskCompletionSource<QueryResults>();
+
+			var connection = new UdpClientConnection (GablarskiProtocol.Instance, key);
+			connection.Start (MessageTypes.Unreliable);
+
+			var cancelSources = new CancellationTokenSource (timeout);
+			cancelSources.Token.Register (() => {
+				tcs.TrySetCanceled();
+				connection.Dispose();
+			});
+
+			connection.ConnectionlessMessageReceived += (sender, args) => {
+				var results = args.Message as QueryServerResultMessage;
+				if (results == null)
+					return;
+
+				tcs.TrySetResult (new QueryResults (results.ServerInfo, results.Channels, results.Users));
+
+				connection.Dispose();
+			};
+
+			connection.SendConnectionlessMessage (new QueryServerMessage(), target);
+
+			return tcs.Task;
+		}
+
 		public GablarskiClient (RSAAsymmetricKey key)
 		{
 			if (key == null)
