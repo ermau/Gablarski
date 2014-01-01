@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2011, Eric Maupin
+﻿// Copyright (c) 2011-2013, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -34,10 +34,6 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Tempest;
 
 namespace Gablarski.Messages
@@ -61,15 +57,28 @@ namespace Gablarski.Messages
 		public PermissionDeniedMessage (GablarskiMessageType type)
 			: this()
 		{
-			this.DeniedMessage = type;
+			DeniedMessage = type;
+		}
+
+		public override bool AcceptedConnectionlessly
+		{
+			get { return true; }
+		}
+
+		public override bool MustBeReliable
+		{
+			get { return false; }
+		}
+
+		public override bool PreferReliable
+		{
+			get { return true; }
 		}
 
 		public GablarskiMessageType DeniedMessage
 		{
 			get; set;
 		}
-
-		#region Overrides of MessageBase
 
 		public override void WritePayload (ISerializationContext context, IValueWriter writerm)
 		{
@@ -78,9 +87,7 @@ namespace Gablarski.Messages
 
 		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
-			this.DeniedMessage = (GablarskiMessageType)reader.ReadUInt16();
+			DeniedMessage = (GablarskiMessageType)reader.ReadUInt16();
 		}
-
-		#endregion
 	}
 }
