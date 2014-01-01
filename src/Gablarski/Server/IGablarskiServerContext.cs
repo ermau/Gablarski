@@ -152,7 +152,7 @@ namespace Gablarski.Server
 			if (self == null)
 				throw new ArgumentNullException ("self");
 
-			return self.PermissionsProvider.GetPermissions (0).CheckPermission (name);
+			return self.PermissionsProvider.GetPermissions (-1).CheckPermission (name);
 		}
 	}
 }
