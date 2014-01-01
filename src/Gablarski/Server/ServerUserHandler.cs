@@ -601,7 +601,7 @@ namespace Gablarski.Server
 
 			nickname = nickname.ToLower().Trim();
 
-			IUserInfo current = Manager.Single (u => u.Nickname.ToLower().Trim() == nickname);
+			IUserInfo current = Manager.Where (u => u.Nickname != null).Single (u => u.Nickname.ToLower().Trim() == nickname);
 			if (info.IsRegistered && info.UserId == current.UserId) {
 				Manager.Disconnect (current);
 				return true;
