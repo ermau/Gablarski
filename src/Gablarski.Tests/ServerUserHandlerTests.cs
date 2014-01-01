@@ -442,7 +442,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void RequestOnlineUserList()
 		{
-			permissions.EnablePermissions (0, PermissionName.RequestChannelList);
+			permissions.EnablePermissions (-1, PermissionName.RequestChannelList);
 
 			var u1 = JoinAsGuest (server, client, "Nickname");
 
@@ -486,7 +486,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void RequestAllUserList()
 		{
-			permissions.EnablePermissions (0, PermissionName.RequestFullUserList);
+			permissions.EnablePermissions (-1, PermissionName.RequestFullUserList);
 
 			var u1 = JoinAsGuest (server, client, "Nickname");
 

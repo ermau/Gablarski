@@ -118,7 +118,7 @@ namespace Gablarski.Tests
 		[Description ("Even if the connection hasn't 'joined', it should still be able to request the channel list.")]
 		public void RequestChannelListMessageNotJoined()
 		{
-			permissions.EnablePermissions (0, PermissionName.RequestChannelList);
+			permissions.EnablePermissions (-1, PermissionName.RequestChannelList);
 
 			var cs = provider.GetConnections (GablarskiProtocol.Instance);
 			var c = new ConnectionBuffer (cs.Item1);
