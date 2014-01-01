@@ -37,7 +37,7 @@ namespace Gablarski.Tests
 		}
 
 		[Test]
-		public void GetHashCode()
+		public void GetHashCodeTest()
 		{
 			var one = new AudioFormat (WaveFormatEncoding.LPCM, 2, 16, 48000);
 			var two = new AudioFormat (WaveFormatEncoding.LPCM, 2, 16, 48000);
