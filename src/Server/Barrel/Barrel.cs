@@ -118,7 +118,7 @@ namespace Gablarski.Barrel
 					}
 				}
 
-				server.AddConnectionProvider (new UdpConnectionProvider (serverConfig.Port, GablarskiProtocol.Instance, key));
+				server.AddConnectionProvider (new UdpConnectionProvider (serverConfig.Port, GablarskiProtocol.Instance, key), ExecutionMode.GlobalOrder);
 			}
 
 			foreach (IConnectionProvider provider in providers.ConnectionProviders)
