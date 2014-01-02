@@ -1,4 +1,4 @@
-// Copyright (c) 2011-2013, Eric Maupin
+// Copyright (c) 2011-2014, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -38,7 +38,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Gablarski.Messages;
-using Cadenza;
 using Tempest;
 using Timer = System.Threading.Timer;
 
@@ -252,7 +251,7 @@ namespace Gablarski.Server
 			
 			if (!msg.ServerInfoOnly && !context.GetPermission (PermissionName.RequestChannelList)) {
 				var denied = new PermissionDeniedMessage (GablarskiMessageType.QueryServer);
-				e.Messenger.SendConnectionlessMessage (denied, e.From);
+				e.Messenger.SendConnectionlessMessageAsync (denied, e.From);
 
 				return;
 			}
@@ -265,7 +264,7 @@ namespace Gablarski.Server
 			}
 
 			result.ServerInfo = GetServerInfo();
-			e.Messenger.SendConnectionlessMessage (result, e.From);
+			e.Messenger.SendConnectionlessMessageAsync (result, e.From);
 		}
 	}
 }

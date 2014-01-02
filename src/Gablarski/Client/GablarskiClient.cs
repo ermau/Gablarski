@@ -1,4 +1,4 @@
-// Copyright (c) 2010-2013, Eric Maupin
+// Copyright (c) 2010-2014, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -50,7 +50,7 @@ namespace Gablarski.Client
 	public class GablarskiClient
 		: IGablarskiClientContext
 	{
-		public static Task<QueryResults> QueryAsync (RSAAsymmetricKey key, Target target, TimeSpan timeout)
+		public static async Task<QueryResults> QueryAsync (RSAAsymmetricKey key, Target target, TimeSpan timeout)
 		{
 			if (key == null)
 				throw new ArgumentNullException ("key");
@@ -78,9 +78,9 @@ namespace Gablarski.Client
 				connection.Dispose();
 			};
 
-			connection.SendConnectionlessMessage (new QueryServerMessage(), target);
+			await connection.SendConnectionlessMessageAsync (new QueryServerMessage(), target).ConfigureAwait (false);
 
-			return tcs.Task;
+			return await tcs.Task.ConfigureAwait (false);
 		}
 
 		public GablarskiClient (RSAAsymmetricKey key)
