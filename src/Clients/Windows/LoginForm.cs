@@ -390,58 +390,8 @@ namespace Gablarski.Clients.Windows
 			this.serverStatus.Image = image;
 		}
 
-		//private void AddServerQuery (ServerQuery query)
-		//{
-		//	if (this.closing)
-		//		return;
-
-		//	bool port = (bool)query.Tag;
-		//	lock (addServerQuerySync)
-		//	{
-		//		bool last = lastWasPort;
-		//		lastWasPort = port;
-		//		if (last && !port)
-		//			return;
-
-		//		switch (query.RejectedReason)
-		//		{
-		//			case ConnectionRejectedReason.BanHammer:
-		//				BeginInvoke ((Action<Image>)SetStatusImage, serverBannedImage);
-		//				break;
-
-		//			case ConnectionRejectedReason.CouldNotConnect:
-		//				BeginInvoke ((Action<Image>)SetStatusImage, serverConnectErrorImage);
-		//				break;
-
-		//			case ConnectionRejectedReason.IncompatibleVersion:
-		//				BeginInvoke ((Action<Image>)SetStatusImage, serverVersionErrorImage);
-		//				break;
-
-		//			case ConnectionRejectedReason.Unknown:
-		//				if (query.ServerInfo != null)
-		//				{
-		//					BeginInvoke ((Action<ServerInfo>)(serverInfo =>
-		//					{
-		//						if (IsDisposed || Disposing || this.closing)
-		//							return;
-
-		//						if (this.inName.Text == String.Empty)
-		//							this.inName.Text = serverInfo.Name;
-
-		//						this.serverStatus.Image = serverOkImage;
-		//					}), query.ServerInfo);
-		//				}
-
-		//				break;
-		//		}
-		//	}
-		//}
-
-		private void inServer_Validated (object sender, EventArgs e)
+		private async void QueryNewServer (bool updatingPort)
 		{
-			lock (addServerQuerySync)
-				lastWasPort = false;
-
 			int port = (int)this.inPort.Value;
 
 			if (String.IsNullOrWhiteSpace (this.inServer.Text))
@@ -450,20 +400,40 @@ namespace Gablarski.Clients.Windows
 				return;
 
 			this.serverStatus.Image = serverQueryImage;
-			//GablarskiClient.QueryServer (this.inServer.Text, port, false, AddServerQuery);
+
+			QueryResults results = null;
+			bool timedOut = false;
+			try {
+				results = await GablarskiClient.QueryAsync (Program.Key.Result, new Target (this.inServer.Text, port), TimeSpan.FromSeconds (10));
+			} catch (OperationCanceledException) {
+				timedOut = true;
+			}
+
+			bool last = this.lastWasPort;
+			if (last && !updatingPort)
+				return;
+
+			if (!timedOut) {
+				if (results == null || results.ServerInfo == null)
+					return;
+
+				if (String.IsNullOrWhiteSpace (this.inName.Text))
+					this.inName.Text = results.ServerInfo.Name;
+
+				this.serverStatus.Image = serverOkImage;
+			} else
+				SetStatusImage (serverConnectErrorImage);
+		}
+
+		private void inServer_Validated (object sender, EventArgs e)
+		{
+			lastWasPort = false;
+			QueryNewServer (updatingPort: false);
 		}
 
 		private void inPort_Validated (object sender, EventArgs e)
 		{
-			int port = (int)this.inPort.Value;
-
-			if (String.IsNullOrWhiteSpace (this.inServer.Text))
-				return;
-			if (port < IPEndPoint.MinPort || port > IPEndPoint.MaxPort)
-				return;
-
-			this.serverStatus.Image = serverQueryImage;
-			//GablarskiClient.QueryServer (this.inServer.Text, port, true, AddServerQuery);
+			QueryNewServer (updatingPort: true);
 		}
 	}
 }
