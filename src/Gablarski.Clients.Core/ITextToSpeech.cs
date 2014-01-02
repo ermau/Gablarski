@@ -1,11 +1,11 @@
-﻿// Copyright (c) 2011, Eric Maupin
+﻿// Copyright (c) 2011-2014, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
 // or without modification, are permitted provided that
 // the following conditions are met:
 //
-// - Redistributions of source code must retain the above 
+// - Redistributions of source code must retain the above
 //   copyright notice, this list of conditions and the
 //   following disclaimer.
 //
@@ -37,6 +37,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Gablarski.Audio;
 using Gablarski.Clients.Media;
 
@@ -68,11 +69,11 @@ namespace Gablarski.Clients
 		/// Tells the text to speech engine what to say.
 		/// </summary>
 		/// <param name="say"></param>
-		void Say (string say);
+		Task SayAsync (string say);
 
 		/// <summary>
-		/// Gets the audio for <paramref name="say"/> in <paramref name="source"/>'s format.
+		/// Gets the audio for <paramref name="say"/>.
 		/// </summary>
-		byte[] GetSpeech (string say, AudioSource source);
+		byte[] GetSpeech (string say);
 	}
 }

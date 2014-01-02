@@ -315,9 +315,11 @@ namespace Gablarski.Clients.Windows
 			SetupTTS();
 		}
 
+		private ITextToSpeech tts;
 		private void SetupTTS ()
 		{
-			playPhonetic.Enabled = Modules.TextToSpeech.Any (tts => tts.GetType().GetSimpleName() == Settings.TextToSpeech);
+			this.tts = Modules.TextToSpeech.FirstOrDefault (tts => tts.GetType().GetSimpleName() == Settings.TextToSpeech);
+			playPhonetic.Enabled = (this.tts != null);
 		}
 
 		private async void startLocal_Click (object sender, EventArgs e)
@@ -371,15 +373,15 @@ namespace Gablarski.Clients.Windows
 			Program.UpdateTaskbarServers();
 		}
 
-		private void playPhonetic_Click (object sender, EventArgs e)
+		private async void playPhonetic_Click (object sender, EventArgs e)
 		{
-			ITextToSpeech tts = Modules.TextToSpeech.FirstOrDefault (t => t.GetType().GetSimpleName() == Settings.TextToSpeech);
-			if (tts != null)
-				tts.Say (this.inPhonetic.Text);
+			if (this.tts == null)
+				return;
+
+			await this.tts.SayAsync (this.inPhonetic.Text);
 		}
 
 		private bool lastWasPort = false;
-		private readonly object addServerQuerySync = new object();
 		private bool closing;
 
 		private void SetStatusImage (Image image)

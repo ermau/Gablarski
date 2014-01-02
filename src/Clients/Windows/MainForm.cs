@@ -164,7 +164,7 @@ namespace Gablarski.Clients.Windows
 
 					var format = tts.SupportedFormats.OrderByDescending (af => af.SampleRate).FirstOrDefault();
 					if (format == null)
-						continue;
+						format = new AudioFormat (WaveFormatEncoding.LPCM, 1, 16, 44100);
 
 					var source = this.gablarski.Sources.CreateFake ("speech", format, (short)(format.SampleRate / 100));
 					this.speechSources.Add (tts, source);
@@ -919,7 +919,7 @@ namespace Gablarski.Clients.Windows
 							DisablePlayback();
 					};
 
-					this.audioPlayback.QueuePlayback (tts.Value, tts.Key.GetSpeech ("Disconnected", tts.Value));
+					this.audioPlayback.QueuePlayback (tts.Value, tts.Key.GetSpeech ("Disconnected"));
 				}
 			}
 

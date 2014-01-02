@@ -223,7 +223,7 @@ namespace Gablarski.Clients
 					if (this.speechNotifiers.TryGetValues (type, out speakers))
 					{
 						foreach (var n in speakers)
-							SpeechReceiver.Receive (n.AudioSource, n.GetSpeech (notification, n.AudioSource));
+							SpeechReceiver.Receive (n.AudioSource, n.GetSpeech (notification));
 					}
 				}
 			}
@@ -257,7 +257,7 @@ namespace Gablarski.Clients
 					if (this.speechNotifiers.TryGetValues (type, out speakers))
 					{
 						foreach (var n in speakers)
-							SpeechReceiver.Receive (n.AudioSource, n.GetSpeech (String.Format (notification, (!phonetic.IsNullOrWhitespace()) ? phonetic : nickname), n.AudioSource));
+							SpeechReceiver.Receive (n.AudioSource, n.GetSpeech (String.Format (notification, (!phonetic.IsNullOrWhitespace()) ? phonetic : nickname)));
 					}
 				}
 			}

@@ -1,4 +1,4 @@
-// Copyright (c) 2011, Eric Maupin
+// Copyright (c) 2011-2014, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -40,7 +40,7 @@ using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Speech.AudioFormat;
-using System.Threading;
+using System.Threading.Tasks;
 using Gablarski.Audio;
 using Gablarski.Clients;
 using System.Speech.Synthesis;
@@ -54,10 +54,9 @@ namespace Gablarski.SpeechNotifier
 	{
 		public EventSpeech()
 		{
-			this.formats = this.speech.Voice.SupportedAudioFormats
-				.ToDictionary (af => new AudioFormat (GetWaveEncodingFormat (af.EncodingFormat),
-				                                      af.ChannelCount, af.BitsPerSample,
-				                                      af.SamplesPerSecond), af => af, AudioFormatEqualityComparer.Comparer);
+			this.formats = this.speech.Voice.SupportedAudioFormats.Select (af =>
+				new AudioFormat (GetWaveEncodingFormat (af.EncodingFormat), af.ChannelCount, af.BitsPerSample, af.SamplesPerSecond)
+				).ToList();
 		}
 
 		public string Name
@@ -70,8 +69,14 @@ namespace Gablarski.SpeechNotifier
 			get { return this.audioSource; }
 			set
 			{
-				if (!SupportedFormats.Contains (value.CodecSettings, AudioFormatEqualityComparer.Comparer))
-					throw new ArgumentException ("The audio source's format is unsupported", "value");
+				if (value != null) {
+					AudioCodecArgs settings = value.CodecSettings;
+					this.format = new SpeechAudioFormatInfo (
+						settings.SampleRate,
+						settings.BitsPerSample == 8 ? AudioBitsPerSample.Eight : AudioBitsPerSample.Sixteen,
+						settings.Channels == 1 ? AudioChannel.Mono : AudioChannel.Stereo);
+				} else
+					this.format = null;
 
 				this.audioSource = value;
 			}
@@ -79,19 +84,18 @@ namespace Gablarski.SpeechNotifier
 
 		public IEnumerable<AudioFormat> SupportedFormats
 		{
-			get { return this.formats.Keys; }
+			get { return this.formats; }
 		}
 
-		public byte[] GetSpeech (string say, AudioSource source)
+		public byte[] GetSpeech (string say)
 		{
 			if (say == null)
 				throw new ArgumentNullException ("say");
-			if (source == null)
-				throw new ArgumentNullException ("source");
+			if (AudioSource == null)
+				throw new InvalidOperationException ("You must set AudioSource before calling GetSpeech");
 
-			lock (speech)
-			{
-				speech.SetOutputToAudioStream (this.voiceBuffer, this.formats[source.CodecSettings]);
+			lock (speech) {
+				speech.SetOutputToAudioStream (this.voiceBuffer, this.format);
 				speech.Speak (say);
 
 				byte[] output = this.voiceBuffer.ToArray();
@@ -101,20 +105,17 @@ namespace Gablarski.SpeechNotifier
 			}
 		}
 
-		public void Say (string say)
+		public Task SayAsync (string say)
 		{
 			if (say == null)
 				throw new ArgumentNullException ("say");
 			
-			ThreadPool.QueueUserWorkItem (o =>
-			{
-				lock (sync)
-				{
+			return Task.Factory.StartNew (o => {
+				lock (sync) {
 					if (media != null)
 						media.AddTalker();
 
-					lock (speech)
-					{
+					lock (speech) {
 						speech.SetOutputToDefaultAudioDevice();
 						speech.Speak ((string)o);
 					}
@@ -122,7 +123,7 @@ namespace Gablarski.SpeechNotifier
 					if (media != null)
 						media.RemoveTalker();
 				}
-			}, say);
+			}, say, TaskCreationOptions.HideScheduler);
 		}
 
 		public IMediaController Media
@@ -146,12 +147,13 @@ namespace Gablarski.SpeechNotifier
 			speech.Dispose();
 		}
 
+		private SpeechAudioFormatInfo format;
+		private AudioSource audioSource;
 		private readonly object sync = new object();
-		private MemoryStream voiceBuffer = new MemoryStream(120000);
+		private readonly MemoryStream voiceBuffer = new MemoryStream (120000);
 		private IMediaController media;
 		private readonly SpeechSynthesizer speech = new SpeechSynthesizer ();
-		private AudioSource audioSource;
-		private Dictionary<AudioFormat, SpeechAudioFormatInfo> formats;
+		private readonly List<AudioFormat> formats;
 
 		private static WaveFormatEncoding GetWaveEncodingFormat (EncodingFormat encoding)
 		{
