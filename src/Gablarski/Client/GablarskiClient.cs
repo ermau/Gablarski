@@ -210,6 +210,7 @@ namespace Gablarski.Client
 
 		public Task<ClientConnectionResult> ConnectAsync (Target target)
 		{
+			this.previousTarget = target;
 			this.running = true;
 			return this.client.ConnectAsync (target);
 		}
@@ -243,6 +244,8 @@ namespace Gablarski.Client
 			//this.RegisterMessageHandler<ConnectionRejectedMessage> (OnConnectionRejectedMessage);
 			this.RegisterMessageHandler<DisconnectMessage> (OnDisconnectedMessage);
 		}
+
+		private Target previousTarget;
 
 		protected readonly object StateSync = new object();
 		protected ServerInfo serverInfo;
@@ -395,7 +398,7 @@ namespace Gablarski.Client
 			}
 
 			CurrentUser.ReceivedJoinResult += ReconnectJoinedResult;
-			//ConnectCore();
+			ConnectAsync (this.previousTarget);
 		}
 
 		private void ReconnectJoinedResult (object sender, ReceivedJoinResultEventArgs e)
