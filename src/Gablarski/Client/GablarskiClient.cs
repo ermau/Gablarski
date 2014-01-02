@@ -208,14 +208,6 @@ namespace Gablarski.Client
 			set { reconnectAttemptFrequency = value; }
 		}
 
-		/// <summary>
-		/// Gets or sets whether to trace verbosely.
-		/// </summary>
-		public bool VerboseTracing
-		{
-			get; set;
-		}
-
 		public Task<ClientConnectionResult> ConnectAsync (Target target)
 		{
 			this.running = true;
