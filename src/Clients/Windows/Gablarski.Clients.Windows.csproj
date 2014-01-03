@@ -109,7 +109,8 @@
     <Reference Include="Cadenza">
       <HintPath>..\..\..\lib\Cadenza.dll</HintPath>
     </Reference>
-    <Reference Include="Elysium">
+    <Reference Include="Elysium, Version=2.0.1042.4, Culture=neutral, PublicKeyToken=afa220db249e5b15, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\packages\Elysium.Theme.2.0.4\lib\net45\Elysium.dll</HintPath>
     </Reference>
     <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
@@ -124,8 +125,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>.\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
     </Reference>
-    <Reference Include="Mindscape.Raygun4Net">
-      <HintPath>..\..\..\packages\Mindscape.Raygun4Net.1.1.2\lib\net35\Mindscape.Raygun4Net.dll</HintPath>
+    <Reference Include="Mindscape.Raygun4Net, Version=1.1.8.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\packages\Mindscape.Raygun4Net.1.1.8\lib\net35\Mindscape.Raygun4Net.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -291,7 +293,6 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
-    <None Include="Resources.res" />
     <None Include="Resources\connect.png" />
     <None Include="Resources\server_add.png" />
     <None Include="Resources\server_connect.png" />
