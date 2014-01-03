@@ -207,7 +207,7 @@ namespace Gablarski.Clients.Windows
 			//Application.EnableVisualStyles ();
 			//Application.SetCompatibleTextRenderingDefault (false);
 
-			//SetupSocial();
+			SetupSocial();
 
 			var window = new MainWindow();
 			window.Show();
@@ -366,7 +366,7 @@ namespace Gablarski.Clients.Windows
 			}
 		}
 
-		/*private static void SetupSocial()
+		private static void SetupSocial()
 		{
 			var person = new Person (Key.Result.PublicSignature.Aggregate (String.Empty, (s, b) => s + b.ToString ("X2"))) {
 				Nickname = Settings.Nickname,
@@ -379,7 +379,7 @@ namespace Gablarski.Clients.Windows
 
 			string host = ConfigurationManager.AppSettings["socialHost"];
 			SocialClient.SetTarget (new Target (host, SocialProtocol.DefaultPort));
-		}*/
+		}
 
 		private static void PersonalSetup()
 		{
