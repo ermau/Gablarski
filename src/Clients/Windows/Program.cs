@@ -208,9 +208,6 @@ namespace Gablarski.Clients.Windows
 
 			//SetupSocial();
 
-			MainWindow window = new MainWindow();
-			window.Show();
-
 			/*var m = new MainForm();
 			m.Show();*/
 
@@ -232,12 +229,9 @@ namespace Gablarski.Clients.Windows
 			} else if (Settings.ShowConnectOnStart) {
 				if (!m.ShowConnect (true))
 					return;
-			}
+			}*/
 
-			/*System.Windows.Application app = new System.Windows.Application();
-			app.Run (window);*/
-			
-			app.Run (window);
+			app.Run (new MainWindow());
 
 			Settings.SaveAsync().Wait();
 		}
