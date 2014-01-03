@@ -185,6 +185,7 @@ namespace Gablarski.Clients.Windows
 
 			System.Windows.Application app = new System.Windows.Application();
 			app.Resources.MergedDictionaries.Add (new ResourceDictionary { Source = new Uri ("/Elysium;component/Themes/Generic.xaml", UriKind.Relative) });
+			app.Resources.MergedDictionaries.Add (new ResourceDictionary { Source = new Uri ("Resources.xaml", UriKind.Relative) });
 			app.Apply (Theme.Dark, AccentBrushes.Blue, Brushes.White);
 
 			if (Settings.Nickname == null)
