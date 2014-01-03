@@ -209,8 +209,8 @@ namespace Gablarski.Clients.Windows
 
 			//SetupSocial();
 
-			/*var m = new MainForm();
-			m.Show();*/
+			var window = new MainWindow();
+			window.Show();
 
 			UpdateTaskbarServers();
 
@@ -232,7 +232,7 @@ namespace Gablarski.Clients.Windows
 					return;
 			}*/
 
-			app.Run (new MainWindow());
+			app.Run (window);
 
 			Settings.SaveAsync().Wait();
 		}
