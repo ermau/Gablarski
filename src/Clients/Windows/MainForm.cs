@@ -302,7 +302,7 @@ namespace Gablarski.Clients.Windows
 			}
 			catch (Exception ex)
 			{
-				Program.Raygun.Send (ex, new[] { "playback-init" }, Settings.CurrentSettings);
+				Program.Raygun.Send (ex, new[] { "playback-init" }, Settings.CurrentSettings.ToDictionary());
 
 				if (this.audioPlayback != null)
 					this.audioPlayback.Dispose();
@@ -383,7 +383,7 @@ namespace Gablarski.Clients.Windows
 			}
 			catch (Exception ex)
 			{
-				Program.Raygun.Send (ex, new[] { "capture-init" }, Settings.CurrentSettings);
+				Program.Raygun.Send (ex, new[] { "capture-init" }, Settings.CurrentSettings.ToDictionary());
 
 				if (this.voiceCapture != null)
 					this.voiceCapture.Dispose();
@@ -487,8 +487,8 @@ namespace Gablarski.Clients.Windows
 
 					break;
 
-				case Settings.EnableGablarskiURLsSettingName:
-					if (Settings.EnableGablarskiURLs)
+				case Settings.EnableGablarskiUrlsSettingName:
+					if (Settings.EnableGablarskiUrls)
 						Program.EnableGablarskiURIs();
 					else
 						Program.DisableGablarskiURIs();

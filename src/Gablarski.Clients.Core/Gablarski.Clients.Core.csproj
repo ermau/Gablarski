@@ -101,6 +101,7 @@
     <Compile Include="Input\CommandBinding.cs" />
     <Compile Include="Input\CommandStateChangedEventArgs.cs" />
     <Compile Include="Input\ISpeechRecognizer.cs" />
+    <Compile Include="ISettingsProvider.cs" />
     <Compile Include="ITextToSpeech.cs" />
     <Compile Include="Messages\AddBuddyMessage.cs" />
     <Compile Include="Messages\JoinVoiceMessage.cs" />
@@ -126,6 +127,7 @@
     </Compile>
     <Compile Include="SelectedObservableCollection.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="ClientDataSettingsProvider.cs" />
     <Compile Include="Updater.cs" />
     <Compile Include="ViewModels\AddBuddyViewModel.cs" />
     <Compile Include="ViewModels\AudioCaptureSettingsViewModel.cs" />

@@ -59,7 +59,7 @@ namespace Gablarski.Clients.ViewModels
 			return !String.IsNullOrWhiteSpace (Nickname);
 		}
 
-		private void OnDone()
+		private async void OnDone()
 		{
 			// If it's an email, convert it to a special gravatar uri, we don't want
 			// to be sending emails to other people.
@@ -71,7 +71,7 @@ namespace Gablarski.Clients.ViewModels
 
 			Settings.Avatar = Avatar;
 			Settings.Nickname = Nickname;
-			Settings.Save();
+			await Settings.SaveAsync();
 
 			var done = SetupDone;
 			if (done != null)

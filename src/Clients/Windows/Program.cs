@@ -147,7 +147,7 @@ namespace Gablarski.Clients.Windows
 					StartupLog.Error ("Fatal Error", (Exception)e.ExceptionObject);
 
 				if (Raygun != null)
-					Raygun.Send ((Exception) e.ExceptionObject, null, Settings.CurrentSettings);
+					Raygun.Send ((Exception) e.ExceptionObject, null, Settings.CurrentSettings.ToDictionary());
 
 				MessageBox.Show ("Unexpected error" + Environment.NewLine + (e.ExceptionObject as Exception).ToDisplayString(),
 				                 "Unexpected error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -170,7 +170,12 @@ namespace Gablarski.Clients.Windows
 			StartupLog.DebugFormat ("Local files: {0}", useLocal);
 			StartupLog.DebugFormat ("Setting up databases..");
 
-			ClientData.Setup (useLocal);
+			Task dataSetup = ClientData.SetupAsync (useLocal);
+
+			Task loadSettings = dataSetup.ContinueWith (async t => {
+				await Settings.LoadAsync().ConfigureAwait (false);
+				await ClientData.CheckForUpdatesAsync().ConfigureAwait (false);
+			}).Unwrap();
 
 			StartupLog.DebugFormat ("Databases setup.");
 
@@ -178,8 +183,10 @@ namespace Gablarski.Clients.Windows
 
 			StartupLog.Debug ("Starting key retrieval");
 			var keyCancelSource = new CancellationTokenSource();
-			Key = ClientData.GetCryptoKeyAsync (keyCancelSource.Token);
-			Key.ContinueWith (t => StartupLog.DebugFormat ("Key retrieval: {0}{1}{2}", t.Status, Environment.NewLine, t.Exception));
+			Key = dataSetup.ContinueWith (t => ClientData.GetCryptoKeyAsync (keyCancelSource.Token), keyCancelSource.Token).Unwrap();
+			Key.ContinueWith (t => StartupLog.DebugFormat ("Key retrieval: {0}{1}{2}", t.Status, Environment.NewLine, t.Exception), keyCancelSource.Token);
+
+			loadSettings.Wait();
 
 			SetupFirstRun();
 
@@ -232,7 +239,7 @@ namespace Gablarski.Clients.Windows
 			
 			app.Run (window);
 
-			Settings.Save();
+			Settings.SaveAsync().Wait();
 		}
 
 		private static void CheckForUpdates()
@@ -344,9 +351,9 @@ namespace Gablarski.Clients.Windows
 			DialogResult result = MessageBox.Show ("Register gablarski:// urls with this client?", "Register gablarski://",
 				MessageBoxButtons.OKCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1);
 
-			Settings.EnableGablarskiURLs = (result == DialogResult.OK);
+			Settings.EnableGablarskiUrls = (result == DialogResult.OK);
 			Settings.Version = typeof (Program).Assembly.GetName().Version.ToString();
-			Settings.Save();
+			Settings.SaveAsync().Wait();
 
 			IInputProvider input = Modules.Input.FirstOrDefault (p => p.GetType().GetSimpleName() == Settings.InputProvider);
 			if (input != null) {
@@ -355,11 +362,11 @@ namespace Gablarski.Clients.Windows
 			}
 
 			try {
-				if (Settings.EnableGablarskiURLs)
+				if (Settings.EnableGablarskiUrls)
 					EnableGablarskiURIs();
 
 				Settings.FirstRun = false;
-				Settings.Save();
+				Settings.SaveAsync().Wait();
 			} catch {
 			}
 		}

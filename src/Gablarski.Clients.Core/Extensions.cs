@@ -35,6 +35,7 @@
 // DAMAGE.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.IO;
@@ -83,6 +84,14 @@ namespace Gablarski.Clients
 
 			int len = reader.ReadInt32();
 			return reader.ReadBytes (len);
+		}
+
+		public static IDictionary ToDictionary<TKey, TValue> (this IEnumerable<KeyValuePair<TKey, TValue>> self)
+		{
+			if (self == null)
+				throw new ArgumentNullException ("self");
+
+			return self.ToDictionary (kvp => kvp.Key, kvp => kvp.Value);
 		}
 	}
 }

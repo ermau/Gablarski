@@ -60,7 +60,7 @@ namespace Gablarski.Clients.Persistence
 {
 	public static class ClientData
 	{
-		public static void Setup (bool useLocalFiles)
+		public static async Task SetupAsync (bool useLocalFiles)
 		{
 			DataDirectory = new DirectoryInfo (Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.ApplicationData), "Gablarski"));
 			if (!DataDirectory.Exists)
@@ -88,8 +88,8 @@ namespace Gablarski.Clients.Persistence
 			db = new SQLiteConnection ("Data Source=" + DbFile.FullName);
 			#endif
 			db.Open();
-			
-			CreateDbs();
+
+			await CreateTablesAsync().ConfigureAwait (false);
 		}
 
 		sealed class RSAParametersSerializer
@@ -139,7 +139,7 @@ namespace Gablarski.Clients.Persistence
 			return GetCryptoKeyAsync (CancellationToken.None);
 		}
 
-		public static Task<RSAAsymmetricKey> GetCryptoKeyAsync (CancellationToken cancelToken = default(CancellationToken))
+		public static Task<RSAAsymmetricKey> GetCryptoKeyAsync (CancellationToken cancelToken)
 		{
 			return Task.Run (() => {
 				RSAAsymmetricKey key = null;
@@ -175,18 +175,17 @@ namespace Gablarski.Clients.Persistence
 			}, cancelToken);
 		}
 
-		public static bool CheckForUpdates()
+		public static async Task<bool> CheckForUpdatesAsync()
 		{
 			if (!Settings.Version.IsNullOrWhitespace())
 			{
-				string newVersion = Settings.Version = typeof (ClientData).Assembly.GetName().Version.ToString();
 				Version version = new Version (Settings.Version);
 
 				if (version < new Version (0, 13, 1))
 				{
 					Settings.TextToSpeech = "Gablarski.SpeechNotifier.EventSpeech, Gablarski.SpeechNotifier";
-					Settings.Version = newVersion;
-					Settings.Save();
+					Settings.Version = "0.13.1.0";
+					await Settings.SaveAsync().ConfigureAwait (false);
 
 					return true;
 				}
@@ -195,8 +194,8 @@ namespace Gablarski.Clients.Persistence
 				{
 					Settings.PlaybackDevice = "Default";
 					Settings.VoiceDevice = "Default";
-					Settings.Version = newVersion;
-					Settings.Save();
+					Settings.Version = "0.13.4.0";
+					await Settings.SaveAsync().ConfigureAwait (false);
 
 					return true;
 				}
@@ -206,30 +205,29 @@ namespace Gablarski.Clients.Persistence
 
 			db.Close();
 			DbFile.Delete();
-			Settings.Clear();
-
+			
 			DbFile.Refresh();
 			
 			db.Open();
-			CreateDbs();
+			await CreateTablesAsync().ConfigureAwait (false);
 			
 			return true;
 		}
 
-		public static IEnumerable<SettingEntry> GetSettings()
+		public static async Task<IEnumerable<SettingEntry>> GetSettingsAsync()
 		{
+			List<SettingEntry> entries = new List<SettingEntry>();
 			using (var cmd = db.CreateCommand ("SELECT * FROM settings"))
-			using (var reader = cmd.ExecuteReader())
-			{
-				while (reader.Read())
-				{
-					yield return new SettingEntry (Convert.ToInt32 (reader["settingId"]))
-					{
+			using (var reader = cmd.ExecuteReader()) {
+				while (await reader.ReadAsync().ConfigureAwait (false)) {
+					entries.Add (new SettingEntry (Convert.ToInt32 (reader["settingId"])) {
 						Name = Convert.ToString (reader["settingName"]),
 						Value = Convert.ToString (reader["settingValue"])
-					};
+					});
 				}
 			}
+
+			return entries;
 		}
 
 		#region Ignores
@@ -516,25 +514,25 @@ namespace Gablarski.Clients.Persistence
 		private static FileInfo DbFile;
 		private static FileInfo KeyFile;
 
-		private static void CreateDbs()
+		private static async Task CreateTablesAsync()
 		{
 			using (var cmd = db.CreateCommand ("CREATE TABLE IF NOT EXISTS servers (serverId integer primary key autoincrement, serverName varchar(255), serverHost varchar(255), serverPort integer, serverPassword varchar(255), serverUserNickname varchar(255), serverUserPhonetic varchar(255), serverUserName varchar(255), serverUserPassword varchar(255))"))
-				cmd.ExecuteNonQuery();
+				await cmd.ExecuteNonQueryAsync().ConfigureAwait (false);
 
 			using (var cmd = db.CreateCommand ("CREATE TABLE IF NOT EXISTS settings (settingId integer primary key autoincrement, settingName varchar(255), settingValue varchar(255))"))
-				cmd.ExecuteNonQuery();
+				await cmd.ExecuteNonQueryAsync().ConfigureAwait (false);
 
 			using (var cmd = db.CreateCommand ("CREATE TABLE IF NOT EXISTS volumes (volumeId integer primary key autoincrement, volumeServerId integer, volumeUsername varchar(255), volumeGain float)"))
-				cmd.ExecuteNonQuery();
+				await cmd.ExecuteNonQueryAsync().ConfigureAwait (false);
 
 			using (var cmd = db.CreateCommand ("CREATE TABLE IF NOT EXISTS ignores (ignoreId integer primary key autoincrement, ignoreServerId integer, ignoreUsername varchar(255))"))
-				cmd.ExecuteNonQuery();
+				await cmd.ExecuteNonQueryAsync().ConfigureAwait (false);
 
 			using (var cmd = db.CreateCommand ("CREATE TABLE IF NOT EXISTS commandbindings (commandbindingProvider string, commandbindingCommand integer, commandbindingInput varchar(255))"))
-				cmd.ExecuteNonQuery();
+				await cmd.ExecuteNonQueryAsync().ConfigureAwait (false);
 
 			using (var cmd = db.CreateCommand ("CREATE TABLE IF NOT EXISTS buddies (identity string)"))
-				cmd.ExecuteNonQuery();
+				await cmd.ExecuteNonQueryAsync().ConfigureAwait (false);
 		}
 	}
 }

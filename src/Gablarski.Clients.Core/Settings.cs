@@ -1,4 +1,40 @@
-﻿using System;
+﻿// Copyright (c) 2013, Eric Maupin
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with
+// or without modification, are permitted provided that
+// the following conditions are met:
+//
+// - Redistributions of source code must retain the above 
+//   copyright notice, this list of conditions and the
+//   following disclaimer.
+//
+// - Redistributions in binary form must reproduce the above
+//   copyright notice, this list of conditions and the
+//   following disclaimer in the documentation and/or other
+//   materials provided with the distribution.
+//
+// - Neither the name of Gablarski nor the names of its
+//   contributors may be used to endorse or promote products
+//   or services derived from this software without specific
+//   prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS
+// AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+// WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+// PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+// HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+// INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+// GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+// THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+// DAMAGE.
+
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -15,167 +51,112 @@ namespace Gablarski.Clients
 {
 	public static class Settings
 	{
+		static Settings()
+		{
+			settings.PropertyChanged += (sender, args) => OnSettingsChanged (args.PropertyName);
+		}
+
 		public static event PropertyChangedEventHandler SettingChanged;
 
 		public static bool FirstRun
 		{
 			get { return GetSetting ("FirstRun", true); }
-			set
-			{
-				if (SetSetting ("FirstRun", value))
-					OnSettingsChanged ("FirstRun");
-			}
+			set { SetSetting ("FirstRun", value); }
 		}
 
 		public const string VersionName = "Version";
 		public static string Version
 		{
 			get { return GetSetting (VersionName, null); }
-			set
-			{
-				if (SetSetting (VersionName, value))
-					OnSettingsChanged (VersionName);
-			}
+			set { SetSetting (VersionName, value); }
 		}
 
 		public const string NicknameName = "Nickname";
 		public static string Nickname
 		{
 			get { return GetSetting (NicknameName, null); }
-			set
-			{
-				if (SetSetting (NicknameName, value))
-					OnSettingsChanged (NicknameName);
-			}
+			set { SetSetting (NicknameName, value); }
 		}
 
 		public const string AvatarName = "AvatarUrl";
 		public static string Avatar
 		{
 			get { return GetSetting (AvatarName, null); }
-			set
-			{
-				if (SetSetting (AvatarName, value))
-					OnSettingsChanged (AvatarName);
-			}
+			set { SetSetting (AvatarName, value); }
 		}
 
 		public const string GlobalVolumeName = "GlobalVolume";
 		public static float GlobalVolume
 		{
 			get { return GetSetting (GlobalVolumeName, 1.0f); }
-			set
-			{
-				if (SetSetting (GlobalVolumeName, value))
-					OnSettingsChanged (GlobalVolumeName);
-			}
+			set { SetSetting (GlobalVolumeName, value); }
 		}
 
 		public const string UseMusicCurrentVolumeName = "UseMusicCurrentVolume";
 		public static bool UseMusicCurrentVolume
 		{
 			get { return GetSetting (UseMusicCurrentVolumeName, true); }
-			set
-			{
-				if (SetSetting (UseMusicCurrentVolumeName, value))
-					OnSettingsChanged (UseMusicCurrentVolumeName);
-			}
+			set { SetSetting (UseMusicCurrentVolumeName, value); }
 		}
 
 		public const string UsePushToTalkSettingName = "UsePushToTalk";
 		public static bool UsePushToTalk
 		{
 			get { return GetSetting (UsePushToTalkSettingName, true); }
-			set
-			{
-				if (SetSetting (UsePushToTalkSettingName, value))
-					OnSettingsChanged (UsePushToTalkSettingName);
-			}
+			set { SetSetting (UsePushToTalkSettingName, value); }
 		}
 
 		public const string VoiceActivationLevelSettingName = "VoiceActivationLevel";
 		public static int VoiceActivationLevel
 		{
 			get { return GetSetting (VoiceActivationLevelSettingName, 4000); }
-			set
-			{
-				if (SetSetting (VoiceActivationLevelSettingName, value))
-					OnSettingsChanged (VoiceActivationLevelSettingName);
-			}
+			set { SetSetting (VoiceActivationLevelSettingName, value); }
 		}
 
 		public const string VoiceActivationContinueThresholdSettingName = "VoiceActivationContinueThreshold";
 		public static int VoiceActivationContinueThreshold
 		{
 			get { return GetSetting (VoiceActivationContinueThresholdSettingName, 600); }
-			set
-			{
-				if (SetSetting (VoiceActivationContinueThresholdSettingName, value))
-					OnSettingsChanged (VoiceActivationContinueThresholdSettingName);
-			}
+			set { SetSetting (VoiceActivationContinueThresholdSettingName, value); }
 		}
 
 		public static string VoiceProvider
 		{
 			get { return GetSetting ("VoiceProvider", "Gablarski.OpenAL.Providers.OpenALCaptureProvider, Gablarski.OpenAL"); }
-			set
-			{
-				if (SetSetting ("VoiceProvider", value))
-					OnSettingsChanged ("VoiceProvider");
-			}
+			set { SetSetting ("VoiceProvider", value); }
 		}
 
 		public static string VoiceDevice
 		{
 			get { return GetSetting ("VoiceDevice", "Default"); }
-			set
-			{
-				if (SetSetting ("VoiceDevice", value))
-					OnSettingsChanged ("VoiceDevice");
-			}
+			set { SetSetting ("VoiceDevice", value); }
 		}
 
 		public const string PlaybackProviderSettingName = "PlaybackProvider";
 		public static string PlaybackProvider
 		{
 			get { return GetSetting (PlaybackProviderSettingName, "Gablarski.OpenAL.Providers.OpenALPlaybackProvider, Gablarski.OpenAL"); }
-			set
-			{
-				if (SetSetting (PlaybackProviderSettingName, value))
-					OnSettingsChanged (PlaybackProviderSettingName);
-			}
+			set { SetSetting (PlaybackProviderSettingName, value); }
 		}
 
 		public const string PlaybackDeviceSettingName = "PlaybackDevice";
 		public static string PlaybackDevice
 		{
 			get { return GetSetting (PlaybackDeviceSettingName, "Default"); }
-			set
-			{
-				if (SetSetting (PlaybackDeviceSettingName, value))
-					OnSettingsChanged (PlaybackDeviceSettingName);
-			}
+			set { SetSetting (PlaybackDeviceSettingName, value); }
 		}
 
 		public const string TextToSpeechSettingName = "TextToSpeech";
 		public static string TextToSpeech
 		{
 			get { return GetSetting (TextToSpeechSettingName, "Gablarski.SpeechNotifier.EventSpeech, Gablarski.SpeechNotifier"); }
-			set
-			{
-				if (SetSetting (TextToSpeechSettingName, value))
-					OnSettingsChanged (TextToSpeechSettingName);
-			}
+			set { SetSetting (TextToSpeechSettingName, value); }
 		}
 
 		public static string InputProvider
 		{
 			get { return GetSetting ("InputProvider", "Gablarski.Input.DirectInput.DirectInputProvider, Gablarski.Input.DirectInput"); }
-			set
-			{
-				if (SetSetting ("InputProvider", value))
-					OnSettingsChanged ("InputProvider");
-			}
+			set { SetSetting ("InputProvider", value); }
 		}
 
 		public static ICollection<CommandBinding> CommandBindings
@@ -186,35 +167,27 @@ namespace Gablarski.Clients
 		public static bool DisplaySources
 		{
 			get { return GetSetting ("DisplaySources", false); }
-			set
-			{
-				if (SetSetting ("DisplaySources", value))
-					OnSettingsChanged ("DisplaySources");
-			}
+			set { SetSetting ("DisplaySources", value); }
 		}
 
 		public static bool ShowConnectOnStart
 		{
 			get { return GetSetting ("ShowConnectOnStart", true); }
-			set
-			{
-				if (SetSetting ("ShowConnectOnStart", value))
-					OnSettingsChanged ("ShowConnectOnStart");
-			}
+			set { SetSetting ("ShowConnectOnStart", value); }
 		}
 
 		public const string EnableNotificationsSettingName = "EnableNotifications";
 		public static bool EnableNotifications
 		{
 			get { return GetSetting (EnableNotificationsSettingName, true); }
-			set
-			{
-				if (SetSetting (EnableNotificationsSettingName, value))
-					OnSettingsChanged (EnableNotificationsSettingName);
-			}
+			set { SetSetting (EnableNotificationsSettingName, value); }
 		}
 
 		public const string EnabledNotificationsSettingName = "EnabledNotifications";
+
+		private static string lastNotificationValue;
+		private static MutableLookup<string, NotificationType> notifications;
+
 		public static ILookup<string, NotificationType> EnabledNotifications
 		{
 			get
@@ -222,25 +195,23 @@ namespace Gablarski.Clients
 				string data = GetSetting (EnabledNotificationsSettingName, 
 					"Gablarski.Growl.GrowlNotifier, Gablarski.Growl:*;Gablarski.SpeechNotifier.EventSpeech, Gablarski.SpeechNotifier:*;");
 
-				var notifications = new	MutableLookup<string, NotificationType>();
+				if (data != lastNotificationValue) {
+					notifications = new MutableLookup<string, NotificationType>();
 
-				string[] notifiers = data.Split (';');
-				for (int i = 0; i < notifiers.Length; ++i)
-				{
-					if (notifiers[i].IsNullOrWhitespace())
-						continue;
+					string[] notifiers = data.Split (';');
+					for (int i = 0; i < notifiers.Length; ++i) {
+						if (notifiers[i].IsNullOrWhitespace())
+							continue;
 
-					string[] parts = notifiers[i].Split (':');
-					if (parts[1] == "*")
-					{
-						foreach (NotificationType t in Enum.GetValues (typeof (NotificationType)))
-							notifications.Add (parts[0], t);
-					}
-					else
-					{
-						string[] types = parts[1].Split (',');
-						for (int t = 0; t < types.Length; ++t)
-							notifications.Add (parts[0], (NotificationType)Enum.Parse (typeof(NotificationType), types[t]));
+						string[] parts = notifiers[i].Split (':');
+						if (parts[1] == "*") {
+							foreach (NotificationType t in Enum.GetValues (typeof (NotificationType)))
+								notifications.Add (parts[0], t);
+						} else {
+							string[] types = parts[1].Split (',');
+							for (int t = 0; t < types.Length; ++t)
+								notifications.Add (parts[0], (NotificationType) Enum.Parse (typeof (NotificationType), types[t]));
+						}
 					}
 				}
 
@@ -249,6 +220,9 @@ namespace Gablarski.Clients
 
 			set
 			{
+				if (value == null)
+					throw new ArgumentNullException ("value");
+
 				var types = Enum.GetValues (typeof (NotificationType));
 
 				StringBuilder data = new StringBuilder();
@@ -276,100 +250,89 @@ namespace Gablarski.Clients
 					data.Append (";");
 				}
 
-				if (SetSetting (EnabledNotificationsSettingName, data.ToString()))
-					OnSettingsChanged (EnabledNotificationsSettingName);
+				lastNotificationValue = data.ToString();
+				notifications = new MutableLookup<string, NotificationType> (value);
+
+				SetSetting (EnabledNotificationsSettingName, data.ToString());
 			}
 		}
 
+		private const string DefaultMediaPlayers = "Gablarski.iTunes.iTunesIntegration, Gablarski.iTunes;Gablarski.Winamp.WinampIntegration, Gablarski.Winamp";
 		public const string EnabledMediaPlayerIntegrationsSettingName = "EnabledMediaPlayerIntegrations";
 		public static IEnumerable<string> EnabledMediaPlayerIntegrations
 		{
 			get
 			{
-				return GetSetting (EnabledMediaPlayerIntegrationsSettingName,
-					"Gablarski.iTunes.iTunesIntegration, Gablarski.iTunes;Gablarski.Winamp.WinampIntegration, Gablarski.Winamp"
-					).Split (';').Where (s => !s.IsNullOrWhitespace());
+				return GetSetting (EnabledMediaPlayerIntegrationsSettingName, DefaultMediaPlayers)
+					.Split (';').Where (s => !s.IsNullOrWhitespace());
 			}
 
-			set
-			{
-				if (SetSetting (EnabledMediaPlayerIntegrationsSettingName, value.Implode (";")))
-					OnSettingsChanged (EnabledMediaPlayerIntegrationsSettingName);
-			}
+			set { SetSetting (EnabledMediaPlayerIntegrationsSettingName, value.Implode (";")); }
 		}
 
 		public const string EnableMediaVolumeControlSettingName = "EnableMediaVolumeControl";
 		public static bool EnableMediaVolumeControl
 		{
 			get { return GetSetting (EnableMediaVolumeControlSettingName, true); }
-			set
-			{
-				if (SetSetting (EnableMediaVolumeControlSettingName, value))
-					OnSettingsChanged (EnableMediaVolumeControlSettingName);
-			}
+			set { SetSetting (EnableMediaVolumeControlSettingName, value); }
 		}
 
 		public const string MediaVolumeControlIgnoresYouSettingName = "MediaVolumeControlIgnoresYou";
 		public static bool MediaVolumeControlIgnoresYou
 		{
 			get { return GetSetting (MediaVolumeControlIgnoresYouSettingName, true); }
-			set
-			{
-				if (SetSetting (MediaVolumeControlIgnoresYouSettingName, value))
-					OnSettingsChanged (MediaVolumeControlIgnoresYouSettingName);
-			}
+			set { SetSetting (MediaVolumeControlIgnoresYouSettingName, value); }
 		}
 
 		public const string TalkingMusicVolumeSettingName = "TalkingMusicVolume";
 		public static int TalkingMusicVolume
 		{
 			get { return GetSetting (TalkingMusicVolumeSettingName, 30); }
-			set
-			{
-				if (SetSetting (TalkingMusicVolumeSettingName, value))
-					OnSettingsChanged (TalkingMusicVolumeSettingName);
-			}
+			set { SetSetting (TalkingMusicVolumeSettingName, value); }
 		}
 
 		public const string NormalMusicVolumeSettingName = "NormalMusicVolume";
 		public static int NormalMusicVolume
 		{
 			get { return GetSetting (NormalMusicVolumeSettingName, 100); }
-			set
-			{
-				if (SetSetting (NormalMusicVolumeSettingName, value))
-					OnSettingsChanged (NormalMusicVolumeSettingName);
+			set { SetSetting (NormalMusicVolumeSettingName, value); }
+		}
+
+		public const string EnableGablarskiUrlsSettingName = "EnableGablarskiURLs";
+		public static bool EnableGablarskiUrls
+		{
+			get { return GetSetting (EnableGablarskiUrlsSettingName, true); }
+			set { SetSetting (EnableGablarskiUrlsSettingName, value); }
+		}
+
+		public static IReadOnlyDictionary<string, string> CurrentSettings
+		{
+			get { return settings.ToDictionary(); }
+		}
+
+		public static async Task LoadAsync()
+		{
+			await settings.LoadAsync().ConfigureAwait (false);
+
+			commandBindings = new ObservableCollection<CommandBinding>();
+			commandBindings.CollectionChanged += OnCommandBindingsChanged;
+
+			foreach (var cbe in ClientData.GetCommandBindings()) {
+				IInputProvider provider = Modules.Input.FirstOrDefault (ip => ip.GetType().GetSimpleName() == cbe.ProviderType);
+				if (provider == null)
+					continue;
+
+				commandBindings.Add (new CommandBinding (provider, cbe.Command, cbe.Input));
 			}
 		}
 
-		public const string EnableGablarskiURLsSettingName = "EnableGablarskiURLs";
-		public static bool EnableGablarskiURLs
+		public static async Task SaveAsync()
 		{
-			get { return GetSetting (EnableGablarskiURLsSettingName, true); }
-			set
-			{
-				if (SetSetting (EnableGablarskiURLsSettingName, value))
-					OnSettingsChanged (EnableGablarskiURLsSettingName);
-			}
-		}
+			if (settings == null)
+				return;
 
-		public static System.Collections.IDictionary CurrentSettings
-		{
-			get { return settings; }
-		}
-
-		public static void Save()
-		{
-			LoadSettings();
-
-			lock (SettingLock)
-			{
-				foreach (var entry in settings.Values)
-					ClientData.SaveOrUpdate (entry);
-
-				settings = null;
-				if (commandBindings != null)
-				{
+			lock (settings) {
+				if (commandBindings != null) {
 					commandBindings.CollectionChanged -= OnCommandBindingsChanged;
 
 					ClientData.DeleteAllBindings();
@@ -379,50 +342,13 @@ namespace Gablarski.Clients
 					commandBindings = null;
 				}
 			}
-		}
 
-		public static Task SaveAsync()
-		{
-			return Task.Run ((Action)Save);
+			await settings.SaveAsync().ConfigureAwait (false);
+			await LoadAsync().ConfigureAwait (false);
 		}
-
-		public static void Clear()
-		{
-			lock (SettingLock)
-				settings = null;
-		}
-
-		private readonly static object SettingLock = new object();
 
 		private static ObservableCollection<CommandBinding> commandBindings;
-		private static Dictionary<string, SettingEntry> settings;
-
-		private static void LoadSettings ()
-		{
-			
-			lock (SettingLock)
-			{
-				if (settings != null)
-					return;
-
-				var settingsEntries = ClientData.GetSettings();
-				settings = settingsEntries.ToDictionary (s => s.Name);
-
-				if (ClientData.CheckForUpdates())
-					settings = ClientData.GetSettings().ToDictionary (s => s.Name);
-
-				commandBindings = new ObservableCollection<CommandBinding>();
-				commandBindings.CollectionChanged += OnCommandBindingsChanged;
-				foreach (var cbe in ClientData.GetCommandBindings())
-				{
-					IInputProvider provider = Enumerable.FirstOrDefault<IInputProvider> (Modules.Input, ip => Extensions.GetSimpleName(ip.GetType()) == cbe.ProviderType);
-					if (provider == null)
-						continue;
-
-					commandBindings.Add (new CommandBinding (provider, cbe.Command, cbe.Input));
-				}
-			}
-		}
+		private static readonly ClientDataSettingsProvider settings = new ClientDataSettingsProvider();
 
 		private static void OnCommandBindingsChanged (object sender, NotifyCollectionChangedEventArgs e)
 		{
@@ -431,15 +357,7 @@ namespace Gablarski.Clients
 
 		private static string GetSetting (string settingName, string defaultValue)
 		{
-			LoadSettings();
-
-			lock (SettingLock)
-			{
-				if (!settings.ContainsKey (settingName))
-					settings[settingName] = new SettingEntry (0) { Name = settingName, Value = defaultValue };
-
-				return settings[settingName].Value;
-			}
+			return settings.GetValue (settingName, defaultValue);
 		}
 
 		private static bool GetSetting (string settingName, bool defaultValue)
@@ -457,39 +375,19 @@ namespace Gablarski.Clients
 			return Single.Parse (GetSetting (settingName, defaultValue.ToString()));
 		}
 
-		private static bool SetSetting (string settingName, string value)
+		private static void SetSetting (string settingName, string value)
 		{
-			LoadSettings();
-
-			lock (SettingLock)
-			{
-				SettingEntry entry;
-				if (settings.TryGetValue (settingName, out entry))
-				{
-					if (entry.Value != value)
-					{
-						entry.Value = value;
-						return true;
-					}
-				}
-				else
-				{
-					settings[settingName] = new SettingEntry (0) { Name = settingName, Value = value };
-					return true;
-				}
-			}
-
-			return false;
+			settings.SetValue (settingName, value);
 		}
 
-		private static bool SetSetting (string settingName, bool value)
+		private static void SetSetting (string settingName, bool value)
 		{
-			return SetSetting (settingName, (value) ? "1" : "0");
+			SetSetting (settingName, (value) ? "1" : "0");
 		}
 
-		private static bool SetSetting<T> (string settingName, T value)
+		private static void SetSetting<T> (string settingName, T value)
 		{
-			return SetSetting (settingName, value.ToString());
+			SetSetting (settingName, value.ToString());
 		}
 
 		private static void OnSettingsChanged (string propertyName)
