@@ -117,7 +117,7 @@ namespace Gablarski.Audio
 					audioPlayback.SetGain (s, options.Gain);
 					playbacks[s] = new AudioPlaybackEntity (audioPlayback, s, options);
 
-					if (this.playbackMuted || mutedPlayers.Contains (audioPlayback))
+					if (mutedPlayers.Contains (audioPlayback))
 						playbacks[s].Muted = true;
 				}
 			}
@@ -143,7 +143,7 @@ namespace Gablarski.Audio
 				audioPlayback.SetGain (source, options.Gain);
 				playbacks[source] = new AudioPlaybackEntity (audioPlayback, source, options);
 
-				if (this.playbackMuted || mutedPlayers.Contains (audioPlayback))
+				if (mutedPlayers.Contains (audioPlayback))
 					playbacks[source].Muted = true;
 			}
 		}
