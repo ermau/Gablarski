@@ -179,7 +179,8 @@ namespace Gablarski.Clients.Windows
 
 			StartupLog.DebugFormat ("Databases setup.");
 
-			CheckForUpdates();
+			if (!Debugger.IsAttached)
+				CheckForUpdates();
 
 			StartupLog.Debug ("Starting key retrieval");
 			var keyCancelSource = new CancellationTokenSource();
