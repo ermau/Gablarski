@@ -128,7 +128,7 @@ namespace Gablarski.Client
 		/// <summary>
 		/// Gets the channel manager for this client.
 		/// </summary>
-		public ClientChannelHandler Channels
+		public IClientChannelHandler Channels
 		{
 			get;
 			private set;
@@ -218,11 +218,6 @@ namespace Gablarski.Client
 		public Task DisconnectAsync()
 		{
 			return this.client.DisconnectAsync();
-		}
-
-		IIndexedEnumerable<int, IChannelInfo> IGablarskiClientContext.Channels
-		{
-			get { return this.Channels; }
 		}
 
 		private void Setup (IClientConnection connection, IAudioEngine audioEngine, IClientUserHandler userHandler, IClientSourceHandler sourceHandler, ClientChannelHandler channelHandler)
@@ -368,7 +363,7 @@ namespace Gablarski.Client
 
 				CurrentUser = new CurrentUser (this);
 				this.Users.Reset();
-				this.Channels.Clear();
+				this.Channels.Reset();
 				this.Sources.Reset();
 
 				this.Audio.Stop();

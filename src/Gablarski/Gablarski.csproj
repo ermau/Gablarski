@@ -111,6 +111,7 @@
     <Compile Include="BanInfo.cs" />
     <Compile Include="Audio\AudioEngine.cs" />
     <Compile Include="Audio\IAudioSender.cs" />
+    <Compile Include="Client\IClientChannelHandler.cs" />
     <Compile Include="Client\IClientSourceHandler.cs" />
     <Compile Include="Client\IClientSourceManager.cs" />
     <Compile Include="Client\IClientUserHandler.cs" />
@@ -184,6 +185,7 @@
     <Compile Include="Messages\SourceListMessage.cs" />
     <Compile Include="Messages\SourceResultMessage.cs" />
     <Compile Include="ByteArrayExtensions.cs" />
+    <Compile Include="ObservableDictionary.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Server\GablarskiSocialServer.cs" />
     <Compile Include="Server\IRedirector.cs" />

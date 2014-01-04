@@ -1,4 +1,4 @@
-// Copyright (c) 2011, Eric Maupin
+// Copyright (c) 2011-2014, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -36,15 +36,16 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
+using System.Threading.Tasks;
 using Gablarski.Messages;
-using System.Threading;
 using Tempest;
 
 namespace Gablarski.Client
 {
 	public class ClientChannelHandler
-		: IIndexedEnumerable<int, IChannelInfo>
+		: IClientChannelHandler, INotifyCollectionChanged
 	{
 		protected internal ClientChannelHandler (IGablarskiClientContext context)
 		{
@@ -56,17 +57,20 @@ namespace Gablarski.Client
 			this.context.RegisterMessageHandler<ChannelListMessage> (OnChannelListReceivedMessage);
 		}
 
-		#region Events
-		/// <summary>
-		/// The result of a channel edit request has been received.
-		/// </summary>
-		public event EventHandler<ChannelEditResultEventArgs> ReceivedChannelEditResult;
+		public event NotifyCollectionChangedEventHandler CollectionChanged
+		{
+			add { this.channels.CollectionChanged += value; }
+			remove { this.channels.CollectionChanged -= value; }
+		}
 
-		/// <summary>
-		/// A new or updated player list has been received.
-		/// </summary>
-		public event EventHandler<ReceivedListEventArgs<IChannelInfo>> ReceivedChannelList;
-		#endregion
+		public int Count
+		{
+			get
+			{
+				lock (this.channelLock)
+					return this.channels.Count;
+			}
+		}
 
 		/// <summary>Gets the channel with id <paramref name="channelId"/></summary>
 		/// <param name="channelId">The id of the channel.</param>
@@ -91,39 +95,39 @@ namespace Gablarski.Client
 		/// Send a create channel request to the server.
 		/// </summary>
 		/// <param name="channel">The channel to create.</param>
-		public void Create (ChannelInfo channel)
+		public async Task<ChannelEditResult> CreateAsync (IChannelInfo channel)
 		{
 			if (channel == null)
 				throw new ArgumentNullException ("channel");
-
 			if (channel.ChannelId != 0)
 				throw new ArgumentException ("Can not create an existing channel", "channel");
 
-			this.context.Connection.SendFor<ChannelEditResultMessage> (new ChannelEditMessage (channel))
-				.ContinueWith (t => OnChannelEditResultMessage (t.Result));
+			var editMsg = new ChannelEditMessage (channel);
+			var resultMessage = await this.context.Connection.SendFor<ChannelEditResultMessage> (editMsg).ConfigureAwait (false);
+			return resultMessage.Result;
 		}
 
 		/// <summary>
 		/// Sends an update request to the server for <paramref name="channel"/>.
 		/// </summary>
 		/// <param name="channel">The updated information for the channel.</param>
-		public void Update (ChannelInfo channel)
+		public async Task<ChannelEditResult> UpdateAsync (IChannelInfo channel)
 		{
 			if (channel == null)
 				throw new ArgumentNullException ("channel");
-
 			if (channel.ChannelId == 0)
 				throw new ArgumentException ("channel must be an existing channel", "channel");
 
-			this.context.Connection.SendFor<ChannelEditResultMessage> (new ChannelEditMessage (channel))
-				.ContinueWith (t => OnChannelEditResultMessage (t.Result));
+			var editMsg = new ChannelEditMessage (channel);
+			var resultMessage = await this.context.Connection.SendFor<ChannelEditResultMessage> (editMsg);
+			return resultMessage.Result;
 		}
 
 		/// <summary>
 		/// Sends a delete channel request to the server.
 		/// </summary>
 		/// <param name="channel">The channel to delete.</param>
-		public void Delete (ChannelInfo channel)
+		public async Task<ChannelEditResult> DeleteAsync (IChannelInfo channel)
 		{
 			if (channel == null)
 				throw new ArgumentNullException ("channel");
@@ -131,107 +135,51 @@ namespace Gablarski.Client
 			if (channel.ChannelId == 0)
 				throw new ArgumentException ("channel must be an existing channel", "channel");
 
-			this.context.Connection.SendFor<ChannelEditResultMessage> (new ChannelEditMessage (channel) { Delete = true })
-				.ContinueWith (t => OnChannelEditResultMessage (t.Result));
+			var editMsg = new ChannelEditMessage (channel) { Delete = true };
+			var resultMessage = await this.context.Connection.SendFor<ChannelEditResultMessage> (editMsg).ConfigureAwait (false);
+			return resultMessage.Result;
 		}
 
 		/// <summary>
 		/// Clears the channel manager of all channels.
 		/// </summary>
-		public void Clear()
+		public void Reset()
 		{
 			lock (channelLock)
-			{
-				this.channels = null;
-			}
+				this.channels.Clear();
 		}
 
-		#region IEnumerable<IChannelInfo> members
 		public IEnumerator<IChannelInfo> GetEnumerator ()
 		{
 			if (this.channels == null || this.channels.Count == 0)
 				return Enumerable.Empty<IChannelInfo> ().GetEnumerator();
 
 			lock (channelLock)
-			{
 				return channels.Values.ToList ().GetEnumerator();
-			}
 		}
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator ()
 		{
 			return this.GetEnumerator ();
 		}
-		#endregion
 
 		private readonly IGablarskiClientContext context;
 
 		private readonly object channelLock = new object ();
-		private Dictionary<int, IChannelInfo> channels;
+		private readonly ObservableDictionary<int, IChannelInfo> channels = new ObservableDictionary<int, IChannelInfo>();
 
 		internal void OnChannelListReceivedMessage (MessageEventArgs<ChannelListMessage> e)
 		{
-			lock (channelLock)
-			{
-				this.channels = e.Message.Channels.ToDictionary (c => c.ChannelId);
+			lock (channelLock) {
+				HashSet<int> removedIds = new HashSet<int> (this.channels.Keys);
+				removedIds.IntersectWith (e.Message.Channels.Select (c => c.ChannelId));
+
+				foreach (int id in removedIds)
+					this.channels.Remove (id);
+
+				foreach (IChannelInfo channel in e.Message.Channels)
+					this.channels[channel.ChannelId] = channel;
 			}
-
-			OnReceivedChannelList (new ReceivedListEventArgs<IChannelInfo> (e.Message.Channels));
-		}
-
-		internal void OnChannelEditResultMessage (ChannelEditResultMessage msg)
-		{
-			IChannelInfo channel;
-			lock (this.channelLock)
-			{
-				this.channels.TryGetValue (msg.ChannelId, out channel);
-			}
-
-			OnReceivedChannelEditResult (new ChannelEditResultEventArgs (channel, msg.Result));
-		}
-
-		protected internal virtual void OnReceivedChannelList (ReceivedListEventArgs<IChannelInfo> e)
-		{
-			var received = this.ReceivedChannelList;
-			if (received != null)
-				received (this, e);
-		}
-
-		protected internal virtual void OnReceivedChannelEditResult (ChannelEditResultEventArgs e)
-		{
-			var received = this.ReceivedChannelEditResult;
-			if (received != null)
-				received (this, e);
 		}
 	}
-
-	#region Event Args
-	public class ChannelEditResultEventArgs
-		: EventArgs
-	{
-		public ChannelEditResultEventArgs (IChannelInfo channel, ChannelEditResult result)
-		{
-			this.Channel = channel;
-			this.Result = result;
-		}
-
-		/// <summary>
-		/// Gets the channel the edit request was for.
-		/// </summary>
-		public IChannelInfo Channel
-		{
-			get;
-			private set;
-		}
-
-		/// <summary>
-		/// Gets the result of the channel edit request.
-		/// </summary>
-		public ChannelEditResult Result
-		{
-			get;
-			private set;
-		}
-	}
-	#endregion
 }

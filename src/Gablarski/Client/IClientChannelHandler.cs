@@ -1,4 +1,4 @@
-// Copyright (c) 2011, Eric Maupin
+﻿// Copyright (c) 2014, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -34,50 +34,18 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
-using Gablarski.Audio;
-using Tempest;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Gablarski.Client
 {
-	/// <summary>
-	/// Represents a Gablarski client context.
-	/// </summary>
-	public interface IGablarskiClientContext
-		: IClientContext
+	public interface IClientChannelHandler
+		: IReadOnlyList<IChannelInfo>
 	{
-		IAudioEngine Audio { get; }
+		Task<ChannelEditResult> CreateAsync (IChannelInfo channelInfo);
+		Task<ChannelEditResult> UpdateAsync (IChannelInfo channelInfo);
+		Task<ChannelEditResult> DeleteAsync (IChannelInfo channelInfo);
 
-		/// <summary>
-		/// Information about the current server. (<c>null</c> if not connected)
-		/// </summary>
-		ServerInfo ServerInfo { get; }
-
-		/// <summary>
-		/// Gets the channels handler associated with this context.
-		/// </summary>
-		IClientChannelHandler Channels { get; }
-
-		/// <summary>
-		/// Gets the source handler associated with this context.
-		/// </summary>
-		IClientSourceHandler Sources { get; }
-
-		/// <summary>
-		/// Gets the user handler associated with this context.
-		/// </summary>
-		IClientUserHandler Users { get; }
-
-		/// <summary>
-		/// Gets the current logged in user.
-		/// </summary>
-		ICurrentUserHandler CurrentUser { get; }
-	}
-
-	public static class ContextExtensions
-	{
-		public static IChannelInfo GetCurrentChannel (this IGablarskiClientContext self)
-		{
-			return self.Channels[self.CurrentUser.CurrentChannelId];
-		}
+		void Reset();
 	}
 }
