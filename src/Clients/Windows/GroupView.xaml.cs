@@ -39,9 +39,6 @@ namespace Gablarski.Clients.Windows
 
 		private void OnJoinVoiceMessage (JoinVoiceMessage msg)
 		{
-			MainForm main = new MainForm();
-			main.Connect (msg.Target.Hostname, msg.Target.Port);
-			main.Show();
 		}
 	}
 }
