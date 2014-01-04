@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2011, Eric Maupin
+﻿// Copyright (c) 2011-2014, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -40,7 +40,7 @@ using System.Linq;
 
 namespace Gablarski
 {
-	public interface ISourceHandler<TSource>
+	public interface ISourceHandler<out TSource>
 		: IIndexedEnumerable<int, TSource>
 	{
 		IEnumerable<TSource> this[IUserInfo user] { get; }

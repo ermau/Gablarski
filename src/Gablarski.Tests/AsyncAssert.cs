@@ -43,14 +43,14 @@ namespace Gablarski.Tests
 {
 	public static class AsyncAssert
 	{
-		public static void Throws<T> (Func<Task> method)
+		public static void Throws<T> (Func<System.Threading.Tasks.Task> method)
 			where T : Exception
 		{
 			if (method == null)
 				throw new ArgumentNullException ("method");
 
 			try {
-				Task task = method();
+				System.Threading.Tasks.Task task = method();
 				task.Wait();
 			} catch (AggregateException aex) {
 				Assert.IsTrue (aex.Flatten().InnerExceptions.OfType<T>().Any(), "Exception of type {0} was not thrown", typeof (T));

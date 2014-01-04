@@ -80,10 +80,9 @@ namespace Gablarski.Tests
 				ChannelsProvider = new LobbyChannelProvider(),
 			};
 
-			context.Sources = new ServerSourceHandler (context, new ServerSourceManager (context));
+			context.Sources = new ServerSourceHandler (context);
 			context.Channels = new ServerChannelHandler (context);
-			context.UserManager = new ServerUserManager();
-			context.Users = handler = new ServerUserHandler (context, context.UserManager);
+			context.Users = handler = new ServerUserHandler (context);
 
 			context.Start();
 
@@ -670,7 +669,7 @@ namespace Gablarski.Tests
 		//}
 
 		[Test]
-		public async Task RegisterNotConnected()
+		public async System.Threading.Tasks.Task RegisterNotConnected()
 		{
 			var cs = provider.GetConnections (GablarskiProtocol.Instance);
 			var s = new ConnectionBuffer (cs.Item2);

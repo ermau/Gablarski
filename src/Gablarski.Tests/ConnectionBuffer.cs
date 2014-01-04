@@ -95,12 +95,12 @@ namespace Gablarski.Tests
 			return this.connection.SendResponseAsync (originalMessage, response);
 		}
 
-		public Task DisconnectAsync ()
+		public System.Threading.Tasks.Task DisconnectAsync ()
 		{
 			return this.connection.DisconnectAsync();
 		}
 
-		public Task DisconnectAsync (ConnectionResult reason, string customReason = null)
+		public System.Threading.Tasks.Task DisconnectAsync (ConnectionResult reason, string customReason = null)
 		{
 			return this.connection.DisconnectAsync (reason, customReason);
 		}

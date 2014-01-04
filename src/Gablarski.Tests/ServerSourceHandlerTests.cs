@@ -51,13 +51,12 @@ namespace Gablarski.Tests
 	public class ServerSourceHandlerTests
 	{
 		private IGablarskiServerContext context;
-		private IServerSourceManager manager;
-		private IServerUserManager userManager;
 		private ServerSourceHandler handler;
+		private ServerUserHandler users;
 		private MockServerConnection server;
 		private ConnectionBuffer client;
 		private MockPermissionsProvider permissions;
-		private UserInfo user;
+		private IUserInfo user;
 		private MockConnectionProvider provider;
 
 		private const int defaultBitrate = 96000;
@@ -78,7 +77,6 @@ namespace Gablarski.Tests
 			this.provider = new MockConnectionProvider (GablarskiProtocol.Instance);
 			this.provider.Start (MessageTypes.All);
 
-			userManager = new ServerUserManager();
 			MockServerContext c;
 			context = c = new MockServerContext (provider)
 			{
@@ -90,14 +88,14 @@ namespace Gablarski.Tests
 					MinimumAudioBitrate = minBitrate
 				},
 
-				UserManager = userManager,
 				PermissionsProvider = permissions,
-				ChannelsProvider = channels 
+				ChannelsProvider = channels,
+				UserProvider = new MockUserProvider(),
 			};
-			c.Users = new ServerUserHandler (context, userManager);
+			c.Users = users = new ServerUserHandler (context);
+			c.Sources = new ServerSourceHandler (context);
 
-			manager = new ServerSourceManager (context);
-			handler = new ServerSourceHandler (context, manager);
+			handler = new ServerSourceHandler (context);
 
 			user = UserInfoTests.GetTestUser (1, 1, false);
 		
@@ -106,15 +104,14 @@ namespace Gablarski.Tests
 			client = new ConnectionBuffer (cs.Item1);
 			server = cs.Item2;
 
-			userManager.Connect (server);
-			userManager.Join (server, user);
+			users.Connect (server, client);
+			users.Join (server, client, ref user);
 		}
 
 		[TearDown]
 		public void Teardown()
 		{
 			handler = null;
-			manager = null;
 			context = null;
 			server = null;
 			permissions = null;
@@ -123,18 +120,36 @@ namespace Gablarski.Tests
 		[Test]
 		public void CtorNull()
 		{
-			Assert.Throws<ArgumentNullException> (() => new ServerSourceHandler (null, manager));
-			Assert.Throws<ArgumentNullException> (() => new ServerSourceHandler (context, null));
+			Assert.Throws<ArgumentNullException> (() => new ServerSourceHandler (null));
 		}
 
 		[Test]
 		public void Enumerable()
 		{
-			var source = manager.Create ("Name", user, AudioSourceTests.GetTestSource().CodecSettings);
-			var source2 = manager.Create ("Name2", user, AudioSourceTests.GetTestSource().CodecSettings);
+			var settings = AudioSourceTests.GetTestSource().CodecSettings;
 
-			Assert.Contains (source, handler.ToList());
-			Assert.Contains (source2, handler.ToList());
+			permissions.EnablePermissions (user.UserId, PermissionName.RequestSource);
+
+			handler.RequestSourceMessage (new MessageEventArgs<RequestSourceMessage> (server, new RequestSourceMessage {
+				Name = "Name",
+				AudioSettings = settings
+			}));
+
+			handler.RequestSourceMessage (new MessageEventArgs<RequestSourceMessage> (server, new RequestSourceMessage {
+				Name = "Name2",
+				AudioSettings = settings
+			}));
+
+			var sources = handler.ToList();
+
+			var source = sources.FirstOrDefault();
+			Assert.IsNotNull (source, "No sources");
+			Assert.AreEqual ("Name", source.Name);
+			Assert.AreEqual (settings, source.CodecSettings);
+
+			source = sources.Skip (1).FirstOrDefault();
+			Assert.AreEqual ("Name2", source.Name);
+			Assert.AreEqual (settings, source.CodecSettings);
 		}
 
 		#region RequestSourceMessage
@@ -158,7 +173,7 @@ namespace Gablarski.Tests
 			var cs = this.provider.GetConnections (GablarskiProtocol.Instance);
 			var cl = new ConnectionBuffer (cs.Item1);
 
-			userManager.Connect (cs.Item2);
+			users.Connect (cs.Item2, cl);
 
 			handler.RequestSourceMessage (new MessageEventArgs<RequestSourceMessage> (cs.Item2,
 				new RequestSourceMessage ("Name", AudioCodecArgsTests.GetTestArgs())));
@@ -179,7 +194,7 @@ namespace Gablarski.Tests
 
 		public AudioSource GetSourceFromRequest (MockServerConnection serverConnection, ConnectionBuffer clientConnection)
 		{
-			permissions.EnablePermissions (userManager.GetUser (serverConnection).UserId,	PermissionName.RequestSource);
+			permissions.EnablePermissions (users[serverConnection].UserId,	PermissionName.RequestSource);
 
 			var audioArgs = new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 64000, AudioSourceTests.FrameSize, 10);
 			handler.RequestSourceMessage (new MessageEventArgs<RequestSourceMessage> (serverConnection,
@@ -282,8 +297,9 @@ namespace Gablarski.Tests
 			var c = cs.Item2;
 			var cl = new ConnectionBuffer (cs.Item1);
 
-			userManager.Connect (c);
-			userManager.Join (c, UserInfoTests.GetTestUser (2));
+			IUserInfo user2 = UserInfoTests.GetTestUser (2);
+			users.Connect (c, cl);
+			users.Join (c, cl, ref user2);
 
 			var audioArgs = AudioCodecArgsTests.GetTestArgs();
 			handler.RequestSourceMessage (new MessageEventArgs<RequestSourceMessage> (server,
@@ -375,8 +391,9 @@ namespace Gablarski.Tests
 			var c = cs.Item2;
 			var cl = new ConnectionBuffer (cs.Item1);
 
-			userManager.Connect (c);
-			userManager.Join (c, UserInfoTests.GetTestUser (2));
+			users.Connect (c, cl);
+			IUserInfo user2 = UserInfoTests.GetTestUser (2);
+			users.Join (c, cl, ref user2);
 
 			handler.RequestSourceListMessage (new MessageEventArgs<RequestSourceListMessage> (c, new RequestSourceListMessage()));
 			var list = cl.DequeueAndAssertMessage<SourceListMessage>();
@@ -447,7 +464,7 @@ namespace Gablarski.Tests
 			var c = cs.Item2;
 			var cl = new ConnectionBuffer (cs.Item1);
 
-			userManager.Connect (c);
+			users.Connect (c, cl);
 
 			var source = GetSourceFromRequest();
 
@@ -468,8 +485,10 @@ namespace Gablarski.Tests
 			var c = cs.Item2;
 			var cl = new ConnectionBuffer (cs.Item1);
 
-			userManager.Connect (c);
-			userManager.Join (c, UserInfoTests.GetTestUser (2));
+			users.Connect (c, cl);
+			IUserInfo user2 = UserInfoTests.GetTestUser (2);
+			users.Join (c, cl, ref user2);
+			client.DequeueAndAssertMessage<UserJoinedMessage>();
 
 			var source = GetSourceFromRequest();
 			Assert.AreEqual (SourceResult.NewSource, cl.DequeueAndAssertMessage<SourceResultMessage>().SourceResult);
@@ -486,7 +505,7 @@ namespace Gablarski.Tests
 //		[Test]
 //		public void RequestMuteWithPermission()
 //		{
-//			var u = UserInfoTests.GetTestUser (2);
+//			IUserInfo u = UserInfoTests.GetTestUser (2);
 //			var c = new MockServerConnection();
 //			userManager.Connect (c);
 //			userManager.Join (c, u);
@@ -536,7 +555,7 @@ namespace Gablarski.Tests
 			var c = cs.Item2;
 			var cl = new ConnectionBuffer (cs.Item1);
 
-			userManager.Connect (c);
+			users.Connect (c, cl);
 
 			handler.ClientAudioSourceStateChangeMessage (new MessageEventArgs<ClientAudioSourceStateChangeMessage> (c,
 				new ClientAudioSourceStateChangeMessage { SourceId = 1, Starting = true }));
@@ -548,17 +567,19 @@ namespace Gablarski.Tests
 		[Test]
 		public void ClientAudioSourceStateChangeNotOwnedSource()
 		{
-			var u = UserInfoTests.GetTestUser (2, 1, false);
+			IUserInfo u = UserInfoTests.GetTestUser (2, 1, false);
 			
 			var cs = provider.GetConnections (GablarskiProtocol.Instance);
 			var c = cs.Item2;
 			var cl = new ConnectionBuffer (cs.Item1);
 
-			userManager.Connect (c);
-			userManager.Join (c, u);
+			users.Connect (c, cl);
+			users.Join (c, cl, ref u);
+			client.DequeueAndAssertMessage<UserJoinedMessage>();
 
-			var s = manager.Create ("Name", user, new AudioCodecArgs());
-
+			var s = GetSourceFromRequest (server, client);
+			cl.DequeueAndAssertMessage<SourceResultMessage>();
+			
 			handler.ClientAudioSourceStateChangeMessage (new MessageEventArgs<ClientAudioSourceStateChangeMessage> (c,
 				new ClientAudioSourceStateChangeMessage { SourceId = s.Id, Starting = true }));
 
@@ -569,16 +590,20 @@ namespace Gablarski.Tests
 		[Test]
 		public void ClientAudioSourceStateChangedUserMuted()
 		{
-			var u = UserInfoTests.GetTestUser (2, 1, true);
+			IUserInfo u = UserInfoTests.GetTestUser (2, 1, true);
 			
 			var cs = provider.GetConnections (GablarskiProtocol.Instance);
 			var c = cs.Item2;
 			var cl = new ConnectionBuffer (cs.Item1);
 
-			userManager.Connect (c);
-			userManager.Join (c, u);
+			users.Connect (c, cl);
+			users.Join (c, cl, ref u);
+			client.DequeueAndAssertMessage<UserJoinedMessage>();
 
-			var s = manager.Create ("Name", u, new AudioCodecArgs ());
+			MuteUser (u, cl);
+
+			var s = GetSourceFromRequest (c, cl);
+			client.DequeueAndAssertMessage<SourceResultMessage>();
 
 			handler.ClientAudioSourceStateChangeMessage (new MessageEventArgs<ClientAudioSourceStateChangeMessage> (c,
 				new ClientAudioSourceStateChangeMessage { SourceId = s.Id, Starting = true }));
@@ -587,20 +612,32 @@ namespace Gablarski.Tests
 			cl.AssertNoMessage();
 		}
 
+		private void MuteUser (IUserInfo user, ConnectionBuffer client)
+		{
+			this.permissions.EnablePermissions (this.user.UserId, PermissionName.MuteUser);
+			this.users.OnRequestMuteUserMessage (new MessageEventArgs<RequestMuteUserMessage> (this.server,
+				new RequestMuteUserMessage (user, true)));
+			this.client.DequeueAndAssertMessage<UserMutedMessage>();
+			client.DequeueAndAssertMessage<UserMutedMessage>();
+		}
+
 		[Test]
 		public void ClientAudioSourceStateChangedSourceMuted()
 		{
-			var u = UserInfoTests.GetTestUser (2, 1, false);
+			IUserInfo u = UserInfoTests.GetTestUser (2, 1, false);
 			
 			var cs = provider.GetConnections (GablarskiProtocol.Instance);
 			var c = cs.Item2;
 			var cl = new ConnectionBuffer (cs.Item1);
 
-			userManager.Connect (c);
-			userManager.Join (c, u);
+			users.Connect (c, cl);
+			users.Join (c, cl, ref u);
+			client.DequeueAndAssertMessage<UserJoinedMessage>();
 
-			var s = manager.Create ("Name", u, new AudioCodecArgs ());
-			manager.ToggleMute (s);
+			var s = GetSourceFromRequest (c, cl);
+			client.DequeueAndAssertMessage<SourceResultMessage>();
+
+			MuteUser (u, cl);
 
 			handler.ClientAudioSourceStateChangeMessage (new MessageEventArgs<ClientAudioSourceStateChangeMessage> (c,
 				new ClientAudioSourceStateChangeMessage { SourceId = s.Id, Starting = true }));
@@ -612,16 +649,18 @@ namespace Gablarski.Tests
 		[Test]
 		public void ClientAudioSourceStateChangedSameChannel()
 		{
-			var u = UserInfoTests.GetTestUser (2, 1, false);
+			IUserInfo u = UserInfoTests.GetTestUser (2, 1, false);
 			
 			var cs = provider.GetConnections (GablarskiProtocol.Instance);
 			var c = cs.Item2;
 			var cl = new ConnectionBuffer (cs.Item1);
 
-			userManager.Connect (c);
-			userManager.Join (c, u);
+			users.Connect (c, cl);
+			users.Join (c, cl, ref u);
+			client.DequeueAndAssertMessage<UserJoinedMessage>();
 
-			var s = manager.Create ("Name", u, new AudioCodecArgs ());
+			var s = GetSourceFromRequest (c, cl);
+			client.DequeueAndAssertMessage<SourceResultMessage>();
 
 			handler.ClientAudioSourceStateChangeMessage (new MessageEventArgs<ClientAudioSourceStateChangeMessage> (c,
 				new ClientAudioSourceStateChangeMessage { SourceId = s.Id, Starting = true }));
@@ -636,16 +675,18 @@ namespace Gablarski.Tests
 		[Test]
 		public void ClientAudioSourceStateChangedDifferentChannel()
 		{
-			var u = UserInfoTests.GetTestUser (2, 2, false);
+			IUserInfo u = UserInfoTests.GetTestUser (2, 2, false);
 			
 			var cs = provider.GetConnections (GablarskiProtocol.Instance);
 			var c = cs.Item2;
 			var cl = new ConnectionBuffer (cs.Item1);
 
-			userManager.Connect (c);
-			userManager.Join (c, u);
+			users.Connect (c, cl);
+			users.Join (c, cl, ref u);
+			client.DequeueAndAssertMessage<UserJoinedMessage>();
 
-			var s = manager.Create ("Name", u, new AudioCodecArgs ());
+			var s = GetSourceFromRequest (c, cl);
+			client.DequeueAndAssertMessage<SourceResultMessage>();
 
 			handler.ClientAudioSourceStateChangeMessage (new MessageEventArgs<ClientAudioSourceStateChangeMessage> (c,
 				new ClientAudioSourceStateChangeMessage { SourceId = s.Id, Starting = true }));
@@ -688,7 +729,7 @@ namespace Gablarski.Tests
 			var c = cs.Item2;
 			var cl = new ConnectionBuffer (cs.Item1);
 
-			userManager.Connect (c);
+			users.Connect (c, cl);
 
 			handler.OnClientAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (c,
 				new ClientAudioDataMessage
@@ -710,8 +751,10 @@ namespace Gablarski.Tests
 			var c = cs.Item2;
 			var cl = new ConnectionBuffer (cs.Item1);
 
-			userManager.Connect (c);
-			userManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
+			users.Connect (c, cl);
+			IUserInfo user2 = UserInfoTests.GetTestUser (2, 1, false);
+			users.Join (c, cl, ref user2);
+			client.DequeueAndAssertMessage<UserJoinedMessage>();
 
 			handler.OnClientAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (server,
 				new ClientAudioDataMessage
@@ -733,8 +776,10 @@ namespace Gablarski.Tests
 			var c = cs.Item2;
 			var cl = new ConnectionBuffer (cs.Item1);
 
-			userManager.Connect (c);
-			userManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
+			users.Connect (c, cl);
+			IUserInfo user2 = UserInfoTests.GetTestUser (2, 1, false);
+			users.Join (c, cl, ref user2);
+			client.DequeueAndAssertMessage<UserJoinedMessage>();
 
 			var s = GetSourceFromRequest();
 			var result = cl.DequeueAndAssertMessage<SourceResultMessage>();
@@ -761,14 +806,19 @@ namespace Gablarski.Tests
 			var c = cs.Item2;
 			var cl = new ConnectionBuffer (cs.Item1);
 
-			userManager.Connect (c);
-			userManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
+			users.Connect (c, cl);
+			IUserInfo user2 = UserInfoTests.GetTestUser (2, 1, false);
+			users.Join (c, cl, ref user2);
+			client.DequeueAndAssertMessage<UserJoinedMessage>();
 
 			var s = GetSourceFromRequest();
-			manager.ToggleMute (s);
+			cl.DequeueAndAssertMessage<SourceResultMessage>();
 
-			var result = cl.DequeueAndAssertMessage<SourceResultMessage>();
-			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
+			permissions.EnablePermissions (user.UserId, PermissionName.MuteAudioSource);
+			handler.RequestMuteSourceMessage (new MessageEventArgs<RequestMuteSourceMessage> (server, new RequestMuteSourceMessage (s, true)));
+			client.DequeueAndAssertMessage<SourceMutedMessage>();
+			cl.DequeueAndAssertMessage<SourceMutedMessage>();
+
 			cl.AssertNoMessage();
 
 			handler.OnClientAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (server,
@@ -791,14 +841,20 @@ namespace Gablarski.Tests
 			var c = cs.Item2;
 			var cl = new ConnectionBuffer (cs.Item1);
 
-			userManager.Connect (c);
-			userManager.Join (c, UserInfoTests.GetTestUser (2, 1, true));
+			users.Connect (c, cl);
+			IUserInfo user2 = UserInfoTests.GetTestUser (2, 1, false);
+			users.Join (c, cl, ref user2);
+			client.DequeueAndAssertMessage<UserJoinedMessage>();
 
 			var s = GetSourceFromRequest (c, cl);
 
 			var result = client.DequeueAndAssertMessage<SourceResultMessage>();
 			Assert.AreEqual (SourceResult.NewSource, result.SourceResult);
 			client.AssertNoMessage();
+
+			MuteUser (user2, cl);
+
+			permissions.EnablePermissions (user2.UserId, PermissionName.SendAudio);
 
 			handler.OnClientAudioDataMessage (new MessageEventArgs<ClientAudioDataMessage> (c,
 				new ClientAudioDataMessage
@@ -820,9 +876,10 @@ namespace Gablarski.Tests
 			var c = cs.Item2;
 			var cl = new ConnectionBuffer (cs.Item1);
 
-			userManager.Connect (c);
-			var u = UserInfoTests.GetTestUser (2, 2, false);
-			userManager.Join (c, u);
+			users.Connect (c, cl);
+			IUserInfo u = UserInfoTests.GetTestUser (2, 2, false);
+			users.Join (c, cl, ref u);
+			client.DequeueAndAssertMessage<UserJoinedMessage>();
 
 			var s = GetSourceFromRequest();
 			var result = cl.DequeueAndAssertMessage<SourceResultMessage>();
@@ -851,9 +908,11 @@ namespace Gablarski.Tests
 			var c = cs.Item2;
 			var cl = new ConnectionBuffer (cs.Item1);
 
-			userManager.Connect (c);
-			var u = UserInfoTests.GetTestUser (2, 2, false);
-			userManager.Join (c, u);
+			users.Connect (c, cl);
+			IUserInfo u = UserInfoTests.GetTestUser (2, 2, false);
+			users.Join (c, cl, ref u);
+
+			client.DequeueAndAssertMessage<UserJoinedMessage>();
 
 			var s = GetSourceFromRequest();
 			var result = cl.DequeueAndAssertMessage<SourceResultMessage>();
@@ -880,8 +939,10 @@ namespace Gablarski.Tests
 			var c = cs.Item2;
 			var cl = new ConnectionBuffer (cs.Item1);
 
-			userManager.Connect (c);
-			userManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
+			users.Connect (c, cl);
+			IUserInfo user2 = UserInfoTests.GetTestUser (2, 1, false);
+			users.Join (c, cl, ref user2);
+			client.DequeueAndAssertMessage<UserJoinedMessage>();
 
 			var s = GetSourceFromRequest();
 			var result = cl.DequeueAndAssertMessage<SourceResultMessage>();
@@ -910,8 +971,10 @@ namespace Gablarski.Tests
 			var c = cs.Item2;
 			var cl = new ConnectionBuffer (cs.Item1);
 
-			userManager.Connect (c);
-			userManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
+			users.Connect (c, cl);
+			IUserInfo user2 = UserInfoTests.GetTestUser (2, 1, false);
+			users.Join (c, cl, ref user2);
+			client.DequeueAndAssertMessage<UserJoinedMessage>();
 
 			var s = GetSourceFromRequest();
 			var result = cl.DequeueAndAssertMessage<SourceResultMessage>();
@@ -938,15 +1001,20 @@ namespace Gablarski.Tests
 			var c = cs.Item2;
 			var cl = new ConnectionBuffer (cs.Item1);
 
-			userManager.Connect (c);
-			userManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
+			users.Connect (c, cl);
+			IUserInfo user2 = UserInfoTests.GetTestUser (2, 1, false);
+			users.Join (c, cl, ref user2);
+			client.DequeueAndAssertMessage<UserJoinedMessage>();
 
 			var cs2 = provider.GetConnections (GablarskiProtocol.Instance);
 			var c2 = cs2.Item2;
-			var cl2 = new ConnectionBuffer (cs.Item1);
+			var cl2 = new ConnectionBuffer (cs2.Item1);
 
-			userManager.Connect (c2);
-			userManager.Join (c2, UserInfoTests.GetTestUser (3, 2, false));
+			users.Connect (c2, cl2);
+			IUserInfo user3 = UserInfoTests.GetTestUser (3, 2, false);
+			users.Join (c2, cl2, ref user3);
+			client.DequeueAndAssertMessage<UserJoinedMessage>();
+			cl.DequeueAndAssertMessage<UserJoinedMessage>();
 
 			var s = GetSourceFromRequest();
 			var result = cl.DequeueAndAssertMessage<SourceResultMessage>();
@@ -980,15 +1048,22 @@ namespace Gablarski.Tests
 			var c = cs.Item2;
 			var cl = new ConnectionBuffer (cs.Item1);
 
-			userManager.Connect (c);
-			userManager.Join (c, UserInfoTests.GetTestUser (2, 1, false));
+			users.Connect (c, cl);
+			IUserInfo user2 = UserInfoTests.GetTestUser (2, 1, false);
+			users.Join (c, cl, ref user2);
+
+			client.DequeueAndAssertMessage<UserJoinedMessage>();
 
 			var cs2 = provider.GetConnections (GablarskiProtocol.Instance);
 			var c2 = cs2.Item2;
-			var cl2 = new ConnectionBuffer (cs.Item1);
+			var cl2 = new ConnectionBuffer (cs2.Item1);
 
-			userManager.Connect (c2);
-			userManager.Join (c2, UserInfoTests.GetTestUser (3, 2, false));
+			users.Connect (c2, cl2);
+			IUserInfo user3 = UserInfoTests.GetTestUser (3, 2, false);
+			users.Join (c2, cl2, ref user3);
+
+			client.DequeueAndAssertMessage<UserJoinedMessage>();
+			cl.DequeueAndAssertMessage<UserJoinedMessage>();
 
 			var s = GetSourceFromRequest();
 			var result = cl.DequeueAndAssertMessage<SourceResultMessage>();
@@ -1020,17 +1095,20 @@ namespace Gablarski.Tests
 			var c = cs.Item2;
 			var cl = new ConnectionBuffer (cs.Item1);
 
-			userManager.Connect (c);
-			var u1 = UserInfoTests.GetTestUser (2, 1, false);
-			userManager.Join (c, u1);
+			users.Connect (c, cl);
+			IUserInfo u1 = UserInfoTests.GetTestUser (2, 1, false);
+			users.Join (c, cl, ref u1);
+			client.DequeueAndAssertMessage<UserJoinedMessage>();
 
 			var cs2 = provider.GetConnections (GablarskiProtocol.Instance);
 			var c2 = cs2.Item2;
-			var cl2 = new ConnectionBuffer (cs.Item1);
+			var cl2 = new ConnectionBuffer (cs2.Item1);
 
-			userManager.Connect (c2);
-			var u2 = UserInfoTests.GetTestUser (3, 2, false);
-			userManager.Join (c2, u2);
+			users.Connect (c2, cl2);
+			IUserInfo u2 = UserInfoTests.GetTestUser (3, 2, false);
+			users.Join (c2, cl2, ref u2);
+			client.DequeueAndAssertMessage<UserJoinedMessage>();
+			cl.DequeueAndAssertMessage<UserJoinedMessage>();
 
 			var s = GetSourceFromRequest();
 			var result = cl.DequeueAndAssertMessage<SourceResultMessage>();
@@ -1064,17 +1142,22 @@ namespace Gablarski.Tests
 			var c = cs.Item2;
 			var cl = new ConnectionBuffer (cs.Item1);
 
-			userManager.Connect (c);
-			var u1 = UserInfoTests.GetTestUser (2, 1, false);
-			userManager.Join (c, u1);
+			users.Connect (c, cl);
+			IUserInfo u1 = UserInfoTests.GetTestUser (2, 1, false);
+			users.Join (c, cl, ref u1);
+
+			client.DequeueAndAssertMessage<UserJoinedMessage>();
 
 			var cs2 = provider.GetConnections (GablarskiProtocol.Instance);
 			var c2 = cs2.Item2;
-			var cl2 = new ConnectionBuffer (cs.Item1);
+			var cl2 = new ConnectionBuffer (cs2.Item1);
 
-			userManager.Connect (c2);
-			var u2 = UserInfoTests.GetTestUser (3, 1, false);
-			userManager.Join (c2, u2);
+			users.Connect (c2, cl2);
+			IUserInfo u2 = UserInfoTests.GetTestUser (3, 1, false);
+			users.Join (c2, cl2, ref u2);
+
+			client.DequeueAndAssertMessage<UserJoinedMessage>();
+			cl.DequeueAndAssertMessage<UserJoinedMessage>();
 
 			var s = GetSourceFromRequest();
 			var result = cl.DequeueAndAssertMessage<SourceResultMessage>();

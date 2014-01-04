@@ -130,7 +130,6 @@ namespace Gablarski.Server
 		private IServerUserHandler users;
 		private ServerSourceHandler sources;
 		private ServerChannelHandler channels;
-		private ServerUserManager userManager;
 		private Timer pingTimer;
 
 		IServerUserHandler IGablarskiServerContext.Users
@@ -168,7 +167,7 @@ namespace Gablarski.Server
 			get
 			{
 				lock (this.syncRoot)
-					return this.userManager.GetConnections();
+					return this.users.Connections;
 			}
 		}
 
@@ -181,12 +180,10 @@ namespace Gablarski.Server
 
 		private void SetupHandlers()
 		{
-			this.userManager = new ServerUserManager();
-
-			var userHandler = new ServerUserHandler (this, this.userManager);
+			var userHandler = new ServerUserHandler (this);
 			this.users = userHandler;
 
-			var sourceHandler = new ServerSourceHandler (this, new ServerSourceManager (this));
+			var sourceHandler = new ServerSourceHandler (this);
 			this.sources = sourceHandler;
 			
 			var channelHandler = new ServerChannelHandler (this);
@@ -199,12 +196,12 @@ namespace Gablarski.Server
 		{
 			IUserInfo user = this.users[e.UserId];
 			if (user != null)
-				this.userManager.GetConnection (user).SendAsync (new PermissionsMessage (e.UserId, this.context.PermissionsProvider.GetPermissions (e.UserId)));
+				this.users[user].SendAsync (new PermissionsMessage (e.UserId, this.context.PermissionsProvider.GetPermissions (e.UserId)));
 		}
 
 		protected override void OnConnectionDisconnectedGlobal (object sender, DisconnectedEventArgs e)
 		{
-			IUserInfo user = this.userManager.GetUser (e.Connection);
+			IUserInfo user = this.users[e.Connection];
 			if (user != null)
 			{
 				this.sources.Remove (user);

@@ -52,18 +52,17 @@ namespace Gablarski.Tests
 	{
 		private IChannelProvider channels;
 		private IGablarskiServerContext context;
-		private IServerUserManager manager;
 		private ServerChannelHandler handler;
+		private ServerUserHandler users;
 		private MockPermissionsProvider permissions;
 		private MockServerConnection server;
-		private UserInfo user;
+		private IUserInfo user;
 		private ConnectionBuffer client;
 		private MockConnectionProvider provider;
 
 		[SetUp]
 		public void Setup()
 		{
-			manager = new ServerUserManager();
 			permissions = new MockPermissionsProvider();
 			channels = new LobbyChannelProvider();
 
@@ -72,11 +71,12 @@ namespace Gablarski.Tests
 			{
 				ChannelsProvider = channels,
 				PermissionsProvider = permissions,
-				UserManager = new ServerUserManager (),
-				Settings = new ServerSettings { Name = "Test Server" }
+				UserProvider = new MockUserProvider(),
+				Settings = new ServerSettings { Name = "Test Server" },
 			};
 
-			mcontext.Users = new ServerUserHandler (context, manager);
+			mcontext.Sources = new ServerSourceHandler (context);
+			mcontext.Users = users = new ServerUserHandler (context);
 			mcontext.Channels = handler = new ServerChannelHandler (context);
 
 			user = UserInfoTests.GetTestUser (1, 1, false);
@@ -89,8 +89,8 @@ namespace Gablarski.Tests
 			client = new ConnectionBuffer (connections.Item1);
 			server = connections.Item2;
 
-			manager.Connect (server);
-			manager.Join (server, user);
+			users.Connect (server, client);
+			users.Join (server, client, ref user);
 		}
 
 		[Test]
@@ -101,7 +101,7 @@ namespace Gablarski.Tests
 
 		[Test]
 		[Description ("If not connected, don't attempt to reply.")]
-		public async Task RequestChannelListMessageNotConnected()
+		public async System.Threading.Tasks.Task RequestChannelListMessageNotConnected()
 		{
 			var cs = provider.GetConnections (GablarskiProtocol.Instance);
 			var c = new ConnectionBuffer (cs.Item1);
@@ -124,7 +124,7 @@ namespace Gablarski.Tests
 			var c = new ConnectionBuffer (cs.Item1);
 			var s = new ConnectionBuffer (cs.Item2);
 
-			manager.Connect (cs.Item2);
+			users.Connect (cs.Item2, c);
 
 			handler.RequestChanneListMessage (new MessageEventArgs<RequestChannelListMessage> (s,
 				new RequestChannelListMessage()));
@@ -185,14 +185,16 @@ namespace Gablarski.Tests
 			Assert.AreEqual (channels.DefaultChannel.ChannelId, moved.ChangeInfo.PreviousChannelId);
 			Assert.AreEqual (0, moved.ChangeInfo.RequestingUserId);
 
-			var secondUser = UserInfoTests.GetTestUser (2, 1, false);
+			IUserInfo secondUser = UserInfoTests.GetTestUser (2, 1, false);
 
 			var cs = provider.GetConnections (GablarskiProtocol.Instance);
 			var secondClient = new ConnectionBuffer (cs.Item1);
 
 			var secondServer = cs.Item2;
-			manager.Connect (secondServer);
-			manager.Join (secondServer, secondUser);
+			users.Connect (secondServer, secondClient);
+			users.Join (secondServer, secondClient, ref secondUser);
+			client.DequeueAndAssertMessage<UserJoinedMessage>();
+
 			permissions.EnablePermissions (secondUser.UserId, PermissionName.ChangeChannel);
 
 			context.Users.Move (secondServer, secondUser, channel);

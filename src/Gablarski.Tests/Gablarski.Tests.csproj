@@ -115,10 +115,12 @@
     <Compile Include="ServerMessageTests.cs" />
     <Compile Include="ServerSourceHandlerTests.cs" />
     <Compile Include="ServerSourceManagerTests.cs" />
+    <Compile Include="ServerUserHandlerExtensions.cs" />
     <Compile Include="SourceManagerTests.cs" />
     <Compile Include="ServerTests.cs" />
     <Compile Include="ServerUserHandlerTests.cs" />
     <Compile Include="ServerUserManagerTests.cs" />
+    <Compile Include="TaskAssert.cs" />
     <Compile Include="UserInfoTests.cs" />
     <Compile Include="ClientUserManagerTests.cs" />
     <Compile Include="Mocks\MockRedirector.cs" />

@@ -64,17 +64,15 @@ namespace Gablarski.Tests
 			var channels = new ClientChannelHandler (context);
 			ClientChannelHandlerTests.PopulateChannels (channels, server);
 
-			c.Users = new ClientUserHandler (context, new ClientUserManager());
+			c.Users = new ClientUserHandler (context);
 			c.Channels = channels;
 			c.CurrentUser = new CurrentUser (context, 1, "Foo", channels.First().ChannelId);
 
-			this.manager = new ClientSourceManager (context);
-			this.handler = new ClientSourceHandler (context, manager);
+			this.handler = new ClientSourceHandler (context);
 		}
 
 		private IGablarskiClientContext context;
 		private ClientSourceHandler handler;
-		private ClientSourceManager manager;
 		private MockConnectionProvider provider;
 		private ConnectionBuffer server;
 		private MockClientConnection client;
@@ -82,8 +80,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void CtorNull()
 		{
-			Assert.Throws<ArgumentNullException> (() => new ClientSourceHandler (null, manager));
-			Assert.Throws<ArgumentNullException> (() => new ClientSourceHandler (context, null));
+			Assert.Throws<ArgumentNullException> (() => new ClientSourceHandler (null));
 		}
 
 		[Test]
@@ -102,7 +99,10 @@ namespace Gablarski.Tests
 		public void ToggleIgnore()
 		{
 			var source = AudioSourceTests.GetTestSource();
-			manager.Add (source);
+			
+			handler.OnSourceListReceivedMessage (new MessageEventArgs<SourceListMessage> (client, new SourceListMessage {
+				Sources = new[] { source }
+			}));
 
 			Assert.IsFalse (handler.GetIsIgnored (source));
 			Assert.IsTrue (handler.ToggleIgnore (source));

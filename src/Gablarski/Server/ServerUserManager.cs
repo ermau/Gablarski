@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2011, Eric Maupin
+﻿// Copyright (c) 2009-2014, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -44,8 +44,16 @@ using Tempest;
 namespace Gablarski.Server
 {
 	public class ServerUserManager
-		: IServerUserManager
+		: IIndexedEnumerable<int, IUserInfo>
 	{
+		/// <summary>
+		/// Gets the number of connected users.
+		/// </summary>
+		public int Count
+		{
+			get { return this.connectedUsers.Count; }
+		}
+
 		public IUserInfo this [int userId]
 		{
 			get
@@ -59,11 +67,15 @@ namespace Gablarski.Server
 			return connections.ToList();
 		}
 
+		/// <summary>
+		/// Gets the connections for joined users.
+		/// </summary>
 		public IEnumerable<IConnection> GetUserConnections()
 		{
 			return this.connectedUsers.Values;
 		}
 
+		/// <exception cref="ArgumentNullException"><paramref name="connection"/> is <c>null</c>.</exception>
 		public void Connect (IConnection connection)
 		{
 			if (connection == null)
@@ -72,6 +84,7 @@ namespace Gablarski.Server
 			connections.Add (connection);
 		}
 
+		/// <exception cref="ArgumentNullException"><paramref name="connection"/> is <c>null</c>.</exception>
 		public bool GetIsConnected (IConnection connection)
 		{
 			if (connection == null)
@@ -80,6 +93,7 @@ namespace Gablarski.Server
 			return connections.Contains (connection);
 		}
 
+		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
 		public bool GetIsConnected (IUserInfo user)
 		{
 			if (user == null)
@@ -92,6 +106,7 @@ namespace Gablarski.Server
 			return false;
 		}
 
+		/// <exception cref="ArgumentNullException"><paramref name="connection"/> or <paramref name="user"/> is <c>null</c>.</exception>
 		public void Join (IConnection connection, IUserInfo user)
 		{
 			if (connection == null)
@@ -106,6 +121,7 @@ namespace Gablarski.Server
 			joined.Add (connection);
 		}
 
+		/// <exception cref="ArgumentNullException"><paramref name="connection"/> is <c>null</c>.</exception>
 		public bool GetIsJoined (IConnection connection)
 		{
 			if (connection == null)
@@ -114,6 +130,7 @@ namespace Gablarski.Server
 			return joined.Contains (connection);
 		}
 
+		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
 		public bool GetIsJoined (IUserInfo user)
 		{
 			if (user == null)
@@ -126,6 +143,12 @@ namespace Gablarski.Server
 			return false;
 		}
 
+		/// <summary>
+		/// Moves <paramref name="user"/> to <paramref name="channel"/>.
+		/// </summary>
+		/// <param name="user">The user to move.</param>
+		/// <param name="channel">The channel to move the user to.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="user"/> or <paramref name="channel"/> is <c>null</c>.</exception>
 		public void Move (IUserInfo user, IChannelInfo channel)
 		{
 			if (user == null)
@@ -145,6 +168,12 @@ namespace Gablarski.Server
 			connectedUsers.Inverse[connection] = newUser;
 		}
 
+		/// <summary>
+		/// Toggles mute on the <paramref name="user"/>.
+		/// </summary>
+		/// <param name="user">The user to mute or unmute.</param>
+		/// <returns><c>true</c> if <paramref name="user"/> is now muted, <c>false</c> otherwise.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
 		public bool ToggleMute (IUserInfo user)
 		{
 			if (user == null)
@@ -164,6 +193,13 @@ namespace Gablarski.Server
 			return newUser.IsMuted;
 		}
 
+		/// <summary>
+		/// Sets the state for the <paramref name="user"/>.
+		/// </summary>
+		/// <param name="user">The user to set the state of.</param>
+		/// <param name="newStatus">The new state of the user.</param>
+		/// <returns>The updated <see cref="UserInfo"/>. <c>null</c> if the user was not found.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
 		public IUserInfo SetStatus (IUserInfo user, UserStatus newStatus)
 		{
 			if (user == null)
@@ -183,6 +219,16 @@ namespace Gablarski.Server
 			return newUser;
 		}
 
+		/// <summary>
+		/// Sets the comment for the <paramref name="user"/>.
+		/// </summary>
+		/// <param name="user">The user to set the comment of.</param>
+		/// <param name="comment">The new comment for the user.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
+		/// <returns>The updated <see cref="UserInfo"/>. <c>null</c> if the user was not found.</returns>
+		/// <remarks>
+		/// Passing either <c>null</c> or <c>String.Empty</c> for <paramref name="comment"/> is ok to clear it.
+		/// </remarks>
 		public IUserInfo SetComment (IUserInfo user, string comment)
 		{
 			if (user == null)
@@ -202,6 +248,10 @@ namespace Gablarski.Server
 			return newUser;
 		}
 
+		/// <exception cref="ArgumentNullException"><paramref name="connection"/> or <paramref name="user"/> is <c>null</c>.</exception>
+		/// <remarks>
+		/// If <paramref name="user" /> is already logged in, the new <paramref name="connection"/> should be associated with it.
+		/// </remarks>
 		public void Login (IConnection connection, IUserInfo user)
 		{
 			if (connection == null)
@@ -225,6 +275,7 @@ namespace Gablarski.Server
 			loggedIn.Add (connection);
 		}
 
+		/// <exception cref="ArgumentNullException"><paramref name="connection"/> is <c>null</c>.</exception>
 		public bool GetIsLoggedIn (IConnection connection)
 		{
 			if (connection == null)
@@ -233,6 +284,7 @@ namespace Gablarski.Server
 			return loggedIn.Contains (connection);
 		}
 
+		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
 		public bool GetIsLoggedIn (IUserInfo user)
 		{
 			if (user == null)
@@ -245,6 +297,16 @@ namespace Gablarski.Server
 			return false;
 		}
 
+		/// <summary>
+		/// Gets whether <paramref name="nickname"/> is currently in use or not.
+		/// </summary>
+		/// <param name="nickname">The name to check.</param>
+		/// <returns><c>true</c> if the nickname is in use, <c>false</c> otherwise.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="nickname"/> is <c>null</c>.</exception>
+		/// <remarks>
+		/// Nicknames are trimmed and lower cased before checking, changing case or adding
+		/// spaces will not result in an unused nickname.
+		/// </remarks>
 		public bool GetIsNicknameInUse (string nickname)
 		{
 			if (nickname == null)
@@ -256,6 +318,7 @@ namespace Gablarski.Server
 				.Any (u => u.Nickname.ToLower().Trim() == nickname);
 		}
 
+		/// <exception cref="ArgumentNullException"><paramref name="connection"/> is <c>null</c>.</exception>
 		public void Disconnect (IConnection connection)
 		{
 			if (connection == null)
@@ -269,6 +332,18 @@ namespace Gablarski.Server
 			connectedUsers.Inverse.Remove (connection);
 		}
 
+		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
+		public void Disconnect (IUserInfo user)
+		{
+			if (user == null)
+				throw new ArgumentNullException ("user");
+
+			IConnection connection;
+			if (connectedUsers.TryGetValue (user, out connection))
+				Disconnect (connection);
+		}
+
+		/// <exception cref="ArgumentNullException"><paramref name="predicate"/> is <c>null</c>.</exception>
 		public void Disconnect (Func<IConnection, bool> predicate)
 		{
 			if (predicate == null)
@@ -283,6 +358,12 @@ namespace Gablarski.Server
 			}
 		}
 
+		/// <summary>
+		/// Gets the user associated with the <paramref name="connection"/>. <c>null</c> if not found.
+		/// </summary>
+		/// <param name="connection"></param>
+		/// <returns>The associated user, <c>null</c> if not found.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="connection"/> is <c>null</c>.</exception>
 		public IUserInfo GetUser (IConnection connection)
 		{
 			if (connection == null)
@@ -294,6 +375,12 @@ namespace Gablarski.Server
 			return user;
 		}
 
+		/// <summary>
+		/// Gets the connection associated with the <paramref name="user"/>. <c>null</c> if not found.
+		/// </summary>
+		/// <param name="user">The user to find the connection for.</param>
+		/// <returns>The associated connection, <c>null</c> if not found.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
 		public IConnection GetConnection (IUserInfo user)
 		{
 			if (user == null)

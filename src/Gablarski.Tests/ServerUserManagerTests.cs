@@ -50,7 +50,7 @@ namespace Gablarski.Tests
 	public class ServerUserManagerTests
 	{
 		private MockConnectionProvider provider;
-		private IServerUserManager manager;
+		private ServerUserManager manager;
 		private MockClientConnection client;
 		private MockServerConnection server;
 		private IUserInfo user;
@@ -452,7 +452,8 @@ namespace Gablarski.Tests
 		[Test]
 		public void GetIsConnectedNull()
 		{
-			Assert.Throws<ArgumentNullException> (() => manager.GetIsConnected (null));
+			Assert.Throws<ArgumentNullException> (() => manager.GetIsConnected ((IConnection)null));
+			Assert.Throws<ArgumentNullException> (() => manager.GetIsConnected ((IUserInfo)null));
 		}
 
 		[Test]

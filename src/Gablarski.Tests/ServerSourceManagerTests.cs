@@ -59,7 +59,7 @@ namespace Gablarski.Tests
 		public void Setup()
 		{
 			context = new MockServerContext();
-			manager = new ServerSourceManager (context);
+			manager = new ServerSourceManager();
 		}
 
 		[Test]

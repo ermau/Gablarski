@@ -64,7 +64,7 @@ namespace Gablarski.Tests
 
 			var client = new MockClientContext (c);
 			this.context = client;
-			this.sender = new ClientSourceHandler (client, new ClientSourceManager (client));
+			this.sender = new ClientSourceHandler (client);
 			this.receiver = (IAudioReceiver)this.sender;
 		}
 

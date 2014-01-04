@@ -95,12 +95,6 @@ namespace Gablarski.Tests.Mocks
 			set;
 		}
 
-		public IServerUserManager UserManager
-		{
-			get;
-			set;
-		}
-
 		public IServerSourceHandler Sources
 		{
 			get;
@@ -115,8 +109,14 @@ namespace Gablarski.Tests.Mocks
 
 		public IEnumerable<IRedirector> Redirectors
 		{
-			get;
-			set;
+			get
+			{
+				syncRoot.EnterReadLock();
+				var redirects = redirectors.ToArray();
+				syncRoot.ExitReadLock();
+
+				return redirects;
+			}
 		}
 
 		public ServerSettings Settings
@@ -125,6 +125,7 @@ namespace Gablarski.Tests.Mocks
 			set;
 		}
 
+		private readonly List<IRedirector> redirectors = new List<IRedirector>();
 		private readonly ReaderWriterLockSlim syncRoot = new ReaderWriterLockSlim();
 		private readonly List<IConnection> connections = new List<IConnection>();
 

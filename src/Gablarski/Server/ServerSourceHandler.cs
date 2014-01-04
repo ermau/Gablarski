@@ -1,4 +1,4 @@
-// Copyright (c) 2011, Eric Maupin
+// Copyright (c) 2009-2014, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -48,17 +48,15 @@ namespace Gablarski.Server
 		: IServerSourceHandler
 	{
 		private readonly IGablarskiServerContext context;
-		private readonly IServerSourceManager manager;
+		private readonly ServerSourceManager manager;
 
-		public ServerSourceHandler (IGablarskiServerContext context, IServerSourceManager manager)
+		public ServerSourceHandler (IGablarskiServerContext context)
 		{
 			if (context == null)
 				throw new ArgumentNullException ("context");
-			if (manager == null)
-				throw new ArgumentNullException ("manager");
 
 			this.context = context;
-			this.manager = manager;
+			this.manager = new ServerSourceManager();
 
 			this.context.RegisterMessageHandler<RequestSourceMessage> (RequestSourceMessage);
 			this.context.RegisterMessageHandler<ClientAudioDataMessage> (OnClientAudioDataMessage);
@@ -75,6 +73,11 @@ namespace Gablarski.Server
 		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return GetEnumerator();
+		}
+
+		public int Count
+		{
+			get { return this.manager.Count; }
 		}
 
 		public AudioSource this [int key]
@@ -205,7 +208,7 @@ namespace Gablarski.Server
 			if (!CanSendFromSource (e.Connection, msg.SourceId, out speaker))
 				return;
 
-			foreach (IConnection connection in context.Users.Connections)
+			foreach (IConnection connection in context.Users.UserConnections)
 			{
 				if (connection == e.Connection)
 					continue;

@@ -70,6 +70,11 @@ namespace Gablarski.Server
 			return GetEnumerator();
 		}
 
+		public int Count
+		{
+			get { throw new NotImplementedException(); }
+		}
+
 		public IChannelInfo this [int key]
 		{
 			get { return this.FirstOrDefault (c => c.ChannelId == key); }
@@ -77,7 +82,8 @@ namespace Gablarski.Server
 
 		private void ChannelsProviderOnChannelsUpdated (object sender, EventArgs args)
 		{
-			var channels = context.ChannelsProvider.GetChannels();
+			var channels = context.ChannelsProvider.GetChannels().ToArray();
+
 			var channelIds = new HashSet<int> (channels.Select (c => c.ChannelId));
 
 			foreach (UserInfo user in context.Users.Where (u => !channelIds.Contains (u.CurrentChannelId)))

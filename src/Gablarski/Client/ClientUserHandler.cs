@@ -1,4 +1,4 @@
-// Copyright (c) 2011, Eric Maupin
+// Copyright (c) 2009-2014, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -48,15 +48,13 @@ namespace Gablarski.Client
 	public class ClientUserHandler
 		: IClientUserHandler
 	{
-		protected internal ClientUserHandler (IGablarskiClientContext context, IClientUserManager manager)
+		protected internal ClientUserHandler (IGablarskiClientContext context)
 		{
 			if (context == null)
 				throw new ArgumentNullException ("context");
-			if (manager == null)
-				throw new ArgumentNullException ("manager");
 
 			this.context = context;
-			this.manager = manager;
+			this.manager = new ClientUserManager();
 
 			this.context.RegisterMessageHandler<UserInfoListMessage> (OnUserListReceivedMessage);
 			this.context.RegisterMessageHandler<UserUpdatedMessage> (OnUserUpdatedMessage);
@@ -126,6 +124,11 @@ namespace Gablarski.Client
 		public IUserInfo Current
 		{
 			get { return this.context.CurrentUser; }
+		}
+
+		public int Count
+		{
+			get { return this.manager.Count; }
 		}
 
 		/// <summary>
@@ -266,7 +269,7 @@ namespace Gablarski.Client
 			get { return this.manager.SyncRoot; }
 		}
 
-		private readonly IClientUserManager manager;
+		private readonly ClientUserManager manager;
 		private readonly MutableLookup<int, IUserInfo> channels = new MutableLookup<int, IUserInfo> ();
 		private readonly IGablarskiClientContext context;
 

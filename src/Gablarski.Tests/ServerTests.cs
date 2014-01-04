@@ -90,22 +90,14 @@ namespace Gablarski.Tests
 			Assert.AreEqual (LoginResultState.Success, joinResultMessage.Result);
 
 			if (!loggedIn)
-			{
 				connection.DequeueAndAssertMessage<PermissionsMessage>();
-			}
 
-			var userJoinedMessage = connection.DequeueAndAssertMessage<UserJoinedMessage>();
-			IUserInfo user = userJoinedMessage.UserInfo;
-			Assert.AreEqual (nickname, userJoinedMessage.UserInfo.Nickname);
+			IUserInfo user = joinResultMessage.UserInfo;
+			Assert.AreEqual (nickname, joinResultMessage.UserInfo.Nickname);
 			
-			Assert.AreEqual (joinResultMessage.UserInfo.Username, userJoinedMessage.UserInfo.Username);
-			Assert.AreEqual (joinResultMessage.UserInfo.UserId, userJoinedMessage.UserInfo.UserId);
-			Assert.AreEqual (joinResultMessage.UserInfo.CurrentChannelId, userJoinedMessage.UserInfo.CurrentChannelId);
-
-			//connection.Client.DequeueAndAssertMessage<ChannelListMessage>();
-			//var usermsg = connection.Client.DequeueAndAssertMessage<UserInfoListMessage>();
-			//Assert.IsNotNull (usermsg.Users.FirstOrDefault (u => u.UserId == userJoinedMessage.UserInfo.UserId));
-			//connection.Client.DequeueAndAssertMessage<SourceListMessage>();
+			Assert.AreEqual (joinResultMessage.UserInfo.Username, joinResultMessage.UserInfo.Username);
+			Assert.AreEqual (joinResultMessage.UserInfo.UserId, joinResultMessage.UserInfo.UserId);
+			Assert.AreEqual (joinResultMessage.UserInfo.CurrentChannelId, joinResultMessage.UserInfo.CurrentChannelId);
 
 			return user;
 		}

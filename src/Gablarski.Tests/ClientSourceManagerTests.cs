@@ -64,7 +64,7 @@ namespace Gablarski.Tests
 			var channels = new ClientChannelHandler (context);
 			ClientChannelHandlerTests.PopulateChannels (channels, server);
 
-			context.Users = new ClientUserHandler (context, new ClientUserManager());
+			context.Users = new ClientUserHandler (context);
 			context.Channels = channels;
 			context.CurrentUser = new CurrentUser (context, 1, "Foo", channels.First().ChannelId);
 

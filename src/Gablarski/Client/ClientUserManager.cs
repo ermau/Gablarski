@@ -1,4 +1,4 @@
-// Copyright (c) 2011, Eric Maupin
+// Copyright (c) 2009-2014, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -42,8 +42,17 @@ using Cadenza.Collections;
 namespace Gablarski.Client
 {
 	internal class ClientUserManager
-		: IClientUserManager
+		: IIndexedEnumerable<int, IUserInfo>
 	{
+		public int Count
+		{
+			get
+			{
+				lock (this.syncRoot)
+					return this.users.Count;
+			}
+		}
+
 		public IUserInfo this[int userId]
 		{
 			get
@@ -58,6 +67,18 @@ namespace Gablarski.Client
 			}
 		}
 
+		public object SyncRoot
+		{
+			get { return this.syncRoot; }
+		}
+
+		/// <summary>
+		/// Joins <paramref name="user"/>.
+		/// </summary>
+		/// <param name="user">
+		/// A <see cref="UserInfo"/>
+		/// </param>
+		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
 		public void Join (IUserInfo user)
 		{
 			if (user == null)
@@ -67,6 +88,12 @@ namespace Gablarski.Client
 			Update (u);
 		}
 
+		/// <summary>
+		/// Gets whether or not <paramref name="user"/> is currently in the manager.
+		/// </summary>
+		/// <param name="user">The user to check for.</param>
+		/// <returns><c>true</c> if <paramref name="user"/> is in the manager, <c>false</c> otherwise.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
 		public bool GetIsJoined (IUserInfo user)
 		{
 			if (user == null)
@@ -76,6 +103,12 @@ namespace Gablarski.Client
 				return users.ContainsKey (user.UserId);
 		}
 
+		/// <summary>
+		/// Gets whether or not <paramref name="user"/> is currently ignored.
+		/// </summary>
+		/// <param name="user">The user to check.</param>
+		/// <returns><c>true</c> if ignored, <c>false</c> if not.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
 		public bool GetIsIgnored (IUserInfo user)
 		{
 			if (user == null)
@@ -85,6 +118,10 @@ namespace Gablarski.Client
 				return this.ignores.Contains (user.UserId);
 		}
 
+		/// <summary>
+		/// Departs a user.
+		/// </summary>
+		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c></exception>
 		public bool Depart (IUserInfo user)
 		{
 			if (user == null)
@@ -105,6 +142,11 @@ namespace Gablarski.Client
 			}
 		}
 		
+		/// <summary>
+		/// Updates the manager using <paramref name="userUpdate"/> as the new list of users.
+		/// </summary>
+		/// <param name="userUpdate">The new list of users.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="userUpdate"/> is <c>null</c></exception>
 		public void Update (IEnumerable<IUserInfo> userUpdate)
 		{
 			if (userUpdate == null)
@@ -119,6 +161,11 @@ namespace Gablarski.Client
 			}
 		}
 		
+		/// <summary>
+		/// Updates the user internally to match the properties of <paramref name="user"/>.
+		/// </summary>
+		/// <param name="user">The new set of properties for the user.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
 		public void Update (IUserInfo user)
 		{
 			if (user == null)
@@ -144,6 +191,13 @@ namespace Gablarski.Client
 			}
 		}
 
+		/// <summary>
+		/// Gets the users in the given channel.
+		/// </summary>
+		/// <param name="channelId">The id of the channel.</param>
+		/// <returns>
+		/// A <see cref="IEnumerable{UserInfo}"/> of the users in the channel. <c>null</c> if the channel was not found.
+		/// </returns>
 		public IEnumerable<IUserInfo> GetUsersInChannel (int channelId)
 		{
 			lock (this.syncRoot)
@@ -152,6 +206,12 @@ namespace Gablarski.Client
 			}
 		}
 
+		/// <summary>
+		/// Toggles ignore on <paramref name="user"/>.
+		/// </summary>
+		/// <param name="user">The user to toggle ignore for.</param>
+		/// <returns>The new ignore state.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
 		public bool ToggleIgnore (IUserInfo user)
 		{
 			if (user == null)
@@ -167,6 +227,11 @@ namespace Gablarski.Client
 			return !ignored;
 		}
 
+		/// <summary>
+		/// Toggles mute on <paramref name="user"/>.
+		/// </summary>
+		/// <param name="user">The user to toggle mute for.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
 		public void ToggleMute (IUserInfo user)
 		{
 			if (user == null)
@@ -196,11 +261,6 @@ namespace Gablarski.Client
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator ()
 		{
 			return GetEnumerator ();
-		}
-
-		object IClientUserManager.SyncRoot
-		{
-			get { return this.syncRoot; }
 		}
 
 		private readonly object syncRoot = new object ();

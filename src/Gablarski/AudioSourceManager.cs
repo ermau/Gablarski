@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2011, Eric Maupin
+﻿// Copyright (c) 2009-2014, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -44,7 +44,7 @@ using Gablarski.Audio;
 namespace Gablarski
 {
 	public class AudioSourceManager
-		: ISourceManager
+		: IReadOnlyList<AudioSource>
 	{
 		public IEnumerator<AudioSource> GetEnumerator()
 		{
@@ -55,6 +55,15 @@ namespace Gablarski
 		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return GetEnumerator();
+		}
+
+		public int Count
+		{
+			get
+			{
+				lock (this.syncRoot)
+					return Sources.Count;
+			}
 		}
 
 		public AudioSource this [int key]
@@ -72,6 +81,11 @@ namespace Gablarski
 			}
 		}
 
+		/// <summary>
+		/// Gets the audio sources owned by <paramref name="user"/>.
+		/// </summary>
+		/// <param name="user">The owner to find sources for.</param>
+		/// <returns>An empty enumerable if <paramref name="user"/> doesn't own any sources, otherwise the owned sources.</returns>
 		public IEnumerable<AudioSource> this [IUserInfo user]
 		{
 			get
@@ -81,6 +95,12 @@ namespace Gablarski
 			}
 		}
 
+		/// <summary>
+		/// Toggles mute for the <paramref name="source"/>.
+		/// </summary>
+		/// <param name="source">The source to toggle mute for.</param>
+		/// <returns><c>true</c> if <paramref name="source"/> was muted, <c>false</c> if not or not found.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
 		public bool ToggleMute (AudioSource source)
 		{
 			if (source == null)
@@ -103,6 +123,9 @@ namespace Gablarski
 			}
 		}
 
+		/// <summary>
+		/// Clears the manager of all sources.
+		/// </summary>
 		public virtual void Clear()
 		{
 			lock (this.syncRoot)
@@ -112,6 +135,12 @@ namespace Gablarski
 			}
 		}
 
+		/// <summary>
+		/// Removes the audio <paramref name="source"/>.
+		/// </summary>
+		/// <param name="source">The source to remove.</param>
+		/// <returns><c>true</c> if the source was found and removed, <c>false otherwise.</c></returns>
+		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
 		public virtual bool Remove (AudioSource source)
 		{
 			if (source == null)
@@ -124,6 +153,12 @@ namespace Gablarski
 			}
 		}
 
+		/// <summary>
+		/// Removes all audio sources for <paramref name="user"/>.
+		/// </summary>
+		/// <param name="user">The user to remove all sources for.</param>
+		/// <returns><c>true</c> if any sources belonging to <paramref name="user"/> were found.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
 		public virtual bool Remove (IUserInfo user)
 		{
 			if (user == null)

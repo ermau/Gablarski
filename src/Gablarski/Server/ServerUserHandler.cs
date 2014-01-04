@@ -1,4 +1,4 @@
-// Copyright (c) 2011-2013, Eric Maupin
+// Copyright (c) 2009-2014, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -48,10 +48,13 @@ namespace Gablarski.Server
 	public class ServerUserHandler
 		: IServerUserHandler
 	{
-		public ServerUserHandler (IGablarskiServerContext context, IServerUserManager manager)
+		public ServerUserHandler (IGablarskiServerContext context)
 		{
+			if (context == null)
+				throw new ArgumentNullException ("context");
+
 			this.context = context;
-			this.Manager = manager;
+			Manager = new ServerUserManager();
 
 			this.context.RegisterMessageHandler<ConnectMessage> (OnConnectMessage);
 			this.context.RegisterMessageHandler<LoginMessage> (OnLoginMessage);
@@ -66,6 +69,11 @@ namespace Gablarski.Server
 			this.context.RegisterMessageHandler<RequestMuteUserMessage> (OnRequestMuteUserMessage);
 			this.context.RegisterMessageHandler<RequestUserListMessage> (OnRequestUserListMessage);
 			this.context.RegisterMessageHandler<ChannelChangeMessage> (OnChannelChangeMessage);
+		}
+
+		public int Count
+		{
+			get { return Manager.Count; }
 		}
 
 		public IUserInfo this[int userId]
@@ -83,10 +91,15 @@ namespace Gablarski.Server
 			get { return (IServerConnection)Manager.GetConnection (user); }
 		}
 
+		public IEnumerable<IConnection> Connections
+		{
+			get { return Manager.GetConnections(); }
+		}
+
 		/// <summary>
 		/// Gets the connections for joined users.
 		/// </summary>
-		public IEnumerable<IConnection> Connections
+		public IEnumerable<IConnection> UserConnections
 		{
 			get { return Manager.GetUserConnections(); }
 		}
@@ -210,7 +223,7 @@ namespace Gablarski.Server
 			return GetEnumerator();
 		}
 
-		internal readonly IServerUserManager Manager;
+		internal readonly ServerUserManager Manager;
 		private readonly IGablarskiServerContext context;
 		private readonly HashSet<IUserInfo> approvals = new HashSet<IUserInfo>();
 
@@ -277,8 +290,12 @@ namespace Gablarski.Server
 				if (!Manager.GetIsLoggedIn (e.Connection))
 					e.Connection.SendAsync (new PermissionsMessage (info.UserId, this.context.PermissionsProvider.GetPermissions (info.UserId)));
 
-				foreach (IConnection connection in this.context.Connections)
+				foreach (IConnection connection in this.context.Connections) {
+					if (connection == e.Connection)
+						continue;
+
 					connection.SendAsync (new UserJoinedMessage (info));
+				}
 			}
 			else
 				e.Connection.SendAsync (msg);

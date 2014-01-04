@@ -66,8 +66,7 @@ namespace Gablarski.Tests
 			var channels = new ClientChannelHandler (context);
 			ClientChannelHandlerTests.PopulateChannels (channels, this.server);
 
-			this.userManager = new ClientUserManager();
-			this.handler = new ClientUserHandler (context, userManager);
+			this.handler = new ClientUserHandler (context);
 			context.Users = this.handler;
 			context.Channels = channels;
 		}
@@ -78,7 +77,6 @@ namespace Gablarski.Tests
 			this.userProvider = null;
 			this.server = null;
 			this.handler = null;
-			this.userManager = null;
 			this.provider = null;
 			this.context = null;
 		}
@@ -108,14 +106,12 @@ namespace Gablarski.Tests
 		private ClientUserHandler handler;
 		private MockClientContext context;
 		private MockUserProvider userProvider;
-		private ClientUserManager userManager;
 		private MockClientConnection client;
 
 		[Test]
-		public void NullConnection()
+		public void CtorNull()
 		{
-			Assert.Throws<ArgumentNullException> (() => new ClientUserHandler (null, new ClientUserManager()));
-			Assert.Throws<ArgumentNullException> (() => new ClientUserHandler (new MockClientContext (this.client), null));
+			Assert.Throws<ArgumentNullException> (() => new ClientUserHandler (null));
 		}
 
 		[Test]
@@ -212,7 +208,7 @@ namespace Gablarski.Tests
 			userProvider.UpdateSupported = true;
 			userProvider.RegistrationMode = UserRegistrationMode.PreApproved;
 			context = new MockClientContext (this.client) { ServerInfo = new ServerInfo (new ServerSettings(), userProvider) };
-			this.handler = new ClientUserHandler (context, this.userManager);
+			this.handler = new ClientUserHandler (context);
 
 			CreateUsers (this.client, this.handler);
 
@@ -231,7 +227,7 @@ namespace Gablarski.Tests
 			userProvider.UpdateSupported = false;
 			userProvider.RegistrationMode = UserRegistrationMode.None;
 			context = new MockClientContext (this.client) { ServerInfo = new ServerInfo (new ServerSettings(), userProvider) };
-			this.handler = new ClientUserHandler (context, this.userManager);
+			this.handler = new ClientUserHandler (context);
 
 			CreateUsers (this.client, this.handler);
 
@@ -246,7 +242,7 @@ namespace Gablarski.Tests
 			userProvider.UpdateSupported = true;
 			userProvider.RegistrationMode = UserRegistrationMode.Approved;
 			context = new MockClientContext (this.client) { ServerInfo = new ServerInfo (new ServerSettings(), userProvider) };
-			this.handler = new ClientUserHandler (context, this.userManager);
+			this.handler = new ClientUserHandler (context);
 			
 			this.handler.ApproveRegistration ("username");
 

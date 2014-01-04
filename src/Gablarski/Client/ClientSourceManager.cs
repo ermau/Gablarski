@@ -1,4 +1,4 @@
-// Copyright (c) 2011, Eric Maupin
+// Copyright (c) 2009-2014, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -45,7 +45,7 @@ using Gablarski.Messages;
 namespace Gablarski.Client
 {
 	public class ClientSourceManager
-		: AudioSourceManager, IClientSourceManager
+		: AudioSourceManager
 	{
 		protected internal ClientSourceManager (IGablarskiClientContext context)
 		{
@@ -74,11 +74,21 @@ namespace Gablarski.Client
 			}
 		}
 
+		/// <summary>
+		/// Adds <paramref name="source"/> to the manager.
+		/// </summary>
+		/// <param name="source"></param>
+		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
 		public void Add (AudioSource source)
 		{
 			Update (source);
 		}
 
+		/// <summary>
+		/// Updates the manager with a new list of sources.
+		/// </summary>
+		/// <param name="sources">The new list of sources.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="sources"/> is <c>null</c>.</exception>
 		public void Update (IEnumerable<AudioSource> updatedSources)
 		{
 			if (updatedSources == null)
@@ -103,6 +113,11 @@ namespace Gablarski.Client
 			}
 		}
 
+		/// <summary>
+		/// Updates the manager with new state for a source.
+		/// </summary>
+		/// <param name="source">The source to update.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
 		public void Update (AudioSource source)
 		{
 			if (source == null)
@@ -121,6 +136,12 @@ namespace Gablarski.Client
 			}
 		}
 
+		/// <summary>
+		/// Gets whether the source is ignored or not..
+		/// </summary>
+		/// <param name="source">The source to check.</param>
+		/// <returns><c>true</c> if the source is ignored, <c>false</c> if it's not ignored or is unknown.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
 		public bool GetIsIgnored (AudioSource source)
 		{
 			if (source == null)
@@ -132,6 +153,12 @@ namespace Gablarski.Client
 			}
 		}
 
+		/// <summary>
+		/// Toggles ignore for the source.
+		/// </summary>
+		/// <param name="source">The source to ignore.</param>
+		/// <returns>The new state of ignore on <paramref name="source"/>, or <c>false</c> if it's .</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
 		public bool ToggleIgnore (AudioSource source)
 		{
 			if (source == null)
@@ -153,6 +180,9 @@ namespace Gablarski.Client
 			}
 		}
 
+		/// <summary>
+		/// Clears the manager of all sources.
+		/// </summary>
 		public override void Clear()
 		{
 			lock (syncRoot)

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2011, Eric Maupin
+﻿// Copyright (c) 2009-2014, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -49,15 +49,13 @@ namespace Gablarski.Client
 	public class ClientSourceHandler
 		: IClientSourceHandler
 	{
-		protected internal ClientSourceHandler (IGablarskiClientContext context, IClientSourceManager manager)
+		protected internal ClientSourceHandler (IGablarskiClientContext context)
 		{
 			if (context == null)
 				throw new ArgumentNullException ("context");
-			if (manager == null)
-				throw new ArgumentNullException ("manager");
 
 			this.context = context;
-			this.manager = manager;
+			this.manager = new ClientSourceManager (context);
 
 			this.context.RegisterMessageHandler<SourceListMessage> (OnSourceListReceivedMessage);
 			this.context.RegisterMessageHandler<SourcesRemovedMessage> (OnSourcesRemovedMessage);
@@ -74,6 +72,11 @@ namespace Gablarski.Client
 		public event EventHandler<AudioSourceEventArgs> AudioSourceStarted;
 		public event EventHandler<AudioSourceEventArgs> AudioSourceStopped;
 		public event EventHandler<ReceivedAudioEventArgs> ReceivedAudio;
+
+		public int Count
+		{
+			get { return this.manager.Count; }
+		}
 
 		public AudioSource this[int id]
 		{
@@ -237,7 +240,7 @@ namespace Gablarski.Client
 
 		private int nextFakeAudioId = -1;
 		private readonly IGablarskiClientContext context;
-		private readonly IClientSourceManager manager;
+		private readonly ClientSourceManager manager;
 		private readonly Dictionary<AudioSource, SourceState> sources = new Dictionary<AudioSource, SourceState>();
 
 		class SourceState

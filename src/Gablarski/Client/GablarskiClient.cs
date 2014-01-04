@@ -229,8 +229,8 @@ namespace Gablarski.Client
 			this.CurrentUser = new CurrentUser (this);
 
 			this.Audio = (audioEngine ?? new AudioEngine());
-			this.Users = (userHandler ?? new ClientUserHandler (this, new ClientUserManager()));
-			this.Sources = (sourceHandler ?? new ClientSourceHandler (this, new ClientSourceManager (this)));
+			this.Users = (userHandler ?? new ClientUserHandler (this));
+			this.Sources = (sourceHandler ?? new ClientSourceHandler (this));
 			this.Channels = (channelHandler ?? new ClientChannelHandler (this));
 
 			this.RegisterMessageHandler<PermissionDeniedMessage> (OnPermissionDeniedMessage);

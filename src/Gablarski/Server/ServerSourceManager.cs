@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2011, Eric Maupin
+﻿// Copyright (c) 2009-2014, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -35,22 +35,23 @@
 // DAMAGE.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Gablarski.Audio;
 
 namespace Gablarski.Server
 {
-	public class ServerSourceManager
-		: AudioSourceManager, IServerSourceManager
+	public sealed class ServerSourceManager
+		: AudioSourceManager
 	{
-		private readonly IGablarskiServerContext context;
-
-		public ServerSourceManager (IGablarskiServerContext serverContext)
-		{
-			this.context = serverContext;
-		}
-
+		/// <summary>
+		/// Creates a new audio source
+		/// </summary>
+		/// <param name="name">The name of the source as requested by the user.</param>
+		/// <param name="owner">The user id that owns the audio source.</param>
+		/// <param name="audioArgs">The audio properties of the source to create.</param>
+		/// <returns>The newly created audio source.</returns>
+		/// <exception cref="ArgumentException"><paramref name="name"/> is in use by the user already.</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="name"/>, <paramref name="owner"/> or <paramref name="audioArgs"/> is <c>null</c>.</exception>
 		public AudioSource Create (string name, IUserInfo owner, AudioCodecArgs audioArgs)
 		{
 			if (name == null)
@@ -78,6 +79,13 @@ namespace Gablarski.Server
 			return source;
 		}
 
+		/// <summary>
+		/// Gets whether the <paramref name="sourceName"/> is in use by <paramref name="user"/>.
+		/// </summary>
+		/// <param name="user">The user to check the sources of.</param>
+		/// <param name="sourceName">The name to check for.</param>
+		/// <returns><c>true</c> if the source name is in use, <c>false</c> if not or <paramref name="user"/> wasn't found.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="user"/> or <paramref name="sourceName"/> is <c>null</c>.</exception>
 		public bool IsSourceNameTaken (IUserInfo user, string sourceName)
 		{
 			if (user == null)

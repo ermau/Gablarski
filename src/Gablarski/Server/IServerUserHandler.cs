@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2011-2013, Eric Maupin
+﻿// Copyright (c) 2009-2014, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -61,9 +61,14 @@ namespace Gablarski.Server
 		IServerConnection this [IUserInfo user] { get; }
 
 		/// <summary>
-		/// Gets the connections for joined users.
+		/// Gets all connections.
 		/// </summary>
 		IEnumerable<IConnection> Connections { get; }
+
+		/// <summary>
+		/// Gets the connections for joined users.
+		/// </summary>
+		IEnumerable<IConnection> UserConnections { get; }
 
 		/// <summary>
 		/// Moves <paramref name="user"/> to the <paramref name="targetChannel"/>.
