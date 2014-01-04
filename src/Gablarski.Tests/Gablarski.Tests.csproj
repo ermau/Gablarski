@@ -94,7 +94,7 @@
     <Compile Include="AudioSourceTests.cs" />
     <Compile Include="BanInfoTests.cs" />
     <Compile Include="ChannelInfoTests.cs" />
-    <Compile Include="ClientChannelManagerTests.cs" />
+    <Compile Include="ClientChannelHandlerTests.cs" />
     <Compile Include="ClientSourceHandlerTests.cs" />
     <Compile Include="ClientSourceManagerTests.cs" />
     <Compile Include="ClientUserHandlerTests.cs" />

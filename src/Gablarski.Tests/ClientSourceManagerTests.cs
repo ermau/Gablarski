@@ -61,8 +61,8 @@ namespace Gablarski.Tests
 			this.client = connections.Item1;
 
 			context = new MockClientContext (this.client);
-			var channels = new ClientChannelManager (context);
-			ClientChannelManagerTests.PopulateChannels (channels, server);
+			var channels = new ClientChannelHandler (context);
+			ClientChannelHandlerTests.PopulateChannels (channels, server);
 
 			context.Users = new ClientUserHandler (context, new ClientUserManager());
 			context.Channels = channels;

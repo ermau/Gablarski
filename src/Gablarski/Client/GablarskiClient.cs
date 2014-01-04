@@ -128,7 +128,7 @@ namespace Gablarski.Client
 		/// <summary>
 		/// Gets the channel manager for this client.
 		/// </summary>
-		public ClientChannelManager Channels
+		public ClientChannelHandler Channels
 		{
 			get;
 			private set;
@@ -225,7 +225,7 @@ namespace Gablarski.Client
 			get { return this.Channels; }
 		}
 
-		private void Setup (IClientConnection connection, IAudioEngine audioEngine, IClientUserHandler userHandler, IClientSourceHandler sourceHandler, ClientChannelManager channelManager)
+		private void Setup (IClientConnection connection, IAudioEngine audioEngine, IClientUserHandler userHandler, IClientSourceHandler sourceHandler, ClientChannelHandler channelHandler)
 		{
 			this.client = new TempestClient (connection, MessageTypes.All);
 			this.client.Connected += OnClientConnected;
@@ -236,7 +236,7 @@ namespace Gablarski.Client
 			this.Audio = (audioEngine ?? new AudioEngine());
 			this.Users = (userHandler ?? new ClientUserHandler (this, new ClientUserManager()));
 			this.Sources = (sourceHandler ?? new ClientSourceHandler (this, new ClientSourceManager (this)));
-			this.Channels = (channelManager ?? new ClientChannelManager (this));
+			this.Channels = (channelHandler ?? new ClientChannelHandler (this));
 
 			this.RegisterMessageHandler<PermissionDeniedMessage> (OnPermissionDeniedMessage);
 			this.RegisterMessageHandler<RedirectMessage> (OnRedirectMessage);

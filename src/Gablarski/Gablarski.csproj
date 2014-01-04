@@ -155,7 +155,7 @@
     <Compile Include="Messages\UserListMessage.cs" />
     <Compile Include="Messages\UserUpdatedMessage.cs" />
     <Compile Include="ChannelInfo.cs" />
-    <Compile Include="Client\ClientChannelManager.cs" />
+    <Compile Include="Client\ClientChannelHandler.cs" />
     <Compile Include="Client\GablarskiClient.cs" />
     <Compile Include="Audio\IAudioCaptureProvider.cs" />
     <Compile Include="Audio\IAudioDevice.cs" />
