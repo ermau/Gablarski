@@ -215,6 +215,7 @@
       <DependentUpon>InputForm.cs</DependentUpon>
     </Compile>
     <Compile Include="NotificationTypeConverter.cs" />
+    <Compile Include="NullableBoolImageConverter.cs" />
     <Compile Include="PersonaSetupWindow.xaml.cs">
       <DependentUpon>PersonaSetupWindow.xaml</DependentUpon>
     </Compile>
