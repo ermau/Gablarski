@@ -63,6 +63,16 @@ namespace Gablarski.Clients.Windows.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap AppBarAdd {
+            get {
+                object obj = ResourceManager.GetObject("AppBarAdd", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap BanImage {
             get {
                 object obj = ResourceManager.GetObject("BanImage", resourceCulture);
@@ -266,6 +276,36 @@ namespace Gablarski.Clients.Windows.Properties {
         internal static System.Drawing.Bitmap LServerImage {
             get {
                 object obj = ResourceManager.GetObject("LServerImage", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ModernServerConnectingImage {
+            get {
+                object obj = ResourceManager.GetObject("ModernServerConnectingImage", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ModernServerDisconnectImage {
+            get {
+                object obj = ResourceManager.GetObject("ModernServerDisconnectImage", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ModernServerImage {
+            get {
+                object obj = ResourceManager.GetObject("ModernServerImage", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

@@ -330,6 +330,10 @@
     <None Include="Resources\user_add.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\appbar.network.server.png" />
+    <None Include="Resources\appbar.network.server.disconnect.png" />
+    <None Include="Resources\appbar.network.server.connecting.png" />
+    <None Include="Resources\appbar.add.png" />
     <None Include="iconlist.txt" />
     <None Include="app.manifest" />
     <None Include="..\..\..\lib\sqlite3.dll">
