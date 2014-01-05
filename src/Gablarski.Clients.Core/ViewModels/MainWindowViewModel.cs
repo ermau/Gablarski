@@ -57,10 +57,16 @@ namespace Gablarski.Clients.ViewModels
 			this.buddyListViewModel = new BuddyListViewModel (client);
 			this.onlineFilter = new ObservableFilter<Person, WatchList> (this.client.WatchList, p => p.Status != Status.Offline);
 
-			Servers = new AsyncValue<IEnumerable<ServerEntry>> (ClientData.GetServersAsync(), Enumerable.Empty<ServerEntry>());
+			Servers = new ServerListViewModel (client.Connection.LocalKey);
 
 			AddBuddy = new RelayCommand (() => Messenger.Send (new AddBuddyMessage()));
 			StartChat = new RelayCommand<Person> (OnStartChat);
+		}
+
+		public ServerListViewModel Servers
+		{
+			get;
+			private set;
 		}
 
 		public Person Persona
@@ -71,12 +77,6 @@ namespace Gablarski.Clients.ViewModels
 		public BuddyListViewModel BuddyList
 		{
 			get { return this.buddyListViewModel; }
-		}
-
-		public AsyncValue<IEnumerable<ServerEntry>> Servers
-		{
-			get;
-			private set;
 		}
 
 		public ICommand AddBuddy

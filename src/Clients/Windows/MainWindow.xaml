@@ -8,13 +8,13 @@
 		xmlns:ComponentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
 		xmlns:metro="http://schemas.codeplex.com/elysium"
 		xmlns:params="http://schemas.codeplex.com/elysium/params"
-		Title="Gablarski" Height="500" Width="250"
+		xmlns:viewModels="clr-namespace:Gablarski.Clients.ViewModels;assembly=Gablarski.Clients"
+		Title="Gablarski" Height="600" Width="250"
 		params:Design.Theme="Dark"
 		params:Design.AccentBrush="{x:Static metro:AccentBrushes.Blue}"
 		params:Design.ContrastBrush="White"
 		Background="{DynamicResource BackgroundBrush}"
 		BorderThickness="1">
-	
 	<Window.Resources>
 		<Gablarski:AvatarConverter x:Key="AvatarConverter" />
 		<CollectionViewSource x:Key="BuddiesByStatus" Source="{Binding BuddyList.Buddies}">
@@ -28,24 +28,24 @@
 		<StackPanel DockPanel.Dock="Top">
 			<Grid Margin="3">
 				<Grid.RowDefinitions>
-					<RowDefinition />
-					<RowDefinition />
+					<RowDefinition Height="28" />
+					<RowDefinition Height="34" />
 				</Grid.RowDefinitions>
 				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="36" />
+					<ColumnDefinition Width="Auto" />
 					<ColumnDefinition />
 				</Grid.ColumnDefinitions>
 
-				<Image Grid.RowSpan="2" Grid.Column="0" DataContext="{Binding Persona.Avatar, Converter={StaticResource AvatarConverter}}" Source="{Binding Value}" Height="32" Width="32" Margin="2" />
+				<Image Grid.RowSpan="2" Grid.Column="0" DataContext="{Binding Persona.Avatar, Converter={StaticResource AvatarConverter}}" Source="{Binding Value}" Height="54" Width="54" Margin="4" />
 
-				<TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding Persona.Nickname}" Margin="2" MouseUp="OnMouseUpNickname" />
+				<TextBlock FontSize="16" Grid.Column="1" Grid.Row="0" Text="{Binding Persona.Nickname}" Margin="4,0,4,4" MouseUp="OnMouseUpNickname" />
 
-				<StackPanel Grid.Column="1" Grid.Row="0" Orientation="Horizontal" Visibility="Collapsed">
+				<!--<StackPanel Grid.Column="1" Grid.Row="0" Orientation="Horizontal" Visibility="Collapsed">
 					<TextBox x:Name="nickname" Width="100" Text="{Binding Persona.Nickname, Mode=TwoWay, UpdateSourceTrigger=Explicit}" />
 					<Button IsDefault="True" Click="OnClickAcceptName" />
-				</StackPanel>
+				</StackPanel>-->
 
-				<ComboBox Visibility="Hidden" Grid.Column="1" Grid.Row="1" Margin="2" SelectedValue="{Binding Persona.Status, Mode=TwoWay}">
+				<ComboBox Grid.Column="1" Grid.Row="1" SelectedValue="{Binding Persona.Status, Mode=TwoWay}" Margin="4,0,4,4">
 					<ComboBox.Resources>
 						<ObjectDataProvider x:Key="Status" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
 							<ObjectDataProvider.MethodParameters>
@@ -90,7 +90,7 @@
 										<ColumnDefinition />
 									</Grid.ColumnDefinitions>
 
-									<Image Height="32" Width="32" Grid.Column="0" />
+									<Image Height="48" Width="48" Grid.Column="0" />
 									<TextBlock Grid.Column="1" Text="{Binding Nickname}" Style="{StaticResource NameStyle}" />
 								</Grid>
 							</DataTemplate>
@@ -101,22 +101,63 @@
 				</Grid>
 			</TabItem>
 
-			<TabItem Header="servers">
+			<TabItem Header="server" DataContext="{Binding Servers}">
 				<Grid>
 					<Grid.RowDefinitions>
 						<RowDefinition Height="*" />
 						<RowDefinition Height="Auto" />
 					</Grid.RowDefinitions>
-
+					
 					<ListBox Grid.Row="0" Name="servers" ItemsSource="{Binding Servers.Value}" MouseDoubleClick="OnServerDoubleClick">
 						<ListBox.ItemTemplate>
-							<DataTemplate>
-								<TextBlock Text="{Binding Name}" />
+							<DataTemplate DataType="viewModels:ServerEntryViewModel">
+								<Grid>
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition />
+										<ColumnDefinition />
+									</Grid.ColumnDefinitions>
+
+									<Image Grid.Column="0" Height="40" Width="40" Stretch="None" Margin="3">
+										<Image.Source>
+											<Binding Path="IsOnline.Value">
+												<Binding.Converter>
+													<Gablarski:NullableBoolImageConverter
+														NullImageSource="resx://ModernServerConnectingImage"
+														TrueImageSource="resx://ModernServerImage"
+														FalseImageSource="resx://ModernServerDisconnectImage"
+													/>
+												</Binding.Converter>
+											</Binding>
+										</Image.Source>
+									</Image>
+
+									<StackPanel Grid.Column="1" Margin="6,0,0,0">
+										<TextBlock Text="{Binding Server.Name}" FontSize="18" />
+										<TextBlock Text="{Binding ConnectedUsers.Value,StringFormat={}{0} users}">
+											<TextBlock.Visibility>
+												<Binding Path="IsOnline.Value">
+													<Binding.Converter>
+														<BooleanToVisibilityConverter />
+													</Binding.Converter>
+												</Binding>
+											</TextBlock.Visibility>
+										</TextBlock>
+									</StackPanel>
+									
+								</Grid>
 							</DataTemplate>
 						</ListBox.ItemTemplate>
 					</ListBox>
 
-					<Button Grid.Row="1" Click="OnStartLocalServer">Start Local</Button>
+					<!--<StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,5">
+						<metro:CommandButton MinHeight="32" MinWidth="32" Height="32" Width="32" Padding="5">
+							<Image Source="resx://AppBarAdd" />
+						</metro:CommandButton>
+					</StackPanel>-->
+					
+					<TreeView Grid.Row="0" Visibility="Collapsed">
+						
+					</TreeView>
 				</Grid>
 			</TabItem>
 		</TabControl>
