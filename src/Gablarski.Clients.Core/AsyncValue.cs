@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013, Eric Maupin
+﻿// Copyright (c) 2013-2014, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -47,6 +47,8 @@ namespace Gablarski.Clients
 	public sealed class AsyncValue<T>
 		: INotifyPropertyChanged
 	{
+		private readonly bool incompleteEnabled;
+		private readonly T incompleteValue;
 		private readonly Task<T> valueTask;
 		private readonly T defaultValue;
 		private bool isRunning = true;
@@ -68,6 +70,13 @@ namespace Gablarski.Clients
 			}, TaskContinuationOptions.HideScheduler | TaskContinuationOptions.OnlyOnRanToCompletion);
 		}
 
+		public AsyncValue ([NotNull] Task<T> valueTask, T defaultValue, T incompleteValue)
+			: this (valueTask, defaultValue)
+		{
+			this.incompleteValue = incompleteValue;
+			this.incompleteEnabled = true;
+		}
+
 		public event PropertyChangedEventHandler PropertyChanged;
 
 		public bool IsRunning
@@ -87,6 +96,8 @@ namespace Gablarski.Clients
 		{
 			get
 			{
+				if (this.incompleteEnabled && (this.valueTask.IsFaulted || this.valueTask.IsCanceled))
+					return this.incompleteValue;
 				if (this.valueTask.Status != TaskStatus.RanToCompletion)
 					return this.defaultValue;
 
