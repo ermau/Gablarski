@@ -103,14 +103,9 @@ namespace Gablarski.Client
 		public event EventHandler<ChannelChangedEventArgs> UserChangedChannel;
 
 		/// <summary>
-		/// A user was kicked from your current channel.
+		/// A user was kicked.
 		/// </summary>
-		public event EventHandler<UserEventArgs> UserKickedFromChannel;
-
-		/// <summary>
-		/// A user was kicked from the server.
-		/// </summary>
-		public event EventHandler<UserEventArgs> UserKickedFromServer;
+		public event EventHandler<UserKickedEventArgs> UserKicked;
 
 		/// <summary>
 		/// Received an unsuccessful result of a change channel request.
@@ -276,16 +271,14 @@ namespace Gablarski.Client
 		#region Message handlers
 		internal void OnUserKickedMessage (MessageEventArgs<UserKickedMessage> e)
 		{
-			var msg = (UserKickedMessage) e.Message;
-
 			IUserInfo user;
 			lock (this.manager.SyncRoot)
-				user = this.manager[msg.UserId];
+				user = this.manager[e.Message.UserId];
 
-			if (msg.FromServer)
-				OnUserKickedFromServer (new UserEventArgs (user));
+			if (e.Message.FromServer)
+				OnUserKicked (new UserKickedEventArgs (user));
 			else
-				OnUserKickedFromChannel (new UserEventArgs (user));
+				OnUserKicked (new UserKickedEventArgs (user, context.Channels[user.CurrentChannelId]));
 		}
 
 		internal void OnUserMutedMessage (MessageEventArgs<UserMutedMessage> e)
@@ -453,16 +446,9 @@ namespace Gablarski.Client
 				result (this, e);
 		}
 
-		private void OnUserKickedFromServer (UserEventArgs e)
+		private void OnUserKicked (UserKickedEventArgs e)
 		{
-			var kicked = UserKickedFromServer;
-			if (kicked != null)
-				kicked (this, e);
-		}
-
-		private void OnUserKickedFromChannel (UserEventArgs e)
-		{
-			var kicked = UserKickedFromChannel;
+			var kicked = UserKicked;
 			if (kicked != null)
 				kicked (this, e);
 		}

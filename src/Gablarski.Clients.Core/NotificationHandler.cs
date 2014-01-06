@@ -1,4 +1,4 @@
-// Copyright (c) 2011, Eric Maupin
+// Copyright (c) 2009-2014, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -57,13 +57,15 @@ namespace Gablarski.Clients
 		/// <param name="client"></param>
 		public NotificationHandler (GablarskiClient client)
 		{
+			if (client == null)
+				throw new ArgumentNullException ("client");
+
 			this.client = client;
 			this.client.Disconnected += OnClientDisconnected;
 			this.client.Users.UserJoined += OnUserJoined;
 			this.client.Users.UserDisconnected += OnUserDisconnected;
 			this.client.Users.UserChangedChannel += OnUserChangedChannel;
-			this.client.Users.UserKickedFromChannel += OnUserKickedFromChannel;
-			this.client.Users.UserKickedFromServer += OnUserKickedFromServer;
+			this.client.Users.UserKicked += OnUserKicked;
 		}
 
 		/// <summary>
@@ -274,8 +276,7 @@ namespace Gablarski.Clients
 			this.client.Users.UserJoined -= OnUserJoined;
 			this.client.Users.UserDisconnected -= OnUserDisconnected;
 			this.client.Users.UserChangedChannel -= OnUserChangedChannel;
-			this.client.Users.UserKickedFromChannel -= OnUserKickedFromChannel;
-			this.client.Users.UserKickedFromServer -= OnUserKickedFromServer;
+			this.client.Users.UserKicked -= OnUserKicked;
 		}
 
 		private bool isDisposed;
@@ -283,14 +284,11 @@ namespace Gablarski.Clients
 		private readonly MutableLookup<NotificationType, ITextToSpeech> speechNotifiers = new MutableLookup<NotificationType, ITextToSpeech>();
 		private readonly GablarskiClient client;
 
-		private void OnUserKickedFromServer (object sender, UserEventArgs e)
+		private void OnUserKicked (object sender, UserKickedEventArgs e)
 		{
-			Notify (NotificationType.UserKicked, "{0} was kicked from the server.", e.User.Nickname, e.User.Phonetic, NotifyPriority.Important);
-		}
-
-		private void OnUserKickedFromChannel (object sender, UserEventArgs e)
-		{
-			if (e.User.CurrentChannelId == client.CurrentUser.CurrentChannelId)
+			if (e.FromServer)
+				Notify (NotificationType.UserKicked, "{0} was kicked from the server.", e.User.Nickname, e.User.Phonetic, NotifyPriority.Important);
+			else if (e.Channel.ChannelId == client.CurrentUser.CurrentChannelId)
 				Notify (NotificationType.UserKicked, "{0} was kicked from the channel.", e.User.Nickname, e.User.Phonetic, NotifyPriority.Important);
 		}
 

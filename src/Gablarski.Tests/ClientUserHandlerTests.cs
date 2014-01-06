@@ -296,8 +296,8 @@ namespace Gablarski.Tests
 			CreateUsers (this.client, this.handler);
 			var target = this.handler.First();
 
-			handler.UserKickedFromChannel += (sender, e) =>
-			{
+			handler.UserKicked += (sender, e) => {
+				Assert.AreEqual (e.User.CurrentChannelId, e.Channel.ChannelId);
 				Assert.AreEqual (target.UserId, e.User.UserId);
 				Assert.Pass();
 			};
@@ -314,8 +314,9 @@ namespace Gablarski.Tests
 			CreateUsers (this.client, this.handler);
 			var target = this.handler.First();
 
-			handler.UserKickedFromServer += (sender, e) =>
-			{
+			handler.UserKicked += (sender, e) => {
+				Assert.IsTrue (e.FromServer);
+				Assert.IsNull (e.Channel);
 				Assert.AreEqual (target.UserId, e.User.UserId);
 				Assert.Pass();
 			};

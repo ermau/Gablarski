@@ -119,6 +119,7 @@
     <Compile Include="Client\QueryResults.cs" />
     <Compile Include="Client\ReceivedChannelChannelResultEventArgs.cs" />
     <Compile Include="Client\UserEventArgs.cs" />
+    <Compile Include="Client\UserKickedEventArgs.cs" />
     <Compile Include="Client\UserMutedEventArgs.cs" />
     <Compile Include="GablarskiProtocol.cs" />
     <Compile Include="GablarskiSocialClient.cs" />

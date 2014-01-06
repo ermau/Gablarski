@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2011, Eric Maupin
+﻿// Copyright (c) 2009-2014, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -83,12 +83,7 @@ namespace Gablarski.Client
 		/// <summary>
 		/// A user was kicked from their current channel to the default channel.
 		/// </summary>
-		event EventHandler<UserEventArgs> UserKickedFromChannel;
-
-		/// <summary>
-		/// A user was kicked from the server.
-		/// </summary>
-		event EventHandler<UserEventArgs> UserKickedFromServer;
+		event EventHandler<UserKickedEventArgs> UserKicked;
 
 		/// <summary>
 		/// Gets the current user.
