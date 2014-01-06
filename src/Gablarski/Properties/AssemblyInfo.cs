@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration ("")]
 [assembly: AssemblyCompany ("Eric Maupin")]
 [assembly: AssemblyProduct ("Gablarski")]
-[assembly: AssemblyCopyright ("Copyright © Eric Maupin 2010")]
+[assembly: AssemblyCopyright ("Copyright © Eric Maupin 2009-2014")]
 [assembly: AssemblyTrademark ("")]
 [assembly: AssemblyCulture ("")]
 
@@ -18,3 +18,4 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion("0.0.0.0")]
 
 [assembly: InternalsVisibleTo ("Gablarski.Tests")]
+[assembly: InternalsVisibleTo ("Gablarski.Clients.Core.Tests")]

@@ -134,6 +134,7 @@
     <Compile Include="ViewModels\AudioPlaybackSettingsViewModel.cs" />
     <Compile Include="ViewModels\BindingListViewModel.cs" />
     <Compile Include="ViewModels\BuddyListViewModel.cs" />
+    <Compile Include="ViewModels\ChannelViewModel.cs" />
     <Compile Include="ViewModels\ChatViewModel.cs" />
     <Compile Include="ViewModels\CommandBindingViewModel.cs" />
     <Compile Include="ViewModels\DeviceViewModel.cs" />
@@ -148,8 +149,10 @@
     <Compile Include="ViewModels\PersonaSetupViewModel.cs" />
     <Compile Include="ViewModels\RelayCommand.cs" />
     <Compile Include="ViewModels\ServerListViewModel.cs" />
+    <Compile Include="ViewModels\ServerViewModel.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />
     <Compile Include="ViewModels\TextMessage.cs" />
+    <Compile Include="ViewModels\UserViewModel.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
   </ItemGroup>
   <ItemGroup>

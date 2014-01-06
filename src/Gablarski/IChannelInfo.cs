@@ -1,4 +1,4 @@
-// Copyright (c) 2011, Eric Maupin
+// Copyright (c) 2009-2014, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -34,12 +34,9 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
-using Tempest;
-
 namespace Gablarski
 {
 	public interface IChannelInfo
-		: ISerializable
 	{
 		/// <summary>
 		/// Gets the ID of this channel.

@@ -2,12 +2,12 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle ("Gablarski.Clients")]
+[assembly: AssemblyTitle ("Gablarski.Clients.Core")]
 [assembly: AssemblyDescription ("")]
 [assembly: AssemblyConfiguration ("")]
 [assembly: AssemblyCompany ("Eric Maupin")]
-[assembly: AssemblyProduct ("Gablarski.Clients")]
-[assembly: AssemblyCopyright ("Copyright © Eric Maupin 2010")]
+[assembly: AssemblyProduct ("Gablarski.Clients.Core")]
+[assembly: AssemblyCopyright ("Copyright © Eric Maupin 2009-2014")]
 [assembly: AssemblyTrademark ("")]
 [assembly: AssemblyCulture ("")]
 
@@ -16,3 +16,5 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyVersion ("0.0.0.0")]
 [assembly: AssemblyFileVersion ("0.0.0.0")]
+
+[assembly: InternalsVisibleTo ("Gablarski.Clients.Core.Tests")]
