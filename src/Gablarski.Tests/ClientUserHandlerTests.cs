@@ -198,8 +198,8 @@ namespace Gablarski.Tests
 		[Test]
 		public void ApproveRegistrationNull()
 		{
-			Assert.Throws<ArgumentNullException> (() => this.handler.ApproveRegistration ((string)null));
-			Assert.Throws<ArgumentNullException> (() => this.handler.ApproveRegistration ((IUserInfo)null));
+			Assert.Throws<ArgumentNullException> (() => this.handler.ApproveRegistrationAsync ((string)null));
+			Assert.Throws<ArgumentNullException> (() => this.handler.ApproveRegistrationAsync ((IUserInfo)null));
 		}
 
 		[Test]
@@ -215,7 +215,7 @@ namespace Gablarski.Tests
 			var user = this.handler.First();
 			int userId = user.UserId;
 
-			this.handler.ApproveRegistration (user);
+			this.handler.ApproveRegistrationAsync (user);
 
 			var msg = this.server.DequeueAndAssertMessage<RegistrationApprovalMessage>();
 			Assert.AreEqual (userId, msg.UserId);
@@ -233,7 +233,7 @@ namespace Gablarski.Tests
 
 			var user = this.handler.First();
 
-			Assert.Throws<NotSupportedException>(() => this.handler.ApproveRegistration (user));
+			Assert.Throws<NotSupportedException>(() => this.handler.ApproveRegistrationAsync (user));
 		}
 
 		[Test]
@@ -244,7 +244,7 @@ namespace Gablarski.Tests
 			context = new MockClientContext (this.client) { ServerInfo = new ServerInfo (new ServerSettings(), userProvider) };
 			this.handler = new ClientUserHandler (context);
 			
-			this.handler.ApproveRegistration ("username");
+			this.handler.ApproveRegistrationAsync ("username");
 
 			var msg = this.server.DequeueAndAssertMessage<RegistrationApprovalMessage>();
 			Assert.AreEqual ("username", msg.Username);
@@ -253,13 +253,13 @@ namespace Gablarski.Tests
 		[Test]
 		public void RejectRegistrationNull()
 		{
-			Assert.Throws<ArgumentNullException> (() => this.handler.RejectRegistration (null));
+			Assert.Throws<ArgumentNullException> (() => this.handler.RejectRegistrationAsync (null));
 		}
 
 		[Test]
 		public void KickNull()
 		{
-			Assert.Throws<ArgumentNullException> (() => this.handler.Kick (null, true));
+			Assert.Throws<ArgumentNullException> (() => this.handler.KickAsync (null, true));
 		}
 
 		[Test]
@@ -269,7 +269,7 @@ namespace Gablarski.Tests
 			var admin = this.handler.First();
 			var target = this.handler.Skip (1).First();
 
-			this.handler.Kick (target, true);
+			this.handler.KickAsync (target, true);
 
 			var kick = server.DequeueAndAssertMessage<KickUserMessage>();
 			Assert.AreEqual (target.UserId, kick.UserId);
@@ -283,7 +283,7 @@ namespace Gablarski.Tests
 			var admin = this.handler.First();
 			var target = this.handler.Skip (1).First();
 
-			this.handler.Kick (target, false);
+			this.handler.KickAsync (target, false);
 
 			var kick = server.DequeueAndAssertMessage<KickUserMessage>();
 			Assert.AreEqual (target.UserId, kick.UserId);

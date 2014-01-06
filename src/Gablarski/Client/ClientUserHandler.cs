@@ -131,44 +131,44 @@ namespace Gablarski.Client
 		/// </summary>
 		/// <param name="user">The user to move.</param>
 		/// <param name="targetChannel">The target channel to move the user to.</param>
-		public void Move (IUserInfo user, IChannelInfo targetChannel)
+		public Task MoveAsync (IUserInfo user, IChannelInfo targetChannel)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
 			if (targetChannel == null)
 				throw new ArgumentNullException ("targetChannel");
 
-			this.context.Connection.SendAsync (new ChannelChangeMessage (user.UserId, targetChannel.ChannelId));
+			return this.context.Connection.SendAsync (new ChannelChangeMessage (user.UserId, targetChannel.ChannelId));
 		}
 
-		public void ApproveRegistration (IUserInfo userInfo)
+		public Task ApproveRegistrationAsync (IUserInfo userInfo)
 		{
 			if (userInfo == null)
 				throw new ArgumentNullException ("userInfo");
 			if (context.ServerInfo.RegistrationMode != UserRegistrationMode.PreApproved)
 				throw new NotSupportedException();
 
-			this.context.Connection.SendAsync (new RegistrationApprovalMessage { Approved = true, UserId = userInfo.UserId });
+			return this.context.Connection.SendAsync (new RegistrationApprovalMessage { Approved = true, UserId = userInfo.UserId });
 		}
 
-		public void ApproveRegistration (string username)
+		public Task ApproveRegistrationAsync (string username)
 		{
 			if (username == null)
 				throw new ArgumentNullException ("username");
 			if (context.ServerInfo.RegistrationMode != UserRegistrationMode.Approved)
 				throw new NotSupportedException();
 
-			this.context.Connection.SendAsync (new RegistrationApprovalMessage { Approved = true, Username = username });
+			return this.context.Connection.SendAsync (new RegistrationApprovalMessage { Approved = true, Username = username });
 		}
 
-		public void RejectRegistration (string username)
+		public Task RejectRegistrationAsync (string username)
 		{
 			if (username == null)
 				throw new ArgumentNullException ("username");
 			if (context.ServerInfo.RegistrationMode != UserRegistrationMode.Approved)
 				throw new NotSupportedException();
 
-			this.context.Connection.SendAsync (new RegistrationApprovalMessage { Approved = false, Username = username });
+			return this.context.Connection.SendAsync (new RegistrationApprovalMessage { Approved = false, Username = username });
 		}
 
 		public bool GetIsIgnored (IUserInfo user)
@@ -191,7 +191,7 @@ namespace Gablarski.Client
 			return state;
 		}
 
-		public void ToggleMute (IUserInfo user)
+		public async Task SetMuteAsync (IUserInfo user, bool mute)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
@@ -200,15 +200,15 @@ namespace Gablarski.Client
 			if (user == null)
 				return;
 
-			this.context.Connection.SendAsync (new RequestMuteUserMessage (user, !user.IsMuted));
+			await this.context.Connection.SendAsync (new RequestMuteUserMessage (user, mute)).ConfigureAwait (false);
 		}
 
-		public void Kick (IUser user, bool fromServer)
+		public Task KickAsync (IUser user, bool fromServer)
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
 
-			this.context.Connection.SendAsync (new KickUserMessage (user, fromServer));
+			return this.context.Connection.SendAsync (new KickUserMessage (user, fromServer));
 		}
 
 		public Task BanAsync (IUserInfo user, TimeSpan banLength)

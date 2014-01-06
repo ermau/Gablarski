@@ -401,9 +401,9 @@ namespace Gablarski.Client
 			if (e.Result != LoginResultState.Success)
 				return;
 
-			IChannelInfo channel = this.Channels[this.disconnectedInChannelId];
+			IChannelInfo channel = Channels[this.disconnectedInChannelId];
 			if (channel != null)
-				this.Users.Move (this.CurrentUser, channel);
+				Users.MoveAsync (CurrentUser, channel);
 
 			this.disconnectedInChannelId = 0;
 		}

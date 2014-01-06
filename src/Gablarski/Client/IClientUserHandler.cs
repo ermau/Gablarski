@@ -120,7 +120,7 @@ namespace Gablarski.Client
 		/// <param name="username">The username to approve registration for.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="username"/> is <c>null</c>.</exception>
 		/// <exception cref="NotSupportedException">The server does not support either registration or approvals.</exception>
-		void ApproveRegistration (string username);
+		Task ApproveRegistrationAsync (string username);
 
 		/// <summary>
 		/// Pre-approves the registration of <paramref name="user"/>.
@@ -128,7 +128,7 @@ namespace Gablarski.Client
 		/// <param name="user">The user to pre-approve for registration.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
 		/// <exception cref="NotSupportedException">The server does not support either pre-registration or approvals.</exception>
-		void ApproveRegistration (IUserInfo user);
+		Task ApproveRegistrationAsync (IUserInfo user);
 
 		/// <summary>
 		/// Rejects the registration of <paramref name="username"/>.
@@ -136,14 +136,14 @@ namespace Gablarski.Client
 		/// <param name="username">The username to reject registration for.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="username"/> is <c>null</c>.</exception>
 		/// <exception cref="NotSupportedException">The server does not support either registration or approvals.</exception>
-		void RejectRegistration (string username);
+		Task RejectRegistrationAsync (string username);
 
 		/// <summary>
 		/// Requests to move <paramref name="user"/> to <paramref name="targetChannel"/>.
 		/// </summary>
 		/// <param name="user">The user to move.</param>
 		/// <param name="targetChannel">The target channel to move the user to.</param>
-		void Move (IUserInfo user, IChannelInfo targetChannel);
+		Task MoveAsync (IUserInfo user, IChannelInfo targetChannel);
 
 		/// <summary>
 		/// Kicks a user to the default channel or from the server.
@@ -151,20 +151,17 @@ namespace Gablarski.Client
 		/// <param name="user">The user to kick.</param>
 		/// <param name="fromServer">Whether to kick the user from the server or just from the default channel.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
-		void Kick (IUser user, bool fromServer);
+		Task KickAsync (IUser user, bool fromServer);
 
 		Task BanAsync (IUserInfo user, TimeSpan banLength);
 
 		/// <summary>
 		/// Attempts to toggle mute on <paramref name="user"/>.
 		/// </summary>
-		/// <param name="user">The user to attempt to mute.</param>
+		/// <param name="user">The user to attempt to mute/unmute.</param>
+		/// <param name="mute">Whether to mute or unmute.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
-		/// <remarks>
-		/// Since muting is server-side and permissions restricted, this will return immediately without
-		/// new state information, that'll come later.
-		/// </remarks>
-		void ToggleMute (IUserInfo user);
+		Task SetMuteAsync (IUserInfo user, bool mute);
 
 		/// <summary>
 		/// Resets the handler to it's initial state.
