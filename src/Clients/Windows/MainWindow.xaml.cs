@@ -35,9 +35,13 @@
 // DAMAGE.
 
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Input;
 using Gablarski.Clients.Messages;
+using Gablarski.Clients.Persistence;
 using Gablarski.Clients.ViewModels;
+using Tempest;
+using Tempest.Social;
 
 namespace Gablarski.Clients.Windows
 {
