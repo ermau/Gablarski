@@ -104,6 +104,7 @@
     <Compile Include="Audio\AudioExtensions.cs" />
     <Compile Include="Audio\AudioFormat.cs" />
     <Compile Include="Audio\AudioPlaybackEntity.cs" />
+    <Compile Include="Client\ChannelChangedEventArgs.cs" />
     <Compile Include="Client\ClientSourceHandler.cs" />
     <Compile Include="Audio\IAudioEngine.cs" />
     <Compile Include="Audio\IAudioReceiver.cs" />
@@ -116,6 +117,9 @@
     <Compile Include="Client\IClientUserHandler.cs" />
     <Compile Include="Client\ICurrentUserHandler.cs" />
     <Compile Include="Client\QueryResults.cs" />
+    <Compile Include="Client\ReceivedChannelChannelResultEventArgs.cs" />
+    <Compile Include="Client\UserEventArgs.cs" />
+    <Compile Include="Client\UserMutedEventArgs.cs" />
     <Compile Include="GablarskiProtocol.cs" />
     <Compile Include="GablarskiSocialClient.cs" />
     <Compile Include="IChannelInfo.cs" />
