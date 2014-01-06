@@ -78,7 +78,9 @@ namespace Gablarski.Clients
 						if (!this.maps.TryGetValue (newItem, out selectedItems))
 							this.maps[newItem] = selectedItems = new List<TSelected>();
 
-						selectedItems.Add (this.selector (newItem));
+						TSelected selected = this.selector (newItem);
+						selectedItems.Add (selected);
+						Add (selected);
 					}
 
 					break;
@@ -90,10 +92,13 @@ namespace Gablarski.Clients
 					foreach (TSource oldItem in e.OldItems) {
 						List<TSelected> selectedItems;
 						if (this.maps.TryGetValue (oldItem, out selectedItems)) {
+							TSelected selected = selectedItems[0];
 							selectedItems.RemoveAt (0);
 
 							if (selectedItems.Count == 0)
 								this.maps.Remove (oldItem);
+
+							Remove (selected);
 						}
 					}
 
