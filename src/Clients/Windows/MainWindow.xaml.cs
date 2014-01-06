@@ -76,5 +76,19 @@ namespace Gablarski.Clients.Windows
 				WindowStartupLocation = WindowStartupLocation.CenterOwner
 			}.Show();
 		}
+
+		private void OnServerDoubleClick (object sender, MouseButtonEventArgs e)
+		{
+			var server = this.servers.SelectedItem as ServerEntry;
+			if (server == null)
+				return;
+
+		}
+
+		private async void OnStartLocalServer (object sender, RoutedEventArgs e)
+		{
+			await LocalServer.StartAsync (Program.Key.Result);
+
+		}
 	}
 }
