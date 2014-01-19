@@ -45,6 +45,7 @@
 					<Button IsDefault="True" Click="OnClickAcceptName" />
 				</StackPanel>-->
 
+				<!--
 				<ComboBox Grid.Column="1" Grid.Row="1" SelectedValue="{Binding Persona.Status, Mode=TwoWay}" Margin="4,0,4,4">
 					<ComboBox.Resources>
 						<ObjectDataProvider x:Key="Status" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
@@ -56,12 +57,12 @@
 					<ComboBox.ItemsSource>
 						<Binding Source="{StaticResource Status}" />
 					</ComboBox.ItemsSource>
-				</ComboBox>
+				</ComboBox>!-->
 			</Grid>
 		</StackPanel>
 
 		<TabControl>
-			<TabItem Header="buddies">
+			<!--<TabItem Header="buddies">
 				<Grid>
 					<Grid.RowDefinitions>
 						<RowDefinition />
@@ -99,7 +100,7 @@
 					
 					<Button Name="addBuddy" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Command="{Binding AddBuddy}">Add Buddy</Button>
 				</Grid>
-			</TabItem>
+			</TabItem>!-->
 
 			<TabItem Header="server" DataContext="{Binding Servers}">
 				<Grid>

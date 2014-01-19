@@ -378,7 +378,7 @@ namespace Gablarski.Clients.Windows
 			History = new ChatHistory (SocialClient);
 
 			string host = ConfigurationManager.AppSettings["socialHost"];
-			SocialClient.SetTarget (new Target (host, SocialProtocol.DefaultPort));
+			//SocialClient.SetTarget (new Target (host, SocialProtocol.DefaultPort));
 		}
 
 		private static void PersonalSetup()
