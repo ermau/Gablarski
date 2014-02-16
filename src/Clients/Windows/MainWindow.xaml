@@ -15,6 +15,18 @@
 		params:Design.ContrastBrush="White"
 		Background="{DynamicResource BackgroundBrush}"
 		BorderThickness="1">
+	<metro:Window.TitleBar>
+		<Grid>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*" />
+				<ColumnDefinition Width="33" />
+			</Grid.ColumnDefinitions>
+
+			<Button Width="33" Height="32" Grid.Column="1" ToolTip="Settings" Click="OnClickSettings" Style="{DynamicResource {x:Static metro:Window.DefaultCaptionButtonStyleKey}}">
+				<Image Source="resx://AppBarSettings" Width="10" Height="10" />
+			</Button>
+		</Grid>
+	</metro:Window.TitleBar>
 	<Window.Resources>
 		<Gablarski:AvatarConverter x:Key="AvatarConverter" />
 		<CollectionViewSource x:Key="BuddiesByStatus" Source="{Binding BuddyList.Buddies}">

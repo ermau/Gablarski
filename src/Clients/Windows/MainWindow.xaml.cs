@@ -94,5 +94,13 @@ namespace Gablarski.Clients.Windows
 			await LocalServer.StartAsync (Program.Key.Result);
 
 		}
+
+		private void OnClickSettings (object sender, RoutedEventArgs e)
+		{
+			new SettingsWindow {
+				Owner = this,
+				WindowStartupLocation = WindowStartupLocation.CenterOwner
+			}.ShowDialog();
+		}
 	}
 }
