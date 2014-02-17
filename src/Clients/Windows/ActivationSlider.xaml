@@ -11,7 +11,7 @@
 					 Minimum="{Binding ElementName=root,Path=Minimum}"
 					 Maximum="{Binding ElementName=root,Path=Maximum}"
 					 Value="{Binding ElementName=root,Path=ActivationLevel}"
-					 BorderThickness="0" Margin="10,0,10,0" />
+					 BorderThickness="0" Margin="5,0,5,0" />
 
 		<Slider Name="slider"
 				Minimum="{Binding ElementName=root,Path=Minimum}"
