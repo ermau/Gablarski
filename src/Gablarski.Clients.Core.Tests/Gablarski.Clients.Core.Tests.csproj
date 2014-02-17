@@ -42,12 +42,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ChannelViewModelTests.cs" />
     <Compile Include="ClientContextBasedTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SelectedObservableCollectionTests.cs" />
-    <Compile Include="ServerViewModelTests.cs" />
-    <Compile Include="UserViewModelTests.cs" />
+    <Compile Include="ViewModels\ChannelViewModelTests.cs" />
+    <Compile Include="ViewModels\ServerListViewModelTests.cs" />
+    <Compile Include="ViewModels\UserViewModelTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Gablarski.Clients.Core\Gablarski.Clients.Core.csproj">
