@@ -279,13 +279,12 @@ namespace Gablarski.Client
 		protected void OnConnectionRejected (RejectedConnectionEventArgs e)
 		{
 			this.connecting = false;
-			e.Reconnect = (e.Reason == ConnectionRejectedReason.CouldNotConnect || e.Reason == ConnectionRejectedReason.Unknown);
 
 			var rejected = this.ConnectionRejected;
 			if (rejected != null)
 				rejected (this, e);
 
-			DisconnectCore (DisconnectionReason.Rejected, this.client.Connection, e.Reconnect, false);
+			DisconnectCore (DisconnectionReason.Rejected, this.client.Connection, false);
 		}
 
 		protected void OnPermissionDenied (PermissionDeniedEventArgs e)
@@ -297,7 +296,7 @@ namespace Gablarski.Client
 
 		private void OnDisconnectedMessage (MessageEventArgs<DisconnectMessage> e)
 		{
-			DisconnectCore (e.Message.Reason, (IClientConnection)e.Connection, (GetHandlingForReason (e.Message.Reason) == DisconnectHandling.Reconnect), true);
+			DisconnectCore (e.Message.Reason, (IClientConnection)e.Connection, true);
 		}
 
 		private void OnPermissionDeniedMessage (MessageEventArgs<PermissionDeniedMessage> e)
@@ -325,33 +324,7 @@ namespace Gablarski.Client
 			ConnectAsync (new Target (e.Message.Host, e.Message.Port));
 		}
 
-		private enum DisconnectHandling
-		{
-			None,
-			Reconnect
-		}
-
-		private DisconnectHandling GetHandlingForReason (DisconnectionReason reason)
-		{
-			if (!ReconnectAutomatically)
-				return DisconnectHandling.None;
-
-			switch (reason)
-			{
-				case DisconnectionReason.Unknown:
-					return DisconnectHandling.Reconnect;
-
-				default:
-					return DisconnectHandling.None;
-			}
-		}
-
-		private void DisconnectCore (DisconnectionReason reason, IClientConnection connection)
-		{
-			DisconnectCore (reason, connection, GetHandlingForReason (reason) == DisconnectHandling.Reconnect, true);
-		}
-
-		private void DisconnectCore (DisconnectionReason reason, IClientConnection connection, bool reconnect, bool fireEvent)
+		private void DisconnectCore (DisconnectionReason reason, IClientConnection connection, bool fireEvent = true)
 		{
 			lock (StateSync)
 			{
@@ -372,40 +345,7 @@ namespace Gablarski.Client
 
 				if (fireEvent)
 					OnDisconnected (this, new DisconnectedEventArgs (reason));
-
-				if (reconnect)
-				{
-					this.connecting = true;
-					ThreadPool.QueueUserWorkItem (Reconnect);
-				}
 			}
-		}
-
-		private void Reconnect (object state)
-		{
-			Interlocked.Increment (ref this.reconnectAttempt);
-			Thread.Sleep (ReconnectAttemptFrequency);
-
-			lock (StateSync)
-			{
-				if (!this.running && !this.connecting)
-					return;
-			}
-
-			CurrentUser.ReceivedJoinResult += ReconnectJoinedResult;
-			ConnectAsync (this.previousTarget);
-		}
-
-		private void ReconnectJoinedResult (object sender, ReceivedJoinResultEventArgs e)
-		{
-			if (e.Result != LoginResultState.Success)
-				return;
-
-			IChannelInfo channel = Channels[this.disconnectedInChannelId];
-			if (channel != null)
-				Users.MoveAsync (CurrentUser, channel);
-
-			this.disconnectedInChannelId = 0;
 		}
 
 		private void OnClientDisconnected (object sender, ClientDisconnectedEventArgs e)
@@ -457,7 +397,6 @@ namespace Gablarski.Client
 		}
 	}
 
-	#region Event Args
 	public class PermissionDeniedEventArgs
 		: EventArgs
 	{
@@ -481,9 +420,7 @@ namespace Gablarski.Client
 	{
 		public RejectedConnectionEventArgs (ConnectionRejectedReason reason, int reconnectAttempt)
 		{
-			this.Reason = reason;
-			ReconnectAttempt = reconnectAttempt;
-			Reconnect = true;
+			Reason = reason;
 		}
 
 		/// <summary>
@@ -493,32 +430,6 @@ namespace Gablarski.Client
 		{
 			get;
 			private set;
-		}
-
-		/// <summary>
-		/// Gets the reconnect attempt number. 0 = not an attempt.
-		/// </summary>
-		public int ReconnectAttempt
-		{
-			get;
-			private set;
-		}
-
-		/// <summary>
-		/// Gets whether this was a reconnect attempt failing or not.
-		/// </summary>
-		public bool Reconnecting
-		{
-			get { return ReconnectAttempt != 0; }
-		}
-
-		/// <summary>
-		/// Gets or sets whether to attempt to reconnect.
-		/// </summary>
-		public bool Reconnect
-		{
-			get;
-			set;
 		}
 	}
 
@@ -554,5 +465,4 @@ namespace Gablarski.Client
 			private set;
 		}
 	}
-	#endregion
 }
