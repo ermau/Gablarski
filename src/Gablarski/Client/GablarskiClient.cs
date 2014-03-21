@@ -217,7 +217,7 @@ namespace Gablarski.Client
 
 		public Task DisconnectAsync()
 		{
-			return this.client.DisconnectAsync();
+			return this.client.DisconnectAsync (ConnectionResult.Custom, DisconnectReasonRequested);
 		}
 
 		IIndexedEnumerable<int, IChannelInfo> IGablarskiClientContext.Channels
@@ -413,9 +413,20 @@ namespace Gablarski.Client
 			this.disconnectedInChannelId = 0;
 		}
 
+		private const string DisconnectReasonRequested = "Requested";
+
 		private void OnClientDisconnected (object sender, ClientDisconnectedEventArgs e)
 		{
-			DisconnectCore (DisconnectionReason.Unknown, this.client.Connection);
+			DisconnectionReason reason = DisconnectionReason.Unknown;
+			if (e.Reason == ConnectionResult.Custom) {
+				switch (e.CustomReason) {
+					case DisconnectReasonRequested:
+						reason = DisconnectionReason.Requested;
+						break;
+				}
+			}
+
+			DisconnectCore (reason, this.client.Connection);
 		}
 
 		private void OnClientConnected (object sender, ClientConnectionEventArgs e)
