@@ -11,27 +11,6 @@
 		Background="{DynamicResource BackgroundBrush}"
 		BorderThickness="1">
 	
-	<Window.Resources>
-		<Gablarski:AvatarConverter x:Key="AvatarConverter" />
-		
-		<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-		
-		<Style x:Key="Hint" TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
-			<Setter Property="Margin" Value="5,2" />
-			<Setter Property="Foreground" Value="White" />
-			<Setter Property="BorderBrush" Value="Transparent" />
-			<Setter Property="FontSize" Value="30" />
-			<Setter Property="Focusable" Value="False" />
-		</Style>
-
-		<Style x:Key="TextInput" TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
-			<Setter Property="Background" Value="Transparent" />
-			<Setter Property="BorderThickness" Value="0,0,0,1" />
-			<Setter Property="FontSize" Value="30" />
-			<Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}" />
-		</Style>
-	</Window.Resources>
-	
 	<Grid HorizontalAlignment="Center" Margin="0,-40,0,0">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="70" />

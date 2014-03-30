@@ -12,10 +12,6 @@
 		BorderThickness="1">
 	
 	<Window.Resources>
-		<Gablarski:AvatarConverter x:Key="AvatarConverter" />
-		
-		<BooleanToVisibilityConverter x:Key="VisibilityConverter" />
-
 		<Style x:Key="Hint" TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
 			<Setter Property="Margin" Value="5,2" />
 			<Setter Property="Foreground" Value="LightGray" />
