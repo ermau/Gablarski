@@ -189,6 +189,7 @@
     <Compile Include="ByteArrayExtensions.cs" />
     <Compile Include="ObservableDictionary.cs" />
     <Compile Include="ObservableList.cs" />
+    <Compile Include="ObservableLookup.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Server\GablarskiSocialServer.cs" />
     <Compile Include="Server\IRedirector.cs" />
