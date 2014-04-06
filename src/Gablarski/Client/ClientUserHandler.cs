@@ -123,6 +123,16 @@ namespace Gablarski.Client
 			get { return this.manager.Count; }
 		}
 
+		public IUserInfo this[int userId]
+		{
+			get { return this.manager[userId]; }
+		}
+
+		public ILookup<int, IUserInfo> ByChannel
+		{
+			get { return this.manager.ByChannel; }
+		}
+
 		/// <summary>
 		/// Requests to move <paramref name="user"/> to <paramref name="targetChannel"/>.
 		/// </summary>
@@ -216,18 +226,6 @@ namespace Gablarski.Client
 			return this.context.Connection.SendAsync (new BanUserMessage {
 				BanInfo = new BanInfo (null, user.Username, banLength)
 			});
-		}
-
-		public IEnumerable<IUserInfo> GetUsersInChannel (int channelId)
-		{
-			lock (SyncRoot) {
-				return this.manager.ByChannel[channelId];
-			}
-		}
-
-		public IUserInfo this[int userId]
-		{
-			get { return this.manager[userId]; }
 		}
 
 		public void Reset()

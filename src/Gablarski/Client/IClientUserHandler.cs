@@ -36,6 +36,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Gablarski.Client
@@ -89,6 +90,11 @@ namespace Gablarski.Client
 		IUserInfo Current { get; }
 
 		/// <summary>
+		/// Gets a lookup for users by channel id.
+		/// </summary>
+		ILookup<int, IUserInfo> ByChannel { get; }
+
+		/// <summary>
 		/// Gets whether or not <paramref name="user"/> is currently ignored.
 		/// </summary>
 		/// <param name="user">The user to check.</param>
@@ -102,15 +108,6 @@ namespace Gablarski.Client
 		/// <param name="user">The user to ignore or unignore.</param>
 		/// <returns><c>true</c> if the user is now ignored, <c>false</c> if the user is now unignored.</returns>
 		bool ToggleIgnore (IUserInfo user);
-
-		/// <summary>
-		/// Gets the users in the given channel.
-		/// </summary>
-		/// <param name="channelId">The id of the channel.</param>
-		/// <returns>
-		/// A <see cref="IEnumerable{UserInfo}"/> of the users in the channel. <c>null</c> if the channel was not found.
-		/// </returns>
-		IEnumerable<IUserInfo> GetUsersInChannel (int channelId);
 
 		/// <summary>
 		/// Approves the registration of <paramref name="username"/>.
