@@ -223,9 +223,8 @@ namespace Gablarski.Client
 
 		public IEnumerable<IUserInfo> GetUsersInChannel (int channelId)
 		{
-			lock (SyncRoot)
-			{
-				return this.channels[channelId].ToList();
+			lock (SyncRoot) {
+				return this.manager.GetUsersInChannel (channelId);
 			}
 		}
 
@@ -239,7 +238,6 @@ namespace Gablarski.Client
 			lock (SyncRoot)
 			{
 				this.manager.Clear();
-				channels.Clear();
 			}
 		}
 
@@ -265,7 +263,6 @@ namespace Gablarski.Client
 		}
 
 		private readonly ClientUserManager manager;
-		private readonly MutableLookup<int, IUserInfo> channels = new MutableLookup<int, IUserInfo> ();
 		private readonly IGablarskiClientContext context;
 
 		#region Message handlers
