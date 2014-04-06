@@ -62,6 +62,7 @@ namespace Gablarski.Tests
 		public static void Join (this ServerUserHandler self, IServerConnection serverConnection, ConnectionBuffer clientConnection, ref IUserInfo user, bool isLoggedIn = false)
 		{
 			self.OnJoinMessage (new MessageEventArgs<JoinMessage> (serverConnection, new JoinMessage {
+				Header = new MessageHeader(),
 				Nickname = user.Nickname,
 				Phonetic = user.Phonetic,
 			}));

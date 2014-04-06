@@ -1,11 +1,11 @@
-// Copyright (c) 2011, Eric Maupin
+// Copyright (c) 2011-2014, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
 // or without modification, are permitted provided that
 // the following conditions are met:
 //
-// - Redistributions of source code must retain the above 
+// - Redistributions of source code must retain the above
 //   copyright notice, this list of conditions and the
 //   following disclaimer.
 //
@@ -37,6 +37,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Gablarski.Messages;
 using Cadenza;
 using Tempest;
@@ -55,8 +56,6 @@ namespace Gablarski.Client
 
 			this.context.RegisterMessageHandler<UserChangedChannelMessage> (OnUserChangedChannelMessage);
 			this.context.RegisterMessageHandler<UserUpdatedMessage> (OnUserUpdatedMessage);
-			this.context.RegisterMessageHandler<LoginResultMessage> (OnLoginResultMessage);
-			this.context.RegisterMessageHandler<JoinResultMessage> (OnJoinResultMessage);
 			this.context.RegisterMessageHandler<PermissionsMessage> (OnPermissionsMessage);
 			this.context.RegisterMessageHandler<UserKickedMessage> (OnUserKickedMessage);
 			this.context.RegisterMessageHandler<RegisterResultMessage> (OnRegisterResultMessage);
@@ -72,25 +71,16 @@ namespace Gablarski.Client
 			if (currentChannelId < 0)
 				throw new ArgumentOutOfRangeException ("currentChannelId");
 
-			this.UserId = userId;
-			this.Nickname = nickname;
-			this.CurrentChannelId = currentChannelId;
+			UserId = userId;
+			Nickname = nickname;
+			CurrentChannelId = currentChannelId;
 		}
-
-		#region Events
-		/// <summary>
-		/// A login result has been received.
-		/// </summary>
-		public event EventHandler<ReceivedLoginResultEventArgs> ReceivedLoginResult;
-
-		public event EventHandler<ReceivedJoinResultEventArgs> ReceivedJoinResult;
 
 		public event EventHandler<ReceivedRegisterResultEventArgs> ReceivedRegisterResult;
 
 		public event EventHandler PermissionsChanged;
 
 		public event EventHandler Kicked;
-		#endregion
 
 		public IEnumerable<Permission> Permissions
 		{
@@ -109,26 +99,31 @@ namespace Gablarski.Client
 			}
 		}
 
-		public void Login (string username, string password)
+		public async Task<LoginResult> LoginAsync (string username, string password)
 		{
 			if (username.IsNullOrWhitespace())
 				throw new ArgumentNullException("username");
 			if (password == null)
 				throw new ArgumentNullException("password");
 
-			this.context.Connection.SendAsync (new LoginMessage
-			{
-				Username = username,
-				Password = password
-			});
-		}
-		
-		public void Join (string nickname, string serverPassword)
-		{
-			Join (nickname, null, serverPassword);
+			try {
+				var response = await this.context.Connection.SendFor<LoginResultMessage> (new LoginMessage {
+					Username = username,
+					Password = password
+				}, 30000).ConfigureAwait (false);
+
+				return response.Result;
+			} catch (OperationCanceledException) {
+				return null;
+			}
 		}
 
-		public void Join (string nickname, string phonetic, string serverPassword)
+		public Task<LoginResultState> JoinAsync (string nickname, string serverPassword)
+		{
+			return JoinAsync (nickname, null, serverPassword);
+		}
+
+		public async Task<LoginResultState> JoinAsync (string nickname, string phonetic, string serverPassword)
 		{
 			if (nickname.IsNullOrWhitespace())
 				throw new ArgumentNullException ("nickname");
@@ -136,38 +131,55 @@ namespace Gablarski.Client
 			if (phonetic.IsNullOrWhitespace())
 				phonetic = nickname;
 
-			this.context.Connection.SendAsync (new JoinMessage (nickname, phonetic, serverPassword));
+			try {
+				var response = await this.context.Connection.SendFor<JoinResultMessage> (new JoinMessage (nickname, phonetic, serverPassword)).ConfigureAwait (false);
+				if (response.Result == LoginResultState.Success) {
+					UserId = response.UserInfo.UserId;
+					Username = response.UserInfo.Username;
+					Nickname = response.UserInfo.Nickname;
+					CurrentChannelId = response.UserInfo.CurrentChannelId;
+				}
+
+				return response.Result;
+			} catch (OperationCanceledException) {
+				return LoginResultState.FailedUnknown;
+			}
 		}
 
-		public void Register (string username, string password)
+		public async Task<RegisterResult> RegisterAsync (string username, string password)
 		{
-			this.context.Connection.SendAsync (new RegisterMessage (username, password));
+			try {
+				var resultMsg = await this.context.Connection.SendFor<RegisterResultMessage> (new RegisterMessage (username, password), 30000).ConfigureAwait (false);
+				return resultMsg.Result;
+			} catch (OperationCanceledException) {
+				return RegisterResult.FailedUnknown;
+			}
 		}
 
 		/// <summary>
 		/// Sets the current user's comment.
 		/// </summary>
 		/// <param name="comment">The comment to set. <c>null</c> is valid to clear.</param>
-		public void SetComment (string comment)
+		public async Task SetCommentAsync (string comment)
 		{
-			if (comment == this.Comment)
+			if (comment == Comment)
 				return;
 
 			Comment = comment;
-			this.context.Connection.SendAsync (new SetCommentMessage (comment));
+			await this.context.Connection.SendAsync (new SetCommentMessage (comment)).ConfigureAwait (false);
 		}
 
 		/// <summary>
 		/// Sets the current user's status.
 		/// </summary>
 		/// <param name="status">The status to set.</param>
-		public void SetStatus (UserStatus status)
+		public async Task SetStatusAsync (UserStatus status)
 		{
-			if (status == this.Status)
+			if (status == Status)
 				return;
 
 			Status = status;
-			this.context.Connection.SendAsync (new SetStatusMessage (status));
+			await this.context.Connection.SendAsync (new SetStatusMessage (status)).ConfigureAwait (false);
 		}
 
 		/// <summary>
@@ -177,7 +189,7 @@ namespace Gablarski.Client
 		{
 			context.Audio.MutePlayback();
 
-			SetStatus (Status | UserStatus.MutedSound);
+			SetStatusAsync (Status | UserStatus.MutedSound);
 		}
 
 		/// <summary>
@@ -187,7 +199,7 @@ namespace Gablarski.Client
 		{
 			context.Audio.UnmutePlayback();
 
-			SetStatus (Status ^ UserStatus.MutedSound);
+			SetStatusAsync (Status ^ UserStatus.MutedSound);
 		}
 
 		/// <summary>
@@ -197,7 +209,7 @@ namespace Gablarski.Client
 		{
 			context.Audio.MuteCapture();
 
-			SetStatus (Status | UserStatus.MutedMicrophone);
+			SetStatusAsync (Status | UserStatus.MutedMicrophone);
 		}
 
 		/// <summary>
@@ -207,44 +219,31 @@ namespace Gablarski.Client
 		{
 			context.Audio.UnmuteCapture();
 
-			SetStatus (Status ^ UserStatus.MutedMicrophone);
+			SetStatusAsync (Status ^ UserStatus.MutedMicrophone);
 		}
 
+		private HashSet<int> registerResultMessagesToIgnore;
 		private readonly IGablarskiClientContext context;
 		private readonly object permissionLock = new object();
 		private IEnumerable<Permission> permissions;
 
-		protected virtual void OnLoginResult (ReceivedLoginResultEventArgs e)
-		{
-			var result = this.ReceivedLoginResult;
-			if (result != null)
-				result (this, e);
-		}
-
 		protected virtual void OnPermissionsChanged (EventArgs e)
 		{
-			var changed = this.PermissionsChanged;
+			var changed = PermissionsChanged;
 			if (changed != null)
 				changed (this, e);
 		}
 
-		protected virtual void OnJoinResult (ReceivedJoinResultEventArgs e)
-		{
-			var join = this.ReceivedJoinResult;
-			if (join != null)
-				join (this, e);
-		}
-
 		protected virtual void OnRegisterResult (ReceivedRegisterResultEventArgs e)
 		{
-			var result = this.ReceivedRegisterResult;
+			var result = ReceivedRegisterResult;
 			if (result != null)
 				result (this, e);
 		}
 
 		protected virtual void OnKicked (EventArgs e)
 		{
-			var kicked = this.Kicked;
+			var kicked = Kicked;
 			if (kicked != null)
 				kicked (this, e);
 		}
@@ -271,7 +270,7 @@ namespace Gablarski.Client
 			if (user == null || !user.Equals (this))
 				return;
 
-			this.CurrentChannelId = msg.ChangeInfo.TargetChannelId;
+			CurrentChannelId = msg.ChangeInfo.TargetChannelId;
 		}
 
 		internal void OnUserUpdatedMessage (MessageEventArgs<UserUpdatedMessage> e)
@@ -281,47 +280,21 @@ namespace Gablarski.Client
 			if (!msg.User.Equals (this))
 				return;
 
-			this.Comment = msg.User.Comment;
-			this.Status = msg.User.Status;
-		}
-
-		internal void OnLoginResultMessage (MessageEventArgs<LoginResultMessage> e)
-		{
-		    var msg = (LoginResultMessage)e.Message;
-			if (msg.Result.ResultState == LoginResultState.Success)
-				this.UserId = msg.Result.UserId;
-
-			var args = new ReceivedLoginResultEventArgs (msg.Result);
-			OnLoginResult (args);
-		}
-
-		internal void OnJoinResultMessage (MessageEventArgs<JoinResultMessage> e)
-		{
-			var msg = (JoinResultMessage)e.Message;
-			if (msg.Result == LoginResultState.Success)
-			{
-				this.UserId = msg.UserInfo.UserId;
-				this.Username = msg.UserInfo.Username;
-				this.Nickname = msg.UserInfo.Nickname;
-				this.CurrentChannelId = msg.UserInfo.CurrentChannelId;
-			}
-
-			var args = new ReceivedJoinResultEventArgs(msg.Result);
-			OnJoinResult (args);
+			Comment = msg.User.Comment;
+			Status = msg.User.Status;
 		}
 
 		internal void OnRegisterResultMessage (MessageEventArgs<RegisterResultMessage> e)
 		{
-			OnRegisterResult (new ReceivedRegisterResultEventArgs (((RegisterResultMessage)e.Message).Result));
+			OnRegisterResult (new ReceivedRegisterResultEventArgs (e.Message.Result));
 		}
 
 		internal void OnPermissionsMessage (MessageEventArgs<PermissionsMessage> e)
 		{
-			var msg = (PermissionsMessage)e.Message;
-			if (msg.OwnerId != this.UserId)
+			if (e.Message.OwnerId != UserId)
 				return;
 
-			this.permissions = msg.Permissions;
+			this.permissions = e.Message.Permissions;
 			OnPermissionsChanged (EventArgs.Empty);
 		}
 	}

@@ -176,7 +176,7 @@ namespace Gablarski.Tests
 				state = RegisterResult.FailedUsernameInUse;
 			else
 			{
-				state = RegisterResult.Success;
+				state = RegisterResult.Approved;
 				int userId = ((users.Any()) ? users.Max (u => u.UserId) : 0) + 1;
 
 				if (RegistrationMode != UserRegistrationMode.Approved)

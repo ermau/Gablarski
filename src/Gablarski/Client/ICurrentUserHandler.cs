@@ -1,11 +1,11 @@
-﻿// Copyright (c) 2011, Eric Maupin
+﻿// Copyright (c) 2011-2014, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
 // or without modification, are permitted provided that
 // the following conditions are met:
 //
-// - Redistributions of source code must retain the above 
+// - Redistributions of source code must retain the above
 //   copyright notice, this list of conditions and the
 //   following disclaimer.
 //
@@ -36,7 +36,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 
 namespace Gablarski.Client
 {
@@ -44,8 +44,11 @@ namespace Gablarski.Client
 		: IUserInfo
 	{
 		event EventHandler PermissionsChanged;
-		event EventHandler<ReceivedJoinResultEventArgs> ReceivedJoinResult;
-		event EventHandler<ReceivedLoginResultEventArgs> ReceivedLoginResult;
+
+		/// <summary>
+		/// Received a registeristration result.
+		/// </summary>
+		/// <remarks>This will only fire if <see cref="RegisterAsync"/> returned <see cref="RegisterResult.Pending"/>.</remarks>
 		event EventHandler<ReceivedRegisterResultEventArgs> ReceivedRegisterResult;
 		event EventHandler Kicked;
 
@@ -58,14 +61,14 @@ namespace Gablarski.Client
 		/// <param name="password">The password to log in with.</param>
 		/// <exception cref="System.ArgumentNullException"><paramref name="username"/> is null or empty.</exception>
 		/// <exception cref="System.ArgumentNullException"><paramref name="password"/> is null.</exception>
-		void Login (string username, string password);
-		
+		Task<LoginResult> LoginAsync (string username, string password);
+
 		/// <summary>
 		/// Joins the connected server with the specified nickname and password.
 		/// </summary>
 		/// <param name="nickname">The nickname to use when in the server.</param>
 		/// <param name="serverPassword">The password to join the server.</param>
-		void Join (string nickname, string serverPassword);
+		Task<LoginResultState> JoinAsync (string nickname, string serverPassword);
 
 		/// <summary>
 		/// Joins the connected server with the specified nickname and password.
@@ -73,7 +76,7 @@ namespace Gablarski.Client
 		/// <param name="nickname">The nickname to use when in the server.</param>
 		/// <param name="phonetic">The phonetic spelling for the nickname.</param>
 		/// <param name="serverPassword">The password to join the server.</param>
-		void Join (string nickname, string phonetic, string serverPassword);
+		Task<LoginResultState> JoinAsync (string nickname, string phonetic, string serverPassword);
 
 		/// <summary>
 		/// Sends a registration to the server.
@@ -82,7 +85,7 @@ namespace Gablarski.Client
 		/// <param name="password">The password to register with.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="username"/> or <paramref name="password"/> is null.</exception>
 		/// <exception cref="ArgumentException"><paramref name="username"/> or <paramref name="password"/> is empty.</exception>
-		void Register (string username, string password);
+		Task<RegisterResult> RegisterAsync (string username, string password);
 
 		void MuteCapture();
 		void UnmuteCapture();
@@ -90,37 +93,8 @@ namespace Gablarski.Client
 		void MutePlayback();
 		void UnmutePlayback();
 
-		void SetComment (string comment);
-		void SetStatus (UserStatus status);
-	}
-
-	public class ReceivedJoinResultEventArgs
-		: EventArgs
-	{
-		public ReceivedJoinResultEventArgs (LoginResultState result)
-		{
-			this.Result = result;
-		}
-
-		public LoginResultState Result
-		{
-			get; set;
-		}
-	}
-
-	public class ReceivedLoginResultEventArgs
-		: EventArgs
-	{
-		public ReceivedLoginResultEventArgs (LoginResult result)
-		{
-			this.Result = result;
-		}
-
-		public LoginResult Result
-		{
-			get;
-			private set;
-		}
+		Task SetCommentAsync (string comment);
+		Task SetStatusAsync (UserStatus status);
 	}
 
 	public class ReceivedRegisterResultEventArgs

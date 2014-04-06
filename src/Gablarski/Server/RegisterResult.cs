@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2011, Eric Maupin
+﻿// Copyright (c) 2011-2014, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -34,8 +34,6 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
-using System.Linq;
-
 namespace Gablarski
 {
 	public enum RegisterResult
@@ -47,9 +45,14 @@ namespace Gablarski
 		FailedUnknown = 0,
 
 		/// <summary>
-		/// Succeeded (or entered successfully for approval.)
+		/// Succeeded and was automatically approved.
 		/// </summary>
-		Success = 1,
+		Approved = 1,
+
+		/// <summary>
+		/// Succeeded and is now awaiting approval.
+		/// </summary>
+		Pending = 7,
 
 		/// <summary>
 		/// Failed because the username is invalid.

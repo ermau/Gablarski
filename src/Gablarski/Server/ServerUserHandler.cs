@@ -258,13 +258,13 @@ namespace Gablarski.Server
 
 			if (join.Nickname.IsNullOrWhitespace ())
 			{
-				e.Connection.SendAsync (new JoinResultMessage (LoginResultState.FailedInvalidNickname, null));
+				e.Connection.SendResponseAsync (e.Message, new JoinResultMessage (LoginResultState.FailedInvalidNickname, null));
 				return;
 			}
 
 			if (!String.IsNullOrEmpty (this.context.Settings.ServerPassword) && join.ServerPassword != this.context.Settings.ServerPassword)
 			{
-				e.Connection.SendAsync (new JoinResultMessage (LoginResultState.FailedServerPassword, null));
+				e.Connection.SendResponseAsync (e.Message, new JoinResultMessage (LoginResultState.FailedServerPassword, null));
 				return;
 			}
 
@@ -285,7 +285,7 @@ namespace Gablarski.Server
 			if (result == LoginResultState.Success)
 			{
 				Manager.Join (e.Connection, info);
-				e.Connection.SendAsync (msg);
+				e.Connection.SendResponseAsync (e.Message, msg);
 
 				if (!Manager.GetIsLoggedIn (e.Connection))
 					e.Connection.SendAsync (new PermissionsMessage (info.UserId, this.context.PermissionsProvider.GetPermissions (info.UserId)));
@@ -307,13 +307,13 @@ namespace Gablarski.Server
 
 			if (login.Username.IsNullOrWhitespace())
 			{
-				e.Connection.SendAsync (new LoginResultMessage (new LoginResult (0, LoginResultState.FailedUsername)));
+				e.Connection.SendResponseAsync (e.Message, new LoginResultMessage (new LoginResult (0, LoginResultState.FailedUsername)));
 				return;
 			}
 
 			LoginResult result = this.context.UserProvider.Login (login.Username, login.Password);
 
-			e.Connection.SendAsync (new LoginResultMessage (result));
+			e.Connection.SendResponseAsync (e.Message, new LoginResultMessage (result));
 
 			if (result.Succeeded)
 			{
@@ -482,7 +482,7 @@ namespace Gablarski.Server
 			
 			if (!this.context.UserProvider.UpdateSupported)
 			{
-				e.Connection.SendAsync (new RegisterResultMessage { Result = RegisterResult.FailedUnsupported });
+				e.Connection.SendResponseAsync (e.Message, new RegisterResultMessage { Result = RegisterResult.FailedUnsupported, Header = new MessageHeader() });
 				return;
 			}
 
@@ -499,7 +499,7 @@ namespace Gablarski.Server
 
 					if (!this.approvals.Remove (user))
 					{
-						e.Connection.SendAsync (new RegisterResultMessage { Result = RegisterResult.FailedNotApproved });
+						e.Connection.SendResponseAsync (e.Message, new RegisterResultMessage { Result = RegisterResult.FailedNotApproved });
 						return;
 					}
 
@@ -508,16 +508,16 @@ namespace Gablarski.Server
 				case UserRegistrationMode.Message:
 				case UserRegistrationMode.WebPage:
 				case UserRegistrationMode.None:
-					e.Connection.SendAsync (new RegisterResultMessage { Result = RegisterResult.FailedUnsupported });
+					e.Connection.SendResponseAsync (e.Message, new RegisterResultMessage { Result = RegisterResult.FailedUnsupported });
 					return;
 
 				default:
-					e.Connection.SendAsync (new RegisterResultMessage { Result = RegisterResult.FailedUnknown });
+					e.Connection.SendResponseAsync (e.Message, new RegisterResultMessage { Result = RegisterResult.FailedUnknown });
 					return;
 			}
 
 			var result = this.context.UserProvider.Register (msg.Username, msg.Password);
-			e.Connection.SendAsync (new RegisterResultMessage { Result = result });
+			e.Connection.SendResponseAsync (e.Message, new RegisterResultMessage { Result = result });
 		}
 
 		internal void OnSetPermissionsMessage (MessageEventArgs<SetPermissionsMessage> e)

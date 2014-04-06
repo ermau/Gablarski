@@ -292,7 +292,7 @@ namespace Gablarski.Tests
 			}
 
 			handler.OnJoinMessage (new MessageEventArgs<JoinMessage> (sc,
-				new JoinMessage (nickname, userServerpassword)));
+				new JoinMessage (nickname, userServerpassword) { Header = new MessageHeader()}));
 			
 			if (shouldWork)
 			{
@@ -692,7 +692,7 @@ namespace Gablarski.Tests
 			users.RegistrationMode = UserRegistrationMode.None;
 
 			handler.OnRegisterMessage (new MessageEventArgs<RegisterMessage> (server,
-				new RegisterMessage ("username", "password")));
+				new RegisterMessage ("username", "password") { Header = new MessageHeader() }));
 
 			var msg = client.DequeueAndAssertMessage<RegisterResultMessage>();
 			Assert.AreEqual (RegisterResult.FailedUnsupported, msg.Result);
@@ -707,7 +707,7 @@ namespace Gablarski.Tests
 			users.RegistrationMode = UserRegistrationMode.PreApproved;
 
 			handler.OnRegisterMessage (new MessageEventArgs<RegisterMessage> (server,
-				new RegisterMessage ("username", "password")));
+				new RegisterMessage ("username", "password") { Header = new MessageHeader() }));
 
 			client.AssertNoMessage();
 		}
@@ -721,10 +721,10 @@ namespace Gablarski.Tests
 			users.RegistrationMode = UserRegistrationMode.Normal;
 
 			handler.OnRegisterMessage (new MessageEventArgs<RegisterMessage> (server,
-				new RegisterMessage ("username", "password")));
+				new RegisterMessage ("username", "password") { Header = new MessageHeader() }));
 
 			var msg = client.DequeueAndAssertMessage<RegisterResultMessage>();
-			Assert.AreEqual (RegisterResult.Success, msg.Result);
+			Assert.AreEqual (RegisterResult.Approved, msg.Result);
 		}
 
 		[Test]
@@ -740,7 +740,7 @@ namespace Gablarski.Tests
 			users.RegistrationMode = UserRegistrationMode.Normal;
 
 			handler.OnRegisterMessage (new MessageEventArgs<RegisterMessage> (s, 
-				new RegisterMessage ("username", "password")));
+				new RegisterMessage ("username", "password") { Header = new MessageHeader() }));
 
 			var msg = c.DequeueAndAssertMessage<RegisterResultMessage>();
 			Assert.AreEqual (RegisterResult.FailedUnsupported, msg.Result);
@@ -759,7 +759,7 @@ namespace Gablarski.Tests
 			users.RegistrationMode = UserRegistrationMode.None;
 
 			handler.OnRegisterMessage (new MessageEventArgs<RegisterMessage> (s, 
-				new RegisterMessage ("username", "password")));
+				new RegisterMessage ("username", "password") { Header = new MessageHeader() }));
 
 			var msg = c.DequeueAndAssertMessage<RegisterResultMessage>();
 			Assert.AreEqual (RegisterResult.FailedUnsupported, msg.Result);
@@ -778,7 +778,7 @@ namespace Gablarski.Tests
 			users.RegistrationMode = UserRegistrationMode.WebPage;
 
 			handler.OnRegisterMessage (new MessageEventArgs<RegisterMessage> (s, 
-				new RegisterMessage ("username", "password")));
+				new RegisterMessage ("username", "password") { Header = new MessageHeader() }));
 
 			var msg = c.DequeueAndAssertMessage<RegisterResultMessage>();
 			Assert.AreEqual (RegisterResult.FailedUnsupported, msg.Result);
@@ -797,7 +797,7 @@ namespace Gablarski.Tests
 			users.RegistrationMode = UserRegistrationMode.Message;
 
 			handler.OnRegisterMessage (new MessageEventArgs<RegisterMessage> (s, 
-				new RegisterMessage ("username", "password")));
+				new RegisterMessage ("username", "password") { Header = new MessageHeader() }));
 
 			var msg = c.DequeueAndAssertMessage<RegisterResultMessage>();
 			Assert.AreEqual (RegisterResult.FailedUnsupported, msg.Result);
@@ -816,10 +816,10 @@ namespace Gablarski.Tests
 			users.RegistrationMode = UserRegistrationMode.Normal;
 
 			handler.OnRegisterMessage (new MessageEventArgs<RegisterMessage> (s,
-				new RegisterMessage ("username", "password")));
+				new RegisterMessage ("username", "password") { Header = new MessageHeader() }));
 
 			var msg = c.DequeueAndAssertMessage<RegisterResultMessage>();
-			Assert.AreEqual (RegisterResult.Success, msg.Result);
+			Assert.AreEqual (RegisterResult.Approved, msg.Result);
 		}
 
 		[Test]
@@ -835,7 +835,7 @@ namespace Gablarski.Tests
 			users.RegistrationMode = UserRegistrationMode.PreApproved;
 
 			handler.OnRegisterMessage (new MessageEventArgs<RegisterMessage> (s,
-				new RegisterMessage ("username", "password")));
+				new RegisterMessage ("username", "password") { Header = new MessageHeader() }));
 
 			var msg = c.DequeueAndAssertMessage<RegisterResultMessage>();
 			Assert.AreEqual (RegisterResult.FailedNotApproved, msg.Result);
@@ -856,10 +856,10 @@ namespace Gablarski.Tests
 			handler.ApproveRegistration (u);
 
 			handler.OnRegisterMessage (new MessageEventArgs<RegisterMessage> (s, 
-				new RegisterMessage ("username", "password")));
+				new RegisterMessage ("username", "password") { Header = new MessageHeader() }));
 
 			var msg = c.DequeueAndAssertMessage<RegisterResultMessage>();
-			Assert.AreEqual (RegisterResult.Success, msg.Result);
+			Assert.AreEqual (RegisterResult.Approved, msg.Result);
 		}
 
 		[Test]
