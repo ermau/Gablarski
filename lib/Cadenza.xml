@@ -4186,7 +4186,7 @@ Console.WriteLine (6.UpTo (12).Implode (", "));
             it can be used with
             <see cref="M:Cadenza.IEnumerableCoda.Transpose``1(System.Collections.Generic.IEnumerable{System.Collections.Generic.IEnumerable{``0}})" />.
           </para>
-                <code lang="C#" src="../../Test/Cadenza/JaggedArrayTest.cs#Rows">int[][] s = new []{
+                <code lang="C#" src="../../Test/Cadenza/JaggedArrayCodaTest.cs#Rows">int[][] s = new []{
 	new[]{1, 2, 3},
 	new[]{4, 5, 6},
 	new[]{7, 8, 9},
@@ -5982,7 +5982,7 @@ Assert.AreEqual (9.Just (),
               <see cref="T:System.InvalidOperationException" /> is thrown.
             </para>
                 </block>
-                <code lang="C#" src="../../Test/Cadenza/ObjectTest.cs#Match">Assert.AreEqual ("foo",
+                <code lang="C#" src="../../Test/Cadenza/ObjectCodaTest.cs#Match">Assert.AreEqual ("foo",
 	"foo".Match (
 		s =&gt; Maybe.When (s.Length != 3, "bar!"),
 		s =&gt; s.Just ()));
@@ -6097,7 +6097,7 @@ Assert.AreEqual (-1, "*default*".Match (m));
                 <para>
             Given the <c>TreeNode&lt;T&gt;</c> declaration:
           </para>
-                <code lang="C#" src="../../Test/Cadenza/ObjectTest.cs#TreeNode_Declaration">class TreeNode&lt;T&gt;
+                <code lang="C#" src="../../Test/Cadenza/ObjectCodaTest.cs#TreeNode_Declaration">class TreeNode&lt;T&gt;
 {
 	public TreeNode ()
 	{
@@ -6111,7 +6111,7 @@ Assert.AreEqual (-1, "*default*".Match (m));
                 <para>
                     <c>TraverseBreadthFirst()</c> is used as:
           </para>
-                <code lang="C#" src="../../Test/Cadenza/ObjectTest.cs#TraverseBreadthFirst">TreeNode&lt;int&gt; root = new TreeNode&lt;int&gt; {
+                <code lang="C#" src="../../Test/Cadenza/ObjectCodaTest.cs#TraverseBreadthFirst">TreeNode&lt;int&gt; root = new TreeNode&lt;int&gt; {
 	Value = 1, Children = new [] {
 		new TreeNode&lt;int&gt; { Value = 2 },
 		new TreeNode&lt;int&gt; {
@@ -6259,7 +6259,7 @@ AssertAreSame (new[]{ 1, 2, 3, 4, 5 }, values);
                 <para>
             Given the <c>TreeNode&lt;T&gt;</c> declaration:
           </para>
-                <code lang="C#" src="../../Test/Cadenza/ObjectTest.cs#TreeNode_Declaration">class TreeNode&lt;T&gt;
+                <code lang="C#" src="../../Test/Cadenza/ObjectCodaTest.cs#TreeNode_Declaration">class TreeNode&lt;T&gt;
 {
 	public TreeNode ()
 	{
@@ -6273,7 +6273,7 @@ AssertAreSame (new[]{ 1, 2, 3, 4, 5 }, values);
                 <para>
                     <c>TraverseDepthFirst()</c> is used as:
           </para>
-                <code lang="C#" src="../../Test/Cadenza/ObjectTest.cs#TraverseDepthFirst">TreeNode&lt;int&gt; root = new TreeNode&lt;int&gt; {
+                <code lang="C#" src="../../Test/Cadenza/ObjectCodaTest.cs#TraverseDepthFirst">TreeNode&lt;int&gt; root = new TreeNode&lt;int&gt; {
 	Value = 1, Children = new [] {
 		new TreeNode&lt;int&gt; { Value = 2 },
 		new TreeNode&lt;int&gt; {
@@ -6400,7 +6400,7 @@ AssertAreSame (new[]{ 1, 2, 3, 5, 4 }, values);
             declaration (which is useful for reducing in-scope variables, as no
             variable is explicitly declared).
           </para>
-                <code lang="C#" src="../../Test/Cadenza/ObjectTest.cs#With">// sorts the array, then returns the 
+                <code lang="C#" src="../../Test/Cadenza/ObjectCodaTest.cs#With">// sorts the array, then returns the 
 // element in the middle of the array.
 Assert.AreEqual (3,
 	new[]{5, 4, 3, 2, 1}.Sort ()
@@ -6438,7 +6438,7 @@ Assert.AreEqual (3,
             it can be used with
             <see cref="M:Cadenza.IEnumerableCoda.Transpose``1(System.Collections.Generic.IEnumerable{System.Collections.Generic.IEnumerable{``0}})" />.
           </para>
-                <code lang="C#" src="../../Test/Cadenza/RectangularArrayTest.cs#Rows">int[,] s = new int[,] {
+                <code lang="C#" src="../../Test/Cadenza/RectangularArrayCodaTest.cs#Rows">int[,] s = new int[,] {
 	{1, 2, 3},
 	{4, 5, 6},
 	{7, 8, 9},
@@ -6774,7 +6774,7 @@ Assert.AreEqual ("1,2,3,4,5",
           the associated captured values within <paramref name="self" />.
         </returns>
             <remarks>
-                <code lang="C#" src="../../Test/Cadenza/StringTest.cs#CaptureNamedGroups">Assert.AreEqual ("flag=--; name=foo; value=bar",
+                <code lang="C#" src="../../Test/Cadenza/StringCodaTest.cs#CaptureNamedGroups">Assert.AreEqual ("flag=--; name=foo; value=bar",
 		"--foo=bar"
 		.CaptureNamedGroups (@"^(?&lt;flag&gt;--|-|/)(?&lt;name&gt;[^:=]+)((?&lt;sep&gt;[:=])(?&lt;value&gt;.*))?$")
 		.With (r =&gt; "flag=" + r ["flag"].Implode () + 
@@ -6818,7 +6818,7 @@ Assert.AreEqual ("1,2,3,4,5",
           the associated captured values within <paramref name="self" />.
         </returns>
             <remarks>
-                <code lang="C#" src="../../Test/Cadenza/StringTest.cs#CaptureNamedGroups">Assert.AreEqual ("flag=--; name=foo; value=bar",
+                <code lang="C#" src="../../Test/Cadenza/StringCodaTest.cs#CaptureNamedGroups">Assert.AreEqual ("flag=--; name=foo; value=bar",
 		"--foo=bar"
 		.CaptureNamedGroups (@"^(?&lt;flag&gt;--|-|/)(?&lt;name&gt;[^:=]+)((?&lt;sep&gt;[:=])(?&lt;value&gt;.*))?$")
 		.With (r =&gt; "flag=" + r ["flag"].Implode () + 
@@ -6861,7 +6861,7 @@ Assert.AreEqual ("1,2,3,4,5",
           match the regular expression <paramref name="regex" />.
         </returns>
             <remarks>
-                <code lang="C#" src="../../Test/Cadenza/StringTest.cs#Captures">Assert.IsTrue (
+                <code lang="C#" src="../../Test/Cadenza/StringCodaTest.cs#Captures">Assert.IsTrue (
 		new[]{"a", "b", "c", "d"}.SequenceEqual (
 			"a - b - c - d".Captures (@"(\w+)")));
 </code>
@@ -6902,7 +6902,7 @@ Assert.AreEqual ("1,2,3,4,5",
           match the regular expression <paramref name="regex" />.
         </returns>
             <remarks>
-                <code lang="C#" src="../../Test/Cadenza/StringTest.cs#Captures">Assert.IsTrue (
+                <code lang="C#" src="../../Test/Cadenza/StringCodaTest.cs#Captures">Assert.IsTrue (
 		new[]{"a", "b", "c", "d"}.SequenceEqual (
 			"a - b - c - d".Captures (@"(\w+)")));
 </code>
@@ -6938,7 +6938,7 @@ Assert.AreEqual ("1,2,3,4,5",
           whitespace; otherwise, <see langword="false" />.
         </returns>
             <remarks>
-                <code lang="C#" src="../../Test/Cadenza/StringTest.cs#IsNullOrWhitespace">string s = null;
+                <code lang="C#" src="../../Test/Cadenza/StringCodaTest.cs#IsNullOrWhitespace">string s = null;
 Assert.IsTrue (s.IsNullOrWhitespace());
 Assert.IsTrue ("".IsNullOrWhitespace());
 Assert.IsTrue ("    ".IsNullOrWhitespace());
@@ -6969,7 +6969,7 @@ Assert.IsFalse ("foo".IsNullOrWhitespace());
             A "line of text" is the same as that used by 
             <see cref="M:Cadenza.TextReaderCoda.Lines(System.IO.TextReader)" />.
           </block>
-                <code lang="C#" src="../../Test/Cadenza/StringTest.cs#Lines">Assert.IsTrue (new[]{"one", "two", "three"}
+                <code lang="C#" src="../../Test/Cadenza/StringCodaTest.cs#Lines">Assert.IsTrue (new[]{"one", "two", "three"}
 		.SequenceEqual ("one\ntwo\nthree".Lines ()));
 </code>
             </remarks>
@@ -6997,7 +6997,7 @@ Assert.IsFalse ("foo".IsNullOrWhitespace());
           text within <paramref name="self" />.
         </returns>
             <remarks>
-                <code lang="C#" src="../../Test/Cadenza/StringTest.cs#Matches">string match = @"a - b
+                <code lang="C#" src="../../Test/Cadenza/StringCodaTest.cs#Matches">string match = @"a - b
 c - d
 e - f";
 
@@ -7044,7 +7044,7 @@ Assert.AreEqual ("e - f", matches [2].Value);
           text within <paramref name="self" />.
         </returns>
             <remarks>
-                <code lang="C#" src="../../Test/Cadenza/StringTest.cs#Matches">string match = @"a - b
+                <code lang="C#" src="../../Test/Cadenza/StringCodaTest.cs#Matches">string match = @"a - b
 c - d
 e - f";
 
@@ -7096,7 +7096,7 @@ Assert.AreEqual ("e - f", matches [2].Value);
             in that no captures (parenthesis) are required within 
             <paramref name="regex" />.
           </para>
-                <code lang="C#" src="../../Test/Cadenza/StringTest.cs#MatchValues">string match = @"a - b
+                <code lang="C#" src="../../Test/Cadenza/StringCodaTest.cs#MatchValues">string match = @"a - b
 c - d
 e - f";
 
@@ -7148,7 +7148,7 @@ AssertAreSame (expected, actual);
             in that no captures (parenthesis) are required within 
             <paramref name="regex" />.
           </para>
-                <code lang="C#" src="../../Test/Cadenza/StringTest.cs#MatchValues">string match = @"a - b
+                <code lang="C#" src="../../Test/Cadenza/StringCodaTest.cs#MatchValues">string match = @"a - b
 c - d
 e - f";
 
@@ -7192,7 +7192,7 @@ AssertAreSame (expected, actual);
           within <paramref name="targets " /> have been removed.
         </returns>
             <remarks>
-                <code lang="C#" src="../../Test/Cadenza/StringTest.cs#Remove">Assert.AreEqual (" Bar ", "Foo Bar Monkeys".Remove ("Foo", "Monkeys"));
+                <code lang="C#" src="../../Test/Cadenza/StringCodaTest.cs#Remove">Assert.AreEqual (" Bar ", "Foo Bar Monkeys".Remove ("Foo", "Monkeys"));
 Assert.AreEqual (" Bar ", "Foo Bar Foo".Remove ("Foo"));
 </code>
             </remarks>
@@ -7239,12 +7239,13 @@ Assert.AreEqual (" Bar ", "Foo Bar Foo".Remove ("Foo"));
             When <paramref name="end" /> is positive, this is equivalent to
             <c>self.Substring (start, end - start)</c>.
           </para>
-                <code lang="C#" src="../../Test/Cadenza/StringTest.cs#Slice">var data = "0123456789";
+                <code lang="C#" src="../../Test/Cadenza/StringCodaTest.cs#Slice">var data = "0123456789";
 
 Assert.AreEqual ("0",       data.Slice (0, 1));
 Assert.AreEqual ("89",      data.Slice (8, 10));
 Assert.AreEqual ("456789",  data.Slice (4, -1));
 Assert.AreEqual ("8",       data.Slice (8, -2));
+Assert.AreEqual ("",        data.Slice (data.Length, data.Length));
 </code>
             </remarks>
             <exception cref="T:System.ArgumentNullException">
@@ -7288,7 +7289,7 @@ Assert.AreEqual ("8",       data.Slice (8, -2));
             This probabably doesn't properly support
             <see cref="T:System.FlagsAttribute" /> enums...
           </block>
-                <code lang="C#" src="../../Test/Cadenza/StringTest.cs#ToEnum">Assert.AreEqual (Foo.Gazonk, "Gazonk".ToEnum&lt;Foo&gt; ());
+                <code lang="C#" src="../../Test/Cadenza/StringCodaTest.cs#ToEnum">Assert.AreEqual (Foo.Gazonk, "Gazonk".ToEnum&lt;Foo&gt; ());
 Assert.AreEqual (Foo.Bar,    "Bar".ToEnum&lt;Foo&gt; ());
 </code>
             </remarks>
@@ -7340,7 +7341,7 @@ Assert.AreEqual (Foo.Bar,    "Bar".ToEnum&lt;Foo&gt; ());
               them.
             </para>
                 </block>
-                <code lang="C#" src="../../Test/Cadenza/StringTest.cs#Tokens">string[] expected = {"(", "hello", ",", "world", "!)"};
+                <code lang="C#" src="../../Test/Cadenza/StringCodaTest.cs#Tokens">string[] expected = {"(", "hello", ",", "world", "!)"};
 string[] actual = "(hello, world!)"
 	.Tokens (
 			(p, c) =&gt; char.IsLetterOrDigit (c), // words
@@ -7380,7 +7381,7 @@ AssertAreSame (expected, actual);
             <see cref="M:System.Char.IsWhiteSpace(System.Char)" />
             returns <see langword="false" />.
           </block>
-                <code lang="C#" src="../../Test/Cadenza/StringTest.cs#Words">string[] expected = {"skip", "leading", "and", "trailing", "whitespace"};
+                <code lang="C#" src="../../Test/Cadenza/StringCodaTest.cs#Words">string[] expected = {"skip", "leading", "and", "trailing", "whitespace"};
 string[] actual = 
 	"   skip  leading\r\n\tand trailing\vwhitespace   "
 	.Words ().ToArray ();
@@ -7478,7 +7479,7 @@ AssertAreSame (expected, actual);
               </term>
                     </item>
                 </list>
-                <code lang="C#" src="../../Test/Cadenza/StringTest.cs#WrappedLines">// Notice that the first width is 50, but the actual returned length is 17.
+                <code lang="C#" src="../../Test/Cadenza/StringCodaTest.cs#WrappedLines">// Notice that the first width is 50, but the actual returned length is 17.
 // This is because the newline is encountered first.
 // The width of 48 is used to constrain all remaining lines, causing
 // the 4th line to require line-wrapping.
@@ -7650,7 +7651,7 @@ Assert.IsTrue (new[]{
               </term>
                     </item>
                 </list>
-                <code lang="C#" src="../../Test/Cadenza/StringTest.cs#WrappedLines">// Notice that the first width is 50, but the actual returned length is 17.
+                <code lang="C#" src="../../Test/Cadenza/StringCodaTest.cs#WrappedLines">// Notice that the first width is 50, but the actual returned length is 17.
 // This is because the newline is encountered first.
 // The width of 48 is used to constrain all remaining lines, causing
 // the 4th line to require line-wrapping.
@@ -9081,7 +9082,7 @@ KeyValuePair&lt;string, int&gt; kvp   = tuple.ToKeyValuePair ();
             This is equivalent to
             <c><paramref name="type" />.IsAssignableFrom(<paramref name="self" />)</c>.
           </para>
-                <code lang="C#" src="../../Test/Cadenza/TypeTest.cs#IsAssignableTo">// Can string be implicitly converted to object?  Yes.
+                <code lang="C#" src="../../Test/Cadenza/TypeCodaTest.cs#IsAssignableTo">// Can string be implicitly converted to object?  Yes.
 Assert.IsTrue (typeof(string).IsAssignableTo (typeof (object)));
 // Can object be implicitly converted to string?  No.
 Assert.IsFalse (typeof(object).IsAssignableTo (typeof (string)));
@@ -9121,7 +9122,7 @@ Assert.IsFalse (typeof(object).IsAssignableTo (typeof (string)));
             </term>
                     </item>
                 </list>
-                <code lang="C#" src="../../Test/Cadenza/TypeTest.cs#IsNullable">Assert.IsTrue (typeof (int?).IsNullable ());
+                <code lang="C#" src="../../Test/Cadenza/TypeCodaTest.cs#IsNullable">Assert.IsTrue (typeof (int?).IsNullable ());
 Assert.IsFalse (typeof (int).IsNullable ());
 Assert.IsFalse (typeof (string).IsNullable ());
 Assert.IsFalse (typeof (Nullable&lt;&gt;).IsNullable ());
@@ -9470,6 +9471,85 @@ Assert.IsFalse (typeof (Nullable&lt;&gt;).IsNullable ());
             <value>To be added.</value>
             <remarks>To be added.</remarks>
         </member>
+        <member name="T:Cadenza.Collections.BidirectionalLookup`2">
+            <typeparam name="TKey">To be added.</typeparam>
+            <typeparam name="TElement">To be added.</typeparam>
+            <summary>To be added.</summary>
+            <remarks>To be added.</remarks>
+        </member>
+        <member name="C:Cadenza.Collections.BidirectionalLookup`2">
+            <summary>To be added.</summary>
+            <remarks>To be added.</remarks>
+        </member>
+        <member name="C:Cadenza.Collections.BidirectionalLookup`2(``10System`1``10`1.``10Collections`1``10`1.``10Generic`1``10`1.``10IEqualityComparer`1``10`1{``10TKey`1``10`1},``10System`1``10`1.``10Collections`1``10`1.``10Generic`1``10`1.``10IEqualityComparer`1``10`1{``10TElement`1``10`1})">
+            <param name="keyComparer">To be added.</param>
+            <param name="valueComparer">To be added.</param>
+            <summary>To be added.</summary>
+            <remarks>To be added.</remarks>
+            <exception cref="T:System.ArgumentNullException">To be added; from: <see cref="M:Cadenza.Collections.BidirectionalLookup`2.#ctor(System.Collections.Generic.IEqualityComparer{`0},System.Collections.Generic.IEqualityComparer{`1})" />, <see cref="M:Cadenza.Collections.BidirectionalLookup`2.#ctor(System.Collections.Generic.IEqualityComparer{`0},System.Collections.Generic.IEqualityComparer{`1})" /></exception>
+        </member>
+        <member name="M:Cadenza.Collections.BidirectionalLookup`2.Add(``10TKey`1``10`1,``10System`1``10`1.``10Collections`1``10`1.``10Generic`1``10`1.``10IEnumerable`1``10`1{``10TElement`1``10`1})">
+            <param name="key">To be added.</param>
+            <param name="elements">To be added.</param>
+            <summary>To be added.</summary>
+            <remarks>To be added.</remarks>
+            <exception cref="T:System.ArgumentNullException">To be added; from: <see cref="M:Cadenza.Collections.BidirectionalLookup`2.Add(`0,System.Collections.Generic.IEnumerable{`1})" /></exception>
+        </member>
+        <member name="M:Cadenza.Collections.BidirectionalLookup`2.Add(``10TKey`1``10`1,``10TElement`1``10`1)">
+            <param name="key">To be added.</param>
+            <param name="element">To be added.</param>
+            <summary>To be added.</summary>
+            <remarks>To be added.</remarks>
+        </member>
+        <member name="M:Cadenza.Collections.BidirectionalLookup`2.Clear">
+            <summary>To be added.</summary>
+            <remarks>To be added.</remarks>
+        </member>
+        <member name="M:Cadenza.Collections.BidirectionalLookup`2.Contains(``10TKey`1``10`1)">
+            <param name="key">To be added.</param>
+            <summary>To be added.</summary>
+            <returns>To be added.</returns>
+            <remarks>To be added.</remarks>
+        </member>
+        <member name="P:Cadenza.Collections.BidirectionalLookup`2.Count">
+            <summary>To be added.</summary>
+            <value>To be added.</value>
+            <remarks>To be added.</remarks>
+        </member>
+        <member name="M:Cadenza.Collections.BidirectionalLookup`2.GetEnumerator">
+            <summary>To be added.</summary>
+            <returns>To be added.</returns>
+            <remarks>To be added.</remarks>
+        </member>
+        <member name="P:Cadenza.Collections.BidirectionalLookup`2.Inverse">
+            <summary>To be added.</summary>
+            <value>To be added.</value>
+            <remarks>To be added.</remarks>
+        </member>
+        <member name="P:Cadenza.Collections.BidirectionalLookup`2.Item(``10TKey`1``10`1)">
+            <param name="key">To be added.</param>
+            <summary>To be added.</summary>
+            <value>To be added.</value>
+            <remarks>To be added.</remarks>
+        </member>
+        <member name="M:Cadenza.Collections.BidirectionalLookup`2.Remove(``10TKey`1``10`1)">
+            <param name="key">To be added.</param>
+            <summary>To be added.</summary>
+            <returns>To be added.</returns>
+            <remarks>To be added.</remarks>
+        </member>
+        <member name="M:Cadenza.Collections.BidirectionalLookup`2.Remove(``10TKey`1``10`1,``10TElement`1``10`1)">
+            <param name="key">To be added.</param>
+            <param name="element">To be added.</param>
+            <summary>To be added.</summary>
+            <returns>To be added.</returns>
+            <remarks>To be added.</remarks>
+        </member>
+        <member name="M:Cadenza.Collections.BidirectionalLookup`2.System#Collections#IEnumerable#GetEnumerator">
+            <summary>To be added.</summary>
+            <returns>To be added.</returns>
+            <remarks>To be added.</remarks>
+        </member>
         <member name="T:Cadenza.Collections.CachedSequence`1">
             <typeparam name="T">
       The type of the value to store in the sequence.
@@ -9484,7 +9564,7 @@ Assert.IsFalse (typeof (Nullable&lt;&gt;).IsNullable ());
         which come from a generator that will generate different values
         from each invocation.  Consider the following generator:
       </para>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#CachedSequence_RandomValuesGenerator">internal static IEnumerable&lt;int&gt; RandomValues (Random r, int max)
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#CachedSequence_RandomValuesGenerator">internal static IEnumerable&lt;int&gt; RandomValues (Random r, int max)
 {
 	while (true)
 		yield return r.Next (max);
@@ -9513,7 +9593,7 @@ foreach (var v in RandomValues (r, 10).Take(3))
         referenced multiple times (under the assumption that the
         sequence won't change):
       </para>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#NoCache">var randSeq = RandomValues (new Random (), 100);
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#NoCache">var randSeq = RandomValues (new Random (), 100);
 // this could pass, but that's highly improbable
 Assert.IsFalse (
 		randSeq.Take (10).SelectFromEach (randSeq.Take (10),
@@ -9915,6 +9995,56 @@ Assert.IsTrue (
             <remarks>To be added.</remarks>
             <exception cref="T:System.ArgumentNullException">To be added; from: <see cref="M:Cadenza.Collections.CollectionCoda.RemoveAll``1(System.Collections.Generic.ICollection{``0},System.Func{``0,System.Boolean})" />, <see cref="M:Cadenza.Collections.CollectionCoda.RemoveAll``1(System.Collections.Generic.ICollection{``0},System.Func{``0,System.Boolean})" /></exception>
         </member>
+        <member name="T:Cadenza.Collections.DelegatedEqualityComparer`1">
+            <typeparam name="T">To be added.</typeparam>
+            <summary>To be added.</summary>
+            <remarks>To be added.</remarks>
+        </member>
+        <member name="C:Cadenza.Collections.DelegatedEqualityComparer`1(`0System`0.`0Func`0{`0T`0,`0T`0,`0System`0.`0Boolean`0},`0System`0.`0Func`0{`0T`0,`0System`0.`0Int32`0})">
+            <param name="equalsGetter">To be added.</param>
+            <param name="hashCodeGetter">To be added.</param>
+            <summary>To be added.</summary>
+            <remarks>To be added.</remarks>
+            <exception cref="T:System.ArgumentNullException">To be added; from: <see cref="M:Cadenza.Collections.DelegatedEqualityComparer`1.#ctor(System.Func{`0,`0,System.Boolean},System.Func{`0,System.Int32})" />, <see cref="M:Cadenza.Collections.DelegatedEqualityComparer`1.#ctor(System.Func{`0,`0,System.Boolean},System.Func{`0,System.Int32})" /></exception>
+        </member>
+        <member name="M:Cadenza.Collections.DelegatedEqualityComparer`1.Equals(`0T`0,`0T`0)">
+            <param name="x">To be added.</param>
+            <param name="y">To be added.</param>
+            <summary>To be added.</summary>
+            <returns>To be added.</returns>
+            <remarks>To be added.</remarks>
+        </member>
+        <member name="M:Cadenza.Collections.DelegatedEqualityComparer`1.GetHashCode(`0T`0)">
+            <param name="obj">To be added.</param>
+            <summary>To be added.</summary>
+            <returns>To be added.</returns>
+            <remarks>To be added.</remarks>
+        </member>
+        <member name="T:Cadenza.Collections.DelegatedEqualityComparer`2">
+            <typeparam name="TSource">To be added.</typeparam>
+            <typeparam name="T">To be added.</typeparam>
+            <summary>To be added.</summary>
+            <remarks>To be added.</remarks>
+        </member>
+        <member name="C:Cadenza.Collections.DelegatedEqualityComparer`2(``10System`1``10`1.``10Func`1``10`1{``10TSource`1``10`1,``10T`1``10`1})">
+            <param name="selector">To be added.</param>
+            <summary>To be added.</summary>
+            <remarks>To be added.</remarks>
+            <exception cref="T:System.ArgumentNullException">To be added; from: <see cref="M:Cadenza.Collections.DelegatedEqualityComparer`2.#ctor(System.Func{`0,`1})" /></exception>
+        </member>
+        <member name="M:Cadenza.Collections.DelegatedEqualityComparer`2.Equals(``10TSource`1``10`1,``10TSource`1``10`1)">
+            <param name="x">To be added.</param>
+            <param name="y">To be added.</param>
+            <summary>To be added.</summary>
+            <returns>To be added.</returns>
+            <remarks>To be added.</remarks>
+        </member>
+        <member name="M:Cadenza.Collections.DelegatedEqualityComparer`2.GetHashCode(``10TSource`1``10`1)">
+            <param name="obj">To be added.</param>
+            <summary>To be added.</summary>
+            <returns>To be added.</returns>
+            <remarks>To be added.</remarks>
+        </member>
         <member name="T:Cadenza.Collections.DictionaryCoda">
             <summary>To be added.</summary>
             <remarks>To be added.</remarks>
@@ -10095,11 +10225,31 @@ Assert.IsTrue (
             <exception cref="T:System.ArgumentNullException">To be added; from: <see cref="M:Cadenza.Check.Self(System.Object)" />, <see cref="M:Cadenza.Check.Func(System.Object)" />, <see cref="M:Cadenza.Collections.EnumerableCoda.AggregateReverseHistory``3(System.Collections.Generic.IEnumerable{``0},``1,System.Func{``1,``0,``1},System.Func{``1,``2})" /></exception>
         </member>
         <member name="M:Cadenza.Collections.EnumerableCoda.And(System.Collections.Generic.IEnumerable{System.Boolean})">
-            <param name="self">To be added.</param>
-            <summary>To be added.</summary>
-            <returns>To be added.</returns>
-            <remarks>To be added.</remarks>
-            <exception cref="T:System.ArgumentNullException">To be added; from: <see cref="M:Cadenza.Check.Self(System.Object)" /></exception>
+            <param name="self">
+          A <see cref="T:System.Collections.Generic.IEnumerable{System.Boolean}" />
+          containing the values to boolean-OR together.
+        </param>
+            <summary>Boolean-ANDs a sequence together.</summary>
+            <returns>
+                <see langword="false" /> if any of the elements in the sequence is
+          <see langword="false" />; otherwise, <paramref name="self" /> is a
+          sequence of finite length and all of the elements are
+          <see langword="true" />.
+        </returns>
+            <remarks>
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#And">Assert.AreEqual (false,
+		new[]{true, false, true, true}.And ());
+Assert.AreEqual (false,
+		new[]{false, false, false, false}.And ());
+Assert.AreEqual (true,
+		new[]{true, true, true, true}.And ());
+Assert.AreEqual (false,
+		new[]{true, true, true, true}.Concat (Sequence.Repeat (false)).And ());
+</code>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+                <paramref name="self" /> is <see langword="null" />.
+        </exception>
         </member>
         <member name="M:Cadenza.Collections.EnumerableCoda.Apply``1(System.Collections.Generic.IEnumerable{``0})">
             <typeparam name="TSource">To be added.</typeparam>
@@ -10322,7 +10472,7 @@ Assert.IsTrue (
             next element within <paramref name="self" /> is the first element
             of the new group).
           </para>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#HaskellGroupBy">// Split a string into pairs
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#HaskellGroupBy">// Split a string into pairs
 string s = "123456789";
 int c = 0;
 List&lt;List&lt;char&gt;&gt; pairs = s.HaskellGroupBy(delegate {
@@ -10453,7 +10603,7 @@ Assert.IsTrue(new[]{'9'}.SequenceEqual (pairs [4]));
             starts at the start of <paramref name="self" /> and increments
             until the end of <paramref name="self" />.
           </para>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#InitialSegments">IEnumerable&lt;IEnumerable&lt;char&gt;&gt; e = "abc".InitialSegments ();
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#InitialSegments">IEnumerable&lt;IEnumerable&lt;char&gt;&gt; e = "abc".InitialSegments ();
 var l = e.ToList ();
 Assert.AreEqual (4, l.Count);
 AssertAreSame (new char[]{},          l [0]);
@@ -10496,13 +10646,45 @@ AssertAreSame (new[]{'a', 'b', 'c'},  l [3]);
             <exception cref="T:System.ArgumentNullException">To be added; from: <see cref="M:Cadenza.Check.Self(System.Object)" />, <see cref="M:Cadenza.Collections.EnumerableCoda.Intersperse``1(System.Collections.Generic.IEnumerable{System.Collections.Generic.IEnumerable{``0}},System.Collections.Generic.IEnumerable{``0})" />, <see cref="M:Cadenza.Check.Self(System.Object)" />, <see cref="M:Cadenza.Check.Self(System.Object)" />, <see cref="M:Cadenza.Collections.EnumerableCoda.Concat``1(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{System.Collections.Generic.IEnumerable{``0}})" /></exception>
         </member>
         <member name="M:Cadenza.Collections.EnumerableCoda.Intersperse``1(System.Collections.Generic.IEnumerable{``0},``0)">
-            <typeparam name="TSource">To be added.</typeparam>
-            <param name="self">To be added.</param>
-            <param name="value">To be added.</param>
-            <summary>To be added.</summary>
-            <returns>To be added.</returns>
-            <remarks>To be added.</remarks>
-            <exception cref="T:System.ArgumentNullException">To be added; from: <see cref="M:Cadenza.Check.Self(System.Object)" /></exception>
+            <typeparam name="TSource">
+          The type of the elements in <paramref name="self" />.
+        </typeparam>
+            <param name="self">
+          A <see cref="T:System.Collections.Generic.IEnumerable{TSource}" />
+          containing elements to intersperse <paramref name="value" /> into.
+        </param>
+            <param name="value">
+          A <typeparamref name="TSource" /> to insert between each element of
+          <paramref name="self" />.
+        </param>
+            <summary>
+          Returns a sequence in which <paramref name="value" /> is inserted
+          between each element of <paramref name="self" />.
+        </summary>
+            <returns>
+          A <see cref="T:System.Collections.Generic.IEnumerable{TSource}" />
+          containing the sequence <paramref name="self" /> with
+          <paramref name="value" /> interspersed between each element.
+        </returns>
+            <remarks>
+                <para>
+            This is conceptually like <see cref="M:System.String.Join" /> and
+            <see cref="M:Cadenza.Collections.EnumerableCoda.Implode" />, but
+            usable for non-<see cref="T:System.String" /> values.
+          </para>
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#Intersperse">Assert.AreEqual ("1929394", new[]{1,2,3,4}.Intersperse (9).Implode ());
+Assert.AreEqual ("a.z",     new[]{'a','z'}.Intersperse ('.').Implode ());
+IEnumerable&lt;IEnumerable&lt;char&gt;&gt; e = new char[][]{ 
+	new char[]{'b', 'c', 'd'}, 
+	new char[]{'e', 'f', 'g'},
+};
+IEnumerable&lt;char&gt; x = new char[]{'a', 'a'};
+Assert.AreEqual ("bcdaaefg", e.Intersperse (x).Implode ());
+</code>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+                <paramref name="self" /> is <see langword="null" />.
+        </exception>
         </member>
         <member name="M:Cadenza.Collections.EnumerableCoda.MaxBy``2(System.Collections.Generic.IEnumerable{``0},System.Func{``0,``1})">
             <typeparam name="TSource">
@@ -10529,7 +10711,12 @@ AssertAreSame (new[]{'a', 'b', 'c'},  l [3]);
           value from <paramref name="selector" />.
         </returns>
             <remarks>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#MaxBy" />
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#MaxBy">Assert.AreEqual ("forty-three",
+		new[] {
+			new {A = "forty-two",    B = 42},
+			new {A = "forty-three",  B = 43},
+		}.MaxBy (i =&gt; i.B).A);
+</code>
             </remarks>
             <exception cref="T:System.ArgumentNullException">
                 <paramref name="self" /> or <paramref name="selector" /> is 
@@ -10568,7 +10755,12 @@ AssertAreSame (new[]{'a', 'b', 'c'},  l [3]);
           value from <paramref name="selector" />.
         </returns>
             <remarks>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#MinBy" />
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#MinBy">Assert.AreEqual ("forty-two",
+		new[] {
+			new {A = "forty-two",   B = 42},
+			new {A = "forty-three", B = 43},
+		}.MinBy (i =&gt; i.B).A);
+</code>
             </remarks>
             <exception cref="T:System.ArgumentNullException">
                 <paramref name="self" /> or <paramref name="selector" /> is 
@@ -10603,7 +10795,12 @@ AssertAreSame (new[]{'a', 'b', 'c'},  l [3]);
           value from <paramref name="selector" />.
         </returns>
             <remarks>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#MinBy" />
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#MinBy">Assert.AreEqual ("forty-two",
+		new[] {
+			new {A = "forty-two",   B = 42},
+			new {A = "forty-three", B = 43},
+		}.MinBy (i =&gt; i.B).A);
+</code>
             </remarks>
             <exception cref="T:System.ArgumentNullException">
                 <paramref name="self" /> or <paramref name="selector" /> is 
@@ -10642,7 +10839,12 @@ AssertAreSame (new[]{'a', 'b', 'c'},  l [3]);
           value from <paramref name="selector" />.
         </returns>
             <remarks>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#MinBy" />
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#MinBy">Assert.AreEqual ("forty-two",
+		new[] {
+			new {A = "forty-two",   B = 42},
+			new {A = "forty-three", B = 43},
+		}.MinBy (i =&gt; i.B).A);
+</code>
             </remarks>
             <exception cref="T:System.ArgumentNullException">
                 <paramref name="self" /> or <paramref name="selector" /> is 
@@ -10653,27 +10855,130 @@ AssertAreSame (new[]{'a', 'b', 'c'},  l [3]);
         </exception>
         </member>
         <member name="M:Cadenza.Collections.EnumerableCoda.NotNull``1(System.Collections.Generic.IEnumerable{System.Nullable{``0}})">
-            <typeparam name="TSource">To be added.</typeparam>
-            <param name="self">To be added.</param>
-            <summary>To be added.</summary>
-            <returns>To be added.</returns>
-            <remarks>To be added.</remarks>
+            <typeparam name="TSource">
+          The type of the elements in <paramref name="self" />.
+        </typeparam>
+            <param name="self">
+          A <see cref="T:System.Collections.Generic.IEnumerable{System.Nullable{TSource}}" />
+          containing the sequence to retrieve the non-<see langword="null" />
+          elements from.
+        </param>
+            <summary>
+          Retrieves the non-<see langword="null" /> elements from the sequence.
+        </summary>
+            <returns>
+          A <see cref="T:System.Collections.Generic.IEnumerable{TSource}" />
+          containing the non-<see langword="null" /> elements from
+          <paramref name="self" />.
+        </returns>
+            <remarks>
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#NotNull">IEnumerable&lt;int?&gt; s = new int?[]{
+	null,
+	2,
+	null,
+	4
+};
+Assert.IsTrue (new []{
+		2, 4
+}.SequenceEqual (s.NotNull ()));
+</code>
+            </remarks>
         </member>
         <member name="M:Cadenza.Collections.EnumerableCoda.Or(System.Collections.Generic.IEnumerable{System.Boolean})">
-            <param name="self">To be added.</param>
-            <summary>To be added.</summary>
-            <returns>To be added.</returns>
-            <remarks>To be added.</remarks>
-            <exception cref="T:System.ArgumentNullException">To be added; from: <see cref="M:Cadenza.Check.Self(System.Object)" /></exception>
+            <param name="self">
+          A <see cref="T:System.Collections.Generic.IEnumerable{System.Boolean}" />
+          containing the values to boolean-OR together.
+        </param>
+            <summary>Boolean-ORs a sequence together.</summary>
+            <returns>
+                <see langword="true" /> if any of the elements in the sequence is
+          <see langword="true" />; otherwise, <paramref name="self" /> is a
+          sequence of finite length and all of the elements are
+          <see langword="false" />.
+        </returns>
+            <remarks>
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#Or">Assert.AreEqual (true,
+		new[]{true, false, true, true}.Or ());
+Assert.AreEqual (false,
+		new[]{false, false, false, false}.Or ());
+Assert.AreEqual (true,
+		new[]{true, true, true, true}.Or ());
+Assert.AreEqual (true,
+		new[]{false, false, true}.Concat (Sequence.Repeat (false)).Or ());
+</code>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+                <paramref name="self" /> is <see langword="null" />.
+        </exception>
         </member>
         <member name="M:Cadenza.Collections.EnumerableCoda.OrderByNatural``1(System.Collections.Generic.IEnumerable{``0},System.Func{``0,System.String})">
-            <typeparam name="TSource">To be added.</typeparam>
-            <param name="self">To be added.</param>
-            <param name="func">To be added.</param>
-            <summary>To be added.</summary>
-            <returns>To be added.</returns>
-            <remarks>To be added.</remarks>
-            <exception cref="T:System.ArgumentNullException">To be added; from: <see cref="M:Cadenza.Check.Self(System.Object)" />, <see cref="M:Cadenza.Check.Func(System.Object)" /></exception>
+            <typeparam name="TSource">
+          The type of the elements in <paramref name="self" />.
+        </typeparam>
+            <param name="self">
+          A <see cref="T:System.Collections.Generic.IEnumerable{TSource}" />
+          containing the sequence to order naturally.
+        </param>
+            <param name="func">
+          A <see cref="T:System.Func{TSource,System.String}" /> to use to
+          convert an element into a <see cref="T:System.String" />, as natural
+          ordering is done in terms of strings.
+        </param>
+            <summary>
+          Orders the elements of a sequence in natural order.
+        </summary>
+            <returns>
+          A <see cref="T:System.Collections.Generic.IEnumerable{TSource}" />
+          in which the elements have been sorted in natural order.
+        </returns>
+            <remarks>
+                <para>
+            "Natural Ordering" orders embedded numeric data as humans would
+            sort, not as computers would sort. For example, "2" comes before
+            "10", not afterward as is typically the case.
+          </para>
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#OrderByNatural">string[] expected = {
+	"a.1.b.2.c.3.d.4.e.5.f.6.g.7.h.8.i.9.j.10.k.11",
+	"a.1.b.2.c.3.d.4.e.5.f.6.g.7.h.8.i.9.j.10.k.12",
+	"bar",
+	"foo",
+	"foo",
+	"foo1",
+	"foo2",
+	"foo3",
+	"foo4",
+	"foo5",
+	"foo6",
+	"foo7",
+	"foo8",
+	"foo9",
+	"foo10",
+};
+IEnumerable&lt;string&gt; actual = new[]{
+	"foo",
+	"foo",
+	"foo10",
+	"foo1",
+	"foo4",
+	"foo2",
+	"foo3",
+	"foo9",
+	"foo5",
+	"foo7",
+	"foo8",
+	"foo6",
+	"bar",
+	"a.1.b.2.c.3.d.4.e.5.f.6.g.7.h.8.i.9.j.10.k.12",
+	"a.1.b.2.c.3.d.4.e.5.f.6.g.7.h.8.i.9.j.10.k.11",
+}.OrderByNatural (s =&gt; s);
+
+AssertAreSame (expected, actual);
+</code>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+                <paramref name="self" /> or <paramref name="func" />
+          is <see langword="null" />.
+        </exception>
         </member>
         <member name="M:Cadenza.Collections.EnumerableCoda.Partition``1(System.Collections.Generic.IEnumerable{``0},System.Func{``0,System.Boolean})">
             <typeparam name="TSource">
@@ -10706,7 +11011,7 @@ AssertAreSame (new[]{'a', 'b', 'c'},  l [3]);
           contains the elements which do not satisfy <paramref name="predicate" />.
         </returns>
             <remarks>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#Partition">Tuple&lt;IEnumerable&lt;int&gt;, IEnumerable&lt;int&gt;&gt; r =
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#Partition">Tuple&lt;IEnumerable&lt;int&gt;, IEnumerable&lt;int&gt;&gt; r =
 	Enumerable.Range (1,6).Partition (x =&gt; x % 2 == 0);
 Assert.IsTrue (new[]{2, 4, 6}.SequenceEqual (r.Item1));
 Assert.IsTrue (new[]{1, 3, 5}.SequenceEqual (r.Item2));
@@ -10740,7 +11045,7 @@ Assert.IsTrue (new[]{1, 3, 5}.SequenceEqual (r.Item2));
             appended to the current path string and the current element
             is appended.
           </block>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#PathCombine">var data = new [] {"a", "b", "c"};
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#PathCombine">var data = new [] {"a", "b", "c"};
 var result = string.Format ("a{0}b{0}c", Path.DirectorySeparatorChar);
 Assert.AreEqual (result, data.PathCombine ());
 
@@ -10815,7 +11120,7 @@ Assert.AreEqual (Path.Combine (String.Empty, String.Empty), data.PathCombine (),
             <c><paramref name="self" />.RemoveFirstOccurrence(<paramref name="value" />,
             <see langword="null" />)</c>.
           </para>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#RemoveFirstOccurrence">Assert.AreEqual ("bnana",
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#RemoveFirstOccurrence">Assert.AreEqual ("bnana",
 		"banana".RemoveFirstOccurrence ('a').Implode ());
 </code>
             </remarks>
@@ -10855,7 +11160,7 @@ Assert.AreEqual (Path.Combine (String.Empty, String.Empty), data.PathCombine (),
           <paramref name="value" /> has been removed.
         </returns>
             <remarks>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#RemoveFirstOccurrence">Assert.AreEqual ("bnana",
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#RemoveFirstOccurrence">Assert.AreEqual ("bnana",
 		"banana".RemoveFirstOccurrence ('a').Implode ());
 </code>
             </remarks>
@@ -10897,7 +11202,7 @@ Assert.AreEqual (Path.Combine (String.Empty, String.Empty), data.PathCombine (),
             <c><paramref name="self" />.RemoveFirstOccurrences(<paramref name="value" />,
             <paramref name="count" />, <see langword="null" />)</c>.
           </para>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#RemoveFirstOccurrences">Assert.AreEqual ("bnna",
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#RemoveFirstOccurrences">Assert.AreEqual ("bnna",
 		"banana".RemoveFirstOccurrences ('a', 2).Implode ());
 </code>
             </remarks>
@@ -10945,7 +11250,7 @@ Assert.AreEqual (Path.Combine (String.Empty, String.Empty), data.PathCombine (),
           <paramref name="value" /> have been removed.
         </returns>
             <remarks>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#RemoveFirstOccurrences">Assert.AreEqual ("bnna",
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#RemoveFirstOccurrences">Assert.AreEqual ("bnna",
 		"banana".RemoveFirstOccurrences ('a', 2).Implode ());
 </code>
             </remarks>
@@ -10979,7 +11284,7 @@ Assert.AreEqual (Path.Combine (String.Empty, String.Empty), data.PathCombine (),
           followed by the sequence <paramref name="self" />, etc.
         </returns>
             <remarks>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#Repeat">Assert.AreEqual ("foofoofoo", new [] {"foo"}.Repeat (3).Implode ());
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#Repeat">Assert.AreEqual ("foofoofoo", new [] {"foo"}.Repeat (3).Implode ());
 Assert.AreEqual ("foobarfoobar", new [] {"foo", "bar"}.Repeat (2).Implode ());
 </code>
             </remarks>
@@ -11032,7 +11337,7 @@ Assert.AreEqual ("foobarfoobar", new [] {"foo", "bar"}.Repeat (2).Implode ());
         </returns>
             <remarks>
                 <para>This is Haskell's <c>mapAccumL</c>.</para>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#SelectAggregated">IEnumerable&lt;int&gt; s = new []{2, 3, 4, 5};
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#SelectAggregated">IEnumerable&lt;int&gt; s = new []{2, 3, 4, 5};
 Tuple&lt;int, List&lt;string&gt;&gt; r = s.SelectAggregated (1,
 		(a,b) =&gt; Tuple.Create (a-b, "s" + (a-b)));
 Assert.AreEqual (-13, r.Item1);
@@ -11102,7 +11407,7 @@ Assert.AreEqual (0, r.Item2.Count);
                 <para>
             Given the <c>TreeNode&lt;T&gt;</c> declaration:
           </para>
-                <code lang="C#" src="../../Test/Cadenza/ObjectTest.cs#TreeNode_Declaration">class TreeNode&lt;T&gt;
+                <code lang="C#" src="../../Test/Cadenza/ObjectCodaTest.cs#TreeNode_Declaration">class TreeNode&lt;T&gt;
 {
 	public TreeNode ()
 	{
@@ -11116,7 +11421,7 @@ Assert.AreEqual (0, r.Item2.Count);
                 <para>
                     <c>SelectBreadthFirst()</c> is used as:
           </para>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#SelectBreadthFirst">TreeNode&lt;int&gt;[] root = new TreeNode&lt;int&gt;[] {
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#SelectBreadthFirst">TreeNode&lt;int&gt;[] root = new TreeNode&lt;int&gt;[] {
 	new TreeNode&lt;int&gt; {
 		Value = 1, Children = new [] {
 			new TreeNode&lt;int&gt; { Value = 2 },
@@ -11199,7 +11504,7 @@ AssertAreSame (new[]{ 1, 2, 3, 4, 5, -1 }, values);
                 <para>
             Given the <c>TreeNode&lt;T&gt;</c> declaration:
           </para>
-                <code lang="C#" src="../../Test/Cadenza/ObjectTest.cs#TreeNode_Declaration">class TreeNode&lt;T&gt;
+                <code lang="C#" src="../../Test/Cadenza/ObjectCodaTest.cs#TreeNode_Declaration">class TreeNode&lt;T&gt;
 {
 	public TreeNode ()
 	{
@@ -11213,7 +11518,7 @@ AssertAreSame (new[]{ 1, 2, 3, 4, 5, -1 }, values);
                 <para>
                     <c>SelectDepthFirst()</c> is used as:
           </para>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#SelectDepthFirst">TreeNode&lt;int&gt;[] root = new TreeNode&lt;int&gt;[] {
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#SelectDepthFirst">TreeNode&lt;int&gt;[] root = new TreeNode&lt;int&gt;[] {
 	new TreeNode&lt;int&gt; {
 		Value = 1, Children = new [] {
 			new TreeNode&lt;int&gt; { Value = 2 },
@@ -11294,7 +11599,7 @@ AssertAreSame (new[]{ 1, 2, 3, 5, 4, -1 }, values);
             The number of items in the list returned is equal to the shorter of
             <paramref name="self" /> and <paramref name="source2" />.
           </para>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#SelectFromEach2">List&lt;int&gt;  a = new List&lt;int&gt; {1, 2, 3, 4};
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#SelectFromEach2">List&lt;int&gt;  a = new List&lt;int&gt; {1, 2, 3, 4};
 List&lt;char&gt; b = new List&lt;char&gt; {'a', 'b', 'c', 'd', 'e'};
 var c = a.SelectFromEach (b, (x, y) =&gt; new { First = x, Second = y }).ToList ();
 Assert.AreEqual (4, c.Count);
@@ -11369,7 +11674,7 @@ Assert.AreEqual ('d', c [3].Second);
             The number of items in the list returned is equal to the shorter of
             <paramref name="self" />, <paramref name="source2" />, and <paramref name="source3" />.
           </para>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#SelectFromEach3">Assert.AreEqual ("123",
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#SelectFromEach3">Assert.AreEqual ("123",
 		new[]{1}.SelectFromEach (new[]{2}, new[]{3}, 
 			(x,y,z) =&gt; x.ToString () + y.ToString () + z.ToString ()).Implode ());
 </code>
@@ -11442,7 +11747,7 @@ Assert.AreEqual ('d', c [3].Second);
             The number of items in the list returned is equal to the shorter of
             <paramref name="self" />, <paramref name="source2" />, <paramref name="source3" />, and <paramref name="source4" />.
           </para>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#SelectFromEach4">Assert.AreEqual ("1234",
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#SelectFromEach4">Assert.AreEqual ("1234",
 		new[]{1}.SelectFromEach (new[]{2}, new[]{3}, new[]{4},
 			(w,x,y,z) =&gt; w.ToString () + x.ToString () + y.ToString () + z.ToString ()).Implode ());
 </code>
@@ -11498,7 +11803,7 @@ Assert.AreEqual ('d', c [3].Second);
         </returns>
             <remarks>
                 <para>This is Haskell's <c>mapAccumR</c>.</para>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#SelectReverseAggregated">IEnumerable&lt;int&gt; s = new []{1, 2, 3, 4};
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#SelectReverseAggregated">IEnumerable&lt;int&gt; s = new []{1, 2, 3, 4};
 Tuple&lt;int, List&lt;string&gt;&gt; r = s.SelectReverseAggregated (5,
 		(a,b) =&gt; Tuple.Create (a-b, "s" + (a-b)));
 Assert.AreEqual (-5, r.Item1);
@@ -11585,7 +11890,7 @@ Assert.AreEqual (0, r.Item2.Count);
             <paramref name="list" /> contain elements, and will return greater
             than zero if <paramref name="list" /> still contains elements.
           </para>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#SequenceCompare">Assert.AreEqual (0,
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#SequenceCompare">Assert.AreEqual (0,
 		new[]{1, 2}.SequenceCompare (new[]{1, 2}));
 Assert.AreEqual (-1,
 		new[]{1, 1}.SequenceCompare (new[]{1, 2}));
@@ -11673,7 +11978,7 @@ Assert.AreEqual (1,
             <paramref name="list" /> contain elements, and will return greater
             than zero if <paramref name="list" /> still contains elements.
           </para>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#SequenceCompare">Assert.AreEqual (0,
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#SequenceCompare">Assert.AreEqual (0,
 		new[]{1, 2}.SequenceCompare (new[]{1, 2}));
 Assert.AreEqual (-1,
 		new[]{1, 1}.SequenceCompare (new[]{1, 2}));
@@ -11710,7 +12015,7 @@ Assert.AreEqual (1,
                 <para>
             This is equivalent to calling <c>Shuffle(self, null)</c>.
           </para>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#Shuffle">IEnumerable&lt;int&gt; r = new[]{1,2,3,4,5}.Shuffle ();
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#Shuffle">IEnumerable&lt;int&gt; r = new[]{1,2,3,4,5}.Shuffle ();
 Assert.AreEqual (5, r.Count());
 Assert.IsTrue (r.Contains (1));
 Assert.IsTrue (r.Contains (2));
@@ -11754,7 +12059,7 @@ Assert.IsFalse (r.Contains (6));
             determine the element's position within the returned sequence, then
             creates a new sequence based on the random element ordering.
           </block>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#Shuffle">IEnumerable&lt;int&gt; r = new[]{1,2,3,4,5}.Shuffle ();
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#Shuffle">IEnumerable&lt;int&gt; r = new[]{1,2,3,4,5}.Shuffle ();
 Assert.AreEqual (5, r.Count());
 Assert.IsTrue (r.Contains (1));
 Assert.IsTrue (r.Contains (2));
@@ -11798,7 +12103,7 @@ Assert.IsFalse (r.Contains (6));
             <remarks>
                 <para>
             This is equivalent to calling <c>SkipPrefix(self, prefix, null).</c></para>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#SkipPrefix">Assert.AreEqual ("bar",
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#SkipPrefix">Assert.AreEqual ("bar",
 		"foobar".SkipPrefix ("foo").Implode ());
 Assert.AreEqual ("",
 		"foo".SkipPrefix ("foo").Implode ());
@@ -11847,7 +12152,7 @@ Assert.AreEqual (null,
           <paramref name="prefix" />, then <see langword="null" /> is returned.
         </returns>
             <remarks>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#SkipPrefix">Assert.AreEqual ("bar",
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#SkipPrefix">Assert.AreEqual ("bar",
 		"foobar".SkipPrefix ("foo").Implode ());
 Assert.AreEqual ("",
 		"foo".SkipPrefix ("foo").Implode ());
@@ -12069,7 +12374,7 @@ Assert.AreEqual (null,
             <c>Tuple.Create (self.TakeWhile (predicate), 
             self.SkipWhile (predicate));</c>.
           </para>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#Span">Assert.AreEqual ("12|341234",
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#Span">Assert.AreEqual ("12|341234",
 		new[]{1,2,3,4,1,2,3,4}.Span (e =&gt; e &lt; 3)
 		.Aggregate ((x, y) =&gt; x.Implode () + "|" + y.Implode ()));
 Assert.AreEqual ("123|",
@@ -12116,7 +12421,7 @@ Assert.AreEqual ("|123",
             <c>Tuple.Create (self.Take (firstLength), 
             self.Skip (firstLength));</c>.
           </para>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#SplitAt">Assert.AreEqual ("Hello |World!",
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#SplitAt">Assert.AreEqual ("Hello |World!",
 		"Hello World!".SplitAt (6)
 		.Aggregate ((x,y) =&gt; x.Implode () + "|" + y.Implode ()));
 Assert.AreEqual ("123|45",
@@ -12286,19 +12591,94 @@ Next
         </exception>
         </member>
         <member name="M:Cadenza.Collections.EnumerableCoda.Sum``1(System.Collections.Generic.IEnumerable{``0})">
-            <typeparam name="TSource">To be added.</typeparam>
-            <param name="self">To be added.</param>
-            <summary>To be added.</summary>
-            <returns>To be added.</returns>
-            <remarks>To be added.</remarks>
+            <typeparam name="TSource">
+          The type of element in the sequence <paramref name="self" />.
+        </typeparam>
+            <param name="self">
+          A <see cref="T:System.Collections.Generic.IEnumerable{TSource}" />
+          containing the values to sum.
+        </param>
+            <summary>Sums the values in a sequence.</summary>
+            <returns>
+          A <typeparamref name="TSource" /> containing the summation of the
+          values within <paramref name="source" />.
+        </returns>
+            <remarks>
+                <para>
+            This is equivalent to calling <c>Sum(self, null)</c>.
+          </para>
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#Sum">IEnumerable&lt;uint&gt; s = null;
+Assert.Throws&lt;ArgumentNullException&gt;(() =&gt; s.Sum ());
+
+s = new []{1U, 2U, 3U};
+Assert.AreEqual (6U, s.Sum ());
+Assert.AreEqual (6U, s.Sum (null));
+
+IEnumerable&lt;SimpleNumber&gt; s2 = new[]{
+	new SimpleNumber (1),
+	new SimpleNumber (2),
+	new SimpleNumber (3),
+};
+Assert.AreEqual (new SimpleNumber (6), s2.Sum (new SimpleNumberMath ()));
+</code>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+                <paramref name="self" /> is <see langword="null" />.
+        </exception>
+            <exception cref="T:System.NotSupportedException">
+                <see cref="P:Cadenza.Numerics.Math{TSource}.Default" />
+          could not be loaded.
+        </exception>
         </member>
         <member name="M:Cadenza.Collections.EnumerableCoda.Sum``1(System.Collections.Generic.IEnumerable{``0},Cadenza.Numerics.Math{``0})">
-            <typeparam name="TSource">To be added.</typeparam>
-            <param name="self">To be added.</param>
-            <param name="m">To be added.</param>
-            <summary>To be added.</summary>
-            <returns>To be added.</returns>
-            <remarks>To be added.</remarks>
+            <typeparam name="TSource">
+          The type of element in the sequence <paramref name="self" />.
+        </typeparam>
+            <param name="self">
+          A <see cref="T:System.Collections.Generic.IEnumerable{TSource}" />
+          containing the values to sum.
+        </param>
+            <param name="m">
+          A <see cref="T:Cadenza.Numerics.Math{TSource}" /> to use for summing
+          the values within <paramref name="self" />.
+          If <see langword="null" />, then
+          <see cref="P:Cadenza.Numerics.Math{TSource}.Default" /> is used.
+        </param>
+            <summary>Sums the values in a sequence.</summary>
+            <returns>
+          A <typeparamref name="TSource" /> containing the summation of the
+          values within <paramref name="source" />.
+        </returns>
+            <remarks>
+                <para>
+            This is the "fallback" provider for
+            <see cref="M:System.Linq.Enumerable.Sum" />, allowing summation
+            over types that LINQ doens't support, such as unsigned types and
+            user-defined types which provide appropriate arithmetic operators.
+          </para>
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#Sum">IEnumerable&lt;uint&gt; s = null;
+Assert.Throws&lt;ArgumentNullException&gt;(() =&gt; s.Sum ());
+
+s = new []{1U, 2U, 3U};
+Assert.AreEqual (6U, s.Sum ());
+Assert.AreEqual (6U, s.Sum (null));
+
+IEnumerable&lt;SimpleNumber&gt; s2 = new[]{
+	new SimpleNumber (1),
+	new SimpleNumber (2),
+	new SimpleNumber (3),
+};
+Assert.AreEqual (new SimpleNumber (6), s2.Sum (new SimpleNumberMath ()));
+</code>
+            </remarks>
+            <exception cref="T:System.ArgumentNullException">
+                <paramref name="self" /> is <see langword="null" />.
+        </exception>
+            <exception cref="T:System.NotSupportedException">
+                <paramref name="m" /> is <see langword="null" /> and 
+          <see cref="P:Cadenza.Numerics.Math{TSource}.Default" />
+          could not be loaded.
+        </exception>
         </member>
         <member name="M:Cadenza.Collections.EnumerableCoda.Tokens``3(System.Collections.Generic.IEnumerable{``0},``1,System.Func{``1,``0,``1},System.Func{``1,Cadenza.Tuple{``2,``1}},System.Func{``1,``0,System.Boolean}[])">
             <typeparam name="TSource">
@@ -12421,7 +12801,7 @@ Next
               and the accumulation process restarted.
             </para>
                 </block>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#Tokens">// Turn a sequence of numbers into a new sequence of numbers
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#Tokens">// Turn a sequence of numbers into a new sequence of numbers
 // for which the sum is less than 10.
 IEnumerable&lt;int&gt;  numbers         = new[]{1, 1, 3, 5, 8, 13};
 IEnumerable&lt;int&gt;  sumsLessThan10  = numbers.Tokens (0,
@@ -12487,7 +12867,7 @@ Assert.IsTrue (
           with the same ordering and values as <paramref name="self" />.
         </returns>
             <remarks>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#ToList">int[][] a = new int[][]{
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#ToList">int[][] a = new int[][]{
 	new int[]{1, 2, 3},
 	new int[]{4, 5, 6},
 };
@@ -12626,7 +13006,7 @@ Assert.AreEqual (a [1][2], c [1][2]);
             otherwise a <see cref="T:System.NotSupportedException" /> is
             thrown.
           </para>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#ToTuple">IEnumerable&lt;object&gt; s = new object[]{1, '2', 3L, "4"};
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#ToTuple">IEnumerable&lt;object&gt; s = new object[]{1, '2', 3L, "4"};
 object tl = s.ToTuple ();
 Assert.AreEqual (typeof(Tuple&lt;int, char, long, string&gt;), tl.GetType());
 
@@ -12721,7 +13101,7 @@ Assert.AreEqual ("4", t.Item4);
             starts at the start of <paramref name="self" /> and increments
             until the end of <paramref name="self" />.
           </para>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#TrailingSegments">IEnumerable&lt;IEnumerable&lt;char&gt;&gt; e = "abc".TrailingSegments ();
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#TrailingSegments">IEnumerable&lt;IEnumerable&lt;char&gt;&gt; e = "abc".TrailingSegments ();
 var l = e.ToList ();
 Assert.AreEqual (4, l.Count);
 AssertAreSame (new[]{'a', 'b', 'c'},  l [0]);
@@ -12763,7 +13143,7 @@ AssertAreSame (new char[]{},          l [3]);
             maximum number of input columns are "skipped" when an input column
             index exceeds the length of that row.
           </para>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#Transpose">IEnumerable&lt;IEnumerable&lt;int&gt;&gt; a = new int[][]{
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#Transpose">IEnumerable&lt;IEnumerable&lt;int&gt;&gt; a = new int[][]{
 	new int[]{1, 2, 3},
 	new int[]{4, 5, 6},
 };
@@ -12826,7 +13206,7 @@ Assert.IsTrue (new[]{2, 5}.SequenceEqual (b.ElementAt (1)));
             <c>default(<typeparamref name="TSource" />)</c>, was the matching
             element).
           </block>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#TryGetFirst">var seq = new int[]{0, 1, 2};
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#TryGetFirst">var seq = new int[]{0, 1, 2};
 int first;
 
 Assert.IsTrue (seq.TryGetFirst (out first));
@@ -12874,7 +13254,7 @@ Assert.IsTrue (0 == first);
             <c>default(<typeparamref name="TSource" />)</c>, was the matching
             element).
           </block>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#TryGetFirst2">var seq = new int[]{0, 1, 2};
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#TryGetFirst2">var seq = new int[]{0, 1, 2};
 int first;
 
 Assert.IsTrue (seq.TryGetFirst (v =&gt; v.IsOdd (), out first));
@@ -12917,7 +13297,7 @@ Assert.IsTrue (0 == first);
                 <para>
             This is analogous to undoing a <c>Zip</c> operation.
           </para>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#Unzip2">Assert.AreEqual ("1,2|3,4",
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#Unzip2">Assert.AreEqual ("1,2|3,4",
 		new[]{1,2}.Zip (new[]{3,4,5}).Unzip ()
 		.Aggregate ((a, b) =&gt; a.Implode (",") + "|" + b.Implode (",")));
 </code>
@@ -12959,7 +13339,7 @@ Assert.IsTrue (0 == first);
                 <para>
             This is analogous to undoing a <c>Zip</c> operation.
           </para>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#Unzip3">Assert.AreEqual ("1,2|3,4|5,6",
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#Unzip3">Assert.AreEqual ("1,2|3,4|5,6",
 		new[]{1,2}.Zip (new[]{3,4,5}, new[]{5,6}).Unzip ()
 		.Aggregate ((a, b, c) =&gt; a.Implode (",") + "|" + b.Implode (",") + "|" + c.Implode (",")));
 </code>
@@ -13004,7 +13384,7 @@ Assert.IsTrue (0 == first);
                 <para>
             This is analogous to undoing a <c>Zip</c> operation.
           </para>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#Unzip4">Assert.AreEqual ("1,2|3,4|5,6|7,8",
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#Unzip4">Assert.AreEqual ("1,2|3,4|5,6|7,8",
 		new[]{1,2}.Zip (new[]{3,4,5,6}, new[]{5,6,7}, new[]{7,8}).Unzip ()
 		.Aggregate ((a, b, c, d) =&gt; a.Implode (",") + "|" + b.Implode (",") + "|" + c.Implode (",") + "|" + d.Implode (",")));
 </code>
@@ -13053,7 +13433,7 @@ Assert.IsTrue (0 == first);
             The number of items in the list returned is equal to the shorter
             of <paramref name="self" /> and <paramref name="source2" />.
           </para>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#Zip2">Assert.AreEqual ("1,5|2,4|",
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#Zip2">Assert.AreEqual ("1,5|2,4|",
 		new[]{1,2}.Zip (new[]{5,4,3})
 		.Aggregate (new StringBuilder(), 
 			(b, e) =&gt; b.AppendFormat ("{0},{1}|", e.Item1, e.Item2)).ToString ());
@@ -13117,7 +13497,7 @@ Assert.AreEqual ("",
             The number of items in the list returned is equal to the shorter of
             <paramref name="self" />, <paramref name="source2" />, and <paramref name="source3" />.
           </para>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#Zip3">Assert.AreEqual ("1,3,5|2,4,6|",
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#Zip3">Assert.AreEqual ("1,3,5|2,4,6|",
 		new[]{1,2}.Zip (new[]{3,4,5,6}, new[]{5,6,7})
 		.Aggregate (new StringBuilder(), 
 			(b, e) =&gt; b.AppendFormat ("{0},{1},{2}|", e.Item1, e.Item2, e.Item3)).ToString ());
@@ -13188,7 +13568,7 @@ Assert.AreEqual ("",
             The number of items in the list returned is equal to the shorter of
             <paramref name="self" />, <paramref name="source2" />, <paramref name="source3" />, and <paramref name="source4" />.
           </para>
-                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableTest.cs#Zip4">Assert.AreEqual ("1,3,5,7|2,4,6,8|",
+                <code lang="C#" src="../../Test/Cadenza.Collections/EnumerableCodaTest.cs#Zip4">Assert.AreEqual ("1,3,5,7|2,4,6,8|",
 		new[]{1,2}.Zip (new[]{3,4,5,6}, new[]{5,6,7}, new[]{7,8})
 		.Aggregate (new StringBuilder(), 
 			(b, e) =&gt; b.AppendFormat ("{0},{1},{2},{3}|", e.Item1, e.Item2, e.Item3, e.Item4)).ToString ());
@@ -13204,6 +13584,41 @@ Assert.AreEqual ("",
         </exception>
             <altmember cref="M:Cadenza.Collections.EnumerableCoda.SelectFromEach``5(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{``1},System.Collections.Generic.IEnumerable{``2},System.Collections.Generic.IEnumerable{``3},System.Func{``0,``1,``2,``3,``4})" />
             <altmember cref="M:Cadenza.Collections.EnumerableCoda.Unzip``4(System.Collections.Generic.IEnumerable{Cadenza.Tuple{``0,``1,``2,``3}})" />
+        </member>
+        <member name="T:Cadenza.Collections.IMutableLookup`2">
+            <typeparam name="TKey">To be added.</typeparam>
+            <typeparam name="TElement">To be added.</typeparam>
+            <summary>To be added.</summary>
+            <remarks>To be added.</remarks>
+        </member>
+        <member name="M:Cadenza.Collections.IMutableLookup`2.Add(``10TKey`1``10`1,``10System`1``10`1.``10Collections`1``10`1.``10Generic`1``10`1.``10IEnumerable`1``10`1{``10TElement`1``10`1})">
+            <param name="key">To be added.</param>
+            <param name="elements">To be added.</param>
+            <summary>To be added.</summary>
+            <remarks>To be added.</remarks>
+        </member>
+        <member name="M:Cadenza.Collections.IMutableLookup`2.Add(``10TKey`1``10`1,``10TElement`1``10`1)">
+            <param name="key">To be added.</param>
+            <param name="element">To be added.</param>
+            <summary>To be added.</summary>
+            <remarks>To be added.</remarks>
+        </member>
+        <member name="M:Cadenza.Collections.IMutableLookup`2.Clear">
+            <summary>To be added.</summary>
+            <remarks>To be added.</remarks>
+        </member>
+        <member name="M:Cadenza.Collections.IMutableLookup`2.Remove(``10TKey`1``10`1)">
+            <param name="key">To be added.</param>
+            <summary>To be added.</summary>
+            <returns>To be added.</returns>
+            <remarks>To be added.</remarks>
+        </member>
+        <member name="M:Cadenza.Collections.IMutableLookup`2.Remove(``10TKey`1``10`1,``10TElement`1``10`1)">
+            <param name="key">To be added.</param>
+            <param name="element">To be added.</param>
+            <summary>To be added.</summary>
+            <returns>To be added.</returns>
+            <remarks>To be added.</remarks>
         </member>
         <member name="T:Cadenza.Collections.KeyValuePairCoda">
             <summary>
@@ -13748,6 +14163,27 @@ Assert.AreEqual (3, list.NodeAt (2).Value);
             </summary>
             <value>To be added.</value>
             <remarks>To be added.</remarks>
+        </member>
+        <member name="T:Cadenza.Collections.QueueCoda">
+            <summary>To be added.</summary>
+            <remarks>To be added.</remarks>
+        </member>
+        <member name="M:Cadenza.Collections.QueueCoda.DequeueOrDefault``1(System.Collections.Generic.Queue{``0})">
+            <typeparam name="T">To be added.</typeparam>
+            <param name="self">To be added.</param>
+            <summary>To be added.</summary>
+            <returns>To be added.</returns>
+            <remarks>To be added.</remarks>
+            <exception cref="T:System.ArgumentNullException">To be added; from: <see cref="M:Cadenza.Collections.QueueCoda.DequeueOrDefault``1(System.Collections.Generic.Queue{``0})" /></exception>
+        </member>
+        <member name="M:Cadenza.Collections.QueueCoda.TryDequeue``1(System.Collections.Generic.Queue{``0},``0@)">
+            <typeparam name="T">To be added.</typeparam>
+            <param name="self">To be added.</param>
+            <param name="element">To be added.</param>
+            <summary>To be added.</summary>
+            <returns>To be added.</returns>
+            <remarks>To be added.</remarks>
+            <exception cref="T:System.ArgumentNullException">To be added; from: <see cref="M:Cadenza.Collections.QueueCoda.TryDequeue``1(System.Collections.Generic.Queue{``0},``0@)" /></exception>
         </member>
         <member name="T:Cadenza.Collections.ReadOnlyDictionary`2">
             <typeparam name="TKey">To be added.</typeparam>
@@ -14666,7 +15102,7 @@ Assert.AreEqual (3, list.NodeAt (2).Value);
               them.
             </para>
                 </block>
-                <code lang="C#" src="../../Test/Cadenza.IO/TextReaderTest.cs#Tokens">var r = new MyStringReader ("(append 3.5 \"hello, world!\")");
+                <code lang="C#" src="../../Test/Cadenza.IO/TextReaderCodaTest.cs#Tokens">var r = new MyStringReader ("(append 3.5 \"hello, world!\")");
 var words = r.Tokens (
 	(p, c) =&gt; char.IsLetterOrDigit (c) || c == '.',
 	(p, c) =&gt; !char.IsWhiteSpace (c))
@@ -14748,7 +15184,7 @@ Assert.IsFalse (r.WasDisposed);
               them.
             </para>
                 </block>
-                <code lang="C#" src="../../Test/Cadenza.IO/TextReaderTest.cs#Tokens">var r = new MyStringReader ("(append 3.5 \"hello, world!\")");
+                <code lang="C#" src="../../Test/Cadenza.IO/TextReaderCodaTest.cs#Tokens">var r = new MyStringReader ("(append 3.5 \"hello, world!\")");
 var words = r.Tokens (
 	(p, c) =&gt; char.IsLetterOrDigit (c) || c == '.',
 	(p, c) =&gt; !char.IsWhiteSpace (c))
@@ -14804,7 +15240,7 @@ Assert.IsFalse (r.WasDisposed);
               returns <see langword="false" />.
             </para>
                 </block>
-                <code lang="C#" src="../../Test/Cadenza.IO/TextReaderTest.cs#Words">MyStringReader r = new MyStringReader ("   (skip  leading,\r\n\tand trailing\vwhitespace)   ");
+                <code lang="C#" src="../../Test/Cadenza.IO/TextReaderCodaTest.cs#Words">MyStringReader r = new MyStringReader ("   (skip  leading,\r\n\tand trailing\vwhitespace)   ");
 string[] words = r.Words ().ToArray ();
 Assert.IsTrue (r.WasDisposed);
 Assert.AreEqual (5, words.Length);
@@ -14874,7 +15310,7 @@ Assert.AreEqual ("4", r.Words ().First ());
               returns <see langword="false" />.
             </para>
                 </block>
-                <code lang="C#" src="../../Test/Cadenza.IO/TextReaderTest.cs#Words">MyStringReader r = new MyStringReader ("   (skip  leading,\r\n\tand trailing\vwhitespace)   ");
+                <code lang="C#" src="../../Test/Cadenza.IO/TextReaderCodaTest.cs#Words">MyStringReader r = new MyStringReader ("   (skip  leading,\r\n\tand trailing\vwhitespace)   ");
 string[] words = r.Words ().ToArray ();
 Assert.IsTrue (r.WasDisposed);
 Assert.AreEqual (5, words.Length);
