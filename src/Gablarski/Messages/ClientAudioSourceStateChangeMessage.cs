@@ -56,20 +56,16 @@ namespace Gablarski.Messages
 			get; set;
 		}
 
-		#region Overrides of MessageBase
-
 		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
-			writer.WriteBool (this.Starting);
-			writer.WriteInt32 (this.SourceId);
+			writer.WriteBool (Starting);
+			writer.WriteInt32 (SourceId);
 		}
 
 		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
-			this.Starting = reader.ReadBool();
-			this.SourceId = reader.ReadInt32();
+			Starting = reader.ReadBool();
+			SourceId = reader.ReadInt32();
 		}
-
-		#endregion
 	}
 }
