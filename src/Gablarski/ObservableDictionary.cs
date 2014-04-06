@@ -4,7 +4,7 @@
 // Author:
 //   Eric Maupin <me@ermau.com>
 //
-// Copyright (c) 2013 Eric Maupin
+// Copyright (c) 2013-2014 Eric Maupin
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,11 +32,25 @@ using System.Linq;
 
 namespace Gablarski
 {
+	public interface IReadOnlyOrderedDictionary<TKey, TValue>
+		: IReadOnlyDictionary<TKey, TValue>
+	{
+		KeyValuePair<TKey, TValue> this[int index] { get; }
+	}
+
+	public interface IOrderedDictionary<TKey, TValue>
+		: IReadOnlyOrderedDictionary<TKey, TValue>, IDictionary<TKey, TValue>
+	{
+		void Insert (int index, TKey key, TValue value);
+		void RemoveAt (int index);
+	}
+
 	sealed class ObservableDictionary<TKey, TValue>
-		: IDictionary<TKey, TValue>, INotifyCollectionChanged
+		: IOrderedDictionary<TKey, TValue>, INotifyCollectionChanged
 	{
 		public ObservableDictionary()
 		{
+			this.keyOrder = new List<TKey>();
 			this.dict = new Dictionary<TKey, TValue>();
 			this.keys = new ReadOnlyObservableCollection<TKey> (this.dict.Keys);
 			this.values = new ReadOnlyObservableCollection<TValue> (this.dict.Values);
@@ -44,6 +58,10 @@ namespace Gablarski
 
 		public ObservableDictionary (int capacity)
 		{
+			if (capacity <= 0)
+				throw new ArgumentOutOfRangeException ("capacity");
+
+			this.keyOrder = new List<TKey> (capacity);
 			this.dict = new Dictionary<TKey, TValue> (capacity);
 			this.keys = new ReadOnlyObservableCollection<TKey>(this.dict.Keys);
 			this.values = new ReadOnlyObservableCollection<TValue>(this.dict.Values);
@@ -63,18 +81,26 @@ namespace Gablarski
 			{
 				bool changed = this.dict.ContainsKey (key);
 				this.dict[key] = value;
-
-				var action = (changed) ? NotifyCollectionChangedAction.Replace : NotifyCollectionChangedAction.Add;
-				Signal (action, key, value, changed);
+				if (!changed)
+					this.keyOrder.Add (key);
 			}
 		}
 
-		public ICollection<TKey> Keys
+		public KeyValuePair<TKey, TValue> this [int index]
+		{
+			get
+			{
+				TKey key = this.keyOrder[index];
+				return new KeyValuePair<TKey, TValue> (key, this.dict[key]);
+			}
+		}
+
+		public IEnumerable<TKey> Keys
 		{
 			get { return this.keys; }
 		}
 
-		public ICollection<TValue> Values
+		public IEnumerable<TValue> Values
 		{
 			get { return this.values; }
 		}
@@ -92,27 +118,16 @@ namespace Gablarski
 		public void Clear()
 		{
 			this.dict.Clear();
-			Signal (NotifyCollectionChangedAction.Reset);
+
+			var args = new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Reset);
+			OnCollectionChanged (args);
+			this.keys.SignalCollectionChanged (args);
+			this.values.SignalCollectionChanged (args);
 		}
 
 		bool ICollection<KeyValuePair<TKey, TValue>>.Contains (KeyValuePair<TKey, TValue> item)
 		{
 			return ((ICollection<KeyValuePair<TKey, TValue>>)this.dict).Contains (item);
-		}
-
-		void ICollection<KeyValuePair<TKey, TValue>>.CopyTo (KeyValuePair<TKey, TValue>[] array, int arrayIndex)
-		{
-			((ICollection<KeyValuePair<TKey, TValue>>)this.dict).CopyTo (array, arrayIndex);
-		}
-
-		bool ICollection<KeyValuePair<TKey, TValue>>.Remove (KeyValuePair<TKey, TValue> item)
-		{
-			bool removed = ((ICollection<KeyValuePair<TKey, TValue>>)this.dict).Remove (item);
-			if (removed) {
-				Signal (NotifyCollectionChangedAction.Remove, item.Key, item.Value);
-			}
-
-			return removed;
 		}
 
 		public bool ContainsKey (TKey key)
@@ -122,27 +137,68 @@ namespace Gablarski
 
 		public void Add (TKey key, TValue value)
 		{
-			this.dict.Add (key, value);
+			int index = this.keyOrder.Count;
 
-			Signal (NotifyCollectionChangedAction.Add, key, value);
+			this.dict.Add (key, value);
+			this.keyOrder.Add (key);
+
+			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Add, new KeyValuePair<TKey, TValue> (key, value), index));
+			this.keys.SignalCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Add, key, index));
+			this.values.SignalCollectionChanged(new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Add, value, index));
+		}
+
+		public void Insert (int index, TKey key, TValue value)
+		{
+			this.dict.Add (key, value);
+			this.keyOrder.Insert (index, key);
+
+			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Add, new KeyValuePair<TKey, TValue> (key, value), index));
+			this.keys.SignalCollectionChanged (new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, key, index));
+			this.values.SignalCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Add, value, index));
+		}
+
+		public void RemoveAt (int index)
+		{
+			TKey key = this.keyOrder[index];
+			TValue value = this.dict[key];
+			this.keyOrder.RemoveAt (index);
+			this.dict.Remove (key);
+
+			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Remove, new KeyValuePair<TKey, TValue> (key, value), index));
+			this.keys.SignalCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Remove, key, index));
+			this.values.SignalCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Remove, value, index));
 		}
 
 		public bool Remove (TKey key)
 		{
-			TValue value;
-			bool present = this.dict.TryGetValue (key, out value);
-			if (present) {
-				this.dict.Remove (key);
+			int index = this.keyOrder.IndexOf (key);
+			if (index == -1)
+				return false;
 
-				Signal (NotifyCollectionChangedAction.Remove, key, value);
-			}
+			TValue value = this.dict[key];
+			this.dict.Remove (key);
+			this.keyOrder.Remove (key);
 
-			return present;
+			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Remove, new KeyValuePair<TKey, TValue> (key, value), index));
+			this.keys.SignalCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Remove, key, index));
+			this.values.SignalCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Remove, value, index));
+
+			return true;
+		}
+
+		bool ICollection<KeyValuePair<TKey, TValue>>.Remove (KeyValuePair<TKey, TValue> item)
+		{
+			return Remove(item.Key);
 		}
 
 		public bool TryGetValue (TKey key, out TValue value)
 		{
 			return this.dict.TryGetValue (key, out value);
+		}
+
+		void ICollection<KeyValuePair<TKey, TValue>>.CopyTo (KeyValuePair<TKey, TValue>[] array, int arrayIndex)
+		{
+			((ICollection<KeyValuePair<TKey, TValue>>)this.dict).CopyTo (array, arrayIndex);
 		}
 
 		public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
@@ -155,34 +211,26 @@ namespace Gablarski
 			return GetEnumerator();
 		}
 
+		private readonly List<TKey> keyOrder;
 		private readonly ReadOnlyObservableCollection<TKey> keys;
 		private readonly ReadOnlyObservableCollection<TValue> values;
 		private readonly Dictionary<TKey, TValue> dict;
+
+		ICollection<TKey> IDictionary<TKey, TValue>.Keys
+		{
+			get { return this.keys; }
+		}
+
+		ICollection<TValue> IDictionary<TKey, TValue>.Values
+		{
+			get { return this.values; }
+		}
 
 		private void OnCollectionChanged (NotifyCollectionChangedEventArgs e)
 		{
 			NotifyCollectionChangedEventHandler handler = this.CollectionChanged;
 			if (handler != null)
 				handler (this, e);
-		}
-
-		private void Signal (NotifyCollectionChangedAction action)
-		{
-			var e = new NotifyCollectionChangedEventArgs (action);
-			OnCollectionChanged (e);
-
-			this.keys.SignalCollectionChanged (this, e);
-			this.values.SignalCollectionChanged (this, e);
-		}
-
-		private void Signal (NotifyCollectionChangedAction action, TKey key, TValue value, bool valueOnly = false)
-		{
-			OnCollectionChanged (new NotifyCollectionChangedEventArgs (action, new KeyValuePair<TKey, TValue> (key, value), 0));
-
-			if (!valueOnly)
-				this.keys.SignalCollectionChanged (this, new NotifyCollectionChangedEventArgs (action, key, 0));
-
-			this.values.SignalCollectionChanged (this, new NotifyCollectionChangedEventArgs (action, value, 0));
 		}
 
 		private sealed class ReadOnlyObservableCollection<T>
@@ -210,14 +258,14 @@ namespace Gablarski
 				get { return true; }
 			}
 
-			public void SignalCollectionChanged (object sender, NotifyCollectionChangedEventArgs e)
+			public void SignalCollectionChanged (NotifyCollectionChangedEventArgs e)
 			{
 				if (e == null)
 					throw new ArgumentNullException ("e");
 
 				var changed = CollectionChanged;
 				if (changed != null)
-					changed (sender, e);
+					changed (this, e);
 			}
 
 			public IEnumerator<T> GetEnumerator()
