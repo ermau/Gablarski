@@ -35,6 +35,10 @@
 // DAMAGE.
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Windows.Data;
+using Cadenza.Collections;
 using Gablarski.Client;
 
 namespace Gablarski.Clients.ViewModels
@@ -42,13 +46,22 @@ namespace Gablarski.Clients.ViewModels
 	public class ChannelViewModel
 		: ViewModelBase
 	{
-		public ChannelViewModel (IClientChannelHandler channels, IChannelInfo channel)
+		public ChannelViewModel (IGablarskiClientContext clientContext, IChannelInfo channel)
 		{
+			if (clientContext == null)
+				throw new ArgumentNullException ("clientContext");
 			if (channel == null)
 				throw new ArgumentNullException ("channel");
 
 			Channel = channel;
-			this.channels = channels;
+			this.clientContext = clientContext;
+
+			Users = new CollectionView<UserViewModel> (clientContext.Users) {
+				ItemFilter = u => ((IUserInfo) u).CurrentChannelId == channel.ChannelId,
+				ItemConverter = new LambdaConverter<IUserInfo, UserViewModel> (u => new UserViewModel (clientContext.Users, u), uvm => uvm.User)
+			};
+
+			BindingOperations.EnableCollectionSynchronization (Users, Users);
 		}
 
 		public IChannelInfo Channel
@@ -57,6 +70,12 @@ namespace Gablarski.Clients.ViewModels
 			private set;
 		}
 
-		private readonly IClientChannelHandler channels;
+		public IEnumerable<UserViewModel> Users
+		{
+			get;
+			private set;
+		}
+
+		private readonly IGablarskiClientContext clientContext;
 	}
 }
