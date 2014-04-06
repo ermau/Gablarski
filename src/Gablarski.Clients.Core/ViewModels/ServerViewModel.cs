@@ -37,7 +37,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Windows.Data;
 using Gablarski.Client;
+using Gablarski.Clients.Persistence;
+using Tempest;
 
 namespace Gablarski.Clients.ViewModels
 {
@@ -52,15 +56,62 @@ namespace Gablarski.Clients.ViewModels
 			this.clientContext = clientContext;
 
 			Channels = new SelectedObservableCollection<IChannelInfo, ChannelViewModel> (
-				this.clientContext.Channels, c => new ChannelViewModel (this.clientContext.Channels, c));
-		}
+				this.clientContext.Channels, c => new ChannelViewModel (this.clientContext, c));
 
-		private readonly IGablarskiClientContext clientContext;
+			BindingOperations.EnableCollectionSynchronization (Channels, Channels);
+		}
 
 		public IEnumerable<ChannelViewModel> Channels
 		{
 			get;
 			private set;
 		}
+
+		public bool IsConnecting
+		{
+			get { return this.isConnecting; }
+			private set
+			{
+				if (this.isConnecting == value)
+					return;
+
+				this.isConnecting = value; 
+				OnPropertyChanged();
+			}
+		}
+
+		public ClientConnectionResult ConnectionResult
+		{
+			get { return this.connectionResult; }
+			private set
+			{
+				if (this.connectionResult == value)
+					return;
+
+				this.connectionResult = value;
+				OnPropertyChanged();
+			}
+		}
+
+		public async Task JoinAsync (ServerEntry entry)
+		{
+			if (entry == null)
+				throw new ArgumentNullException ("entry");
+
+			IsConnecting = true;
+
+			var target = new Target (entry.Host, entry.Port);
+			ConnectionResult = await this.clientContext.ConnectAsync (target);
+
+			IsConnecting = false;
+
+			if (ConnectionResult.Result != Tempest.ConnectionResult.Success)
+				return;
+
+		}
+
+		private readonly IGablarskiClientContext clientContext;
+		private bool isConnecting;
+		private ClientConnectionResult connectionResult;
 	}
 }
