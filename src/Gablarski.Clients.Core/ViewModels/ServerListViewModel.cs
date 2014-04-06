@@ -5,7 +5,7 @@
 // or without modification, are permitted provided that
 // the following conditions are met:
 //
-// - Redistributions of source code must retain the above 
+// - Redistributions of source code must retain the above
 //   copyright notice, this list of conditions and the
 //   following disclaimer.
 //
@@ -37,22 +37,30 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Gablarski.Client;
+using Gablarski.Clients.Messages;
 using Gablarski.Clients.Persistence;
 using Tempest;
-using Timer = System.Threading.Timer;
 
 namespace Gablarski.Clients.ViewModels
 {
 	public class ServerListViewModel
 		: ViewModelBase
 	{
+		private readonly RSAAsymmetricKey key;
+		private ServerViewModel currentServer;
+
 		public ServerListViewModel (RSAAsymmetricKey key)
 		{
+			if (key == null)
+				throw new ArgumentNullException ("key");
+
+			this.key = key;
 			Servers = new AsyncValue<IEnumerable<ServerEntryViewModel>> (
 				ClientData.GetServersAsync().ContinueWith (t => t.Result.Select (se => new ServerEntryViewModel (key, se))),
 				Enumerable.Empty<ServerEntryViewModel>());
+
+			Messenger.Register<JoinServerMessage> (OnJoinServerMessage);
 		}
 
 		public AsyncValue<IEnumerable<ServerEntryViewModel>> Servers
@@ -60,68 +68,29 @@ namespace Gablarski.Clients.ViewModels
 			get;
 			private set;
 		}
-	}
 
-	public class ServerEntryViewModel
-		: ViewModelBase
-	{
-		private static readonly TimeSpan QueryTimeout = TimeSpan.FromSeconds (15);
-
-		public ServerEntryViewModel (RSAAsymmetricKey key, ServerEntry server)
+		public ServerViewModel CurrentServer
 		{
-			this.key = key;
-			Server = server;
-
-			Task<QueryResults> query = GablarskiClient.QueryAsync (key, new Target (server.Host, server.Port), QueryTimeout);
-			IsOnline = new AsyncValue<bool?> (query.ContinueWith (t => (bool?)(!t.IsCanceled), TaskContinuationOptions.HideScheduler), null, false);
-			ConnectedUsers = new AsyncValue<int> (query.ContinueWith (t => t.Result.Users.Count(), TaskContinuationOptions.OnlyOnRanToCompletion | TaskContinuationOptions.HideScheduler), 0);
-
-			this.requeryTimer = new Timer (OnRequery, null, 30000, 30000);
-		}
-
-		public AsyncValue<bool?> IsOnline
-		{
-			get { return this.isOnline; }
+			get { return this.currentServer; }
 			private set
 			{
-				if (this.isOnline == value)
+				if (this.currentServer == value)
 					return;
 
-				this.isOnline = value; 
+				this.currentServer = value;
 				OnPropertyChanged();
 			}
 		}
 
-		public AsyncValue<int> ConnectedUsers
+		private async void OnJoinServerMessage (JoinServerMessage msg)
 		{
-			get { return this.connectedUsers; }
-			private set
-			{
-				if (this.connectedUsers == value)
-					return;
+			if (CurrentServer != null)
+				throw new InvalidOperationException ("Can not join a server while one is already active");
 
-				this.connectedUsers = value;
-				OnPropertyChanged();
-			}
-		}
+			var client = new GablarskiClient (this.key);
+			CurrentServer = new ServerViewModel (client);
 
-		public ServerEntry Server
-		{
-			get;
-			private set;
-		}
-
-		private readonly RSAAsymmetricKey key;
-		private readonly Timer requeryTimer;
-		private AsyncValue<bool?> isOnline;
-		private AsyncValue<int> connectedUsers;
-
-		private void OnRequery (object state)
-		{
-			Task<QueryResults> query = GablarskiClient.QueryAsync (this.key, new Target (Server.Host, Server.Port), QueryTimeout);
-
-			IsOnline = new AsyncValue<bool?> (query.ContinueWith (t => (bool?)(!t.IsCanceled), TaskContinuationOptions.HideScheduler), IsOnline.Value, false);
-			ConnectedUsers = new AsyncValue<int> (query.ContinueWith (t => t.Result.Users.Count(), TaskContinuationOptions.OnlyOnRanToCompletion | TaskContinuationOptions.HideScheduler), ConnectedUsers.Value);
+			await CurrentServer.JoinAsync (msg.Server);
 		}
 	}
 }
