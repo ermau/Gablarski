@@ -224,12 +224,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="RegisterForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="RegisterForm.Designer.cs">
-      <DependentUpon>RegisterForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="ResourceWebRequestFactory.cs" />
     <Compile Include="ServerEntryView.xaml.cs">
       <DependentUpon>ServerEntryView.xaml</DependentUpon>
