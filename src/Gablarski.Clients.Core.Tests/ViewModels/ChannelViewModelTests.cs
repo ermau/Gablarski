@@ -48,14 +48,14 @@ namespace Gablarski.Clients.Core.Tests
 		public void CtorNull()
 		{
 			Assert.That (() => new ChannelViewModel (null, new ChannelInfo()), Throws.TypeOf<ArgumentNullException>());
-			Assert.That (() => new ChannelViewModel (Context.Channels, null), Throws.TypeOf<ArgumentNullException>());
+			Assert.That (() => new ChannelViewModel (Context, null), Throws.TypeOf<ArgumentNullException>());
 		}
 
 		[Test]
 		public void Ctor()
 		{
 			var channel = new ChannelInfo();
-			var vm = new ChannelViewModel (Context.Channels, channel);
+			var vm = new ChannelViewModel (Context, channel);
 
 			Assert.That (vm.Channel, Is.SameAs (channel));
 		}

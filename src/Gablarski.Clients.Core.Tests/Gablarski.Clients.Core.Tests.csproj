@@ -49,6 +49,7 @@
     <Compile Include="SelectedObservableCollectionTests.cs" />
     <Compile Include="ViewModels\ChannelViewModelTests.cs" />
     <Compile Include="ViewModels\ServerListViewModelTests.cs" />
+    <Compile Include="ViewModels\ServerViewModelTests.cs" />
     <Compile Include="ViewModels\UserViewModelTests.cs" />
   </ItemGroup>
   <ItemGroup>
