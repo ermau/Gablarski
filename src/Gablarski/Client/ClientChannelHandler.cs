@@ -178,7 +178,7 @@ namespace Gablarski.Client
 					this.channels.Remove (id);
 
 				foreach (IChannelInfo channel in e.Message.Channels)
-					((IDictionary<int, IChannelInfo>) this.channels)[channel.ChannelId] = channel;
+					this.channels[channel.ChannelId] = channel;
 			}
 		}
 	}

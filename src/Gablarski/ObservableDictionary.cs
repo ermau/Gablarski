@@ -35,7 +35,7 @@ namespace Gablarski
 	public interface IReadOnlyOrderedDictionary<TKey, TValue>
 		: IReadOnlyDictionary<TKey, TValue>
 	{
-		KeyValuePair<TKey, TValue> this[int index] { get; }
+		KeyValuePair<TKey, TValue> GetAt (int index);
 	}
 
 	public interface IOrderedDictionary<TKey, TValue>
@@ -80,15 +80,6 @@ namespace Gablarski
 			set { Replace (key, value); }
 		}
 
-		public KeyValuePair<TKey, TValue> this [int index]
-		{
-			get
-			{
-				TKey key = this.keyOrder[index];
-				return new KeyValuePair<TKey, TValue> (key, this.dict[key]);
-			}
-		}
-
 		public IEnumerable<TKey> Keys
 		{
 			get { return this.keys; }
@@ -107,6 +98,12 @@ namespace Gablarski
 		void ICollection<KeyValuePair<TKey, TValue>>.Add (KeyValuePair<TKey, TValue> item)
 		{
 			Add (item.Key, item.Value);
+		}
+
+		public KeyValuePair<TKey, TValue> GetAt (int index)
+		{
+			TKey key = this.keyOrder[index];
+			return new KeyValuePair<TKey, TValue> (key, this.dict[key]);
 		}
 
 		public void Clear()
