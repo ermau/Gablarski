@@ -105,6 +105,7 @@
     <Compile Include="ISettingsProvider.cs" />
     <Compile Include="ITextToSpeech.cs" />
     <Compile Include="Messages\AddBuddyMessage.cs" />
+    <Compile Include="Messages\JoinServerMessage.cs" />
     <Compile Include="Messages\JoinVoiceMessage.cs" />
     <Compile Include="Messages\StartChatMessage.cs" />
     <Compile Include="Modules.cs" />
