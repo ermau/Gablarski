@@ -221,7 +221,7 @@ namespace Gablarski.Client
 		public IEnumerable<IUserInfo> GetUsersInChannel (int channelId)
 		{
 			lock (SyncRoot) {
-				return this.manager.GetUsersInChannel (channelId);
+				return this.manager.ByChannel[channelId];
 			}
 		}
 
@@ -242,9 +242,7 @@ namespace Gablarski.Client
 		{
 			IEnumerable<IUserInfo> returnUsers;
 			lock (SyncRoot)
-			{
-				 returnUsers = this.manager.ToList();
-			}
+				 returnUsers = this.manager.Values.ToList();
 
 			return returnUsers.GetEnumerator ();
 		}

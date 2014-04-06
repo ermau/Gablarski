@@ -1,11 +1,11 @@
-// Copyright (c) 2010, Eric Maupin
+// Copyright (c) 2010-2014, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
 // or without modification, are permitted provided that
 // the following conditions are met:
 //
-// - Redistributions of source code must retain the above 
+// - Redistributions of source code must retain the above
 //   copyright notice, this list of conditions and the
 //   following disclaimer.
 //
@@ -52,10 +52,17 @@ namespace Gablarski.Tests
 			var user = new UserInfo ("Nickname", "Phonetic", "Username", 1, 2, true);
 
 			var manager = new ClientUserManager ();
+
+			bool raised = false;
+			manager.CollectionChanged += (s, e) => {
+				raised = true;
+				Assert.That (e.NewItems[0], Is.EqualTo (user));
+			};
+
 			manager.Join (user);
 
 			Assert.IsTrue (manager.GetIsJoined (user));
-			Assert.IsTrue (((IEnumerable<IUserInfo>)manager).Contains (user));
+			Assert.That (manager.Values, Contains.Item (user));
 			Assert.AreEqual (user, manager[user.UserId]);
 		}
 		
@@ -75,13 +82,13 @@ namespace Gablarski.Tests
 			manager.Join (user);
 			
 			Assert.IsTrue (manager.GetIsJoined (user));
-			Assert.IsTrue (((IEnumerable<IUserInfo>)manager).Contains (user));
+			Assert.That (manager.Values, Contains.Item (user));
 			Assert.AreEqual (user, manager[user.UserId]);
 			
 			Assert.IsTrue (manager.Depart (user));
 			
 			Assert.IsFalse (manager.GetIsJoined (user));
-			Assert.IsFalse (((IEnumerable<IUserInfo>)manager).Contains (user));
+			Assert.That (manager.Values, Is.Empty);
 			Assert.AreEqual (null, manager[user.UserId]);
 		}
 		

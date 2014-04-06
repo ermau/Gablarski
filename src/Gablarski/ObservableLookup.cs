@@ -46,6 +46,19 @@ namespace Gablarski
 	sealed class ObservableLookup<TKey, TElement>
 		: IMutableLookup<TKey, TElement>, INotifyCollectionChanged, IList
 	{
+		public ObservableLookup()
+		{
+		}
+
+		public ObservableLookup (IEnumerable<IGrouping<TKey, TElement>> lookup)
+		{
+			if (lookup == null)
+				throw new ArgumentNullException ("lookup");
+
+			foreach (var group in lookup)
+				Add (group.Key, group);
+		}
+
 		public event NotifyCollectionChangedEventHandler CollectionChanged;
 
 		public int Count

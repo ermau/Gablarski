@@ -36,14 +36,17 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using Cadenza.Collections;
 
 namespace Gablarski.Client
 {
 	internal class ClientUserManager
-		: IIndexedEnumerable<int, IUserInfo>
+		: IReadOnlyDictionary<int, IUserInfo>, INotifyCollectionChanged
 	{
+		public event NotifyCollectionChangedEventHandler CollectionChanged;
+
 		public int Count
 		{
 			get
@@ -57,9 +60,8 @@ namespace Gablarski.Client
 		{
 			get
 			{
-				UserInfo user;
-				lock (syncRoot)
-				{
+				IUserInfo user;
+				lock (syncRoot) {
 					this.users.TryGetValue (userId, out user);
 				}
 
@@ -67,9 +69,36 @@ namespace Gablarski.Client
 			}
 		}
 
+		public IEnumerable<int> Keys
+		{
+			get { return this.users.Keys; }
+		}
+
+		public IEnumerable<IUserInfo> Values
+		{
+			get { return this.users.Values; }
+		}
+
+		public ILookup<int, IUserInfo> ByChannel
+		{
+			get { return this.channels; }
+		}
+
 		public object SyncRoot
 		{
 			get { return this.syncRoot; }
+		}
+
+		public bool TryGetValue (int key, out IUserInfo value)
+		{
+			lock (this.syncRoot)
+				return this.users.TryGetValue (key, out value);
+		}
+
+		public bool ContainsKey (int key)
+		{
+			lock (this.syncRoot)
+				return this.users.ContainsKey (key);
 		}
 
 		/// <summary>
@@ -127,19 +156,21 @@ namespace Gablarski.Client
 			if (user == null)
 				throw new ArgumentNullException ("user");
 
-			lock (this.syncRoot)
-			{
+			int index = -1;
+			lock (this.syncRoot) {
 				this.ignores.Remove (user.UserId);
 
-				UserInfo realUser;
-				if (this.users.TryGetValue (user.UserId, out realUser))
-				{
-					this.users.Remove (user.UserId);
-					return this.channels.Remove (user.CurrentChannelId, realUser);
-				}
-				else
+				IUserInfo realUser;
+				if (!this.users.TryGetValue (user.UserId, out realUser))
 					return false;
+
+				index = this.users.IndexOf (user.UserId);
+				this.users.Remove (user.UserId);
+				this.channels.Remove (user.CurrentChannelId, realUser);
 			}
+
+			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Remove, user, index));
+			return true;
 		}
 		
 		/// <summary>
@@ -151,14 +182,16 @@ namespace Gablarski.Client
 		{
 			if (userUpdate == null)
 				throw new ArgumentNullException ("userUpdate");
-				
-			lock (this.syncRoot)
-			{
-				this.ignores = new HashSet<int> (this.ignores.Intersect (userUpdate.Select (u => u.UserId)));
-				this.users = userUpdate.ToDictionary (u => u.UserId, u => new UserInfo (u));
-				this.channels =
-					new MutableLookup<int, UserInfo> (userUpdate.ToLookup (u => u.CurrentChannelId, u => new UserInfo (u)));
+
+			var update = userUpdate.ToDictionary (u => u.UserId, u => (IUserInfo) new UserInfo (u));
+
+			lock (this.syncRoot) {
+				this.ignores = new HashSet<int> (this.ignores.Intersect (update.Keys));
+				this.users = new OrderedDictionary<int, IUserInfo> (update);
+				this.channels = new ObservableLookup<int, IUserInfo> (update.ToLookup (kvp => kvp.Value.CurrentChannelId, kvp => new UserInfo (kvp.Value)));
 			}
+
+			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Reset));
 		}
 		
 		/// <summary>
@@ -170,40 +203,40 @@ namespace Gablarski.Client
 		{
 			if (user == null)
 				throw new ArgumentNullException ("user");
-				
-			lock (this.syncRoot)
-			{
-				UserInfo oldUser;
-				if (users.TryGetValue (user.UserId, out oldUser))
-					channels.Remove (oldUser.CurrentChannelId, oldUser);
-					
-				channels.Add (user.CurrentChannelId, users[user.UserId] = new UserInfo (user));
+
+			user = new UserInfo (user);
+
+			int index = 0;
+			bool removed = false;
+			IUserInfo oldUser;
+			lock (this.syncRoot) {
+				if (users.TryGetValue (user.UserId, out oldUser)) {
+					index = this.users.IndexOf (user.UserId);
+					this.users.Remove (user.UserId);
+					this.channels.Remove (oldUser.CurrentChannelId, oldUser);
+					removed = true;
+				} else
+					index = this.users.Count;
+
+				this.users.Insert (index, user.UserId, user);
+				channels.Add (user.CurrentChannelId, user);
 			}
+
+			if (removed)
+				OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Replace, oldUser, user, index));
+			else
+				OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Add, user, index));
 		}
 
 		public void Clear ()
 		{
-			lock (this.syncRoot)
-			{
+			lock (this.syncRoot) {
 				ignores.Clear();
 				users.Clear();
 				channels.Clear();
 			}
-		}
 
-		/// <summary>
-		/// Gets the users in the given channel.
-		/// </summary>
-		/// <param name="channelId">The id of the channel.</param>
-		/// <returns>
-		/// A <see cref="IEnumerable{UserInfo}"/> of the users in the channel. <c>null</c> if the channel was not found.
-		/// </returns>
-		public IEnumerable<IUserInfo> GetUsersInChannel (int channelId)
-		{
-			lock (this.syncRoot)
-			{
-				return this.channels[channelId].Cast<IUserInfo>().ToList();
-			}
+			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Reset));
 		}
 
 		/// <summary>
@@ -237,25 +270,18 @@ namespace Gablarski.Client
 			if (user == null)
 				throw new ArgumentNullException ("user");
 
-			lock (this.syncRoot)
-			{
-				UserInfo oldUser;
+			lock (this.syncRoot) {
+				IUserInfo oldUser;
 				if (!users.TryGetValue (user.UserId, out oldUser))
 					oldUser = new UserInfo (user);
 				
-				users[user.UserId] = new UserInfo (oldUser.Nickname, user.Phonetic, user.Username, user.UserId, user.CurrentChannelId, !user.IsMuted);
+				Update (new UserInfo (oldUser.Nickname, user.Phonetic, user.Username, user.UserId, user.CurrentChannelId, !user.IsMuted));
 			}
 		}
 
-		public IEnumerator<IUserInfo> GetEnumerator ()
+		public IEnumerator<KeyValuePair<int, IUserInfo>> GetEnumerator()
 		{
-			IEnumerable<IUserInfo> returnUsers;
-			lock (this.syncRoot)
-			{
-				 returnUsers = this.users.Values.Cast<IUserInfo>().ToList();
-			}
-
-			return returnUsers.GetEnumerator ();
+			return this.users.GetEnumerator();
 		}
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator ()
@@ -266,7 +292,14 @@ namespace Gablarski.Client
 		private readonly object syncRoot = new object ();
 
 		private HashSet<int> ignores = new HashSet<int>();
-		private Dictionary<int, UserInfo> users = new Dictionary<int, UserInfo> ();
-		private MutableLookup<int, UserInfo> channels = new MutableLookup<int, UserInfo> ();
+		private OrderedDictionary<int, IUserInfo> users = new OrderedDictionary<int, IUserInfo> ();
+		private ObservableLookup<int, IUserInfo> channels = new ObservableLookup<int, IUserInfo> ();
+
+		private void OnCollectionChanged (NotifyCollectionChangedEventArgs e)
+		{
+			var handler = CollectionChanged;
+			if (handler != null)
+				handler (this, e);
+		}
 	}
 }
