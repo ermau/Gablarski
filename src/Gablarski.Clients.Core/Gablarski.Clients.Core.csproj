@@ -63,6 +63,7 @@
       <HintPath>..\..\lib\Cadenza.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Configuration" />
@@ -91,6 +92,7 @@
     <Compile Include="AvatarCache.cs" />
     <Compile Include="AutomaticErrorReporter.cs" />
     <Compile Include="ChatHistory.cs" />
+    <Compile Include="CollectionView.cs" />
     <Compile Include="DefaultDevice.cs" />
     <Compile Include="ErrorManager.cs" />
     <Compile Include="Extensions.cs" />
