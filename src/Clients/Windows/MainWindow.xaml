@@ -167,10 +167,8 @@
 							<Image Source="resx://AppBarAdd" />
 						</metro:CommandButton>
 					</StackPanel>-->
-					
-					<TreeView Grid.Row="0" Visibility="Collapsed">
-						
-					</TreeView>
+
+					<Gablarski:ServerView Grid.Row="0" DataContext="{Binding CurrentServer}" Visibility="{Binding Converter={StaticResource NullToVisibilityConverter}}" />
 				</Grid>
 			</TabItem>
 		</TabControl>
