@@ -229,6 +229,9 @@
     <Compile Include="ServerEntryView.xaml.cs">
       <DependentUpon>ServerEntryView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ServerView.xaml.cs">
+      <DependentUpon>ServerView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
