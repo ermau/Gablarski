@@ -216,6 +216,7 @@
     </Compile>
     <Compile Include="NotificationTypeConverter.cs" />
     <Compile Include="NullableBoolImageConverter.cs" />
+    <Compile Include="NullToVisibilityConverter.cs" />
     <Compile Include="PersonaSetupWindow.xaml.cs">
       <DependentUpon>PersonaSetupWindow.xaml</DependentUpon>
     </Compile>
