@@ -221,7 +221,7 @@ namespace Gablarski.LocalServer
 					CreateUser (session, username, HashPassword (password));
 					
 					trans.Commit();
-					return RegisterResult.Success;
+					return RegisterResult.Approved;
 				}
 				else if (RegistrationMode == UserRegistrationMode.Approved)
 				{
@@ -232,7 +232,7 @@ namespace Gablarski.LocalServer
 					});
 
 					trans.Commit();
-					return RegisterResult.Success;
+					return RegisterResult.Approved;
 				}
 				else
 				{
