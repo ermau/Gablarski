@@ -59,8 +59,8 @@ namespace Gablarski.Client
 
 		public event NotifyCollectionChangedEventHandler CollectionChanged
 		{
-			add { this.channels.CollectionChanged += value; }
-			remove { this.channels.CollectionChanged -= value; }
+			add { ((INotifyCollectionChanged)this.channels.Values).CollectionChanged += value; }
+			remove { ((INotifyCollectionChanged)this.channels.Values).CollectionChanged -= value; }
 		}
 
 		public int Count
@@ -178,7 +178,7 @@ namespace Gablarski.Client
 					this.channels.Remove (id);
 
 				foreach (IChannelInfo channel in e.Message.Channels)
-					this.channels[channel.ChannelId] = channel;
+					((IDictionary<int, IChannelInfo>) this.channels)[channel.ChannelId] = channel;
 			}
 		}
 	}
