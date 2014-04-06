@@ -5,7 +5,7 @@
 // or without modification, are permitted provided that
 // the following conditions are met:
 //
-// - Redistributions of source code must retain the above 
+// - Redistributions of source code must retain the above
 //   copyright notice, this list of conditions and the
 //   following disclaimer.
 //
@@ -39,7 +39,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Cadenza.Collections;
 using Gablarski.Messages;
 using Tempest;
 
@@ -66,7 +65,6 @@ namespace Gablarski.Client
 			this.context.RegisterMessageHandler<UserKickedMessage> (OnUserKickedMessage);
 		}
 
-		#region Events
 		/// <summary>
 		/// An new or updated user list has been received.
 		/// </summary>
@@ -111,7 +109,6 @@ namespace Gablarski.Client
 		/// Received an unsuccessful result of a change channel request.
 		/// </summary>
 		public event EventHandler<ReceivedChannelChannelResultEventArgs> ReceivedChannelChangeResult;
-		#endregion
 
 		/// <summary>
 		/// Gets the current user.
@@ -265,7 +262,6 @@ namespace Gablarski.Client
 		private readonly ClientUserManager manager;
 		private readonly IGablarskiClientContext context;
 
-		#region Message handlers
 		internal void OnUserKickedMessage (MessageEventArgs<UserKickedMessage> e)
 		{
 			IUserInfo user;
@@ -384,61 +380,59 @@ namespace Gablarski.Client
 
 			OnReceivedChannelChangeResult (new ReceivedChannelChannelResultEventArgs (msg.MoveInfo, msg.Result));
 		}
-		#endregion
 
-		#region Event Invokers
 		protected virtual void OnUserIgnored (UserMutedEventArgs e)
 		{
-			var ignored = this.UserIgnored;
+			var ignored = UserIgnored;
 			if (ignored != null)
 				ignored (this, e);
 		}
 
 		protected virtual void OnUserMuted (UserMutedEventArgs e)
 		{
-			var muted = this.UserMuted;
+			var muted = UserMuted;
 			if (muted != null)
 				muted (this, e);
 		}
 
 		protected virtual void OnUserUpdated (UserEventArgs e)
 		{
-			var updated = this.UserUpdated;
+			var updated = UserUpdated;
 			if (updated != null)
 				updated (this, e);
 		}
 
 		protected virtual void OnUserDisconnected (UserEventArgs e)
 		{
-			var disconnected = this.UserDisconnected;
+			var disconnected = UserDisconnected;
 			if (disconnected != null)
 				disconnected (this, e);
 		}
 
 		protected virtual void OnReceivedUserList (ReceivedListEventArgs<IUserInfo> e)
 		{
-			var received = this.ReceivedUserList;
+			var received = ReceivedUserList;
 			if (received != null)
 				received (this, e);
 		}
 
 		protected virtual void OnUserJoined (UserEventArgs e)
 		{
-			var result = this.UserJoined;
+			var result = UserJoined;
 			if (result != null)
 				result (this, e);
 		}
 
 		protected virtual void OnUserChangedChannnel (ChannelChangedEventArgs e)
 		{
-			var result = this.UserChangedChannel;
+			var result = UserChangedChannel;
 			if (result != null)
 				result (this, e);
 		}
 
 		protected virtual void OnReceivedChannelChangeResult (ReceivedChannelChannelResultEventArgs e)
 		{
-			var result = this.ReceivedChannelChangeResult;
+			var result = ReceivedChannelChangeResult;
 			if (result != null)
 				result (this, e);
 		}
@@ -449,6 +443,5 @@ namespace Gablarski.Client
 			if (kicked != null)
 				kicked (this, e);
 		}
-		#endregion
 	}
 }
