@@ -29,11 +29,11 @@
 	</metro:Window.TitleBar>
 	<Window.Resources>
 		<Gablarski:AvatarConverter x:Key="AvatarConverter" />
-		<CollectionViewSource x:Key="BuddiesByStatus" Source="{Binding BuddyList.Buddies}">
+		<!--<CollectionViewSource x:Key="BuddiesByStatus" Source="{Binding BuddyList.Buddies}">
 			<CollectionViewSource.SortDescriptions>
 				<ComponentModel:SortDescription PropertyName="Status" Direction="Descending" />
 			</CollectionViewSource.SortDescriptions>
-		</CollectionViewSource>
+		</CollectionViewSource>-->
 		
 	</Window.Resources>
 	<DockPanel>
