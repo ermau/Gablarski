@@ -53,7 +53,7 @@ namespace Gablarski.Clients.Windows
 		public MainWindow()
 		{
 			InitializeComponent();
-			DataContext = new MainWindowViewModel (Program.SocialClient);
+			DataContext = new MainWindowViewModel (Program.SocialClient, Program.Key.Result);
 
 			Messenger.Register<AddBuddyMessage> (OnAddBuddyMessage);
 		}

@@ -1,11 +1,11 @@
-﻿// Copyright (c) 2012-2013, Eric Maupin
+﻿// Copyright (c) 2012-2014, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
 // or without modification, are permitted provided that
 // the following conditions are met:
 //
-// - Redistributions of source code must retain the above 
+// - Redistributions of source code must retain the above
 //   copyright notice, this list of conditions and the
 //   following disclaimer.
 //
@@ -35,12 +35,10 @@
 // DAMAGE.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Input;
 using Gablarski.Annotations;
 using Gablarski.Clients.Messages;
-using Gablarski.Clients.Persistence;
+using Tempest;
 using Tempest.Social;
 
 namespace Gablarski.Clients.ViewModels
@@ -48,16 +46,18 @@ namespace Gablarski.Clients.ViewModels
 	public class MainWindowViewModel
 		: ViewModelBase
 	{
-		public MainWindowViewModel ([NotNull] GablarskiSocialClient client)
+		public MainWindowViewModel ([NotNull] GablarskiSocialClient client, RSAAsymmetricKey key)
 		{
 			if (client == null)
 				throw new ArgumentNullException ("client");
+			if (key == null)
+				throw new ArgumentNullException ("key");
 
 			this.client = client;
 			this.buddyListViewModel = new BuddyListViewModel (client);
 			this.onlineFilter = new ObservableFilter<Person, WatchList> (this.client.WatchList, p => p.Status != Status.Offline);
 
-			Servers = new ServerListViewModel (client.Connection.LocalKey);
+			Servers = new ServerListViewModel (key);
 
 			AddBuddy = new RelayCommand (() => Messenger.Send (new AddBuddyMessage()));
 			StartChat = new RelayCommand<Person> (OnStartChat);
