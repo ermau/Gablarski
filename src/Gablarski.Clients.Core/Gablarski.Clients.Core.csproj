@@ -149,6 +149,7 @@
     <Compile Include="ViewModels\ObservableFilter.cs" />
     <Compile Include="ViewModels\PersonaSetupViewModel.cs" />
     <Compile Include="ViewModels\RelayCommand.cs" />
+    <Compile Include="ViewModels\ServerEntryViewModel.cs" />
     <Compile Include="ViewModels\ServerListViewModel.cs" />
     <Compile Include="ViewModels\ServerViewModel.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />

@@ -231,6 +231,9 @@
       <DependentUpon>RegisterForm.cs</DependentUpon>
     </Compile>
     <Compile Include="ResourceWebRequestFactory.cs" />
+    <Compile Include="ServerEntryView.xaml.cs">
+      <DependentUpon>ServerEntryView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
@@ -269,9 +272,6 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Servers.cs" />
-    <EmbeddedResource Include="RegisterForm.resx">
-      <DependentUpon>RegisterForm.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="VolumeForm.resx">
       <DependentUpon>VolumeForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -391,6 +391,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Resources.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ServerEntryView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
