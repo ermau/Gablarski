@@ -77,13 +77,7 @@ namespace Gablarski
 		public TValue this[TKey key]
 		{
 			get { return this.dict[key]; }
-			set
-			{
-				bool changed = this.dict.ContainsKey (key);
-				this.dict[key] = value;
-				if (!changed)
-					this.keyOrder.Add (key);
-			}
+			set { Replace (key, value); }
 		}
 
 		public KeyValuePair<TKey, TValue> this [int index]
@@ -155,6 +149,21 @@ namespace Gablarski
 			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Add, new KeyValuePair<TKey, TValue> (key, value), index));
 			this.keys.SignalCollectionChanged (new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, key, index));
 			this.values.SignalCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Add, value, index));
+		}
+
+		public void Replace (TKey key, TValue value)
+		{
+			int index = this.keyOrder.IndexOf (key);
+			if (index == -1) {
+				Add (key, value);
+				return;
+			}
+
+			TValue oldValue = this.dict[key];
+			this.dict[key] = value;
+
+			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Replace, new KeyValuePair<TKey, TValue> (key, value), new KeyValuePair<TKey, TValue> (key, oldValue), index));
+			this.values.SignalCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Replace, value, oldValue, index));
 		}
 
 		public void RemoveAt (int index)
