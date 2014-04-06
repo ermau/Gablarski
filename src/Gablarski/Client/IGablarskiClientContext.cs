@@ -34,6 +34,7 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
+using System.Threading.Tasks;
 using Gablarski.Audio;
 using Tempest;
 
@@ -71,6 +72,8 @@ namespace Gablarski.Client
 		/// Gets the current logged in user.
 		/// </summary>
 		ICurrentUserHandler CurrentUser { get; }
+
+		Task<ClientConnectionResult> ConnectAsync (Target target);
 	}
 
 	public static class ContextExtensions
