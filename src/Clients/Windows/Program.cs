@@ -265,12 +265,7 @@ namespace Gablarski.Clients.Windows
 					StandardButtons = TaskDialogStandardButtons.Yes | TaskDialogStandardButtons.No
 				};
 
-				//update.Controls.Add (new TaskDialogButton ("update", "Yes") { UseElevationIcon = true });
-				//update.Controls.Add (new TaskDialogButton ("dontupdate", "No"));
-
 				update.Closing += (sender, args) => {
-					//if (args.CustomButton != "update")
-						//return;
 					if (args.TaskDialogResult != TaskDialogResult.Yes)
 						return;
 
