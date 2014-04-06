@@ -83,10 +83,11 @@ namespace Gablarski.Clients.Windows
 
 		private void OnServerDoubleClick (object sender, MouseButtonEventArgs e)
 		{
-			var server = this.servers.SelectedItem as ServerEntry;
-			if (server == null)
+			var servervm = (ServerEntryViewModel) this.servers.SelectedItem;
+			if (servervm == null)
 				return;
 
+			Messenger.Send (new JoinServerMessage (servervm.Server));
 		}
 
 		private async void OnStartLocalServer (object sender, RoutedEventArgs e)
