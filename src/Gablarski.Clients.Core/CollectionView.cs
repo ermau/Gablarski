@@ -57,10 +57,18 @@ namespace Gablarski.Clients
 		}
 
 		public CollectionView (IEnumerable itemSource, IValueConverter itemConverter)
-			: this (itemSource)
 		{
 			if (itemConverter == null)
 				throw new ArgumentNullException ("itemConverter");
+			if (itemSource == null)
+				throw new ArgumentNullException ("itemSource");
+
+			this.syncContext = SynchronizationContext.Current;
+			this.itemSource = itemSource;
+
+			var incc = itemSource as INotifyCollectionChanged;
+			if (incc != null)
+				incc.CollectionChanged += OnCollectionChanged;
 
 			ItemConverter = itemConverter;
 		}
