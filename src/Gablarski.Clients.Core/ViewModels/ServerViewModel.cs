@@ -35,7 +35,6 @@
 // DAMAGE.
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Data;
@@ -55,10 +54,11 @@ namespace Gablarski.Clients.ViewModels
 
 			this.clientContext = clientContext;
 
-			Channels = new SelectedObservableCollection<IChannelInfo, ChannelViewModel> (
-				this.clientContext.Channels, c => new ChannelViewModel (this.clientContext, c));
+			BindingOperations.EnableCollectionSynchronization (this.clientContext.Channels, this.clientContext.Channels.SyncContext);
 
-			BindingOperations.EnableCollectionSynchronization (Channels, Channels);
+			Channels = new CollectionView<ChannelViewModel> (this.clientContext.Channels,
+				new LambdaConverter<IChannelInfo, ChannelViewModel> (
+					c => new ChannelViewModel (this.clientContext, c), vm => vm.Channel));
 		}
 
 		public IEnumerable<ChannelViewModel> Channels
@@ -107,7 +107,6 @@ namespace Gablarski.Clients.ViewModels
 
 			if (ConnectionResult.Result != Tempest.ConnectionResult.Success)
 				return;
-
 		}
 
 		private readonly IGablarskiClientContext clientContext;
