@@ -15,7 +15,7 @@
 		</HierarchicalDataTemplate>
 
 		<DataTemplate DataType="{x:Type vms:UserViewModel}">
-			<TextBlock x:Name="Nickname" Text="{Binding User.Nickname}" FontSize="20">
+			<TextBlock x:Name="Nickname" Text="{Binding User.Nickname}" FontSize="20" Foreground="{DynamicResource ForegroundBrush}">
 				<VisualStateManager.VisualStateGroups>
 					<VisualStateGroup x:Name="UserStatus">
 						<VisualState x:Name="Normal">
