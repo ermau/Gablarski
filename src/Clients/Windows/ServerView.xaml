@@ -46,12 +46,12 @@
 			</StackPanel>
 		</Border>
 
-		<TreeView Style="{DynamicResource MetroTreeView}" ItemsSource="{Binding Channels}">		
-			<TreeView.ItemTemplate>
-				<HierarchicalDataTemplate DataType="vms:ChannelViewModel" ItemsSource="{Binding }">
-					<TextBlock Text="{Binding Channel.Name}" />
-				</HierarchicalDataTemplate>
-			</TreeView.ItemTemplate>
+		<TreeView Style="{DynamicResource MetroTreeView}" ItemsSource="{Binding Channels}">
+			<TreeView.ItemContainerStyle>
+				<Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+					<Setter Property="IsExpanded" Value="True" />
+				</Style>
+			</TreeView.ItemContainerStyle>
 		</TreeView>
 	</Grid>
 </UserControl>
