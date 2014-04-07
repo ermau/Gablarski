@@ -127,8 +127,24 @@ namespace Gablarski.Clients
 			SendOrPostCallback action = s => {
 				var args = (NotifyCollectionChangedEventArgs) s;
 				switch (e.Action) {
-					//TODO
+					case NotifyCollectionChangedAction.Add:
+						if (e.NewStartingIndex == -1)
+							goto case NotifyCollectionChangedAction.Reset;
+
+						for (int i = 0; i < e.NewItems.Count; i++) {
+							object element = e.NewItems[i];
+							AttachListener (element);
+
+							if (ItemConverter != null)
+								element = ItemConverter.Convert (element, typeof (T), null, null);
+
+							this.items.Insert (e.NewStartingIndex, (T) element);
+						}
+
+						break;
+
 					default:
+					case NotifyCollectionChangedAction.Reset:
 						Reset();
 						args = new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Reset);
 						break;
