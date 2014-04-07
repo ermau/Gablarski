@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Globalization;
+using System.Threading;
 using System.Windows.Data;
 
 namespace Gablarski.Clients
@@ -45,6 +46,7 @@ namespace Gablarski.Clients
 			if (itemSource == null)
 				throw new ArgumentNullException ("itemSource");
 
+			this.syncContext = SynchronizationContext.Current;
 			this.itemSource = itemSource;
 
 			var incc = itemSource as INotifyCollectionChanged;
@@ -106,6 +108,7 @@ namespace Gablarski.Clients
 			return this.items.GetEnumerator();
 		}
 
+		private SynchronizationContext syncContext;
 		private readonly ObservableCollection<T> items = new ObservableCollection<T>();
 		private readonly IEnumerable itemSource;
 		private IValueConverter itemConverter;
@@ -113,15 +116,24 @@ namespace Gablarski.Clients
 
 		private void OnCollectionChanged (object sender, NotifyCollectionChangedEventArgs e)
 		{
-			switch (e.Action) {
+			SendOrPostCallback action = s => {
+				var args = (NotifyCollectionChangedEventArgs) s;
+				switch (e.Action) {
 					//TODO
-				default:
-				case NotifyCollectionChangedAction.Reset:
-					Reset();
-					break;
-			}
+					default:
+						Reset();
+						args = new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Reset);
+						break;
+				}
 
-			OnCollectionChanged (e);
+				OnCollectionChanged (args);
+			};
+
+
+			if (this.syncContext != null)
+				this.syncContext.Post (action, e);
+			else
+				action (e);
 		}
 
 		private void OnCollectionChanged (NotifyCollectionChangedEventArgs e)
@@ -132,6 +144,11 @@ namespace Gablarski.Clients
 		}
 
 		private void Reset()
+		{
+			BindingOperations.AccessCollection (this.itemSource, ResetCore, false);
+		}
+
+		private void ResetCore()
 		{
 			foreach (T item in this.items)
 				DetatchListener (item);
