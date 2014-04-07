@@ -35,6 +35,7 @@
 // DAMAGE.
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using Gablarski.Audio;
 using Gablarski.Client;
@@ -80,16 +81,18 @@ namespace Gablarski.Clients.ViewModels
 		private readonly IGablarskiClientContext context;
 		private bool isTalking;
 
-		private int sourcesPlaying;
+		private readonly HashSet<int> sourcesPlaying = new HashSet<int>();
 
 		private void OnAudioSourceStopped (object sender, AudioSourceEventArgs e)
 		{
 			if (e.Source.OwnerId != User.UserId)
 				return;
 
-			int newValue = Interlocked.Decrement (ref this.sourcesPlaying);
-			if (newValue == 0)
-				IsTalking = false;
+			lock (this.sourcesPlaying) {
+				this.sourcesPlaying.Remove (e.Source.Id);
+				if (this.sourcesPlaying.Count == 0)
+					IsTalking = false;
+			}
 		}
 
 		private void OnAudioSourceStarted (object sender, AudioSourceEventArgs e)
@@ -97,8 +100,13 @@ namespace Gablarski.Clients.ViewModels
 			if (e.Source.OwnerId != User.UserId)
 				return;
 
-			Interlocked.Increment (ref this.sourcesPlaying);
-			IsTalking = true;
+			lock (this.sourcesPlaying) {
+				if (this.sourcesPlaying.Contains (e.Source.Id))
+					return;
+
+				this.sourcesPlaying.Add (e.Source.Id);
+				IsTalking = true;
+			}
 		}
 	}
 }
