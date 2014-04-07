@@ -39,8 +39,11 @@
 		</DataTemplate>
 	</UserControl.Resources>
 	<Grid>
-		<Border Grid.Row="0" Background="Black" Opacity="0.8" Visibility="{Binding IsConnecting,Converter={StaticResource BooleanToVisibilityConverter}}">
-			<metro:ProgressRing State="Indeterminate" Height="100" Width="100" />
+		<Border Grid.Row="0" Background="Black" Opacity="0.8" Visibility="{Binding IsConnecting, Converter={StaticResource BooleanToVisibilityConverter}}">
+			<StackPanel VerticalAlignment="Center">
+				<metro:ProgressRing State="Indeterminate" Height="100" Width="100" />
+				<!--<Button Width="75" Height="30">Cancel</Button>-->
+			</StackPanel>
 		</Border>
 
 		<TreeView Style="{DynamicResource MetroTreeView}" ItemsSource="{Binding Channels}">		
