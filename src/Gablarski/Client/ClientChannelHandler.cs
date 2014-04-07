@@ -5,7 +5,7 @@
 // or without modification, are permitted provided that
 // the following conditions are met:
 //
-// - Redistributions of source code must retain the above 
+// - Redistributions of source code must retain the above
 //   copyright notice, this list of conditions and the
 //   following disclaimer.
 //
@@ -70,6 +70,11 @@ namespace Gablarski.Client
 				lock (this.channelLock)
 					return this.channels.Count;
 			}
+		}
+
+		public object SyncContext
+		{
+			get { return this.channelLock; }
 		}
 
 		/// <summary>Gets the channel with id <paramref name="channelId"/></summary>

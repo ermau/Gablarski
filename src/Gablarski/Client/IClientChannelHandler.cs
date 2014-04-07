@@ -5,7 +5,7 @@
 // or without modification, are permitted provided that
 // the following conditions are met:
 //
-// - Redistributions of source code must retain the above 
+// - Redistributions of source code must retain the above
 //   copyright notice, this list of conditions and the
 //   following disclaimer.
 //
@@ -42,6 +42,8 @@ namespace Gablarski.Client
 	public interface IClientChannelHandler
 		: IReadOnlyList<IChannelInfo>
 	{
+		object SyncContext { get; }
+
 		Task<ChannelEditResult> CreateAsync (IChannelInfo channelInfo);
 		Task<ChannelEditResult> UpdateAsync (IChannelInfo channelInfo);
 		Task<ChannelEditResult> DeleteAsync (IChannelInfo channelInfo);
