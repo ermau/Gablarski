@@ -131,6 +131,8 @@ namespace Gablarski.Clients
 						if (e.NewStartingIndex == -1)
 							goto case NotifyCollectionChangedAction.Reset;
 
+						List<T> converted = new List<T> (e.NewItems.Count);
+
 						for (int i = 0; i < e.NewItems.Count; i++) {
 							object element = e.NewItems[i];
 							AttachListener (element);
@@ -138,8 +140,11 @@ namespace Gablarski.Clients
 							if (ItemConverter != null)
 								element = ItemConverter.Convert (element, typeof (T), null, null);
 
-							this.items.Insert (e.NewStartingIndex, (T) element);
+							converted.Add ((T) element);
+							this.items.Insert (e.NewStartingIndex + i, (T) element);
 						}
+
+						args = new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Add, converted, e.NewStartingIndex);
 
 						break;
 
