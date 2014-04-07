@@ -175,6 +175,7 @@
       <DependentUpon>AddBuddyWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="AvatarConverter.cs" />
+    <Compile Include="CaseConverter.cs" />
     <Compile Include="ChatWindow.xaml.cs">
       <DependentUpon>ChatWindow.xaml</DependentUpon>
     </Compile>
