@@ -46,14 +46,28 @@ namespace Gablarski
 	sealed class ObservableLookup<TKey, TElement>
 		: IMutableLookup<TKey, TElement>, INotifyCollectionChanged, IList
 	{
-		public ObservableLookup()
+		/// <summary>
+		/// Creates and initializes a new instance of the <see cref="ObservableLookup{TKey,TElement}"/> class.
+		/// </summary>
+		/// <param name="persistCollections">Persist collections returned from the indexer.</param>
+		/// <remarks>
+		/// <para>
+		/// Setting <paramref name="persistCollections"/> to <c>true</c> makes a couple important behavioral changes. When a
+		/// collection is requested and does not exist, it is created. When that collection is empty, it is not deleted unless
+		/// the key itself is removed.
+		/// </para>
+		/// </remarks>
+		public ObservableLookup (bool persistCollections = false)
 		{
+			this.persistCollections = persistCollections;
 		}
 
-		public ObservableLookup (IEnumerable<IGrouping<TKey, TElement>> lookup)
+		public ObservableLookup (IEnumerable<IGrouping<TKey, TElement>> lookup, bool persistCollections = false)
 		{
 			if (lookup == null)
 				throw new ArgumentNullException ("lookup");
+
+			this.persistCollections = persistCollections;
 
 			foreach (var group in lookup)
 				Add (group.Key, group);
@@ -68,7 +82,20 @@ namespace Gablarski
 
 		public IEnumerable<TElement> this [TKey key]
 		{
-			get { return this.groupings[key]; }
+			get
+			{
+				Grouping grouping;
+				if (!this.groupings.TryGetValue (key, out grouping)) {
+					if (this.persistCollections) {
+						int index = this.groupings.Count;
+						this.groupings.Add (key, grouping = new Grouping (key));
+						OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Add, grouping, index));
+					} else
+						return Enumerable.Empty<TElement>();
+				}
+
+				return grouping;
+			}
 		}
 
 		public bool Contains (TKey key)
@@ -78,11 +105,7 @@ namespace Gablarski
 
 		public void Add (TKey key, TElement element)
 		{
-			Grouping grouping;
-			if (!this.groupings.TryGetValue (key, out grouping))
-				grouping = new Grouping (key);
-
-			grouping.Add (element);
+			Add (key, new[] { element });
 		}
 
 		public void Add (TKey key, IEnumerable<TElement> elements)
@@ -106,7 +129,7 @@ namespace Gablarski
 				return false;
 
 			if (grouping.Remove (element)) {
-				if (grouping.Count == 0) {
+				if (!this.persistCollections && grouping.Count == 0) {
 					int index = this.groupings.IndexOf (key);
 					this.groupings.RemoveAt (index);
 					OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Remove, grouping, index));
@@ -131,7 +154,12 @@ namespace Gablarski
 
 		public void Clear()
 		{
-			this.groupings.Clear();
+			if (this.persistCollections) {
+				foreach (Grouping grouping in this.groupings.Values)
+					grouping.Clear();
+			} else
+				this.groupings.Clear();
+
 			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Reset));
 		}
 
@@ -145,6 +173,7 @@ namespace Gablarski
 			return GetEnumerator();
 		}
 
+		private readonly bool persistCollections;
 		private readonly OrderedDictionary<TKey, Grouping> groupings = new OrderedDictionary<TKey, Grouping>();
 
 		class Grouping
