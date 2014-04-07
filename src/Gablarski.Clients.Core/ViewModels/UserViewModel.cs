@@ -35,6 +35,8 @@
 // DAMAGE.
 
 using System;
+using System.Threading;
+using Gablarski.Audio;
 using Gablarski.Client;
 
 namespace Gablarski.Clients.ViewModels
@@ -42,14 +44,17 @@ namespace Gablarski.Clients.ViewModels
 	public class UserViewModel
 		: ViewModelBase
 	{
-		public UserViewModel (IClientUserHandler users, IUserInfo user)
+		public UserViewModel (IGablarskiClientContext context, IUserInfo user)
 		{
-			if (users == null)
-				throw new ArgumentNullException ("users");
+			if (context == null)
+				throw new ArgumentNullException ("context");
 			if (user == null)
 				throw new ArgumentNullException ("user");
 
-			this.users = users;
+			this.context = context;
+			this.context.Sources.AudioSourceStarted += OnAudioSourceStarted;
+			this.context.Sources.AudioSourceStopped += OnAudioSourceStopped;
+
 			User = user;
 		}
 
@@ -59,6 +64,41 @@ namespace Gablarski.Clients.ViewModels
 			private set;
 		}
 
-		private readonly IClientUserHandler users;
+		public bool IsTalking
+		{
+			get { return this.isTalking; }
+			private set
+			{
+				if (this.isTalking == value)
+					return;
+
+				this.isTalking = value;
+				OnPropertyChanged();
+			}
+		}
+
+		private readonly IGablarskiClientContext context;
+		private bool isTalking;
+
+		private int sourcesPlaying;
+
+		private void OnAudioSourceStopped (object sender, AudioSourceEventArgs e)
+		{
+			if (e.Source.OwnerId != User.UserId)
+				return;
+
+			int newValue = Interlocked.Decrement (ref this.sourcesPlaying);
+			if (newValue == 0)
+				IsTalking = false;
+		}
+
+		private void OnAudioSourceStarted (object sender, AudioSourceEventArgs e)
+		{
+			if (e.Source.OwnerId != User.UserId)
+				return;
+
+			Interlocked.Increment (ref this.sourcesPlaying);
+			IsTalking = true;
+		}
 	}
 }
