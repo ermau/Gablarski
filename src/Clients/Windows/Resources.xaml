@@ -30,12 +30,9 @@
 	</Style>
 	
 	<windows:AvatarConverter x:Key="AvatarConverter" />
-
 	<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-
 	<windows:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
-
-	
+	<windows:CaseConverter ToUpper="True" x:Key="UpperCaseConverter" />
 
 	<Style x:Key="MetroTreeViewItem" TargetType="{x:Type TreeViewItem}">
 		<Setter Property="Background" Value="Transparent"/>
