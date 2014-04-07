@@ -229,6 +229,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="RegisterWindow.xaml.cs">
+      <DependentUpon>RegisterWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ResourceWebRequestFactory.cs" />
     <Compile Include="ServerEntryView.xaml.cs">
       <DependentUpon>ServerEntryView.xaml</DependentUpon>

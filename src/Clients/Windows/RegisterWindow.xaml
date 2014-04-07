@@ -1,0 +1,60 @@
+﻿<metro:Window x:Class="Gablarski.Clients.Windows.RegisterWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:metro="http://schemas.codeplex.com/elysium"
+        xmlns:params="http://schemas.codeplex.com/elysium/params"
+        Title="RegisterWindow" Height="290" Width="400"
+		Background="{DynamicResource BackgroundBrush}"
+		BorderThickness="1"
+		params:Design.Theme="Dark"
+		params:Design.AccentBrush="{x:Static metro:AccentBrushes.Blue}"
+		params:Design.ContrastBrush="White">	
+    <Grid HorizontalAlignment="Center" Margin="0,-40,0,0">
+		<Grid.Resources>
+			<Style x:Key="InputGrid" TargetType="Grid">
+				<Setter Property="Width" Value="300" />
+				<Setter Property="Height" Value="50" />
+				<Setter Property="Margin" Value="10,0,0,0" />
+				<Setter Property="VerticalAlignment" Value="Center" />
+				<Setter Property="HorizontalAlignment" Value="Left" />
+			</Style>
+		</Grid.Resources>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="70" />
+			<RowDefinition Height="60" />
+			<RowDefinition Height="60" />
+			<RowDefinition Height="60" />
+			<RowDefinition Height="40" />
+		</Grid.RowDefinitions>
+		
+		<TextBlock Grid.Row="0" FontSize="40" Margin="0,10,0,0">register</TextBlock>
+
+		<Grid Grid.Row="1" Style="{StaticResource InputGrid}">
+			<TextBox Style="{StaticResource Hint}" Text="username" Visibility="{Binding ElementName=username, Path=Text.IsEmpty, Converter={StaticResource VisibilityConverter}}" />
+			<TextBox Style="{StaticResource TextInput}" Name="username" Text="{Binding Username, ValidatesOnNotifyDataErrors=True}" />
+		</Grid>
+		
+		<Grid Grid.Row="2" Style="{StaticResource InputGrid}">
+			<TextBox Style="{StaticResource Hint}" Text="nickname" Visibility="{Binding ElementName=password, Path=Text.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}" />
+			<PasswordBox Style="{StaticResource PasswordInput}" Name="password" Password="{Binding Password, ValidatesOnNotifyDataErrors=True}" />
+		</Grid>
+		
+		<Grid Grid.Row="3" Style="{StaticResource InputGrid}">
+			<TextBox Style="{StaticResource Hint}" Text="nickname" Visibility="{Binding ElementName=password2, Path=Text.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}" />
+			<PasswordBox Style="{StaticResource PasswordInput}" Name="password2" Password="{Binding Password2, ValidatesOnNotifyDataErrors=True}" />
+		</Grid>
+
+		<StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
+			<StackPanel.Resources>
+				<Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+					<Setter Property="Margin" Value="5" />
+					<Setter Property="MinWidth" Value="70" />
+					<Setter Property="Height" Value="30" />
+				</Style>
+			</StackPanel.Resources>
+			
+			<Button IsDefault="True" Command="{Binding Register}">Register</Button>
+			<Button IsCancel="True">Cancel</Button>
+		</StackPanel>
+    </Grid>
+</metro:Window>

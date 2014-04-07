@@ -151,6 +151,7 @@
     <Compile Include="ViewModels\NotificationTypeViewModel.cs" />
     <Compile Include="ViewModels\ObservableFilter.cs" />
     <Compile Include="ViewModels\PersonaSetupViewModel.cs" />
+    <Compile Include="ViewModels\RegisterViewModel.cs" />
     <Compile Include="ViewModels\RelayCommand.cs" />
     <Compile Include="ViewModels\ServerEntryViewModel.cs" />
     <Compile Include="ViewModels\ServerListViewModel.cs" />
