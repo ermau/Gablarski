@@ -250,7 +250,7 @@ namespace Gablarski.Client
 			return GetEnumerator ();
 		}
 
-		protected object SyncRoot
+		public object SyncRoot
 		{
 			get { return this.manager.SyncRoot; }
 		}

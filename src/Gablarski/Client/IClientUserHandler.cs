@@ -94,6 +94,8 @@ namespace Gablarski.Client
 		/// </summary>
 		ILookup<int, IUserInfo> ByChannel { get; }
 
+		object SyncRoot { get; }
+
 		/// <summary>
 		/// Gets whether or not <paramref name="user"/> is currently ignored.
 		/// </summary>
