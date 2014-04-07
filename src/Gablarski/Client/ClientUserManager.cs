@@ -186,9 +186,17 @@ namespace Gablarski.Client
 			var update = userUpdate.ToDictionary (u => u.UserId, u => (IUserInfo) new UserInfo (u));
 
 			lock (this.syncRoot) {
-				this.ignores = new HashSet<int> (this.ignores.Intersect (update.Keys));
-				this.users = new OrderedDictionary<int, IUserInfo> (update);
-				this.channels = new ObservableLookup<int, IUserInfo> (update.ToLookup (kvp => kvp.Value.CurrentChannelId, kvp => new UserInfo (kvp.Value)));
+				var intersectIgnores = this.ignores.Intersect (update.Keys);
+				
+				ClearCore();
+
+				foreach (int ignoreId in intersectIgnores)
+					this.ignores.Add (ignoreId);
+
+				foreach (var kvp in update) {
+					this.users.Add (kvp.Key, kvp.Value);
+					this.channels.Add (kvp.Value.CurrentChannelId, kvp.Value);
+				}
 			}
 
 			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Reset));
@@ -230,12 +238,7 @@ namespace Gablarski.Client
 
 		public void Clear ()
 		{
-			lock (this.syncRoot) {
-				ignores.Clear();
-				users.Clear();
-				channels.Clear();
-			}
-
+			ClearCore();
 			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Reset));
 		}
 
@@ -291,9 +294,18 @@ namespace Gablarski.Client
 
 		private readonly object syncRoot = new object ();
 
-		private HashSet<int> ignores = new HashSet<int>();
-		private OrderedDictionary<int, IUserInfo> users = new OrderedDictionary<int, IUserInfo> ();
-		private ObservableLookup<int, IUserInfo> channels = new ObservableLookup<int, IUserInfo> ();
+		private readonly HashSet<int> ignores = new HashSet<int>();
+		private readonly OrderedDictionary<int, IUserInfo> users = new OrderedDictionary<int, IUserInfo> ();
+		private readonly ObservableLookup<int, IUserInfo> channels = new ObservableLookup<int, IUserInfo> (persistCollections: true);
+
+		private void ClearCore()
+		{
+			lock (this.syncRoot) {
+				ignores.Clear();
+				users.Clear();
+				channels.Clear();
+			}
+		}
 
 		private void OnCollectionChanged (NotifyCollectionChangedEventArgs e)
 		{
