@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle ("Gablarski Windows Client")]
 [assembly: AssemblyDescription ("")]
 [assembly: AssemblyConfiguration ("")]
-[assembly: AssemblyCompany ("Eric Maupin")]
+[assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct ("Gablarski Windows Client")]
-[assembly: AssemblyCopyright ("Copyright © Eric Maupin 2010-2013")]
+[assembly: AssemblyCopyright("Copyright © Eric Maupin 2009-2011, Xamarin Inc. 2011-2014")]
 [assembly: AssemblyTrademark ("")]
 [assembly: AssemblyCulture ("")]
 

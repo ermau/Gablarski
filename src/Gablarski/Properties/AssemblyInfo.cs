@@ -5,9 +5,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle ("Gablarski")]
 [assembly: AssemblyDescription ("")]
 [assembly: AssemblyConfiguration ("")]
-[assembly: AssemblyCompany ("Eric Maupin")]
+[assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct ("Gablarski")]
-[assembly: AssemblyCopyright ("Copyright © Eric Maupin 2009-2014")]
+[assembly: AssemblyCopyright("Copyright © Eric Maupin 2009-2011, Xamarin Inc. 2011-2014")]
 [assembly: AssemblyTrademark ("")]
 [assembly: AssemblyCulture ("")]
 
