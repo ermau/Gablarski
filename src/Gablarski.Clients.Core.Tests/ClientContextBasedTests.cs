@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014, Eric Maupin
+﻿// Copyright (c) 2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -52,6 +52,7 @@ namespace Gablarski.Clients.Core.Tests
 			var context = new MockClientContext (clientConnection);
 			context.Channels = new ClientChannelHandler (context);
 			context.Users = new ClientUserHandler (context);
+			context.Sources = new ClientSourceHandler (context);
 			Context = context;
 		}
 	}
