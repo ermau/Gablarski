@@ -1,4 +1,5 @@
-// Copyright (c) 2009-2014, Eric Maupin
+// Copyright (c) 2009-2011, Eric Maupin
+// Copyright (c) 2011-2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -186,7 +187,7 @@ namespace Gablarski.Client
 			var update = userUpdate.ToDictionary (u => u.UserId, u => (IUserInfo) new UserInfo (u));
 
 			lock (this.syncRoot) {
-				var intersectIgnores = this.ignores.Intersect (update.Keys);
+				var intersectIgnores = this.ignores.Intersect (update.Keys).ToArray();
 				
 				ClearCore();
 
