@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014, Eric Maupin
+﻿// Copyright (c) 2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -103,10 +103,12 @@ namespace Gablarski.Clients.ViewModels
 			var target = new Target (entry.Host, entry.Port);
 			ConnectionResult = await this.clientContext.ConnectAsync (target);
 
-			IsConnecting = false;
-
 			if (ConnectionResult.Result != Tempest.ConnectionResult.Success)
 				return;
+
+			await this.clientContext.CurrentUser.JoinAsync (entry.UserNickname, entry.UserPhonetic, entry.ServerPassword);
+
+			IsConnecting = false;
 		}
 
 		private readonly IGablarskiClientContext clientContext;
