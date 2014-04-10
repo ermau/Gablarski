@@ -63,7 +63,6 @@ Section -Main SEC0000
     SetOutPath $INSTDIR
     SetOverwrite on
     File ..\..\..\lib\Cadenza.dll
-    File ..\..\..\lib\Cadenza.pdb
     File ..\..\..\lib\log4net.dll
     File ..\..\..\lib\log4net.License.txt
     File ..\..\..\lib\OpenAL32.dll
@@ -185,7 +184,6 @@ Section /o -un.Main UNSEC0000
     Delete /REBOOTOK $INSTDIR\log4net.dll
     Delete /REBOOTOK $INSTDIR\libcelt.license.txt
     Delete /REBOOTOK $INSTDIR\libcelt.dll
-    Delete /REBOOTOK $INSTDIR\Cadenza.pdb
     Delete /REBOOTOK $INSTDIR\Cadenza.dll
     DeleteRegValue HKLM "${REGKEY}\Components" Main
 SectionEnd
