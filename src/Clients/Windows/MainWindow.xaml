@@ -37,7 +37,7 @@
 		
 	</Window.Resources>
 	<DockPanel>
-		<StackPanel DockPanel.Dock="Top">
+		<StackPanel DockPanel.Dock="Top" Visibility="Collapsed">
 			<Grid Margin="3">
 				<Grid.RowDefinitions>
 					<RowDefinition Height="28" />
