@@ -196,8 +196,9 @@ namespace Gablarski.Clients.Windows
 			app.Resources.MergedDictionaries.Add (new ResourceDictionary { Source = new Uri ("Resources.xaml", UriKind.Relative) });
 			app.Apply (Theme.Dark, AccentBrushes.Blue, Brushes.White);
 
+			/*
 			if (Settings.Nickname == null)
-				PersonalSetup();
+				PersonalSetup();*/
 
 			if (!ShowKeyProgress (keyCancelSource))
 				return;
