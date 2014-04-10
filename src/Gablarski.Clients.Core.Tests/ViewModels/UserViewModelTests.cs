@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014, Eric Maupin
+﻿// Copyright (c) 2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -48,14 +48,14 @@ namespace Gablarski.Clients.Core.Tests
 		public void CtorNull()
 		{
 			Assert.That (() => new UserViewModel (null, new UserInfo()), Throws.TypeOf<ArgumentNullException>());
-			Assert.That (() => new UserViewModel (Context.Users, null), Throws.TypeOf<ArgumentNullException>());
+			Assert.That (() => new UserViewModel (Context, null), Throws.TypeOf<ArgumentNullException>());
 		}
 
 		[Test]
 		public void Ctor()
 		{
 			UserInfo user = new UserInfo();
-			var vm = new UserViewModel (Context.Users, user);
+			var vm = new UserViewModel (Context, user);
 
 			Assert.AreSame (user, vm.User);
 		}
