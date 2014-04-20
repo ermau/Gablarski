@@ -39,7 +39,7 @@
 		</DataTemplate>
 	</UserControl.Resources>
 	<Grid>
-		<Border Grid.Row="0" Background="Black" Opacity="0.8" Visibility="{Binding IsConnecting, Converter={StaticResource BooleanToVisibilityConverter}}">
+		<Border Grid.Row="0" Background="Black" Opacity="0.8" Visibility="{Binding IsConnecting, Converter={StaticResource BooleanToVisibilityConverter}}" Panel.ZIndex="1">
 			<StackPanel VerticalAlignment="Center">
 				<metro:ProgressRing State="Indeterminate" Height="100" Width="100" />
 				<!--<Button Width="75" Height="30">Cancel</Button>-->
