@@ -1,11 +1,18 @@
-﻿// Copyright (c) 2009-2014, Eric Maupin
+﻿//
+// MockClientContext.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2009-2011, Eric Maupin
+// Copyright (c) 2011-2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
 // or without modification, are permitted provided that
 // the following conditions are met:
 //
-// - Redistributions of source code must retain the above 
+// - Redistributions of source code must retain the above
 //   copyright notice, this list of conditions and the
 //   following disclaimer.
 //
@@ -37,6 +44,7 @@
 using Gablarski.Audio;
 using Gablarski.Client;
 using Tempest;
+using Tempest.Tests;
 
 namespace Gablarski.Tests
 {
@@ -71,5 +79,17 @@ namespace Gablarski.Tests
 		public ICurrentUserHandler CurrentUser { get; set; }
 
 		public ServerInfo ServerInfo { get; set; }
+
+		public static MockClientContext Create()
+		{
+			var provider = new MockConnectionProvider (GablarskiProtocol.Instance);
+
+			var context = new MockClientContext (provider.GetClientConnection());
+			context.Channels = new ClientChannelHandler (context);
+			context.Sources = new ClientSourceHandler (context);
+			context.Users = new ClientUserHandler (context);
+			context.CurrentUser = new CurrentUser (context);
+			return context;
+		}
 	}
 }
