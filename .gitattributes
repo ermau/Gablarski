@@ -1,0 +1,11 @@
+*	text=auto
+*.cs	text
+*.xaml	text
+*.xml	text
+
+.sln	text	eol=crlf
+
+*.dll	binary
+*.png	binary
+*.gif	binary
+*.jpg	binary
