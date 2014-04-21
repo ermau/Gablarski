@@ -1,4 +1,11 @@
-﻿// Copyright (c) 2010-2013, Eric Maupin
+﻿//
+// Program.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2009-2011, Eric Maupin
+// Copyright (c) 2011-2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -52,7 +59,6 @@ using Mindscape.Raygun4Net;
 using System.Windows.Media;
 using Elysium;
 using Tempest;
-using Tempest.Social;
 using Gablarski.Clients.Input;
 using Gablarski.Clients.Persistence;
 using Microsoft.WindowsAPICodePack.Shell;
@@ -68,8 +74,8 @@ namespace Gablarski.Clients.Windows
 
 		public static Task<RSAAsymmetricKey> Key;
 
-		public static GablarskiSocialClient SocialClient;
-		public static ChatHistory History;
+		/*public static GablarskiSocialClient SocialClient;
+		public static ChatHistory History;*/
 
 		public static ILog StartupLog;
 
@@ -208,7 +214,7 @@ namespace Gablarski.Clients.Windows
 			//Application.EnableVisualStyles ();
 			//Application.SetCompatibleTextRenderingDefault (false);
 
-			SetupSocial();
+			//SetupSocial();
 
 			var window = new MainWindow();
 			window.Show();
@@ -362,7 +368,7 @@ namespace Gablarski.Clients.Windows
 			}
 		}
 
-		private static void SetupSocial()
+		/*private static void SetupSocial()
 		{
 			var person = new Person (Key.Result.PublicSignature.Aggregate (String.Empty, (s, b) => s + b.ToString ("X2"))) {
 				Nickname = Settings.Nickname,
@@ -375,7 +381,7 @@ namespace Gablarski.Clients.Windows
 
 			string host = ConfigurationManager.AppSettings["socialHost"];
 			//SocialClient.SetTarget (new Target (host, SocialProtocol.DefaultPort));
-		}
+		}*/
 
 		private static void PersonalSetup()
 		{

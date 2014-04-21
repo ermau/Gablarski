@@ -34,14 +34,12 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
+using System;
 using System.Windows;
-using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Interop;
 using Gablarski.Clients.Messages;
-using Gablarski.Clients.Persistence;
 using Gablarski.Clients.ViewModels;
-using Tempest;
-using Tempest.Social;
 
 namespace Gablarski.Clients.Windows
 {
@@ -50,12 +48,17 @@ namespace Gablarski.Clients.Windows
 	/// </summary>
 	public partial class MainWindow
 	{
+		//private static readonly ChatViewModel ChatViewModel = new ChatViewModel (Program.SocialClient, Program.History);
+
 		public MainWindow()
 		{
 			InitializeComponent();
-			DataContext = new MainWindowViewModel (Program.SocialClient, Program.Key.Result);
 
-			Messenger.Register<AddBuddyMessage> (OnAddBuddyMessage);
+
+			DataContext = new MainWindowViewModel (Program.Key.Result, windowHandle);
+
+			/*Messenger.Register<AddBuddyMessage> (OnAddBuddyMessage);
+			Messenger.Register<StartChatMessage> (OnStartChatMessage);*/
 		}
 
 		private void OnClickAcceptName (object sender, RoutedEventArgs e)
@@ -68,9 +71,20 @@ namespace Gablarski.Clients.Windows
 			
 		}
 
-		private void OnDoubleClickBuddy (object sender, MouseButtonEventArgs e)
+		/*
+		private void OnStartChatMessage (StartChatMessage startChatMessage)
 		{
-			
+			ChatViewModel chatVM = ChatViewModel;
+
+			var history = Program.History.GetMessages (startChatMessage.Group);
+			BindingOperations.EnableCollectionSynchronization (history, history);
+
+			var window = new ChatWindow {
+				DataContext = chatVM,
+				WindowStartupLocation = WindowStartupLocation.CenterScreen
+			};
+
+			window.Show();
 		}
 
 		private void OnAddBuddyMessage (AddBuddyMessage addBuddyMessage)
@@ -79,7 +93,7 @@ namespace Gablarski.Clients.Windows
 				Owner = this,
 				WindowStartupLocation = WindowStartupLocation.CenterOwner
 			}.Show();
-		}
+		}*/
 
 		private void OnServerDoubleClick (object sender, MouseButtonEventArgs e)
 		{

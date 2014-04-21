@@ -174,14 +174,8 @@
     <Compile Include="ActivationSlider.xaml.cs">
       <DependentUpon>ActivationSlider.xaml</DependentUpon>
     </Compile>
-    <Compile Include="AddBuddyWindow.xaml.cs">
-      <DependentUpon>AddBuddyWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="AvatarConverter.cs" />
     <Compile Include="CaseConverter.cs" />
-    <Compile Include="ChatWindow.xaml.cs">
-      <DependentUpon>ChatWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="EditBalloon.cs" />
     <Compile Include="BindingList.xaml.cs">
       <DependentUpon>BindingList.xaml</DependentUpon>
@@ -200,9 +194,6 @@
       <DependentUpon>CommentForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Extensions.cs" />
-    <Compile Include="GroupView.xaml.cs">
-      <DependentUpon>GroupView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="LoginForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -372,19 +363,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="AddBuddyWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="BindingList.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="ChatWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="GroupView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -430,10 +409,6 @@
     <ProjectReference Include="..\..\Gablarski\Gablarski.csproj">
       <Project>{7347052b-da5b-4cca-ab28-3963766e3cdb}</Project>
       <Name>Gablarski</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Tempest.Social\Desktop\Tempest.Social\Tempest.Social.csproj">
-      <Project>{0569ec5a-d715-4a46-a2a5-bbe5f06f56c0}</Project>
-      <Name>Tempest.Social</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Tempest.Social\Tempest\Desktop\Tempest\Tempest.csproj">
       <Project>{d6a2003c-cbb2-47b0-b306-521141d3068d}</Project>

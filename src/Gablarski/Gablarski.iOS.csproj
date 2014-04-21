@@ -169,10 +169,6 @@
     <Compile Include="Client\ClientUserManager.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Tempest.Social\iOS\Tempest.Social.iOS\Tempest.Social.iOS.csproj">
-      <Project>{db758ad2-4073-4512-8da9-90ab433b6437}</Project>
-      <Name>Tempest.Social.iOS</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Tempest.Social\Tempest\iOS\Tempest\Tempest.iOS.csproj">
       <Project>{7994a7c5-fbc5-486e-a345-0b7499a34589}</Project>
       <Name>Tempest.iOS</Name>

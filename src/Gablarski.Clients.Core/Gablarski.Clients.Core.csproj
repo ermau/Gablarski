@@ -91,7 +91,6 @@
     <Compile Include="AsyncValue.cs" />
     <Compile Include="AvatarCache.cs" />
     <Compile Include="AutomaticErrorReporter.cs" />
-    <Compile Include="ChatHistory.cs" />
     <Compile Include="CollectionView.cs" />
     <Compile Include="DefaultDevice.cs" />
     <Compile Include="ErrorManager.cs" />
@@ -109,7 +108,6 @@
     <Compile Include="Messages\AddBuddyMessage.cs" />
     <Compile Include="Messages\JoinServerMessage.cs" />
     <Compile Include="Messages\JoinVoiceMessage.cs" />
-    <Compile Include="Messages\StartChatMessage.cs" />
     <Compile Include="Modules.cs" />
     <Compile Include="Music\IControlMediaPlayer.cs" />
     <Compile Include="Input\IInputProvider.cs" />
@@ -133,16 +131,12 @@
     <Compile Include="Settings.cs" />
     <Compile Include="ClientDataSettingsProvider.cs" />
     <Compile Include="Updater.cs" />
-    <Compile Include="ViewModels\AddBuddyViewModel.cs" />
     <Compile Include="ViewModels\AudioCaptureSettingsViewModel.cs" />
     <Compile Include="ViewModels\AudioPlaybackSettingsViewModel.cs" />
     <Compile Include="ViewModels\BindingListViewModel.cs" />
-    <Compile Include="ViewModels\BuddyListViewModel.cs" />
     <Compile Include="ViewModels\ChannelViewModel.cs" />
-    <Compile Include="ViewModels\ChatViewModel.cs" />
     <Compile Include="ViewModels\CommandBindingViewModel.cs" />
     <Compile Include="ViewModels\DeviceViewModel.cs" />
-    <Compile Include="ViewModels\GroupViewModel.cs" />
     <Compile Include="ViewModels\InputSettingsViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\Messenger.cs" />
@@ -157,7 +151,6 @@
     <Compile Include="ViewModels\ServerListViewModel.cs" />
     <Compile Include="ViewModels\ServerViewModel.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />
-    <Compile Include="ViewModels\TextMessage.cs" />
     <Compile Include="ViewModels\UserViewModel.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
   </ItemGroup>
@@ -165,10 +158,6 @@
     <ProjectReference Include="..\Gablarski\Gablarski.csproj">
       <Project>{7347052b-da5b-4cca-ab28-3963766e3cdb}</Project>
       <Name>Gablarski</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Tempest.Social\Desktop\Tempest.Social\Tempest.Social.csproj">
-      <Project>{0569ec5a-d715-4a46-a2a5-bbe5f06f56c0}</Project>
-      <Name>Tempest.Social</Name>
     </ProjectReference>
     <ProjectReference Include="..\Tempest.Social\Tempest\Desktop\Tempest\Tempest.csproj">
       <Project>{d6a2003c-cbb2-47b0-b306-521141d3068d}</Project>

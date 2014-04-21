@@ -3,7 +3,6 @@
 		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 		xmlns:System="clr-namespace:System;assembly=mscorlib"
-		xmlns:Social="clr-namespace:Tempest.Social;assembly=Tempest.Social"
 		xmlns:Gablarski="clr-namespace:Gablarski.Clients.Windows"
 		xmlns:ComponentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
 		xmlns:metro="http://schemas.codeplex.com/elysium"

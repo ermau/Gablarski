@@ -1,4 +1,10 @@
-﻿// Copyright (c) 2014, Eric Maupin
+﻿//
+// ServerListViewModel.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2014, Eric Maupin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with

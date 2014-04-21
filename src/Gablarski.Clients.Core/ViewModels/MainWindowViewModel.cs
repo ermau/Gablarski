@@ -1,4 +1,10 @@
-﻿// Copyright (c) 2012-2014, Eric Maupin
+﻿//
+// MainWindowViewModel.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2012-2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -39,28 +45,29 @@ using System.Windows.Input;
 using Gablarski.Annotations;
 using Gablarski.Clients.Messages;
 using Tempest;
-using Tempest.Social;
 
 namespace Gablarski.Clients.ViewModels
 {
 	public class MainWindowViewModel
 		: ViewModelBase
 	{
-		public MainWindowViewModel ([NotNull] GablarskiSocialClient client, RSAAsymmetricKey key)
+		//public MainWindowViewModel ([NotNull] GablarskiSocialClient client, RSAAsymmetricKey key, IntPtr windowHandle)
+		public MainWindowViewModel (RSAAsymmetricKey key, IntPtr windowHandle)
 		{
+			/*
 			if (client == null)
-				throw new ArgumentNullException ("client");
+				throw new ArgumentNullException ("client");*/
 			if (key == null)
 				throw new ArgumentNullException ("key");
 
-			this.client = client;
+			Servers = new ServerListViewModel (key);
+
+			/*this.client = client;
 			this.buddyListViewModel = new BuddyListViewModel (client);
 			this.onlineFilter = new ObservableFilter<Person, WatchList> (this.client.WatchList, p => p.Status != Status.Offline);
 
-			Servers = new ServerListViewModel (key);
-
 			AddBuddy = new RelayCommand (() => Messenger.Send (new AddBuddyMessage()));
-			StartChat = new RelayCommand<Person> (OnStartChat);
+			StartChat = new RelayCommand<Person> (OnStartChat);*/
 		}
 
 		public ServerListViewModel Servers
@@ -69,6 +76,7 @@ namespace Gablarski.Clients.ViewModels
 			private set;
 		}
 
+		/*
 		public Person Persona
 		{
 			get { return this.client.Persona; }
@@ -77,7 +85,7 @@ namespace Gablarski.Clients.ViewModels
 		public BuddyListViewModel BuddyList
 		{
 			get { return this.buddyListViewModel; }
-		}
+		}*/
 
 		public ICommand AddBuddy
 		{
@@ -97,11 +105,11 @@ namespace Gablarski.Clients.ViewModels
 			private set;
 		}
 
-		private readonly ObservableFilter<Person, WatchList> onlineFilter;
+		/*private readonly ObservableFilter<Person, WatchList> onlineFilter;
 		private readonly GablarskiSocialClient client;
-		private readonly BuddyListViewModel buddyListViewModel;
+		private readonly BuddyListViewModel buddyListViewModel;*/
 
-		private async void OnStartChat (Person person)
+		/*private async void OnStartChat (Person person)
 		{
 			if (person == null)
 				return;
@@ -111,6 +119,6 @@ namespace Gablarski.Clients.ViewModels
 				return;
 
 			Messenger.Send (new StartChatMessage (group));
-		}
+		}*/
 	}
 }
