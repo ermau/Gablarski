@@ -1,4 +1,10 @@
-﻿// Copyright (c) 2009-2011, Eric Maupin
+﻿//
+// Settings.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2009-2011, Eric Maupin
 // Copyright (c) 2011-2014, Xamarin Inc.
 // All rights reserved.
 //
@@ -346,7 +352,7 @@ namespace Gablarski.Clients
 			}
 
 			await settings.SaveAsync().ConfigureAwait (false);
-			await LoadAsync().ConfigureAwait (false);
+			await settings.LoadAsync().ConfigureAwait (false);
 		}
 
 		private static ObservableCollection<CommandBinding> commandBindings;
