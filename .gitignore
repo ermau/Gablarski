@@ -7,3 +7,4 @@ _ReSharper*
 *.dotCover
 /.nuget/NuGet.exe
 /packages
+*.ide
