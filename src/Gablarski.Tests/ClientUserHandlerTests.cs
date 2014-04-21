@@ -326,5 +326,21 @@ namespace Gablarski.Tests
 
 			Assert.Fail ("UserKickedFromServer event was not fired.");
 		}
+
+		[Test]
+		public void JoinResultRaisesUserJoined()
+		{
+			bool raised = false;
+			var user = new UserInfo ("Nickname", "Phoenetic", 1, 1, false);
+			handler.UserJoined += (sender, args) => {
+				Assert.That (args.User, Is.EqualTo (user));
+				raised = true;
+			};
+
+			handler.OnJoinResultMessage (new MessageEventArgs<JoinResultMessage> (this.client,
+				new JoinResultMessage (LoginResultState.Success, user)));
+
+			Assert.That (raised, Is.True, "UserJoined was not raised");
+		}
 	}
 }

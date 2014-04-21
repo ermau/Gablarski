@@ -63,6 +63,7 @@ namespace Gablarski.Client
 			this.context.RegisterMessageHandler<UserDisconnectedMessage> (OnUserDisconnectedMessage);
 			this.context.RegisterMessageHandler<UserMutedMessage> (OnUserMutedMessage);
 			this.context.RegisterMessageHandler<UserKickedMessage> (OnUserKickedMessage);
+			this.context.RegisterMessageHandler<JoinResultMessage> (OnJoinResultMessage);
 		}
 
 		/// <summary>
@@ -257,6 +258,15 @@ namespace Gablarski.Client
 
 		private readonly ClientUserManager manager;
 		private readonly IGablarskiClientContext context;
+
+		internal void OnJoinResultMessage (MessageEventArgs<JoinResultMessage> e)
+		{
+			if (e.Message.Result != LoginResultState.Success)
+				return;
+
+			OnUserJoinedMessage (new MessageEventArgs<UserJoinedMessage> (e.Connection,
+				new UserJoinedMessage (e.Message.UserInfo)));
+		}
 
 		internal void OnUserKickedMessage (MessageEventArgs<UserKickedMessage> e)
 		{
