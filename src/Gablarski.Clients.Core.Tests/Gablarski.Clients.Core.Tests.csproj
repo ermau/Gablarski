@@ -65,15 +65,16 @@
       <Project>{7347052b-da5b-4cca-ab28-3963766e3cdb}</Project>
       <Name>Gablarski</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Tempest.Social\Tempest\Desktop\Tempest\Tempest.csproj">
+    <ProjectReference Include="..\Tempest\Desktop\Tempest\Tempest.csproj">
       <Project>{d6a2003c-cbb2-47b0-b306-521141d3068d}</Project>
       <Name>Tempest</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Tempest.Social\Tempest\Desktop\Tempest\Tests\Tempest.Tests.csproj">
+    <ProjectReference Include="..\Tempest\Desktop\Tempest\Tests\Tempest.Tests.csproj">
       <Project>{97d53dfa-634e-4595-9ae3-dc1bc8a5f553}</Project>
       <Name>Tempest.Tests</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

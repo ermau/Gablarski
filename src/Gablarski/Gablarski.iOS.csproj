@@ -169,12 +169,6 @@
     <Compile Include="Client\ClientUserManager.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Tempest.Social\Tempest\iOS\Tempest\Tempest.iOS.csproj">
-      <Project>{7994a7c5-fbc5-486e-a345-0b7499a34589}</Project>
-      <Name>Tempest.iOS</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Reference Include="Cadenza, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Tempest.Social\Libraries\Cadenza.dll</HintPath>
@@ -183,6 +177,12 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="monotouch" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Tempest\iOS\Tempest\Tempest.iOS.csproj">
+      <Project>{7994a7c5-fbc5-486e-a345-0b7499a34589}</Project>
+      <Name>Tempest.iOS</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.MonoTouch.CSharp.targets" />
 </Project>

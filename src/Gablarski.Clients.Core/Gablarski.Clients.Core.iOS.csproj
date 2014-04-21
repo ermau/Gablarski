@@ -88,7 +88,7 @@
       <Project>{3656abb0-669b-431a-b781-ff034facf096}</Project>
       <Name>Gablarski.iOS</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Tempest.Social\Tempest\iOS\Tempest\Tempest.iOS.csproj">
+    <ProjectReference Include="..\Tempest\iOS\Tempest\Tempest.iOS.csproj">
       <Project>{7994a7c5-fbc5-486e-a345-0b7499a34589}</Project>
       <Name>Tempest.iOS</Name>
     </ProjectReference>

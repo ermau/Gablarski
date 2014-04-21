@@ -1,3 +1,6 @@
 [submodule "src/Opus.NET"]
 	path = src/Opus.NET
 	url = https://github.com/ermau/Opus.NET.git
+[submodule "Tempest"]
+	path = src/Tempest
+	url = https://github.com/ermau/Tempest.git

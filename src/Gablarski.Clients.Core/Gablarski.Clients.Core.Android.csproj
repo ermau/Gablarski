@@ -95,10 +95,6 @@
       <Project>{1634fc7f-54f5-4836-8b80-b78619034809}</Project>
       <Name>Gablarski.Android</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Tempest.Social\Tempest\Android\Tempest\Tempest.Android.csproj">
-      <Project>{a876af1d-c592-4a50-957d-2eb3eb4be361}</Project>
-      <Name>Tempest.Android</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

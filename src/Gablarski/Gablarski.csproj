@@ -276,7 +276,7 @@
       <Project>{838bdb0b-5eb1-4c1e-9026-0a8842ac00c6}</Project>
       <Name>OpusWrapper</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Tempest.Social\Tempest\Desktop\Tempest\Tempest.csproj">
+    <ProjectReference Include="..\Tempest\Desktop\Tempest\Tempest.csproj">
       <Project>{d6a2003c-cbb2-47b0-b306-521141d3068d}</Project>
       <Name>Tempest</Name>
     </ProjectReference>
