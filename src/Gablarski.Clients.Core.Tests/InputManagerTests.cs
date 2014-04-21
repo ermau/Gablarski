@@ -1,17 +1,11 @@
-﻿//
-// ServerListViewModelTests.cs
-//
-// Author:
-//   Eric Maupin <me@ermau.com>
-//
-// Copyright (c) 2014, Xamarin Inc.
+﻿// Copyright (c) 2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
 // or without modification, are permitted provided that
 // the following conditions are met:
 //
-// - Redistributions of source code must retain the above
+// - Redistributions of source code must retain the above 
 //   copyright notice, this list of conditions and the
 //   following disclaimer.
 //
@@ -41,18 +35,21 @@
 // DAMAGE.
 
 using System;
-using Gablarski.Clients.ViewModels;
+using Gablarski.Clients.Input;
+using Gablarski.Tests;
 using NUnit.Framework;
 
 namespace Gablarski.Clients.Core.Tests
 {
 	[TestFixture]
-	public class ServerListViewModelTests
+	public class InputManagerTests
 	{
 		[Test]
 		public void CtorNull()
 		{
-			Assert.That (() => new ServerListViewModel (null, IntPtr.Zero), Throws.InstanceOf<ArgumentNullException>());
+			Assert.That (() => new InputManager (null, new IInputProvider[0], new ISpeechRecognizer[0]), Throws.TypeOf<ArgumentNullException>());
+			Assert.That (() => new InputManager (MockClientContext.Create(), null, new ISpeechRecognizer[0]), Throws.TypeOf<ArgumentNullException>());
+			Assert.That (() => new InputManager (MockClientContext.Create(), new IInputProvider[0], null), Throws.TypeOf<ArgumentNullException>());
 		}
 	}
 }

@@ -60,7 +60,8 @@ namespace Gablarski.Clients.ViewModels
 			if (key == null)
 				throw new ArgumentNullException ("key");
 
-			Servers = new ServerListViewModel (key);
+			this.windowHandle = windowHandle;
+			Servers = new ServerListViewModel (key, windowHandle);
 
 			/*this.client = client;
 			this.buddyListViewModel = new BuddyListViewModel (client);
@@ -108,6 +109,7 @@ namespace Gablarski.Clients.ViewModels
 		/*private readonly ObservableFilter<Person, WatchList> onlineFilter;
 		private readonly GablarskiSocialClient client;
 		private readonly BuddyListViewModel buddyListViewModel;*/
+		private readonly IntPtr windowHandle;
 
 		/*private async void OnStartChat (Person person)
 		{

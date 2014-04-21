@@ -53,12 +53,13 @@ namespace Gablarski.Clients.ViewModels
 	public class ServerViewModel
 		: ViewModelBase
 	{
-		public ServerViewModel (IGablarskiClientContext clientContext)
+		public ServerViewModel (IGablarskiClientContext clientContext, IntPtr windowHandle)
 		{
 			if (clientContext == null)
 				throw new ArgumentNullException ("clientContext");
 
 			this.clientContext = clientContext;
+			this.windowHandle = windowHandle;
 
 			BindingOperations.EnableCollectionSynchronization (this.clientContext.Channels, this.clientContext.Channels.SyncContext);
 
@@ -112,13 +113,21 @@ namespace Gablarski.Clients.ViewModels
 			if (ConnectionResult.Result != Tempest.ConnectionResult.Success)
 				return;
 
-			await this.clientContext.CurrentUser.JoinAsync (entry.UserNickname, entry.UserPhonetic, entry.ServerPassword);
+			Task<LoginResultState> joinTask = this.clientContext.CurrentUser.JoinAsync (entry.UserNickname, entry.UserPhonetic, entry.ServerPassword);
+
+			this.input = new InputManager (this.clientContext, Modules.Input, Modules.SpeechRecognizers);
+
+			// TODO failed joins
+			await joinTask;
+			await this.input.SetupInputAsync (this.windowHandle);
 
 			IsConnecting = false;
 		}
 
 		private readonly IGablarskiClientContext clientContext;
+		private readonly IntPtr windowHandle;
 		private bool isConnecting;
 		private ClientConnectionResult connectionResult;
+		private InputManager input;
 	}
 }

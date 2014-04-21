@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="ClientContextBasedTests.cs" />
     <Compile Include="ErrorManagerTests.cs" />
+    <Compile Include="InputManagerTests.cs" />
     <Compile Include="Messages\JoinServerMessageTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SelectedObservableCollectionTests.cs" />

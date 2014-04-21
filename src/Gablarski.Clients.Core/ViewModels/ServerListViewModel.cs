@@ -54,14 +54,16 @@ namespace Gablarski.Clients.ViewModels
 		: ViewModelBase
 	{
 		private readonly RSAAsymmetricKey key;
+		private readonly IntPtr windowHandle;
 		private ServerViewModel currentServer;
 
-		public ServerListViewModel (RSAAsymmetricKey key)
+		public ServerListViewModel (RSAAsymmetricKey key, IntPtr windowHandle)
 		{
 			if (key == null)
 				throw new ArgumentNullException ("key");
 
 			this.key = key;
+			this.windowHandle = windowHandle;
 			Servers = new AsyncValue<IEnumerable<ServerEntryViewModel>> (
 				ClientData.GetServersAsync().ContinueWith (t => t.Result.Select (se => new ServerEntryViewModel (key, se))),
 				Enumerable.Empty<ServerEntryViewModel>());
@@ -94,7 +96,7 @@ namespace Gablarski.Clients.ViewModels
 				throw new InvalidOperationException ("Can not join a server while one is already active");
 
 			var client = new GablarskiClient (this.key);
-			CurrentServer = new ServerViewModel (client);
+			CurrentServer = new ServerViewModel (client, this.windowHandle);
 
 			await CurrentServer.JoinAsync (msg.Server);
 		}

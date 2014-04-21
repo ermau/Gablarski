@@ -54,6 +54,7 @@ namespace Gablarski.Clients.Windows
 		{
 			InitializeComponent();
 
+			IntPtr windowHandle = new WindowInteropHelper (this).EnsureHandle();
 
 			DataContext = new MainWindowViewModel (Program.Key.Result, windowHandle);
 
