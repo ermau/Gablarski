@@ -1,4 +1,11 @@
-// Copyright (c) 2011-2013, Eric Maupin
+//
+// ClientData.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2009-2011, Eric Maupin
+// Copyright (c) 2011-2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -209,7 +216,9 @@ namespace Gablarski.Clients.Persistence
 			DbFile.Refresh();
 			
 			db.Open();
+
 			await CreateTablesAsync().ConfigureAwait (false);
+			await Settings.LoadAsync().ConfigureAwait (false);
 			
 			return true;
 		}

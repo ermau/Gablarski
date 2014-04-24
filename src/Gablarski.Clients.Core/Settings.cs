@@ -1,4 +1,10 @@
-﻿// Copyright (c) 2009-2011, Eric Maupin
+﻿//
+// Settings.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2009-2011, Eric Maupin
 // Copyright (c) 2011-2014, Xamarin Inc.
 // All rights reserved.
 //
@@ -52,11 +58,6 @@ namespace Gablarski.Clients
 {
 	public static class Settings
 	{
-		static Settings()
-		{
-			settings.PropertyChanged += (sender, args) => OnSettingsChanged (args.PropertyName);
-		}
-
 		public static event PropertyChangedEventHandler SettingChanged;
 
 		public static bool FirstRun
@@ -314,6 +315,9 @@ namespace Gablarski.Clients
 
 		public static async Task LoadAsync()
 		{
+			if (settings == null)
+				throw new InvalidOperationException ("Attempting to load settings without set provider");
+
 			await settings.LoadAsync().ConfigureAwait (false);
 
 			commandBindings = new ObservableCollection<CommandBinding>();
@@ -326,6 +330,26 @@ namespace Gablarski.Clients
 
 				commandBindings.Add (new CommandBinding (provider, cbe.Command, cbe.Input));
 			}
+		}
+
+		public static Task LoadAsync (ISettingsProvider settingsProvider)
+		{
+			if (settingsProvider == null)
+				throw new ArgumentNullException ("settingsProvider");
+
+			if (settings != null) {
+				settings.PropertyChanged -= OnSettingsPropertyChanged;
+			}
+
+			settings = settingsProvider;
+			settings.PropertyChanged += OnSettingsPropertyChanged;
+			
+			return LoadAsync();
+		}
+
+		private static void OnSettingsPropertyChanged (object sender, PropertyChangedEventArgs e)
+		{
+			OnSettingsChanged (e.PropertyName);
 		}
 
 		public static async Task SaveAsync()
@@ -346,11 +370,11 @@ namespace Gablarski.Clients
 			}
 
 			await settings.SaveAsync().ConfigureAwait (false);
-			await LoadAsync().ConfigureAwait (false);
+			await settings.LoadAsync().ConfigureAwait (false);
 		}
 
 		private static ObservableCollection<CommandBinding> commandBindings;
-		private static readonly ClientDataSettingsProvider settings = new ClientDataSettingsProvider();
+		private static ISettingsProvider settings;
 
 		private static void OnCommandBindingsChanged (object sender, NotifyCollectionChangedEventArgs e)
 		{

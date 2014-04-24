@@ -1,4 +1,10 @@
-﻿// Copyright (c) 2013, Eric Maupin
+﻿//
+// ISettingsProvider.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2013, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
