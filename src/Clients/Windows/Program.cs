@@ -12,7 +12,7 @@
 // or without modification, are permitted provided that
 // the following conditions are met:
 //
-// - Redistributions of source code must retain the above 
+// - Redistributions of source code must retain the above
 //   copyright notice, this list of conditions and the
 //   following disclaimer.
 //
@@ -179,7 +179,7 @@ namespace Gablarski.Clients.Windows
 			Task dataSetup = ClientData.SetupAsync (useLocal);
 
 			Task loadSettings = dataSetup.ContinueWith (async t => {
-				await Settings.LoadAsync().ConfigureAwait (false);
+				await Settings.LoadAsync (new ClientDataSettingsProvider()).ConfigureAwait (false);
 				await ClientData.CheckForUpdatesAsync().ConfigureAwait (false);
 			}).Unwrap();
 
