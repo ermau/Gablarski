@@ -1,11 +1,18 @@
-﻿// Copyright (c) 2011-2013, Eric Maupin
+﻿//
+// BindingListViewModel.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2011, Eric Maupin
+// Copyright (c) 2013-2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
 // or without modification, are permitted provided that
 // the following conditions are met:
 //
-// - Redistributions of source code must retain the above 
+// - Redistributions of source code must retain the above
 //   copyright notice, this list of conditions and the
 //   following disclaimer.
 //
@@ -37,8 +44,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Gablarski.Clients.Persistence;
 using Gablarski.Clients.Input;
@@ -46,7 +53,7 @@ using Gablarski.Clients.Input;
 namespace Gablarski.Clients.ViewModels
 {
 	public class BindingListViewModel
-		: INotifyPropertyChanged
+		: BusyViewModel
 	{
 		private readonly IntPtr window;
 
@@ -60,8 +67,6 @@ namespace Gablarski.Clients.ViewModels
 			RemoveCommand = new RelayCommand<CommandBindingViewModel> (b => this.bindings.Remove (b));
 		}
 
-		public event PropertyChangedEventHandler PropertyChanged;
-
 		private IInputProvider inputProvider;
 		public IInputProvider InputProvider
 		{
@@ -71,24 +76,27 @@ namespace Gablarski.Clients.ViewModels
 				if (this.inputProvider == value)
 					return;
 
-				if (this.inputProvider != null)
-				{
+				if (this.inputProvider != null) {
 					this.inputProvider.Detach();
 					this.inputProvider.Dispose();
 				}
 
 				this.inputProvider = value;
+				OnPropertyChanged();
+
 				if (this.inputProvider == null)
 					return;
 
-				this.inputProvider.AttachAsync (this.window).Wait();
-				OnPropertyChanged (new PropertyChangedEventArgs ("InputProvider"));
+				IsBusy = true;
 
-				this.bindings = new ObservableCollection<CommandBindingViewModel> (ClientData.GetCommandBindings()
-					.Where (b => value.GetType().GetSimpleName() == b.ProviderType)
-					.Select (b => new CommandBindingViewModel (value, b)));
+				this.inputProvider.AttachAsync (this.window).ContinueWith (t => {
+					this.bindings = new ObservableCollection<CommandBindingViewModel> (ClientData.GetCommandBindings()
+						.Where (b => value.GetType().GetSimpleName() == b.ProviderType)
+						.Select (b => new CommandBindingViewModel (value, b)));
 
-				OnPropertyChanged (new PropertyChangedEventArgs ("Bindings"));
+					OnPropertyChanged ("Bindings");
+					IsBusy = false;
+				}, TaskScheduler.FromCurrentSynchronizationContext());
 			}
 		}
 
@@ -121,13 +129,6 @@ namespace Gablarski.Clients.ViewModels
 		}
 
 		private ObservableCollection<CommandBindingViewModel> bindings;
-
-		private void OnPropertyChanged (PropertyChangedEventArgs e)
-		{
-			PropertyChangedEventHandler handler = PropertyChanged;
-			if (handler != null)
-				handler (this, e);
-		}
 
 		internal static string SpaceEnum (string enumName)
 		{
