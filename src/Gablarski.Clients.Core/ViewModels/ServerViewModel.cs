@@ -115,7 +115,7 @@ namespace Gablarski.Clients.ViewModels
 
 			Task<LoginResultState> joinTask = this.clientContext.CurrentUser.JoinAsync (entry.UserNickname, entry.UserPhonetic, entry.ServerPassword);
 
-			this.input = new InputManager (this.clientContext, Modules.Input, Modules.SpeechRecognizers);
+			this.input = new InputManager (this.clientContext);
 
 			// TODO failed joins
 			await joinTask;

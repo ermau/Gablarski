@@ -1,11 +1,17 @@
-﻿// Copyright (c) 2013, Eric Maupin
+﻿//
+// AudioCaptureSettingsViewModel.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2013-2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
 // or without modification, are permitted provided that
 // the following conditions are met:
 //
-// - Redistributions of source code must retain the above 
+// - Redistributions of source code must retain the above
 //   copyright notice, this list of conditions and the
 //   following disclaimer.
 //
@@ -37,30 +43,35 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Gablarski.Audio;
 
 namespace Gablarski.Clients.ViewModels
 {
 	public class AudioCaptureSettingsViewModel
-		: ViewModelBase
+		: BusyViewModel
 	{
 		public AudioCaptureSettingsViewModel()
 		{
-			CaptureProviders = Modules.Capture;
+			IsBusy = true;
 
-			IAudioCaptureProvider savedCaptureProvider = Modules.Capture.FirstOrDefault (p => p.GetType().GetSimpleName() == Settings.VoiceProvider);
-			if (savedCaptureProvider == null)
-				CurrentCaptureProvider = Modules.Capture.FirstOrDefault();
-			else {
-				CurrentCaptureProvider = savedCaptureProvider;
+			var getSelectedProvider = Modules.GetImplementerOrDefaultAsync<IAudioCaptureProvider> (Settings.VoiceProvider);
 
-				if (Settings.VoiceDevice != null)
-				{
-					var setDevice = CaptureDevices.FirstOrDefault (d => d.Device.Name == Settings.VoiceDevice);
-					if (setDevice != null)
-						CurrentCaptureDevice = setDevice;
-				}
-			}
+			Modules.GetImplementersAsync<IAudioCaptureProvider>().ContinueWith (t => {
+				CaptureProviders = t.Result;
+
+				getSelectedProvider.ContinueWith (st => {
+					CurrentCaptureProvider = st.Result;
+
+					if (Settings.VoiceDevice != null) {
+						var setDevice = CaptureDevices.FirstOrDefault (d => d.Device.Name == Settings.VoiceDevice);
+						if (setDevice != null)
+							CurrentCaptureDevice = setDevice;
+					}
+
+					IsBusy = false;
+				});
+			}, TaskScheduler.FromCurrentSynchronizationContext());
 
 			VoiceActivationThreshold = Settings.VoiceActivationLevel;
 			VoiceActivationSilenceThreshold = Settings.VoiceActivationContinueThreshold / 100;

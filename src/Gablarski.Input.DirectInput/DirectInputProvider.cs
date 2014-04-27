@@ -1,11 +1,18 @@
-﻿// Copyright (c) 2011-2013, Eric Maupin
+﻿//
+// DirectInputProvider.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2009-2011, Eric Maupin
+// Copyright (c) 2011-2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
 // or without modification, are permitted provided that
 // the following conditions are met:
 //
-// - Redistributions of source code must retain the above 
+// - Redistributions of source code must retain the above
 //   copyright notice, this list of conditions and the
 //   following disclaimer.
 //
@@ -36,7 +43,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.Threading;
 using System.Threading.Tasks;
 using Gablarski.Clients.Input;
@@ -44,7 +50,6 @@ using SharpDX.DirectInput;
 
 namespace Gablarski.Input.DirectInput
 {
-	[Export (typeof (IInputProvider))]
 	public class DirectInputProvider
 		: IInputProvider
 	{
@@ -232,7 +237,7 @@ namespace Gablarski.Input.DirectInput
 
 			if (device == null)
 				return "Unknown Device";
-			
+
 			return GetNiceInputName (parts[1], device);
 		}
 
@@ -516,7 +521,7 @@ namespace Gablarski.Input.DirectInput
 									Dictionary<int, Command> binds;
 									if (!this.joystickBindings.TryGetValue (d.Information.InstanceGuid, out binds) || binds.Count == 0)
 										continue;
-									 
+
 									Command c;
 									if (!binds.TryGetValue (update.RawOffset, out c))
 										continue;

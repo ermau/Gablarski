@@ -1,11 +1,18 @@
-﻿// Copyright (c) 2011, Eric Maupin
+﻿//
+// iTunesIntegration.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2009-2011, Eric Maupin
+// Copyright (c) 2011-2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
 // or without modification, are permitted provided that
 // the following conditions are met:
 //
-// - Redistributions of source code must retain the above 
+// - Redistributions of source code must retain the above
 //   copyright notice, this list of conditions and the
 //   following disclaimer.
 //
@@ -35,7 +42,6 @@
 // DAMAGE.
 
 using System;
-using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -44,22 +50,20 @@ using iTunesLib;
 
 namespace Gablarski.iTunes
 {
-	[Export (typeof(IMediaPlayer))]
-	[Export (typeof(IControlMediaPlayer))]
 	public class iTunesIntegration
 		: IControlMediaPlayer
 	{
+		public string Name
+		{
+			get { return "iTunes"; }
+		}
+
 		/// <summary>
 		/// Gets whether or not the media player is currently running.
 		/// </summary>
 		public bool IsRunning
 		{
 			get { return Process.GetProcessesByName ("itunes").Any(); }
-		}
-
-		public string Name
-		{
-			get { return "iTunes"; }
 		}
 
 		public string SongName

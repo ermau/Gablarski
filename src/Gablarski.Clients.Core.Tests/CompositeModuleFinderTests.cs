@@ -1,5 +1,5 @@
 ﻿//
-// ErrorManager.cs
+// CompositeModuleFinderTests.cs
 //
 // Author:
 //   Eric Maupin <me@ermau.com>
@@ -41,73 +41,63 @@
 // DAMAGE.
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using Cadenza.Collections;
+using System.Threading.Tasks;
+using NUnit.Framework;
+using NUnit.Framework.Constraints;
 
-namespace Gablarski.Clients
+namespace Gablarski.Clients.Core.Tests
 {
-	public sealed class ErrorManager
-		: INotifyDataErrorInfo
+	[TestFixture]
+	public class CompositeModuleFinderTests
 	{
-		public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
-
-		public bool HasErrors
+		[Test]
+		public void CtorNull()
 		{
-			get { return this.errors.Count > 0; }
+			Assert.That (() => new CompositeModuleFinder (null), Throws.InstanceOf<ArgumentNullException>());
 		}
 
-		public void AddError (string propertyName, string error)
+		class MockModuleFinder
+			: IModuleFinder
 		{
-			if (error == null)
-				throw new ArgumentNullException ("error");
+			private readonly Type[] typesToFind;
 
-			if (!this.errors[propertyName].Contains (error)) {
-				this.errors.Add (propertyName, error);
-				OnErrorsChanged (new DataErrorsChangedEventArgs (propertyName));
+			public MockModuleFinder (params Type[] typesToFind)
+			{
+				this.typesToFind = typesToFind;
+			}
+
+			public Task<IReadOnlyCollection<Type>> LoadExportsAsync<TContract>()
+			{
+				return Task.FromResult<IReadOnlyCollection<Type>> (this.typesToFind);
 			}
 		}
 
-		public void RemoveError (string propertyName, string error)
+		[Test]
+		public async Task LoadExports()
 		{
-			if (error == null)
-				throw new ArgumentNullException ("error");
+			var finder1 = new MockModuleFinder (typeof (MockModuleFinder));
+			var finder2 = new MockModuleFinder (typeof (CompositeModuleFinder));
 
-			if (this.errors.Remove (propertyName, error))
-				OnErrorsChanged (new DataErrorsChangedEventArgs (propertyName));
+			var composite = new CompositeModuleFinder (finder1, finder2);
+
+			var exports = await composite.LoadExportsAsync<IModuleFinder>();
+			Assert.That (exports, Contains.Item (typeof (MockModuleFinder)));
+			Assert.That (exports, Contains.Item (typeof (CompositeModuleFinder)));
 		}
 
-		public void ClearErrors()
+		[Test]
+		public async Task LoadExportsNoDuplicates()
 		{
-			foreach (IGrouping<string, string> group in this.errors) {
-				ClearErrors (group.Key);
-			}
-		}
+			var finder1 = new MockModuleFinder (typeof (MockModuleFinder), typeof (CompositeModuleFinder));
+			var finder2 = new MockModuleFinder (typeof (CompositeModuleFinder), typeof (MockModuleFinder));
 
-		public void ClearErrors (string propertyName)
-		{
-			if (this.errors.Remove (propertyName))
-				OnErrorsChanged (new DataErrorsChangedEventArgs (propertyName));
-		}
+			var composite = new CompositeModuleFinder (finder1, finder2);
 
-		public IEnumerable GetErrors (string propertyName)
-		{
-			IEnumerable<string> propertyErrors;
-			if (this.errors.TryGetValues (propertyName, out propertyErrors))
-				return propertyErrors;
-
-			return Enumerable.Empty<string>();
-		}
-
-		private readonly MutableLookup<string, string> errors = new MutableLookup<string, string>();
-
-		private void OnErrorsChanged (DataErrorsChangedEventArgs e)
-		{
-			EventHandler<DataErrorsChangedEventArgs> handler = this.ErrorsChanged;
-			if (handler != null)
-				handler (this, e);
+			var exports = await composite.LoadExportsAsync<IModuleFinder>();
+			Assert.That (exports, Contains.Item (typeof (MockModuleFinder)));
+			Assert.That (exports, Contains.Item (typeof (CompositeModuleFinder)));
+			Assert.That (exports, new UniqueItemsConstraint());
 		}
 	}
 }

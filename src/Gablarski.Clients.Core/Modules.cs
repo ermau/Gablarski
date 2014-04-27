@@ -1,11 +1,18 @@
-﻿// Copyright (c) 2011, Eric Maupin
+﻿//
+// Modules.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2009-2011, Eric Maupin
+// Copyright (c) 2011-2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
 // or without modification, are permitted provided that
 // the following conditions are met:
 //
-// - Redistributions of source code must retain the above 
+// - Redistributions of source code must retain the above
 //   copyright notice, this list of conditions and the
 //   following disclaimer.
 //
@@ -34,127 +41,128 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.ComponentModel.Composition.Hosting;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
 using Gablarski.Audio;
 using Gablarski.Clients.Input;
 using Gablarski.Clients.Media;
 
 namespace Gablarski.Clients
 {
-	public class Modules
+	public static class Modules
 	{
-		private Modules()
+		public static void Init (IModuleFinder finder)
 		{
-			new CompositionContainer(new DirectoryCatalog (".")).ComposeParts (this);
+			if (finder == null)
+				throw new ArgumentNullException ("finder");
+
+			Retrievers.Clear();
+			Instances.Clear();
+
+			moduleFinder = finder;
+
+			Prelaunch<IInputProvider>();
+			Prelaunch<IAudioPlaybackProvider>();
+			Prelaunch<IAudioCaptureProvider>();
+			Prelaunch<IMediaPlayer>();
+			Prelaunch<INotifier>();
+			Prelaunch<ITextToSpeech>();
+			Prelaunch<ISpeechRecognizer>();
 		}
 
-		public static void Reload()
+		public static async Task<TContract> GetImplementerOrDefaultAsync<TContract> (string simpleName)
 		{
-			modules.Recompose();
+			List<object> instances;
+			if (!Instances.TryGetValue (typeof (TContract), out instances)) {
+				IEnumerable<Type> types = await GetLoadTask<TContract>().ConfigureAwait (false);
+				instances = Instances.GetOrAdd (typeof (TContract), t => new List<object> { CreateSpecificInstance<TContract> (simpleName, types) });
+				return (TContract)instances[0];
+			}
+
+			TContract instance = (TContract)instances.FirstOrDefault (o => o.GetType().GetSimpleName() == simpleName);
+			if (Equals (instance, default(TContract))) {
+				var types = await GetLoadTask<TContract>().ConfigureAwait (false);
+				lock (instances) {
+					instance = CreateSpecificInstance<TContract> (simpleName, types);
+					instances.Add (instance);
+				}
+			}
+
+			return instance;
 		}
 
-		public static IEnumerable<IInputProvider> Input
+		public static async Task<TContract> GetImplementerAsync<TContract> (string simpleName)
 		{
-			get { return modules.input; }
+			TContract instance = await GetImplementerOrDefaultAsync<TContract> (simpleName);
+			if (instance.GetType().GetSimpleName() != simpleName)
+				return default(TContract);
+
+			return instance;
 		}
 
-		public static IEnumerable<IAudioPlaybackProvider> Playback
+		public static async Task<IReadOnlyCollection<TContract>> GetImplementersAsync<TContract>()
 		{
-			get { return modules.playback; }
+			List<TContract> instances = new List<TContract>();
+
+			List<object> existingInstances = Instances.GetOrAdd (typeof (TContract), t => new List<object>());
+
+			var types = await GetLoadTask<TContract>().ConfigureAwait (false);
+			lock (existingInstances) {
+				foreach (Type type in types) {
+					TContract instance = existingInstances.Cast<TContract>().FirstOrDefault (i => i.GetType() == type);
+
+					if (Equals (instances, default(TContract)))
+						instances.Add ((TContract) Activator.CreateInstance (type));
+					else
+						instances.Add (instance);
+				}
+			}
+
+			return instances;
 		}
 
-		public static IEnumerable<IAudioCaptureProvider> Capture
+		public static Task<IReadOnlyCollection<Type>> GetModulesFor<T>()
 		{
-			get { return modules.capture; }
+			return GetLoadTask<T>();
 		}
 
-		public static IEnumerable<IAudioEngine> AudioEngines
+		private static IModuleFinder moduleFinder;
+		private static readonly ConcurrentDictionary<Type, Task<IReadOnlyCollection<Type>>> Retrievers = new ConcurrentDictionary<Type, Task<IReadOnlyCollection<Type>>>();
+		private static readonly ConcurrentDictionary<Type, List<object>> Instances = new ConcurrentDictionary<Type, List<object>>();
+
+		private static void Prelaunch<TContract>()
 		{
-			get { return modules.audioEngines; }
+			Retrievers.GetOrAdd (typeof (TContract), t => moduleFinder.LoadExportsAsync<TContract>());
 		}
 
-		public static IEnumerable<IMediaPlayer> MediaPlayers
+		private static Task<IReadOnlyCollection<Type>> GetLoadTask<TContract>()
 		{
-			get { return modules.mediaPlayers; }
+			return Retrievers.GetOrAdd (typeof (TContract), t => moduleFinder.LoadExportsAsync<TContract>());
 		}
 
-		public static IEnumerable<INotifier> Notifiers
+		private static Type GetImplementerType (string simpleName, IEnumerable<Type> modules)
 		{
-			get { return modules.notifiers; }
+			if (!String.IsNullOrWhiteSpace (simpleName))
+				modules = modules.Where (t => t.GetSimpleName() == simpleName);
+
+			Type moduleType = modules.FirstOrDefault();
+			if (moduleType == null)
+				return null;
+
+			return moduleType;
 		}
 
-		public static IEnumerable<ITextToSpeech> TextToSpeech
+		private static TContract CreateSpecificInstance<TContract> (string simpleName, IEnumerable<Type> modules)
 		{
-			get { return modules.tts; }
-		}
+			Type moduleType = GetImplementerType (simpleName, modules);
+			if (moduleType == null)
+				return default(TContract);
 
-		public static IEnumerable<ISpeechRecognizer> SpeechRecognizers
-		{
-			get { return modules.speechRecognizers; }
-		}
-
-		private static readonly Modules modules = new Modules();
-
-		[ImportMany (AllowRecomposition = true)]
-		private IEnumerable<ITextToSpeech> tts
-		{
-			get;
-			set;
-		}
-
-		[ImportMany (AllowRecomposition = true)]
-		private IEnumerable<IInputProvider> input
-		{
-			get;
-			set;
-		}
-
-		[ImportMany (AllowRecomposition = true)]
-		private IEnumerable<IAudioEngine> audioEngines
-		{
-			get;
-			set;
-		}
-
-		[ImportMany (AllowRecomposition = true)]
-		private IEnumerable<INotifier> notifiers
-		{
-			get;
-			set;
-		}
-
-		[ImportMany (AllowRecomposition = true)]
-		private IEnumerable<IMediaPlayer> mediaPlayers
-		{
-			get;
-			set;
-		}
-
-		[ImportMany (AllowRecomposition = true)]
-		private IEnumerable<IAudioCaptureProvider> capture
-		{
-			get;
-			set;
-		}
-
-		[ImportMany (AllowRecomposition = true)]
-		private IEnumerable<IAudioPlaybackProvider> playback
-		{
-			get;
-			set;
-		}
-
-		[ImportMany (AllowRecomposition = true)]
-		private IEnumerable<ISpeechRecognizer> speechRecognizers
-		{
-			get;
-			set;
-		}
-
-		private void Recompose()
-		{
+			return (TContract) Activator.CreateInstance (moduleType);
 		}
 	}
 }

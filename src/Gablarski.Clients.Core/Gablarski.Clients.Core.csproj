@@ -65,7 +65,6 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
-    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -96,11 +95,11 @@
     <Compile Include="DefaultDevice.cs" />
     <Compile Include="AssemblyModuleFinder.cs" />
     <Compile Include="ErrorManager.cs" />
+    <Compile Include="INamedComponent.cs" />
     <Compile Include="ModuleAttribute.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="GablarskiErrorReporter.cs" />
     <Compile Include="IErrorReporter.cs" />
-    <Compile Include="INamedComponent.cs" />
     <Compile Include="IModuleFinder.cs" />
     <Compile Include="INotifier.cs" />
     <Compile Include="InputManager.cs" />

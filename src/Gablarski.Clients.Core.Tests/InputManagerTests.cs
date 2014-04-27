@@ -5,7 +5,7 @@
 // or without modification, are permitted provided that
 // the following conditions are met:
 //
-// - Redistributions of source code must retain the above 
+// - Redistributions of source code must retain the above
 //   copyright notice, this list of conditions and the
 //   following disclaimer.
 //
@@ -35,8 +35,6 @@
 // DAMAGE.
 
 using System;
-using Gablarski.Clients.Input;
-using Gablarski.Tests;
 using NUnit.Framework;
 
 namespace Gablarski.Clients.Core.Tests
@@ -47,9 +45,7 @@ namespace Gablarski.Clients.Core.Tests
 		[Test]
 		public void CtorNull()
 		{
-			Assert.That (() => new InputManager (null, new IInputProvider[0], new ISpeechRecognizer[0]), Throws.TypeOf<ArgumentNullException>());
-			Assert.That (() => new InputManager (MockClientContext.Create(), null, new ISpeechRecognizer[0]), Throws.TypeOf<ArgumentNullException>());
-			Assert.That (() => new InputManager (MockClientContext.Create(), new IInputProvider[0], null), Throws.TypeOf<ArgumentNullException>());
+			Assert.That (() => new InputManager (null), Throws.TypeOf<ArgumentNullException>());
 		}
 	}
 }
