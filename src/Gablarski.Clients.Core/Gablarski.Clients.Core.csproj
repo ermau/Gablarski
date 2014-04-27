@@ -92,12 +92,16 @@
     <Compile Include="AvatarCache.cs" />
     <Compile Include="AutomaticErrorReporter.cs" />
     <Compile Include="CollectionView.cs" />
+    <Compile Include="CompositeModuleFinder.cs" />
     <Compile Include="DefaultDevice.cs" />
+    <Compile Include="AssemblyModuleFinder.cs" />
     <Compile Include="ErrorManager.cs" />
+    <Compile Include="ModuleAttribute.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="GablarskiErrorReporter.cs" />
     <Compile Include="IErrorReporter.cs" />
     <Compile Include="INamedComponent.cs" />
+    <Compile Include="IModuleFinder.cs" />
     <Compile Include="INotifier.cs" />
     <Compile Include="InputManager.cs" />
     <Compile Include="Input\Command.cs" />
