@@ -126,8 +126,15 @@ namespace Gablarski.Clients.ViewModels
 
 		public IEnumerable<IAudioCaptureProvider> CaptureProviders
 		{
-			get;
-			private set;
+			get { return this.captureProviders; }
+			private set
+			{
+				if (this.captureProviders == value)
+					return;
+
+				this.captureProviders = value;
+				OnPropertyChanged();
+			}
 		}
 
 		private IAudioCaptureProvider currentCaptureProvider;
@@ -304,5 +311,6 @@ namespace Gablarski.Clients.ViewModels
 		private VoiceActivation activation;
 		private bool isActivating;
 		private int activationLevel;
+		private IEnumerable<IAudioCaptureProvider> captureProviders;
 	}
 }
