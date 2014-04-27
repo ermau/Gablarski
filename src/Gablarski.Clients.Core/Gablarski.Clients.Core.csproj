@@ -143,6 +143,7 @@
     <Compile Include="ViewModels\CommandBindingViewModel.cs" />
     <Compile Include="ViewModels\DeviceViewModel.cs" />
     <Compile Include="ViewModels\InputSettingsViewModel.cs" />
+    <Compile Include="ViewModels\BusyViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\Messenger.cs" />
     <Compile Include="ViewModels\MusicSettingsViewModel.cs" />
