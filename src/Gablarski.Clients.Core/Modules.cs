@@ -76,11 +76,17 @@ namespace Gablarski.Clients
 
 		public static async Task<TContract> GetImplementerOrDefaultAsync<TContract> (string simpleName)
 		{
+			if (moduleFinder == null)
+				throw new InvalidOperationException ("You must call Modules.Init before using Modules");
+
 			List<object> instances;
 			if (!Instances.TryGetValue (typeof (TContract), out instances)) {
-				IEnumerable<Type> types = await GetLoadTask<TContract>().ConfigureAwait (false);
-				instances = Instances.GetOrAdd (typeof (TContract), t => new List<object> { CreateSpecificInstance<TContract> (simpleName, types) });
-				return (TContract)instances[0];
+				IReadOnlyCollection<Type> types = await GetLoadTask<TContract>().ConfigureAwait (false);
+				if (types.Count > 0) {
+					instances = Instances.GetOrAdd (typeof (TContract), t => new List<object> { CreateSpecificInstance<TContract> (simpleName, types) });
+					return (TContract) instances[0];
+				} else
+					return default(TContract);
 			}
 
 			TContract instance = (TContract)instances.FirstOrDefault (o => o.GetType().GetSimpleName() == simpleName);
@@ -97,6 +103,9 @@ namespace Gablarski.Clients
 
 		public static async Task<TContract> GetImplementerAsync<TContract> (string simpleName)
 		{
+			if (moduleFinder == null)
+				throw new InvalidOperationException ("You must call Modules.Init before using Modules");
+
 			TContract instance = await GetImplementerOrDefaultAsync<TContract> (simpleName);
 			if (instance.GetType().GetSimpleName() != simpleName)
 				return default(TContract);
@@ -106,6 +115,9 @@ namespace Gablarski.Clients
 
 		public static async Task<IReadOnlyCollection<TContract>> GetImplementersAsync<TContract>()
 		{
+			if (moduleFinder == null)
+				throw new InvalidOperationException ("You must call Modules.Init before using Modules");
+
 			List<TContract> instances = new List<TContract>();
 
 			List<object> existingInstances = Instances.GetOrAdd (typeof (TContract), t => new List<object>());
@@ -127,6 +139,9 @@ namespace Gablarski.Clients
 
 		public static Task<IReadOnlyCollection<Type>> GetModulesFor<T>()
 		{
+			if (moduleFinder == null)
+				throw new InvalidOperationException ("You must call Modules.Init before using Modules");
+
 			return GetLoadTask<T>();
 		}
 
