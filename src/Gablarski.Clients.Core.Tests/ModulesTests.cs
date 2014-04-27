@@ -43,6 +43,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -72,21 +73,6 @@ namespace Gablarski.Clients.Core.Tests
 			}
 		}
 
-		[Test]
-		public void InitNull()
-		{
-			Assert.That (() => Modules.Init (null), Throws.InstanceOf<ArgumentNullException>());
-		}
-
-		[Test]
-		public async Task GetImplementerOrDefaultAsync_NoImplementers()
-		{
-			Modules.Init (new MockModuleFinder (new Dictionary<Type, Type[]>()));
-
-			var result = await Modules.GetImplementerOrDefaultAsync<string> (null);
-			Assert.That (result, Is.Null);
-		}
-
 		interface IContract
 		{
 			
@@ -102,6 +88,22 @@ namespace Gablarski.Clients.Core.Tests
 		{
 		}
 
+
+		[Test]
+		public void InitNull()
+		{
+			Assert.That (() => Modules.Init (null), Throws.InstanceOf<ArgumentNullException>());
+		}
+
+		[Test]
+		public async Task GetImplementerOrDefaultAsync_NoImplementers()
+		{
+			Modules.Init (new MockModuleFinder (new Dictionary<Type, Type[]>()));
+
+			var result = await Modules.GetImplementerOrDefaultAsync<string> (null);
+			Assert.That (result, Is.Null);
+		}
+		
 		[Test]
 		public async Task GetImplementerOrDefaultAsync_ImplementerButNotSpecified()
 		{
@@ -124,6 +126,47 @@ namespace Gablarski.Clients.Core.Tests
 
 			var results = await Modules.GetImplementersAsync<IContract>();
 			Assert.That (results, Is.Empty);
+		}
+
+		[Test]
+		public async Task GetImplementersAsync_None()
+		{
+			Modules.Init (new MockModuleFinder (new Dictionary<Type, Type[]>()));
+
+			var result = await Modules.GetImplementersAsync<IContract>();
+
+			Assert.That (result, Is.Not.Null);
+			Assert.That (result, Is.Empty);
+		}
+
+		[Test]
+		public async Task GetImplementersAsync()
+		{
+			Modules.Init (new MockModuleFinder (new Dictionary<Type, Type[]> {
+				{ typeof (IContract), new[] { typeof (Implementer), typeof (Implementer2) } }
+			}));
+
+			var results = await Modules.GetImplementersAsync<IContract>();
+
+			Assert.That (results, Is.Not.Null);
+			Assert.That (results.Count, Is.EqualTo (2), "Results contained too many or too few instances");
+			Assert.That (results.OfType<Implementer>().Any(), Is.True, "Results did not contain an Implementer instance");
+			Assert.That (results.OfType<Implementer2>().Any(), Is.True, "Results did not contain an Implementer2 instance");
+		}
+
+		[Test]
+		public async Task GetImplementersAsync_Duplicates()
+		{
+			Modules.Init (new MockModuleFinder (new Dictionary<Type, Type[]> {
+				{ typeof (IContract), new[] { typeof (Implementer), typeof (Implementer2), typeof(Implementer) } }
+			}));
+			
+			var results = await Modules.GetImplementersAsync<IContract>();
+
+			Assert.That (results, Is.Not.Null);
+			Assert.That (results.Count, Is.EqualTo (2), "Results contained too many or too few instances");
+			Assert.That (results.OfType<Implementer>().Any(), Is.True, "Results did not contain an Implementer instance");
+			Assert.That (results.OfType<Implementer2>().Any(), Is.True, "Results did not contain an Implementer2 instance");
 		}
 	}
 }

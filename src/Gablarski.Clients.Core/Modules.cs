@@ -122,15 +122,22 @@ namespace Gablarski.Clients
 
 			List<object> existingInstances = Instances.GetOrAdd (typeof (TContract), t => new List<object>());
 
+			HashSet<Type> typesAdded = new HashSet<Type>();
+
 			var types = await GetLoadTask<TContract>().ConfigureAwait (false);
 			lock (existingInstances) {
 				foreach (Type type in types) {
+					if (typesAdded.Contains (type))
+						continue;
+
 					TContract instance = existingInstances.Cast<TContract>().FirstOrDefault (i => i.GetType() == type);
 
-					if (Equals (instances, default(TContract)))
+					if (Equals (instance, default(TContract)))
 						instances.Add ((TContract) Activator.CreateInstance (type));
 					else
 						instances.Add (instance);
+
+					typesAdded.Add (type);
 				}
 			}
 
