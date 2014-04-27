@@ -61,20 +61,12 @@ namespace Gablarski.Clients
 		/// Creates and initializes a new instance of the <see cref="InputManager"/> class.
 		/// </summary>
 		/// <param name="context">The client context.</param>
-		/// <param name="providers">The list of available input providers.</param>
-		/// <param name="recognizer">The list of available speech recognizers.</param>
-		public InputManager (IGablarskiClientContext context, IEnumerable<IInputProvider> providers, IEnumerable<ISpeechRecognizer> recognizer)
+		public InputManager (IGablarskiClientContext context)
 		{
 			if (context == null)
 				throw new ArgumentNullException ("context");
-			if (providers == null)
-				throw new ArgumentNullException ("providers");
-			if (recognizer == null)
-				throw new ArgumentNullException ("recognizer");
 
 			this.context = context;
-			this.recognizers = recognizer.ToArray();
-			this.providers = providers.ToArray();
 			Settings.SettingChanged += OnSettingChanged;
 		}
 
@@ -103,8 +95,6 @@ namespace Gablarski.Clients
 
 		private IntPtr inputWindowHandle;
 		private readonly IGablarskiClientContext context;
-		private readonly ISpeechRecognizer[] recognizers;
-		private readonly IInputProvider[] providers;
 
 		private IInputProvider InputProvider
 		{
@@ -135,7 +125,7 @@ namespace Gablarski.Clients
 
 		private async Task SetupSpeechRecognizer()
 		{
-			SpeechRecognizer = this.recognizers.FirstOrDefault();
+			SpeechRecognizer = await Modules.GetImplementerOrDefaultAsync<ISpeechRecognizer> (null).ConfigureAwait (false);
 			if (SpeechRecognizer == null)
 				return;
 
@@ -159,11 +149,7 @@ namespace Gablarski.Clients
 		{
 			this.inputWindowHandle = handle;
 
-			Type settingType;
-			if (String.IsNullOrWhiteSpace (InputProviderTypeName) || (settingType = Type.GetType (InputProviderTypeName)) == null)
-				InputProvider = this.providers.FirstOrDefault();
-			else
-				InputProvider = this.providers.FirstOrDefault (p => p.GetType() == settingType);
+			InputProvider = await Modules.GetImplementerAsync<IInputProvider> (InputProviderTypeName).ConfigureAwait (false);
 
 			if (InputProvider == null)
 				throw new InvalidOperationException ("An input provider could not be found");

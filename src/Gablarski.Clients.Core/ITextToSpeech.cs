@@ -1,4 +1,11 @@
-﻿// Copyright (c) 2011-2014, Eric Maupin
+﻿//
+// ITextToSpeech.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2009-2011, Eric Maupin
+// Copyright (c) 2011-2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with

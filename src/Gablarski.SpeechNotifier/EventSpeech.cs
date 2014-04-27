@@ -1,4 +1,11 @@
-// Copyright (c) 2011-2014, Eric Maupin
+//
+// EventSpeech.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2009-2011, Eric Maupin
+// Copyright (c) 2011-2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -36,7 +43,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Speech.AudioFormat;
@@ -48,7 +54,6 @@ using Gablarski.Clients.Media;
 
 namespace Gablarski.SpeechNotifier
 {
-	[Export (typeof (ITextToSpeech))]
 	public class EventSpeech
 		:  ITextToSpeech
 	{
@@ -135,11 +140,6 @@ namespace Gablarski.SpeechNotifier
 				lock (sync)
 					media = value;
 			}
-		}
-
-		public override string ToString()
-		{
-			return Name;
 		}
 
 		public void Dispose()

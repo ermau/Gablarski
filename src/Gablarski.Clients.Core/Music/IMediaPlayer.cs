@@ -1,11 +1,18 @@
-﻿// Copyright (c) 2011, Eric Maupin
+﻿//
+// IMediaPlayer.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2009-2011, Eric Maupin
+// Copyright (c) 2011-2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
 // or without modification, are permitted provided that
 // the following conditions are met:
 //
-// - Redistributions of source code must retain the above 
+// - Redistributions of source code must retain the above
 //   copyright notice, this list of conditions and the
 //   following disclaimer.
 //
@@ -35,9 +42,6 @@
 // DAMAGE.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Gablarski.Clients.Media
 {
@@ -68,7 +72,7 @@ namespace Gablarski.Clients.Media
 		string AlbumName { get; }
 
 		/// <summary>
-		/// Sets the volume	for the media player. 0 - 100.
+		/// Sets the volume for the media player. 0 - 100.
 		/// </summary>
 		/// <exception cref="ArgumentOutOfRangeException">When value is &lt; 0 or &gt; 100.</exception>
 		int Volume { get; set; }

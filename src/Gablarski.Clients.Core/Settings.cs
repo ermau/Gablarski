@@ -324,7 +324,7 @@ namespace Gablarski.Clients
 			commandBindings.CollectionChanged += OnCommandBindingsChanged;
 
 			foreach (var cbe in ClientData.GetCommandBindings()) {
-				IInputProvider provider = Modules.Input.FirstOrDefault (ip => ip.GetType().GetSimpleName() == cbe.ProviderType);
+				IInputProvider provider = await Modules.GetImplementerAsync<IInputProvider> (cbe.ProviderType).ConfigureAwait (false);
 				if (provider == null)
 					continue;
 

@@ -1,4 +1,11 @@
-﻿// Copyright (c) 2011-2013, Eric Maupin
+﻿//
+// OpenALCaptureProvider.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2009-2011, Eric Maupin
+// Copyright (c) 2011-2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -36,12 +43,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using Gablarski.Audio;
 
 namespace Gablarski.OpenAL.Providers
 {
-	[Export (typeof(IAudioCaptureProvider))]
 	public class OpenALCaptureProvider
 		: IAudioCaptureProvider
 	{
@@ -145,11 +150,6 @@ namespace Gablarski.OpenAL.Providers
 		public IAudioDevice DefaultDevice
 		{
 			get { return OpenAL.GetDefaultCaptureDevice(); }
-		}
-
-		public override string ToString()
-		{
-			return "OpenAL Capture";
 		}
 
 		public void Dispose ()

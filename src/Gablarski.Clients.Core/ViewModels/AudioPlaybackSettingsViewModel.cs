@@ -1,11 +1,17 @@
-﻿// Copyright (c) 2013, Eric Maupin
+﻿//
+// AudioPlaybackSettingsViewModel.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2013-2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
 // or without modification, are permitted provided that
 // the following conditions are met:
 //
-// - Redistributions of source code must retain the above 
+// - Redistributions of source code must retain the above
 //   copyright notice, this list of conditions and the
 //   following disclaimer.
 //
@@ -36,30 +42,35 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Gablarski.Audio;
 
 namespace Gablarski.Clients.ViewModels
 {
 	public class AudioPlaybackSettingsViewModel
-		: ViewModelBase
+		: BusyViewModel
 	{
 		public AudioPlaybackSettingsViewModel()
 		{
-			PlaybackProviders = Modules.Playback;
+			IsBusy = true;
 
-			IAudioPlaybackProvider savedPlaybackProvider = Modules.Playback.FirstOrDefault (p => p.GetType().GetSimpleName() == Settings.PlaybackProvider);
-			if (savedPlaybackProvider == null)
-				CurrentPlaybackProvider = Modules.Playback.FirstOrDefault();
-			else {
-				CurrentPlaybackProvider = savedPlaybackProvider;
+			var scheduler = TaskScheduler.FromCurrentSynchronizationContext();
 
-				if (Settings.PlaybackDevice != null)
-				{
-					var setDevice = PlaybackDevices.FirstOrDefault (d => d.Device.Name == Settings.PlaybackDevice);
-					if (setDevice != null)
-						CurrentPlaybackDevice = setDevice;
-				}
-			}
+			var getSelectedProvider = Modules.GetImplementerOrDefaultAsync<IAudioPlaybackProvider> (Settings.PlaybackProvider);
+			Modules.GetImplementersAsync<IAudioPlaybackProvider>().ContinueWith (t => {
+				PlaybackProviders = t.Result;
+				getSelectedProvider.ContinueWith (ts => {
+					CurrentPlaybackProvider = ts.Result;
+
+					if (Settings.PlaybackDevice != null) {
+						var setDevice = PlaybackDevices.FirstOrDefault (d => d.Device.Name == Settings.PlaybackDevice);
+						if (setDevice != null)
+							CurrentPlaybackDevice = setDevice;
+					}
+
+					IsBusy = false;
+				});
+			}, scheduler);
 
 			Volume = Settings.GlobalVolume * 100;
 		}
@@ -80,8 +91,15 @@ namespace Gablarski.Clients.ViewModels
 
 		public IEnumerable<IAudioPlaybackProvider> PlaybackProviders
 		{
-			get;
-			private set;
+			get { return this.playbackProviders; }
+			private set
+			{
+				if (this.playbackProviders == value)
+					return;
+
+				this.playbackProviders = value;
+				OnPropertyChanged();
+			}
 		}
 
 		private IAudioPlaybackProvider currentPlaybackProvider;
@@ -125,6 +143,8 @@ namespace Gablarski.Clients.ViewModels
 		}
 
 		private DeviceViewModel currentPlaybackDevice;
+		private IEnumerable<IAudioPlaybackProvider> playbackProviders;
+
 		public DeviceViewModel CurrentPlaybackDevice
 		{
 			get { return this.currentPlaybackDevice; }

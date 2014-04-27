@@ -176,6 +176,7 @@
     </Compile>
     <Compile Include="AvatarConverter.cs" />
     <Compile Include="CaseConverter.cs" />
+    <Compile Include="DirectoryModuleFinder.cs" />
     <Compile Include="EditBalloon.cs" />
     <Compile Include="BindingList.xaml.cs">
       <DependentUpon>BindingList.xaml</DependentUpon>
@@ -194,12 +195,6 @@
       <DependentUpon>CommentForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Extensions.cs" />
-    <Compile Include="LoginForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="LoginForm.Designer.cs">
-      <DependentUpon>LoginForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
@@ -253,9 +248,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="CommentForm.resx">
       <DependentUpon>CommentForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="LoginForm.resx">
-      <DependentUpon>LoginForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="InputForm.resx">
       <DependentUpon>InputForm.cs</DependentUpon>

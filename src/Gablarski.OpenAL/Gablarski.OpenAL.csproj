@@ -84,7 +84,6 @@
       <HintPath>..\..\lib\log4net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -108,6 +107,10 @@
     <Compile Include="SourcePool.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Gablarski.Clients.Core\Gablarski.Clients.Core.csproj">
+      <Project>{f8a695aa-8bc9-46d4-8b7a-bdbd7b74401f}</Project>
+      <Name>Gablarski.Clients.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Gablarski\Gablarski.csproj">
       <Project>{7347052B-DA5B-4CCA-AB28-3963766E3CDB}</Project>
       <Name>Gablarski</Name>

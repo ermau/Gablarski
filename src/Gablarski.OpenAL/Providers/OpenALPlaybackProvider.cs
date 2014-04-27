@@ -1,11 +1,18 @@
-// Copyright (c) 2011, Eric Maupin
+//
+// OpenALPlaybackProvider.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2009-2011, Eric Maupin
+// Copyright (c) 2011-2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
 // or without modification, are permitted provided that
 // the following conditions are met:
 //
-// - Redistributions of source code must retain the above 
+// - Redistributions of source code must retain the above
 //   copyright notice, this list of conditions and the
 //   following disclaimer.
 //
@@ -35,13 +42,11 @@
 // DAMAGE.
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.Linq;
 using Gablarski.Audio;
 
 namespace Gablarski.OpenAL.Providers
 {
-	[Export (typeof(IAudioPlaybackProvider))]
 	public class OpenALPlaybackProvider
 		: IAudioPlaybackProvider
 	{
@@ -50,7 +55,6 @@ namespace Gablarski.OpenAL.Providers
 			this.pool.SourceFinished += PoolSourceFinished;
 		}
 
-		#region IAudioPlaybackProvider Members
 		public event EventHandler<AudioSourceEventArgs> SourceFinished;
 
 		public float Gain
@@ -197,15 +201,6 @@ namespace Gablarski.OpenAL.Providers
 			get { return OpenAL.GetDefaultPlaybackDevice(); }
 		}
 
-		#endregion
-
-		public override string ToString()
-		{
-			return "OpenAL Playback";
-		}
-
-		#region IDisposable Members
-
 		public void Dispose()
 		{
 			GC.SuppressFinalize (this);
@@ -240,8 +235,6 @@ namespace Gablarski.OpenAL.Providers
 			this.device = null;
 			this.isDisposed = true;
 		}
-
-		#endregion
 
 		private bool isDisposed;
 		private PlaybackDevice device;

@@ -169,6 +169,8 @@ namespace Gablarski.Clients.Windows
 			FileInfo program = new FileInfo (Process.GetCurrentProcess().MainModule.FileName);
 			Environment.CurrentDirectory = program.Directory.FullName;
 
+			Modules.Init (new CompositeModuleFinder (new AssemblyModuleFinder(), new DirectoryModuleFinder (".")));
+
 			string useLocalValue = ConfigurationManager.AppSettings["useLocalDatabase"];
 			bool useLocal;
 			Boolean.TryParse (useLocalValue, out useLocal);
@@ -352,7 +354,7 @@ namespace Gablarski.Clients.Windows
 			Settings.Version = typeof (Program).Assembly.GetName().Version.ToString();
 			Settings.SaveAsync().Wait();
 
-			IInputProvider input = Modules.Input.FirstOrDefault (p => p.GetType().GetSimpleName() == Settings.InputProvider);
+			IInputProvider input = Modules.GetImplementerOrDefaultAsync<IInputProvider> (Settings.InputProvider).Result;
 			if (input != null) {
 				foreach (CommandBinding binding in input.Defaults)
 					Settings.CommandBindings.Add (new CommandBinding (binding.Provider, binding.Command, binding.Input));

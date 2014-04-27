@@ -1,18 +1,17 @@
 ﻿//
-// ISpeechRecognizer.cs
+// DirectoryModuleFinder.cs
 //
 // Author:
 //   Eric Maupin <me@ermau.com>
 //
-// Copyright (c) 2009-2011, Eric Maupin
-// Copyright (c) 2011-2014, Xamarin Inc.
+// Copyright (c) 2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
 // or without modification, are permitted provided that
 // the following conditions are met:
 //
-// - Redistributions of source code must retain the above
+// - Redistributions of source code must retain the above 
 //   copyright notice, this list of conditions and the
 //   following disclaimer.
 //
@@ -42,53 +41,63 @@
 // DAMAGE.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using System.Threading.Tasks;
+using Gablarski.Annotations;
 
-namespace Gablarski.Clients.Input
+namespace Gablarski.Clients.Windows
 {
-	/// <summary>
-	/// Contract for speech recognition -> commands.
-	/// </summary>
-	public interface ISpeechRecognizer
-		: INamedComponent, IDisposable
+	public sealed class DirectoryModuleFinder
+		: IModuleFinder
 	{
-		/// <summary>
-		/// Fired when a bound command state has changed.
-		/// </summary>
-		/// <seealso cref="IInputProvider.CommandStateChanged"/>
-		event EventHandler<CommandStateChangedEventArgs> CommandStateChanged;
+		public DirectoryModuleFinder ([NotNull] params string[] paths)
+		{
+			if (paths == null)
+				throw new ArgumentNullException ("paths");
 
-		ITextToSpeech TextToSpeech { set; }
+			scan = Task.Run (() => ScanAssemblies (paths));
+		}
 
-		/// <summary>
-		/// Opens the recognizer and prepares it for use.
-		/// </summary>
-		/// <returns><c>true</c> if </returns>
-		Task OpenAsync();
+		private void ScanAssemblies (string[] paths)
+		{
+			Parallel.ForEach (paths, d => {
+				if (!Directory.Exists (d))
+					return;
 
-		/// <summary>
-		/// Closes the recognizer.
-		/// </summary>
-		void Close();
+				string[] files = Directory.GetFiles (d, "*.dll");
+				foreach (string file in files) {
+					Assembly assembly;
+					try {
+						assembly = Assembly.LoadFrom (file);
+					} catch (Exception) {
+						continue;
+					}
 
-		/// <summary>
-		/// Updates the recognizer with the channels and users so it can update detections.
-		/// </summary>
-		/// <param name="channels">The channels</param>
-		/// <param name="users">The users</param>
-		/// <exception cref="ArgumentNullException"><paramref name="channels"/> or <paramref name="users"/> is <c>null</c>.</exception>
-		/// <exception cref="InvalidOperationException">The recognizer is currently stopped.</exception>
-		void Update (IEnumerable<IChannelInfo> channels, IEnumerable<IUserInfo> users);
+					foreach (var export in assembly.GetCustomAttributes<ModuleAttribute>()) {
+						List<Type> exports = types.GetOrAdd (export.ContractType, t => new List<Type>());
+						lock (exports)
+							exports.Add (export.ExportedType);
+					}
+				}
+			});
+		}
 
-		/// <summary>
-		/// Starts attempting to recognize a command.
-		/// </summary>
-		void StartRecognizing();
+		public async Task<IReadOnlyCollection<Type>> LoadExportsAsync<TContract>()
+		{
+			await this.scan.ConfigureAwait (false);
 
-		/// <summary>
-		/// Stops attempting to recognize a command.
-		/// </summary>
-		void StopRecognizing();
+			List<Type> exports;
+			if (!types.TryGetValue (typeof (TContract), out exports))
+				return new Type[0];
+
+			return exports;
+		}
+
+		private readonly Task scan;
+
+		private readonly ConcurrentDictionary<Type, List<Type>> types = new ConcurrentDictionary<Type, List<Type>>();
 	}
 }

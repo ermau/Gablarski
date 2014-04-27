@@ -1,11 +1,17 @@
-﻿// Copyright (c) 2013, Eric Maupin
+﻿//
+// InputSettingsViewModel.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2013-2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
 // or without modification, are permitted provided that
 // the following conditions are met:
 //
-// - Redistributions of source code must retain the above 
+// - Redistributions of source code must retain the above
 //   copyright notice, this list of conditions and the
 //   following disclaimer.
 //
@@ -38,22 +44,29 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Gablarski.Clients.Input;
 
 namespace Gablarski.Clients.ViewModels
 {
 	public class InputSettingsViewModel
-		: ViewModelBase
+		: BusyViewModel
 	{
 		public InputSettingsViewModel (IntPtr windowHandle)
 		{
-			InputProviders = Modules.Input;
-			
-			Bindings = new BindingListViewModel (windowHandle, new RelayCommand<CommandBindingViewModel> (Record, CanRecord));
-			Bindings.InputProvider = InputProviders.FirstOrDefault (p => p.GetType().GetSimpleName() == Settings.InputProvider);
+			IsBusy = true;
 
-			NewBinding = new RelayCommand (() => Bindings.Bindings.Add (new CommandBindingViewModel (Bindings.InputProvider)));
+			Modules.GetImplementersAsync<IInputProvider>().ContinueWith (t => {
+				InputProviders = t.Result;
+
+				Bindings = new BindingListViewModel (windowHandle, new RelayCommand<CommandBindingViewModel> (Record, CanRecord));
+				Bindings.InputProvider = InputProviders.FirstOrDefault (p => p.GetType().GetSimpleName() == Settings.InputProvider);
+
+				IsBusy = false;
+			}, TaskScheduler.FromCurrentSynchronizationContext());
+			
+			NewBinding = new RelayCommand (() => Bindings.Bindings.Add (new CommandBindingViewModel (Bindings.InputProvider)), () => Bindings != null);
 		}
 
 		private bool isRecording;
@@ -79,8 +92,16 @@ namespace Gablarski.Clients.ViewModels
 
 		public BindingListViewModel Bindings
 		{
-			get;
-			private set;
+			get { return this.bindings; }
+			private set
+			{
+				if (this.bindings == value)
+					return;
+
+				this.bindings = value;
+				OnPropertyChanged();
+				((RelayCommand) NewBinding).RaiseCanExecuteChanged();
+			}
 		}
 
 		public ICommand NewBinding
@@ -119,6 +140,8 @@ namespace Gablarski.Clients.ViewModels
 
 		private readonly object inputSync = new object();
 		private CommandBindingViewModel recordingEntry;
+		private BindingListViewModel bindings;
+
 		private void Record (CommandBindingViewModel binding)
 		{
 			IsRecording = true;

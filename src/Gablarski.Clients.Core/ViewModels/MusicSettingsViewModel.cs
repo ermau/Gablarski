@@ -1,11 +1,17 @@
-﻿// Copyright (c) 2013, Eric Maupin
+﻿//
+// MusicSettingsViewModel.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2013-2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
 // or without modification, are permitted provided that
 // the following conditions are met:
 //
-// - Redistributions of source code must retain the above 
+// - Redistributions of source code must retain the above
 //   copyright notice, this list of conditions and the
 //   following disclaimer.
 //
@@ -45,7 +51,7 @@ namespace Gablarski.Clients.ViewModels
 	{
 		public MusicSettingsViewModel()
 		{
-			MediaPlayers = Modules.MediaPlayers.Select (
+			MediaPlayers = Modules.GetImplementersAsync<IMediaPlayer>().Result.Select (
 					p => new MediaPlayerViewModel (p, Settings.EnabledMediaPlayerIntegrations.Contains (p.GetType().GetSimpleName())))
 					.ToArray();
 

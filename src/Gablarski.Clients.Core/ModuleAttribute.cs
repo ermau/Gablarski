@@ -1,11 +1,10 @@
 ﻿//
-// ISpeechRecognizer.cs
+// ModuleAttribute.cs
 //
 // Author:
 //   Eric Maupin <me@ermau.com>
 //
-// Copyright (c) 2009-2011, Eric Maupin
-// Copyright (c) 2011-2014, Xamarin Inc.
+// Copyright (c) 2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -42,53 +41,34 @@
 // DAMAGE.
 
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
-namespace Gablarski.Clients.Input
+namespace Gablarski.Clients
 {
-	/// <summary>
-	/// Contract for speech recognition -> commands.
-	/// </summary>
-	public interface ISpeechRecognizer
-		: INamedComponent, IDisposable
+	[AttributeUsage (AttributeTargets.Assembly, AllowMultiple = true)]
+	public sealed class ModuleAttribute
+		: Attribute
 	{
-		/// <summary>
-		/// Fired when a bound command state has changed.
-		/// </summary>
-		/// <seealso cref="IInputProvider.CommandStateChanged"/>
-		event EventHandler<CommandStateChangedEventArgs> CommandStateChanged;
+		public ModuleAttribute (Type contractType, Type exportedType)
+		{
+			if (contractType == null)
+				throw new ArgumentNullException ("contractType");
+			if (exportedType == null)
+				throw new ArgumentNullException ("exportedType");
 
-		ITextToSpeech TextToSpeech { set; }
+			ContractType = contractType;
+			ExportedType = exportedType;
+		}
 
-		/// <summary>
-		/// Opens the recognizer and prepares it for use.
-		/// </summary>
-		/// <returns><c>true</c> if </returns>
-		Task OpenAsync();
+		public Type ContractType
+		{
+			get;
+			private set;
+		}
 
-		/// <summary>
-		/// Closes the recognizer.
-		/// </summary>
-		void Close();
-
-		/// <summary>
-		/// Updates the recognizer with the channels and users so it can update detections.
-		/// </summary>
-		/// <param name="channels">The channels</param>
-		/// <param name="users">The users</param>
-		/// <exception cref="ArgumentNullException"><paramref name="channels"/> or <paramref name="users"/> is <c>null</c>.</exception>
-		/// <exception cref="InvalidOperationException">The recognizer is currently stopped.</exception>
-		void Update (IEnumerable<IChannelInfo> channels, IEnumerable<IUserInfo> users);
-
-		/// <summary>
-		/// Starts attempting to recognize a command.
-		/// </summary>
-		void StartRecognizing();
-
-		/// <summary>
-		/// Stops attempting to recognize a command.
-		/// </summary>
-		void StopRecognizing();
+		public Type ExportedType
+		{
+			get;
+			private set;
+		}
 	}
 }

@@ -1,13 +1,15 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Gablarski.Clients;
+using Gablarski.Clients.Input;
+using Gablarski.SpeechNotifier;
 
 [assembly: AssemblyTitle ("Gablarski.SpeechNotifier")]
 [assembly: AssemblyDescription ("")]
 [assembly: AssemblyConfiguration ("")]
 [assembly: AssemblyCompany ("")]
 [assembly: AssemblyProduct ("Gablarski.SpeechNotifier")]
-[assembly: AssemblyCopyright ("Copyright © Eric Maupin 2010")]
+[assembly: AssemblyCopyright ("Copyright © Eric Maupin 2009-2011, Xamarin Inc. 2011-2014")]
 [assembly: AssemblyTrademark ("")]
 [assembly: AssemblyCulture ("")]
 
@@ -16,3 +18,6 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyVersion ("0.0.0.0")]
 [assembly: AssemblyFileVersion ("0.0.0.0")]
+
+[assembly: Module (typeof (ITextToSpeech), typeof (EventSpeech))]
+[assembly: Module (typeof (ISpeechRecognizer), typeof (SpeechRecognizer))]
