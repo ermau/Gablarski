@@ -40,6 +40,8 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
+using System;
+
 namespace Gablarski.Clients.ViewModels
 {
 	public class NotifierViewModel
@@ -47,6 +49,9 @@ namespace Gablarski.Clients.ViewModels
 	{
 		public NotifierViewModel (INamedComponent notifier, bool enabled)
 		{
+			if (notifier == null)
+				throw new ArgumentNullException ("notifier");
+
 			Notifier = notifier;
 			IsEnabled = enabled;
 		}
