@@ -20,4 +20,4 @@ using Gablarski.OpenAL.Providers;
 [assembly: AssemblyFileVersion ("0.0.0.0")]
 
 [assembly: Module (typeof (IAudioPlaybackProvider), typeof (OpenALPlaybackProvider))]
-[assembly: Module (typeof (IAudioCaptureProvider), typeof (OpenALPlaybackProvider))]
+[assembly: Module (typeof (IAudioCaptureProvider), typeof (OpenALCaptureProvider))]
