@@ -44,6 +44,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Gablarski.Annotations;
@@ -61,6 +62,32 @@ namespace Gablarski.Clients.Windows
 			scan = Task.Run (() => ScanAssemblies (paths));
 		}
 
+		public DirectoryModuleFinder ([NotNull] IEnumerable<string> paths, [NotNull] IEnumerable<string> filesToIgnore)
+		{
+			if (paths == null)
+				throw new ArgumentNullException ("paths");
+			if (filesToIgnore == null)
+				throw new ArgumentNullException ("filesToIgnore");
+
+			this.filesToIgnore = new HashSet<string> (filesToIgnore);
+			this.scan = Task.Run (() => ScanAssemblies (paths.ToArray()));
+		}
+
+		public async Task<IReadOnlyCollection<Type>> LoadExportsAsync<TContract>()
+		{
+			await this.scan.ConfigureAwait (false);
+
+			List<Type> exports;
+			if (!types.TryGetValue (typeof (TContract), out exports))
+				return new Type[0];
+
+			return exports;
+		}
+
+		private readonly Task scan;
+		private readonly ConcurrentDictionary<Type, List<Type>> types = new ConcurrentDictionary<Type, List<Type>>();
+		private readonly HashSet<string> filesToIgnore;
+
 		private void ScanAssemblies (string[] paths)
 		{
 			Parallel.ForEach (paths, d => {
@@ -69,6 +96,12 @@ namespace Gablarski.Clients.Windows
 
 				string[] files = Directory.GetFiles (d, "*.dll");
 				foreach (string file in files) {
+					if (this.filesToIgnore != null) {
+						string filename = Path.GetFileName (file);
+						if (this.filesToIgnore.Contains (filename))
+							continue;
+					}
+
 					Assembly assembly;
 					try {
 						assembly = Assembly.LoadFrom (file);
@@ -84,20 +117,5 @@ namespace Gablarski.Clients.Windows
 				}
 			});
 		}
-
-		public async Task<IReadOnlyCollection<Type>> LoadExportsAsync<TContract>()
-		{
-			await this.scan.ConfigureAwait (false);
-
-			List<Type> exports;
-			if (!types.TryGetValue (typeof (TContract), out exports))
-				return new Type[0];
-
-			return exports;
-		}
-
-		private readonly Task scan;
-
-		private readonly ConcurrentDictionary<Type, List<Type>> types = new ConcurrentDictionary<Type, List<Type>>();
 	}
 }

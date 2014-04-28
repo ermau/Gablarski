@@ -169,7 +169,16 @@ namespace Gablarski.Clients.Windows
 			FileInfo program = new FileInfo (Process.GetCurrentProcess().MainModule.FileName);
 			Environment.CurrentDirectory = program.Directory.FullName;
 
-			Modules.Init (new CompositeModuleFinder (new AssemblyModuleFinder(), new DirectoryModuleFinder (".")));
+			Modules.Init (new CompositeModuleFinder (
+				new AssemblyModuleFinder(),
+				new DirectoryModuleFinder (
+					new[] { "." },
+					filesToIgnore:
+						new[] {
+							"Cadenza.dll", "log4net.dll", "opus.dll", "OpusWrapper.dll", "SharpDX.dll", "Tempest.dll", "OpenAL32.dll",
+							"Microsoft.WindowsAPICodePack.dll", "Microsoft.WindowsAPICodePack.Shell.dll", "Mindscape.Raygun4Net.dll",
+							"sqlite3.dll", "System.Data.SQLite.dll", "Elysium.dll", "Microsoft.Expression.Interactions.dll"
+						})));
 
 			string useLocalValue = ConfigurationManager.AppSettings["useLocalDatabase"];
 			bool useLocal;
