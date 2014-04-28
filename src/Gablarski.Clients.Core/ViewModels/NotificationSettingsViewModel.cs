@@ -97,8 +97,15 @@ namespace Gablarski.Clients.ViewModels
 
 		public IEnumerable<NotifierViewModel> Notifiers
 		{
-			get;
-			private set;
+			get { return this.notifiers; }
+			private set
+			{
+				if (this.notifiers == value)
+					return;
+
+				this.notifiers = value;
+				OnPropertyChanged();
+			}
 		}
 
 		private NotifierViewModel currentNotifier;
@@ -118,6 +125,7 @@ namespace Gablarski.Clients.ViewModels
 
 		private MutableLookup<string, NotificationTypeViewModel> globalNotifications;
 		private bool isLoading = true;
+		private IEnumerable<NotifierViewModel> notifiers;
 
 		public IEnumerable<NotificationTypeViewModel> EnabledNotifications
 		{

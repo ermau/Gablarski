@@ -86,8 +86,15 @@ namespace Gablarski.Clients.ViewModels
 
 		public IEnumerable<IInputProvider> InputProviders
 		{
-			get;
-			private set;
+			get { return this.inputProviders; }
+			private set
+			{
+				if (this.inputProviders == value)
+					return;
+
+				this.inputProviders = value;
+				OnPropertyChanged();
+			}
 		}
 
 		public BindingListViewModel Bindings
@@ -141,6 +148,7 @@ namespace Gablarski.Clients.ViewModels
 		private readonly object inputSync = new object();
 		private CommandBindingViewModel recordingEntry;
 		private BindingListViewModel bindings;
+		private IEnumerable<IInputProvider> inputProviders;
 
 		private void Record (CommandBindingViewModel binding)
 		{
