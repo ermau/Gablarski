@@ -1,4 +1,11 @@
-﻿// Copyright (c) 2011-2014, Eric Maupin
+﻿//
+// ISourceHandler.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2009-2011, Eric Maupin
+// Copyright (c) 2011-2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -34,15 +41,14 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Gablarski
 {
 	public interface ISourceHandler<out TSource>
-		: IIndexedEnumerable<int, TSource>
+		: IReadOnlyCollection<TSource>
 	{
-		IEnumerable<TSource> this[IUserInfo user] { get; }
+		IEnumerable<TSource> GetSources (IUserInfo user);
+		TSource GetSource (int sourceId);
 	}
 }

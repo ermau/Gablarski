@@ -1,4 +1,11 @@
-﻿// Copyright (c) 2009-2014, Eric Maupin
+﻿//
+// AudioSourceManager.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2009-2011, Eric Maupin
+// Copyright (c) 2011-2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -37,6 +44,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using Cadenza.Collections;
 using Gablarski.Audio;
@@ -44,18 +53,9 @@ using Gablarski.Audio;
 namespace Gablarski
 {
 	public class AudioSourceManager
-		: IReadOnlyList<AudioSource>
+		: IReadOnlyDictionary<int, AudioSource>, INotifyCollectionChanged
 	{
-		public IEnumerator<AudioSource> GetEnumerator()
-		{
-			lock (this.syncRoot)
-				return this.Sources.Values.ToList().GetEnumerator();
-		}
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
+		public event NotifyCollectionChangedEventHandler CollectionChanged;
 
 		public int Count
 		{
@@ -81,6 +81,24 @@ namespace Gablarski
 			}
 		}
 
+		public IEnumerable<int> Keys
+		{
+			get
+			{
+				lock (this.syncRoot)
+					return new ReadOnlyCollection<int> (Sources.Keys.ToList());
+			}
+		}
+
+		public IEnumerable<AudioSource> Values
+		{
+			get
+			{
+				lock (this.syncRoot)
+					return new ReadOnlyCollection<AudioSource> (Sources.Values.ToList());
+			}
+		}
+
 		/// <summary>
 		/// Gets the audio sources owned by <paramref name="user"/>.
 		/// </summary>
@@ -95,6 +113,18 @@ namespace Gablarski
 			}
 		}
 
+		public bool ContainsKey (int key)
+		{
+			lock (this.syncRoot)
+				return Sources.ContainsKey (key);
+		}
+
+		public bool TryGetValue (int key, out AudioSource value)
+		{
+			lock (this.syncRoot)
+				return Sources.TryGetValue (key, out value);
+		}
+
 		/// <summary>
 		/// Toggles mute for the <paramref name="source"/>.
 		/// </summary>
@@ -106,21 +136,27 @@ namespace Gablarski
 			if (source == null)
 				throw new ArgumentNullException ("source");
 
-			lock (this.syncRoot)
-			{
-				AudioSource actual;
+			AudioSource newSource, actual;
+			int index;
+			lock (this.syncRoot) {
 				if (!Sources.TryGetValue (source.Id, out actual))
 					return false;
 
-				AudioSource newSource = new AudioSource (actual);
-				newSource.IsMuted = !actual.IsMuted;
+				newSource = new AudioSource (actual) {
+					IsMuted = !actual.IsMuted
+				};
 
 				OwnedSources.Remove (source.OwnerId, source);
-				Sources[newSource.Id] = newSource;
-				OwnedSources.Add (source.OwnerId, source);
 
-				return newSource.IsMuted;
+				index = Sources.IndexOf (newSource.Id);
+				Sources.RemoveAt (index);
+
+				OwnedSources.Add (source.OwnerId, source);
+				Sources.Insert (index, newSource.Id, newSource);
 			}
+
+			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Replace, newSource, actual, index));
+			return newSource.IsMuted;
 		}
 
 		/// <summary>
@@ -128,11 +164,12 @@ namespace Gablarski
 		/// </summary>
 		public virtual void Clear()
 		{
-			lock (this.syncRoot)
-			{
-				Sources.Clear();
+			lock (this.syncRoot) {
 				OwnedSources.Clear();
+				Sources.Clear();
 			}
+
+			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Reset));
 		}
 
 		/// <summary>
@@ -146,11 +183,20 @@ namespace Gablarski
 			if (source == null)
 				throw new ArgumentNullException ("source");
 
-			lock (this.syncRoot)
-			{
+			AudioSource actual;
+			int index;
+			lock (this.syncRoot) {
+				if (!Sources.TryGetValue (source.Id, out actual))
+					return false;
+			
 				OwnedSources.Remove (source.OwnerId, source);
-				return Sources.Remove (source.Id);
+				index = Sources.IndexOf (source.Id);
+				
+				Sources.RemoveAt (index);
 			}
+
+			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Remove, actual, index));
+			return true;
 		}
 
 		/// <summary>
@@ -164,18 +210,45 @@ namespace Gablarski
 			if (user == null)
 				throw new ArgumentNullException ("user");
 
-			lock (this.syncRoot)
-			{
-				foreach (AudioSource source in OwnedSources[user.UserId])
-					Sources.Remove (source.Id);
-
-				return OwnedSources.Remove (user.UserId);
+			bool any = false;
+			lock (this.syncRoot) {
+				foreach (AudioSource source in OwnedSources[user.UserId]) {
+					bool removed = Remove (source);
+					if (removed)
+						any = true;
+				}
 			}
+
+			return any;
+		}
+
+		public IEnumerator<AudioSource> GetEnumerator()
+		{
+			lock (this.syncRoot)
+				return Sources.Values.ToList().GetEnumerator();
+		}
+
+		IEnumerator<KeyValuePair<int, AudioSource>> IEnumerable<KeyValuePair<int, AudioSource>>.GetEnumerator()
+		{
+			lock (this.syncRoot)
+				return new OrderedDictionary<int, AudioSource> (Sources).GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
 		}
 
 		protected readonly object syncRoot = new object();
 
 		protected readonly MutableLookup<int, AudioSource> OwnedSources = new MutableLookup<int, AudioSource>();
-		protected readonly Dictionary<int, AudioSource> Sources = new Dictionary<int, AudioSource>();
+		protected readonly OrderedDictionary<int, AudioSource> Sources = new OrderedDictionary<int, AudioSource>();
+
+		protected virtual void OnCollectionChanged (NotifyCollectionChangedEventArgs e)
+		{
+			var handler = CollectionChanged;
+			if (handler != null)
+				handler (this, e);
+		}
 	}
 }

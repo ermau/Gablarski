@@ -196,7 +196,7 @@ namespace Gablarski.Tests
 			Assert.AreEqual (name, s.Name);
 			AudioCodecArgsTests.AssertAreEqual (new AudioCodecArgs (format, 0, frameSize, 10), s.CodecSettings);
 			
-			Assert.AreSame (s, this.handler[s.Id]);
+			Assert.AreSame (s, this.handler.GetSource (s.Id));
 		}
 	}
 }

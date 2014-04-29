@@ -1,4 +1,11 @@
-// Copyright (c) 2009-2014, Eric Maupin
+//
+// ClientSourceManager.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2009-2011, Eric Maupin
+// Copyright (c) 2011-2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -37,6 +44,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Threading;
 using Gablarski.Audio;
@@ -65,12 +73,8 @@ namespace Gablarski.Client
 		/// </summary>
 		public IEnumerable<AudioSource> Mine
 		{
-			get
-			{
-				lock (syncRoot)
-				{
-					return this.Where (s => s.OwnerId == context.CurrentUser.UserId).ToList();
-				}
+			get {
+				return Values.Where (s => s.OwnerId == context.CurrentUser.UserId).ToList();
 			}
 		}
 
@@ -96,21 +100,22 @@ namespace Gablarski.Client
 
 			IEnumerable<AudioSource> updatedAndNew;
 
-			lock (syncRoot)
-			{
+			List<AudioSource> deleted;
+			lock (syncRoot) {
 				updatedAndNew = updatedSources.Where (s => !Sources.ContainsValue (s));
 				updatedAndNew = updatedAndNew.Concat (Sources.Values.Intersect (updatedSources)).ToList();
-				var deleted = Sources.Values.Where (s => !updatedSources.Contains (s)).ToList();
+				deleted = Sources.Values.Where (s => !updatedSources.Contains (s)).ToList();
 
 				foreach (var s in updatedAndNew)
 					Update (s);
 
-				foreach (var d in deleted)
-				{
+				foreach (var d in deleted) {
 					lock (Sources)
 						Sources.Remove (d.Id);
 				}
 			}
+
+			OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Remove, deleted));
 		}
 
 		/// <summary>
@@ -123,17 +128,25 @@ namespace Gablarski.Client
 			if (source == null)
 				throw new ArgumentNullException ("source");
 
-			lock (syncRoot)
-			{
-				AudioSource oldSource;
-				if (!Sources.TryGetValue (source.Id, out oldSource))
-				{
-					Sources[source.Id] = source;
+			NotifyCollectionChangedEventArgs changeArgs;
+			lock (syncRoot) {
+				AudioSource originalSource;
+				if (!Sources.TryGetValue (source.Id, out originalSource)) {
+					int index = Sources.Count;
+					Sources.Add (source.Id, source);
 					OwnedSources.Add (source.OwnerId, source);
+
+					changeArgs = new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Add, source, index);
+				} else {
+					var oldSource = new AudioSource (originalSource);
+					source.CopyTo (originalSource);
+
+					int index = Sources.IndexOf (source.Id);
+					changeArgs = new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Replace, originalSource, oldSource, index);
 				}
-				else
-					source.CopyTo (oldSource);
 			}
+
+			OnCollectionChanged (changeArgs);
 		}
 
 		/// <summary>
@@ -147,8 +160,7 @@ namespace Gablarski.Client
 			if (source == null)
 				throw new ArgumentNullException ("source");
 
-			lock (syncRoot)
-			{
+			lock (syncRoot) {
 				return ignoredSources.Contains (source);
 			}
 		}
@@ -164,8 +176,7 @@ namespace Gablarski.Client
 			if (source == null)
 				throw new ArgumentNullException ("source");
 
-			lock (syncRoot)
-			{
+			lock (syncRoot) {
 				if (!Sources.ContainsKey (source.Id))
 					return false;
 
@@ -185,8 +196,7 @@ namespace Gablarski.Client
 		/// </summary>
 		public override void Clear()
 		{
-			lock (syncRoot)
-			{
+			lock (syncRoot) {
 				ignoredSources.Clear();
 				base.Clear();
 			}
@@ -196,15 +206,13 @@ namespace Gablarski.Client
 		private readonly HashSet<AudioSource> ignoredSources = new HashSet<AudioSource>();
 	}
 
-	#region Event Args
-
 	public class AudioSourceMutedEventArgs
 		: AudioSourceEventArgs
 	{
 		public AudioSourceMutedEventArgs (AudioSource source, bool unmuted)
 			: base (source)
 		{
-			this.Unmuted = unmuted;
+			Unmuted = unmuted;
 		}
 
 		public bool Unmuted { get; set; }
@@ -215,9 +223,9 @@ namespace Gablarski.Client
 	{
 		public ReceivedAudioSourceEventArgs (string sourceName, AudioSource source, SourceResult result)
 		{
-			this.SourceName = sourceName;
-			this.Result = result;
-			this.Source = source;
+			SourceName = sourceName;
+			Result = result;
+			Source = source;
 		}
 
 		/// <summary>
@@ -247,6 +255,4 @@ namespace Gablarski.Client
 			private set;
 		}
 	}
-
-	#endregion
 }

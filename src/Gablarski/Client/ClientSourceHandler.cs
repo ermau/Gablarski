@@ -84,19 +84,22 @@ namespace Gablarski.Client
 			get { return this.manager.Count; }
 		}
 
-		public AudioSource this[int id]
-		{
-			get { return manager[id]; }
-		}
-
-		public IEnumerable<AudioSource> this[IUserInfo user]
-		{
-			get { return manager[user]; }
-		}
-
 		public IEnumerable<AudioSource> Mine
 		{
-			get { return manager.Where (s => s.OwnerId == context.CurrentUser.UserId); }
+			get { return manager.Values.Where (s => s.OwnerId == context.CurrentUser.UserId); }
+		}
+
+		public IEnumerable<AudioSource> GetSources (IUserInfo user)
+		{
+			if (user == null)
+				throw new ArgumentNullException ("user");
+
+			return this.manager[user];
+		}
+
+		public AudioSource GetSource (int sourceId)
+		{
+			return this.manager[sourceId];
 		}
 
 		public void Receive (AudioSource source, byte[] audio)

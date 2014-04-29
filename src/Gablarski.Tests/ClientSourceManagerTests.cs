@@ -36,6 +36,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using Gablarski.Audio;
 using Gablarski.Client;
@@ -103,14 +104,21 @@ namespace Gablarski.Tests
 		[Test]
 		public void Add()
 		{
+			int raised = 0;
+			manager.CollectionChanged += (sender, e) => {
+				raised++;
+				Assert.That (e.Action, Is.EqualTo (NotifyCollectionChangedAction.Add));
+				Assert.That (e.NewItems.Count, Is.EqualTo (1));
+			};
+
 			CreateSources();
 
-			var csource = manager.FirstOrDefault (s => s.Id == 1);
+			var csource = manager.Values.FirstOrDefault (s => s.Id == 1);
 			Assert.IsNotNull (csource, "Source not found");
 			AudioSourceTests.AssertSourcesMatch (AudioSourceTests.GetTestSource (1, 0), csource);
 			Assert.IsTrue (manager[context.CurrentUser].Contains (csource), "Owned sources did not contain source");
 
-			var source = manager.FirstOrDefault (s => s.Id == 2);
+			var source = manager.Values.FirstOrDefault (s => s.Id == 2);
 			Assert.IsNotNull (source, "Source not found");
 			AudioSourceTests.AssertSourcesMatch (AudioSourceTests.GetTestSource (2, 1), source);
 		}
@@ -146,7 +154,7 @@ namespace Gablarski.Tests
 		{
 			CreateSources();
 
-			var source = manager.First();
+			var source = manager.Values.First();
 			Assert.IsFalse (manager.GetIsIgnored (source));
 			Assert.IsTrue (manager.ToggleIgnore (source));
 			Assert.IsTrue (manager.GetIsIgnored (source));
@@ -168,7 +176,7 @@ namespace Gablarski.Tests
 		{
 			CreateSources();
 
-			var source = manager.First();
+			var source = manager.Values.First();
 			Assert.IsFalse (manager.GetIsIgnored (source));
 			Assert.IsTrue (manager.ToggleIgnore (source));
 			Assert.IsTrue (manager.GetIsIgnored (source));

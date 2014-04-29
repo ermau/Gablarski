@@ -87,14 +87,14 @@ namespace Gablarski.Server
 			get { return this.manager.Count; }
 		}
 
-		public AudioSource this [int key]
+		public AudioSource GetSource (int sourceId)
 		{
-			get { return manager[key]; }
+			return manager[sourceId];
 		}
 
-		public IEnumerable<AudioSource> this [IUserInfo user]
+		public IEnumerable<AudioSource> GetSources (IUserInfo user)
 		{
-			get { return manager[user]; }
+			return manager[user];
 		}
 
 		public void Remove (AudioSource source)
@@ -119,7 +119,7 @@ namespace Gablarski.Server
 
 		internal void RequestSourceMessage (MessageEventArgs<RequestSourceMessage> e)
 		{
-			var request = (RequestSourceMessage)e.Message;
+			var request = e.Message;
 
 			SourceResult result = SourceResult.FailedUnknown;
 
@@ -204,7 +204,7 @@ namespace Gablarski.Server
 			if (!e.Connection.IsConnected)
 				return;
 			
-			e.Connection.SendAsync (new SourceListMessage (manager));
+			e.Connection.SendAsync (new SourceListMessage (manager.Values));
 		}
 
 		internal void ClientAudioSourceStateChangeMessage (MessageEventArgs<ClientAudioSourceStateChangeMessage> e)
