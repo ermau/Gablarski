@@ -37,6 +37,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Gablarski.Audio;
 using Gablarski.Client;
 using Gablarski.Messages;
@@ -114,7 +115,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void ToggleMuteNull()
 		{
-			Assert.Throws<ArgumentNullException> (() => handler.ToggleMute (null));
+			Assert.Throws<ArgumentNullException> (() => handler.ToggleMuteAsync (null));
 		}
 
 		[Test]
@@ -147,17 +148,17 @@ namespace Gablarski.Tests
 		[Test]
 		public void RequestNull()
 		{
-			Assert.Throws<ArgumentNullException> (() => handler.Request (null, AudioFormat.Mono16bitLPCM, AudioSourceTests.FrameSize));
-			Assert.Throws<ArgumentNullException> (() => handler.Request ("name", null, AudioSourceTests.FrameSize));
+			Assert.Throws<ArgumentNullException> (() => handler.RequestSourceAsync (null, AudioFormat.Mono16bitLPCM, AudioSourceTests.FrameSize));
+			Assert.Throws<ArgumentNullException> (() => handler.RequestSourceAsync ("name", null, AudioSourceTests.FrameSize));
 
-			Assert.Throws<ArgumentNullException> (() => handler.Request (null, AudioFormat.Mono16bitLPCM, AudioSourceTests.FrameSize, 64000));
-			Assert.Throws<ArgumentNullException> (() => handler.Request ("name", null, AudioSourceTests.FrameSize, 64000));
+			Assert.Throws<ArgumentNullException> (() => handler.RequestSourceAsync (null, AudioFormat.Mono16bitLPCM, AudioSourceTests.FrameSize, 64000));
+			Assert.Throws<ArgumentNullException> (() => handler.RequestSourceAsync ("name", null, AudioSourceTests.FrameSize, 64000));
 		}
 
 		[Test]
 		public void RequestDefaultBitrate()
 		{
-			this.handler.Request ("voice", AudioFormat.Mono16bitLPCM, 480);
+			this.handler.RequestSourceAsync ("voice", AudioFormat.Mono16bitLPCM, 480);
 
 			var msg = this.server.DequeueAndAssertMessage<RequestSourceMessage>();
 			Assert.AreEqual ("voice", msg.Name);
@@ -171,7 +172,7 @@ namespace Gablarski.Tests
 		[Test]
 		public void RequestFrequencyAndBitRate()
 		{
-			this.handler.Request ("voice", new AudioFormat (WaveFormatEncoding.LPCM, 1, 16, 48000), AudioSourceTests.FrameSize, 64000);
+			this.handler.RequestSourceAsync ("voice", new AudioFormat (WaveFormatEncoding.LPCM, 1, 16, 48000), AudioSourceTests.FrameSize, 64000);
 
 			var msg = this.server.DequeueAndAssertMessage<RequestSourceMessage>();
 			Assert.AreEqual ("voice", msg.Name);

@@ -1,4 +1,11 @@
-// Copyright (c) 2009-2014, Eric Maupin
+//
+// ServerSourceHandler.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2009-2011, Eric Maupin
+// Copyright (c) 2011-2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -157,7 +164,7 @@ namespace Gablarski.Server
 			}
 			finally
 			{
-				e.Connection.SendAsync (new SourceResultMessage (request.Name, result, source));
+				e.Connection.SendResponseAsync (request, new SourceResultMessage (request.Name, result, source));
 				if (result == SourceResult.Succeeded)
 				{
 					foreach (IConnection connection in context.Connections)

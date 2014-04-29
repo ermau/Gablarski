@@ -1,4 +1,11 @@
-﻿// Copyright (c) 2011, Eric Maupin
+﻿//
+// SourceResultMessage.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2009-2011, Eric Maupin
+// Copyright (c) 2011-2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -35,9 +42,6 @@
 // DAMAGE.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Gablarski.Audio;
 using Tempest;
 
@@ -57,17 +61,15 @@ namespace Gablarski.Messages
 			if (sourceName == null)
 				throw new ArgumentNullException ("sourceName");
 
-			this.SourceName = sourceName;
-			this.SourceResult = result;
-			this.Source = source;
+			SourceName = sourceName;
+			SourceResult = result;
+			Source = source;
 
-			if (source == null)
-			{
-				switch (result)
-				{
-					case Messages.SourceResult.NewSource:
-					case Messages.SourceResult.SourceRemoved:
-					case Messages.SourceResult.Succeeded:
+			if (source == null) {
+				switch (result) {
+					case SourceResult.NewSource:
+					case SourceResult.SourceRemoved:
+					case SourceResult.Succeeded:
 						throw new ArgumentNullException ("source", "source can not be null if the result didn't fail");
 				}
 			}
@@ -93,24 +95,23 @@ namespace Gablarski.Messages
 
 		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
-			writer.WriteString (this.SourceName);
-			writer.WriteByte ((byte)this.SourceResult);
+			writer.WriteString (SourceName);
+			writer.WriteByte ((byte)SourceResult);
 
-			if (this.Source != null)
-				this.Source.Serialize (context, writer);
+			if (Source != null)
+				Source.Serialize (context, writer);
 		}
 
 		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
-			this.SourceName = reader.ReadString ();
-			this.SourceResult = (SourceResult)reader.ReadByte ();
+			SourceName = reader.ReadString ();
+			SourceResult = (SourceResult)reader.ReadByte ();
 
-			switch (this.SourceResult)
-			{
-				case Messages.SourceResult.NewSource:
-				case Messages.SourceResult.SourceRemoved:
-				case Messages.SourceResult.Succeeded:
-					this.Source = new AudioSource (context, reader);
+			switch (this.SourceResult) {
+				case SourceResult.NewSource:
+				case SourceResult.SourceRemoved:
+				case SourceResult.Succeeded:
+					Source = new AudioSource (context, reader);
 					break;
 			}
 		}
@@ -120,9 +121,14 @@ namespace Gablarski.Messages
 		: byte
 	{
 		/// <summary>
+		/// Failed for an unknown reason.
+		/// </summary>
+		FailedUnknown = 0,
+
+		/// <summary>
 		/// Another users new source.
 		/// </summary>
-		NewSource = 0,
+		NewSource = 2,
 
 		/// <summary>
 		/// The source was removed.
@@ -133,11 +139,6 @@ namespace Gablarski.Messages
 		/// The source was successfully requested.
 		/// </summary>
 		Succeeded = 1,
-
-		/// <summary>
-		/// Failed for an unknown reason.
-		/// </summary>
-		FailedUnknown = 2,
 
 		/// <summary>
 		/// Failed because you or the server is at it's source limit.

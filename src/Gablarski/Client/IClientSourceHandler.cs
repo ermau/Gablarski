@@ -1,4 +1,11 @@
-// Copyright (c) 2011, Eric Maupin
+//
+// IClientSourceHandler.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2009-2011, Eric Maupin
+// Copyright (c) 2011-2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -36,7 +43,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 using Gablarski.Audio;
 
 namespace Gablarski.Client
@@ -74,7 +81,7 @@ namespace Gablarski.Client
 		/// target, but on the bitrate of the source you actually receive.
 		/// </remarks>
 		/// <exception cref="ArgumentNullException"><paramref name="name"/> or <paramref name="format"/> are <c>null</c>.</exception>
-		void Request (string name, AudioFormat format, short frameSize, int targetBitrate);
+		Task<AudioSource> RequestSourceAsync (string name, AudioFormat format, short frameSize, int targetBitrate);
 
 		/// <summary>
 		/// Creates a fake audio source for playing audio locally through the Gablarski audio engine.
@@ -109,7 +116,7 @@ namespace Gablarski.Client
 		/// </summary>
 		/// <param name="source">The source to mute.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
-		void ToggleMute (AudioSource source);
+		Task ToggleMuteAsync (AudioSource source);
 
 		/// <summary>
 		/// Resets the handler back to the starting state.
@@ -119,12 +126,12 @@ namespace Gablarski.Client
 
 	public static class ClientSourceHandlerExtensions
 	{
-		public static void Request (this IClientSourceHandler self, string name, AudioFormat format, short frameSize)
+		public static Task<AudioSource> RequestSourceAsync (this IClientSourceHandler self, string name, AudioFormat format, short frameSize)
 		{
 			if (self == null)
 				throw new ArgumentNullException ("self");
 
-			self.Request (name, format, frameSize, 0);
+			return self.RequestSourceAsync (name, format, frameSize, 0);
 		}
 	}
 }

@@ -181,12 +181,12 @@ namespace Gablarski.Client
 			OnAudioSourceStopped (new AudioSourceEventArgs (source));
 		}
 
-		public void ToggleMute (AudioSource source)
+		public Task ToggleMuteAsync (AudioSource source)
 		{
 			if (source == null)
 				throw new ArgumentNullException ("source");
 
-			this.context.Connection.SendAsync (new RequestMuteSourceMessage (source, !source.IsMuted));
+			return this.context.Connection.SendAsync (new RequestMuteSourceMessage (source, !source.IsMuted));
 		}
 
 		/// <summary>
@@ -198,9 +198,23 @@ namespace Gablarski.Client
 		/// The server may not agree with the bitrate you request, do not set up audio based on this
 		/// target, but on the bitrate of the source you actually receive.
 		/// </remarks>
-		public void Request (string name, AudioFormat format, short frameSize, int targetBitrate)
+		public async Task<AudioSource> RequestSourceAsync (string name, AudioFormat format, short frameSize, int targetBitrate)
 		{
-			this.context.Connection.SendAsync (new RequestSourceMessage (name, new AudioCodecArgs (format, targetBitrate, frameSize, 10)));
+			if (name == null)
+				throw new ArgumentNullException ("name");
+
+			try {
+				var result = await this.context.Connection.SendFor<SourceResultMessage> (
+					new RequestSourceMessage (name, new AudioCodecArgs (format, targetBitrate, frameSize, 10)),
+					30000).ConfigureAwait (false);
+
+				if (result.SourceResult != SourceResult.Succeeded)
+					throw new Exception (String.Format ("Error requesting source '{0}': {1}", result.SourceName, result.SourceResult));
+				
+				return result.Source;
+			} catch (OperationCanceledException) {
+				return null;
+			}
 		}
 
 		public AudioSource CreateFake (string name, AudioFormat format, short frameSize)
@@ -308,7 +322,7 @@ namespace Gablarski.Client
 
 		internal void OnAudioSourceStateChangedMessage (MessageEventArgs<AudioSourceStateChangeMessage> e)
 		{
-			var msg = (AudioSourceStateChangeMessage)e.Message;
+			var msg = e.Message;
 
 			var source = this.manager[msg.SourceId];
 
