@@ -1,11 +1,18 @@
-﻿// Copyright (c) 2011, Eric Maupin
+﻿//
+// IAudioEngine.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2009-2011, Eric Maupin
+// Copyright (c) 2011-2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
 // or without modification, are permitted provided that
 // the following conditions are met:
 //
-// - Redistributions of source code must retain the above 
+// - Redistributions of source code must retain the above
 //   copyright notice, this list of conditions and the
 //   following disclaimer.
 //
@@ -36,8 +43,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Gablarski.Client;
 
 namespace Gablarski.Audio
@@ -247,6 +252,11 @@ namespace Gablarski.Audio
 		/// </summary>
 		/// <exception cref="System.InvalidOperationException"><see cref="AudioSender"/>, <see cref="AudioReceiver"/> or <see cref="Context"/> are not set.</exception>
 		void Start();
+
+		/// <summary>
+		/// Clears the audio engine of all attachments and mutes.
+		/// </summary>
+		void Clear();
 
 		/// <summary>
 		/// Stops the audio engine and clears all attachments.

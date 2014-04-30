@@ -1,11 +1,18 @@
-// Copyright (c) 2011, Eric Maupin
+//
+// AudioEngine.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2009-2011, Eric Maupin
+// Copyright (c) 2011-2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
 // or without modification, are permitted provided that
 // the following conditions are met:
 //
-// - Redistributions of source code must retain the above 
+// - Redistributions of source code must retain the above
 //   copyright notice, this list of conditions and the
 //   following disclaimer.
 //
@@ -37,7 +44,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using Gablarski.Client;
 using Gablarski.Messages;
 
@@ -469,18 +475,15 @@ namespace Gablarski.Audio
 			AudioReceiver.ReceivedAudio += OnReceivedAudio;
 		}
 
-		public void Stop ()
+		public void Clear()
 		{
-			this.running = false;
-
-			if (this.AudioReceiver != null)
-				this.AudioReceiver.ReceivedAudio -= OnReceivedAudio;
-
 			lock (captures)
 			{
 				captureToSourceLookup.Clear();
 				captures.Clear();
 				mutedCaptures.Clear();
+
+				this.captureMuted = false;
 			}
 
 			lock (playbacks)
@@ -488,7 +491,19 @@ namespace Gablarski.Audio
 				playbacks.Clear();
 				playbackProviders.Clear();
 				mutedPlayers.Clear();
+
+				this.playbackMuted = false;
 			}
+		}
+
+		public void Stop ()
+		{
+			this.running = false;
+
+			if (AudioReceiver != null)
+				AudioReceiver.ReceivedAudio -= OnReceivedAudio;
+
+			Clear();
 		}
 
 		private volatile bool running;
