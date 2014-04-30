@@ -88,6 +88,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsyncValue.cs" />
+    <Compile Include="AudioHandler.cs" />
     <Compile Include="AvatarCache.cs" />
     <Compile Include="AutomaticErrorReporter.cs" />
     <Compile Include="CollectionView.cs" />

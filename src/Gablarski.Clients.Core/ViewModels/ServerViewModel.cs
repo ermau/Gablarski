@@ -44,6 +44,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using Gablarski.Audio;
 using Gablarski.Client;
 using Gablarski.Clients.Persistence;
 using Tempest;
@@ -59,6 +60,9 @@ namespace Gablarski.Clients.ViewModels
 				throw new ArgumentNullException ("clientContext");
 
 			this.clientContext = clientContext;
+			this.input = new InputHandler (this.clientContext);
+			this.audio = new AudioHandler (this.clientContext);
+
 			this.windowHandle = windowHandle;
 
 			BindingOperations.EnableCollectionSynchronization (this.clientContext.Channels, this.clientContext.Channels.SyncContext);
@@ -115,11 +119,18 @@ namespace Gablarski.Clients.ViewModels
 
 			Task<LoginResultState> joinTask = this.clientContext.CurrentUser.JoinAsync (entry.UserNickname, entry.UserPhonetic, entry.ServerPassword);
 
-			this.input = new InputHandler (this.clientContext);
+			Task inputTask = this.input.SetupInputAsync (this.windowHandle);
+			
+			await this.audio.SetupAudioAsync();
 
 			// TODO failed joins
 			await joinTask;
-			await this.input.SetupInputAsync (this.windowHandle);
+
+			// TODO failed request
+			Task<AudioSource> voiceSourceTask = this.audio.RequestVoiceSourceAsync (new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 0, 480, 10));
+
+			await inputTask;
+			this.input.VoiceSource = await voiceSourceTask;
 
 			IsConnecting = false;
 		}
@@ -129,5 +140,6 @@ namespace Gablarski.Clients.ViewModels
 		private bool isConnecting;
 		private ClientConnectionResult connectionResult;
 		private InputHandler input;
+		private AudioHandler audio;
 	}
 }

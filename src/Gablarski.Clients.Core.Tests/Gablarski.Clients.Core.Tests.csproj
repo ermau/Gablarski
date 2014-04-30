@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AudioHandlerTests.cs" />
     <Compile Include="ClientContextBasedTests.cs" />
     <Compile Include="CompositeModuleFinderTests.cs" />
     <Compile Include="ErrorManagerTests.cs" />

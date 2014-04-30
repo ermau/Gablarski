@@ -110,5 +110,14 @@ namespace Gablarski.Audio
 			self.Device = device;
 			self.Open();
 		}
+
+		public static void Open (this IAudioPlaybackProvider self, string name)
+		{
+			if (self == null)
+				throw new ArgumentNullException ("self");
+
+			IAudioDevice device = self.GetDevices().FirstOrDefault (d => d.Name == name) ?? self.DefaultDevice;
+			self.Open (device);
+		}
 	}
 }
