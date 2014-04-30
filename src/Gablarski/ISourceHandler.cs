@@ -42,11 +42,12 @@
 // DAMAGE.
 
 using System.Collections.Generic;
+using System.Collections.Specialized;
 
 namespace Gablarski
 {
 	public interface ISourceHandler<out TSource>
-		: IReadOnlyCollection<TSource>
+		: IReadOnlyCollection<TSource>, INotifyCollectionChanged
 	{
 		IEnumerable<TSource> GetSources (IUserInfo user);
 		TSource GetSource (int sourceId);

@@ -44,6 +44,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
 using Gablarski.Audio;
@@ -69,6 +70,12 @@ namespace Gablarski.Client
 			this.context.RegisterMessageHandler<ServerAudioDataMessage> (OnServerAudioDataMessage);
 			this.context.RegisterMessageHandler<AudioSourceStateChangeMessage> (OnAudioSourceStateChangedMessage);
 			this.context.RegisterMessageHandler<SourceMutedMessage> (OnSourceMutedMessage);
+		}
+
+		public event NotifyCollectionChangedEventHandler CollectionChanged
+		{
+			add { this.manager.CollectionChanged += value; }
+			remove { this.manager.CollectionChanged -= value; }
 		}
 
 		public event EventHandler<ReceivedListEventArgs<AudioSource>> ReceivedSourceList;
