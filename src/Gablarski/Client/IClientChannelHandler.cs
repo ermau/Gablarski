@@ -1,4 +1,10 @@
-﻿// Copyright (c) 2014, Eric Maupin
+﻿//
+// IClientChannelHandler.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -42,6 +48,7 @@ namespace Gablarski.Client
 	public interface IClientChannelHandler
 		: IReadOnlyList<IChannelInfo>
 	{
+		IChannelInfo Current { get; }
 		object SyncContext { get; }
 
 		Task<ChannelEditResult> CreateAsync (IChannelInfo channelInfo);

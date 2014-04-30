@@ -313,9 +313,9 @@ namespace Gablarski.Clients
 		{
 			if (e.User.Equals (client.CurrentUser))
 				Notify (NotificationType.SwitchedChannel, "Switched to channel " + e.TargetChannel.Name + ".");
-			else if (e.TargetChannel.Equals (client.CurrentChannel))
+			else if (e.TargetChannel.Equals (client.Channels.Current))
 				Notify (NotificationType.UserJoinedChannel, "{0} joined the channel.", e.User.Nickname, e.User.Phonetic);
-			else if (e.PreviousChannel.Equals (client.CurrentChannel))
+			else if (e.PreviousChannel.Equals (client.Channels.Current))
 				Notify (NotificationType.UserLeftChannel, "{0} left the channel.", e.User.Nickname, e.User.Phonetic);
 		}
 	}

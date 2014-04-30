@@ -1,4 +1,11 @@
-// Copyright (c) 2011-2014, Eric Maupin
+//
+// ClientChannelHandler.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2009-2011, Eric Maupin
+// Copyright (c) 2011-2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -75,6 +82,18 @@ namespace Gablarski.Client
 		public object SyncContext
 		{
 			get { return this.channelLock; }
+		}
+
+		public IChannelInfo Current
+		{
+			get
+			{
+				var user = this.context.CurrentUser;
+				if (user == null)
+					return null;
+
+				return this[user.CurrentChannelId];
+			}
 		}
 
 		/// <summary>Gets the channel with id <paramref name="channelId"/></summary>

@@ -1,4 +1,11 @@
-// Copyright (c) 2010-2014, Eric Maupin
+//
+// GablarskiClient.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2009-2011, Eric Maupin
+// Copyright (c) 2011-2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -111,7 +118,6 @@ namespace Gablarski.Client
 		/// </summary>
 		public event EventHandler<DisconnectedEventArgs> Disconnected;
 
-
 		/// <summary>
 		/// Gets whether the client is currently trying to connect or reconnect.
 		/// </summary>
@@ -167,14 +173,6 @@ namespace Gablarski.Client
 		{
 			get;
 			private set;
-		}
-
-		/// <summary>
-		/// Gets the current channel the user is in.
-		/// </summary>
-		public IChannelInfo CurrentChannel
-		{
-			get { return this.Channels[this.CurrentUser.CurrentChannelId]; }
 		}
 
 		/// <summary>
