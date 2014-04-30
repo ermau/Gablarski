@@ -531,6 +531,9 @@ namespace Gablarski.Audio
 
 		private void OnSamplesAvailable (object sender, SamplesAvailableEventArgs e)
 		{
+			if (!this.running)
+				return;
+
 			lock (captures)
 			{
 				AudioSource source;
