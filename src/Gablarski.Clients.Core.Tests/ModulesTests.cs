@@ -53,26 +53,6 @@ namespace Gablarski.Clients.Core.Tests
 	[TestFixture]
 	public class ModulesTests
 	{
-		class MockModuleFinder
-			: IModuleFinder
-		{
-			private readonly Dictionary<Type, Type[]> modules;
-
-			public MockModuleFinder (Dictionary<Type, Type[]> modules)
-			{
-				this.modules = modules;
-			}
-
-			public Task<IReadOnlyCollection<Type>> LoadExportsAsync<TContract>()
-			{
-				Type[] implementers;
-				if (!this.modules.TryGetValue (typeof (TContract), out implementers))
-					implementers = new Type[0];
-
-				return Task.FromResult<IReadOnlyCollection<Type>> (implementers);
-			}
-		}
-
 		interface IContract
 		{
 			
