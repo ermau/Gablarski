@@ -1,5 +1,5 @@
 ﻿//
-// InputManager.cs
+// InputHandler.cs
 //
 // Author:
 //   Eric Maupin <me@ermau.com>
@@ -55,13 +55,13 @@ namespace Gablarski.Clients
 	/// A manager for input, handles setting up/tearing down input providers and handles <see cref="Command" />s.
 	/// </summary>
 	/// <remarks>At current, the manager can not handle a changing list of input providers.</remarks>
-	public sealed class InputManager
+	public sealed class InputHandler
 	{
 		/// <summary>
-		/// Creates and initializes a new instance of the <see cref="InputManager"/> class.
+		/// Creates and initializes a new instance of the <see cref="InputHandler"/> class.
 		/// </summary>
 		/// <param name="context">The client context.</param>
-		public InputManager (IGablarskiClientContext context)
+		public InputHandler (IGablarskiClientContext context)
 		{
 			if (context == null)
 				throw new ArgumentNullException ("context");
@@ -69,7 +69,6 @@ namespace Gablarski.Clients
 			this.context = context;
 			Settings.SettingChanged += OnSettingChanged;
 		}
-
 
 		/// <summary>
 		/// Gets or sets the <see cref="AudioSource" /> to send audio from on the <see cref="Command.Talk" /> command.

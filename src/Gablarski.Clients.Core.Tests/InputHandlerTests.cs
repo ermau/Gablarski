@@ -1,4 +1,10 @@
-﻿// Copyright (c) 2014, Xamarin Inc.
+﻿//
+// InputHandlerTests.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -40,12 +46,12 @@ using NUnit.Framework;
 namespace Gablarski.Clients.Core.Tests
 {
 	[TestFixture]
-	public class InputManagerTests
+	public class InputHandlerTests
 	{
 		[Test]
 		public void CtorNull()
 		{
-			Assert.That (() => new InputManager (null), Throws.TypeOf<ArgumentNullException>());
+			Assert.That (() => new InputHandler (null), Throws.TypeOf<ArgumentNullException>());
 		}
 	}
 }

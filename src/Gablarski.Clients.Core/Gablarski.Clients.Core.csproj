@@ -102,7 +102,7 @@
     <Compile Include="IErrorReporter.cs" />
     <Compile Include="IModuleFinder.cs" />
     <Compile Include="INotifier.cs" />
-    <Compile Include="InputManager.cs" />
+    <Compile Include="InputHandler.cs" />
     <Compile Include="Input\Command.cs" />
     <Compile Include="Input\CommandBinding.cs" />
     <Compile Include="Input\CommandStateChangedEventArgs.cs" />

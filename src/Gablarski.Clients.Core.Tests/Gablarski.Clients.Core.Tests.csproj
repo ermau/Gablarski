@@ -48,7 +48,7 @@
     <Compile Include="ClientContextBasedTests.cs" />
     <Compile Include="CompositeModuleFinderTests.cs" />
     <Compile Include="ErrorManagerTests.cs" />
-    <Compile Include="InputManagerTests.cs" />
+    <Compile Include="InputHandlerTests.cs" />
     <Compile Include="Messages\JoinServerMessageTests.cs" />
     <Compile Include="ModulesTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

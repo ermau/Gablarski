@@ -115,7 +115,7 @@ namespace Gablarski.Clients.ViewModels
 
 			Task<LoginResultState> joinTask = this.clientContext.CurrentUser.JoinAsync (entry.UserNickname, entry.UserPhonetic, entry.ServerPassword);
 
-			this.input = new InputManager (this.clientContext);
+			this.input = new InputHandler (this.clientContext);
 
 			// TODO failed joins
 			await joinTask;
@@ -128,6 +128,6 @@ namespace Gablarski.Clients.ViewModels
 		private readonly IntPtr windowHandle;
 		private bool isConnecting;
 		private ClientConnectionResult connectionResult;
-		private InputManager input;
+		private InputHandler input;
 	}
 }
