@@ -212,7 +212,7 @@ namespace Gablarski
 
 			bool any = false;
 			lock (this.syncRoot) {
-				foreach (AudioSource source in OwnedSources[user.UserId]) {
+				foreach (AudioSource source in OwnedSources[user.UserId].ToList()) {
 					bool removed = Remove (source);
 					if (removed)
 						any = true;
