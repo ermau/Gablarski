@@ -370,7 +370,7 @@ namespace Gablarski.Clients
 			}
 
 			await settings.SaveAsync().ConfigureAwait (false);
-			await settings.LoadAsync().ConfigureAwait (false);
+			await LoadAsync().ConfigureAwait (false);
 		}
 
 		private static ObservableCollection<CommandBinding> commandBindings;
