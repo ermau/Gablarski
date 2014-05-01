@@ -231,7 +231,7 @@ namespace Gablarski.Server
 		{
 			var msg = e.Message;
 			
-			if (!msg.Host.IsNullOrWhitespace() && msg.Port != 0)
+			/*if (!msg.Host.IsNullOrWhitespace() && msg.Port != 0)
 			{
 				foreach (var r in this.context.Redirectors)
 				{
@@ -242,7 +242,7 @@ namespace Gablarski.Server
 					e.Connection.SendAsync (new RedirectMessage { Host = redirect.Address.ToString(), Port = redirect.Port });
 					return;
 				}
-			}
+			}*/
 
 			Manager.Connect (e.Connection);
 

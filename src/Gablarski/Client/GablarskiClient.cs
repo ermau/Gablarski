@@ -232,7 +232,7 @@ namespace Gablarski.Client
 			this.Channels = (channelHandler ?? new ClientChannelHandler (this));
 
 			this.RegisterMessageHandler<PermissionDeniedMessage> (OnPermissionDeniedMessage);
-			this.RegisterMessageHandler<RedirectMessage> (OnRedirectMessage);
+			//this.RegisterMessageHandler<RedirectMessage> (OnRedirectMessage);
 			this.RegisterMessageHandler<ServerInfoMessage> (OnServerInfoReceivedMessage);
 			//this.RegisterMessageHandler<ConnectionRejectedMessage> (OnConnectionRejectedMessage);
 			this.RegisterMessageHandler<DisconnectMessage> (OnDisconnectedMessage);
