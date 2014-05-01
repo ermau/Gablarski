@@ -215,7 +215,7 @@ namespace Gablarski.Clients
 
 		private void Talk (bool on)
 		{
-			if (PushToTalk || VoiceSource == null)
+			if (!PushToTalk || VoiceSource == null)
 				return;
 
 			if (on)
