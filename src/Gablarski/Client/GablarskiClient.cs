@@ -206,11 +206,34 @@ namespace Gablarski.Client
 			set { reconnectAttemptFrequency = value; }
 		}
 
-		public Task<ClientConnectionResult> ConnectAsync (Target target)
+		public async Task<ClientConnectionResult> ConnectAsync (Target target)
 		{
 			this.previousTarget = target;
 			this.running = true;
-			return this.client.ConnectAsync (target);
+			ClientConnectionResult result = await this.client.ConnectAsync (target).ConfigureAwait (false);
+			if (result.Result != ConnectionResult.Success)
+				return result;
+
+			if (!this.running) {
+				await this.client.DisconnectAsync().ConfigureAwait (false);
+				return result;
+			}
+
+			await client.Connection.SendAsync (new ConnectMessage {
+				ProtocolVersion = 14,
+			}).ConfigureAwait (false);
+
+			lock (StateSync) {
+				if (Audio.AudioSender == null)
+					Audio.AudioSender = Sources;
+				if (Audio.AudioReceiver == null)
+					Audio.AudioReceiver = Sources;
+
+				Audio.Context = this;
+				Audio.Start();
+			}
+
+			return result;
 		}
 
 		public Task DisconnectAsync()
@@ -221,7 +244,6 @@ namespace Gablarski.Client
 		private void Setup (IClientConnection connection, IAudioEngine audioEngine, IClientUserHandler userHandler, IClientSourceHandler sourceHandler, ClientChannelHandler channelHandler)
 		{
 			this.client = new TempestClient (connection, MessageTypes.All);
-			this.client.Connected += OnClientConnected;
 			this.client.Disconnected += OnClientDisconnected;
 
 			this.CurrentUser = new CurrentUser (this);
@@ -349,29 +371,6 @@ namespace Gablarski.Client
 		private void OnClientDisconnected (object sender, ClientDisconnectedEventArgs e)
 		{
 			DisconnectCore (DisconnectionReason.Unknown, this.client.Connection);
-		}
-
-		private void OnClientConnected (object sender, ClientConnectionEventArgs e)
-		{
-			lock (StateSync)
-			{
-				if (!this.running)
-				{
-					this.client.DisconnectAsync();
-					return;
-				}
-
-				client.Connection.SendAsync (new ConnectMessage { ProtocolVersion = 14 });
-				//Host = this.originalHost, Port = this.originalEndPoint.Port
-
-				if (Audio.AudioSender == null)
-					Audio.AudioSender = Sources;
-				if (Audio.AudioReceiver == null)
-					Audio.AudioReceiver = Sources;
-
-				Audio.Context = this;
-				Audio.Start();
-			}
 		}
 
 		void IContext.LockHandlers()
