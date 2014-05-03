@@ -74,6 +74,34 @@ namespace Gablarski.Clients
 			Prelaunch<ISpeechRecognizer>();
 		}
 
+		/// <summary>
+		/// Creates an independent instance of <typeparamref name="TContract" /> that is not added to the local cache.
+		/// </summary>
+		/// <typeparam name="TContract">The contract type.</typeparam>
+		/// <param name="simpleName">The type's simple name to search for.</param>
+		/// <returns>The <typeparamref name="TContract"/> matching <paramref name="simpleName"/> or <c>null</c> if not found.</returns>
+		public static async Task<TContract> CreateInstance<TContract> (string simpleName)
+		{
+			var modules = await GetModulesFor<TContract>().ConfigureAwait (false);
+			return CreateSpecificInstance<TContract> (simpleName, modules);
+		}
+
+		/// <summary>
+		/// Creates independent instances of <typeparamref name="TContract" /> that are not added to the local cache.
+		/// </summary>
+		/// <typeparam name="TContract">The contract type.</typeparam>
+		/// <returns>A collection of </returns>
+		public static async Task<IReadOnlyCollection<TContract>> CreateInstances<TContract>()
+		{
+			var types = await GetModulesFor<TContract>().ConfigureAwait (false);
+			List<TContract> list = new List<TContract> (types.Count);
+
+			foreach (var type in types)
+				list.Add ((TContract) Activator.CreateInstance (type));
+
+			return list;
+		}
+
 		public static async Task<TContract> GetImplementerOrDefaultAsync<TContract> (string simpleName)
 		{
 			if (moduleFinder == null)
