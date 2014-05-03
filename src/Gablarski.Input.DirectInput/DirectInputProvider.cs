@@ -125,14 +125,7 @@ namespace Gablarski.Input.DirectInput
 				foreach (CommandBinding binding in bindings)
 				{
 					string[] parts = binding.Input.Split ('|');
-					if (parts[0] == "keyboard")
-						parts[0] = KeyboardGuid.ToString();
-					else if (parts[1] == "mouse")
-						parts[0] = MouseGuid.ToString();
-
-					Guid deviceGuid;
-					if (!Guid.TryParse (parts[0], out deviceGuid))
-						continue;
+					Guid deviceGuid = GetRealGuid (parts[0]);
 
 					if (deviceGuid == KeyboardGuid)
 					{
@@ -222,7 +215,7 @@ namespace Gablarski.Input.DirectInput
 				throw new FormatException ("Input was in an unrecognized format.");
 
 			string[] parts = deviceInput.Split ('|');
-			Guid deviceGuid = new Guid (parts[0]);
+			Guid deviceGuid = GetRealGuid (parts[0]);
 
 			Device device = null;
 			if (deviceGuid == KeyboardGuid)
@@ -276,6 +269,24 @@ namespace Gablarski.Input.DirectInput
 		private Mouse mouse;
 
 		private Thread inputRunnerThread;
+
+		/// <summary>
+		/// Converts any special values like 'mouse' and 'keyboard' to the actual GUID
+		/// </summary>
+		/// <param name="guid">The guid or special value.</param>
+		/// <returns>The proper Guid.</returns>
+		private Guid GetRealGuid (string guid)
+		{
+			Guid deviceGuid;
+			if (guid == "keyboard")
+				deviceGuid = KeyboardGuid;
+			else if (guid == "mouse")
+				deviceGuid = MouseGuid;
+			else
+				Guid.TryParse (guid, out deviceGuid);
+
+			return deviceGuid;
+		}
 
 		private string GetNiceInputName (string deviceInput, Device device)
 		{
