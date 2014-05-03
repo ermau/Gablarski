@@ -76,10 +76,8 @@ namespace Gablarski.Clients.ViewModels
 				if (this.inputProvider == value)
 					return;
 
-				if (this.inputProvider != null) {
+				if (this.inputProvider != null)
 					this.inputProvider.Detach();
-					this.inputProvider.Dispose();
-				}
 
 				this.inputProvider = value;
 				OnPropertyChanged();

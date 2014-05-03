@@ -1,4 +1,10 @@
-﻿// Copyright (c) 2013, Eric Maupin
+﻿//
+// SettingsViewModel.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2013-2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -112,8 +118,8 @@ namespace Gablarski.Clients.ViewModels
 
 		private void Close()
 		{
-			Capture.Close();
-			Input.Close();
+			Capture.Dispose();
+			Input.Dispose();
 
 			var closing = Closing;
 			if (closing != null)

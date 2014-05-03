@@ -51,13 +51,13 @@ using Gablarski.Clients.Input;
 namespace Gablarski.Clients.ViewModels
 {
 	public class InputSettingsViewModel
-		: BusyViewModel
+		: BusyViewModel, IDisposable
 	{
 		public InputSettingsViewModel (IntPtr windowHandle)
 		{
 			IsBusy = true;
 
-			Modules.GetImplementersAsync<IInputProvider>().ContinueWith (t => {
+			Modules.CreateInstances<IInputProvider>().ContinueWith (t => {
 				InputProviders = t.Result;
 
 				Bindings = new BindingListViewModel (windowHandle, new RelayCommand<CommandBindingViewModel> (Record, CanRecord));
@@ -117,9 +117,12 @@ namespace Gablarski.Clients.ViewModels
 			private set;
 		}
 
-		public void Close()
+		public void Dispose()
 		{
 			Bindings.InputProvider = null;
+
+			foreach (var input in InputProviders)
+				input.Dispose();
 		}
 
 		public void UpdateSettings()
@@ -129,8 +132,7 @@ namespace Gablarski.Clients.ViewModels
 				Settings.CommandBindings.Clear();
 
 				foreach (var b in Bindings.Bindings)
-					Settings.CommandBindings.Add (new Gablarski.Clients.Input.CommandBinding (Bindings.InputProvider, b.Command,
-						b.Input));
+					Settings.CommandBindings.Add (new Input.CommandBinding (Bindings.InputProvider, b.Command, b.Input));
 			} else
 				Settings.InputProvider = String.Empty;
 		}

@@ -45,32 +45,31 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Gablarski.Audio;
+using Tempest;
 
 namespace Gablarski.Clients.ViewModels
 {
 	public class AudioCaptureSettingsViewModel
-		: BusyViewModel
+		: BusyViewModel, IDisposable
 	{
 		public AudioCaptureSettingsViewModel()
 		{
 			IsBusy = true;
 
-			var getSelectedProvider = Modules.GetImplementerOrDefaultAsync<IAudioCaptureProvider> (Settings.VoiceProvider);
-
-			Modules.GetImplementersAsync<IAudioCaptureProvider>().ContinueWith (t => {
+			Modules.CreateInstances<IAudioCaptureProvider>().ContinueWith (t => {
 				CaptureProviders = t.Result;
+				CurrentCaptureProvider = t.Result.FirstOrDefault(p => p.GetType().GetSimplestName() == Settings.VoiceProvider);
 
-				getSelectedProvider.ContinueWith (st => {
-					CurrentCaptureProvider = st.Result;
+				if (CurrentCaptureProvider != null && CurrentCaptureProvider.Device != null)
+					this.currentCaptureDevice = CaptureDevices.FirstOrDefault (vm => vm.Device == CurrentCaptureProvider.Device);
 
-					if (Settings.VoiceDevice != null) {
-						var setDevice = CaptureDevices.FirstOrDefault (d => d.Device.Name == Settings.VoiceDevice);
-						if (setDevice != null)
-							CurrentCaptureDevice = setDevice;
-					}
+				if (Settings.VoiceDevice != null) {
+					var setDevice = CaptureDevices.FirstOrDefault (d => d.Device.Name == Settings.VoiceDevice);
+					if (setDevice != null)
+						CurrentCaptureDevice = setDevice;
+				}
 
-					IsBusy = false;
-				});
+				IsBusy = false;
 			}, TaskScheduler.FromCurrentSynchronizationContext());
 
 			VoiceActivationThreshold = Settings.VoiceActivationLevel;
@@ -298,14 +297,16 @@ namespace Gablarski.Clients.ViewModels
 			Settings.UsePushToTalk = !UseVoiceActivation;
 		}
 
-		public void Close()
+		public void Dispose()
 		{
-			if (CurrentCaptureProvider == null)
-				return;
-			
-			CurrentCaptureProvider.SamplesAvailable -= OnSamplesAvailable;
-			if (CurrentCaptureProvider.IsCapturing)
-				CurrentCaptureProvider.EndCapture();
+			if (CurrentCaptureProvider != null) {
+				CurrentCaptureProvider.SamplesAvailable -= OnSamplesAvailable;
+				if (CurrentCaptureProvider.IsCapturing)
+					CurrentCaptureProvider.EndCapture();
+			}
+
+			foreach (IAudioCaptureProvider provider in CaptureProviders)
+				provider.Dispose();
 		}
 
 		private VoiceActivation activation;
