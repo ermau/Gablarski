@@ -66,6 +66,7 @@ namespace Gablarski.Clients.ViewModels
 			Messenger.Register<JoinServerMessage> (OnJoinServerMessage);
 			Messenger.Register<EditServerMessage> (OnEditServerMessage);
 			Messenger.Register<DoneEditingServerMessage> (OnCancelEditServerMessage);
+			Messenger.Register<LeaveServerMessage> (OnLeaveServerMessage);
 		}
 
 		public AsyncValue<IEnumerable<ServerEntryViewModel>> Servers
@@ -133,6 +134,11 @@ namespace Gablarski.Clients.ViewModels
 		{
 			LoadServersAsync();
 			EditingServer = null;
+		}
+
+		private void OnLeaveServerMessage (LeaveServerMessage msg)
+		{
+			CurrentServer = null;
 		}
 
 		private void LoadServersAsync()

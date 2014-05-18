@@ -44,8 +44,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using System.Windows.Input;
 using Gablarski.Audio;
 using Gablarski.Client;
+using Gablarski.Clients.Messages;
 using Gablarski.Clients.Persistence;
 using Tempest;
 
@@ -70,14 +72,22 @@ namespace Gablarski.Clients.ViewModels
 			Channels = new CollectionView<ChannelViewModel> (this.clientContext.Channels,
 				new LambdaConverter<IChannelInfo, ChannelViewModel> (
 					c => new ChannelViewModel (this.clientContext, c), vm => vm.Channel));
+
+			LeaveServer = new RelayCommand (OnLeave);
 		}
 
 		public ServerInfo ServerInfo
 		{
 			get { return this.clientContext.ServerInfo; }
- 		}
+		}
 
 		public IEnumerable<ChannelViewModel> Channels
+		{
+			get;
+			private set;
+		}
+
+		public ICommand LeaveServer
 		{
 			get;
 			private set;
@@ -148,5 +158,19 @@ namespace Gablarski.Clients.ViewModels
 		private ClientConnectionResult connectionResult;
 		private InputHandler input;
 		private AudioHandler audio;
+
+		private async void OnLeave()
+		{
+			var i = this.input;
+			if (i != null)
+				i.DisableInput();
+
+			var a = this.audio;
+			if (a != null)
+				a.DisableAudio();
+
+			await this.clientContext.DisconnectAsync();
+			Messenger.Send (new LeaveServerMessage());
+		}
 	}
 }
