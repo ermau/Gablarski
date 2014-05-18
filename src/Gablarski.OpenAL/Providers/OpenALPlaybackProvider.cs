@@ -230,6 +230,8 @@ namespace Gablarski.OpenAL.Providers
 
 			OpenAL.DebugFormat ("Freeing OpenALPlaybackProvider. Disposing: ", disposing);
 
+			Close();
+
 			if (disposing)
 			{
 				this.pool.Dispose();
