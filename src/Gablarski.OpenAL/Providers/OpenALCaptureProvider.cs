@@ -83,6 +83,10 @@ namespace Gablarski.OpenAL.Providers
 					throw new ArgumentException ("Device must be a non-null OpenAL.CaptureDevice", "value");
 
 				this.device = cdevice;
+				if (this.isOpened) {
+					Close();
+					Open (this.format);
+				}
 			}
 		}
 
