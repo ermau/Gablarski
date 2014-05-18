@@ -74,6 +74,8 @@ namespace Gablarski.Client
 		ICurrentUserHandler CurrentUser { get; }
 
 		Task<ClientConnectionResult> ConnectAsync (Target target);
+
+		Task DisconnectAsync();
 	}
 
 	public static class ContextExtensions
