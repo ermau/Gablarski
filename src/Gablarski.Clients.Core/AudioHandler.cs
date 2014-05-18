@@ -73,12 +73,22 @@ namespace Gablarski.Clients
 			this.context.Audio.Clear();
 
 			var p = this.playback;
-			if (p != null)
+			if (p != null) {
+				var pd = p.Device;
 				p.Close();
+				
+				if (pd != null)
+					pd.Dispose();
+			}
 
 			var c = this.capture;
-			if (c != null && c.IsCapturing)
+			if (c != null) {
+				var cd = c.Device;
 				c.Close();
+
+				if (cd != null)
+					cd.Dispose();
+			}
 		}
 
 		public async Task<AudioSource> RequestVoiceSourceAsync (AudioCodecArgs format)
