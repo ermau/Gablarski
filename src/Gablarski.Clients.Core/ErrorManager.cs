@@ -45,6 +45,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Cadenza.Collections;
 
 namespace Gablarski.Clients
@@ -59,7 +60,7 @@ namespace Gablarski.Clients
 			get { return this.errors.Count > 0; }
 		}
 
-		public void AddError (string propertyName, string error)
+		public void AddError (string error, [CallerMemberName] string propertyName = null)
 		{
 			if (error == null)
 				throw new ArgumentNullException ("error");
@@ -70,7 +71,7 @@ namespace Gablarski.Clients
 			}
 		}
 
-		public void RemoveError (string propertyName, string error)
+		public void RemoveError (string error, [CallerMemberName] string propertyName = null)
 		{
 			if (error == null)
 				throw new ArgumentNullException ("error");
@@ -79,14 +80,14 @@ namespace Gablarski.Clients
 				OnErrorsChanged (new DataErrorsChangedEventArgs (propertyName));
 		}
 
-		public void ClearErrors()
+		public void ClearAllErrors()
 		{
 			foreach (IGrouping<string, string> group in this.errors) {
 				ClearErrors (group.Key);
 			}
 		}
 
-		public void ClearErrors (string propertyName)
+		public void ClearErrors ([CallerMemberName] string propertyName = null)
 		{
 			if (this.errors.Remove (propertyName))
 				OnErrorsChanged (new DataErrorsChangedEventArgs (propertyName));

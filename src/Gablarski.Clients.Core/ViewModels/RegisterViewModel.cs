@@ -54,10 +54,10 @@ namespace Gablarski.Clients.ViewModels
 
 				this.username = value;
 
-				this.errors.ClearErrors ("Username");
+				this.errors.ClearErrors();
 
 				if (String.IsNullOrWhiteSpace (value))
-					this.errors.AddError ("Username", UsernameBlankError);
+					this.errors.AddError (UsernameBlankError);
 
 				OnPropertyChanged();
 			}
@@ -73,10 +73,10 @@ namespace Gablarski.Clients.ViewModels
 
 				this.password = value;
 
-				this.errors.ClearErrors ("Password");
+				this.errors.ClearErrors();
 
 				if (String.IsNullOrWhiteSpace (value))
-					this.errors.AddError ("Password", PasswordBlankError);
+					this.errors.AddError (PasswordBlankError);
 
 				OnPropertyChanged();
 			}
@@ -92,12 +92,12 @@ namespace Gablarski.Clients.ViewModels
 
 				this.password2 = value;
 
-				this.errors.ClearErrors ("Password2");
+				this.errors.ClearErrors();
 
 				if (String.IsNullOrWhiteSpace (value))
-					this.errors.AddError ("Password2", PasswordBlankError);
+					this.errors.AddError (PasswordBlankError);
 				if (value != Password)
-					this.errors.AddError ("Password2", PasswordsDoNotMatchError);
+					this.errors.AddError (PasswordsDoNotMatchError);
 
 				OnPropertyChanged();
 			}
@@ -145,15 +145,15 @@ namespace Gablarski.Clients.ViewModels
 			RegisterResult result = await this.client.CurrentUser.RegisterAsync (Username, Password);
 			switch (result) {
 				case RegisterResult.FailedPassword:
-					this.errors.AddError ("Password", PasswordIsInvalid);
+					this.errors.AddError (PasswordIsInvalid, "Password");
 					break;
 
 				case RegisterResult.FailedUsername:
-					this.errors.AddError ("Username", UsernameInvalid);
+					this.errors.AddError (UsernameInvalid, "Username");
 					break;
 
 				case RegisterResult.FailedUsernameInUse:
-					this.errors.AddError ("Username", UsernameInUse);
+					this.errors.AddError (UsernameInUse, "Username");
 					break;
 			}
 
