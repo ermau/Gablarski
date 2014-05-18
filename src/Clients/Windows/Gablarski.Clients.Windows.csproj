@@ -177,7 +177,6 @@
     <Compile Include="AvatarConverter.cs" />
     <Compile Include="CaseConverter.cs" />
     <Compile Include="DirectoryModuleFinder.cs" />
-    <Compile Include="EditBalloon.cs" />
     <Compile Include="BindingList.xaml.cs">
       <DependentUpon>BindingList.xaml</DependentUpon>
     </Compile>
