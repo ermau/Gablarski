@@ -72,6 +72,11 @@ namespace Gablarski.Clients.ViewModels
 					c => new ChannelViewModel (this.clientContext, c), vm => vm.Channel));
 		}
 
+		public ServerInfo ServerInfo
+		{
+			get { return this.clientContext.ServerInfo; }
+ 		}
+
 		public IEnumerable<ChannelViewModel> Channels
 		{
 			get;
@@ -116,6 +121,8 @@ namespace Gablarski.Clients.ViewModels
 
 			if (ConnectionResult.Result != Tempest.ConnectionResult.Success)
 				return;
+
+			OnPropertyChanged ("ServerInfo");
 
 			Task<LoginResultState> joinTask = this.clientContext.CurrentUser.JoinAsync (entry.UserNickname, entry.UserPhonetic, entry.ServerPassword);
 

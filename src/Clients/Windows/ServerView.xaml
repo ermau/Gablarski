@@ -39,14 +39,28 @@
 		</DataTemplate>
 	</UserControl.Resources>
 	<Grid>
-		<Border Grid.Row="0" Background="Black" Opacity="0.8" Visibility="{Binding IsConnecting, Converter={StaticResource BooleanToVisibilityConverter}}" Panel.ZIndex="1">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition />
+		</Grid.RowDefinitions>
+		
+		<Border Grid.RowSpan="2" Background="Black" Opacity="0.8" Visibility="{Binding IsConnecting, Converter={StaticResource BooleanToVisibilityConverter}}" Panel.ZIndex="1">
 			<StackPanel VerticalAlignment="Center">
 				<metro:ProgressRing State="Indeterminate" Height="100" Width="100" />
 				<!--<Button Width="75" Height="30">Cancel</Button>-->
 			</StackPanel>
 		</Border>
 
-		<TreeView Style="{DynamicResource MetroTreeView}" ItemsSource="{Binding Channels}">
+		<Grid Grid.Row="0" Height="48">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="48" />
+				<ColumnDefinition />
+			</Grid.ColumnDefinitions>
+
+			<TextBlock Grid.Column="1" Text="{Binding ServerInfo.Name}" FontSize="20" />
+		</Grid>
+
+		<TreeView Grid.Row="1" Style="{DynamicResource MetroTreeView}" ItemsSource="{Binding Channels}">
 			<TreeView.ItemContainerStyle>
 				<Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
 					<Setter Property="IsExpanded" Value="True" />
