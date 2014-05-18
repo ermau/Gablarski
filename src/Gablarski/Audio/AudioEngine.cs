@@ -169,7 +169,7 @@ namespace Gablarski.Audio
 			lock (captures)
 			{
 				audioCapture.SamplesAvailable += OnSamplesAvailable;
-				audioCapture.BeginCapture (source.CodecSettings, source.CodecSettings.FrameSize);
+				audioCapture.BeginCapture (source.CodecSettings.FrameSize);
 				captures[source] = new AudioCaptureEntity (audioCapture, source, options);
 				captureToSourceLookup[audioCapture] = source;
 
