@@ -74,6 +74,11 @@ namespace Gablarski.Audio
 		/// <exception cref="InvalidOperationException"><see cref="Device"/> is not set.</exception>
 		/// <exception cref="ObjectDisposedException">This playback provider has already been disposed.</exception>
 		void Open();
+
+		/// <summary>
+		/// Disables the playback provider without disposing.
+		/// </summary>
+		void Close();
 		
 		/// <summary>
 		/// Queues audio <paramref name="data"/> to be played back, owned by <paramref name="source"/>.

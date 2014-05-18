@@ -43,6 +43,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Gablarski.Audio;
 
 namespace Gablarski.OpenAL.Providers
@@ -118,7 +119,21 @@ namespace Gablarski.OpenAL.Providers
 			if (Context.CurrentContext == null || Context.CurrentContext.Device != this.device)
 				Context.CreateAndActivate (this.device);
 
-			isOpen = true;
+			this.isOpen = true;
+		}
+
+		public void Close()
+		{
+			if (this.isDisposed)
+				throw new ObjectDisposedException ("OpenALPlaybackProvider");
+
+			this.isOpen = false;
+
+			var d = Interlocked.Exchange (ref this.device, null);
+			if (d != null)
+				d.Dispose();
+
+			Context.ClearCurrent();
 		}
 
 		private bool isOpen;

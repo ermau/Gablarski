@@ -150,7 +150,7 @@ namespace Gablarski.OpenAL
 			return c;
 		}
 
-		public void ClearCurrent()
+		public static void ClearCurrent()
 		{
 			alcMakeContextCurrent (IntPtr.Zero);
 			CurrentContext = null;
