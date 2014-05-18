@@ -145,13 +145,16 @@ namespace Gablarski.Clients.ViewModels
 				if (this.currentCaptureProvider == value)
 					return;
 
-				if (this.currentCaptureProvider != null)
+				if (this.currentCaptureProvider != null) {
 					this.currentCaptureProvider.SamplesAvailable -= OnSamplesAvailable;
+					this.currentCaptureProvider.Close();
+				}
 
 				this.currentCaptureProvider = value; 
 				OnPropertyChanged();
 
 				if (value != null) {
+					value.Open (AudioFormat.Mono16bitLPCM);
 					value.SamplesAvailable += OnSamplesAvailable;
 
 					CaptureDevices = new[] { new DefaultDevice() }
@@ -205,7 +208,7 @@ namespace Gablarski.Clients.ViewModels
 							actualDevice = CaptureDevices.First (d => d.Device.Equals (CurrentCaptureProvider.DefaultDevice)).Device;
 
 						CurrentCaptureProvider.Device = actualDevice;
-						CurrentCaptureProvider.BeginCapture (AudioFormat.Mono16bitLPCM, FrameSize);
+						CurrentCaptureProvider.BeginCapture (FrameSize);
 					}
 				}
 
@@ -235,7 +238,7 @@ namespace Gablarski.Clients.ViewModels
 								: CurrentCaptureDevice.Device;
 						}
 
-						CurrentCaptureProvider.BeginCapture (AudioFormat.Mono16bitLPCM, FrameSize);
+						CurrentCaptureProvider.BeginCapture (FrameSize);
 					}
 				}
 
