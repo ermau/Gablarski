@@ -82,11 +82,12 @@ namespace Gablarski.OpenAL.Providers
 				if (cdevice == null)
 					throw new ArgumentException ("Device must be a non-null OpenAL.CaptureDevice", "value");
 
-				this.device = cdevice;
 				if (this.isOpened) {
 					Close();
+					this.device = cdevice;
 					Open (this.format);
-				}
+				} else
+					this.device = cdevice;
 			}
 		}
 
@@ -116,10 +117,7 @@ namespace Gablarski.OpenAL.Providers
 		{
 			EndCapture();
 			this.isOpened = false;
-
-			var d = Interlocked.Exchange (ref this.device, null);
-			if (d != null)
-				d.Dispose();
+			this.device = null;
 		}
 
 		public void BeginCapture (int captureFrameSize)

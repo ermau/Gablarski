@@ -128,10 +128,7 @@ namespace Gablarski.OpenAL.Providers
 				throw new ObjectDisposedException ("OpenALPlaybackProvider");
 
 			this.isOpen = false;
-
-			var d = Interlocked.Exchange (ref this.device, null);
-			if (d != null)
-				d.Dispose();
+			this.device = null;
 
 			Context.ClearCurrent();
 		}
