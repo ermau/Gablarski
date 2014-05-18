@@ -98,6 +98,7 @@
     <Compile Include="ErrorManager.cs" />
     <Compile Include="INamedComponent.cs" />
     <Compile Include="Messages\EditServerMessage.cs" />
+    <Compile Include="Messages\LeaveServerMessage.cs" />
     <Compile Include="ModuleAttribute.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="GablarskiErrorReporter.cs" />
