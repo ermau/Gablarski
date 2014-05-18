@@ -154,7 +154,6 @@ namespace Gablarski.Clients.ViewModels
 				OnPropertyChanged();
 
 				if (value != null) {
-					value.Open (AudioFormat.Mono16bitLPCM);
 					value.SamplesAvailable += OnSamplesAvailable;
 
 					CaptureDevices = new[] { new DefaultDevice() }
@@ -208,6 +207,7 @@ namespace Gablarski.Clients.ViewModels
 							actualDevice = CaptureDevices.First (d => d.Device.Equals (CurrentCaptureProvider.DefaultDevice)).Device;
 
 						CurrentCaptureProvider.Device = actualDevice;
+						CurrentCaptureProvider.Open (AudioFormat.Mono16bitLPCM);
 						CurrentCaptureProvider.BeginCapture (FrameSize);
 					}
 				}
@@ -238,6 +238,7 @@ namespace Gablarski.Clients.ViewModels
 								: CurrentCaptureDevice.Device;
 						}
 
+						CurrentCaptureProvider.Open (AudioFormat.Mono16bitLPCM);
 						CurrentCaptureProvider.BeginCapture (FrameSize);
 					}
 				}
