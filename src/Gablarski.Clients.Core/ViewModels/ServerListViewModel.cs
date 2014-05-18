@@ -4,7 +4,7 @@
 // Author:
 //   Eric Maupin <me@ermau.com>
 //
-// Copyright (c) 2014, Eric Maupin
+// Copyright (c) 2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -43,6 +43,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Input;
 using Gablarski.Client;
 using Gablarski.Clients.Messages;
 using Gablarski.Clients.Persistence;
@@ -53,10 +54,6 @@ namespace Gablarski.Clients.ViewModels
 	public class ServerListViewModel
 		: ViewModelBase
 	{
-		private readonly RSAAsymmetricKey key;
-		private readonly IntPtr windowHandle;
-		private ServerViewModel currentServer;
-
 		public ServerListViewModel (RSAAsymmetricKey key, IntPtr windowHandle)
 		{
 			if (key == null)
@@ -64,17 +61,24 @@ namespace Gablarski.Clients.ViewModels
 
 			this.key = key;
 			this.windowHandle = windowHandle;
-			Servers = new AsyncValue<IEnumerable<ServerEntryViewModel>> (
-				ClientData.GetServersAsync().ContinueWith (t => t.Result.Select (se => new ServerEntryViewModel (key, se))),
-				Enumerable.Empty<ServerEntryViewModel>());
+			LoadServersAsync();
 
 			Messenger.Register<JoinServerMessage> (OnJoinServerMessage);
+			Messenger.Register<EditServerMessage> (OnEditServerMessage);
+			Messenger.Register<DoneEditingServerMessage> (OnCancelEditServerMessage);
 		}
 
 		public AsyncValue<IEnumerable<ServerEntryViewModel>> Servers
 		{
-			get;
-			private set;
+			get { return this.servers; }
+			private set
+			{
+				if (this.servers == value)
+					return;
+
+				this.servers = value;
+				OnPropertyChanged();
+			}
 		}
 
 		public ServerViewModel CurrentServer
@@ -90,6 +94,25 @@ namespace Gablarski.Clients.ViewModels
 			}
 		}
 
+		public ServerEntryViewModel EditingServer
+		{
+			get { return this.editingServer; }
+			private set
+			{
+				if (this.editingServer == value)
+					return;
+
+				this.editingServer = value;
+				OnPropertyChanged();
+			}
+		}
+
+		private readonly RSAAsymmetricKey key;
+		private readonly IntPtr windowHandle;
+		private ServerViewModel currentServer;
+		private ServerEntryViewModel editingServer;
+		private AsyncValue<IEnumerable<ServerEntryViewModel>> servers;
+
 		private async void OnJoinServerMessage (JoinServerMessage msg)
 		{
 			if (CurrentServer != null)
@@ -99,6 +122,24 @@ namespace Gablarski.Clients.ViewModels
 			CurrentServer = new ServerViewModel (client, this.windowHandle);
 
 			await CurrentServer.JoinAsync (msg.Server);
+		}
+
+		private void OnEditServerMessage (EditServerMessage msg)
+		{
+			EditingServer = new ServerEntryViewModel (this.key, msg.Entry);
+		}
+
+		private void OnCancelEditServerMessage (DoneEditingServerMessage msg)
+		{
+			LoadServersAsync();
+			EditingServer = null;
+		}
+
+		private void LoadServersAsync()
+		{
+			Servers = new AsyncValue<IEnumerable<ServerEntryViewModel>> (
+				ClientData.GetServersAsync().ContinueWith (t => t.Result.Select (se => new ServerEntryViewModel (this.key, se))),
+				Enumerable.Empty<ServerEntryViewModel>());
 		}
 	}
 }

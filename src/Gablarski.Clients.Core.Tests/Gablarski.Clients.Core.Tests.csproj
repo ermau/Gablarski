@@ -50,6 +50,7 @@
     <Compile Include="CompositeModuleFinderTests.cs" />
     <Compile Include="ErrorManagerTests.cs" />
     <Compile Include="InputHandlerTests.cs" />
+    <Compile Include="Messages\EditServerMessageTests.cs" />
     <Compile Include="Messages\JoinServerMessageTests.cs" />
     <Compile Include="MockModuleFinder.cs" />
     <Compile Include="MockSettingsProvider.cs" />

@@ -97,6 +97,7 @@
     <Compile Include="AssemblyModuleFinder.cs" />
     <Compile Include="ErrorManager.cs" />
     <Compile Include="INamedComponent.cs" />
+    <Compile Include="Messages\EditServerMessage.cs" />
     <Compile Include="ModuleAttribute.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="GablarskiErrorReporter.cs" />

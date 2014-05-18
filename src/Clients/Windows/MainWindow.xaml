@@ -8,7 +8,7 @@
 		xmlns:metro="http://schemas.codeplex.com/elysium"
 		xmlns:params="http://schemas.codeplex.com/elysium/params"
 		xmlns:viewModels="clr-namespace:Gablarski.Clients.ViewModels;assembly=Gablarski.Clients"
-		Title="Gablarski" Height="600" Width="250"
+		Title="Gablarski" Height="600" Width="275" MinHeight="200" MinWidth="275"
 		params:Design.Theme="Dark"
 		params:Design.AccentBrush="{x:Static metro:AccentBrushes.Blue}"
 		params:Design.ContrastBrush="White"
@@ -35,8 +35,14 @@
 		</CollectionViewSource>-->
 		
 	</Window.Resources>
-	<DockPanel>
-		<StackPanel DockPanel.Dock="Top" Visibility="Collapsed">
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+		
+		<StackPanel Grid.Row="0" Visibility="Collapsed">
 			<Grid Margin="3">
 				<Grid.RowDefinitions>
 					<RowDefinition Height="28" />
@@ -72,7 +78,7 @@
 			</Grid>
 		</StackPanel>
 
-		<TabControl>
+		<TabControl Grid.Row="1">
 			<!--<TabItem Header="buddies">
 				<Grid>
 					<Grid.RowDefinitions>
@@ -114,16 +120,22 @@
 			</TabItem>!-->
 
 			<TabItem Header="server" DataContext="{Binding Servers}">
+				<TabItem.ContextMenu>
+					<ContextMenu>
+						<MenuItem Header="Add Server" Click="OnClickAddServer" />
+					</ContextMenu>
+				</TabItem.ContextMenu>
 				<Grid>
-					<Grid.RowDefinitions>
-						<RowDefinition Height="*" />
-						<RowDefinition Height="Auto" />
-					</Grid.RowDefinitions>
-					
 					<ListBox Grid.Row="0" Name="servers" ItemsSource="{Binding Servers.Value}" MouseDoubleClick="OnServerDoubleClick">
 						<ListBox.ItemTemplate>
 							<DataTemplate DataType="viewModels:ServerEntryViewModel">
 								<Grid>
+									<Grid.ContextMenu>
+										<ContextMenu>
+											<MenuItem Header="Add Server" Click="OnClickAddServer" />
+											<MenuItem Header="Edit Server" Click="OnClickEditServer" />
+										</ContextMenu>
+									</Grid.ContextMenu>
 									<Grid.ColumnDefinitions>
 										<ColumnDefinition />
 										<ColumnDefinition />
@@ -168,8 +180,16 @@
 					</StackPanel>-->
 
 					<Gablarski:ServerView Grid.Row="0" DataContext="{Binding CurrentServer}" Visibility="{Binding Converter={StaticResource NullToVisibilityConverter}}" />
+					
+					<Border Grid.Row="0" Background="{DynamicResource BackgroundBrush}" Padding="0,5,0,5" DataContext="{Binding EditingServer}">
+						<Border.Visibility>
+							<Binding Path="." Converter="{StaticResource NullToVisibilityConverter}" />
+						</Border.Visibility>
+						
+						<Gablarski:ServerEntryView />
+					</Border>
 				</Grid>
 			</TabItem>
 		</TabControl>
-	</DockPanel>
+	</Grid>
 </metro:Window>

@@ -1,17 +1,17 @@
 ﻿//
-// ServerEntry.cs
+// EditServerMessageTests.cs
 //
 // Author:
 //   Eric Maupin <me@ermau.com>
 //
-// Copyright (c) 2014, Xamarin Inc.
+// Copyright (c) 2014 Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
 // or without modification, are permitted provided that
 // the following conditions are met:
 //
-// - Redistributions of source code must retain the above 
+// - Redistributions of source code must retain the above
 //   copyright notice, this list of conditions and the
 //   following disclaimer.
 //
@@ -40,87 +40,28 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
-
 using System;
+using Gablarski.Clients.Messages;
+using Gablarski.Clients.Persistence;
+using NUnit.Framework;
 
-namespace Gablarski.Clients.Persistence
+namespace Gablarski.Clients.Core.Tests
 {
-	public class ServerEntry
+	[TestFixture]
+	public class EditServerMessageTests
 	{
-		public ServerEntry (int id)
+		public void Ctor()
 		{
-			Id = id;
-			Port = GablarskiProtocol.Port;
+			var entry = new ServerEntry (0);
+
+			var msg = new EditServerMessage (entry);
+
+			Assert.That (msg.Entry, Is.SameAs (entry));
 		}
 
-		public ServerEntry (ServerEntry serverEntry)
+		public void CtorNull()
 		{
-			if (serverEntry == null)
-				throw new ArgumentNullException ("serverEntry");
-
-			Id = serverEntry.Id;
-			Name = serverEntry.Name;
-			Host = serverEntry.Host;
-			Port = serverEntry.Port;
-			ServerPassword = serverEntry.ServerPassword;
-			UserNickname = serverEntry.UserNickname;
-			UserPhonetic = serverEntry.UserPhonetic;
-			UserName = serverEntry.UserName;
-			UserPassword = serverEntry.UserPassword;
-		}
-
-		public virtual int Id
-		{
-			get;
-			private set;
-		}
-
-		public virtual string Name
-		{
-			get;
-			set;
-		}
-
-		public virtual string Host
-		{
-			get;
-			set;
-		}
-
-		public virtual int Port
-		{
-			get;
-			set;
-		}
-
-		public virtual string ServerPassword
-		{
-			get;
-			set;
-		}
-
-		public virtual string UserNickname
-		{
-			get;
-			set;
-		}
-
-		public virtual string UserPhonetic
-		{
-			get;
-			set;
-		}
-
-		public virtual string UserName
-		{
-			get;
-			set;
-		}
-
-		public virtual string UserPassword
-		{
-			get;
-			set;
+			Assert.That (() => new EditServerMessage (null), Throws.InstanceOf<ArgumentNullException>());
 		}
 	}
 }

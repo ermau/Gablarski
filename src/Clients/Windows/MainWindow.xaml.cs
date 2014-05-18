@@ -1,4 +1,10 @@
-﻿// Copyright (c) 2013, Eric Maupin
+﻿//
+// MainWindow.xaml.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2013-2014 Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -39,6 +45,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
 using Gablarski.Clients.Messages;
+using Gablarski.Clients.Persistence;
 using Gablarski.Clients.ViewModels;
 
 namespace Gablarski.Clients.Windows
@@ -117,6 +124,23 @@ namespace Gablarski.Clients.Windows
 				Owner = this,
 				WindowStartupLocation = WindowStartupLocation.CenterOwner
 			}.ShowDialog();
+		}
+
+		private void OnClickAddServer (object sender, RoutedEventArgs e)
+		{
+			Messenger.Send (new EditServerMessage (new ServerEntry (0)));
+		}
+
+		private void OnClickEditServer (object sender, RoutedEventArgs e)
+		{
+			if (this.servers.SelectedItem == null)
+				return;
+
+			ServerEntryViewModel entry = this.servers.SelectedItem as ServerEntryViewModel;
+			if (entry == null)
+				return;
+
+			Messenger.Send (new EditServerMessage (entry.Server));
 		}
 	}
 }

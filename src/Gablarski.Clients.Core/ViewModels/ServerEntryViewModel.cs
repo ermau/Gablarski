@@ -1,4 +1,10 @@
-// Copyright (c) 2014, Eric Maupin
+//
+// ServerEntryViewModel.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2014 Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -35,9 +41,13 @@
 // DAMAGE.
 
 using System;
+using System.Collections;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using Gablarski.Client;
+using Gablarski.Clients.Messages;
 using Gablarski.Clients.Persistence;
 using Tempest;
 using Timer = System.Threading.Timer;
@@ -45,20 +55,53 @@ using Timer = System.Threading.Timer;
 namespace Gablarski.Clients.ViewModels
 {
 	public class ServerEntryViewModel
-		: ViewModelBase
+		: ViewModelBase, INotifyDataErrorInfo
 	{
 		private static readonly TimeSpan QueryTimeout = TimeSpan.FromSeconds (15);
 
 		public ServerEntryViewModel (RSAAsymmetricKey key, ServerEntry server)
 		{
+			if (key == null)
+				throw new ArgumentNullException ("key");
+			if (server == null)
+				throw new ArgumentNullException ("server");
+
 			this.key = key;
-			this.Server = server;
 
-			Task<QueryResults> query = GablarskiClient.QueryAsync (key, new Target (server.Host, server.Port), QueryTimeout);
-			this.IsOnline = new AsyncValue<bool?> (query.ContinueWith (t => (bool?)(!t.IsCanceled), TaskContinuationOptions.HideScheduler), null, false);
-			this.ConnectedUsers = new AsyncValue<int> (query.ContinueWith (t => t.Result.Users.Count(), TaskContinuationOptions.OnlyOnRanToCompletion | TaskContinuationOptions.HideScheduler), 0);
+			Server = new ServerEntry (server);
 
-			this.requeryTimer = new Timer (OnRequery, null, 30000, 30000);
+			this.host = server.Host;
+			this.port = server.Port;
+			this.name = server.Name;
+			this.nickname = server.UserNickname;
+
+			KickOffQuery();
+
+			this.save = new RelayCommand (OnSave, CanSave);
+			Cancel = new RelayCommand (() => Messenger.Send (new DoneEditingServerMessage()));
+		}
+
+		public ServerEntryViewModel (RSAAsymmetricKey key)
+		{
+			if (key == null)
+				throw new ArgumentNullException ("key");
+
+			this.key = key;
+
+			Server = new ServerEntry (0) {
+				Port = 42912
+			};
+		}
+
+		public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged
+		{
+			add { this.errors.ErrorsChanged += value; }
+			remove { this.errors.ErrorsChanged -= value; }
+		}
+
+		public bool HasErrors
+		{
+			get { return this.errors.HasErrors; }
 		}
 
 		public AsyncValue<bool?> IsOnline
@@ -87,23 +130,171 @@ namespace Gablarski.Clients.ViewModels
 			}
 		}
 
+		public string Host
+		{
+			get { return this.host; }
+			set
+			{
+				if (this.host == value)
+					return;
+
+				this.errors.ClearErrors();
+
+				this.host = value;
+				OnPropertyChanged();
+
+				if (String.IsNullOrWhiteSpace (value))
+					this.errors.AddError ("Hostname must be filled in");
+
+				this.save.RaiseCanExecuteChanged();
+
+				KickOffQuery();
+			}
+		}
+
+		public int Port
+		{
+			get { return this.port; }
+			set
+			{
+				if (this.port == value)
+					return;
+
+				this.errors.ClearErrors();
+
+				this.port = value;
+				OnPropertyChanged();
+
+				if (value < 0 || value > UInt16.MaxValue)
+					this.errors.AddError ("Invalid port");
+
+				this.save.RaiseCanExecuteChanged();
+
+				KickOffQuery();
+			}
+		}
+
+		public string Name
+		{
+			get { return this.name; }
+			set
+			{
+				if (this.name == value)
+					return;
+
+				this.errors.ClearErrors();
+
+				this.name = value;
+				OnPropertyChanged();
+
+				if (String.IsNullOrWhiteSpace (value))
+					this.errors.AddError ("Server name must be filled in");
+
+				this.save.RaiseCanExecuteChanged();
+			}
+		}
+
+		public string Nickname
+		{
+			get { return this.nickname; }
+			set
+			{
+				if (this.nickname == value)
+					return;
+
+				this.errors.ClearErrors();
+
+				this.nickname = value;
+				OnPropertyChanged();
+
+				if (String.IsNullOrWhiteSpace (value))
+					this.errors.AddError ("You must enter a nickname");
+
+				this.save.RaiseCanExecuteChanged();
+			}
+		}
+
+		public ICommand Save
+		{
+			get { return this.save; }
+		}
+
+		public ICommand Cancel
+		{
+			get;
+			private set;
+		}
+
 		public ServerEntry Server
 		{
 			get;
 			private set;
 		}
 
+		public IEnumerable GetErrors (string propertyName)
+		{
+			return this.errors.GetErrors (propertyName);
+		}
+
+		private int port;
+		private string host, name, nickname;
+
 		private readonly RSAAsymmetricKey key;
-		private readonly Timer requeryTimer;
+		private Timer requeryTimer;
 		private AsyncValue<bool?> isOnline;
 		private AsyncValue<int> connectedUsers;
+		private readonly ErrorManager errors = new ErrorManager();
+		private RelayCommand save;
 
-		private void OnRequery (object state)
+		private bool GetHostAndPortValid()
 		{
-			Task<QueryResults> query = GablarskiClient.QueryAsync (this.key, new Target (this.Server.Host, this.Server.Port), QueryTimeout);
+			return (!String.IsNullOrWhiteSpace (Host)) && (Port > 0 && Port < UInt16.MaxValue);
+		}
 
-			IsOnline = new AsyncValue<bool?> (query.ContinueWith (t => (bool?)(!t.IsCanceled), TaskContinuationOptions.HideScheduler), this.IsOnline.Value, false);
-			ConnectedUsers = new AsyncValue<int> (query.ContinueWith (t => t.Result.Users.Count(), TaskContinuationOptions.OnlyOnRanToCompletion | TaskContinuationOptions.HideScheduler), this.ConnectedUsers.Value);
+		private bool CanSave()
+		{
+			return (!HasErrors && GetHostAndPortValid() && !String.IsNullOrWhiteSpace (Name) &&
+			        !String.IsNullOrWhiteSpace (Nickname));
+		}
+
+		private void OnSave()
+		{
+			var entry = new ServerEntry (Server) {
+				Name = this.name,
+				Host = this.host,
+				Port = this.port,
+				UserNickname = this.nickname
+			};
+
+			ClientData.SaveOrUpdate (entry);
+
+			Messenger.Send (new DoneEditingServerMessage());
+		}
+
+		private void Query()
+		{
+			Task<QueryResults> query = GablarskiClient.QueryAsync (key, new Target (Server.Host, Server.Port), QueryTimeout);
+
+			query.ContinueWith (t => {
+				if (!String.IsNullOrWhiteSpace (Name))
+					return;
+
+				Name = t.Result.ServerInfo.Name;
+			}, TaskContinuationOptions.OnlyOnRanToCompletion);
+
+			IsOnline = new AsyncValue<bool?> (query.ContinueWith (t => (bool?) (!t.IsCanceled), TaskContinuationOptions.HideScheduler), null, false);
+			ConnectedUsers = new AsyncValue<int> (query.ContinueWith (t => t.Result.Users.Count(), TaskContinuationOptions.OnlyOnRanToCompletion | TaskContinuationOptions.HideScheduler), 0);
+		}
+
+		private void KickOffQuery ()
+		{
+			if (this.requeryTimer != null)
+				this.requeryTimer.Dispose();
+
+			if (!GetHostAndPortValid())
+				return;
+
+			this.requeryTimer = new Timer (o => Query(), null, 0, 30000);
 		}
 	}
 }

@@ -59,7 +59,7 @@ namespace Gablarski.Clients.Core.Tests
 				Assert.That (args.PropertyName, Is.EqualTo ("property"));
 			};
 
-			manager.AddError ("property", "error");
+			manager.AddError ("error", "property");
 			Assert.That (manager.HasErrors, Is.True);
 			Assert.That (changedRaised, Is.True, "ErrorsChanged was not raised");
 		}
@@ -67,14 +67,14 @@ namespace Gablarski.Clients.Core.Tests
 		[Test]
 		public void AddErrorDuplicate()
 		{
-			manager.AddError ("property", "error");
+			manager.AddError ("error", "property");
 
 			bool changedRaised = false;
 			manager.ErrorsChanged += (sender, args) => {
 				changedRaised = true;
 			};
 
-			manager.AddError ("property", "error");
+			manager.AddError ("error", "property");
 			Assert.That (manager.HasErrors, Is.True);
 			Assert.That (changedRaised, Is.False, "ErrorsChanged was raised");
 			Assert.That (manager.GetErrors ("property"), Has.Count.EqualTo (1));
@@ -91,7 +91,7 @@ namespace Gablarski.Clients.Core.Tests
 				Assert.That (args.PropertyName, Is.EqualTo ("property"));
 			};
 
-			manager.RemoveError ("property", "error");
+			manager.RemoveError ("error", "property");
 			Assert.That (manager.HasErrors, Is.False);
 			Assert.That (changedRaised, Is.True, "ErrorsChanged was not raised");
 		}
@@ -104,7 +104,7 @@ namespace Gablarski.Clients.Core.Tests
 				changedRaised = true;
 			};
 
-			Assert.That (() => manager.RemoveError ("property", "error"), Throws.Nothing);
+			Assert.That (() => manager.RemoveError ("error", "property"), Throws.Nothing);
 			Assert.That (manager.HasErrors, Is.False);
 			Assert.That (changedRaised, Is.False, "ErrorsChanged was raised");
 		}
