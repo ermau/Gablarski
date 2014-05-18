@@ -1,11 +1,18 @@
-﻿// Copyright (c) 2011-2014, Eric Maupin
+﻿//
+// OpenALRunner.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2009-2011, Eric Maupin
+// Copyright (c) 2011-2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
 // or without modification, are permitted provided that
 // the following conditions are met:
 //
-// - Redistributions of source code must retain the above 
+// - Redistributions of source code must retain the above
 //   copyright notice, this list of conditions and the
 //   following disclaimer.
 //
@@ -43,47 +50,6 @@ namespace Gablarski.OpenAL.Providers
 {
 	internal static class OpenALRunner
 	{
-		internal static void AddUser()
-		{
-			OpenAL.Debug ("Adding OpenAL user");
-
-			int now = Interlocked.Increment (ref counter);
-
-			if (now != 1 || running)
-				return;
-
-			lock (SyncRoot)
-			{
-				if (running)
-					return;
-
-				running = true;
-				(runnerThread = new Thread (Runner)
-				{
-					IsBackground = true,
-					Name = "OpenAL Runner"
-				}).Start();
-			}
-		}
-
-		internal static void RemoveUser()
-		{
-			OpenAL.Debug ("Removing OpenAL user");
-
-			int now = Interlocked.Decrement (ref counter);
-
-			if (now != 0 || !running)
-				return;
-
-			lock (SyncRoot)
-			{
-				if (!running)
-					return;
-
-				running = false;
-			}
-		}
-
 		internal static void AddPlaybackProvider (OpenALPlaybackProvider provider)
 		{
 			OpenAL.Debug ("Adding OpenAL Playback Provider");
@@ -91,8 +57,11 @@ namespace Gablarski.OpenAL.Providers
 			if (provider == null)
 				throw new ArgumentNullException ("provider");
 
-			lock (PlaybackProviders)
+			lock (PlaybackProviders) {
 				PlaybackProviders.Add (provider);
+
+				CheckStartup();
+			}
 		}
 
 		internal static void RemovePlaybackProvider (OpenALPlaybackProvider provider)
@@ -102,8 +71,10 @@ namespace Gablarski.OpenAL.Providers
 			if (provider == null)
 				throw new ArgumentNullException ("provider");
 
-			lock (PlaybackProviders)
-				PlaybackProviders.Remove (provider);
+			lock (SyncRoot) {
+				if (PlaybackProviders.Remove (provider))
+					CheckShutdown();
+			}
 		}
 
 		internal static void AddCaptureProvider (OpenALCaptureProvider provider)
@@ -113,8 +84,11 @@ namespace Gablarski.OpenAL.Providers
 			if (provider == null)
 				throw new ArgumentNullException ("provider");
 
-			lock (CaptureProviders)
+			lock (SyncRoot) {
 				CaptureProviders.Add (provider);
+
+				CheckStartup();
+			}
 		}
 
 		internal static void RemoveCaptureProvider (OpenALCaptureProvider provider)
@@ -124,8 +98,10 @@ namespace Gablarski.OpenAL.Providers
 			if (provider == null)
 				throw new ArgumentNullException ("provider");
 
-			lock (CaptureProviders)
-				CaptureProviders.Remove (provider);
+			lock (SyncRoot) {
+				if (CaptureProviders.Remove (provider))
+					CheckShutdown();
+			}
 		}
 
 		private static readonly object SyncRoot = new object();
@@ -135,12 +111,35 @@ namespace Gablarski.OpenAL.Providers
 		private static volatile bool running;
 		private static Thread runnerThread;
 
+		private static void CheckStartup()
+		{
+			if (running)
+				return;
+
+			running = true;
+			(runnerThread = new Thread (Runner)
+			{
+				IsBackground = true,
+				Name = "OpenAL Runner"
+			}).Start();
+		}
+
+		private static void CheckShutdown()
+		{
+			if (CaptureProviders.Count > 0 || PlaybackProviders.Count > 0)
+				return;
+
+			running = false;
+		}
+
 		private static void Runner()
 		{
-			while (running)
-			{
-				UpdateCapture();
-				UpdatePlayback();
+			while (running) {
+
+				lock (SyncRoot) {
+					UpdateCapture();
+					UpdatePlayback();
+				}
 
 				Thread.Sleep (1);
 			}
@@ -150,12 +149,9 @@ namespace Gablarski.OpenAL.Providers
 		{
 			if (PlaybackProviders.Count == 0)
 				return;
-
-			lock (PlaybackProviders)
-			{
-				for (int i = 0; i < PlaybackProviders.Count; ++i)
-					PlaybackProviders[i].Tick();
-			}
+			
+			for (int i = 0; i < PlaybackProviders.Count; ++i)
+				PlaybackProviders[i].Tick();
 		}
 
 		private static void UpdateCapture()
@@ -163,11 +159,8 @@ namespace Gablarski.OpenAL.Providers
 			if (CaptureProviders.Count == 0)
 				return;
 
-			lock (CaptureProviders)
-			{
-				for (int i = 0; i < CaptureProviders.Count; ++i)
-					CaptureProviders[i].Tick();
-			}
+			for (int i = 0; i < CaptureProviders.Count; ++i)
+				CaptureProviders[i].Tick();
 		}
 	}
 }

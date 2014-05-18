@@ -110,7 +110,6 @@ namespace Gablarski.OpenAL.Providers
 			if (this.isOpen)
 				throw new InvalidOperationException ("Already open");
 
-			OpenALRunner.AddUser();
 			OpenALRunner.AddPlaybackProvider (this);
 
 			if (!this.device.IsOpen)
@@ -241,8 +240,6 @@ namespace Gablarski.OpenAL.Providers
 
 			SourceBuffer.Clear();
 
-			OpenALRunner.RemoveUser();
-			OpenALRunner.RemovePlaybackProvider (this);
 			this.pool = null;
 			this.device = null;
 			this.isDisposed = true;

@@ -123,7 +123,6 @@ namespace Gablarski.OpenAL.Providers
 		public void BeginCapture (int captureFrameSize)
 		{
 			CheckState();
-			OpenALRunner.AddUser();
 
 			this.frameSize = captureFrameSize;
 			OpenALRunner.AddCaptureProvider (this);
@@ -141,10 +140,6 @@ namespace Gablarski.OpenAL.Providers
 		public void EndCapture ()
 		{
 			CheckState();
-			OpenALRunner.RemoveUser();
-
-			if (!this.isOpened)
-				return;
 
 			IsCapturing = false;
 			OpenALRunner.RemoveCaptureProvider (this);
