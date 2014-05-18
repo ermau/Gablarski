@@ -63,14 +63,11 @@ namespace Gablarski.Audio
 		/// <summary>
 		/// Begins a capture.
 		/// </summary>
-		/// <param name="format">The format to capture in.</param>
-		/// <param name="frameSize">The size of frames.</param>
-		/// <exception cref="InvalidOperationException">If <see cref="Device"/> is null.</exception>
-		/// <exception cref="NotSupportedException"><paramref name="format"/> is an unsupported format.</exception>
+		/// <param name="frameSize">The size of frames.</param>		
 		/// <remarks>
 		/// <paramref name="frameSize"/> may affect how often <see cref="SamplesAvailable"/> is raised.
 		/// </remarks>
-		void BeginCapture (AudioFormat format, int frameSize);
+		void BeginCapture (int frameSize);
 
 		/// <summary>
 		/// Reads <paramref name="count"/> samples, waits if neccessary.
@@ -84,6 +81,17 @@ namespace Gablarski.Audio
 		/// </summary>
 		/// <exception cref="InvalidOperationException">If <see cref="Device"/> is null.</exception>
 		void EndCapture ();
+
+		/// <summary>Opens the capture provider with the specified <paramref name="format"/>.</summary>
+		/// <param name="format">The format to capture in.</param>
+		/// <exception cref="NotSupportedException"><paramref name="format"/> is an unsupported format.</exception>
+		/// <exception cref="InvalidOperationException">If <see cref="Device"/> is null.</exception>
+		void Open (AudioFormat format);
+
+		/// <summary>
+		/// Closes the audio provider without disposing it.
+		/// </summary>
+		void Close();
 	}
 
 	/// <summary>
