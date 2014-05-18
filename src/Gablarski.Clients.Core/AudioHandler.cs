@@ -68,6 +68,19 @@ namespace Gablarski.Clients
 			return Task.WhenAll (SetupPlayback(), SetupCapture());
 		}
 
+		public void DisableAudio()
+		{
+			this.context.Audio.Clear();
+
+			var p = this.playback;
+			if (p != null)
+				p.Close();
+
+			var c = this.capture;
+			if (c != null && c.IsCapturing)
+				c.Close();
+		}
+
 		public async Task<AudioSource> RequestVoiceSourceAsync (AudioCodecArgs format)
 		{
 			var options = GetVoiceCaptureOptions();
