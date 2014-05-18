@@ -218,6 +218,7 @@
       <DependentUpon>RegisterWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ResourceWebRequestFactory.cs" />
+    <Compile Include="ReverseBooleanToVisibilityConverter.cs" />
     <Compile Include="ServerEntryView.xaml.cs">
       <DependentUpon>ServerEntryView.xaml</DependentUpon>
     </Compile>
