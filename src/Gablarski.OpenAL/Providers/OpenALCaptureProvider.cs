@@ -100,8 +100,8 @@ namespace Gablarski.OpenAL.Providers
 		{
 			if (openingFormat == null)
 				throw new ArgumentNullException ("openingFormat");
-			if (this.isOpened)
-				throw new InvalidOperationException ("Already open");
+			if (this.isOpened && !Equals (openingFormat, this.format))
+				throw new ArgumentException ("Provider is already open with a different format");
 
 			var d = this.device;
 			if (d == null)
