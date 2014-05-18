@@ -70,10 +70,16 @@ namespace Gablarski.Clients
 
 		public async Task<AudioSource> RequestVoiceSourceAsync (AudioCodecArgs format)
 		{
-			return this.voiceSource = await RequestAudioSourceAsync ("voice", format, GetVoiceCaptureOptions());
+			var options = GetVoiceCaptureOptions();
+			this.voiceSource = await RequestAudioSourceAsync ("voice", format, options);
+
+			this.capture.Open (this.voiceSource.CodecSettings);
+			this.context.Audio.Attach (this.capture, this.voiceSource, options);
+
+			return this.voiceSource;
 		}
 
-		public async Task<AudioSource> RequestAudioSourceAsync (string name, AudioCodecArgs format, AudioEngineCaptureOptions options)
+		async Task<AudioSource> RequestAudioSourceAsync (string name, AudioCodecArgs format, AudioEngineCaptureOptions options)
 		{
 			AudioSource source = await this.context.Sources.RequestSourceAsync (name, format, format.FrameSize, format.Bitrate).ConfigureAwait (false);
 			if (source == null)
@@ -83,7 +89,6 @@ namespace Gablarski.Clients
 			if (captureProvider == null)
 				throw new OperationCanceledException ("There was no capture provider to attach the audio source to");
 
-			this.context.Audio.Attach (this.capture, source, options);
 			return source;
 		}
 

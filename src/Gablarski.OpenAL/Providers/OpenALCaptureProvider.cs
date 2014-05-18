@@ -43,6 +43,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using Gablarski.Audio;
 
 namespace Gablarski.OpenAL.Providers
@@ -66,7 +67,7 @@ namespace Gablarski.OpenAL.Providers
 					new AudioFormat (WaveFormatEncoding.LPCM, 1, 8, 44100),
 					new AudioFormat (WaveFormatEncoding.LPCM, 1, 16, 44100),
 					new AudioFormat (WaveFormatEncoding.LPCM, 2, 8, 44100),
-					new AudioFormat (WaveFormatEncoding.LPCM, 2, 16, 44100),
+					new AudioFormat (WaveFormatEncoding.LPCM, 2, 16, 44100)
 				};
 			}
 		}
@@ -91,33 +92,41 @@ namespace Gablarski.OpenAL.Providers
 			private set;
 		}
 
-		private bool isOpened;
-		public void BeginCapture (AudioFormat format, int captureFrameSize)
+		public void Open (AudioFormat openingFormat)
+		{
+			if (openingFormat == null)
+				throw new ArgumentNullException ("openingFormat");
+			if (this.isOpened)
+				throw new InvalidOperationException ("Already open");
+
+			var d = this.device;
+			if (d == null)
+				throw new InvalidOperationException ("Device is not set");
+
+			this.isOpened = true;
+			d.Open ((uint) openingFormat.SampleRate, openingFormat.ToOpenALFormat());
+			this.format = openingFormat;
+		}
+
+		public void Close()
+		{
+			EndCapture();
+			this.isOpened = false;
+
+			var d = Interlocked.Exchange (ref this.device, null);
+			if (d != null)
+				d.Dispose();
+		}
+
+		public void BeginCapture (int captureFrameSize)
 		{
 			CheckState();
 			OpenALRunner.AddUser();
 
-			if (!this.isOpened)
-			{
-				this.device.Open ((uint)format.SampleRate, format.ToOpenALFormat());
-				this.isOpened = true;
-			}
-
-			if (!this.device.IsOpen)
-				return;
-
-			this.format = format;
 			this.frameSize = captureFrameSize;
 			OpenALRunner.AddCaptureProvider (this);
 			IsCapturing = true;
 			this.device.StartCapture();
-		}
-
-		private void OnSamplesAvailable (int samplesAvailable)
-		{
-			var available = SamplesAvailable;
-			if (available != null)
-				available (this, new SamplesAvailableEventArgs (this, samplesAvailable));
 		}
 
 		public byte[] ReadSamples (int samples)
@@ -158,6 +167,7 @@ namespace Gablarski.OpenAL.Providers
 			Dispose (true);
 		}
 
+		private bool isOpened;
 		private CaptureDevice device;
 		private bool disposed;
 		private int frameSize;
@@ -214,6 +224,13 @@ namespace Gablarski.OpenAL.Providers
 				throw new ObjectDisposedException ("OpenALCaptureProvider");
 			if (this.device == null)
 				throw new InvalidOperationException ("No device set.");
+		}
+
+		private void OnSamplesAvailable (int samplesAvailable)
+		{
+			var available = SamplesAvailable;
+			if (available != null)
+				available (this, new SamplesAvailableEventArgs (this, samplesAvailable));
 		}
 	}
 }
