@@ -113,7 +113,9 @@ namespace Gablarski
 				channels = new LobbyChannelProvider();
 				authorization = new GuestUserProvider { FirstUserIsAdmin = true };
 				permissions = new GuestPermissionProvider();
-				settings = new ServerSettings();
+				settings = new ServerSettings {
+					Name = "Local Server"
+				};
 
 				server = new GablarskiServer (settings, authorization, permissions, channels);
 				server.AddConnectionProvider (new UdpConnectionProvider (GablarskiProtocol.Port, GablarskiProtocol.Instance, key), ExecutionMode.GlobalOrder);
