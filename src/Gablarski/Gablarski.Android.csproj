@@ -57,6 +57,8 @@
     <Compile Include="Audio\AudioExtensions.cs" />
     <Compile Include="Audio\AudioFormat.cs" />
     <Compile Include="Audio\AudioPlaybackEntity.cs" />
+    <Compile Include="Client\ChannelChangedEventArgs.cs" />
+    <Compile Include="Client\ClientChannelHandler.cs" />
     <Compile Include="Client\ClientSourceHandler.cs" />
     <Compile Include="Audio\IAudioEngine.cs" />
     <Compile Include="Audio\IAudioReceiver.cs" />
@@ -64,11 +66,16 @@
     <Compile Include="BanInfo.cs" />
     <Compile Include="Audio\AudioEngine.cs" />
     <Compile Include="Audio\IAudioSender.cs" />
+    <Compile Include="Client\IClientChannelHandler.cs" />
     <Compile Include="Client\IClientSourceHandler.cs" />
     <Compile Include="Client\IClientUserHandler.cs" />
     <Compile Include="Client\ICurrentUserHandler.cs" />
+    <Compile Include="Client\QueryResults.cs" />
+    <Compile Include="Client\ReceivedChannelChannelResultEventArgs.cs" />
+    <Compile Include="Client\UserEventArgs.cs" />
+    <Compile Include="Client\UserKickedEventArgs.cs" />
+    <Compile Include="Client\UserMutedEventArgs.cs" />
     <Compile Include="GablarskiProtocol.cs" />
-    <Compile Include="GablarskiSocialClient.cs" />
     <Compile Include="IChannelInfo.cs" />
     <Compile Include="IIndexedEnumerable.cs" />
     <Compile Include="ISourceHandler.cs" />
@@ -132,6 +139,9 @@
     <Compile Include="Messages\SourceListMessage.cs" />
     <Compile Include="Messages\SourceResultMessage.cs" />
     <Compile Include="ByteArrayExtensions.cs" />
+    <Compile Include="ObservableDictionary.cs" />
+    <Compile Include="ObservableList.cs" />
+    <Compile Include="ObservableLookup.cs" />
     <Compile Include="Server\IRedirector.cs" />
     <Compile Include="Server\IServerChannelHandler.cs" />
     <Compile Include="Server\IConnectionManager.cs" />
