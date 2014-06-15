@@ -248,7 +248,12 @@ namespace Gablarski.Clients.ViewModels
 
 		private bool GetHostAndPortValid()
 		{
-			return (!String.IsNullOrWhiteSpace (Host)) && (Port > 0 && Port < UInt16.MaxValue);
+			return GetHostAndPortValid (Host, Port);
+		}
+
+		private bool GetHostAndPortValid (string host, int port)
+		{
+			return (!String.IsNullOrWhiteSpace (host)) && (port > 0 && port < UInt16.MaxValue);
 		}
 
 		private bool CanSave()
@@ -273,7 +278,12 @@ namespace Gablarski.Clients.ViewModels
 
 		private void Query()
 		{
-			Task<QueryResults> query = GablarskiClient.QueryAsync (key, new Target (Server.Host, Server.Port), QueryTimeout);
+			int p = Server.Port;
+			string h = Server.Host;
+			if (!GetHostAndPortValid (h, p))
+				return;
+
+			Task<QueryResults> query = GablarskiClient.QueryAsync (key, new Target (h, p), QueryTimeout);
 
 			query.ContinueWith (t => {
 				if (!String.IsNullOrWhiteSpace (Name))
