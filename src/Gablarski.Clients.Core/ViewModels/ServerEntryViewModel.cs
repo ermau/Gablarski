@@ -278,8 +278,8 @@ namespace Gablarski.Clients.ViewModels
 
 		private void Query()
 		{
-			int p = Server.Port;
-			string h = Server.Host;
+			int p = this.port;
+			string h = this.host;
 			if (!GetHostAndPortValid (h, p))
 				return;
 
