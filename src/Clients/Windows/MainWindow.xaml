@@ -123,6 +123,8 @@
 				<TabItem.ContextMenu>
 					<ContextMenu>
 						<MenuItem Header="Add Server" Click="OnClickAddServer" />
+						<Separator />
+						<MenuItem Header="Start local server" Click="OnClickLocalServer" />
 					</ContextMenu>
 				</TabItem.ContextMenu>
 				<Grid>
@@ -132,8 +134,12 @@
 								<Grid>
 									<Grid.ContextMenu>
 										<ContextMenu>
-											<MenuItem Header="Add Server" Click="OnClickAddServer" />
+											<MenuItem Header="Join Server" Click="OnClickJoinServer" />
 											<MenuItem Header="Edit Server" Click="OnClickEditServer" />
+											<Separator />
+											<MenuItem Header="Add Server" Click="OnClickAddServer" />
+											<Separator />
+											<MenuItem Header="Start local server" Click="OnClickLocalServer" />
 										</ContextMenu>
 									</Grid.ContextMenu>
 									<Grid.ColumnDefinitions>

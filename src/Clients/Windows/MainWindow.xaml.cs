@@ -105,6 +105,11 @@ namespace Gablarski.Clients.Windows
 
 		private void OnServerDoubleClick (object sender, MouseButtonEventArgs e)
 		{
+			JoinSelectedServer();
+		}
+
+		private void JoinSelectedServer()
+		{
 			var servervm = (ServerEntryViewModel) this.servers.SelectedItem;
 			if (servervm == null)
 				return;
@@ -112,10 +117,15 @@ namespace Gablarski.Clients.Windows
 			Messenger.Send (new JoinServerMessage (servervm.Server));
 		}
 
-		private async void OnStartLocalServer (object sender, RoutedEventArgs e)
+		private async void OnClickLocalServer (object sender, RoutedEventArgs e)
 		{
 			await LocalServer.StartAsync (Program.Key.Result);
 
+			Messenger.Send (new JoinServerMessage (new ServerEntry (0) {
+				Host = "localhost",
+				Port = GablarskiProtocol.Port,
+				UserNickname = "tester"
+			}));
 		}
 
 		private void OnClickSettings (object sender, RoutedEventArgs e)
@@ -141,6 +151,11 @@ namespace Gablarski.Clients.Windows
 				return;
 
 			Messenger.Send (new EditServerMessage (entry.Server));
+		}
+
+		private void OnClickJoinServer (object sender, RoutedEventArgs e)
+		{
+			JoinSelectedServer();
 		}
 	}
 }
