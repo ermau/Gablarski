@@ -15,27 +15,7 @@
 		</HierarchicalDataTemplate>
 
 		<DataTemplate DataType="{x:Type vms:UserViewModel}">
-			<TextBlock x:Name="Nickname" Text="{Binding User.Nickname}" FontSize="20" Foreground="{DynamicResource ForegroundBrush}">
-				<VisualStateManager.VisualStateGroups>
-					<VisualStateGroup x:Name="UserStatus">
-						<VisualState x:Name="Normal">
-							<Storyboard>
-								<windows:SolidColorBrushAnimation To="{DynamicResource ForegroundBrush}" Storyboard.TargetName="Nickname" Storyboard.TargetProperty="Foreground" Duration="0:0:0.2" />
-							</Storyboard>
-						</VisualState>
-						
-						<VisualState x:Name="IsTalking">
-							<Storyboard>
-								<windows:SolidColorBrushAnimation To="{x:Static Brushes.Green}" Storyboard.TargetName="Nickname" Storyboard.TargetProperty="Foreground" Duration="0:0:0.2" />
-							</Storyboard>
-						</VisualState>
-					</VisualStateGroup>
-				</VisualStateManager.VisualStateGroups>				
-				
-				<i:Interaction.Behaviors>
-					<ei:DataStateBehavior Binding="{Binding IsTalking}" Value="True" TrueState="IsTalking" FalseState="Normal" />
-				</i:Interaction.Behaviors>
-			</TextBlock>
+			<windows:UserView />
 		</DataTemplate>
 	</UserControl.Resources>
 	<Grid>

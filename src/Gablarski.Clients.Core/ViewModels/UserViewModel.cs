@@ -78,10 +78,24 @@ namespace Gablarski.Clients.ViewModels
 			}
 		}
 
+		public double Volume
+		{
+			get { return this.volume; }
+			set
+			{
+				if (this.volume == value)
+					return;
+
+				this.volume = value;
+				OnPropertyChanged();
+			}
+		}
+
 		private readonly IGablarskiClientContext context;
 		private bool isTalking;
 
 		private readonly HashSet<int> sourcesPlaying = new HashSet<int>();
+		private double volume;
 
 		private void OnAudioSourceStopped (object sender, AudioSourceEventArgs e)
 		{

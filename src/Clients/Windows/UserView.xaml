@@ -1,0 +1,75 @@
+﻿<UserControl x:Class="Gablarski.Clients.Windows.UserView"
+			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			 xmlns:windows="clr-namespace:Gablarski.Clients.Windows"
+			 xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+			 xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+			 xmlns:metro="http://schemas.codeplex.com/elysium"
+			 mc:Ignorable="d" d:DesignHeight="80" d:DesignWidth="300">
+	<Grid Height="40" Name="UserContainer" VerticalAlignment="Top">
+		<VisualStateManager.VisualStateGroups>
+			<VisualStateGroup x:Name="UserSelected">
+				<VisualState x:Name="NotSelected">
+					<Storyboard>
+						<DoubleAnimation From="80" To="40" Storyboard.TargetName="UserContainer" Storyboard.TargetProperty="Height" Duration="0:0:0.1" />
+					</Storyboard>
+				</VisualState>
+
+				<VisualState x:Name="Selected">
+					<Storyboard>
+						<DoubleAnimation From="40" To="80" Storyboard.TargetName="UserContainer" Storyboard.TargetProperty="Height" Duration="0:0:0.1" />
+					</Storyboard>
+				</VisualState>
+			</VisualStateGroup>
+		</VisualStateManager.VisualStateGroups>
+		
+		<i:Interaction.Behaviors>
+			<ei:DataStateBehavior Binding="{Binding IsSelected,RelativeSource={RelativeSource FindAncestor,AncestorType=TreeViewItem}}" Value="True" TrueState="Selected" FalseState="NotSelected" />
+		</i:Interaction.Behaviors>
+		
+		<Grid.RowDefinitions>
+			<RowDefinition Height="40" />
+			<RowDefinition Height="40" />
+		</Grid.RowDefinitions>
+		
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="*" />
+			<ColumnDefinition Width="Auto" />
+		</Grid.ColumnDefinitions>
+		
+		<TextBlock x:Name="Nickname" Text="{Binding User.Nickname}" FontSize="20" Foreground="{DynamicResource ForegroundBrush}" Grid.Row="0" Margin="19,0,0,0">
+			<VisualStateManager.VisualStateGroups>
+				<VisualStateGroup x:Name="UserStatus">
+					<VisualState x:Name="Normal">
+						<Storyboard>
+							<windows:SolidColorBrushAnimation To="{DynamicResource ForegroundBrush}" Storyboard.TargetName="Nickname" Storyboard.TargetProperty="Foreground" Duration="0:0:0.2" />
+						</Storyboard>
+					</VisualState>
+						
+					<VisualState x:Name="IsTalking">
+						<Storyboard>
+							<windows:SolidColorBrushAnimation To="{x:Static Brushes.Green}" Storyboard.TargetName="Nickname" Storyboard.TargetProperty="Foreground" Duration="0:0:0.2" />
+						</Storyboard>
+					</VisualState>
+				</VisualStateGroup>
+			</VisualStateManager.VisualStateGroups>
+				
+			<i:Interaction.Behaviors>
+				<ei:DataStateBehavior Binding="{Binding IsTalking}" Value="True" TrueState="IsTalking" FalseState="Normal" />
+			</i:Interaction.Behaviors>
+		</TextBlock>
+		
+		<Grid Grid.Row="1" Margin="4">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="40" />
+				<ColumnDefinition Width="1*" />
+			</Grid.ColumnDefinitions>
+
+			<metro:CommandButton Width="24" Height="24" Content="{DynamicResource MaxSound24}" />
+
+			<Slider Grid.Column="1" Name="volume" Maximum="200" Value="{Binding Volume}" VerticalAlignment="Center" Style="{DynamicResource MetroSlider}" />
+		</Grid>
+	</Grid>
+</UserControl>
