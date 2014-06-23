@@ -163,15 +163,7 @@
 
 									<StackPanel Grid.Column="1" Margin="6,0,0,0">
 										<TextBlock Text="{Binding Server.Name}" FontSize="18" />
-										<TextBlock Text="{Binding ConnectedUsers.Value,StringFormat={}{0} users}">
-											<TextBlock.Visibility>
-												<Binding Path="IsOnline.Value">
-													<Binding.Converter>
-														<BooleanToVisibilityConverter />
-													</Binding.Converter>
-												</Binding>
-											</TextBlock.Visibility>
-										</TextBlock>
+										<TextBlock Text="{Binding ConnectedUsers.Value,StringFormat={}{0} users}" Visibility="{Binding IsOnline.Value,Converter={StaticResource BooleanToVisibilityConverter}}" />
 									</StackPanel>
 									
 								</Grid>
