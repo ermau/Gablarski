@@ -117,7 +117,7 @@
 							<ControlTemplate TargetType="{x:Type TreeViewItem}">
 								<Grid>
 									<Grid.ColumnDefinitions>
-										<ColumnDefinition MinWidth="19" Width="Auto"/>
+										<ColumnDefinition Width="Auto"/>
 										<ColumnDefinition Width="*"/>
 									</Grid.ColumnDefinitions>
 									<Grid.RowDefinitions>
@@ -188,7 +188,7 @@
 										<Setter Property="Visibility" TargetName="ItemsHost" Value="Collapsed"/>
 									</Trigger>
 									<Trigger Property="HasItems" Value="false">
-										<Setter Property="Visibility" TargetName="Expander" Value="Hidden"/>
+										<Setter Property="Visibility" TargetName="Expander" Value="Collapsed"/>
 									</Trigger>
 									<Trigger Property="IsSelected" Value="true">
 										<Setter Property="Background" TargetName="Bd" Value="{DynamicResource MiddleLightBrush}"/>
