@@ -13,13 +13,13 @@
 			<VisualStateGroup x:Name="UserSelected">
 				<VisualState x:Name="NotSelected">
 					<Storyboard>
-						<DoubleAnimation From="80" To="40" Storyboard.TargetName="UserContainer" Storyboard.TargetProperty="Height" Duration="0:0:0.1" />
+						<DoubleAnimation From="80" To="40" Storyboard.TargetName="UserContainer" Storyboard.TargetProperty="Height" Duration="0:0:0.2" />
 					</Storyboard>
 				</VisualState>
 
 				<VisualState x:Name="Selected">
 					<Storyboard>
-						<DoubleAnimation From="40" To="80" Storyboard.TargetName="UserContainer" Storyboard.TargetProperty="Height" Duration="0:0:0.1" />
+						<DoubleAnimation From="40" To="80" Storyboard.TargetName="UserContainer" Storyboard.TargetProperty="Height" Duration="0:0:0.2" />
 					</Storyboard>
 				</VisualState>
 			</VisualStateGroup>
