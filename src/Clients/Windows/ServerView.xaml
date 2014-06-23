@@ -22,6 +22,7 @@
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto" />
 			<RowDefinition />
+			<RowDefinition Height="Auto" />
 		</Grid.RowDefinitions>
 		
 		<Border Grid.RowSpan="2" Background="Black" Opacity="0.8" Visibility="{Binding IsConnecting, Converter={StaticResource BooleanToVisibilityConverter}}" Panel.ZIndex="1">
@@ -223,5 +224,18 @@
 				</Style>
 			</TreeView.ItemContainerStyle>
 		</TreeView>
+
+		<Border Background="{DynamicResource HighlightBrush}" Grid.Row="2">
+			<StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+				<StackPanel.Resources>
+					<Style TargetType="metro:CommandButton" BasedOn="{StaticResource {x:Type metro:CommandButton}}">
+						<Setter Property="Margin" Value="5" />
+					</Style>
+				</StackPanel.Resources>
+				
+				<metro:CommandButton Content="{DynamicResource MaxSound32}" Command="{Binding MuteSound}" Background="Transparent" Width="32" Height="32" />
+				<metro:CommandButton Content="{DynamicResource Microphone32}" Command="{Binding MuteMicrophone}" Background="Transparent" Width="32" Height="32" />
+			</StackPanel>
+		</Border>
 	</Grid>
 </UserControl>

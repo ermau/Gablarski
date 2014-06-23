@@ -74,6 +74,8 @@ namespace Gablarski.Clients.ViewModels
 					c => new ChannelViewModel (this.clientContext, c), vm => vm.Channel));
 
 			LeaveServer = new RelayCommand (OnLeave);
+			MuteMicrophone = new RelayCommand (OnMuteMicrophone);
+			MuteSound = new RelayCommand (OnMuteSound);
 		}
 
 		public ServerInfo ServerInfo
@@ -88,6 +90,18 @@ namespace Gablarski.Clients.ViewModels
 		}
 
 		public ICommand LeaveServer
+		{
+			get;
+			private set;
+		}
+
+		public ICommand MuteMicrophone
+		{
+			get;
+			private set;
+		}
+
+		public ICommand MuteSound
 		{
 			get;
 			private set;
@@ -158,6 +172,16 @@ namespace Gablarski.Clients.ViewModels
 		private ClientConnectionResult connectionResult;
 		private InputHandler input;
 		private AudioHandler audio;
+
+		private void OnMuteSound()
+		{
+			throw new NotImplementedException();
+		}
+
+		private void OnMuteMicrophone()
+		{
+			throw new NotImplementedException();
+		}
 
 		private async void OnLeave()
 		{
