@@ -192,7 +192,7 @@
 										<Setter Property="Visibility" TargetName="Expander" Value="Collapsed"/>
 									</Trigger>
 									<Trigger Property="IsSelected" Value="true">
-										<Setter Property="Background" TargetName="Bd" Value="{DynamicResource MiddleLightBrush}"/>
+										<Setter Property="Background" TargetName="Bd" Value="{DynamicResource HighlightBrush}"/>
 										<Setter Property="Foreground" Value="{DynamicResource ContrastBrush}"/>
 									</Trigger>
 									<MultiTrigger>
