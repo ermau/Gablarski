@@ -42,7 +42,7 @@
 					<Path Canvas.Left="-8.5" Canvas.Top="-6.74" Width="16.52" Height="13.48" Stretch="Fill" Fill="{DynamicResource ForegroundBrush}" Data="F1 M 57,42L 57,34L 32.25,34L 42.25,24L 31.75,24L 17.75,38L 31.75,52L 42.25,52L 32.25,42L 57,42 Z" />
 				</Canvas>
 			</metro:CommandButton>
-			<TextBlock Grid.Column="1" Text="{Binding ServerInfo.Name}" FontSize="24" />
+			<TextBlock Grid.Column="1" Text="{Binding ServerInfo.Name}" FontSize="26" VerticalAlignment="Center" />
 		</Grid>
 
 		<TreeView Grid.Row="1" ItemsSource="{Binding Channels}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
