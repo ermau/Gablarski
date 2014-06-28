@@ -1,5 +1,5 @@
 ﻿//
-// AdjustUserVolumeMessage.cs
+// AdjustUserGainMessage.cs
 //
 // Author:
 //   Eric Maupin <me@ermau.com>
@@ -42,25 +42,25 @@
 
 namespace Gablarski.Clients.Messages
 {
-	public class AdjustUserVolumeMessage
+	public class AdjustUserGainMessage
 		: UserMessage
 	{
 		/// <summary>
-		/// Constructs and initializes a new instance of the <see cref="AdjustUserVolumeMessage" /> class.
+		/// Constructs and initializes a new instance of the <see cref="AdjustUserGainMessage" /> class.
 		/// </summary>
-		/// <param name="user">The user to adjust the volume of.</param>
-		/// <param name="volume">The volume multiplier (1 for 100%, 1.5 for 150%).</param>
-		public AdjustUserVolumeMessage (IUserInfo user, double volume)
+		/// <param name="user">The user to adjust the Gain of.</param>
+		/// <param name="gain">The gain value.</param>
+		public AdjustUserGainMessage (IUserInfo user, double gain)
 			: base (user)
 		{
-			Volume = volume;
+			Gain = gain;
 		}
 
 
 		/// <summary>
-		/// Gets the volume multiplier.
+		/// Gets the Gain multiplier.
 		/// </summary>
-		public double Volume
+		public double Gain
 		{
 			get;
 			private set;

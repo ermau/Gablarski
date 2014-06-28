@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 
 namespace Gablarski.Clients.Messages
 {
-	public class GetUserVolumeMessage
+	public class GetUserGainMessage
 		: UserMessage
 	{
-		public GetUserVolumeMessage (IUserInfo user)
+		public GetUserGainMessage (IUserInfo user)
 			: base (user)
 		{
-			Volume = 1;
+			this.Gain = 1;
 		}
 
-		public double Volume
+		public double Gain
 		{
 			get;
 			set;

@@ -63,16 +63,16 @@ namespace Gablarski.Clients
 			this.ignoreTask = ClientData.GetIgnoresAsync (serverEntry);
 
 			this.server = serverEntry;
-			Messenger.Register<GetUserVolumeMessage> (OnUserVolumeMessageMessage);
+			Messenger.Register<GetUserGainMessage> (OnUserVolumeMessageMessage);
 			Messenger.Register<IgnoreUserMessage> (OnIgnoreUserMessage);
-			Messenger.Register<AdjustUserVolumeMessage> (OnAdjustUserVolumeMessage);
+			Messenger.Register<AdjustUserGainMessage> (OnAdjustUserVolumeMessage);
 		}
 
 		public void StopResponding()
 		{
-			Messenger.Unregister<GetUserVolumeMessage> (OnUserVolumeMessageMessage);
+			Messenger.Unregister<GetUserGainMessage> (OnUserVolumeMessageMessage);
 			Messenger.Unregister<IgnoreUserMessage> (OnIgnoreUserMessage);
-			Messenger.Unregister<AdjustUserVolumeMessage> (OnAdjustUserVolumeMessage);
+			Messenger.Unregister<AdjustUserGainMessage> (OnAdjustUserVolumeMessage);
 
 			lock (this.sync) {
 				this.volumeTask = null;
@@ -123,21 +123,20 @@ namespace Gablarski.Clients
 			return entry;
 		}
 
-		private void OnAdjustUserVolumeMessage (AdjustUserVolumeMessage msg)
+		private void OnAdjustUserVolumeMessage (AdjustUserGainMessage msg)
 		{
-			float gain = (float)(Math.Pow (10, msg.Volume) / 100);
 			VolumeEntry entry = GetVolumeEntry (msg.User.Username);
 
 			lock (this.sync) {
 				if (entry == null) {
 					entry = new VolumeEntry { ServerId = this.server.Id, Username = msg.User.Username };
-				} else if (msg.Volume == 1) {
+				} else if (Math.Round (msg.Gain, 2) == 1) {
 					this.volumes.Remove (entry);
 					ClientData.Delete (entry);
 					return;
 				}
 
-				entry.Gain = gain;
+				entry.Gain = (float)msg.Gain;
 				ClientData.SaveOrUpdate (entry);
 
 				if (entry.VolumeId == 0)
@@ -145,11 +144,11 @@ namespace Gablarski.Clients
 			}
 		}
 
-		private void OnUserVolumeMessageMessage (GetUserVolumeMessage message)
+		private void OnUserVolumeMessageMessage (GetUserGainMessage message)
 		{
 			VolumeEntry entry = GetVolumeEntry (message.User.Username);
 			if (entry != null)
-				message.Volume = Math.Log (entry.Gain);
+				message.Gain = entry.Gain;
 		}
 
 		private void OnIgnoreUserMessage (IgnoreUserMessage msg)

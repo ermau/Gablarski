@@ -71,9 +71,9 @@ namespace Gablarski.Clients.ViewModels
 
 			ToggleIgnoreUser = new RelayCommand (() => IsIgnored = !isIgnored);
 
-			var request = new GetUserVolumeMessage (user);
+			var request = new GetUserGainMessage (user);
 			Messenger.Send (request);
-			this.volume = request.Volume;
+			this.volume = 1 + Math.Log (request.Gain);
 		}
 
 		public IUserInfo User
@@ -138,13 +138,13 @@ namespace Gablarski.Clients.ViewModels
 				this.volume = value;
 				OnPropertyChanged();
 
-				float gain = (float)(Math.Pow (10, value) / 100);
+				float gain = (float) Math.Pow (10, value - 1);
 
 				AudioSource source = this.context.Sources.GetSources (User).FirstOrDefault();
 				if (source != null)
 					this.context.Audio.Update (source, new AudioEnginePlaybackOptions (gain));
 
-				Messenger.Send (new AdjustUserVolumeMessage (User, value ));
+				Messenger.Send (new AdjustUserGainMessage (User, value));
 			}
 		}
 

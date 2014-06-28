@@ -61,7 +61,7 @@ namespace Gablarski.Clients
 			this.context = context;
 			this.context.Sources.CollectionChanged += OnSourcesChanged;
 
-			Messenger.Register<AdjustUserVolumeMessage> (OnAdjustUserVolume);
+			Messenger.Register<AdjustUserGainMessage> (OnAdjustUserVolume);
 			Messenger.Register<IgnoreUserMessage> (OnIgnoreUser);
 
 			Settings.SettingChanged += OnSettingsChanged;
@@ -135,15 +135,13 @@ namespace Gablarski.Clients
 
 		}
 
-		private void OnAdjustUserVolume (AdjustUserVolumeMessage msg)
+		private void OnAdjustUserVolume (AdjustUserGainMessage msg)
 		{
 			AudioSource source = this.context.Sources.GetSources (msg.User).FirstOrDefault();
 			if (source == null)
 				return;
 
-			float gain = (float)(Math.Pow (10, msg.Volume) / 100);
-
-			this.context.Audio.Update (source, new AudioEnginePlaybackOptions (gain));
+			this.context.Audio.Update (source, new AudioEnginePlaybackOptions ((float)msg.Gain));
 		}
 
 		private AudioEngineCaptureOptions GetVoiceCaptureOptions()
@@ -200,9 +198,9 @@ namespace Gablarski.Clients
 
 		private float GetGain (IUserInfo user)
 		{
-			var msg = new GetUserVolumeMessage (user);
+			var msg = new GetUserGainMessage (user);
 			Messenger.Send (msg);
-			return (float) (Math.Pow (10, msg.Volume) / 100);
+			return (float)msg.Gain;
 		}
 
 		private void AttachSource (AudioSource source)
