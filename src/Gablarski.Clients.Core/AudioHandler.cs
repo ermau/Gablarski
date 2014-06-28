@@ -47,6 +47,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Gablarski.Audio;
 using Gablarski.Client;
+using Gablarski.Clients.Messages;
 
 namespace Gablarski.Clients
 {
@@ -172,13 +173,28 @@ namespace Gablarski.Clients
 			OnSourcesChanged (this, new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Reset));
 		}
 
+		private float GetGain (IUserInfo user)
+		{
+			var msg = new GetUserVolumeMessage (user);
+			Messenger.Send (msg);
+			return (float) (Math.Pow (10, msg.Volume) / 100);
+		}
+
 		private void AttachSource (AudioSource source)
 		{
 			var p = this.playback;
 			if (p == null)
 				return;
 
-			this.context.Audio.Attach (p, source, new AudioEnginePlaybackOptions());
+			AudioEnginePlaybackOptions options = null;
+
+			IUserInfo owner = this.context.Users[source.OwnerId];
+			if (owner != null) {
+				double gain = GetGain (owner);
+				options = new AudioEnginePlaybackOptions ((float)gain);
+			}
+
+			this.context.Audio.Attach (p, source, options ?? new AudioEnginePlaybackOptions());
 		}
 
 		private async Task SetupCapture()
