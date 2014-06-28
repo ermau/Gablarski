@@ -43,6 +43,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
 namespace Gablarski.Clients
@@ -64,9 +65,14 @@ namespace Gablarski.Clients
 				};
 			}
 
-			List<Action<object>> respondersForType = Responders.GetOrAdd (typeof (T), t => new List<Action<object>>());
+			var r = new Responder {
+				CastedResponder = responder,
+				OriginalResponder = realResponder
+			};
+
+			var respondersForType = Responders.GetOrAdd (typeof (T), t => new List<Responder>());
 			lock (respondersForType)
-				respondersForType.Add (realResponder);
+				respondersForType.Add (r);
 		}
 
 		public static void Unregister<T> (Action<T> responder)
@@ -74,28 +80,36 @@ namespace Gablarski.Clients
 			if (responder == null)
 				throw new ArgumentNullException ("responder");
 
-			List<Action<object>> respondersForType;
+			List<Responder> respondersForType;
 			if (!Responders.TryGetValue (typeof (T), out respondersForType))
 				return;
 
 			lock (respondersForType) {
-				respondersForType.Remove (responder);
+				Responder savedResponder = respondersForType.FirstOrDefault (r => r.CastedResponder == responder);
+				if (savedResponder.Equals (default(Responder)))
+					respondersForType.Remove (savedResponder);
 			}
 		}
 
 		public static void Send<T> (T message)
 		{
-			List<Action<object>> respondersForType;
+			List<Responder> respondersForType;
 			if (!Responders.TryGetValue (typeof (T), out respondersForType))
 				return;
 
 			lock (respondersForType) {
-				foreach (Action<object> action in respondersForType) {
-					action (message);
+				foreach (Responder r in respondersForType) {
+					r.OriginalResponder (message);
 				}
 			}
 		}
 
-		private static readonly ConcurrentDictionary<Type, List<Action<object>>> Responders = new ConcurrentDictionary<Type, List<Action<object>>>();
+		struct Responder
+		{
+			public object CastedResponder;
+			public Action<object> OriginalResponder;
+		}
+
+		private static readonly ConcurrentDictionary<Type, List<Responder>> Responders = new ConcurrentDictionary<Type, List<Responder>>();
 	}
 }

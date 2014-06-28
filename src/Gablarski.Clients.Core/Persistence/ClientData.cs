@@ -261,20 +261,23 @@ namespace Gablarski.Clients.Persistence
 			}
 		}
 
-		public static IEnumerable<IgnoreEntry> GetIgnores()
+		public static async Task<IEnumerable<IgnoreEntry>> GetIgnoresAsync (ServerEntry server)
 		{
-			using (var cmd = db.CreateCommand ("SELECT * FROM ignores"))
-			using (var reader = cmd.ExecuteReader())
-			{
-				while (reader.Read())
-				{
-					yield return new IgnoreEntry (Convert.ToInt32 (reader["ignoreId"]))
-					{
-						ServerId = Convert.ToInt32 (reader["ignoreServerId"]),
-						Username = Convert.ToString (reader["ignoreUsername"])
-					};
+			List<IgnoreEntry> entries = new List<IgnoreEntry>();
+			using (var cmd = db.CreateCommand ("SELECT * FROM ignores WHERE (ignoreServerId=?)")) {
+				cmd.Parameters.Add (new SQLiteParameter ("server", server.Id));
+
+				using (var reader = cmd.ExecuteReader()) {
+					while (await reader.ReadAsync().ConfigureAwait (false)) {
+						entries.Add (new IgnoreEntry (Convert.ToInt32 (reader["ignoreId"])) {
+							ServerId = Convert.ToInt32 (reader["ignoreServerId"]),
+							Username = Convert.ToString (reader["ignoreUsername"])
+						});
+					}
 				}
 			}
+
+			return entries;
 		}
 
 		public static void Delete (IgnoreEntry ignore)
@@ -382,29 +385,29 @@ namespace Gablarski.Clients.Persistence
 		}
 		#endregion
 
-		#region Volume
-		public static IEnumerable<VolumeEntry> GetVolumes (ServerEntry server)
+		public static async Task<IEnumerable<VolumeEntry>> GetVolumesAsync (ServerEntry server)
 		{
 			if (server == null)
 				throw new ArgumentNullException ("server");
 
+			var volumes = new List<VolumeEntry>();
 			using (var cmd = db.CreateCommand())
 			{
 				cmd.CommandText = "SELECT * FROM volumes WHERE (volumeServerId=?)";
 				cmd.Parameters.Add (new SQLiteParameter ("serverId", server.Id));
 				using (var reader = cmd.ExecuteReader())
 				{
-					while (reader.Read())
-					{
-						yield return new VolumeEntry (Convert.ToInt32 (reader[0]))
-						{
+					while (await reader.ReadAsync().ConfigureAwait (false)) {
+						volumes.Add (new VolumeEntry (Convert.ToInt32 (reader[0])) {
 							ServerId = Convert.ToInt32 (reader[1]),
 							Username = Convert.ToString (reader[2]),
 							Gain = Convert.ToSingle (reader[3])
-						};
+						});
 					}
 				}
 			}
+
+			return volumes;
 		}
 
 		public static void SaveOrUpdate (VolumeEntry volumeEntry)
@@ -434,7 +437,7 @@ namespace Gablarski.Clients.Persistence
 			if (volumeEntry == null)
 				throw new ArgumentNullException ("volumeEntry");
 			if (volumeEntry.VolumeId < 1)
-				throw new ArgumentException ("Can't delete a non-existent server", "volumeEntry");
+				throw new ArgumentException ("Can't delete a non-existent volume", "volumeEntry");
 
 			using (var cmd = db.CreateCommand ("DELETE FROM volumes WHERE (volumeId=?)"))
 			{
@@ -442,7 +445,6 @@ namespace Gablarski.Clients.Persistence
 				cmd.ExecuteNonQuery();
 			}
 		}
-		#endregion
 
 		#region Bindings
 		public static IEnumerable<CommandBindingEntry> GetCommandBindings()

@@ -93,6 +93,7 @@
     <Compile Include="AutomaticErrorReporter.cs" />
     <Compile Include="CollectionView.cs" />
     <Compile Include="CompositeModuleFinder.cs" />
+    <Compile Include="DataResponder.cs" />
     <Compile Include="DefaultDevice.cs" />
     <Compile Include="AssemblyModuleFinder.cs" />
     <Compile Include="ErrorManager.cs" />

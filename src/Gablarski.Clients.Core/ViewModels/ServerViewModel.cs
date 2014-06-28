@@ -138,6 +138,15 @@ namespace Gablarski.Clients.ViewModels
 			if (entry == null)
 				throw new ArgumentNullException ("entry");
 
+			var oldResponder = Interlocked.Exchange (ref this.dataResponder, null);
+			if (oldResponder != null) {
+				this.dataResponder.StopResponding();
+			}
+
+			this.dataResponder = new DataResponder();
+			this.dataResponder.BeginResponding (entry);
+			this.server = entry;
+
 			IsConnecting = true;
 
 			var target = new Target (entry.Host, entry.Port);
@@ -170,8 +179,12 @@ namespace Gablarski.Clients.ViewModels
 		private readonly IntPtr windowHandle;
 		private bool isConnecting;
 		private ClientConnectionResult connectionResult;
+		
+		private DataResponder dataResponder;
 		private InputHandler input;
 		private AudioHandler audio;
+
+		private ServerEntry server;
 
 		private void OnMuteSound()
 		{
