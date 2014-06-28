@@ -61,6 +61,9 @@ namespace Gablarski.Clients
 			this.context = context;
 			this.context.Sources.CollectionChanged += OnSourcesChanged;
 
+			Messenger.Register<AdjustUserVolumeMessage> (OnAdjustUserVolume);
+			Messenger.Register<IgnoreUserMessage> (OnIgnoreUser);
+
 			Settings.SettingChanged += OnSettingsChanged;
 		}
 
@@ -120,6 +123,28 @@ namespace Gablarski.Clients
 		private IAudioCaptureProvider capture;
 		private IAudioPlaybackProvider playback;
 		private AudioSource voiceSource;
+
+		private void OnIgnoreUser (IgnoreUserMessage msg)
+		{
+			AudioSource source = this.context.Sources.GetSources (msg.User).FirstOrDefault();
+			if (source == null)
+				return;
+	
+			if (this.context.Sources.GetIsIgnored (source) != msg.Ignore)
+				this.context.Sources.ToggleIgnore (source);
+
+		}
+
+		private void OnAdjustUserVolume (AdjustUserVolumeMessage msg)
+		{
+			AudioSource source = this.context.Sources.GetSources (msg.User).FirstOrDefault();
+			if (source == null)
+				return;
+
+			float gain = (float)(Math.Pow (10, msg.Volume) / 100);
+
+			this.context.Audio.Update (source, new AudioEnginePlaybackOptions (gain));
+		}
 
 		private AudioEngineCaptureOptions GetVoiceCaptureOptions()
 		{
