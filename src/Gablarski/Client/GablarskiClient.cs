@@ -234,6 +234,11 @@ namespace Gablarski.Client
 
 		public async Task<ClientConnectionResult> ConnectAsync (Target target)
 		{
+			var tcs = new TaskCompletionSource<ClientConnectionResult>();
+			var oldTcs = Interlocked.Exchange (ref this.connectTcs, tcs);
+			if (oldTcs != null)
+				oldTcs.TrySetCanceled();
+
 			this.previousTarget = target;
 			this.running = true;
 			ClientConnectionResult result = await this.client.ConnectAsync (target).ConfigureAwait (false);
@@ -259,7 +264,7 @@ namespace Gablarski.Client
 				Audio.Start();
 			}
 
-			return result;
+			return await tcs.Task.ConfigureAwait (false);
 		}
 
 		public Task DisconnectAsync()
@@ -304,6 +309,7 @@ namespace Gablarski.Client
 		private int reconnectAttemptFrequency = 2000;
 		private int reconnectAttempt;
 		private bool connecting, running;
+		private TaskCompletionSource<ClientConnectionResult> connectTcs;
 
 		private TempestClient client;
 
@@ -363,6 +369,10 @@ namespace Gablarski.Client
 		{
 			ServerInfo = e.Message.ServerInfo;
 			IsConnected = true;
+
+			var tcs = Interlocked.Exchange (ref this.connectTcs, null);
+			if (tcs != null)
+				tcs.TrySetResult (new ClientConnectionResult (ConnectionResult.Success, this.client.Connection.RemoteKey));
 
 			OnConnected (this, EventArgs.Empty);
 		}
