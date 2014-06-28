@@ -1,4 +1,10 @@
-﻿// Copyright (c) 2013, Eric Maupin
+﻿//
+// Messenger.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2013-2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -37,10 +43,9 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 
-namespace Gablarski.Clients.ViewModels
+namespace Gablarski.Clients
 {
 	public static class Messenger
 	{
@@ -62,6 +67,20 @@ namespace Gablarski.Clients.ViewModels
 			List<Action<object>> respondersForType = Responders.GetOrAdd (typeof (T), t => new List<Action<object>>());
 			lock (respondersForType)
 				respondersForType.Add (realResponder);
+		}
+
+		public static void Unregister<T> (Action<T> responder)
+		{
+			if (responder == null)
+				throw new ArgumentNullException ("responder");
+
+			List<Action<object>> respondersForType;
+			if (!Responders.TryGetValue (typeof (T), out respondersForType))
+				return;
+
+			lock (respondersForType) {
+				respondersForType.Remove (responder);
+			}
 		}
 
 		public static void Send<T> (T message)
