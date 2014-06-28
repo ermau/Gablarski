@@ -43,8 +43,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Gablarski.Audio;
@@ -98,6 +100,8 @@ namespace Gablarski.Client
 			Setup (new UdpClientConnection (GablarskiProtocol.Instance, key), null, null, null, null);
 		}
 
+		public event PropertyChangedEventHandler PropertyChanged;
+
 		/// <summary>
 		/// The client has connected to the server.
 		/// </summary>
@@ -124,11 +128,27 @@ namespace Gablarski.Client
 		public bool IsConnecting
 		{
 			get { return this.connecting; }
+			private set
+			{
+				if (this.connecting == value)
+					return;
+
+				this.connecting = value;
+				OnPropertyChanged();
+			}
 		}
 
 		public bool IsConnected
 		{
 			get { return this.formallyConnected; }
+			private set
+			{
+				if (this.formallyConnected == value)
+					return;
+
+				this.formallyConnected = value;
+				OnPropertyChanged();
+			}
 		}
 
 		/// <summary>
@@ -163,7 +183,8 @@ namespace Gablarski.Client
 		/// </summary>
 		public IAudioEngine Audio
 		{
-			get; private set;
+			get;
+			private set;
 		}
 
 		/// <summary>
@@ -181,6 +202,14 @@ namespace Gablarski.Client
 		public ServerInfo ServerInfo
 		{
 			get { return this.serverInfo; }
+			private set
+			{
+				if (this.serverInfo == value)
+					return;
+
+				this.serverInfo = value;
+				OnPropertyChanged();
+			}
 		}
 
 		private bool reconnectAutomatically = true;
@@ -193,9 +222,6 @@ namespace Gablarski.Client
 			get { return reconnectAutomatically; }
 			set { reconnectAutomatically = value; }
 		}
-
-		private int reconnectAttemptFrequency = 2000;
-		private bool formallyConnected;
 
 		/// <summary>
 		/// Gets or sets the frequency (ms) at which to attempt reconnection. (2s default).
@@ -246,12 +272,12 @@ namespace Gablarski.Client
 			this.client = new TempestClient (connection, MessageTypes.All);
 			this.client.Disconnected += OnClientDisconnected;
 
-			this.CurrentUser = new CurrentUser (this);
+			CurrentUser = new CurrentUser (this);
 
-			this.Audio = (audioEngine ?? new AudioEngine());
-			this.Users = (userHandler ?? new ClientUserHandler (this));
-			this.Sources = (sourceHandler ?? new ClientSourceHandler (this));
-			this.Channels = (channelHandler ?? new ClientChannelHandler (this));
+			Audio = (audioEngine ?? new AudioEngine());
+			Users = (userHandler ?? new ClientUserHandler (this));
+			Sources = (sourceHandler ?? new ClientSourceHandler (this));
+			Channels = (channelHandler ?? new ClientChannelHandler (this));
 
 			this.RegisterMessageHandler<PermissionDeniedMessage> (OnPermissionDeniedMessage);
 			//this.RegisterMessageHandler<RedirectMessage> (OnRedirectMessage);
@@ -263,7 +289,7 @@ namespace Gablarski.Client
 		private Target previousTarget;
 
 		protected readonly object StateSync = new object();
-		protected ServerInfo serverInfo;
+		private ServerInfo serverInfo;
 
 		protected readonly bool DebugLogging;
 
@@ -274,10 +300,19 @@ namespace Gablarski.Client
 		private int disconnectedInChannelId;
 
 		private string originalHost;
+		private bool formallyConnected;
+		private int reconnectAttemptFrequency = 2000;
 		private int reconnectAttempt;
 		private bool connecting, running;
 
 		private TempestClient client;
+
+		protected virtual void OnPropertyChanged ([CallerMemberName] string propertyName = null)
+		{
+			var changed = PropertyChanged;
+			if (changed != null)
+				changed (this, new PropertyChangedEventArgs (propertyName));
+		}
 
 		protected void OnConnected (object sender, EventArgs e)
 		{
@@ -326,8 +361,8 @@ namespace Gablarski.Client
 
 		private void OnServerInfoReceivedMessage (MessageEventArgs<ServerInfoMessage> e)
 		{
-			this.serverInfo = e.Message.ServerInfo;
-			this.formallyConnected = true;
+			ServerInfo = e.Message.ServerInfo;
+			IsConnected = true;
 
 			OnConnected (this, EventArgs.Empty);
 		}
@@ -350,16 +385,16 @@ namespace Gablarski.Client
 			{
 				disconnectedInChannelId = CurrentUser.CurrentChannelId;
 
-				this.connecting = false;
+				IsConnecting = false;
 				this.running = false;
-				this.formallyConnected = false;
+				IsConnected = false;
 
 				CurrentUser = new CurrentUser (this);
-				this.Users.Reset();
-				this.Channels.Reset();
-				this.Sources.Reset();
+				Users.Reset();
+				Channels.Reset();
+				Sources.Reset();
 
-				this.Audio.Stop();
+				Audio.Stop();
 
 				connection.DisconnectAsync();
 

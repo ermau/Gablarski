@@ -1,4 +1,11 @@
-// Copyright (c) 2011, Eric Maupin
+//
+// IGablarskiClientContext.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2009-2011, Eric Maupin
+// Copyright (c) 2011-2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -34,6 +41,7 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
+using System.ComponentModel;
 using System.Threading.Tasks;
 using Gablarski.Audio;
 using Tempest;
@@ -44,7 +52,7 @@ namespace Gablarski.Client
 	/// Represents a Gablarski client context.
 	/// </summary>
 	public interface IGablarskiClientContext
-		: IClientContext
+		: IClientContext, INotifyPropertyChanged
 	{
 		IAudioEngine Audio { get; }
 
