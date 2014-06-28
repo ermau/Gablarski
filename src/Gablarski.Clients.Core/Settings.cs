@@ -158,8 +158,15 @@ namespace Gablarski.Clients
 		public const string InputProviderSettingName = "InputProvider";
 		public static string InputProvider
 		{
-			get { return GetSetting ("InputProvider", "Gablarski.Input.DirectInput.DirectInputProvider, Gablarski.Input.DirectInput"); }
-			set { SetSetting ("InputProvider", value); }
+			get { return GetSetting (InputProviderSettingName, "Gablarski.Input.DirectInput.DirectInputProvider, Gablarski.Input.DirectInput"); }
+			set { SetSetting (InputProviderSettingName, value); }
+		}
+
+		public const string ThemeSettingName = "Theme";
+		public static string Theme
+		{
+			get { return GetSetting (ThemeSettingName, "Dark"); }
+			set { SetSetting (ThemeSettingName, value); }
 		}
 
 		public static ICollection<CommandBinding> CommandBindings

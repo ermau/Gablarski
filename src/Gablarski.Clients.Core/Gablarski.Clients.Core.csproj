@@ -99,6 +99,7 @@
     <Compile Include="ErrorManager.cs" />
     <Compile Include="INamedComponent.cs" />
     <Compile Include="Messages\AdjustUserVolumeMessage.cs" />
+    <Compile Include="Messages\ChangeThemeMessage.cs" />
     <Compile Include="Messages\EditServerMessage.cs" />
     <Compile Include="Messages\GetUserVolumeMessage.cs" />
     <Compile Include="Messages\LeaveServerMessage.cs" />
@@ -149,6 +150,7 @@
     <Compile Include="ViewModels\ChannelViewModel.cs" />
     <Compile Include="ViewModels\CommandBindingViewModel.cs" />
     <Compile Include="ViewModels\DeviceViewModel.cs" />
+    <Compile Include="ViewModels\GeneralSettingsViewModel.cs" />
     <Compile Include="ViewModels\InputSettingsViewModel.cs" />
     <Compile Include="ViewModels\BusyViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />

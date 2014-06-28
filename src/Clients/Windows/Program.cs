@@ -48,21 +48,21 @@ using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
+using Gablarski.Clients.Messages;
 using log4net;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Mindscape.Raygun4Net;
-using System.Windows.Media;
 using Elysium;
 using Tempest;
 using Gablarski.Clients.Input;
 using Gablarski.Clients.Persistence;
 using Microsoft.WindowsAPICodePack.Shell;
 using Microsoft.WindowsAPICodePack.Taskbar;
+using Application = System.Windows.Application;
 using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace Gablarski.Clients.Windows
@@ -211,7 +211,8 @@ namespace Gablarski.Clients.Windows
 			System.Windows.Application app = new System.Windows.Application();
 			app.Resources.MergedDictionaries.Add (new ResourceDictionary { Source = new Uri ("/Elysium;component/Themes/Generic.xaml", UriKind.Relative) });
 			app.Resources.MergedDictionaries.Add (new ResourceDictionary { Source = new Uri ("Resources.xaml", UriKind.Relative) });
-			app.Apply (Theme.Dark, AccentBrushes.Blue, Brushes.White);
+
+			SetupTheme (app);
 
 			/*
 			if (Settings.Nickname == null)
@@ -253,6 +254,40 @@ namespace Gablarski.Clients.Windows
 			app.Run (window);
 
 			Settings.SaveAsync().Wait();
+		}
+
+		private static Theme GetTheme (string themeName)
+		{
+			Theme theme;
+			if (!Theme.TryParse (themeName, out theme))
+				theme = Theme.Dark;
+
+			return theme;
+		}
+
+		private static Theme currentTheme;
+		private static void SetupTheme (Application app)
+		{
+			Theme theme = GetTheme (Settings.Theme);
+			currentTheme = theme;
+
+			app.Apply (theme, AccentBrushes.Blue, null);
+
+			Settings.SettingChanged += (sender, eventArgs) => {
+				if (eventArgs.PropertyName != Settings.ThemeSettingName)
+					return;
+
+				Messenger.Send (new ChangeThemeMessage (Settings.Theme));
+			};
+
+			Messenger.Register<ChangeThemeMessage> (m => {
+				Theme newTheme = GetTheme (m.Theme);
+				if (newTheme == currentTheme)
+					return;
+
+				currentTheme = newTheme;
+				app.Apply (newTheme, AccentBrushes.Blue, null);
+			});
 		}
 
 		private static void CheckForUpdates()

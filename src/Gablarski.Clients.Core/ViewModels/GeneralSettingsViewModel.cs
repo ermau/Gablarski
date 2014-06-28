@@ -1,10 +1,10 @@
 ﻿//
-// SettingsViewModel.cs
+// GeneralSettingsViewModel.cs
 //
 // Author:
 //   Eric Maupin <me@ermau.com>
 //
-// Copyright (c) 2013-2014, Xamarin Inc.
+// Copyright (c) 2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -41,98 +41,51 @@
 // DAMAGE.
 
 using System;
-using System.Windows.Input;
+using System.Collections.Generic;
+using Gablarski.Clients.Messages;
 
 namespace Gablarski.Clients.ViewModels
 {
-	public class SettingsViewModel
-		: ViewModelBase
+	public class GeneralSettingsViewModel
+		: ViewModelBase, IDisposable
 	{
-		public SettingsViewModel (IntPtr windowHandle)
-		{
-			General = new GeneralSettingsViewModel();
-			Playback = new AudioPlaybackSettingsViewModel();
-			Capture = new AudioCaptureSettingsViewModel();
-			Notifications = new NotificationSettingsViewModel();
-			Input = new InputSettingsViewModel (windowHandle);
-			Music = new MusicSettingsViewModel();
+		private string currentTheme;
 
-			SaveCommand = new RelayCommand (SaveSettings);
-			CloseCommand = new RelayCommand (Close);
+		public GeneralSettingsViewModel()
+		{
+			CurrentTheme = Settings.Theme;
+			Themes = new[] { "Dark", "Light" };
 		}
 
-		public event EventHandler Closing;
+		public string CurrentTheme
+		{
+			get { return this.currentTheme; }
+			set
+			{
+				if (this.currentTheme == value)
+					return;
 
-		public GeneralSettingsViewModel General
+				this.currentTheme = value;
+				OnPropertyChanged();
+
+				Messenger.Send (new ChangeThemeMessage (value));
+			}
+		}
+
+		public IEnumerable<string> Themes
 		{
 			get;
 			private set;
 		}
 
-		public NotificationSettingsViewModel Notifications
+		public void UpdateSettings()
 		{
-			get;
-			private set;
+			Settings.Theme = CurrentTheme;
 		}
 
-		public AudioPlaybackSettingsViewModel Playback
+		public void Dispose()
 		{
-			get;
-			private set;
-		}
-
-		public AudioCaptureSettingsViewModel Capture
-		{
-			get;
-			private set;
-		}
-
-		public InputSettingsViewModel Input
-		{
-			get;
-			private set;
-		}
-
-		public MusicSettingsViewModel Music
-		{
-			get;
-			private set;
-		}
-
-		public ICommand SaveCommand
-		{
-			get;
-			private set;
-		}
-
-		public ICommand CloseCommand
-		{
-			get;
-			private set;
-		}
-
-		private async void SaveSettings()
-		{
-			General.UpdateSettings();
-			Playback.UpdateSettings();
-			Capture.UpdateSettings();
-			Input.UpdateSettings();
-			Music.UpdateSettings();
-			Notifications.UpdateSettings();
-			await Settings.SaveAsync();
-
-			Close();
-		}
-
-		private void Close()
-		{
-			General.Dispose();
-			Capture.Dispose();
-			Input.Dispose();
-
-			var closing = Closing;
-			if (closing != null)
-				closing (this, EventArgs.Empty);
+			Messenger.Send (new ChangeThemeMessage (Settings.Theme));
 		}
 	}
 }
