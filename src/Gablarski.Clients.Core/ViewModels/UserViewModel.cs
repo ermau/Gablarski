@@ -1,4 +1,10 @@
-﻿// Copyright (c) 2014, Xamarin Inc.
+﻿//
+// UserViewModel.cs
+//
+// Author:
+//   Eric Maupin <me@ermau.com>
+//
+// Copyright (c) 2014, Xamarin Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with
@@ -36,9 +42,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Threading;
+using System.Linq;
+using System.Windows.Input;
 using Gablarski.Audio;
 using Gablarski.Client;
+using Gablarski.Clients.Messages;
 
 namespace Gablarski.Clients.ViewModels
 {
@@ -55,14 +63,28 @@ namespace Gablarski.Clients.ViewModels
 			this.context = context;
 			this.context.Sources.AudioSourceStarted += OnAudioSourceStarted;
 			this.context.Sources.AudioSourceStopped += OnAudioSourceStopped;
+			this.context.Users.UserMuted += OnUserMuted;
+
+			IsIgnored = this.context.Sources.GetSources (user).Any (s => this.context.Sources.GetIsIgnored (s));
 
 			User = user;
+
+			ToggleIgnoreUser = new RelayCommand (() => IsIgnored = !isIgnored);
+
+			var request = new GetUserVolumeMessage (user);
+			Messenger.Send (request);
+			this.volume = request.Volume;
 		}
 
 		public IUserInfo User
 		{
 			get;
 			private set;
+		}
+
+		public bool IsHearable
+		{
+			get { return (!IsIgnored && !IsMuted); }
 		}
 
 		public bool IsTalking
@@ -78,6 +100,33 @@ namespace Gablarski.Clients.ViewModels
 			}
 		}
 
+		public ICommand ToggleIgnoreUser
+		{
+			get;
+			private set;
+		}
+
+		public bool IsMuted
+		{
+			get { return User.IsMuted; }
+		}
+
+		public bool IsIgnored
+		{
+			get { return this.isIgnored; }
+			private set
+			{
+				if (this.isIgnored == value)
+					return;
+
+				this.isIgnored = value;
+				OnPropertyChanged();
+				OnPropertyChanged ("IsHearable");
+
+				Messenger.Send (new IgnoreUserMessage (User, value));
+			}
+		}
+
 		public double Volume
 		{
 			get { return this.volume; }
@@ -88,6 +137,14 @@ namespace Gablarski.Clients.ViewModels
 
 				this.volume = value;
 				OnPropertyChanged();
+
+				float gain = (float)(Math.Pow (10, value) / 100);
+
+				AudioSource source = this.context.Sources.GetSources (User).FirstOrDefault();
+				if (source != null)
+					this.context.Audio.Update (source, new AudioEnginePlaybackOptions (gain));
+
+				Messenger.Send (new AdjustUserVolumeMessage (User, value ));
 			}
 		}
 
@@ -96,6 +153,16 @@ namespace Gablarski.Clients.ViewModels
 
 		private readonly HashSet<int> sourcesPlaying = new HashSet<int>();
 		private double volume;
+		private bool isIgnored;
+
+		private void OnUserMuted(object sender, UserMutedEventArgs e)
+		{
+			if (!Equals (e.User, this.User))
+				return;
+
+			OnPropertyChanged ("IsMuted");
+			OnPropertyChanged ("IsHearable");
+		}
 
 		private void OnAudioSourceStopped (object sender, AudioSourceEventArgs e)
 		{
