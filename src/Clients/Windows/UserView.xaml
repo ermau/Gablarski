@@ -67,7 +67,7 @@
 				<ColumnDefinition Width="1*" />
 			</Grid.ColumnDefinitions>
 
-			<metro:CommandButton Content="{Binding IsIgnored}" Command="{Binding MuteSound}" Background="Transparent" Width="32" Height="32">
+			<metro:CommandButton Content="{Binding IsIgnored}" Command="{Binding ToggleIgnoreUser}" Background="Transparent" Width="32" Height="32">
 				<metro:CommandButton.ContentTemplateSelector>
 					<windows:BoolContentSelector TrueContentKey="MuteSound32" FalseContentKey="MaxSound32" />
 				</metro:CommandButton.ContentTemplateSelector>

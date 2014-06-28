@@ -32,6 +32,9 @@ namespace Gablarski.Clients.Windows
 
 		public override DataTemplate SelectTemplate (object item, DependencyObject container)
 		{
+			if (!(item is bool))
+				return this.falseTemplate;
+
 			return ((bool) item) ? this.trueTemplate : this.falseTemplate;
 		}
 
