@@ -175,6 +175,7 @@
       <DependentUpon>ActivationSlider.xaml</DependentUpon>
     </Compile>
     <Compile Include="AvatarConverter.cs" />
+    <Compile Include="BoolToContentConverter.cs" />
     <Compile Include="CaseConverter.cs" />
     <Compile Include="DirectoryModuleFinder.cs" />
     <Compile Include="BindingList.xaml.cs">

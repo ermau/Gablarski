@@ -98,8 +98,12 @@
     <Compile Include="AssemblyModuleFinder.cs" />
     <Compile Include="ErrorManager.cs" />
     <Compile Include="INamedComponent.cs" />
+    <Compile Include="Messages\AdjustUserVolumeMessage.cs" />
     <Compile Include="Messages\EditServerMessage.cs" />
+    <Compile Include="Messages\GetUserVolumeMessage.cs" />
     <Compile Include="Messages\LeaveServerMessage.cs" />
+    <Compile Include="Messages\IgnoreUserMessage.cs" />
+    <Compile Include="Messages\UserMessage.cs" />
     <Compile Include="ModuleAttribute.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="GablarskiErrorReporter.cs" />
