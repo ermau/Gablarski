@@ -199,6 +199,20 @@ namespace Gablarski.Clients
 		private void OnSourcesChanged (object sender, NotifyCollectionChangedEventArgs e)
 		{
 			switch (e.Action) {
+				case NotifyCollectionChangedAction.Add:
+					foreach (AudioSource source in e.NewItems) {
+						AttachSource (source);
+					}
+
+					break;
+
+				case NotifyCollectionChangedAction.Remove:
+					foreach (AudioSource source in e.OldItems) {
+						this.context.Audio.Detach (source);
+					}
+
+					break;
+
 				case NotifyCollectionChangedAction.Reset:
 					Reset();
 					break;
