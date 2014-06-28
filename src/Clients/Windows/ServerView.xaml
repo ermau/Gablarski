@@ -233,8 +233,14 @@
 					</Style>
 				</StackPanel.Resources>
 				
-				<metro:CommandButton Content="{DynamicResource MaxSound32}" Command="{Binding MuteSound}" Background="Transparent" Width="32" Height="32" />
-				<metro:CommandButton Content="{DynamicResource Microphone32}" Command="{Binding MuteMicrophone}" Background="Transparent" Width="32" Height="32" />
+				<metro:CommandButton Content="{Binding IsSoundMuted}" Command="{Binding MuteSound}" Background="Transparent" Width="32" Height="32">
+					<metro:CommandButton.ContentTemplateSelector>
+						<windows:BoolContentSelector TrueContentKey="MuteSound32" FalseContentKey="MaxSound32" />
+					</metro:CommandButton.ContentTemplateSelector>
+				</metro:CommandButton>
+
+				<metro:CommandButton Content="{DynamicResource Microphone32}" Command="{Binding MuteMicrophone}" Background="Transparent" Width="32" Height="32">
+				</metro:CommandButton>
 			</StackPanel>
 		</Border>
 	</Grid>
