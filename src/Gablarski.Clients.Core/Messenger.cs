@@ -97,10 +97,16 @@ namespace Gablarski.Clients
 			if (!Responders.TryGetValue (typeof (T), out respondersForType))
 				return;
 
+			Action<object>[] responders;
 			lock (respondersForType) {
-				foreach (Responder r in respondersForType) {
-					r.OriginalResponder (message);
+				responders = new Action<object>[respondersForType.Count];
+				for (int i = 0; i < respondersForType.Count; i++) {
+					responders[i] = respondersForType[i].OriginalResponder;
 				}
+			}
+
+			foreach (Action<object> responder in responders) {
+				responder (message);
 			}
 		}
 
