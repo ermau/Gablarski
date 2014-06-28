@@ -73,7 +73,24 @@
 				</metro:CommandButton.ContentTemplateSelector>
 			</metro:CommandButton>
 
-			<Slider Grid.Column="1" Name="volume" Maximum="2" Value="{Binding Volume}" VerticalAlignment="Center" Style="{DynamicResource MetroSlider}" Height="32" />
+			<Grid Grid.Column="1">
+				<Grid.RowDefinitions>
+					<RowDefinition />
+					<RowDefinition />
+				</Grid.RowDefinitions>
+				
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="*" />
+				</Grid.ColumnDefinitions>
+
+				<Slider Grid.ColumnSpan="3" Grid.Row="0" Name="volume" Maximum="2" SmallChange="0.1" LargeChange=".25" Value="{Binding Volume}" VerticalAlignment="Center" Style="{DynamicResource MetroSlider}" />
+				
+				<TextBlock Grid.Row="1" Grid.Column="0" HorizontalAlignment="Left">0%</TextBlock>
+				<TextBlock Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center">100%</TextBlock>
+				<TextBlock Grid.Row="1" Grid.Column="2" HorizontalAlignment="Right">200%</TextBlock>
+			</Grid>
 		</Grid>
 	</Grid>
 </UserControl>
