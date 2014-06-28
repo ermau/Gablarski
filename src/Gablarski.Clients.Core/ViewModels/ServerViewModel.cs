@@ -42,6 +42,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -107,6 +109,32 @@ namespace Gablarski.Clients.ViewModels
 			private set;
 		}
 
+		public bool IsSoundMuted
+		{
+			get { return this.isSoundMuted; }
+			private set
+			{
+				if (this.isSoundMuted == value)
+					return;
+
+				this.isSoundMuted = value;
+				OnPropertyChanged();
+			}
+		}
+
+		public bool IsMicrophoneMuted
+		{
+			get { return this.isMicrophoneMuted; }
+			set
+			{
+				if (this.isMicrophoneMuted == value)
+					return;
+
+				this.isMicrophoneMuted = value;
+				OnPropertyChanged();
+			}
+		}
+
 		public bool IsConnecting
 		{
 			get { return this.isConnecting; }
@@ -160,7 +188,7 @@ namespace Gablarski.Clients.ViewModels
 			Task<LoginResultState> joinTask = this.clientContext.CurrentUser.JoinAsync (entry.UserNickname, entry.UserPhonetic, entry.ServerPassword);
 
 			Task inputTask = this.input.SetupInputAsync (this.windowHandle);
-			
+
 			await this.audio.SetupAudioAsync();
 
 			// TODO failed joins
@@ -184,16 +212,23 @@ namespace Gablarski.Clients.ViewModels
 		private InputHandler input;
 		private AudioHandler audio;
 
+		private bool isSoundMuted, isMicrophoneMuted;
 		private ServerEntry server;
 
 		private void OnMuteSound()
 		{
-			throw new NotImplementedException();
+			if (IsSoundMuted = !IsSoundMuted)
+				this.clientContext.Audio.MutePlayback();
+			else
+				this.clientContext.Audio.UnmutePlayback();
 		}
 
 		private void OnMuteMicrophone()
 		{
-			throw new NotImplementedException();
+			if (IsMicrophoneMuted = !IsMicrophoneMuted)
+				this.clientContext.Audio.MuteCapture();
+			else
+				this.clientContext.Audio.UnmuteCapture();
 		}
 
 		private async void OnLeave()
