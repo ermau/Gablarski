@@ -235,12 +235,6 @@
     <Compile Include="UserView.xaml.cs">
       <DependentUpon>UserView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="VolumeForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="VolumeForm.Designer.cs">
-      <DependentUpon>VolumeForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="WebLinkLabel.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -265,9 +259,6 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Servers.cs" />
-    <EmbeddedResource Include="VolumeForm.resx">
-      <DependentUpon>VolumeForm.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="GablarskiClient.exe.config">
