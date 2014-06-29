@@ -73,7 +73,8 @@ namespace Gablarski.Clients.ViewModels
 
 			var request = new GetUserGainMessage (user);
 			Messenger.Send (request);
-			this.volume = (1 + Math.Log (request.Gain + .1)) * (1 / (1 + Math.Log (1.1)));
+
+			this.volume = (1 + Math.Log10 (request.Gain + .1)) * (1 / (1 + Math.Log10 (1.1)));
 		}
 
 		public IUserInfo User
@@ -138,7 +139,7 @@ namespace Gablarski.Clients.ViewModels
 				this.volume = value;
 				OnPropertyChanged();
 
-				float gain = (float) ((Math.Pow (10, (value - 1)) - 0.1) * (9d / 10d));
+				float gain = (float) (-0.1 * (1.0 - Math.Pow (Math.E, 2.3978952727983689 * value)));
 
 				AudioSource source = this.context.Sources.GetSources (User).FirstOrDefault();
 				if (source != null)
