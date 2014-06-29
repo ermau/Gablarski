@@ -1,17 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Gablarski.Clients.Windows
 {
@@ -23,6 +14,21 @@ namespace Gablarski.Clients.Windows
 		public UserView()
 		{
 			InitializeComponent();
+		}
+
+		private void OnClickNormalVolume (object sender, EventArgs routedEventArgs)
+		{
+			this.volume.Value = 1;
+		}
+
+		private void OnClickedNoVolume (object sender, EventArgs e)
+		{
+			this.volume.Value = 0;
+		}
+
+		private void OnClickMaxVolume (object sender, EventArgs e)
+		{
+			this.volume.Value = this.volume.Maximum;
 		}
 	}
 }

@@ -86,10 +86,10 @@
 				</Grid.ColumnDefinitions>
 
 				<Slider Grid.ColumnSpan="3" Grid.Row="0" Name="volume" Maximum="2" SmallChange="0.1" LargeChange=".25" Value="{Binding Volume}" VerticalAlignment="Center" Style="{DynamicResource MetroSlider}" />
-				
-				<TextBlock Grid.Row="1" Grid.Column="0" HorizontalAlignment="Left">0%</TextBlock>
-				<TextBlock Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center">100%</TextBlock>
-				<TextBlock Grid.Row="1" Grid.Column="2" HorizontalAlignment="Right">200%</TextBlock>
+
+				<windows:TextButton Grid.Row="1" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" Clicked="OnClickedNoVolume">0%</windows:TextButton>
+				<windows:TextButton Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Clicked="OnClickNormalVolume">100%</windows:TextButton>
+				<windows:TextButton Grid.Row="1" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Clicked="OnClickMaxVolume">200%</windows:TextButton>
 			</Grid>
 		</Grid>
 	</Grid>
