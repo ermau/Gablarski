@@ -69,7 +69,7 @@ namespace Gablarski.SpeechNotifier
 
 		public Task OpenAsync()
 		{
-			return Task.Factory.StartNew (() => {
+			return Task.Run (() => {
 				lock (this.sync) {
 					if (this.recognition != null)
 						throw new InvalidOperationException ("Already open");
@@ -77,7 +77,12 @@ namespace Gablarski.SpeechNotifier
 					this.recognition = new SpeechRecognitionEngine();
 					this.recognition.SpeechRecognized += OnSpeechRecognized;
 					this.recognition.MaxAlternates = 1;
-					this.recognition.SetInputToDefaultAudioDevice();
+
+					try {
+						this.recognition.SetInputToDefaultAudioDevice();
+					} catch (InvalidOperationException) {
+						return; // no input device
+					}
 
 					GrammarBuilder builder = new GrammarBuilder();
 					builder.Append (new SemanticResultKey ("command", new Choices ("mute", "unmute")));
