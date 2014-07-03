@@ -223,8 +223,13 @@ namespace Gablarski.Clients
 		private async Task SetupCapture()
 		{
 			IAudioCaptureProvider captureProvider = await Modules.GetImplementerAsync<IAudioCaptureProvider> (Settings.VoiceProvider).ConfigureAwait (false);
-			captureProvider.Device = captureProvider.GetDevices().FirstOrDefault (d => d.Name == Settings.VoiceDevice) ?? captureProvider.DefaultDevice;
 			this.capture = captureProvider;
+
+			IAudioDevice device = captureProvider.GetDevices().FirstOrDefault (d => d.Name == Settings.VoiceDevice)
+									?? captureProvider.DefaultDevice;
+
+			if (device != null)
+				captureProvider.Device = device;
 		}
 
 		private void Reset()
