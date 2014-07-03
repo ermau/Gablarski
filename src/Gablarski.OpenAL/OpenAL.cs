@@ -197,7 +197,11 @@ namespace Gablarski.OpenAL
 
 			string defaultName = Marshal.PtrToStringAnsi (alcGetString (IntPtr.Zero, ALC_CAPTURE_DEFAULT_DEVICE_SPECIFIER));
 
-			var strings = ReadStringsFromMemory (alcGetString (IntPtr.Zero, ALC_CAPTURE_DEVICE_SPECIFIER));
+			IntPtr deviceNamesPtr = alcGetString (IntPtr.Zero, ALC_CAPTURE_DEVICE_SPECIFIER);
+			if (deviceNamesPtr == IntPtr.Zero)
+				return new CaptureDevice[0];
+
+			var strings = ReadStringsFromMemory (deviceNamesPtr);
 			CaptureDevice[] devices = new CaptureDevice[strings.Length];
 			for (int i = 0; i < strings.Length; ++i)
 			{
