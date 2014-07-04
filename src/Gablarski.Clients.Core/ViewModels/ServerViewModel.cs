@@ -195,10 +195,14 @@ namespace Gablarski.Clients.ViewModels
 			await joinTask;
 
 			// TODO failed request
-			Task<AudioSource> voiceSourceTask = this.audio.RequestVoiceSourceAsync (new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 0, 480, 10));
+			Task<AudioSource> voiceSourceTask = null;
+			if (this.audio.HasInputDevice)
+				 voiceSourceTask = this.audio.RequestVoiceSourceAsync (new AudioCodecArgs (AudioFormat.Mono16bitLPCM, 0, 480, 10));
 
 			await inputTask;
-			this.input.VoiceSource = await voiceSourceTask;
+
+			if (voiceSourceTask != null)
+				this.input.VoiceSource = await voiceSourceTask;
 
 			IsConnecting = false;
 		}

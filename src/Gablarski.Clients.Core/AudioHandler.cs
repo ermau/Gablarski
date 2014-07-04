@@ -67,6 +67,12 @@ namespace Gablarski.Clients
 			Settings.SettingChanged += OnSettingsChanged;
 		}
 
+		public bool HasInputDevice
+		{
+			get;
+			private set;
+		}
+
 		public Task SetupAudioAsync()
 		{
 			return Task.WhenAll (SetupPlayback(), SetupCapture());
@@ -228,7 +234,7 @@ namespace Gablarski.Clients
 			IAudioDevice device = captureProvider.GetDevices().FirstOrDefault (d => d.Name == Settings.VoiceDevice)
 									?? captureProvider.DefaultDevice;
 
-			if (device != null)
+			if (HasInputDevice = (device != null))
 				captureProvider.Device = device;
 		}
 
