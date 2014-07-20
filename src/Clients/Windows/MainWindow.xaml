@@ -42,7 +42,7 @@
 			<RowDefinition Height="Auto" />
 		</Grid.RowDefinitions>
 		
-		<StackPanel Grid.Row="0" Visibility="Collapsed">
+		<!--<StackPanel Grid.Row="0" Visibility="Collapsed">
 			<Grid Margin="3">
 				<Grid.RowDefinitions>
 					<RowDefinition Height="28" />
@@ -57,12 +57,12 @@
 
 				<TextBlock FontSize="16" Grid.Column="1" Grid.Row="0" Text="{Binding Persona.Nickname}" Margin="4,0,4,4" MouseUp="OnMouseUpNickname" />
 
-				<!--<StackPanel Grid.Column="1" Grid.Row="0" Orientation="Horizontal" Visibility="Collapsed">
+				<StackPanel Grid.Column="1" Grid.Row="0" Orientation="Horizontal" Visibility="Collapsed">
 					<TextBox x:Name="nickname" Width="100" Text="{Binding Persona.Nickname, Mode=TwoWay, UpdateSourceTrigger=Explicit}" />
 					<Button IsDefault="True" Click="OnClickAcceptName" />
-				</StackPanel>-->
+				</StackPanel>
 
-				<!--
+				
 				<ComboBox Grid.Column="1" Grid.Row="1" SelectedValue="{Binding Persona.Status, Mode=TwoWay}" Margin="4,0,4,4">
 					<ComboBox.Resources>
 						<ObjectDataProvider x:Key="Status" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
@@ -74,9 +74,9 @@
 					<ComboBox.ItemsSource>
 						<Binding Source="{StaticResource Status}" />
 					</ComboBox.ItemsSource>
-				</ComboBox>!-->
+				</ComboBox>
 			</Grid>
-		</StackPanel>
+		</StackPanel>-->
 
 		<TabControl Grid.Row="1">
 			<!--<TabItem Header="buddies">
