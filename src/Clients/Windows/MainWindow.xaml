@@ -120,72 +120,83 @@
 			</TabItem>!-->
 
 			<TabItem Header="server" DataContext="{Binding Servers}">
-				<TabItem.ContextMenu>
-					<ContextMenu>
-						<MenuItem Header="Add Server" Click="OnClickAddServer" />
-						<Separator />
-						<MenuItem Header="Start local server" Click="OnClickLocalServer" />
-					</ContextMenu>
-				</TabItem.ContextMenu>
 				<Grid>
-					<ListBox Grid.Row="0" Name="servers" ItemsSource="{Binding Servers.Value}" MouseDoubleClick="OnServerDoubleClick">
-						<ListBox.ItemTemplate>
-							<DataTemplate DataType="viewModels:ServerEntryViewModel">
-								<Grid>
-									<Grid.ContextMenu>
-										<ContextMenu>
-											<MenuItem Header="Join Server" Click="OnClickJoinServer" />
-											<MenuItem Header="Edit Server" Click="OnClickEditServer" />
-											<Separator />
-											<MenuItem Header="Add Server" Click="OnClickAddServer" />
-											<Separator />
-											<MenuItem Header="Start local server" Click="OnClickLocalServer" />
-										</ContextMenu>
-									</Grid.ContextMenu>
-									<Grid.ColumnDefinitions>
-										<ColumnDefinition />
-										<ColumnDefinition />
-									</Grid.ColumnDefinitions>
+					
+					<Grid Grid.Row="0">
+						<Grid.RowDefinitions>
+							<RowDefinition />
+							<RowDefinition Height="Auto" />
+						</Grid.RowDefinitions>
+						
+						<ListBox Grid.Row="0" Name="servers" ItemsSource="{Binding Servers.Value}" MouseDoubleClick="OnServerDoubleClick">
+							<ListBox.ItemTemplate>
+								<DataTemplate DataType="viewModels:ServerEntryViewModel">
+									<Grid>
+										<Grid.ContextMenu>
+											<ContextMenu>
+												<MenuItem Header="Join Server" Click="OnClickJoinServer" />
+												<MenuItem Header="Edit Server" Click="OnClickEditServer" />
+												<Separator />
+												<MenuItem Header="Add Server" Click="OnClickAddServer" />
+												<Separator />
+												<MenuItem Header="Start local server" Click="OnClickLocalServer" />
+											</ContextMenu>
+										</Grid.ContextMenu>
+										<Grid.ColumnDefinitions>
+											<ColumnDefinition />
+											<ColumnDefinition />
+										</Grid.ColumnDefinitions>
 
-									<Image Grid.Column="0" Height="40" Width="40" Stretch="None" Margin="3">
-										<Image.Source>
-											<Binding Path="IsOnline.Value">
-												<Binding.Converter>
-													<Gablarski:NullableBoolImageConverter
+										<Image Grid.Column="0" Height="40" Width="40" Stretch="None" Margin="3">
+											<Image.Source>
+												<Binding Path="IsOnline.Value">
+													<Binding.Converter>
+														<Gablarski:NullableBoolImageConverter
 														NullImageSource="resx://ModernServerConnectingImage"
 														TrueImageSource="resx://ModernServerImage"
 														FalseImageSource="resx://ModernServerDisconnectImage"
 													/>
-												</Binding.Converter>
-											</Binding>
-										</Image.Source>
-									</Image>
+													</Binding.Converter>
+												</Binding>
+											</Image.Source>
+										</Image>
 
-									<StackPanel Grid.Column="1" Margin="6,0,0,0">
-										<TextBlock Text="{Binding Server.Name}" FontSize="18" />
-										<TextBlock Text="{Binding ConnectedUsers.Value,StringFormat={}{0} users}" Visibility="{Binding IsOnline.Value,Converter={StaticResource BooleanToVisibilityConverter}}" />
-									</StackPanel>
-									
-								</Grid>
-							</DataTemplate>
-						</ListBox.ItemTemplate>
-					</ListBox>
+										<StackPanel Grid.Column="1" Margin="6,0,0,0">
+											<TextBlock Text="{Binding Server.Name}" FontSize="18" />
+											<TextBlock Text="{Binding ConnectedUsers.Value,StringFormat={}{0} users}" Visibility="{Binding IsOnline.Value,Converter={StaticResource BooleanToVisibilityConverter}}" />
+										</StackPanel>
 
-					<!--<StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,5">
-						<metro:CommandButton MinHeight="32" MinWidth="32" Height="32" Width="32" Padding="5">
-							<Image Source="resx://AppBarAdd" />
-						</metro:CommandButton>
-					</StackPanel>-->
+									</Grid>
+								</DataTemplate>
+							</ListBox.ItemTemplate>
+						</ListBox>
+
+						<Border Background="{DynamicResource HighlightBrush}" Grid.Row="1">
+							<StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+								<StackPanel.Resources>
+									<Style TargetType="metro:CommandButton" BasedOn="{StaticResource {x:Type metro:CommandButton}}">
+										<Setter Property="Margin" Value="5" />
+									</Style>
+								</StackPanel.Resources>
+
+								<metro:CommandButton Content="{DynamicResource Add32}" Click="OnClickAddServer" ToolTip="Add Server" Background="Transparent" Width="32" Height="32">
+								</metro:CommandButton>
+
+								<metro:CommandButton Content="{DynamicResource Server32}" Click="OnClickLocalServer" ToolTip="Start Local Server" Background="Transparent" Width="32" Height="32">
+								</metro:CommandButton>
+							</StackPanel>
+						</Border>
+					</Grid>
 
 					<Border Grid.Row="0" Background="{DynamicResource BackgroundBrush}" DataContext="{Binding CurrentServer}" Visibility="{Binding Converter={StaticResource NullToVisibilityConverter}}">
 						<Gablarski:ServerView />
 					</Border>
-					
+
 					<Border Grid.Row="0" Background="{DynamicResource BackgroundBrush}" Padding="0,5,0,5" DataContext="{Binding EditingServer}">
 						<Border.Visibility>
 							<Binding Path="." Converter="{StaticResource NullToVisibilityConverter}" />
 						</Border.Visibility>
-						
+
 						<Gablarski:ServerEntryView />
 					</Border>
 				</Grid>
